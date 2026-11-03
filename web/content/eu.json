@@ -5,12 +5,13 @@
   "intro": "Txanden egutegia Espainian txandaka lan egiten dutenentzat: osasungintza, polizia, suhiltzaileak, industria, ostalaritza edo beste edozein sektore. Antolatu goizak, arratsaldeak, gauak, guardiak eta egun libreak, eta ikusi zure hurrengo txanda begi-kolpe batean.",
   "key_facts": "Doakoa · Iragarkirik gabe · Konturik gabe · Konexiorik gabe dabil · Kode irekia · Bost hizkuntza",
   "features": [
-    "Hilabetea saretan edo zerrendan, urteko ikuspegia eta eguneko oharrak. Txanda bakoitzak kolorea, kodea eta ordutegia ditu.",
-    "Margotu txandak ukituz edo arrastatuz, eta sortu txandaketak aurrebistarekin: txanda birakariak, 24/72, 4×4, 6×4, 5×2, 2-2-3 eta eredu propioak.",
-    "Espainiako jaiegunak: estatukoak eta erkidegokoak konexiorik gabe, eskuragarri dauden udalerrietako tokikoak eta zureak.",
-    "Alarma txanda mota bakoitzeko, oharren gogorarazpenak eta Androiderako widgetak.",
-    "Babeskopia automatikoak mugikorrean eta fitxategira esportatzea. Inportatu LRHSoft-en Shifter kopiak, .ics edo CSV fitxategiak eta mugikorreko egutegia.",
-    "Lan egindako orduen, gaueko orduen, jaiegunetako orduen eta aparteko orduen laburpena, diru-sarreren estimazioarekin."
+    "Beheko barra (Hilabetea · Txandaketa · Agenda · Laburpena) eta gaurko txartel tolesgarria, hurrengo txandarekin, hurrengo egun librearekin eta lan-boladarekin. Sareta edo zerrenda, urteko ikuspegia eta eguneko oharrak eranskin eta zereginekin. Alderatu gehienez sei egutegi aldi berean.",
+    "Ukituz edo arrastatuz, hainbat egun hautatu, bikoiztu, kopiatu eta itsatsi, desegin eta berregin. Txandaketen laguntzailea aurrebistarekin: txanda birakariak, 24/72, 4×4, 6×4, 5×2, 2-2-3 eta eredu propioak.",
+    "Espainia, bere erkidego eta udalerriekin, eta beste 21 herrialde (Portugal, Brasil, Latinoamerika, Europa, Ameriketako Estatu Batuak eta Kanada), dena konexiorik gabe, zuk gehitzen dituzunez gain.",
+    "Agortzen ez den alarma txanda mota bakoitzeko, oharren gogorarazpenak eta Androiderako widgetak, lau astekoa barne. Androiden, «Isildu mugikorra nire txandetan» aukerak mugikorra isilarazten du lanean ari zaren bitartean.",
+    "Tokiko babeskopia automatikoak eta, Androiden, eguneroko kopia bat zuk aukeratutako karpetan (Drive, Dropbox, OneDrive edo mugikorra), leheneratu aurreko aurrebistarekin. Inportatu LRHSoft-en Shifter kopiak, .ics edo CSV fitxategiak eta mugikorreko egutegia.",
+    "Lan egindako, gaueko eta jaiegunetako orduak, aparteko orduak eta irteera aurreratuak; orduko gaueko eta jaiegunetako osagarriak; soldata gordinaren eta garbiaren estimazioa, zuk jarritako atxikipenarekin. Hilabete baten edo nahi dituzun daten PDF eta CSV txostenak.",
+    "Oporren eta baimenen saldoak urte eta motaren arabera, eramandako egunekin eta gelditzen zaizkizunekin. Trukeen liburua: idatzi lankide bati eman edo lankide batengandik jaso duzun txanda bat, eta ikusi haren balantzea."
   ],
   "privacy_summary": [
     "Zure txandak, oharrak eta absentziak zure mugikorrean bakarrik gordetzen dira: ez dago konturik, ez zerbitzari propiorik, ez analitikarik.",
@@ -45,8 +46,10 @@
     "03-pintar": "Margotze modua, txanden paletarekin",
     "04-rotaciones": "Txandaketen laguntzailea, aplikatu aurreko aurrebistarekin",
     "05-horas": "Lan egindako orduen, gaueko orduen eta jaiegunetako orduen hileko laburpena",
-    "06-festivos": "Madrilgo Erkidegoko eta Madril udalerriko jaiegunak",
-    "07-mes-oscuro": "Hilabete bera gai ilunarekin"
+    "06-festivos": "Jaiegunak herrialdeka, erkidegoka eta udalerrika",
+    "07-mes-oscuro": "Hilabete bera gai ilunarekin",
+    "08-vacaciones": "Oporren eta baimenen saldoak, gelditzen diren egunekin eta eramandakoekin",
+    "09-cambios": "Trukeen liburua, lankide bakoitzaren balantzearekin eta truke bakoitzeko txandekin"
   },
   "privacy_date": "2026-10-30",
   "kicker": "Txanden egutegia",
@@ -83,12 +86,13 @@
   "features_title": "Dena irekita, Pro bertsiorik eta erosketarik gabe",
   "features_intro": "Txanda bakoitzak kolorea, kodea eta ordutegia ditu, eta ez dago inoiz kolorearen mende bakarrik.",
   "feature_titles": [
-    "Hilabetea Sareta edo Zerrenda gisa",
-    "Txandak margotzea eta txandaketak",
-    "Espainiako jaiegunak",
-    "Alarmak eta widgetak",
+    "Hilabetea, txandaketa, agenda eta laburpena",
+    "Txandak eta txandaketak margotzea",
+    "Jaiegunak herrialdeka",
+    "Alarmak, widgetak eta ez molestatu",
     "Babeskopiak eta inportatzea",
-    "Orduen laburpena"
+    "Orduak eta dirua",
+    "Oporrak, baimenak eta trukeen liburua"
   ],
   "privacy_title": "Zure txandak zure mugikorrean geratzen dira.",
   "support_intro": "Beste zalantzarik baduzu, idatzi niri:",

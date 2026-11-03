@@ -5,12 +5,13 @@
   "intro": "A shift calendar for people who work shifts in Spain: healthcare, police, firefighters, industry, hospitality or any other sector. Set up mornings, afternoons, nights, on-call shifts and days off, and see your next shift at a glance.",
   "key_facts": "Free · No ads · No account · Works offline · Open source · Five languages",
   "features": [
-    "Month in a grid or a list, a year view and notes for each day. Every shift shows its colour, code and times.",
-    "Paint shifts by tapping or dragging, and build rotations with a preview: rotating shifts, 24/72, 4×4, 6×4, 5×2, 2-2-3 and your own patterns.",
-    "Spanish national and regional public holidays offline, local ones for the supported municipalities, and your own.",
-    "An alarm per shift type, note reminders and Android home-screen widgets.",
-    "Automatic backups on your phone and export to a file. Import LRHSoft Shifter backups, .ics or CSV files and the phone calendar.",
-    "Summary of worked, night, public holiday and overtime hours, with estimated pay."
+    "A bottom bar (Month · Rotation · Agenda · Summary) and a foldable Today card with your next shift, next day off and work streak. Grid or list, an annual view and daily notes with attachments and tasks. Compare up to six calendars side by side.",
+    "Tap or drag across days, double shifts, copy, paste, undo and redo. A rotation wizard with a preview covers rotating shifts, 24/72, 4×4, 6×4, 5×2, 2-2-3 and your own patterns.",
+    "Spain with its regions and municipalities, plus 21 more countries (Portugal, Brazil, Latin America, Europe, the United States and Canada), all offline, and your own holidays.",
+    "An alarm per shift type that never runs out, note reminders and Android widgets, including a four-week one. On Android, “Silence the phone on my shifts” mutes it while you work.",
+    "Automatic local backups and, on Android, a daily copy to a folder you choose (Drive, Dropbox, OneDrive or the phone), with a restore preview. Import LRHSoft Shifter backups, .ics or CSV files and the phone calendar.",
+    "Worked, night and public holiday hours, overtime and early leave; night and holiday allowances per hour; estimated gross and net pay with the withholding you set. PDF and CSV reports of a month or any dates.",
+    "Vacation and leave balances per year and type, with the days carried over and the days left. Swap book: log a shift you gave to or received from a colleague and see their balance."
   ],
   "privacy_summary": [
     "Your shifts, notes and absences are stored only on your phone: there is no account, no server of ours and no analytics.",
@@ -45,8 +46,10 @@
     "03-pintar": "Paint mode with the shift palette",
     "04-rotaciones": "Rotation wizard with a preview before applying",
     "05-horas": "Monthly summary of worked, night and public holiday hours",
-    "06-festivos": "Regional and local public holidays for Madrid",
-    "07-mes-oscuro": "The same month in the dark theme"
+    "06-festivos": "Public holidays by country, region and town",
+    "07-mes-oscuro": "The same month in the dark theme",
+    "08-vacaciones": "Vacation and leave balances, with the days left and the ones carried over",
+    "09-cambios": "Swap book with each colleague's balance and the shifts of every change"
   },
   "privacy_date": "2026-10-30",
   "kicker": "Shift calendar",
@@ -83,12 +86,13 @@
   "features_title": "Everything included, no Pro tier or purchases",
   "features_intro": "Every shift shows its colour, code and times, and never relies on colour alone.",
   "feature_titles": [
-    "Month in Grid or List view",
+    "Month, rotation, agenda and summary",
     "Paint shifts and rotations",
-    "Spanish public holidays",
-    "Alarms and widgets",
+    "Public holidays by country",
+    "Alarms, widgets and Do Not Disturb",
     "Backups and import",
-    "Hours summary"
+    "Hours and money",
+    "Vacation, leave and swap book"
   ],
   "privacy_title": "Your shifts stay on your phone.",
   "support_intro": "Anything else? Write to me:",

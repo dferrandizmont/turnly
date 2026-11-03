@@ -5,12 +5,13 @@
   "intro": "Calendari de torns per a qui treballa a torns a Espanya: sanitat, policia, bombers, indústria, hostaleria o qualsevol altre sector. Organitza matins, tardes, nits, guàrdies i dies lliures, i consulta el teu proper torn d’un cop d’ull.",
   "key_facts": "Gratis · Sense anuncis · Sense compte · Funciona sense connexió · Codi obert · Cinc idiomes",
   "features": [
-    "Mes en quadrícula o llista, vista anual i notes per dia. Cada torn porta color, codi i horari.",
-    "Pinta torns tocant o arrossegant, i crea rotacions amb vista prèvia: torns rotatius, 24/72, 4×4, 6×4, 5×2, 2-2-3 i patrons propis.",
-    "Festius d’Espanya nacionals i autonòmics sense connexió, els locals dels municipis disponibles i els teus propis.",
-    "Alarma per tipus de torn, recordatoris de notes i widgets d’Android.",
-    "Còpies de seguretat automàtiques al mòbil i exportació a fitxer. Importa còpies de Shifter de LRHSoft, fitxers .ics o CSV i el calendari del mòbil.",
-    "Resum d’hores treballades, nocturnes, festives i extra, amb estimació d’ingressos."
+    "Barra inferior (Mes · Rotació · Agenda · Resum) i targeta d’avui plegable amb el proper torn, el proper dia lliure i la ratxa. Quadrícula o llista, vista anual i notes per dia amb adjunts i tasques. Compara fins a sis calendaris alhora.",
+    "Toca o arrossega per seleccionar diversos dies, doblar, copiar i enganxar, desfer i refer. Assistent de rotacions amb vista prèvia: torns rotatius, 24/72, 4×4, 6×4, 5×2, 2-2-3 i patrons propis.",
+    "Espanya amb les seves comunitats i municipis, i 21 països més (Portugal, Brasil, Llatinoamèrica, Europa, Estats Units i Canadà), tot sense connexió, a més dels que hi afegeixis tu.",
+    "Alarma per tipus de torn que no s’esgota, recordatoris de notes i widgets d’Android, inclòs un de quatre setmanes. A Android, «Silencia el mòbil durant els meus torns» el silencia mentre treballes.",
+    "Còpies de seguretat locals automàtiques i, a Android, una còpia diària a la carpeta que triïs (Drive, Dropbox, OneDrive o el mòbil), amb vista prèvia en restaurar. Importa còpies de Shifter de LRHSoft, fitxers .ics o CSV i el calendari del mòbil.",
+    "Hores treballades, nocturnes i festives, extres i sortides anticipades; plusos de nit i de festiu per hora; estimació bruta i neta amb la retenció que posis. Informes en PDF i CSV d’un mes o de les dates que vulguis.",
+    "Saldos de vacances i permisos per any i tipus, amb els dies arrossegats i els que et queden. Llibre de canvis: anota un torn que cedeixis o rebis d’un company i mira el seu balanç."
   ],
   "privacy_summary": [
     "Els teus torns, notes i absències es desen només al teu mòbil: no hi ha compte, ni servidor propi, ni analítica.",
@@ -45,8 +46,10 @@
     "03-pintar": "Mode pintar amb la paleta de torns",
     "04-rotaciones": "Assistent de rotacions amb vista prèvia abans d’aplicar",
     "05-horas": "Resum mensual d’hores treballades, nocturnes i festives",
-    "06-festivos": "Festius de la Comunitat de Madrid i del municipi de Madrid",
-    "07-mes-oscuro": "El mateix mes amb el tema fosc"
+    "06-festivos": "Festius per país, comunitat i municipi",
+    "07-mes-oscuro": "El mateix mes amb el tema fosc",
+    "08-vacaciones": "Saldos de vacances i permisos, amb els dies que queden i els arrossegats",
+    "09-cambios": "Llibre de canvis amb el balanç de cada company i els torns de cada canvi"
   },
   "privacy_date": "2026-10-30",
   "kicker": "Calendari de torns",
@@ -83,12 +86,13 @@
   "features_title": "Tot obert, sense Pro ni compres",
   "features_intro": "Cada torn porta color, codi i horari, i mai no depèn només del color.",
   "feature_titles": [
-    "Mes en Quadrícula o Llista",
+    "Mes, rotació, agenda i resum",
     "Pintar torns i rotacions",
-    "Festius d’Espanya",
-    "Alarmes i widgets",
+    "Festius per país",
+    "Alarmes, widgets i no molestar",
     "Còpies de seguretat i importació",
-    "Resum d’hores"
+    "Hores i diners",
+    "Vacances, permisos i llibre de canvis"
   ],
   "privacy_title": "Els teus torns es queden al teu mòbil.",
   "support_intro": "Tens algun altre dubte? Escriu-me:",

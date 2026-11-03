@@ -5,12 +5,13 @@
   "intro": "Calendario de turnos para quienes trabajan a turnos en España: sanidad, policía, bomberos, industria, hostelería o cualquier otro sector. Organiza mañanas, tardes, noches, guardias y días libres, y consulta tu próximo turno de un vistazo.",
   "key_facts": "Gratis · Sin anuncios · Sin cuenta · Funciona sin conexión · Código abierto · Cinco idiomas",
   "features": [
-    "Mes en cuadrícula o lista, vista anual y notas por día. Cada turno lleva color, código y horario.",
-    "Pinta turnos tocando o arrastrando, y crea rotaciones con vista previa: correturnos, 24/72, 4×4, 6×4, 5×2, 2-2-3 y patrones propios.",
-    "Festivos de España nacionales y autonómicos sin conexión, locales de los municipios disponibles y los tuyos propios.",
-    "Alarma por tipo de turno, recordatorios de notas y widgets de Android.",
-    "Copias de seguridad automáticas en el móvil y exportación a archivo. Importa copias de Shifter de LRHSoft, archivos .ics o CSV y el calendario del móvil.",
-    "Resumen de horas trabajadas, nocturnas, festivas y extras, con estimación de ingresos."
+    "Barra inferior (Mes · Rotación · Agenda · Resumen) y tarjeta de hoy plegable con el próximo turno, el próximo día libre y la racha. Cuadrícula o lista, vista anual y notas por día con adjuntos y tareas. Compara hasta seis calendarios a la vez.",
+    "Toca o arrastra para seleccionar varios días, doblar, copiar y pegar, deshacer y rehacer. Asistente de rotaciones con vista previa: correturnos, 24/72, 4×4, 6×4, 5×2, 2-2-3 y patrones propios.",
+    "España con sus comunidades y municipios, y 21 países más (Portugal, Brasil, Latinoamérica, Europa, Estados Unidos y Canadá), todo sin conexión, además de los que añadas tú.",
+    "Alarma por tipo de turno que no se agota, recordatorios de notas y widgets de Android, incluido uno de cuatro semanas. En Android, «Silenciar el móvil en mis turnos» lo silencia mientras trabajas.",
+    "Copias de seguridad locales automáticas y, en Android, una copia diaria en la carpeta que elijas (Drive, Dropbox, OneDrive o el móvil), con vista previa al restaurar. Importa copias de Shifter de LRHSoft, archivos .ics o CSV y el calendario del móvil.",
+    "Horas trabajadas, nocturnas y festivas, extras y salidas anticipadas; pluses de noche y de festivo por hora; estimación bruta y neta con la retención que pongas. Informes en PDF y CSV de un mes o de las fechas que quieras.",
+    "Saldos de vacaciones y permisos por año y tipo, con los días arrastrados y los que te quedan. Libro de cambios: anota un turno que cedas o recibas de un compañero y mira su balance."
   ],
   "privacy_summary": [
     "Tus turnos, notas y ausencias se guardan solo en tu móvil: no hay cuenta, ni servidor propio, ni analítica.",
@@ -45,8 +46,10 @@
     "03-pintar": "Modo pintar con la paleta de turnos",
     "04-rotaciones": "Asistente de rotaciones con vista previa antes de aplicar",
     "05-horas": "Resumen mensual de horas trabajadas, nocturnas y festivas",
-    "06-festivos": "Festivos de la Comunidad de Madrid y del municipio Madrid",
-    "07-mes-oscuro": "El mismo mes con el tema oscuro"
+    "06-festivos": "Festivos por país, comunidad y municipio",
+    "07-mes-oscuro": "El mismo mes con el tema oscuro",
+    "08-vacaciones": "Saldos de vacaciones y permisos, con los días que quedan y los arrastrados",
+    "09-cambios": "Libro de cambios con el balance de cada compañero y los turnos de cada cambio"
   },
   "privacy_date": "2026-10-30",
   "kicker": "Calendario de turnos",
@@ -83,12 +86,13 @@
   "features_title": "Todo abierto, sin Pro ni compras",
   "features_intro": "Cada turno lleva color, código y horario, y nunca depende solo del color.",
   "feature_titles": [
-    "Mes en Cuadrícula o Lista",
+    "Mes, rotación, agenda y resumen",
     "Pintar turnos y rotaciones",
-    "Festivos de España",
-    "Alarmas y widgets",
+    "Festivos por país",
+    "Alarmas, widgets y no molestar",
     "Copias de seguridad e importación",
-    "Resumen de horas"
+    "Horas y dinero",
+    "Vacaciones, permisos y libro de cambios"
   ],
   "privacy_title": "Tus turnos se quedan en tu móvil.",
   "support_intro": "¿Tienes otra duda? Escríbeme:",
