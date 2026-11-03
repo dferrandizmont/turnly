@@ -10,6 +10,13 @@ at once, so they can skip numbers.
 
 ## Unreleased
 
+## 0.8.3 · 2026-11-03
+
+Same app as 0.8.2, now signed with the same key on Google Play and on GitHub.
+
+- Android: the Google Play version and the APK from GitHub now have the same signature, so you can switch between them without uninstalling and without losing anything. If you installed Turnly from Google Play before 0.8.3, uninstall it once (export a backup first) and install it again.
+- Android: the two GitHub APKs and the Google Play version share one version number (2007 for 0.8.3).
+
 ## 0.8.2 · 2026-11-03
 
 Release candidate for Google Play (closed test) and the public GitHub release. It updates 0.8.1 without losing anything.

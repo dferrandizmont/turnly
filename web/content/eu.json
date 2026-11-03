@@ -60,7 +60,7 @@
   "download_intro": "Modu argia eta iluna. Doan eta konturik gabe.",
   "download_notes": {
     "play": "Edonork eman dezake izena: lehenik testerren taldean sartzen zara, eta gero proba onartzen duzu.",
-    "apk": "Eskuz instalatzen da. Google Play-ko bertsioaren beste gako batekin dago sinatuta: batak ez du bestea eguneratzen.",
+    "apk": "Eskuz instalatzen da. 0.8.3 bertsiotik aurrera Google Play-ko bertsioaren sinadura bera du: batetik bestera pasa zaitezke desinstalatu gabe.",
     "app_store": "Turnly iPhonera ere iritsiko da. Bitartean, Androiden bakarrik instala daiteke."
   },
   "join_title": "Nola sartu Google Play-ko proban",

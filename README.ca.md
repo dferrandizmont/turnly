@@ -51,7 +51,7 @@ Si pots, queda’t a la prova almenys 14 dies i fes-la servir de tant en tant (p
 <details>
 <summary>Instal·la l’APK des de GitHub</summary>
 
-També pots baixar l’APK de la [darrera versió](https://github.com/dferrandizmont/turnly/releases/latest) i instal·lar-lo a mà (cal permetre «instal·lar aplicacions d’origen desconegut»). Està signat amb una clau diferent de la de la versió de Google Play, així que l’una no actualitza l’altra: per canviar, exporta abans una còpia des de l’app (`.turnly`; les versions anteriors la desen com a `.cuadrante`).
+També pots baixar l’APK de la [darrera versió](https://github.com/dferrandizmont/turnly/releases/latest) i instal·lar-lo a mà (cal permetre «instal·lar aplicacions d’origen desconegut»). Des de la 0.8.3 està signat amb la mateixa clau que la versió de Google Play, així que pots passar de l’una a l’altra sense desinstal·lar i sense perdre res; Android només no deixa tornar a una versió més antiga. Si vas instal·lar Turnly des de Google Play abans de la 0.8.3, desinstal·la-la una vegada (exporta abans una còpia des de l’app: `.turnly`; les versions anteriors la desen com a `.cuadrante`).
 
 </details>
 

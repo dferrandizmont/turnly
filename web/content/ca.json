@@ -60,7 +60,7 @@
   "download_intro": "Mode clar i fosc. Gratis i sense compte.",
   "download_notes": {
     "play": "Qualsevol s’hi pot apuntar: primer t’uneixes al grup de testers i després acceptes la prova.",
-    "apk": "L’instal·les a mà. Està signat amb una clau diferent de la de la versió de Google Play: l’una no actualitza l’altra.",
+    "apk": "L’instal·les a mà. Des de la 0.8.3 porta la mateixa signatura que la versió de Google Play: pots passar de l’una a l’altra sense desinstal·lar.",
     "app_store": "Turnly arribarà a l’iPhone. Mentrestant, només es pot instal·lar a Android."
   },
   "join_title": "Com unir-te a la prova de Google Play",

@@ -60,7 +60,7 @@
   "download_intro": "Modo claro y oscuro. Gratis y sin cuenta.",
   "download_notes": {
     "play": "Cualquiera puede apuntarse: primero te unes al grupo de testers y después aceptas la prueba.",
-    "apk": "Lo instalas a mano. Va firmado con otra clave que la versión de Google Play: una no actualiza a la otra.",
+    "apk": "Lo instalas a mano. Desde la 0.8.3 lleva la misma firma que la versión de Google Play: puedes pasar de una a otra sin desinstalar.",
     "app_store": "Turnly llegará a iPhone. Mientras tanto, solo se puede instalar en Android."
   },
   "join_title": "Cómo unirte a la prueba de Google Play",

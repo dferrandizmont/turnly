@@ -52,7 +52,7 @@ Ahal baduzu, egon proban gutxienez 14 egunez eta erabili noizean behin (adibidez
 <details>
 <summary>Instalatu APKa GitHub-etik</summary>
 
-[Azken bertsioaren](https://github.com/dferrandizmont/turnly/releases/latest) APKa ere deskarga dezakezu eta eskuz instalatu (jatorri ezezaguneko aplikazioak instalatzea baimendu behar da). Google Play-ko bertsioaren beste gako batekin dago sinatuta; beraz, batak ez du bestea eguneratzen: aldatzeko, esportatu lehenago kopia bat aplikaziotik (`.turnly`; aurreko bertsioek `.cuadrante` gisa gordetzen dute).
+[Azken bertsioaren](https://github.com/dferrandizmont/turnly/releases/latest) APKa ere deskarga dezakezu eta eskuz instalatu (jatorri ezezaguneko aplikazioak instalatzea baimendu behar da). 0.8.3 bertsiotik aurrera Google Play-ko bertsioaren gako berarekin dago sinatuta; beraz, batetik bestera pasa zaitezke desinstalatu gabe eta ezer galdu gabe; Android-ek bertsio zaharrago batera itzultzea bakarrik ez du uzten. Turnly Google Play-tik 0.8.3 baino lehen instalatu bazenuen, desinstalatu behin (esportatu lehenago kopia bat aplikaziotik: `.turnly`; aurreko bertsioek `.cuadrante` gisa gordetzen dute).
 
 </details>
 

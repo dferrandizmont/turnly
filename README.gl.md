@@ -51,7 +51,7 @@ Se podes, quédate na proba polo menos 14 días e úsaa de cando en vez (por exe
 <details>
 <summary>Instala o APK desde GitHub</summary>
 
-Tamén podes descargar o APK da [última versión](https://github.com/dferrandizmont/turnly/releases/latest) e instalalo á man (hai que permitir «instalar aplicacións de orixe descoñecida»). Vai asinado cunha clave distinta da versión de Google Play, así que unha non actualiza a outra: para cambiar, exporta antes unha copia desde a app (`.turnly`; as versións anteriores gárdana como `.cuadrante`).
+Tamén podes descargar o APK da [última versión](https://github.com/dferrandizmont/turnly/releases/latest) e instalalo á man (hai que permitir «instalar aplicacións de orixe descoñecida»). Desde a 0.8.3 vai asinado coa mesma clave que a versión de Google Play, así que podes pasar dunha á outra sen desinstalar e sen perder nada; Android só non deixa volver a unha versión máis antiga. Se instalaches Turnly desde Google Play antes da 0.8.3, desinstálaa unha vez (exporta antes unha copia desde a app: `.turnly`; as versións anteriores gárdana como `.cuadrante`).
 
 </details>
 

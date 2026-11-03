@@ -60,7 +60,7 @@
   "download_intro": "Light and dark themes. Free, with no account.",
   "download_notes": {
     "play": "Anyone can join: first join the testers group, then accept the test.",
-    "apk": "Install it by hand. It uses a different signing key from the Google Play version, so one does not update the other.",
+    "apk": "Install it by hand. Since 0.8.3 it has the same signature as the Google Play version: you can switch between them without uninstalling.",
     "app_store": "Turnly is coming to iPhone. Until then, it can only be installed on Android."
   },
   "join_title": "How to join the Google Play test",
