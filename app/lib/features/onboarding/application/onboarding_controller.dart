@@ -6,38 +6,47 @@ import '../../calendars/application/calendars_controller.dart';
 import '../../calendar/application/schedule_controller.dart';
 import '../../calendar/application/visible_month.dart';
 import '../../holidays/application/holidays_provider.dart';
+import '../../holidays/domain/holiday_country.dart';
 import '../../patterns/domain/pattern_application.dart';
 import '../../patterns/domain/pattern_catalog.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../domain/profession.dart';
 import 'onboarding_providers.dart';
 
-/// Where the person is in the first-use flow. [dot] is the dot of the
-/// progress indicator: one per screen, so the number of «Paso N de M» is never
-/// repeated (H-T01-9).
+/// The three ways to start (docs/diseno.md, «Primer uso»): import the shifts
+/// from somewhere else, use a rotation, or paint the month by hand.
+enum OnboardingPath { import, rotation, paint }
+
+/// Where the person is in the first-use flow: the first question
+/// ([choose]), the screens of the path chosen, the optional last step
+/// ([place]: holidays and job) and [ready].
 enum OnboardingStage {
-  profession(0),
-  place(1),
-  rotation(2),
-  start(3),
-  importCalendar(4),
-  ready(5);
+  choose,
+  rotation,
+  start,
+  importCalendar,
+  place,
+  ready;
 
-  const OnboardingStage(this.dot);
-  final int dot;
-
-  /// Number of progress dots.
-  static const int dots = 6;
+  /// The screens of [path] that carry «Paso N de M», in order (H-T01-9: one
+  /// number per screen). The first question and «Listo» carry none.
+  static List<OnboardingStage> stepsOf(OnboardingPath? path) => switch (path) {
+    OnboardingPath.rotation => const [rotation, start, place],
+    OnboardingPath.import => const [importCalendar, place],
+    OnboardingPath.paint || null => const [place],
+  };
 }
 
-/// What the person has chosen so far. Nothing is written until the end of
-/// step 4 ([OnboardingController.finish]), so going back, changing their mind
-/// or quitting half way leaves no half-made calendar behind.
+/// What the person has chosen so far. Nothing is written until the last
+/// step is left ([OnboardingController.finish]), so going back, changing
+/// their mind or quitting half way leaves no half-made calendar behind.
 class OnboardingState {
   const OnboardingState({
     required this.start,
-    this.stage = OnboardingStage.profession,
+    this.stage = OnboardingStage.choose,
+    this.path,
     this.profession,
+    this.countryCode = spainCountryCode,
     this.regionCode,
     this.municipalityCode,
     this.municipalityName,
@@ -49,14 +58,26 @@ class OnboardingState {
   });
 
   final OnboardingStage stage;
+
+  /// The way to start chosen on the first screen.
+  final OnboardingPath? path;
+
   final Profession? profession;
+
+  /// Country of the holidays (alpha-2, or [otherCountryCode]): proposed from
+  /// the phone's region, changed in the last step. It also picks the list of
+  /// jobs ([professionsFor]).
+  final String countryCode;
+
+  /// Region (Spain's community, or another country's subdivision such as
+  /// `DE-BY`) and municipality (Spain only).
   final String? regionCode;
   final String? municipalityCode;
 
   /// Name of [municipalityCode], to show it back.
   final String? municipalityName;
 
-  /// Catalogue preset chosen in step 3.
+  /// Catalogue preset chosen on the rotation screen.
   final String? presetId;
 
   /// "Lo pinto a mano": no rotation.
@@ -76,10 +97,24 @@ class OnboardingState {
 
   bool get hasRotation => presetId != null && !byHand;
 
+  bool get isSpain => countryCode == spainCountryCode;
+
+  /// The screens of the chosen path with «Paso N de M».
+  List<OnboardingStage> get steps => OnboardingStage.stepsOf(path);
+
+  /// 1-based number of the current screen in [steps]; `null` on the first
+  /// question and on «Listo».
+  int? get stepNumber {
+    final i = steps.indexOf(stage);
+    return i < 0 ? null : i + 1;
+  }
+
   OnboardingState copyWith({
     OnboardingStage? stage,
+    OnboardingPath? path,
     Profession? profession,
     bool clearProfession = false,
+    String? countryCode,
     String? regionCode,
     String? municipalityCode,
     String? municipalityName,
@@ -94,7 +129,9 @@ class OnboardingState {
     bool? saveFailed,
   }) => OnboardingState(
     stage: stage ?? this.stage,
+    path: path ?? this.path,
     profession: clearProfession ? null : profession ?? this.profession,
+    countryCode: countryCode ?? this.countryCode,
     regionCode: clearPlace ? null : regionCode ?? this.regionCode,
     municipalityCode: clearPlace || clearMunicipality
         ? null
@@ -111,7 +148,8 @@ class OnboardingState {
   );
 }
 
-/// The first-use flow: profession, place, rotation, import, ready. Everything
+/// The first-use flow: how to start (import, rotation or by hand), the
+/// screens of that path, holidays and job (optional), ready. Everything
 /// it writes goes through the existing controllers and repositories
 /// (`ScheduleController`, `HolidayController`, `OnboardingRepository`).
 class OnboardingController extends Notifier<OnboardingState> {
@@ -123,7 +161,10 @@ class OnboardingController extends Notifier<OnboardingState> {
   OnboardingState build() {
     final today = CivilDate.fromDateTime(ref.read(clockProvider)());
     _baseline = _probe();
-    return OnboardingState(start: today);
+    return OnboardingState(
+      start: today,
+      countryCode: proposeHolidayCountry(ref.read(systemCountryCodeProvider)),
+    );
   }
 
   Future<({bool done, bool data})> _probe() async {
@@ -139,15 +180,60 @@ class OnboardingController extends Notifier<OnboardingState> {
     }
   }
 
-  // ---- step 1: profession ---------------------------------------------------
+  // ---- first question: how to start --------------------------------------
 
-  void selectProfession(Profession profession) {
-    if (state.profession == profession) return;
-    // The rotation shown depends on the profession: choose again.
-    state = state.copyWith(profession: profession, clearRotation: true);
+  /// «Usar una rotación»: the rotation catalogue. A rotation chosen before
+  /// (and the way back here) is kept.
+  void chooseRotation() {
+    state = state.copyWith(path: OnboardingPath.rotation, byHand: false);
+    _go(OnboardingStage.rotation);
   }
 
-  // ---- step 2: place --------------------------------------------------------
+  /// «Importar mis turnos»: the import screen, without any rotation.
+  void chooseImport() {
+    state = state.copyWith(path: OnboardingPath.import, clearRotation: true);
+    _go(OnboardingStage.importCalendar);
+  }
+
+  /// «Pintar a mano»: no rotation; after the last step the month opens in
+  /// paint mode.
+  void choosePaint() {
+    state = state.copyWith(
+      path: OnboardingPath.paint,
+      clearRotation: true,
+      byHand: true,
+    );
+    _go(OnboardingStage.place);
+  }
+
+  // ---- last step (optional): job --------------------------------------------
+
+  /// Tapping the chosen job again leaves none (the question is optional).
+  /// The rotation is chosen before and stays: the job only sets the hours
+  /// of the shift types.
+  void selectProfession(Profession profession) =>
+      state = state.profession == profession
+      ? state.copyWith(clearProfession: true)
+      : state.copyWith(profession: profession);
+
+  // ---- last step (optional): place ------------------------------------------
+
+  /// Another country drops the region and municipality (in Spain, its
+  /// autonomous community and municipality; elsewhere, its subdivision) and,
+  /// if the job chosen is not in that country's list, swaps it for the
+  /// closest one there ([professionForCountry]).
+  void selectCountry(String countryCode) {
+    final code = normalizeCountryCode(countryCode) ?? otherCountryCode;
+    if (code == state.countryCode) return;
+    final profession = state.profession;
+    state = state.copyWith(
+      countryCode: code,
+      clearPlace: true,
+      profession: profession == null
+          ? null
+          : professionForCountry(profession, code),
+    );
+  }
 
   void selectRegion(String? regionCode) {
     if (regionCode == state.regionCode) return;
@@ -166,15 +252,17 @@ class OnboardingController extends Notifier<OnboardingState> {
           municipalityName: name,
         );
 
-  // ---- step 3: rotation -----------------------------------------------------
+  // ---- rotation -------------------------------------------------------------
 
   void selectPreset(String presetId) =>
       state = state.copyWith(presetId: presetId, byHand: false, stepOffset: 0);
 
-  /// "Lo pinto a mano": no rotation, on to the next step.
+  /// "Lo pinto a mano" on the rotation screen: no rotation, on to the last
+  /// step (and the month in paint mode at the end).
   void paintByHand() {
+    if (state.finishing) return;
     state = state.copyWith(clearRotation: true, byHand: true);
-    next();
+    _go(OnboardingStage.place);
   }
 
   void setStart(CivilDate date) => state = state.copyWith(start: date);
@@ -183,79 +271,91 @@ class OnboardingController extends Notifier<OnboardingState> {
 
   // ---- navigation -----------------------------------------------------------
 
-  /// Whether the main button of the current stage has something to do.
+  /// Whether the main button of the current stage has something to do. The
+  /// first question has no main button: its cards go on by themselves.
   bool get canAdvance => switch (state.stage) {
-    OnboardingStage.profession => state.profession != null,
-    OnboardingStage.rotation => state.presetId != null || state.byHand,
+    OnboardingStage.choose => false,
+    OnboardingStage.rotation => state.presetId != null,
     _ => true,
   };
 
-  /// "Siguiente" / "Continuar". From the last question it writes the choices
+  /// "Siguiente" / "Continuar". From the last step it writes the choices
   /// and lands on "Listo".
   Future<void> next() async {
     if (state.finishing || !canAdvance) return;
     switch (state.stage) {
-      case OnboardingStage.profession:
+      case OnboardingStage.rotation:
+        _go(OnboardingStage.start);
+      case OnboardingStage.start || OnboardingStage.importCalendar:
         _go(OnboardingStage.place);
       case OnboardingStage.place:
-        _go(OnboardingStage.rotation);
-      case OnboardingStage.rotation:
-        _go(
-          state.hasRotation
-              ? OnboardingStage.start
-              : OnboardingStage.importCalendar,
-        );
-      case OnboardingStage.start:
-        _go(OnboardingStage.importCalendar);
-      case OnboardingStage.importCalendar:
         await finish();
-      case OnboardingStage.ready:
+      case OnboardingStage.choose || OnboardingStage.ready:
         break;
     }
   }
 
-  /// "Saltar": leaves this step without choosing anything in it.
+  /// "Saltar": leaves this screen without choosing anything in it.
   Future<void> skip() async {
     if (state.finishing) return;
     switch (state.stage) {
-      case OnboardingStage.profession:
-        state = state.copyWith(clearProfession: true, clearRotation: true);
-        _go(OnboardingStage.place);
-      case OnboardingStage.place:
-        state = state.copyWith(clearPlace: true);
-        _go(OnboardingStage.rotation);
       case OnboardingStage.rotation || OnboardingStage.start:
         state = state.copyWith(clearRotation: true);
-        _go(OnboardingStage.importCalendar);
+        _go(OnboardingStage.place);
       case OnboardingStage.importCalendar:
+        _go(OnboardingStage.place);
+      case OnboardingStage.place:
+        // The country stays (the proposed one, or the one chosen): skipping
+        // the community must not bring Spain's holidays to someone in
+        // another country. The job and the community go.
+        state = state.copyWith(clearPlace: true, clearProfession: true);
         await finish();
-      case OnboardingStage.ready:
+      case OnboardingStage.choose || OnboardingStage.ready:
         break;
     }
   }
 
-  /// Back one step. Returns `false` when there is nowhere to go (the first
-  /// step, or "Listo", whose choices are already saved).
+  /// Back one screen. Returns `false` when there is nowhere to go (the first
+  /// question, or "Listo", whose choices are already saved).
   bool back() {
     if (state.finishing) return true;
     switch (state.stage) {
-      case OnboardingStage.profession || OnboardingStage.ready:
+      case OnboardingStage.choose || OnboardingStage.ready:
         return false;
-      case OnboardingStage.place:
-        _go(OnboardingStage.profession);
-      case OnboardingStage.rotation:
-        _go(OnboardingStage.place);
+      case OnboardingStage.rotation || OnboardingStage.importCalendar:
+        _go(OnboardingStage.choose);
       case OnboardingStage.start:
         _go(OnboardingStage.rotation);
-      case OnboardingStage.importCalendar:
-        _go(
-          state.hasRotation ? OnboardingStage.start : OnboardingStage.rotation,
-        );
+      case OnboardingStage.place:
+        _go(switch (state.path) {
+          OnboardingPath.rotation =>
+            state.hasRotation
+                ? OnboardingStage.start
+                : OnboardingStage.rotation,
+          OnboardingPath.import => OnboardingStage.importCalendar,
+          OnboardingPath.paint || null => OnboardingStage.choose,
+        });
     }
     return true;
   }
 
   void _go(OnboardingStage stage) => state = state.copyWith(stage: stage);
+
+  // ---- what happened outside the flow --------------------------------------
+
+  /// The person came back from the import opened from the flow: what it
+  /// brought is theirs, so [finish] must still write the choices made after
+  /// it (the country and the job of the last step).
+  void acceptImported() => _baseline = _probe();
+
+  /// Whether a backup was restored while the flow was open (from
+  /// «Recuperar una copia de seguridad»): data, or the "done" mark a restore
+  /// leaves, appeared. The flow then has nothing left to ask.
+  Future<bool> restoredMeanwhile() async {
+    final before = await (_baseline ?? _probe());
+    final now = await _probe();
+    return (now.done && !before.done) || (now.data && !before.data);
+  }
 
   // ---- result ---------------------------------------------------------------
 
@@ -270,7 +370,6 @@ class OnboardingController extends Notifier<OnboardingState> {
       stepOffset: state.stepOffset % pattern.lengthDays,
     );
   }
-
 
   /// Accept provisional defaults in the chosen language before the importer
   /// can use them as the person's data. The provenance marker is consumed.
@@ -348,16 +447,18 @@ class OnboardingController extends Notifier<OnboardingState> {
       });
     }
 
-    if (state.regionCode != null) {
-      await guarded(
-        () => ref
-            .read(holidayControllerProvider.notifier)
-            .setPlace(
-              regionCode: state.regionCode,
-              municipalityCode: state.municipalityCode,
-            ),
-      );
-    }
+    // Always written: the country is what keeps a fresh install outside
+    // Spain from showing Spain's holidays (nothing stored means Spain).
+    await guarded(
+      () => ref
+          .read(holidayControllerProvider.notifier)
+          .setPlace(
+            countryCode: state.countryCode,
+            // Spain's community or another country's subdivision.
+            regionCode: state.regionCode,
+            municipalityCode: state.isSpain ? state.municipalityCode : null,
+          ),
+    );
 
     final rotation = request(ref.read(scheduleControllerProvider).schedule);
     if (rotation != null) {

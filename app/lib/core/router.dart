@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/absences/presentation/absences_screen.dart';
 import '../features/agenda/presentation/agenda_screen.dart';
 import '../features/alarms/presentation/alarms_settings_screen.dart';
 import '../features/backup/application/backup_models.dart';
@@ -11,9 +12,13 @@ import '../features/calendar/presentation/month_screen.dart';
 import '../features/calendar_export/presentation/export_screen.dart';
 import '../features/calendars/presentation/calendars_screen.dart';
 import '../features/calendars/presentation/compare_screen.dart';
+import '../features/calendars/domain/calendar.dart' show mainCalendarId;
+import '../features/device_events/presentation/device_events_screen.dart';
 import '../features/holidays/presentation/holidays_settings_screen.dart';
 import '../features/import/data/import_file_picker.dart';
 import '../features/import/presentation/import_screen.dart';
+import '../features/notes/presentation/attachment_viewer_screen.dart';
+import '../features/notes/presentation/sketch_screen.dart';
 import '../features/onboarding/application/onboarding_providers.dart';
 import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/patterns/presentation/pattern_wizard_screen.dart';
@@ -21,9 +26,11 @@ import '../features/patterns/presentation/runs_screen.dart';
 import '../features/schedule/domain/civil_date.dart';
 import '../features/settings/presentation/faq_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
+import '../features/share_link/presentation/share_link_screen.dart';
 import '../features/shift_types/presentation/shift_type_form_screen.dart';
 import '../features/shift_types/presentation/shift_types_screen.dart';
 import '../features/summary/presentation/summary_screen.dart';
+import '../features/swaps/presentation/swaps_screen.dart';
 import '../features/year/presentation/year_screen.dart';
 import 'providers.dart';
 
@@ -37,6 +44,31 @@ class AppRoutes {
   static const settingsHolidays = '/ajustes/festivos';
   static const settingsAlarms = '/ajustes/alarmas';
   static const settingsBackup = '/ajustes/copia';
+
+  /// «Vacaciones y permisos»: the balances of days of leave of a year (P3).
+  static const settingsAbsences = '/ajustes/ausencias';
+
+  /// «Libro de cambios»: the changes of shift with the colleagues (P4).
+  static const swaps = '/cambios';
+
+  /// «Dibujo» of a day (P2): the canvas where a drawing is made
+  /// (`/dia/dibujo?fecha=2026-10-19&calendario=main`).
+  static const daySketch = '/dia/dibujo';
+
+  /// An attachment of a day, full screen (P2): `/dia/adjunto?id=<id>`.
+  static const dayAttachment = '/dia/adjunto';
+
+  /// The canvas of the drawing of [date] in [calendarId].
+  static String sketchFor(CivilDate date, String calendarId) =>
+      '$daySketch?fecha=${date.toIso()}'
+      '&calendario=${Uri.encodeComponent(calendarId)}';
+
+  /// The full screen of the attachment [id].
+  static String attachmentOf(String id) =>
+      '$dayAttachment?id=${Uri.encodeComponent(id)}';
+  /// «Citas del móvil»: the calendars of the phone whose appointments are
+  /// shown next to the shifts (P6).
+  static const settingsDeviceEvents = '/ajustes/citas';
 
   /// «Comparar calendarios» (`/comparar?a=<id>&b=<id>&mes=2026-10`; without
   /// query it opens on the calendar on screen and the next one, this month).
@@ -52,6 +84,9 @@ class AppRoutes {
 
   /// One-off export of the shifts to the phone calendar.
   static const settingsExport = '/ajustes/exportar';
+
+  /// «Compartir por enlace»: a read-only `.ics` link and its QR.
+  static const settingsShareLink = '/ajustes/compartir';
 
   /// Preview of a `.cuadrante` before restoring it; needs a
   /// `BackupImportRequest` as `extra`.
@@ -128,6 +163,18 @@ GoRouter buildRouter({
         builder: (c, s) => const HolidaysSettingsScreen(),
       ),
       GoRoute(
+        path: AppRoutes.settingsAbsences,
+        builder: (c, s) => const AbsencesScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.swaps,
+        builder: (c, s) => const SwapsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.settingsDeviceEvents,
+        builder: (c, s) => const DeviceEventsScreen(),
+      ),
+      GoRoute(
         path: AppRoutes.settingsAlarms,
         builder: (c, s) => const AlarmsSettingsScreen(),
       ),
@@ -176,6 +223,10 @@ GoRouter buildRouter({
         builder: (c, s) => const ExportScreen(),
       ),
       GoRoute(
+        path: AppRoutes.settingsShareLink,
+        builder: (c, s) => const ShareLinkScreen(),
+      ),
+      GoRoute(
         path: AppRoutes.shiftTypes,
         builder: (c, s) => const ShiftTypesScreen(),
       ),
@@ -215,6 +266,19 @@ GoRouter buildRouter({
       GoRoute(
         path: AppRoutes.onboarding,
         builder: (c, s) => const OnboardingScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.daySketch,
+        builder: (c, s) => SketchScreen(
+          date: _parseDate(s.uri.queryParameters['fecha']) ?? now(),
+          calendarId:
+              s.uri.queryParameters['calendario'] ?? mainCalendarId,
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.dayAttachment,
+        builder: (c, s) =>
+            AttachmentViewerScreen(id: s.uri.queryParameters['id'] ?? ''),
       ),
     ],
   );

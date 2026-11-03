@@ -52,9 +52,7 @@ void main() {
           matching: find.text('Euskara'),
         ),
       );
-      for (var i = 0; i < 3; i++) {
-        await app.tap(key('onboarding-skip'));
-      }
+      await app.choosePath('import');
       await app.tap(key(action));
       expect(find.byType(ImportScreen), findsOneWidget);
       final l10n = lookupAppLocalizations(const Locale('eu'));
@@ -111,19 +109,17 @@ void main() {
             matching: find.text(endonym),
           ),
         );
-        expect(app.title, l10n.onboardingProfessionTitle);
+        expect(app.title, l10n.onboardingChooseTitle);
         if (language == AppLanguage.eu) {
-          await app.tap(key('onboarding-profession-nursing'));
-          await app.tap(key('onboarding-next'));
-          await app.tap(key('onboarding-skip'));
+          await app.choosePath('rotation');
           await app.tap(key('onboarding-pattern-12h'));
           await app.tap(key('onboarding-next'));
           await app.tap(key('onboarding-next'));
+          await app.tap(key('onboarding-profession-nursing'));
           await app.tap(key('onboarding-next'));
         } else {
-          for (var i = 0; i < 4; i++) {
-            await app.tap(key('onboarding-skip'));
-          }
+          await app.choosePath('paint');
+          await app.tap(key('onboarding-skip'));
         }
         expect(app.title, l10n.onboardingReadyTitle);
         expect(
@@ -164,9 +160,8 @@ void main() {
     'skipping without choosing a language keeps the system factory language',
     (tester) async {
       final app = await FirstLaunch.open(tester);
-      for (var i = 0; i < 4; i++) {
-        await app.tap(key('onboarding-skip'));
-      }
+      await app.choosePath('paint');
+      await app.tap(key('onboarding-skip'));
       final l10n = lookupAppLocalizations(const Locale('es'));
       expect(
         app.schedule.shiftTypes.firstWhere((t) => t.id == 'night').name,

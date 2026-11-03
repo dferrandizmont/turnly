@@ -1,0 +1,34 @@
+{
+"schema":1,
+"year":2027,
+"country":"FR",
+"national":[
+{"date":"2027-01-01","name":"Jour de l'an"},
+{"date":"2027-03-29","name":"Lundi de Pâques"},
+{"date":"2027-05-01","name":"Fête du Travail"},
+{"date":"2027-05-06","name":"Ascension"},
+{"date":"2027-05-08","name":"Fête de la Victoire"},
+{"date":"2027-05-17","name":"Lundi de Pentecôte"},
+{"date":"2027-07-14","name":"Fête nationale"},
+{"date":"2027-08-15","name":"Assomption"},
+{"date":"2027-11-01","name":"Toussaint"},
+{"date":"2027-11-11","name":"Armistice"},
+{"date":"2027-12-25","name":"Noël"}
+],
+"regional":{
+"FR-57":[{"date":"2027-03-26","name":"Vendredi saint","origin":"regional"},{"date":"2027-12-26","name":"Saint-Étienne","origin":"regional"}],
+"FR-6AE":[{"date":"2027-03-26","name":"Vendredi saint","origin":"regional"},{"date":"2027-12-26","name":"Saint-Étienne","origin":"regional"}],
+"FR-971":[{"date":"2027-03-04","name":"Mi-Carême","origin":"regional"},{"date":"2027-03-26","name":"Vendredi saint","origin":"regional"},{"date":"2027-05-27","name":"Abolition de l'esclavage","origin":"regional"},{"date":"2027-07-21","name":"Fête de Victor Schoelcher","origin":"regional"}],
+"FR-972":[{"date":"2027-03-26","name":"Vendredi saint","origin":"regional"},{"date":"2027-05-22","name":"Abolition de l'esclavage","origin":"regional"},{"date":"2027-07-21","name":"Fête de Victor Schoelcher","origin":"regional"}],
+"FR-973":[{"date":"2027-06-10","name":"Abolition de l'esclavage","origin":"regional"}],
+"FR-974":[{"date":"2027-12-20","name":"Abolition de l'esclavage","origin":"regional"}],
+"FR-976":[{"date":"2027-04-27","name":"Abolition de l'esclavage","origin":"regional"}],
+"FR-BL":[{"date":"2027-10-09","name":"Abolition de l'esclavage","origin":"regional"}],
+"FR-MF":[{"date":"2027-05-28","name":"Abolition de l'esclavage","origin":"regional"},{"date":"2027-07-21","name":"Fête de Victor Schoelcher","origin":"regional"}],
+"FR-NC":[{"date":"2027-09-24","name":"Fête de la Citoyenneté","origin":"regional"}],
+"FR-PF":[{"date":"2027-03-05","name":"Arrivée de l'Évangile","origin":"regional"},{"date":"2027-03-26","name":"Vendredi saint","origin":"regional"},{"date":"2027-11-20","name":"Matāri'i","origin":"regional"}],
+"FR-PM":[],
+"FR-TF":[],
+"FR-WF":[{"date":"2027-04-28","name":"Saint Pierre Chanel","origin":"regional"},{"date":"2027-06-29","name":"Saints Pierre et Paul","origin":"regional"},{"date":"2027-07-29","name":"Fête du Territoire","origin":"regional"}]
+}
+}

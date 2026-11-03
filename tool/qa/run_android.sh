@@ -8,7 +8,7 @@
 #   QA_AVD=<avd> tool/qa/run_android.sh              # another AVD (default Cuadrante_QA)
 #   QA_DEVICE=emulator-5556 tool/qa/run_android.sh   # a device that is already up (never stopped)
 #   QA_WINDOW=1 tool/qa/run_android.sh      # show the emulator window (default: headless)
-#   QA_UPGRADE=1 tool/qa/run_android.sh     # after the battery, U02 (real upgrade from 0.2.0, ~10 min,
+#   QA_UPGRADE=1 tool/qa/run_android.sh     # after the battery, U02 (real upgrade from 0.6.13, ~10 min,
 #                                           # needs network): see tool/qa/upgrade_android.sh. The release
 #                                           # check is tool/qa/release_check.sh (this, with QA_UPGRADE=1).
 #
@@ -45,6 +45,12 @@ DEFINES=()
 [ -n "${QA_ONLY:-}" ] && DEFINES+=("--dart-define=QA_ONLY=$QA_ONLY")
 [ -n "${QA_SKIP:-}" ] && DEFINES+=("--dart-define=QA_SKIP=$QA_SKIP")
 
+# A release build left by U02 (higher versionCode) or an uninstall that kept
+# its data makes the debug install fail with INSTALL_FAILED_VERSION_DOWNGRADE.
+# Only on an emulator: on a real phone this would erase the person's data.
+case "$QA_SERIAL" in
+  emulator-*) qa_adb uninstall "$QA_PACKAGE" >/dev/null 2>&1 || true ;;
+esac
 qa_adb logcat -c >/dev/null 2>&1 || true
 qa_log "running integration_test/app_test.dart (the first build takes several minutes)"
 (

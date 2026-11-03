@@ -3,6 +3,8 @@ import 'package:cuadrante/core/database/app_database.steps.dart';
 import 'package:cuadrante/core/database/migration_v1_to_v2.dart';
 import 'package:cuadrante/core/database/migration_v2_to_v3.dart';
 import 'package:cuadrante/core/database/migration_v3_to_v4.dart';
+import 'package:cuadrante/core/database/migration_v4_to_v5.dart';
+import 'package:cuadrante/core/database/migration_v5_to_v6.dart';
 import 'package:cuadrante/features/schedule/data/schedule_repository.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
 import 'package:drift/drift.dart' hide isNull, isNotNull;
@@ -39,6 +41,8 @@ class _FailingMigrationDatabase extends AppDatabase {
         afterRebuild: () async => throw StateError('boom after the rebuild'),
       ),
       from3To4: migrateFrom3To4,
+      from4To5: migrateFrom4To5,
+      from5To6: migrateFrom5To6,
     ),
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
@@ -115,7 +119,7 @@ void main() {
     };
 
     final db = AppDatabase(schema.newConnection());
-    await verifier.migrateAndValidate(db, 4);
+    await verifier.migrateAndValidate(db, 6);
 
     // Every column of every v2 table, row by row (holiday ids included).
     expect(await dumpV2Columns(db), before);
@@ -181,12 +185,12 @@ void main() {
     ]);
     expect(main.palette.map((t) => t.id), isNot(contains('old')));
 
-    // Nothing dangling, and the file says it is v4.
+    // Nothing dangling, and the file says it is v5.
     expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
     await db.close();
     expect(
       schema.rawDatabase.select('PRAGMA user_version').single.values.single,
-      4,
+      6,
     );
     schema.rawDatabase.close();
   });
@@ -222,7 +226,7 @@ void main() {
   test('an empty v2 database migrates too', () async {
     final schema = await verifier.schemaAt(2);
     final db = AppDatabase(schema.newConnection());
-    await verifier.migrateAndValidate(db, 4);
+    await verifier.migrateAndValidate(db, 6);
     expect(await db.select(db.shiftTypes).get(), isEmpty);
     expect(await db.select(db.dayEntries).get(), isEmpty);
     await db.close();
@@ -239,7 +243,7 @@ void main() {
       final daysBefore = v1ResolvedDays(scheduleFromV1Rows(before));
 
       final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 4);
+      await verifier.migrateAndValidate(db, 6);
 
       expect(await dumpV1Columns(db), before);
       final calendars = await db.select(db.calendars).get();
@@ -262,7 +266,7 @@ void main() {
       await db.close();
       expect(
         schema.rawDatabase.select('PRAGMA user_version').single.values.single,
-        4,
+        6,
       );
       schema.rawDatabase.close();
     },
@@ -333,7 +337,7 @@ void main() {
 
     // Next start: the real step runs on that data and keeps all of it.
     final db = AppDatabase(schema.newConnection());
-    await verifier.migrateAndValidate(db, 4);
+    await verifier.migrateAndValidate(db, 6);
     expect(await dumpV2Columns(db), before);
     final repository = ScheduleRepository(db);
     for (final id in calendarIds) {
@@ -373,7 +377,7 @@ void main() {
     await partial.close();
 
     final db = AppDatabase(schema.newConnection());
-    await verifier.migrateAndValidate(db, 4);
+    await verifier.migrateAndValidate(db, 6);
     expect(await dumpV1Columns(db), before);
     await db.close();
   });
@@ -381,7 +385,7 @@ void main() {
   test('the migrated file has the CHECKs of a new one', () async {
     final (:schema, before: _) = await seededV2();
     final db = AppDatabase(schema.newConnection());
-    await verifier.migrateAndValidate(db, 4);
+    await verifier.migrateAndValidate(db, 6);
 
     Future<void> day(String column, Object value) => db.customStatement(
       'INSERT INTO day_entries (calendar_id, date, $column, updated_at) '
@@ -414,7 +418,7 @@ void main() {
     () async {
       final (:schema, :before) = await seededV2();
       final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 4);
+      await verifier.migrateAndValidate(db, 6);
       final repository = ScheduleRepository(db);
 
       // A shift type with everything v3 adds, and an old one edited.
@@ -508,9 +512,9 @@ void main() {
   test('a fresh database and a migrated one have the same schema', () async {
     final (:schema, before: _) = await seededV2();
     final migrated = AppDatabase(schema.newConnection());
-    await verifier.migrateAndValidate(migrated, 4);
+    await verifier.migrateAndValidate(migrated, 6);
     final fresh = AppDatabase(NativeDatabase.memory());
-    await verifier.migrateAndValidate(fresh, 4);
+    await verifier.migrateAndValidate(fresh, 6);
     for (final table in ['day_entries', 'shift_types']) {
       expect(
         (await columnsOf(migrated, table)).toSet(),

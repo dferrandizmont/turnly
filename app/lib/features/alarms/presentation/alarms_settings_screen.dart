@@ -15,6 +15,8 @@ import '../../../core/widgets/value_row.dart';
 import '../../calendar/application/schedule_controller.dart';
 import '../../calendar/presentation/shift_badge.dart';
 import '../../calendar/presentation/shift_format.dart';
+import '../../dnd/application/dnd_providers.dart';
+import '../../dnd/presentation/dnd_settings_section.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../../settings/presentation/settings_widgets.dart';
 import '../application/alarm_providers.dart';
@@ -48,6 +50,9 @@ class _AlarmsSettingsScreenState extends ConsumerState<AlarmsSettingsScreen> {
     _lifecycle = AppLifecycleListener(
       onResume: () {
         ref.invalidate(alarmPermissionsProvider);
+        // Coming back from «Acceso a No molestar» (P13) the state may have
+        // changed.
+        ref.invalidate(dndPermissionProvider);
         // Time passed while the app slept: "Próximo aviso" may be past.
         ref.invalidate(nextAlarmProvider);
       },
@@ -90,7 +95,10 @@ class _AlarmsSettingsScreenState extends ConsumerState<AlarmsSettingsScreen> {
   Future<void> _test() async {
     final messenger = ScaffoldMessenger.maybeOf(context);
     final l10n = context.l10n;
-    final strings = AlarmStrings.fromL10n(l10n);
+    final strings = AlarmStrings.fromL10n(
+      l10n,
+      clock: alarmClock(AppDateFormat.of(context)),
+    );
     final ok = await _controller.scheduleTest(strings);
     ref.invalidate(alarmPermissionsProvider);
     messenger
@@ -192,8 +200,10 @@ class _AlarmsSettingsScreenState extends ConsumerState<AlarmsSettingsScreen> {
                         onPressed: _test,
                       ),
                     ],
+                    const DndSettingsSection(),
                     const SizedBox(height: Sp.l),
                     _NextAlarmLine(enabled: settings.enabled),
+                    if (settings.enabled) const _ScheduledUntilLine(),
                   ],
                 ),
               ),
@@ -326,6 +336,30 @@ class _NextAlarmLine extends ConsumerWidget {
       key: const ValueKey('alarms-next'),
       textAlign: TextAlign.center,
       style: context.type.meta.copyWith(color: context.colors.textSecondary),
+    );
+  }
+}
+
+/// «Avisos programados hasta el jueves 12 de noviembre» (A1): the day of the
+/// last shift alarm the app really handed to the system. Hidden when none is
+/// scheduled: the line above already says there is no alarm coming, and the
+/// permission card why.
+class _ScheduledUntilLine extends ConsumerWidget {
+  const _ScheduledUntilLine();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final until = ref.watch(alarmsScheduledUntilProvider);
+    if (until == null) return const SizedBox.shrink();
+    final date = AppDateFormat.of(context).weekdayDayMonth(until);
+    return Padding(
+      padding: const EdgeInsets.only(top: Sp.xs),
+      child: Text(
+        context.l10n.alarmsScheduledUntil(date),
+        key: const ValueKey('alarms-scheduled-until'),
+        textAlign: TextAlign.center,
+        style: context.type.meta.copyWith(color: context.colors.textSecondary),
+      ),
     );
   }
 }

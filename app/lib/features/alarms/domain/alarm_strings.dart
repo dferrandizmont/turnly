@@ -1,4 +1,6 @@
+import '../../../core/format/app_date_format.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../schedule/domain/civil_date.dart';
 
 /// Every user-visible text of the alarms, resolved before planning so the
 /// planner and the scheduler stay free of `BuildContext` and of the
@@ -18,10 +20,18 @@ class AlarmStrings {
     required this.reminderEmptyBody,
     required this.reminderChannelName,
     required this.reminderChannelDescription,
+    this.renewalTitle,
+    this.renewalBody,
+    this.clock,
   });
 
-  /// Filled from the ARB file of the current locale.
-  factory AlarmStrings.fromL10n(AppLocalizations l10n) => AlarmStrings(
+  /// Filled from the ARB file of the current locale. [clock] writes a time
+  /// of day the way the person chose in Ajustes (24 h or 12 h); without it
+  /// times read "22:00".
+  factory AlarmStrings.fromL10n(
+    AppLocalizations l10n, {
+    String Function(int minuteOfDay)? clock,
+  }) => AlarmStrings(
     title: l10n.alarmTitle,
     body: l10n.alarmBody,
     channelName: l10n.alarmChannelName,
@@ -35,6 +45,12 @@ class AlarmStrings {
     reminderEmptyBody: l10n.alarmsReminderEmptyBody,
     reminderChannelName: l10n.alarmsReminderChannelName,
     reminderChannelDescription: l10n.alarmsReminderChannelDescription,
+    renewalTitle: l10n.alarmsRenewalTitle,
+    renewalBody: (day) => l10n.alarmsRenewalBody(
+      AppDateFormat(l10n.localeName)
+          .weekdayDayMonth(DateTime(day.year, day.month, day.day)),
+    ),
+    clock: clock,
   );
 
   /// Empty texts, for computing a plan only to read its times (the "next
@@ -55,7 +71,20 @@ class AlarmStrings {
     reminderChannelDescription: '',
   );
 
-  /// "Turno de Noche a las 22:00": shift name and start time ("HH:mm").
+  /// Writes a time of day (minutes after midnight, 1440 wraps to 0) in the
+  /// notifications: "22:00" or "10:00 PM". `null`: 24 h.
+  final String Function(int minuteOfDay)? clock;
+
+  /// [minuteOfDay] as the notifications write it (see [clock]).
+  String time(int minuteOfDay) {
+    final m = ((minuteOfDay % 1440) + 1440) % 1440;
+    final custom = clock;
+    if (custom != null) return custom(m);
+    String two(int n) => n.toString().padLeft(2, '0');
+    return '${two(m ~/ 60)}:${two(m % 60)}';
+  }
+
+  /// "Turno de Noche a las 22:00": shift name and start time (see [time]).
   final String Function(String name, String start) title;
 
   /// Shift name and the two times ("22:00", "06:00").
@@ -87,7 +116,21 @@ class AlarmStrings {
   /// Android channel of the note reminders.
   final String reminderChannelName;
   final String reminderChannelDescription;
+
+  /// The renewal notice (A1): its title and its body for the day of the last
+  /// alarm («Tus avisos de turno llegan hasta el jueves 12 de noviembre…»).
+  /// Null (test texts, [blank]) plans no renewal notice; [AlarmStrings.fromL10n]
+  /// always sets both.
+  final String? renewalTitle;
+  final String Function(CivilDate lastDay)? renewalBody;
 }
 
 String _blank2(String a, String b) => '';
 String _blank3(String a, String b, String c) => '';
+
+/// The clock of the notifications for [format]: "22:00" or "10:00 PM"
+/// (`AlarmStrings.clock`).
+String Function(int minuteOfDay) alarmClock(AppDateFormat format) =>
+    (minuteOfDay) => format.time(
+      DateTime(2000, 1, 1, (minuteOfDay ~/ 60) % 24, minuteOfDay % 60),
+    );

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/diagnostics/crash_reporting.dart' show redactError;
 import '../../../core/icons/app_icons.dart';
+import '../../../core/format/app_date_format.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/providers.dart';
 import '../../../core/router.dart';
@@ -12,23 +13,29 @@ import '../../../core/widgets/app_callout.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/buttons.dart';
 import '../../../core/widgets/content_app_bar.dart';
+import '../../../core/widgets/empty_illustration.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/page_body.dart';
+import '../../calendar/application/schedule_controller.dart';
 import '../../settings/presentation/settings_widgets.dart';
 import '../application/auto_backup_runner.dart';
 import '../application/backup_actions.dart';
 import '../application/backup_models.dart';
 import '../application/backup_providers.dart';
 import '../data/platform_backup_channel.dart';
+import '../domain/backup_warnings.dart';
 import '../domain/restore_summary.dart';
 import 'backup_copy_list.dart';
 import 'backup_format.dart';
+import 'folder_backup_section.dart';
 import 'verification_result_card.dart';
 import '../../../core/widgets/app_snack_bar.dart';
 
 /// Ajustes › Copia de seguridad (`/ajustes/copia`): how safe the schedule is
-/// (when and where the last copy is, honest warnings), the buttons to copy,
-/// export, import and test, and the list of copies with "Restaurar esta".
+/// (when and where the last copy is, checked, honest warnings; a drawing
+/// while there is none), «Guardar una copia fuera de Turnly» as the main
+/// action (B9), the copy on the phone, import and test, and the list of
+/// copies with "Restaurar esta".
 class BackupScreen extends ConsumerStatefulWidget {
   const BackupScreen({super.key});
 
@@ -75,7 +82,18 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
     setState(() => _backingUp = true);
     try {
       await _actions.backupNow();
-      if (mounted) _snack(l10n.backupUiBackupDone);
+      // A copy that lacks attachments (their file is missing, damaged or
+      // could not be read) says so instead of just "Copia hecha".
+      final skipped = skippedAttachmentCount(
+        await _actions.lastCopyWarnings(),
+      );
+      if (mounted) {
+        _snack(
+          skipped > 0
+              ? l10n.backupWarnCopySkipped(skipped)
+              : l10n.backupUiBackupDone,
+        );
+      }
     } catch (_) {
       // The runner has recorded and reported it; the status card shows it.
       if (mounted) _snack(l10n.backupUiBackupFailed);
@@ -192,28 +210,39 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
                 ),
               ),
               const SizedBox(height: Sp.l),
+              // B9: the copy that saves you is the one outside the phone, so
+              // it is the main action; the copy on the phone comes second.
               PrimaryButton(
+                key: const ValueKey('backup-export'),
+                label: l10n.backupUiSaveOutside,
+                icon: AppIcons.share,
+                onPressed: _export,
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(Sp.xs, Sp.s, Sp.xs, Sp.m),
+                child: Text(
+                  l10n.backupUiSaveOutsideHelp,
+                  key: const ValueKey('backup-export-help'),
+                  style: context.type.meta.copyWith(
+                    color: context.colors.textSecondary,
+                  ),
+                ),
+              ),
+              SecondaryButton(
                 key: const ValueKey('backup-now'),
-                label: l10n.backupUiBackupNow,
+                label: _backingUp
+                    ? l10n.backupUiStatusRunning
+                    : l10n.backupUiBackupNow,
                 icon: BackupIcons.save,
-                loading: _backingUp,
-                onPressed: _backupNow,
+                onPressed: _backingUp ? null : _backupNow,
               ),
               const SizedBox(height: Sp.section),
               const _AutoSwitch(),
+              const FolderBackupSection(),
               const SizedBox(height: Sp.section),
               SettingsSection(
                 title: l10n.backupUiSectionFile,
                 children: [
-                  SettingsRow(
-                    key: const ValueKey('backup-export'),
-                    icon: AppIcons.share,
-                    title: l10n.backupUiExport,
-                    subtitle: BackupIcons.apple
-                        ? l10n.backupUiExportSubtitleIos
-                        : l10n.backupUiExportSubtitle,
-                    onTap: _export,
-                  ),
                   if (ref.watch(backupSaveSupportedProvider))
                     SettingsRow(
                       key: const ValueKey('backup-save'),
@@ -281,7 +310,12 @@ class _StatusSection extends ConsumerWidget {
     final String? progress = status.running
         ? l10n.backupUiStatusRunning
         : status.pending
-        ? pendingCopyMessage(l10n, status, now)
+        ? pendingCopyMessage(
+            l10n,
+            status,
+            now,
+            hour12: AppDateFormat.of(context).hour12,
+          )
         : null;
 
     return Column(
@@ -292,34 +326,52 @@ class _StatusSection extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (latest == null) ...[
+                Center(
+                  child: EmptyIllustration(
+                    kind: EmptyIllustrationKind.backup,
+                    shifts: ref.watch(
+                      scheduleControllerProvider.select((s) => s.palette),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: Sp.l),
+              ],
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ExcludeSemantics(
-                    child: Container(
-                      width: Disc.l,
-                      height: Disc.l,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: latest == null
-                            ? colors.dangerContainer
-                            : colors.successContainer,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        latest == null ? BackupIcons.warning : AppIcons.check,
-                        size: IconSize.base,
-                        color: latest == null ? colors.danger : colors.success,
+                  if (latest != null) ...[
+                    ExcludeSemantics(
+                      child: Container(
+                        width: Disc.l,
+                        height: Disc.l,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: latest == null
+                              ? colors.dangerContainer
+                              : colors.successContainer,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          latest == null ? BackupIcons.warning : AppIcons.check,
+                          size: IconSize.base,
+                          color: latest == null
+                              ? colors.danger
+                              : colors.success,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: Sp.m),
+                    const SizedBox(width: Sp.m),
+                  ],
                   Expanded(
                     child: latest == null
-                        ? Text(
-                            l10n.backupUiStatusNoneTitle,
-                            key: const ValueKey('backup-status-title'),
-                            style: type.bodyStrong,
+                        ? Semantics(
+                            header: true,
+                            child: Text(
+                              l10n.backupUiStatusNoneTitle,
+                              key: const ValueKey('backup-status-title'),
+                              style: type.headline,
+                            ),
                           )
                         : Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -331,7 +383,14 @@ class _StatusSection extends ConsumerWidget {
                                 ),
                               ),
                               Text(
-                                sentenceCase(backupWhen(l10n, latestAt!, now)),
+                                sentenceCase(
+                                  backupWhen(
+                                    l10n,
+                                    latestAt!,
+                                    now,
+                                    hour12: AppDateFormat.of(context).hour12,
+                                  ),
+                                ),
                                 key: const ValueKey('backup-status-title'),
                                 style: type.bodyStrong,
                               ),
@@ -340,6 +399,15 @@ class _StatusSection extends ConsumerWidget {
                                 key: const ValueKey('backup-status-where'),
                                 style: type.body.copyWith(
                                   color: colors.textSecondary,
+                                ),
+                              ),
+                              // Every copy of the app is read back whole
+                              // when it is written (`backupAndVerify`).
+                              Text(
+                                l10n.backupUiStatusVerified,
+                                key: const ValueKey('backup-status-verified'),
+                                style: type.meta.copyWith(
+                                  color: colors.success,
                                 ),
                               ),
                             ],
@@ -408,7 +476,13 @@ class _StatusSection extends ConsumerWidget {
             tone: TonePair(colors.dangerContainer, colors.danger),
             titleKey: const ValueKey('backup-failed-title'),
             title: l10n.backupUiStatusFailedTitle,
-            message: _failureMessage(l10n, status, latestAt, now),
+            message: _failureMessage(
+              l10n,
+              status,
+              latestAt,
+              now,
+              AppDateFormat.of(context).hour12,
+            ),
             primaryKey: const ValueKey('backup-failed-retry'),
             primaryLabel: l10n.backupUiRetry,
             onPrimary: onRetry,
@@ -423,13 +497,19 @@ class _StatusSection extends ConsumerWidget {
     AutoBackupStatus status,
     DateTime? latestAt,
     DateTime now,
+    bool hour12,
   ) {
-    final when = backupWhen(l10n, status.lastFailureAt ?? now, now);
+    final when = backupWhen(
+      l10n,
+      status.lastFailureAt ?? now,
+      now,
+      hour12: hour12,
+    );
     final story = latestAt == null
         ? l10n.backupUiStatusFailedNoGood(when)
         : l10n.backupUiStatusFailedWithGood(
             when,
-            backupWhen(l10n, latestAt, now),
+            backupWhen(l10n, latestAt, now, hour12: hour12),
           );
     return '$story ${backupFailureReason(l10n, status.lastError)}';
   }

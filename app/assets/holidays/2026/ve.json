@@ -1,0 +1,21 @@
+{
+"schema":1,
+"year":2026,
+"country":"VE",
+"national":[
+{"date":"2026-01-01","name":"Año Nuevo"},
+{"date":"2026-02-16","name":"Lunes de Carnaval"},
+{"date":"2026-02-17","name":"Martes de Carnaval"},
+{"date":"2026-04-02","name":"Jueves Santo"},
+{"date":"2026-04-03","name":"Viernes Santo"},
+{"date":"2026-04-19","name":"Declaración de la Independencia"},
+{"date":"2026-05-01","name":"Dia Mundial del Trabajador"},
+{"date":"2026-06-24","name":"Batalla de Carabobo"},
+{"date":"2026-07-05","name":"Día de la Independencia"},
+{"date":"2026-07-24","name":"Natalicio de Simón Bolívar"},
+{"date":"2026-10-12","name":"Día de la Resistencia Indígena"},
+{"date":"2026-12-24","name":"Nochebuena"},
+{"date":"2026-12-25","name":"Día de Navidad"},
+{"date":"2026-12-31","name":"Fiesta de Fin de Año"}
+]
+}

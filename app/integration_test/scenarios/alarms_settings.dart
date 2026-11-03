@@ -2,13 +2,13 @@ import 'package:cuadrante/features/alarms/application/alarm_providers.dart';
 import 'package:cuadrante/features/alarms/data/alarm_scheduler.dart';
 import 'package:cuadrante/features/alarms/domain/alarm_planner.dart';
 import 'package:cuadrante/features/alarms/domain/alarm_settings.dart';
-import 'package:cuadrante/features/alarms/domain/alarm_strings.dart';
 import 'package:cuadrante/features/calendars/domain/calendar.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/day_sheet.dart';
 import '../support/qa_core.dart';
 import '../support/qa_harness.dart';
 
@@ -127,12 +127,14 @@ Future<void> _backHome(WidgetTester t) async {
 AlarmSettings _settings(QaApp app) =>
     app.container.read(alarmSettingsProvider).requireValue;
 
-List<PlannedAlarm> _plan(QaApp app) => planAlarms(
+/// The whole plan the app hands to the scheduler, renewal notice included
+/// (A1): the same call [AlarmSync] makes, with the real localized texts.
+List<PlannedAlarm> _plan(QaApp app) => planAlarmSchedule(
   schedule: app.schedule,
   settings: _settings(app),
   now: DateTime.now(),
-  strings: AlarmStrings.blank,
-);
+  strings: app.container.read(alarmSyncProvider).strings!,
+).toSchedule;
 
 /// Master switch on and Noche on (90 minutes, the default), from the UI.
 Future<void> _masterAndNight(QaApp app) async {
@@ -175,15 +177,18 @@ Future<void> _enableNightBody(QaContext qa) async {
     final planned = _plan(app);
     qa.metric('alarmas_pendientes', pending.length);
     expect(pending, isNotEmpty);
-    expect(pending.length, lessThanOrEqualTo(maxPendingAlarms));
+    // The cap is on the shift alarms; the renewal notice (three weeks of
+    // Noche overflow the 14-day horizon) is one more.
+    expect(pending.length, lessThanOrEqualTo(maxPendingAlarms + 1));
     expect(pending.length, planned.length, reason: 'pendientes = plan');
     expect({for (final r in pending) r.id}, {for (final a in planned) a.id});
-    for (final r in pending) {
+    for (final r in pending.where(
+      (r) => r.payload!.contains(':${AlarmKind.shift.name}:'),
+    )) {
       expect(r.payload, startsWith('${alarmPayloadPrefix}night:'));
     }
     // 90 min before 22:00, every night.
-    for (final alarm in planned) {
-      expect(alarm.kind, AlarmKind.shift);
+    for (final alarm in planned.where((a) => a.kind == AlarmKind.shift)) {
       expect(alarm.fireMinute, 20 * 60 + 30);
     }
     // The next-alarm line of the screen comes from the same planner.
@@ -214,8 +219,14 @@ Future<void> _dayBeforeBody(QaContext qa) async {
   try {
     await _openAlarmsScreen(t);
     await _masterAndNight(app);
-    final before = await _until(t, () => _ours(t, plugin), (p) => p.isNotEmpty);
+    // Wait for the whole first set: a partial sync would skew the counts.
+    final before = await _until(
+      t,
+      () => _ours(t, plugin),
+      (p) => p.isNotEmpty && p.length == _plan(app).length,
+    );
     expect(before, isNotEmpty);
+    expect(before.length, _plan(app).length, reason: 'pendientes = plan');
 
     await t.tapAndSettle(
       _k('alarms-daybefore-switch-night'),
@@ -244,7 +255,7 @@ Future<void> _dayBeforeBody(QaContext qa) async {
     );
     expect(
       after.where((r) => r.payload!.contains(':shift:')),
-      hasLength(before.length),
+      hasLength(before.where((r) => r.payload!.contains(':shift:')).length),
       reason: 'las alarmas de antes del turno siguen igual',
     );
     for (final r in reminders) {
@@ -284,8 +295,14 @@ Future<void> _skipDayBody(QaContext qa) async {
   try {
     await _openAlarmsScreen(t);
     await _masterAndNight(app);
-    final before = await _until(t, () => _ours(t, plugin), (p) => p.isNotEmpty);
+    // Wait for the whole first set: a partial sync would skew the counts.
+    final before = await _until(
+      t,
+      () => _ours(t, plugin),
+      (p) => p.isNotEmpty && p.length == _plan(app).length,
+    );
     expect(before, isNotEmpty);
+    expect(before.length, _plan(app).length, reason: 'pendientes = plan');
     await _backHome(t);
 
     // A night with an alarm ahead, in the month on screen when possible.
@@ -301,6 +318,13 @@ Future<void> _skipDayBody(QaContext qa) async {
     );
 
     await t.tapAndSettle(_k('day-${target.toIso()}'), reason: 'celda del día');
+    // «Sin alarma este día» is in «Más opciones», which names it.
+    expect(
+      find.textContaining('Alarma'),
+      findsWidgets,
+      reason: '«Más opciones» la nombra',
+    );
+    await t.openDayMore();
     expect(find.text('Sin alarma este día'), findsOneWidget);
     await qa.shot('detalle');
     await t.tapAndSettle(_k('day-alarm-skip-switch'), reason: 'saltar el día');

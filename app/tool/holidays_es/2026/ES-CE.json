@@ -1,0 +1,11 @@
+{
+"region":"ES-CE",
+"year":2026,
+"kind":"labour",
+"sources":{
+"s1":{"url":"https://www.ceuta.es/ceuta/component/jdownloads/finish/1960-septiembre/22923-bocce-6549-19-09-2025?Itemid=0","ref":"BOCCE núm. 6.549, 19.9.2025 — Resolución de 15 de septiembre de 2025, de la Delegación del Gobierno en Ceuta, por la que se publica la relación de fiestas locales de la Ciudad Autónoma de Ceuta para el año 2026 (acordadas por el Pleno el 4.9.2025)","published":"2025-09-19","retrieved":"2026-10-31"}
+},
+"municipalities":{
+"51001":{"name":"Ceuta","days":["2026-03-20","2026-06-13"],"source":"s1"}
+}
+}

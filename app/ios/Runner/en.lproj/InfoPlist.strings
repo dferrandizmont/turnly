@@ -1,0 +1,4 @@
+"CFBundleDisplayName" = "Turnly";
+"NSCalendarsFullAccessUsageDescription" = "To read shifts from your calendar when importing and, if you ask, add your shifts to the calendar you choose. If that calendar syncs with an account, that account will receive them too.";
+"NSCalendarsUsageDescription" = "To read shifts from your calendar when importing and, if you ask, add your shifts to the calendar you choose. If that calendar syncs with an account, that account will receive them too.";
+"NSCalendarsWriteOnlyAccessUsageDescription" = "To add your shifts to the calendar you choose, without reading what you already have in it. If that calendar syncs with an account, that account will receive them too.";

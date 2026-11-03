@@ -151,11 +151,14 @@ Cuentas de usuario en el MVP, anuncios y avisos de cookies, y cualquier forma de
 **Requisito técnico clave:** el widget **cambia de día solo**. Ver la sección 6.
 
 ### Primer uso (menos de 60 segundos)
-1. «¿A qué te dedicas?» Enfermería / Policía o GC / Bomberos / Industria / Seguridad / Hostelería / Otro. Precarga los turnos y patrones típicos.
-2. «¿Dónde trabajas?» Comunidad y municipio, para los festivos.
-3. «¿Cómo es tu rotación?» Eliges un patrón y el día de inicio, o «lo pinto a mano».
-4. «¿Vienes de otra app?» Importar desde el calendario.
-5. Listo: el mes ya pintado. Sugerencia para añadir el widget, con una animación de cómo se hace.
+Diseño elegido el 31-oct-2026 (2A, `docs/diseno.md`, «Primer uso: tres caminos»).
+1. «¿Cómo empiezas tu cuadrante?» Tres caminos: **Importar mis turnos** (calendario del móvil, `.ics`, CSV o copia de
+   LRHSoft), **Usar una rotación** (eliges un patrón, el día de inicio y el día del ciclo) o **Pintar a mano** (el mes se
+   abre en modo pintar). Debajo, «Recuperar una copia de seguridad».
+2. Último paso, opcional: «¿Dónde trabajas?» (país, comunidad y municipio, para los festivos) y «¿A qué te dedicas?»
+   (Enfermería / Policía o GC / Bomberos / Industria / Seguridad / Hostelería / Otro; ajusta las horas de los turnos).
+   Se puede saltar; el país propuesto se guarda siempre.
+3. Listo: el mes ya pintado. Sugerencia para añadir el widget, con una animación de cómo se hace.
 
 ### Tono y textos
 Cercano, en tú, con vocabulario del sector (saliente, moscoso, libre disposición, correturnos). Nada de jerga técnica: «copia de seguridad», nunca «sync».

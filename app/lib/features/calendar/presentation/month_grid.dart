@@ -11,6 +11,7 @@ import '../../../core/providers.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../holidays/application/holidays_provider.dart';
 import '../../holidays/domain/holiday.dart';
+import '../../device_events/application/device_events_providers.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../../settings/application/preferences_controller.dart';
 import '../application/open_day.dart';
@@ -21,6 +22,7 @@ import '../application/visible_month.dart';
 import '../application/week_layout.dart';
 import 'day_cell.dart';
 import 'month_day_action.dart';
+import 'paint_feedback.dart';
 import '../application/month_presentation.dart';
 import 'grid_geometry.dart';
 
@@ -102,6 +104,10 @@ class _MonthGridState extends ConsumerState<MonthGrid> {
   Offset? _lastPoint;
   final _dayFocus = List.generate(_columns * _rows, (_) => FocusNode());
 
+  /// The appointments of the phone of each day of the grid (P6): the cell
+  /// marks the days that have some.
+  Map<CivilDate, int> _deviceEventCounts = const {};
+
   int _handledFocusRequest = 0;
 
   @override
@@ -159,6 +165,7 @@ class _MonthGridState extends ConsumerState<MonthGrid> {
       ref.read(monthDayFocusProvider.notifier).remember(date);
       // Haptics must never break painting (no vibrator, tests...).
       unawaited(HapticFeedback.selectionClick().catchError((Object _) {}));
+      playPaintSound(ref);
     }
   }
 
@@ -267,6 +274,9 @@ class _MonthGridState extends ConsumerState<MonthGrid> {
     final weekNumbers = ref.watch(
       preferencesProvider.select((p) => p.weekNumbers),
     );
+    final showNoteInMonth = ref.watch(
+      preferencesProvider.select((p) => p.showNoteInMonth),
+    );
 
     _gridStart = monthGridStart(month, weekStart);
     final focus = ref.watch(monthDayFocusProvider);
@@ -287,6 +297,15 @@ class _MonthGridState extends ConsumerState<MonthGrid> {
       _gridStart,
       _gridStart.addDays(_columns * _rows - 1),
     );
+
+    // The appointments of the phone of this month (P6): the days that have
+    // some get a discreet mark. Nothing is read when the month has not been
+    // asked for yet: the mark appears when the events arrive.
+    final deviceEvents = ref.watch(deviceEventMonthProvider(month)).value;
+    _deviceEventCounts = {
+      for (final entry in (deviceEvents?.days ?? const {}).entries)
+        entry.key: entry.value.count,
+    };
 
     return LayoutBuilder(
       builder: (context, box) {
@@ -366,6 +385,7 @@ class _MonthGridState extends ConsumerState<MonthGrid> {
                             selectedDays,
                             openDay,
                             geometry,
+                            showNoteInMonth,
                           ),
                       ],
                     ),
@@ -398,6 +418,7 @@ class _MonthGridState extends ConsumerState<MonthGrid> {
     Set<CivilDate> selectedDays,
     CivilDate? openDay,
     GridGeometry geometry,
+    bool showNoteInMonth,
   ) {
     final day = days[index];
     return SizedBox(
@@ -414,6 +435,8 @@ class _MonthGridState extends ConsumerState<MonthGrid> {
           painted: strokeDays.contains(day.date),
           selected: selectedDays.contains(day.date),
           focused: day.date == openDay,
+          deviceEventCount: _deviceEventCounts[day.date] ?? 0,
+          showNoteInMonth: showNoteInMonth,
           focusNode: _dayFocus[index],
           onMoveFocus: (delta) => _moveFocus(index, delta),
           onTap: () => _tapCell(index),

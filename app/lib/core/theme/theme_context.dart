@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'app_typography.dart';
 
+export 'app_appearance.dart' show AppAccent, CellTextSize;
 export 'app_colors.dart' show AppColors, TonePair;
 export 'app_typography.dart' show AppTypography;
 export 'shift_palette.dart' show ShiftPalette, contrastRatio;

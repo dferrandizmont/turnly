@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One day of the four-week widget: the number, the code of each shift on
+     the tint of the first shift with a bar each, and the first line of the
+     note under them. Today carries a ring; holidays take the number in red.
+     When the note does not travel (an absence day), the clip marks it instead. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fw_cell"
+    android:layout_width="0dp"
+    android:layout_height="match_parent"
+    android:layout_weight="1"
+    android:layout_margin="@dimen/widget_space_xxs">
+    <ImageView
+        android:id="@+id/fw_ring"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/widget_month_cell"
+        android:scaleType="fitXY"
+        android:visibility="gone"
+        android:importantForAccessibility="no"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/widget_space_xxs"
+        android:background="@color/widget_surface"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/fw_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:singleLine="true"
+            android:textSize="@dimen/widget_cell_time_size"
+            android:textColor="@color/widget_text_secondary"/>
+        <LinearLayout
+            android:id="@+id/fw_shifts"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"/>
+        <TextView
+            android:id="@+id/fw_note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:paddingLeft="@dimen/widget_space_xxs"
+            android:paddingRight="@dimen/widget_space_xxs"
+            android:textSize="@dimen/widget_cell_time_size"
+            android:textColor="@color/widget_text_muted"
+            android:visibility="gone"/>
+    </LinearLayout>
+    <ImageView
+        android:id="@+id/fw_note_mark"
+        android:layout_width="@dimen/widget_space_s"
+        android:layout_height="@dimen/widget_space_s"
+        android:layout_gravity="top|end"
+        android:src="@drawable/widget_note"
+        android:contentDescription="@string/widget_has_note"
+        android:visibility="gone"/>
+</FrameLayout>

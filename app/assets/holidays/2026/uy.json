@@ -1,0 +1,12 @@
+{
+"schema":1,
+"year":2026,
+"country":"UY",
+"national":[
+{"date":"2026-01-01","name":"Año Nuevo"},
+{"date":"2026-05-01","name":"Día de los Trabajadores"},
+{"date":"2026-07-18","name":"Jura de la Constitución"},
+{"date":"2026-08-25","name":"Declaratoria de la Independencia"},
+{"date":"2026-12-25","name":"Día de la Familia"}
+]
+}

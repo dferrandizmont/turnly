@@ -143,6 +143,62 @@
       }
     }
   },
+  "offToday": "Avui tens lliure",
+  "@offToday": {
+    "description": "Tarjeta de hoy: hoy es día libre (descanso o ausencia)."
+  },
+  "offTodayBack": "Avui tens lliure; tornes el {date}",
+  "@offTodayBack": {
+    "description": "Tarjeta de hoy: hoy es libre y se sabe cuándo se vuelve, p. ej. «Hoy libras; vuelves el lunes 9».",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "offTomorrow": "Demà tens lliure",
+  "@offTomorrow": {
+    "description": "Tarjeta de hoy: el próximo día libre es mañana."
+  },
+  "offOn": "Tens lliure el {date}",
+  "@offOn": {
+    "description": "Tarjeta de hoy y widget: próximo día libre, p. ej. «Libras el jueves 5».",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "offWeekend": "Cap de setmana lliure: {range}",
+  "@offWeekend": {
+    "description": "Tarjeta de hoy: próximo fin de semana con sábado y domingo libres, p. ej. «Fin de semana libre: 14–15 nov».",
+    "placeholders": {
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "offStreak": "Portes {worked} dies seguits",
+  "@offStreak": {
+    "description": "Tarjeta de hoy: días seguidos trabajando (siempre 3 o más).",
+    "placeholders": {
+      "worked": {
+        "type": "int"
+      }
+    }
+  },
+  "offStreakLeft": "Portes {worked} dies seguits; {left, plural, =1{te’n queda 1} other{te’n queden {left}}}",
+  "@offStreakLeft": {
+    "description": "Tarjeta de hoy: días seguidos trabajando (3 o más) y cuántos de trabajo quedan antes de librar.",
+    "placeholders": {
+      "worked": {
+        "type": "int"
+      },
+      "left": {
+        "type": "int"
+      }
+    }
+  },
   "durationDaysHours": "{days} d {hours} h",
   "@durationDaysHours": {
     "placeholders": {
@@ -345,6 +401,31 @@
       }
     }
   },
+  "dayDetailUndo": "Desfés l’últim canvi d’aquest dia",
+  "dayDetailShiftMenu": "Opcions de {name}",
+  "@dayDetailShiftMenu": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dayDetailChange": "Canvia",
+  "dayDetailChangeTitle": "Canvia {name} per…",
+  "@dayDetailChangeTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dayDetailChangeHint": "Per canviar un torn per un altre, toca’n el menú.",
+  "dayDetailMore": "Més opcions",
+  "dayMoreExtras": "Hores extra",
+  "dayMoreReminder": "Avís",
+  "dayMoreAlarm": "Alarma",
+  "dayMoreDuplicate": "Duplica",
+  "dayMoreClear": "Esborra",
   "dayExtrasTitle": "Hores extra / He sortit abans",
   "dayExtrasOvertime": "Hores extra",
   "dayExtrasEarlyLeave": "He sortit abans",
@@ -430,6 +511,13 @@
   "shiftTypesDiscardBody": "El que has canviat en aquest torn no es desarà.",
   "shiftTypesDiscardKeep": "Continua editant",
   "shiftTypesDiscardConfirm": "Descarta",
+  "shiftTypesScopeTitle": "A quins dies afecta el canvi?",
+  "shiftTypesScopeBody": "Has canviat les hores o els diners d’aquest torn i ja el tens en dies passats.",
+  "shiftTypesScopeAll": "Corregeix-ho a tots els dies",
+  "shiftTypesScopeAllHint": "Era un error: els dies passats també canvien les hores i els diners.",
+  "shiftTypesScopeAllHintSince": "Era un error: canvien els dies des del {date}, quan vas canviar aquest torn per última vegada. Els anteriors es queden com estan.",
+  "shiftTypesScopeFromToday": "Només a partir d’avui",
+  "shiftTypesScopeFromTodayHint": "Ha canviat la teva jornada o el teu preu: els dies passats es queden com estaven.",
   "shiftTypesNoTimes": "Sense horari",
   "shiftTypesRatePerHour": "{rate}/h",
   "shiftTypesFixedPlusPerShift": "+{amount} per torn",
@@ -636,10 +724,17 @@
   "shiftTypesFixedPlusLabel": "Plus per torn (opcional)",
   "shiftTypesFixedPlusHelper": "Es suma una vegada per cada torn treballat.",
   "shiftTypesFixedPlusHint": "Sense plus",
-  "shiftTypesFixedPlusUnit": "€",
   "shiftTypesRateLabel": "Preu per hora (opcional)",
   "shiftTypesRateHelper": "Per calcular quant guanyes al resum del mes.",
-  "shiftTypesRateUnit": "€/h",
+  "shiftTypesRateUnit": "{symbol}/h",
+  "@shiftTypesRateUnit": {
+    "description": "Sufijo del campo de precio por hora: el símbolo de la moneda elegida y /h, p. ej. «€/h».",
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
   "shiftTypesPreviewLabel": "Així es veurà al mes",
   "shiftTypesPreviewLight": "Clar",
   "shiftTypesPreviewDark": "Fosc",
@@ -686,6 +781,19 @@
   "paintDouble": "Dobla",
   "paintEraser": "Esborra",
   "paintToolsLabel": "Eines per pintar",
+  "paintModeReplace": "Canvia el torn",
+  "paintModeAdd": "Afegeix un altre torn",
+  "paintModeAddSpoken": "Afegeix un altre torn (doblar)",
+  "paintHeaderMode": "{header} · {mode}",
+  "paintPreviewTitle": "En tocar un dia",
+  "paintPreviewTitleDouble": "En tocar un dia (doblar)",
+  "paintPreviewReplace": "Substitueix el que hi hagi",
+  "paintPreviewAdd": "S’afegeix al que ja hi ha",
+  "paintPreviewErase": "Deixa el dia buit",
+  "paintPreviewEmpty": "buit",
+  "paintPreviewSpoken": "{title}: {before} passa a {after}. {effect}",
+  "paintPreviewSpokenTimes": "{title}: {before} passa a {after}, {times}. {effect}",
+  "paintToolSpoken": "{name}, {times}",
   "selectionHeader": "Selecció",
   "@selectionHeader": {
     "description": "Etiqueta de la cabecera del modo selección de días (se muestra en mayúsculas)."
@@ -1076,6 +1184,18 @@
   "onboardingSkip": "Omet",
   "onboardingNext": "Següent",
   "onboardingContinue": "Continua",
+  "onboardingChooseTitle": "Com comences el teu quadrant?",
+  "onboardingChooseHelp": "Tria una manera. En menys d’un minut tindràs el mes a punt, i després el pots canviar quan vulguis.",
+  "onboardingPathImport": "Importa els meus torns",
+  "onboardingPathImportHint": "Des del calendari del mòbil, un fitxer .ics o CSV, o una còpia de LRHSoft.",
+  "onboardingPathRotation": "Fes servir una rotació",
+  "onboardingPathRotationHint": "Tria el teu cicle (matins, tardes, nits, sortint…) i s’omple sol, mes rere mes.",
+  "onboardingPathRotationTag": "Si el teu torn es repeteix",
+  "onboardingPathPaint": "Pinta a mà",
+  "onboardingPathPaintHint": "Tria un torn i arrossega pels dies. Per quan cada mes és diferent.",
+  "onboardingChooseLater": "Després et preguntem el país per marcar els festius. Ho pots ometre.",
+  "onboardingRestore": "Recupera una còpia de seguretat",
+  "onboardingOptional": "Opcional",
   "onboardingProgress": "Pas {current} de {total}",
   "@onboardingProgress": {
     "placeholders": {
@@ -1088,7 +1208,7 @@
     }
   },
   "onboardingProfessionTitle": "A què et dediques?",
-  "onboardingProfessionHelp": "Així et deixem preparats els torns i les rotacions de la teva feina. Ho pots canviar quan vulguis.",
+  "onboardingProfessionHelp": "Només per deixar-te els horaris típics de la teva feina. Ho pots canviar quan vulguis.",
   "onboardingProfessionNursing": "Infermeria, TCAI i zeladors",
   "onboardingProfessionNursingHint": "M 08–15, T 15–22, N 22–08 i sortint",
   "onboardingProfessionMedicine": "Medicina (guàrdies)",
@@ -1105,8 +1225,21 @@
   "onboardingProfessionHospitalityHint": "M 08–16 i T 16–00",
   "onboardingProfessionOther": "Altres",
   "onboardingProfessionOtherHint": "Comences amb els torns de sempre",
+  "onboardingProfessionNursingAbroad": "Infermeria i sanitat",
+  "onboardingProfessionNursingAbroadHint": "M 08–15, T 15–22 i N 22–08",
+  "onboardingProfessionPoliceAbroad": "Policia",
+  "onboardingProfessionSecurityAbroad": "Seguretat",
+  "onboardingProfessionHospitalityAbroad": "Hostaleria",
+  "onboardingProfessionIndustryAbroadHint": "Torns rotatius: M 06–14, T 14–22 i N 22–06",
+  "onboardingProfessionCommerce": "Comerç",
+  "onboardingProfessionCommerceHint": "M 09–15 i T 15–21",
+  "onboardingProfessionTransport": "Transport",
+  "onboardingProfessionTransportHint": "M 06–14, T 14–22 i N 22–06",
   "onboardingPlaceTitle": "On treballes?",
   "onboardingPlaceHelp": "Per marcar-te al calendari els festius de la teva comunitat i del teu municipi.",
+  "onboardingPlaceHelpAbroad": "Per marcar-te al calendari els festius oficials del teu país.",
+  "onboardingCountryLabel": "País",
+  "onboardingCountrySheetTitle": "El teu país",
   "onboardingRegionLabel": "Comunitat",
   "onboardingRegionPick": "Tria la comunitat",
   "onboardingRegionSheetTitle": "La teva comunitat",
@@ -1118,6 +1251,31 @@
   "onboardingMunicipalityNone": "Cap municipi no es diu així",
   "onboardingMunicipalityClear": "Treu el municipi",
   "onboardingLocalHolidaysMissing": "Els festius locals del teu municipi els pots afegir tu en dos tocs.",
+  "onboardingLocalHolidaysMissingYear": "Els festius locals del {year} del teu municipi encara no han sortit: afegeix-los tu en dos tocs o espera una actualització.",
+  "@onboardingLocalHolidaysMissingYear": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "onboardingCountryNoData": "Encara no tenim els festius oficials de {country}. Pots afegir els teus a Configuració › Festius.",
+  "@onboardingCountryNoData": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
+  "onboardingCountryNone": "Sense festius oficials. Pots afegir els teus a Configuració › Festius.",
+  "onboardingCountryIncluded": "Marcarem al teu calendari els festius oficials de {country}. Pots afegir els teus a Configuració › Festius.",
+  "@onboardingCountryIncluded": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "onboardingRotationTitle": "Com és la teva rotació?",
   "onboardingRotationHelp": "Tria la que s’hi assembli més. Després dius quan comences.",
   "onboardingRotationTypical": "El més habitual a la teva feina",
@@ -1170,6 +1328,7 @@
     }
   },
   "onboardingReadyByHand": "Rotació: la pintes tu a mà",
+  "onboardingReadyNoOfficialHolidays": "Festius: només els que afegeixis tu",
   "onboardingReadyNothing": "No has triat res, així que comences amb el calendari en blanc.",
   "onboardingReadySaveFailed": "No s’ha pogut desar tot. Revisa els torns i els festius a Configuració.",
   "onboardingOpenCalendar": "Mostra el meu calendari",
@@ -1180,7 +1339,9 @@
   "paintScrollUp": "Pujar pel mes",
   "paintScrollDown": "Baixar pel mes",
   "monthTipPaint": "Tria un torn i arrossega.",
-  "@monthTipPaint": { "description": "Texte del consell compact de la pantalla del mes: una linia que explica com pintar el mes arrossegan pels dies." },
+  "@monthTipPaint": {
+    "description": "Texte del consell compact de la pantalla del mes: una linia que explica com pintar el mes arrossegan pels dies."
+  },
   "postNightAutoTitle": "Sortint automàtic",
   "postNightAutoHelp": "Després d’una nit, l’endemà passa a Sortint si estava buit o lliure.",
   "yearTitle": "Vista anual",
@@ -1259,6 +1420,8 @@
   "summaryEmptyTitle": "Sense torns aquest mes",
   "summaryEmptyBody": "Pinta torns al calendari i aquí veuràs les hores i l’estimació.",
   "summaryHoursWorked": "Hores treballades",
+  "summaryHoursPlanned": "Hores previstes",
+  "summaryWorkedToDate": "{hours} treballades fins ahir",
   "summaryShiftsWorked": "Torns treballats",
   "summaryNightHours": "Hores nocturnes",
   "summaryRestDays": "Dies lliures",
@@ -1283,7 +1446,7 @@
     }
   },
   "summaryExtrasNoRate": "Hi ha hores extra o sortides en dies sense un torn amb preu per hora: no són a l’estimació.",
-  "summaryNoteExtras": "Hores extra i sortides anticipades: les que anotes a cada dia. Les extra sumen i les sortides resten de les hores treballades (un dia no baixa de 0 h). Es valoren al preu per hora del primer torn amb preu d’aquell dia.",
+  "summaryNoteExtras": "Hores extra i sortides anticipades: les que anotes a cada dia. Les extra sumen i les sortides resten de les hores treballades (un dia no baixa de 0 h). La sortida retalla el final de l’últim torn del dia i les extra van just després: així compten també en les nocturnes i en festiu. Es valoren al preu per hora del primer torn amb preu d’aquell dia.",
   "summaryDays": "{count, plural, =1{1 dia} other{{count} dies}}",
   "@summaryDays": {
     "placeholders": {
@@ -1315,7 +1478,13 @@
   "summaryEstimateTitle": "Ingressos estimats",
   "summaryFixedPluses": "Plusos",
   "summaryFixedPlusCount": "{count, plural, one{1 torn} other{{count} torns}}",
-  "@summaryFixedPlusCount": {"placeholders": {"count": {"type": "int"}}},
+  "@summaryFixedPlusCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "summaryEstimateNote": "Estimació, abans d’impostos",
   "summaryEstimateNone": "Posa el preu per hora o el plus per torn a Els meus torns per veure l’estimació.",
   "summaryEstimateMissing": "No inclou el pagament per hora de {types}: sense preu.",
@@ -1360,6 +1529,45 @@
   "summaryNoteDst": "Són hores de rellotge: la nit del canvi d’hora no s’ajusta a 7 o 9 hores.",
   "summaryNoteNoTimes": "Els torns sense horari compten com a torn, però no sumen hores.",
   "summaryNoteHoliday": "Hores en festiu: les que cauen en un festiu de la teva comunitat i municipi, també si el torn passa la mitjanit.",
+  "summaryNoteTense": "Treballades: els dies anteriors a avui. Previstes: d’avui endavant, segons el teu quadrant.",
+  "summaryNoteGoal": "Objectiu: en un mes compta la dotzena part de l’anual; en un any, el mensual per 12; en unes dates, la part dels seus dies. La diferència suma les treballades i les previstes.",
+  "summaryGoalTitle": "Objectiu d’hores",
+  "summaryGoalAdd": "Fixa un objectiu d’hores",
+  "summaryGoalEdit": "Canvia l’objectiu",
+  "summaryGoalTarget": "Objectiu",
+  "summaryGoalDone": "Treballades",
+  "summaryGoalPlanned": "Previstes",
+  "summaryGoalShort": "Et falten {hours}",
+  "summaryGoalShortPlanned": "Amb el que hi ha previst, et falten {hours}",
+  "summaryGoalOver": "Portes {hours} de més",
+  "summaryGoalOverPlanned": "Amb el que hi ha previst, {hours} de més",
+  "summaryGoalMet": "Just l’objectiu",
+  "summaryGoalMetPlanned": "Amb el que hi ha previst, just l’objectiu",
+  "summaryGoalPerMonth": "Objectiu mensual",
+  "summaryGoalPerYear": "Objectiu anual",
+  "summaryGoalFromYear": "{goal} per any, entre 12",
+  "summaryGoalFromMonth": "{goal} per mes, per 12",
+  "summaryGoalRangeFromYear": "{goal} per any, la part de {days, plural, =1{1 dia} other{{days} dies}}",
+  "summaryGoalRangeFromMonth": "{goal} per mes per 12, la part de {days, plural, =1{1 dia} other{{days} dies}}",
+  "summaryGoalChoiceYear": "Per any",
+  "summaryGoalChoiceMonth": "Per mes",
+  "summaryGoalHoursYear": "Hores per any",
+  "summaryGoalHoursMonth": "Hores per mes",
+  "summaryGoalHelpYear": "Per exemple, 1.642 h, una jornada anual habitual. Mira la del teu conveni. Cada mes compta la dotzena part.",
+  "summaryGoalHelpMonth": "Per exemple, 140 h. A l’any compta 12 vegades.",
+  "summaryGoalUnit": "h",
+  "summaryGoalInvalid": "Escriu entre 1 i {max} hores.",
+  "summaryGoalRemove": "Treu l’objectiu",
+  "summaryGoalSaveFailed": "No s’ha pogut desar l’objectiu.",
+  "summaryHowTitle": "Com vaig?",
+  "summaryHowWorked": "treballades",
+  "summaryHowWorkedToDate": "treballades fins ahir",
+  "summaryHowPlanned": "previstes",
+  "summaryHowPlannedRest": "i {hours} previstes fins al {date}",
+  "summaryHowBarLabel": "{worked} treballades, {planned} previstes",
+  "summaryBreakdownTitle": "Detall",
+  "summaryAbsencesNone": "Cap",
+  "summaryEstimateNoPrices": "Sense preus",
   "summaryYearEmpty": "Aquest any no té torns.",
   "summaryYearHint": "Toca un mes per veure’n el detall.",
   "summaryYearHeaderMonth": "Mes",
@@ -1379,7 +1587,7 @@
   },
   "summaryYearMonthEmpty": "Sense torns",
   "summaryYearRowTitle": "Hores i estimació",
-  "summaryYearRowBody": "Torns, hores i euros de cada mes",
+  "summaryYearRowBody": "Torns, hores i imports de cada mes",
   "summaryYearMonthSemantics": "{month}: {shifts}, {hours}",
   "@summaryYearMonthSemantics": {
     "placeholders": {
@@ -1406,13 +1614,67 @@
   "shareMonthFailed": "No s’ha pogut compartir la imatge",
   "shareMonthLegendTitle": "Torns del mes",
   "shareMonthLegendEmpty": "Aquest mes no té torns.",
+  "reportShareTooltip": "Informe en PDF o CSV",
+  "reportSheetTitle": "Informe de torns",
+  "reportSheetIntro": "Un PDF net per imprimir o enviar, o un full de càlcul amb els teus torns.",
+  "reportFormatPdf": "PDF per imprimir o enviar",
+  "reportFormatCsv": "CSV per a Excel o Sheets",
+  "reportIncludeTitle": "Què vols incloure",
+  "reportIncludeNotes": "Notes dels dies",
+  "reportIncludeEarnings": "Imports estimats",
+  "reportAbsencesTitle": "Absències",
+  "reportAbsencesHidden": "No mostrar-les",
+  "reportAbsencesGeneric": "Només com a «Absència»",
+  "reportAbsencesDetailed": "Amb el seu nom i la seva nota",
+  "reportAbsencesHint": "Una baixa mèdica no surt amb el seu nom ni la seva nota tret que triïs «Amb el seu nom i la seva nota».",
+  "reportCreate": "Crea i comparteix",
+  "reportFailed": "No s’ha pogut crear l’informe",
+  "reportSubject": "Torns: {period}",
+  "@reportSubject": {
+    "placeholders": {
+      "period": {
+        "type": "String"
+      }
+    }
+  },
+  "reportUntitled": "Els meus torns",
+  "reportLegendTitle": "Llegenda",
+  "reportTotalsTitle": "Totals",
+  "reportNotesTitle": "Notes",
+  "reportHolidaysTitle": "Festius",
+  "reportHolidayMark": "Festiu",
+  "reportAbsenceName": "Absència",
+  "reportAbsenceCode": "ABS",
+  "reportHoursTotal": "Hores",
+  "reportHoursDone": "Treballades fins ahir",
+  "reportHoursPlannedFrom": "Previstes des d’avui",
+  "reportFooter": "Creat amb Turnly",
+  "reportPageOf": "Pàgina {page} de {total}",
+  "@reportPageOf": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "reportColDate": "Data",
+  "reportColDay": "Dia",
+  "reportColShifts": "Torn",
+  "reportColCode": "Codi",
+  "reportColStart": "Inici",
+  "reportColEnd": "Fi",
+  "reportColHours": "Hores",
+  "reportColNote": "Nota",
   "saveFailed": "No s’ha pogut desar el canvi",
   "@saveFailed": {
     "description": "Aviso (SnackBar) cuando falla escribir un cambio en la base de datos; el calendario ya muestra lo que hay guardado."
   },
   "settingsTitle": "Configuració",
   "settingsOpenTooltip": "Obre la configuració",
-  "settingsSectionSchedule": "El teu quadrant",
+  "settingsSectionSchedule": "El meu calendari",
   "settingsShiftsTitle": "Els meus torns",
   "settingsShiftsSubtitle": "Colors, codis i hores",
   "settingsCalendarsTitle": "Calendaris",
@@ -1422,6 +1684,20 @@
   "settingsThemeSystemDark": "Sistema (fosc)",
   "settingsThemeLight": "Clar",
   "settingsThemeDark": "Fosc",
+  "appearanceAccentTitle": "Color d’accent",
+  "appearanceAccentIndigo": "Indi",
+  "appearanceAccentBlue": "Blau",
+  "appearanceAccentPetrol": "Petroli",
+  "appearanceAccentRaspberry": "Gerd",
+  "appearanceAccentGraphite": "Grafit",
+  "appearanceAccentDefault": "Per defecte",
+  "appearanceAccentNote": "Canvia enllaços, interruptors, selecció i pestanyes. Els colors dels teus torns no canvien.",
+  "appearanceCellSizeTitle": "Mida del torn al mes",
+  "appearanceCellSizeNormal": "Normal",
+  "appearanceCellSizeLarge": "Gran",
+  "appearanceCellSizeExtraLarge": "Molt gran",
+  "appearanceCellSizeNote": "El codi i l’hora de cada dia del mes. Si no caben en una casella, s’ajusten sols.",
+  "appearanceCellSizeSampleCode": "N",
   "settingsWeekStartTitle": "Primer dia de la setmana",
   "settingsWeekStartMonday": "Dilluns",
   "settingsWeekStartSunday": "Diumenge",
@@ -1457,11 +1733,34 @@
   "@languageNameEn": {
     "description": "Nombre del idioma en su propia lengua: igual en todos los idiomas de la app."
   },
+  "settingsTimeFormatTitle": "Format d’hora",
+  "settingsTimeFormatAuto": "Automàtic ({format})",
+  "@settingsTimeFormatAuto": {
+    "description": "Opción «seguir el móvil» del formato de hora, con el reloj que da ahora, p. ej. «Automático (24 h)».",
+    "placeholders": {
+      "format": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTimeFormat24": "24 h (22:00)",
+  "settingsTimeFormat12": "12 h (10:00 p. m.)",
+  "settingsTimeFormatShort24": "24 h",
+  "settingsTimeFormatShort12": "12 h",
+  "settingsCurrencyTitle": "Moneda",
+  "settingsCurrencyNote": "Canviar la moneda no converteix els imports. Revisa els preus per hora i els plusos.",
+  "settingsCurrencySearchHint": "Cerca una moneda o un codi",
+  "settingsCurrencyCommon": "Habituals",
+  "settingsCurrencyAll": "Totes",
+  "settingsCurrencyNone": "Cap moneda coincideix",
   "settingsSaveFailed": "No s’ha pogut desar la configuració. Torna-ho a provar.",
-  "settingsSectionMore": "Avisos i dades",
+  "settingsSectionMore": "Avisos i widget",
+  "settingsSectionBackup": "Còpies i canvi de mòbil",
   "settingsHolidaysTitle": "Festius",
   "settingsAlarmsTitle": "Alarmes",
+  "settingsAlarmsUntil": "Avisos fins al {date}",
   "settingsBackupTitle": "Còpia de seguretat",
+  "settingsBackupLast": "Última: {when}, comprovada",
   "settingsPrivacyTitle": "Política de privacitat",
   "settingsPrivacySubtitle": "S’obre al teu navegador",
   "settingsPrivacyOpenFailed": "No s’ha pogut obrir la política de privacitat. Torna-ho a provar.",
@@ -1491,7 +1790,7 @@
   "faqPatternQ": "Com aplico una rotació i què és el desfasament?",
   "faqPatternA": "En mode pintar toca el botó «Patró» i segueix els passos: tria la teva rotació (o crea la teva), el dia que comences i fins quan es repeteix.\n\nEl desfasament és el punt del cicle on ets el dia d’inici. Si aquell dia et toca nit, al pas «En quin dia del cicle ets aquell dia?» toques la nit i la resta s’ajusta sola. Els dies que ja vas canviar a mà es respecten o se substitueixen, com prefereixis. Per acabar o treure una rotació, ves a Configuració › Les meves rotacions.",
   "faqDoubleQ": "Com doblo un torn?",
-  "faqDoubleA": "Doblar és fer dos torns el mateix dia. Toca el dia i, al detall, fes servir «Afegeix un segon torn». Si estàs pintant, activa «Dobla» i toca els dies. Amb diversos dies triats, «Dobla amb…» afegeix el torn a tots.\n\nUn dia pot tenir els torns que calgui i cadascun suma les seves hores per separat.",
+  "faqDoubleA": "Doblar és fer dos torns el mateix dia. Toca el dia i, al detall, fes servir «Afegeix un segon torn». Si estàs pintant, tria el mode «Afegeix un altre torn» i toca els dies. Amb diversos dies triats, «Dobla amb…» afegeix el torn a tots.\n\nUn dia pot tenir els torns que calgui i cadascun suma les seves hores per separat.",
   "faqPostNightQ": "Què és el sortint automàtic?",
   "faqPostNightA": "És el descans de l’endemà d’una nit. Si l’actives a Configuració › Sortint automàtic, quan pintes o apliques una nit, l’endemà passa a Sortint si estava buit o lliure. Els dies que ja tenien un altre torn no es toquen. Ve desactivat.",
   "faqNotesQ": "Com faig servir les notes i l’agenda?",
@@ -1508,8 +1807,8 @@
   "faqImportA": "Sí. A Configuració › Importa torns pots portar una còpia «.Shifter» de LRHSoft, torns del calendari del mòbil, un fitxer .ics o un CSV. A LRHSoft, crea una còpia a Menú › Còpia de seguretat › Còpia local i tria el fitxer de Documents › ShifterBackups. Revisa les dates, els tipus de torn i la previsualització abans d’importar.\n\n«Exporta al calendari del mòbil» copia els teus torns una vegada a un calendari del telèfon. Si tornes a exportar no es dupliquen: només es toquen els esdeveniments que va crear Turnly.",
   "faqCalendarsQ": "Puc portar diversos calendaris i comparar-los?",
   "faqCalendarsA": "Sí. A Configuració › Calendaris en crees un per a la teva parella, una segona feina o un fill: cadascun té les seves rotacions i els seus dies, i els tipus de torn són els mateixos. Amb dos o més, el nom del calendari damunt del mes et permet canviar de l’un a l’altre. El widget i les alarmes segueixen el calendari marcat com a «Widget i alarmes».\n\nPer veure quan coincidiu lliures, toca «Compara calendaris» en aquesta mateixa fulla: en tries dos i en veus els torns junts i els dies lliures en comú del mes.",
-  "faqSummaryQ": "Com es calculen les hores i els euros?",
-  "faqSummaryA": "La icona de resum del calendari mostra els torns, les hores, les nocturnes i les de festiu del mes, d’un any sencer o de les dates que triïs a «Dates…» (fins a 366 dies). Un torn compta el dia que comença, encara que passi la mitjanit.\n\nPer veure euros, posa el preu per hora i, si en tens, el plus fix per tipus de torn a Configuració › Els meus torns. L’estimació inclou aquests plusos fixos, abans d’impostos. No inclou plusos per hora nocturna o festiva ni retencions.\n\nEl «Plus per torn» se suma una vegada per cada torn treballat d’aquell tipus, també si és partit; no depèn de les hores. Els descansos i les absències no el sumen.",
+  "faqSummaryQ": "Com es calculen les hores i els diners?",
+  "faqSummaryA": "La icona de resum del calendari mostra els torns, les hores, les nocturnes i les de festiu del mes, d’un any sencer o de les dates que triïs a «Dates…» (fins a 366 dies). Un torn compta el dia que comença, encara que passi la mitjanit.\n\nPer veure imports, posa el preu per hora i, si en tens, el plus fix per tipus de torn a Configuració › Els meus torns. L’estimació inclou aquests plusos fixos, abans d’impostos, en la moneda que triïs a Configuració › Aparença. No inclou plusos per hora nocturna o festiva ni retencions.\n\nEl «Plus per torn» se suma una vegada per cada torn treballat d’aquell tipus, també si és partit; no depèn de les hores. Els descansos i les absències no el sumen.",
   "settingsVersionCopied": "S’ha copiat la versió",
   "settingsEmailCopied": "S’ha copiat el correu",
   "settingsAboutTitle": "Quant a",
@@ -1973,6 +2272,114 @@
   "calExportProblemUnavailable": "Aquest mòbil no té calendaris disponibles.",
   "calExportProblemFailed": "No s’ha pogut exportar. Torna-ho a provar.",
   "calExportRangeClamped": "El màxim és un any: s’ha retallat el final.",
+  "calSyncTitle": "Mantenir al dia",
+  "calSyncHelp": "Turnly actualitza aquests esdeveniments tot sol, cada cop que canvies el quadrant i en obrir l’app: des de fa una setmana fins als propers tres mesos. Només toca els esdeveniments que va crear ell. Si ho apagues, els que ja hi són es queden.",
+  "calSyncLast": "Última actualització: {when}",
+  "@calSyncLast": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "calSyncFailed": "{count, plural, =1{No s’ha pogut actualitzar 1 esdeveniment. Es tornarà a provar en la propera actualització.} other{No s’han pogut actualitzar {count} esdeveniments. Es tornarà a provar en la propera actualització.}}",
+  "@calSyncFailed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "calSyncLocked": "Per triar un altre calendari, apaga abans «Mantenir al dia».",
+  "calSyncRunning": "S’està actualitzant el calendari…",
+  "calSyncNoticePermission": "«Mantenir al dia» s’ha apagat: Turnly ja no té permís per usar el teu calendari.",
+  "calSyncNoticeCalendarGone": "«Mantenir al dia» s’ha apagat: el calendari del mòbil ja no hi és o ha canviat de nom.",
+  "calSyncNoticeSourceGone": "«Mantenir al dia» s’ha apagat: el calendari de Turnly que s’exportava ja no existeix.",
+  "calSyncNoticeDismiss": "Entesos",
+  "calExportIcsTitle": "Desa com a fitxer .ics",
+  "calExportIcsHelp": "Un fitxer que obren Google Calendar, Outlook i Apple Calendar, per enviar-lo o desar-lo on vulguis. No necessita permís.",
+  "calExportIcsRange": "Del {from} al {to}",
+  "@calExportIcsRange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "calExportIcsButton": "Desa el fitxer .ics",
+  "calExportIcsRunning": "S’està preparant el fitxer…",
+  "calExportIcsFailed": "No s’ha pogut crear el fitxer. Torna-ho a provar.",
+  "shareLinkRowTitle": "Comparteix per enllaç",
+  "shareLinkRowSubtitle": "La teva família veu els teus torns al seu calendari",
+  "shareLinkRowPublished": "Enllaç publicat",
+  "shareLinkTitle": "Comparteix per enllaç",
+  "shareLinkIntro": "Publica un enllaç només de lectura: qui el tingui veurà els teus torns al seu calendari (Google, Apple, Outlook) sense instal·lar res. S’actualitza sol quan canvies el quadrant.",
+  "shareLinkUnavailableTitle": "Encara no disponible",
+  "shareLinkUnavailableBody": "Aquesta versió encara no pot publicar enllaços. Mentrestant, pots desar els teus torns com a fitxer .ics a Exporta torns.",
+  "shareLinkCalendarLabel": "Calendari",
+  "shareLinkOptionsLabel": "Què es comparteix",
+  "shareLinkIncludeRest": "Inclou els dies lliures",
+  "shareLinkIncludeRestHelp": "Lliure i Sortint, com a esdeveniments de tot el dia.",
+  "shareLinkIncludeAbsences": "Mostra les absències com a «Absència»",
+  "shareLinkIncludeAbsencesHelp": "Sense el motiu: no se sap si és una baixa, vacances o un dia de lliure disposició.",
+  "shareLinkPrivacyTitle": "Què surt i què no",
+  "shareLinkPrivacyBody": "Surten el nom, el codi i l’hora de cada torn, i el nom del calendari. Mai no surten les teves notes, les baixes ni el motiu de cap absència. Qui tingui l’enllaç pot veure els teus torns: passa’l només a qui vulguis i revoca’l quan vulguis.",
+  "shareLinkPublishButton": "Publica l’enllaç",
+  "shareLinkPublishConfirmTitle": "Vols publicar els teus torns?",
+  "shareLinkPublishConfirmBody": "Els teus torns es pujaran al servidor de Turnly perquè l’enllaç funcioni. És l’únic que l’app envia fora del mòbil. S’esborren en revocar l’enllaç o després de sis mesos sense actualitzar-se.",
+  "shareLinkPublishConfirm": "Publica",
+  "shareLinkQrLabel": "Codi QR amb l’enllaç dels teus torns",
+  "shareLinkLinkLabel": "Enllaç",
+  "shareLinkCopy": "Copia",
+  "shareLinkCopied": "Enllaç copiat",
+  "shareLinkShare": "Comparteix",
+  "shareLinkShareText": "Els meus torns a Turnly. Afegeix-los al teu calendari amb aquest enllaç: {url}",
+  "@shareLinkShareText": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
+  "shareLinkLastPublished": "Darrera publicació: {date}",
+  "@shareLinkLastPublished": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "shareLinkPublishing": "S’està publicant…",
+  "shareLinkWaiting": "S’actualitzarà d’aquí a un moment.",
+  "shareLinkNotPublished": "Encara no s’ha pogut publicar.",
+  "shareLinkRefresh": "Actualitza ara",
+  "shareLinkSharedCalendar": "Es comparteixen els torns de «{name}».",
+  "@shareLinkSharedCalendar": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "shareLinkCalendarMissing": "El calendari que comparties ja no hi és. Tria’n un altre per continuar actualitzant l’enllaç.",
+  "shareLinkHowTitle": "Com subscriure-s’hi",
+  "shareLinkHowBody": "A Google Calendar: Altres calendaris › Des d’un URL, i enganxa l’enllaç. A l’iPhone: obre l’enllaç, o ves a Configuració › Calendari › Comptes › Afegeix un compte › Altres › Afegeix un calendari subscrit. Cada calendari decideix cada quan mira els canvis: poden trigar unes hores.",
+  "shareLinkRevoke": "Revoca l’enllaç",
+  "shareLinkRevokeConfirmTitle": "Vols revocar l’enllaç?",
+  "shareLinkRevokeConfirmBody": "S’esborra del servidor i deixa de funcionar per a tothom. Si tornes a publicar, es crea un enllaç nou.",
+  "shareLinkRevokeConfirm": "Revoca",
+  "shareLinkRevoking": "S’està revocant…",
+  "shareLinkRevokePending": "La revocació està pendent: es tornarà a provar sola d’aquí a un moment. Mentrestant no es publica res.",
+  "shareLinkProblemNetwork": "No hi ha connexió amb el servidor. Es tornarà a provar més tard.",
+  "shareLinkProblemRateLimited": "Massa actualitzacions seguides. Es tornarà a provar d’aquí a un moment.",
+  "shareLinkProblemTooLarge": "El quadrant és massa gran per publicar-lo.",
+  "shareLinkProblemRejected": "El servidor no ha acceptat l’enllaç. Revoca’l i publica’n un de nou.",
+  "shareLinkProblemRevoked": "Aquest enllaç es va revocar i ja no funciona. Publica’n un de nou si vols tornar a compartir els teus torns.",
+  "shareLinkProblemServer": "No s’ha pogut completar. Torna-ho a provar.",
+  "shareLinkAbsence": "Absència",
   "onboardingImportButton": "Importa ara",
   "onboardingImportLrhsoftButton": "Importa la còpia de LRHSoft",
   "backupUiRowSubtitle": "Automàtica, exportar i importar",
@@ -1980,6 +2387,7 @@
   "backupUiStatusNoneBody": "Fes-ne una ara: tarda un segon. Mentre no en tinguis, si perds el dispositiu o desinstal·les l’app, es perd el teu quadrant.",
   "backupUiStatusLast": "Última còpia",
   "backupUiStatusWhere": "En aquest dispositiu",
+  "backupUiStatusVerified": "Comprovada: es pot recuperar sencera",
   "backupUiStatusRunning": "S’està desant la còpia…",
   "backupUiStatusPending": "Hi ha canvis nous: la còpia es farà d’aquí a uns segons.",
   "backupUiStatusPendingAt": "Hi ha canvis nous: la pròxima còpia es farà cap a les {time}. Si no vols esperar, toca «Fes una còpia ara».",
@@ -2014,13 +2422,46 @@
   "backupUiBackupNow": "Fes una còpia ara",
   "backupUiBackupDone": "Còpia feta",
   "backupUiBackupFailed": "No s’ha pogut fer la còpia. Les teves dades continuen com estaven.",
+  "backupWarnRestoreSkipped": "{count, plural, =1{La còpia que hem fet abans no inclou 1 adjunt: el fitxer no hi era o no es va poder llegir.} other{La còpia que hem fet abans no inclou {count} adjunts: els fitxers no hi eren o no es van poder llegir.}}",
+  "backupWarnCopySkipped": "{count, plural, =1{Còpia feta, però sense 1 adjunt: el fitxer no hi és o no es pot llegir.} other{Còpia feta, però sense {count} adjunts: els fitxers no hi són o no es poden llegir.}}",
   "backupUiAutoTitle": "Còpies automàtiques",
   "backupUiAutoOn": "Després de canviar alguna cosa, sense que te n’adonis. Desem les 7 últimes i una per dia durant 30 dies.",
   "backupUiAutoOff": "Desactivades: només es copia quan tu ho demanes.",
+  "autoBackupFolderTitle": "Còpia automàtica en una carpeta",
+  "autoBackupFolderIntro": "Una còpia al dia a la carpeta que triïs: Drive, Dropbox, OneDrive o una del dispositiu. Si perds el dispositiu, la tens allà. Desem les 10 últimes.",
+  "autoBackupFolderPrivacy": "La còpia porta tot el teu quadrant, absències i baixes incloses, i es desa allà on sigui aquesta carpeta (per exemple, al teu núvol). No cal cap compte a Turnly.",
+  "autoBackupFolderChoose": "Tria una carpeta",
+  "autoBackupFolderChooseSubtitle": "S’obre el selector de carpetes del sistema",
+  "autoBackupFolderFolder": "Carpeta",
+  "autoBackupFolderUnnamed": "Carpeta triada",
+  "autoBackupFolderChange": "Toca per triar-ne una altra",
+  "autoBackupFolderLast": "Última còpia a la carpeta: {when}",
+  "autoBackupFolderNone": "Encara no hi ha cap còpia a la carpeta.",
+  "autoBackupFolderSchedule": "Es copia un cop al dia i, amb l’app oberta, després dels teus canvis (com a molt cada 6 hores).",
+  "autoBackupFolderCopyNow": "Copia ara a la carpeta",
+  "autoBackupFolderCopyDone": "Còpia desada a la carpeta",
+  "autoBackupFolderVerify": "Prova la còpia de la carpeta",
+  "autoBackupFolderVerifySubtitle": "Comprova que l’última còpia de la carpeta es pot recuperar sencera",
+  "autoBackupFolderStop": "Deixa de copiar en aquesta carpeta",
+  "autoBackupFolderStopSubtitle": "Les còpies que ja són a la carpeta no s’esborren",
+  "autoBackupFolderStopped": "Ja no es fan còpies en aquesta carpeta",
+  "autoBackupFolderFailedTitle": "La còpia a la carpeta no funciona",
+  "autoBackupFolderFailedWhen": "Últim intent: {when}.",
+  "autoBackupFolderErrRevoked": "Turnly ja no té permís per fer servir aquesta carpeta. Torna-la a triar.",
+  "autoBackupFolderErrMissing": "No trobem la carpeta: potser s’ha esborrat o s’ha mogut. Tria’n una altra.",
+  "autoBackupFolderErrUnwritable": "Aquesta carpeta no deixa desar fitxers. Tria’n una altra.",
+  "autoBackupFolderErrNoSpace": "No queda espai on és la carpeta (el dispositiu o el teu núvol). Allibera espai i torna-ho a provar.",
+  "autoBackupFolderErrTooLarge": "La còpia és massa gran per desar-la.",
+  "autoBackupFolderErrFailed": "No s’ha pogut desar la còpia a la carpeta. Ho tornarem a intentar.",
+  "autoBackupFolderErrDamaged": "No hem pogut llegir la configuració de la còpia a la carpeta. Torna a triar la carpeta.",
+  "autoBackupFolderChooseAgain": "Torna a triar la carpeta",
+  "autoBackupFolderPickFailed": "No s’ha pogut fer servir aquesta carpeta. Prova’n una altra.",
   "backupUiSectionFile": "Fitxer",
   "backupUiSectionCheck": "Comprova",
   "backupUiSectionCopies": "Còpies en aquest dispositiu",
   "backupUiExport": "Exporta un fitxer",
+  "backupUiSaveOutside": "Desa una còpia fora de Turnly",
+  "backupUiSaveOutsideHelp": "Al teu núvol, en un altre dispositiu o per correu. Si perds el mòbil o en canvies, la recuperes amb «Importa un fitxer».",
   "backupUiExportSubtitle": "Per desar-lo a Drive o enviar-lo per WhatsApp o correu",
   "backupUiExportFailed": "No s’ha pogut exportar el fitxer.",
   "backupUiSave": "Desa al dispositiu",
@@ -2241,14 +2682,23 @@
   "widgetAddTwoWeeks": "Dues setmanes: actual i següent",
   "widgetAddManualAndroid": "Mantén premuda una zona buida de la pantalla d’inici, tria Widgets i cerca Turnly.",
   "widgetAddManualIos": "Mantén premuda la pantalla d’inici, toca el + de dalt i cerca Turnly.",
+  "widgetNameSmall": "Petit",
+  "widgetNameMedium": "Mitjà",
+  "widgetNameLarge": "Gran",
+  "widgetNameAgenda": "Agenda",
+  "widgetNameTwoWeeks": "Dues setmanes",
+  "widgetDescSmall": "Avui i demà",
+  "widgetDescMedium": "Els propers 7 dies",
+  "widgetDescLarge": "El mes sencer",
+  "widgetDescAgenda": "Propers torns",
+  "widgetDescTwoWeeks": "Actual i següent",
+  "widgetAddNamed": "Afegeix {name}",
   "compareTitle": "Compara calendaris",
   "compareOpen": "Compara calendaris",
   "compareOpenSubtitle": "Mira quan coincidiu lliures",
   "compareSwap": "Intercanvia",
-  "compareIntro": "Tria dos calendaris i mira’n els torns junts. Es marquen els dies lliures de tots dos.",
-  "compareFirstLabel": "Primer calendari",
-  "compareSecondLabel": "Segon calendari",
-  "comparePickTitle": "Tria un calendari",
+  "compareIntro": "Tria de dos a sis calendaris i mira’n els torns junts. Es marquen els dies lliures de tots.",
+  "comparePickTitle": "Tria els calendaris",
   "compareNeedTwoTitle": "Necessites dos calendaris",
   "compareNeedTwoBody": "Crea un altre calendari (la teva parella, una segona feina) per veure quan coincidiu lliures.",
   "compareCount": "{count, plural, =0{Cap dia lliure en comú aquest mes} =1{1 dia lliure en comú aquest mes} other{{count} dies lliures en comú aquest mes}}",
@@ -2260,10 +2710,10 @@
     }
   },
   "compareFreeListTitle": "Dies lliures en comú",
-  "compareLegendFree": "Lliures tots dos",
-  "compareNote": "Compta com a lliure un dia sense torn de feina: buit, lliure o amb una absència (vacances, baixa…). Cada torn compta el dia que comença.",
+  "compareLegendFree": "Lliures en comú",
+  "compareNote": "Compta com a lliure un dia en què cap treballa i tots tenen anotat un lliure o una absència (vacances, baixa…). Un dia sense torns anotats no compta com a lliure: es marca com a «sense anotar». Cada torn compta el dia que comença.",
   "compareNoShiftMark": "–",
-  "compareBothFree": "lliures tots dos",
+  "compareBothFree": "lliures en comú",
   "compareCellCalendar": "{calendar}: {shifts}",
   "@compareCellCalendar": {
     "placeholders": {
@@ -2274,6 +2724,20 @@
         "type": "String"
       }
     }
+  },
+  "compareLegendUnrecorded": "Sense anotar en algun",
+  "compareUnrecordedCount": "{count, plural, =1{1 dia sense anotar en algun} other{{count} dies sense anotar en algun}}",
+  "@compareUnrecordedCount": {
+    "description": "Comparar calendarios: días del mes en que alguno de los calendarios comparados no tiene nada anotado (no cuentan como libres).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "compareUnrecorded": "sense anotar en algun",
+  "@compareUnrecorded": {
+    "description": "Comparar calendarios, lectura en voz alta de un día: alguno de los calendarios comparados no tiene nada anotado."
   },
   "compareLoadFailed": "No s’han pogut llegir els calendaris.",
   "calendarsTitle": "Calendaris",
@@ -2362,19 +2826,45 @@
   "holidayImportSkipped": "Ja existeix · s’omet",
   "holidayImportReady": "S’afegirà",
   "holidayImportIgnored": "{count, plural, =1{S’omet 1 esdeveniment amb hora.} other{S’ometen {count} esdeveniments amb hora.}}",
-  "@holidayImportIgnored": { "placeholders": { "count": { "type": "int" } } },
+  "@holidayImportIgnored": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "holidayImportCapped": "{count, plural, =1{1 esdeveniment supera 31 dies: es retalla.} other{{count} esdeveniments superen 31 dies: es retallen.}}",
-  "@holidayImportCapped": { "placeholders": { "count": { "type": "int" } } },
+  "@holidayImportCapped": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "holidayImportAdd": "{count, plural, =1{Afegeix 1 festiu} other{Afegeix {count} festius}}",
-  "@holidayImportAdd": { "placeholders": { "count": { "type": "int" } } },
+  "@holidayImportAdd": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "holidayImportAdded": "{count, plural, =1{1 festiu afegit} other{{count} festius afegits}}",
-  "@holidayImportAdded": { "placeholders": { "count": { "type": "int" } } },
+  "@holidayImportAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "holidayImportEmpty": "No hi ha festius nous.",
   "holidayImportPreviewHelp": "Les dates que ja tenen festiu s’ometen.",
-
   "holidaysSettingsRegionTitle": "Comunitat autònoma",
   "holidaysSettingsRegionUnset": "Sense triar",
   "holidaysSettingsRegionClear": "Sense comunitat",
+  "holidaysSettingsCountryTitle": "País",
+  "holidaysSettingsCountryOther": "Un altre país: sense festius oficials",
+  "holidaysSettingsCountryNone": "Sense festius oficials",
   "holidaysSettingsMunicipalityTitle": "Municipi",
   "holidaysSettingsMunicipalityNone": "Cap",
   "holidaysSettingsMunicipalitySearch": "Cerca el municipi",
@@ -2389,6 +2879,15 @@
   "holidaysSettingsMunicipalityLoadFailed": "No s’ha pogut carregar la llista de municipis.",
   "holidaysSettingsStatusNoRegion": "Sense comunitat només surten els festius estatals. Tria la teva per veure els autonòmics.",
   "holidaysSettingsStatusNoMunicipality": "Tria el teu municipi per veure’n els festius locals, o afegeix-los tu a sota.",
+  "holidaysSettingsStatusCountryNoData": "Encara no tenim els festius oficials de {country}: afegeix els teus a sota",
+  "@holidaysSettingsStatusCountryNoData": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
+  "holidaysSettingsStatusNoOfficial": "Sense festius oficials: només surten els que afegeixes tu a sota",
   "holidaysSettingsStatusLocalIncluded": "Festius locals de {municipality}: inclosos",
   "@holidaysSettingsStatusLocalIncluded": {
     "placeholders": {
@@ -2417,7 +2916,16 @@
       }
     }
   },
-  "holidaysSettingsStatusLocalPartial": "Potser en falta algun: comprova’ls.",
+  "holidaysSubdivisionKindState": "Estat",
+  "holidaysSubdivisionKindFederalState": "Estat federat",
+  "holidaysSubdivisionKindProvince": "Província",
+  "holidaysSubdivisionKindRegion": "Regió",
+  "holidaysSubdivisionKindNation": "Nació",
+  "holidaysSubdivisionKindCanton": "Cantó",
+  "holidaysSubdivisionKindCity": "Ciutat",
+  "holidaysSubdivisionKindCityOrRegion": "Ciutat o regió",
+  "holidaysSubdivisionSearch": "Cerca",
+  "holidaysSettingsStatusNoSubdivision": "Sense triar només surten els festius de tot el país. Tria el teu per veure també els de la teva zona.",
   "holidaysSettingsAdd": "Afegeix un festiu local",
   "holidaysSettingsAddName": "Nom",
   "holidaysSettingsAddDefaultName": "Festa local",
@@ -2624,6 +3132,9 @@
   },
   "alarmsNextNone": "No hi ha cap avís previst els propers dies.",
   "alarmsNextOff": "Les alarmes estan desactivades.",
+  "alarmsScheduledUntil": "Avisos programats fins al {date}",
+  "alarmsRenewalTitle": "Avisos de torn",
+  "alarmsRenewalBody": "Els teus avisos de torn arriben fins al {date}. Obre Turnly per programar els següents.",
   "alarmsSkipDay": "Sense alarma aquest dia",
   "alarmsReminderTitle": "Recordatori",
   "@alarmsReminderTitle": {
@@ -2671,6 +3182,23 @@
       }
     }
   },
+  "dndSection": "No molestis durant el torn",
+  "dndMasterTitle": "Silencia el mòbil durant els meus torns",
+  "dndMasterHelp": "S’activa «No molestis» quan comença el torn i es desactiva quan acaba.",
+  "dndFilterTitle": "Què deixa passar",
+  "dndFilterSheetTitle": "Què deixa passar durant el torn",
+  "dndFilterAll": "Tot",
+  "dndFilterPriority": "Només el que és prioritari",
+  "dndFilterAlarms": "Només les alarmes",
+  "dndFilterNone": "Silenci total",
+  "dndPermOkTitle": "Tot a punt",
+  "dndPermOkBody": "Turnly pot activar «No molestis» al mòbil durant els teus torns. Es programa com una alarma del sistema: el rellotge pot mostrar l’inici o el final del torn com a propera alarma.",
+  "dndPermTitle": "Falta l’accés a No molestis",
+  "dndPermBody": "Per silenciar el mòbil durant el torn, permet que Turnly accedeixi a «No molestis» a la configuració del sistema.",
+  "dndPermOpen": "Obre la configuració",
+  "dndShiftSection": "No molestis",
+  "dndShiftSwitch": "Activa No molestis durant aquest torn",
+  "dndShiftHelper": "El mòbil se silencia mentre fas aquest torn.",
   "shiftTypesAlarmSection": "Alarma",
   "@shiftTypesAlarmSection": {
     "description": "Cabecera de la sección de alarma del editor de un tipo de turno."
@@ -2760,8 +3288,369 @@
   "monthPresentationGrid": "Quadrícula",
   "monthPresentationList": "Llista",
   "monthSelectDays": "Selecciona dies",
+  "monthNavMonth": "Mes",
+  "monthNavRotation": "Rotació",
+  "monthNavAgenda": "Agenda",
+  "monthNavSummary": "Resum",
+  "todayCardCollapse": "Plega la targeta d’avui",
+  "todayCardExpand": "Desplega la targeta d’avui",
   "monthSelectDay": "Toca per triar aquest dia",
   "monthListRecommended": "Llista recomanada per veure els horaris complets i el text gran.",
   "monthListSelected": "Presentació de llista",
-  "monthGridSelected": "Presentació de quadrícula"
+  "monthGridSelected": "Presentació de quadrícula",
+  "absenceRowTitle": "Vacances i permisos",
+  "absenceRowSubtitle": "Dies permesos, usats i els que et queden",
+  "absenceTitle": "Vacances i permisos",
+  "absenceYearPrevious": "Any anterior",
+  "absenceYearNext": "Any següent",
+  "absenceDays": "{days, plural, =1{1 dia} other{{days} dies}}",
+  "absenceEmptyTitle": "Encara no hi ha saldos",
+  "absenceEmptyBody": "Crea un saldo (vacances, assumptes particulars…) i l’app compta els dies a partir del teu quadrant.",
+  "absenceAdd": "Afegeix un saldo",
+  "absenceContinueSeries": "Continuar una sèrie",
+  "absenceContinueSeriesHelper": "Si continues la sèrie d’un any anterior, se’n copien el nom, els tipus i el topall, i el que et va sobrar s’arrossega. Tu només omples els dies permesos.",
+  "absenceCopyNextYear": "Copiar a l’any següent",
+  "absenceCopiedNextYear": "Saldo copiat a {year}.",
+  "absenceLeftCaption": "{days, plural, =1{dia que et queda} other{dies que et queden}}",
+  "absenceLeftSemantics": "{name}: et queden {days}",
+  "absenceAllowed": "Permesos",
+  "absenceCarried": "Arrossegats",
+  "absenceAdjustment": "Ajustos",
+  "absenceEnjoyed": "Gaudits",
+  "absencePlanned": "Planificats",
+  "absenceCarriedUntil": "Caduquen el {date}",
+  "absenceCarriedNoExpiry": "Sense caducitat",
+  "absenceCarriedExpired": "Van caducar el {date}",
+  "absenceWarnExpiring": "Et queden {days} de l’any anterior que caduquen el {date}.",
+  "absenceWarnPlanned": "Has planificat més dels que tens: {planned} planificats i {left} disponibles.",
+  "absenceNewTitle": "Nou saldo",
+  "absenceEditTitle": "Edita el saldo",
+  "absenceEditTooltip": "Edita {name}",
+  "absenceFieldName": "Nom",
+  "absenceFieldNameHint": "Vacances",
+  "absenceFieldAllowed": "Dies permesos",
+  "absenceFieldAllowedHelper": "Els que et corresponen aquest any, sense comptar els que arrossegues.",
+  "absenceFieldAdjustment": "Ajust manual",
+  "absenceFieldAdjustmentHelper": "Suma o resta dies a mà: els que ja vas gastar abans d’usar l’app o un dia extra que t’han donat. Admet negatius.",
+  "absenceDaysSuffix": "dies",
+  "absenceFieldCarry": "Arrossega el que sobri de l’any anterior",
+  "absenceFieldCarryCap": "Màxim que s’arrossega",
+  "absenceFieldCarryCapHelper": "Deixa-ho buit si s’arrossega tot.",
+  "absenceFieldExpiry": "Caduquen el",
+  "absenceFieldExpiryNone": "Sense caducitat",
+  "absenceFieldExpiryClear": "Treu la caducitat",
+  "absenceFieldTypes": "Tipus de torn que compten",
+  "absenceFieldTypesHelper": "Cada dia pintat amb un d’aquests tipus gasta un dia d’aquest saldo.",
+  "absenceFieldTypesNone": "No tens tipus de torn d’absència. Crea’n un a Els meus torns amb la categoria Absència.",
+  "absenceInvalidName": "Posa-hi un nom (màxim {max} lletres).",
+  "absenceInvalidAllowed": "Escriu un nombre de dies vàlid, per exemple 22.",
+  "absenceInvalidAdjustment": "Escriu dies en passos d’un quart, per exemple -1 o 0,5.",
+  "absenceInvalidCap": "Escriu un màxim vàlid, per exemple 5.",
+  "absenceRemove": "Treu el saldo",
+  "absenceRemoveTitle": "Vols treure aquest saldo?",
+  "absenceRemoveBody": "S’esborra el saldo «{name}» de {year}. Els teus torns no canvien.",
+  "absenceRemoveConfirm": "Treu",
+  "absenceSaveFailed": "No s’ha pogut desar el saldo. Torna-ho a provar.",
+  "absenceSummaryLeft": "Et queden {days} de {name}",
+  "absenceSummaryOpen": "Obre vacances i permisos",
+  "moneyNightPlusLabel": "Plus nocturn per hora",
+  "moneyNightPlusHelper": "S’afegeix per cada hora nocturna treballada.",
+  "moneyHolidayPlusLabel": "Plus festiu per hora",
+  "moneyHolidayPlusHelper": "S’afegeix per cada hora treballada en festiu.",
+  "moneyLocationLabel": "Lloc",
+  "moneyLocationHint": "Hospital, planta 3",
+  "moneyLocationHelper": "Surt als informes (PDF i CSV) al costat del nom del torn.",
+  "moneyExtraTitle": "Import extra",
+  "moneyExtraHelper": "Dietes, quilometratge, un bonus… Fes servir un import negatiu per a una deducció. S’afegeix a l’estimació del dia.",
+  "moneyExtraHint": "Sense import",
+  "moneyExtraInvalid": "Escriu un import vàlid, per exemple 25 o -10,50",
+  "moneyExtraClear": "Treu l’import extra",
+  "moneySectionTitle": "Hores i diners",
+  "moneyWithholdingTitle": "Retenció (%)",
+  "moneyWithholdingSubtitle": "Per calcular el net estimat",
+  "moneyWithholdingValue": "{percent} %",
+  "moneyWithholdingNone": "Sense retenció",
+  "moneyWithholdingHelper": "El percentatge que et retenen de la nòmina (IRPF i cotitzacions). Amb aquest valor calculem un net aproximat; no substitueix la teva nòmina.",
+  "moneyWithholdingField": "Percentatge de retenció",
+  "moneyWithholdingInvalid": "Escriu un nombre enter entre 0 i 100.",
+  "moneyGross": "Brut estimat",
+  "moneyNet": "Net estimat",
+  "moneyNetNote": "Amb una retenció del {percent} %",
+  "moneyNetSetup": "Posa la teva retenció per veure el net",
+  "moneyEarnedTitle": "Guanyat fins ara",
+  "moneyEarnedNote": "Els dies que han passat i el que has treballat avui, fins ara.",
+  "moneyModeQuarter": "Trimestre",
+  "moneyQuarterLabel": "T{quarter} {year}",
+  "moneyQuarterPrevious": "Trimestre anterior",
+  "moneyQuarterNext": "Trimestre següent",
+  "moneyBagTitle": "Borsa d’hores",
+  "moneyBagFavour": "{hours} de més",
+  "moneyBagOwed": "Et falten {hours}",
+  "moneyBagEven": "A zero",
+  "moneyBagNote": "Hores treballades menys objectiu, acumulades mes a mes fins a {month}. El saldo de desembre passa al gener.",
+  "moneyReportExtraColumn": "Import extra",
+  "moneyReportExtraTotal": "Imports extra",
+  "moneyPlusHint": "Sense import",
+  "swapRowTitle": "Llibre de canvis",
+  "swapRowSubtitle": "Els torns que et deuen i els que els deus",
+  "swapTitle": "Llibre de canvis",
+  "swapBalancesTitle": "Balanç",
+  "swapBalanceTheyOwe": "{count, plural, =1{Em deu 1 torn} other{Em deu {count} torns}}",
+  "swapBalanceIOwe": "{count, plural, =1{Li dec 1 torn} other{Li dec {count} torns}}",
+  "swapBalanceEven": "No res pendent",
+  "swapChangesTitle": "Canvis",
+  "swapEmptyTitle": "Encara no hi ha canvis",
+  "swapEmptyBody": "Anota un canvi de torn amb un company i l’app recordarà qui et deu què.",
+  "swapAdd": "Afegeix un canvi",
+  "swapNewTitle": "Canvi nou",
+  "swapEditTitle": "Edita el canvi",
+  "swapStagePending": "Pendent",
+  "swapStageReturned": "Retornat",
+  "swapStageSettled": "Saldat",
+  "swapDirectionTheyOwe": "Me’l deuen",
+  "swapDirectionIOwe": "L’hi dec",
+  "swapFieldService": "Dades del servei",
+  "swapFieldColleague": "Amb qui",
+  "swapFieldColleagueHint": "Marta",
+  "swapInvalidColleague": "Escriu amb qui és el canvi.",
+  "swapFieldDirection": "Qui deu el torn",
+  "swapFieldDirectionHelper": "Tria qui queda en deute amb el canvi.",
+  "swapFieldDate": "El dia que cedeixes el torn",
+  "swapFieldReturnDate": "El dia que reps el torn",
+  "swapFieldReturnNone": "Encara no l’has rebut",
+  "swapFieldReturnClear": "Treu el dia",
+  "swapFieldGivenTypes": "El torn que cedeixes",
+  "swapFieldReceivedTypes": "El torn que reps",
+  "swapFieldTypesHelper": "Tria els torns del canvi per poder aplicar-lo al quadrant.",
+  "swapFieldNote": "Nota",
+  "swapNoteHint": "Per exemple: me’l torna el dilluns",
+  "swapRemove": "Treu el canvi",
+  "swapRemoveTitle": "Vols treure aquest canvi?",
+  "swapRemoveBody": "S’esborra el canvi amb {name} del {date}. Els teus torns no canvien.",
+  "swapRemoveConfirm": "Treu",
+  "swapSaveFailed": "No s’ha pogut desar el canvi. Torna-ho a provar.",
+  "swapRemoved": "Canvi tret",
+  "swapEditTooltip": "Edita el canvi amb {name}",
+  "swapMarkReturned": "Marca com a retornat",
+  "swapMarkReturnedTitle": "Quin dia te’l tornen?",
+  "swapMarkedReturned": "Canvi marcat com a retornat",
+  "swapMarkSettled": "Marca com a saldat",
+  "swapMarkedSettled": "Canvi saldat",
+  "swapReopen": "Marca com a pendent",
+  "swapReopened": "El canvi torna a estar pendent",
+  "swapApplyToCalendar": "Aplica al quadrant",
+  "swapUndoFromCalendar": "Treu del quadrant",
+  "swapApplied": "Canvi aplicat al quadrant",
+  "swapUnapplied": "Canvi tret del quadrant",
+  "swapNothingToApply": "Els dies ja estan com diu el canvi",
+  "swapNotApplied": "Aquest canvi no està aplicat al quadrant",
+  "swapDaySection": "Canvi de torn",
+  "swapDayAdd": "Anota un canvi",
+  "swapDayEmpty": "Aquest dia no té cap canvi anotat.",
+  "swapMenuTooltip": "Opcions del canvi",
+  "swapGivesLabel": "Cedeixes",
+  "swapReceivesLabel": "Reps",
+  "noteAttachmentsSection": "Adjunts",
+  "noteAttachmentsEmptyTitle": "Encara no hi ha fotos ni fitxers",
+  "noteAttachmentsEmptyBody": "Pots afegir una foto, un fitxer o un dibuix a aquest dia.",
+  "noteAttachmentsAdd": "Afegeix",
+  "noteAttachmentsAddPhoto": "Fes una foto",
+  "noteAttachmentsAddGallery": "Tria de la galeria",
+  "noteAttachmentsAddFile": "Tria un fitxer",
+  "noteAttachmentsAddSketch": "Dibuixa",
+  "noteAttachmentKindPhoto": "Foto",
+  "noteAttachmentKindFile": "Fitxer",
+  "noteAttachmentKindSketch": "Dibuix",
+  "noteAttachmentOpen": "Obre {name}",
+  "@noteAttachmentOpen": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "noteAttachmentRemove": "Treu {name}",
+  "@noteAttachmentRemove": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "noteAttachmentRemoveHint": "Mantén premut per treure {name}",
+  "@noteAttachmentRemoveHint": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "noteAttachmentRemoved": "S’ha tret {name}",
+  "@noteAttachmentRemoved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "noteAttachmentsViewerTitle": "Adjunt",
+  "noteAttachmentTooLarge": "Aquest fitxer és massa gran (el màxim són 50 MB).",
+  "noteAttachmentStoreFull": "No queda espai per a més adjunts.",
+  "noteAttachmentUnreadable": "No s’ha pogut llegir el fitxer.",
+  "noteAttachmentCameraDenied": "Sense el permís no podem obrir la càmera.",
+  "noteAttachmentGalleryDenied": "Sense el permís no podem obrir la galeria.",
+  "noteAttachmentFailed": "No s’ha pogut desar l’adjunt.",
+  "noteAttachmentRemoveFailed": "No s’ha pogut treure l’adjunt.",
+  "noteTasksSection": "Tasques",
+  "noteTasksEmpty": "Aquest dia no té tasques.",
+  "noteTasksAdd": "Afegeix una tasca",
+  "noteTasksHint": "Què cal fer",
+  "noteTasksInvalid": "Escriu què cal fer.",
+  "noteTasksUndo": "Desfés l’últim canvi de les tasques",
+  "noteTaskMenu": "Opcions de la tasca",
+  "noteTaskMoveUp": "Puja",
+  "noteTaskMoveDown": "Baixa",
+  "noteTaskRemove": "Treu la tasca",
+  "sketchTitle": "Dibuix",
+  "sketchPen": "Traç",
+  "sketchEraser": "Esborrador",
+  "sketchUndo": "Desfés el traç",
+  "sketchRedo": "Refés el traç",
+  "sketchClear": "Esborra el dibuix",
+  "sketchSave": "Desa",
+  "sketchColor": "Color del traç",
+  "sketchColorInk": "Tinta",
+  "sketchColorAccent": "Accent",
+  "sketchColorHighlight": "Ambre",
+  "sketchColorHoliday": "Vermell",
+  "sketchColorSuccess": "Verd",
+  "sketchEmpty": "Dibuixa alguna cosa per poder desar-la.",
+  "sketchFailed": "No s’ha pogut desar el dibuix.",
+  "appearanceNoteInMonthTitle": "Mostra la nota al mes",
+  "appearanceNoteInMonthSubtitle": "La primera línia de la nota a la casella del dia",
+  "appearancePaintSoundTitle": "So en pintar",
+  "appearancePaintSoundSubtitle": "Un clic en pintar un dia, tret del mode silenci",
+  "appearancePresetsTitle": "Paletes preparades",
+  "appearancePresetsNote": "Canvien alhora el color dels torns que fan servir els colors de fàbrica. Els que hagis pintat al teu gust es queden igual.",
+  "appearancePresetsChoose": "Tria",
+  "appearancePresetsApplied": "Paleta aplicada. Pots desfer-ho.",
+  "appearancePresetSunset": "Capvespre",
+  "appearancePresetSea": "Mar",
+  "appearancePresetForest": "Bosc",
+  "appearancePresetCandy": "Caramel",
+  "appearancePresetNocturnal": "Nit tancada",
+  "appearanceBackgroundTitle": "Imatge de fons del calendari",
+  "appearanceBackgroundChoose": "Tria",
+  "appearanceBackgroundChange": "Canvia",
+  "appearanceBackgroundPick": "Tria de la galeria",
+  "appearanceBackgroundRemove": "Treu la imatge",
+  "appearanceBackgroundOnDevice": "Es queda en aquest mòbil: no viatja amb la còpia de seguretat",
+  "appearanceBackgroundNote": "Es tria de la teva galeria i es veu darrere del mes, amb un vel perquè tot es llegeixi bé. Les caselles del torn no canvien.",
+  "appearanceBackgroundTooLarge": "Aquesta imatge és massa gran. Prova’n una de més petita.",
+  "appearanceBackgroundFailed": "No s’ha pogut desar la imatge.",
+  "widgetAddFourWeeks": "Quatre setmanes: un mes",
+  "widgetNameFourWeeks": "Quatre setmanes",
+  "widgetDescFourWeeks": "El mes per setmanes",
+  "compareSelectorTitle": "Calendaris comparats",
+  "compareSelectorAction": "Canvia",
+  "compareSheetHint": "Pots comparar de 2 a 6 calendaris.",
+  "compareSheetDone": "Fet",
+  "compareSheetMinWarning": "Fan falta com a mínim 2 calendaris per comparar.",
+  "compareSheetMaxWarning": "Ja compares 6 calendaris, el màxim.",
+  "compareWeekendTitle": "Caps de setmana lliures en comú",
+  "compareWeekendCount": "{count, plural, =0{Cap cap de setmana lliure en comú aquest mes} =1{1 cap de setmana lliure en comú aquest mes} other{{count} caps de setmana lliures en comú aquest mes}}",
+  "@compareWeekendCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "compareWeekendDaysCount": "{count, plural, =1{1 dia de cap de setmana lliure en comú} other{{count} dies de cap de setmana lliures en comú}}",
+  "@compareWeekendDaysCount": {
+    "description": "Comparar calendarios: días de fin de semana libres en todos los calendarios comparados que no forman un fin de semana entero.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "compareWeekendSpoken": "{saturday} i {sunday}, lliures en comú",
+  "@compareWeekendSpoken": {
+    "placeholders": {
+      "saturday": {
+        "type": "String"
+      },
+      "sunday": {
+        "type": "String"
+      }
+    }
+  },
+  "compareTableNames": "Calendaris",
+  "devEventsRowTitle": "Cites del mòbil",
+  "devEventsRowSubtitle": "Les cites del teu calendari al costat dels torns",
+  "devEventsTitle": "Cites del mòbil",
+  "devEventsHelp": "Tria els calendaris del mòbil les cites dels quals vols veure al costat dels torns. Turnly només els llegeix: no hi escriu ni hi canvia res.",
+  "devEventsPermissionTitle": "Falta el permís del calendari",
+  "devEventsPermissionBody": "Per llegir les cites del mòbil, Turnly necessita permís per veure els teus calendaris. No es demana en obrir l’app: només si ho acceptes aquí.",
+  "devEventsPermissionDeniedTitle": "L’accés al calendari està desactivat",
+  "devEventsPermissionDeniedBody": "Activa’l a la configuració del sistema (Permisos › Calendari) i torna aquí.",
+  "devEventsPermissionDeniedBodyIos": "Activa’l a la configuració del sistema (Turnly › Calendaris) i torna aquí.",
+  "devEventsPermissionRestrictedTitle": "Aquest mòbil no deixa fer servir el calendari",
+  "devEventsPermissionRestrictedBody": "Pot ser un control parental o un perfil de feina. Sense aquest permís no es poden mostrar les cites.",
+  "devEventsPermissionDeclinedBody": "No has donat el permís. Sense ell no podem llegir els teus calendaris, però pots permetre-ho ara.",
+  "devEventsPermissionAllow": "Permet l’accés",
+  "devEventsPermissionSettings": "Obre la configuració",
+  "devEventsPermissionRecheck": "Torna-ho a comprovar",
+  "devEventsCalendarsTitle": "Calendaris del mòbil",
+  "devEventsChosenCount": "{count, plural, =1{1 calendari triat} other{{count} calendaris triats}}",
+  "@devEventsChosenCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "devEventsEmptyTitle": "No hi ha calendaris",
+  "devEventsEmptyBody": "Aquest mòbil no té cap calendari que Turnly pugui llegir.",
+  "devEventsReadFailedTitle": "No s’han pogut llegir els teus calendaris",
+  "devEventsReadFailedBody": "El calendari del mòbil no ha respost. Comprova’l una altra vegada.",
+  "devEventsOffTitle": "Ara no es mostren cites",
+  "devEventsOffBody": "No has triat cap calendari. Fins que en triïs un, el mes i el dia no mostren cites.",
+  "devEventsSaveFailed": "No s’han pogut desar els canvis.",
+  "devEventsSectionTitle": "Cites del mòbil",
+  "devEventsAllDay": "Tot el dia",
+  "devEventsCount": "{count, plural, =1{1 cita} other{{count} cites}}",
+  "@devEventsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "devEventsEventSemantics": "{time}, {title}",
+  "@devEventsEventSemantics": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "devEventsEventWithCalendarSemantics": "{time}, {title}, {calendar}",
+  "@devEventsEventWithCalendarSemantics": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      },
+      "calendar": {
+        "type": "String"
+      }
+    }
+  }
 }

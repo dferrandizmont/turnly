@@ -1089,10 +1089,1122 @@ i1.GeneratedColumn<int> _column_41(String aliasedName) =>
       type: i1.DriftSqlType.int,
       $customConstraints: 'NULL CHECK (fixed_plus_cents BETWEEN 0 AND 999999)',
     );
+
+final class Schema5 extends i0.VersionedSchema {
+  Schema5({required super.database}) : super(version: 5);
+  @override
+  late final List<i1.DatabaseSchemaEntity> entities = [
+    calendars,
+    shiftTypes,
+    shiftTypeVersions,
+    patterns,
+    patternRuns,
+    dayEntries,
+    holidays,
+    absenceBalances,
+    settings,
+    idxHolidaysDate,
+  ];
+  late final Shape0 calendars = Shape0(
+    source: i0.VersionedTable(
+      entityName: 'calendars',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_3,
+        _column_4,
+        _column_5,
+        _column_6,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape10 shiftTypes = Shape10(
+    source: i0.VersionedTable(
+      entityName: 'shift_types',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'CHECK((start_minute IS NULL)=(end_minute IS NULL))',
+        'CHECK((segment2_start_minute IS NULL)=(segment2_duration_minutes IS NULL))',
+        'CHECK(segment2_start_minute IS NULL OR start_minute IS NOT NULL)',
+        'CHECK(segment2_start_minute IS NULL OR segment2_start_minute BETWEEN 0 AND 1439)',
+        'CHECK(segment2_duration_minutes IS NULL OR segment2_duration_minutes BETWEEN 1 AND 1440)',
+      ],
+      columns: [
+        _column_0,
+        _column_7,
+        _column_1,
+        _column_2,
+        _column_8,
+        _column_9,
+        _column_10,
+        _column_11,
+        _column_12,
+        _column_13,
+        _column_41,
+        _column_34,
+        _column_35,
+        _column_36,
+        _column_37,
+        _column_3,
+        _column_4,
+        _column_5,
+        _column_6,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape11 shiftTypeVersions = Shape11(
+    source: i0.VersionedTable(
+      entityName: 'shift_type_versions',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(shift_type_id, until_date)',
+        'CHECK((start_minute IS NULL)=(end_minute IS NULL))',
+        'CHECK((segment2_start_minute IS NULL)=(segment2_duration_minutes IS NULL))',
+        'CHECK(segment2_start_minute IS NULL OR start_minute IS NOT NULL)',
+        'CHECK(segment2_start_minute IS NULL OR segment2_start_minute BETWEEN 0 AND 1439)',
+        'CHECK(segment2_duration_minutes IS NULL OR segment2_duration_minutes BETWEEN 1 AND 1440)',
+      ],
+      columns: [
+        _column_42,
+        _column_43,
+        _column_8,
+        _column_9,
+        _column_10,
+        _column_44,
+        _column_12,
+        _column_45,
+        _column_41,
+        _column_36,
+        _column_37,
+        _column_5,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape2 patterns = Shape2(
+    source: i0.VersionedTable(
+      entityName: 'patterns',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)', 'CHECK(steps <> \'[]\')'],
+      columns: [_column_0, _column_1, _column_14, _column_5, _column_6],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape3 patternRuns = Shape3(
+    source: i0.VersionedTable(
+      entityName: 'pattern_runs',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'CHECK(end_date IS NULL OR end_date >= start_date)',
+      ],
+      columns: [
+        _column_0,
+        _column_15,
+        _column_16,
+        _column_17,
+        _column_18,
+        _column_19,
+        _column_20,
+        _column_5,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape9 dayEntries = Shape9(
+    source: i0.VersionedTable(
+      entityName: 'day_entries',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(calendar_id, date)'],
+      columns: [
+        _column_15,
+        _column_21,
+        _column_22,
+        _column_23,
+        _column_6,
+        _column_38,
+        _column_39,
+        _column_40,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape5 holidays = Shape5(
+    source: i0.VersionedTable(
+      entityName: 'holidays',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [],
+      columns: [
+        _column_24,
+        _column_21,
+        _column_25,
+        _column_1,
+        _column_26,
+        _column_27,
+        _column_28,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape6 absenceBalances = Shape6(
+    source: i0.VersionedTable(
+      entityName: 'absence_balances',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(year, type)'],
+      columns: [_column_29, _column_30, _column_31],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape7 settings = Shape7(
+    source: i0.VersionedTable(
+      entityName: 'settings',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY("key")'],
+      columns: [_column_32, _column_33],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  final i1.Index idxHolidaysDate = i1.Index(
+    'idx_holidays_date',
+    'CREATE INDEX idx_holidays_date ON holidays (date)',
+  );
+}
+
+class Shape11 extends i0.VersionedTable {
+  Shape11({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get shiftTypeId =>
+      columnsByName['shift_type_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get untilDate =>
+      columnsByName['until_date']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get category =>
+      columnsByName['category']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get startMinute =>
+      columnsByName['start_minute']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get endMinute =>
+      columnsByName['end_minute']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get paidMinutes =>
+      columnsByName['paid_minutes']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get nightOverride =>
+      columnsByName['night_override']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get hourlyRateCents =>
+      columnsByName['hourly_rate_cents']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get fixedPlusCents =>
+      columnsByName['fixed_plus_cents']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get segment2StartMinute =>
+      columnsByName['segment2_start_minute']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get segment2DurationMinutes =>
+      columnsByName['segment2_duration_minutes']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get createdAt =>
+      columnsByName['created_at']! as i1.GeneratedColumn<int>;
+}
+
+i1.GeneratedColumn<String> _column_42(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'shift_type_id',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints:
+          'NOT NULL REFERENCES shift_types(id)ON DELETE CASCADE',
+    );
+i1.GeneratedColumn<String> _column_43(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'until_date',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<int> _column_44(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'paid_minutes',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NULL CHECK (paid_minutes >= 0)',
+    );
+i1.GeneratedColumn<int> _column_45(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'hourly_rate_cents',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NULL CHECK (hourly_rate_cents BETWEEN 0 AND 999999)',
+    );
+
+final class Schema6 extends i0.VersionedSchema {
+  Schema6({required super.database}) : super(version: 6);
+  @override
+  late final List<i1.DatabaseSchemaEntity> entities = [
+    calendars,
+    shiftTypes,
+    shiftTypeVersions,
+    patterns,
+    patternRuns,
+    dayEntries,
+    noteAttachments,
+    dayTasks,
+    shiftSwaps,
+    holidays,
+    absenceBalances,
+    settings,
+    idxNoteAttachmentsDay,
+    idxDayTasksDay,
+    idxShiftSwapsDay,
+    idxHolidaysDate,
+  ];
+  late final Shape0 calendars = Shape0(
+    source: i0.VersionedTable(
+      entityName: 'calendars',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_3,
+        _column_4,
+        _column_5,
+        _column_6,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape12 shiftTypes = Shape12(
+    source: i0.VersionedTable(
+      entityName: 'shift_types',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'CHECK((start_minute IS NULL)=(end_minute IS NULL))',
+        'CHECK((segment2_start_minute IS NULL)=(segment2_duration_minutes IS NULL))',
+        'CHECK(segment2_start_minute IS NULL OR start_minute IS NOT NULL)',
+        'CHECK(segment2_start_minute IS NULL OR segment2_start_minute BETWEEN 0 AND 1439)',
+        'CHECK(segment2_duration_minutes IS NULL OR segment2_duration_minutes BETWEEN 1 AND 1440)',
+      ],
+      columns: [
+        _column_0,
+        _column_7,
+        _column_1,
+        _column_2,
+        _column_8,
+        _column_9,
+        _column_10,
+        _column_11,
+        _column_12,
+        _column_13,
+        _column_46,
+        _column_34,
+        _column_35,
+        _column_36,
+        _column_37,
+        _column_47,
+        _column_48,
+        _column_49,
+        _column_3,
+        _column_4,
+        _column_5,
+        _column_6,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape13 shiftTypeVersions = Shape13(
+    source: i0.VersionedTable(
+      entityName: 'shift_type_versions',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(shift_type_id, until_date)',
+        'CHECK((start_minute IS NULL)=(end_minute IS NULL))',
+        'CHECK((segment2_start_minute IS NULL)=(segment2_duration_minutes IS NULL))',
+        'CHECK(segment2_start_minute IS NULL OR start_minute IS NOT NULL)',
+        'CHECK(segment2_start_minute IS NULL OR segment2_start_minute BETWEEN 0 AND 1439)',
+        'CHECK(segment2_duration_minutes IS NULL OR segment2_duration_minutes BETWEEN 1 AND 1440)',
+      ],
+      columns: [
+        _column_42,
+        _column_43,
+        _column_8,
+        _column_9,
+        _column_10,
+        _column_44,
+        _column_12,
+        _column_50,
+        _column_46,
+        _column_36,
+        _column_37,
+        _column_48,
+        _column_49,
+        _column_5,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape2 patterns = Shape2(
+    source: i0.VersionedTable(
+      entityName: 'patterns',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)', 'CHECK(steps <> \'[]\')'],
+      columns: [_column_0, _column_1, _column_14, _column_5, _column_6],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape3 patternRuns = Shape3(
+    source: i0.VersionedTable(
+      entityName: 'pattern_runs',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'CHECK(end_date IS NULL OR end_date >= start_date)',
+      ],
+      columns: [
+        _column_0,
+        _column_15,
+        _column_16,
+        _column_17,
+        _column_18,
+        _column_19,
+        _column_20,
+        _column_5,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape14 dayEntries = Shape14(
+    source: i0.VersionedTable(
+      entityName: 'day_entries',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(calendar_id, date)'],
+      columns: [
+        _column_15,
+        _column_21,
+        _column_22,
+        _column_23,
+        _column_6,
+        _column_38,
+        _column_39,
+        _column_40,
+        _column_51,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape15 noteAttachments = Shape15(
+    source: i0.VersionedTable(
+      entityName: 'note_attachments',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'CHECK(kind IN (\'photo\', \'file\', \'sketch\'))',
+        'UNIQUE(relative_path COLLATE NOCASE)',
+        'CHECK(length(id) BETWEEN 1 AND 64)',
+        'CHECK(length(relative_path) BETWEEN 1 AND 512 AND substr(relative_path, 1, 1) NOT IN (\'/\', \'.\') AND instr(relative_path, \'..\') = 0 AND instr(relative_path, char(92)) = 0)',
+        'CHECK(length(mime_type) BETWEEN 1 AND 255)',
+        'CHECK(size_bytes BETWEEN 0 AND 52428800)',
+        'CHECK(length(sha256) = 64)',
+        'CHECK(display_name IS NULL OR length(display_name) BETWEEN 1 AND 255)',
+      ],
+      columns: [
+        _column_0,
+        _column_52,
+        _column_21,
+        _column_53,
+        _column_54,
+        _column_55,
+        _column_56,
+        _column_57,
+        _column_58,
+        _column_59,
+        _column_5,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape16 dayTasks = Shape16(
+    source: i0.VersionedTable(
+      entityName: 'day_tasks',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'CHECK(id <> \'\')',
+        'CHECK(trim(title) <> \'\' AND length(title) <= 500)',
+      ],
+      columns: [
+        _column_0,
+        _column_52,
+        _column_21,
+        _column_60,
+        _column_61,
+        _column_59,
+        _column_5,
+        _column_6,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape17 shiftSwaps = Shape17(
+    source: i0.VersionedTable(
+      entityName: 'shift_swaps',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'CHECK(id <> \'\')',
+        'CHECK(direction IN (\'theyOwe\', \'iOwe\'))',
+        'CHECK(status IN (\'pending\', \'returned\'))',
+        'CHECK(trim(colleague) <> \'\' AND length(colleague) <= 200)',
+        'CHECK(note IS NULL OR length(note) <= 2000)',
+        'CHECK((status = \'returned\')=(closed_at IS NOT NULL))',
+      ],
+      columns: [
+        _column_0,
+        _column_52,
+        _column_21,
+        _column_62,
+        _column_63,
+        _column_64,
+        _column_65,
+        _column_66,
+        _column_67,
+        _column_23,
+        _column_5,
+        _column_6,
+        _column_68,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape5 holidays = Shape5(
+    source: i0.VersionedTable(
+      entityName: 'holidays',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [],
+      columns: [
+        _column_24,
+        _column_21,
+        _column_25,
+        _column_1,
+        _column_26,
+        _column_27,
+        _column_28,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape18 absenceBalances = Shape18(
+    source: i0.VersionedTable(
+      entityName: 'absence_balances',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(year, type)',
+        'CHECK(unit IN (\'day\', \'half\', \'quarter\'))',
+        'CHECK(name IS NULL OR(trim(name) <> \'\' AND length(name) <= 100))',
+        'CHECK((period_start IS NULL)=(period_end IS NULL))',
+        'CHECK(period_end IS NULL OR period_end >= period_start)',
+        'CHECK(carry_over_max_days IS NULL OR(carry_over_max_days >= 0 AND carry_over_max_days * 4 = CAST(carry_over_max_days * 4 AS INTEGER)))',
+        'CHECK(adjustment_days * 4 = CAST(adjustment_days * 4 AS INTEGER))',
+      ],
+      columns: [
+        _column_29,
+        _column_30,
+        _column_31,
+        _column_69,
+        _column_70,
+        _column_71,
+        _column_72,
+        _column_73,
+        _column_74,
+        _column_75,
+        _column_76,
+        _column_77,
+        _column_59,
+        _column_78,
+        _column_79,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape7 settings = Shape7(
+    source: i0.VersionedTable(
+      entityName: 'settings',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY("key")'],
+      columns: [_column_32, _column_33],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  final i1.Index idxNoteAttachmentsDay = i1.Index(
+    'idx_note_attachments_day',
+    'CREATE INDEX idx_note_attachments_day ON note_attachments (calendar_id, date)',
+  );
+  final i1.Index idxDayTasksDay = i1.Index(
+    'idx_day_tasks_day',
+    'CREATE INDEX idx_day_tasks_day ON day_tasks (calendar_id, date)',
+  );
+  final i1.Index idxShiftSwapsDay = i1.Index(
+    'idx_shift_swaps_day',
+    'CREATE INDEX idx_shift_swaps_day ON shift_swaps (calendar_id, date)',
+  );
+  final i1.Index idxHolidaysDate = i1.Index(
+    'idx_holidays_date',
+    'CREATE INDEX idx_holidays_date ON holidays (date)',
+  );
+}
+
+class Shape12 extends i0.VersionedTable {
+  Shape12({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get code =>
+      columnsByName['code']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get name =>
+      columnsByName['name']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get colorValue =>
+      columnsByName['color_value']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get category =>
+      columnsByName['category']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get startMinute =>
+      columnsByName['start_minute']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get endMinute =>
+      columnsByName['end_minute']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get paidMinutes =>
+      columnsByName['paid_minutes']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get nightOverride =>
+      columnsByName['night_override']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get hourlyRateCents =>
+      columnsByName['hourly_rate_cents']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get fixedPlusCents =>
+      columnsByName['fixed_plus_cents']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get icon =>
+      columnsByName['icon']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get alarmSound =>
+      columnsByName['alarm_sound']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get segment2StartMinute =>
+      columnsByName['segment2_start_minute']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get segment2DurationMinutes =>
+      columnsByName['segment2_duration_minutes']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get location =>
+      columnsByName['location']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get nightPlusCentsPerHour =>
+      columnsByName['night_plus_cents_per_hour']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get holidayPlusCentsPerHour =>
+      columnsByName['holiday_plus_cents_per_hour']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get sortOrder =>
+      columnsByName['sort_order']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get archived =>
+      columnsByName['archived']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get createdAt =>
+      columnsByName['created_at']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get updatedAt =>
+      columnsByName['updated_at']! as i1.GeneratedColumn<int>;
+}
+
+i1.GeneratedColumn<int> _column_46(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'fixed_plus_cents',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.int,
+      $customConstraints:
+          'NULL CHECK (fixed_plus_cents BETWEEN 0 AND 999999999)',
+    );
+i1.GeneratedColumn<String> _column_47(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'location',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL CHECK (location IS NULL OR LENGTH(TRIM(location)) > 0 AND LENGTH(location) <= 200)',
+    );
+i1.GeneratedColumn<int> _column_48(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'night_plus_cents_per_hour',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.int,
+      $customConstraints:
+          'NULL CHECK (night_plus_cents_per_hour BETWEEN 0 AND 999999999)',
+    );
+i1.GeneratedColumn<int> _column_49(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'holiday_plus_cents_per_hour',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.int,
+      $customConstraints:
+          'NULL CHECK (holiday_plus_cents_per_hour BETWEEN 0 AND 999999999)',
+    );
+
+class Shape13 extends i0.VersionedTable {
+  Shape13({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get shiftTypeId =>
+      columnsByName['shift_type_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get untilDate =>
+      columnsByName['until_date']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get category =>
+      columnsByName['category']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get startMinute =>
+      columnsByName['start_minute']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get endMinute =>
+      columnsByName['end_minute']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get paidMinutes =>
+      columnsByName['paid_minutes']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get nightOverride =>
+      columnsByName['night_override']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get hourlyRateCents =>
+      columnsByName['hourly_rate_cents']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get fixedPlusCents =>
+      columnsByName['fixed_plus_cents']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get segment2StartMinute =>
+      columnsByName['segment2_start_minute']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get segment2DurationMinutes =>
+      columnsByName['segment2_duration_minutes']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get nightPlusCentsPerHour =>
+      columnsByName['night_plus_cents_per_hour']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get holidayPlusCentsPerHour =>
+      columnsByName['holiday_plus_cents_per_hour']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get createdAt =>
+      columnsByName['created_at']! as i1.GeneratedColumn<int>;
+}
+
+i1.GeneratedColumn<int> _column_50(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'hourly_rate_cents',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.int,
+      $customConstraints:
+          'NULL CHECK (hourly_rate_cents BETWEEN 0 AND 999999999)',
+    );
+
+class Shape14 extends i0.VersionedTable {
+  Shape14({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get calendarId =>
+      columnsByName['calendar_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get date =>
+      columnsByName['date']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get shiftTypeIds =>
+      columnsByName['shift_type_ids']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get note =>
+      columnsByName['note']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get updatedAt =>
+      columnsByName['updated_at']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get noteReminderMinute =>
+      columnsByName['note_reminder_minute']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get overtimeMinutes =>
+      columnsByName['overtime_minutes']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get earlyLeaveMinutes =>
+      columnsByName['early_leave_minutes']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get extraAmountCents =>
+      columnsByName['extra_amount_cents']! as i1.GeneratedColumn<int>;
+}
+
+i1.GeneratedColumn<int> _column_51(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'extra_amount_cents',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.int,
+      $customConstraints:
+          'NULL CHECK (extra_amount_cents BETWEEN -999999999 AND 999999999)',
+    );
+
+class Shape15 extends i0.VersionedTable {
+  Shape15({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get calendarId =>
+      columnsByName['calendar_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get date =>
+      columnsByName['date']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get kind =>
+      columnsByName['kind']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get relativePath =>
+      columnsByName['relative_path']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get mimeType =>
+      columnsByName['mime_type']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get sizeBytes =>
+      columnsByName['size_bytes']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get sha256 =>
+      columnsByName['sha256']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get displayName =>
+      columnsByName['display_name']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get sortOrder =>
+      columnsByName['sort_order']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get createdAt =>
+      columnsByName['created_at']! as i1.GeneratedColumn<int>;
+}
+
+i1.GeneratedColumn<String> _column_52(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'calendar_id',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL REFERENCES calendars(id)ON DELETE CASCADE',
+    );
+i1.GeneratedColumn<String> _column_53(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'kind',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<String> _column_54(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'relative_path',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<String> _column_55(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'mime_type',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<int> _column_56(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'size_bytes',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<String> _column_57(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'sha256',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<String> _column_58(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'display_name',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
+i1.GeneratedColumn<int> _column_59(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'sort_order',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL DEFAULT 0',
+      defaultValue: const i1.CustomExpression('0'),
+    );
+
+class Shape16 extends i0.VersionedTable {
+  Shape16({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get calendarId =>
+      columnsByName['calendar_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get date =>
+      columnsByName['date']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get title =>
+      columnsByName['title']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get done =>
+      columnsByName['done']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get sortOrder =>
+      columnsByName['sort_order']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get createdAt =>
+      columnsByName['created_at']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get updatedAt =>
+      columnsByName['updated_at']! as i1.GeneratedColumn<int>;
+}
+
+i1.GeneratedColumn<String> _column_60(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'title',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<int> _column_61(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'done',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL DEFAULT 0 CHECK (done IN (0, 1))',
+      defaultValue: const i1.CustomExpression('0'),
+    );
+
+class Shape17 extends i0.VersionedTable {
+  Shape17({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get calendarId =>
+      columnsByName['calendar_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get date =>
+      columnsByName['date']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get colleague =>
+      columnsByName['colleague']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get direction =>
+      columnsByName['direction']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get givenShiftTypeIds =>
+      columnsByName['given_shift_type_ids']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get receivedShiftTypeIds =>
+      columnsByName['received_shift_type_ids']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get returnDate =>
+      columnsByName['return_date']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get status =>
+      columnsByName['status']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get note =>
+      columnsByName['note']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get createdAt =>
+      columnsByName['created_at']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get updatedAt =>
+      columnsByName['updated_at']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get closedAt =>
+      columnsByName['closed_at']! as i1.GeneratedColumn<int>;
+}
+
+i1.GeneratedColumn<String> _column_62(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'colleague',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<String> _column_63(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'direction',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<String> _column_64(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'given_shift_type_ids',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
+i1.GeneratedColumn<String> _column_65(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'received_shift_type_ids',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
+i1.GeneratedColumn<String> _column_66(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'return_date',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
+i1.GeneratedColumn<String> _column_67(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'status',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL DEFAULT \'pending\'',
+      defaultValue: const i1.CustomExpression('\'pending\''),
+    );
+i1.GeneratedColumn<int> _column_68(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'closed_at',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NULL',
+    );
+
+class Shape18 extends i0.VersionedTable {
+  Shape18({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<int> get year =>
+      columnsByName['year']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get type =>
+      columnsByName['type']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<double> get allowedDays =>
+      columnsByName['allowed_days']! as i1.GeneratedColumn<double>;
+  i1.GeneratedColumn<String> get calendarId =>
+      columnsByName['calendar_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get name =>
+      columnsByName['name']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get periodStart =>
+      columnsByName['period_start']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get periodEnd =>
+      columnsByName['period_end']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get unit =>
+      columnsByName['unit']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get shiftTypeQuarters =>
+      columnsByName['shift_type_quarters']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get carryOver =>
+      columnsByName['carry_over']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<double> get carryOverMaxDays =>
+      columnsByName['carry_over_max_days']! as i1.GeneratedColumn<double>;
+  i1.GeneratedColumn<double> get adjustmentDays =>
+      columnsByName['adjustment_days']! as i1.GeneratedColumn<double>;
+  i1.GeneratedColumn<int> get sortOrder =>
+      columnsByName['sort_order']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get createdAt =>
+      columnsByName['created_at']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get updatedAt =>
+      columnsByName['updated_at']! as i1.GeneratedColumn<int>;
+}
+
+i1.GeneratedColumn<String> _column_69(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'calendar_id',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL REFERENCES calendars(id)ON DELETE CASCADE',
+    );
+i1.GeneratedColumn<String> _column_70(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'name',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
+i1.GeneratedColumn<String> _column_71(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'period_start',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
+i1.GeneratedColumn<String> _column_72(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'period_end',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
+i1.GeneratedColumn<String> _column_73(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'unit',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL DEFAULT \'day\'',
+      defaultValue: const i1.CustomExpression('\'day\''),
+    );
+i1.GeneratedColumn<String> _column_74(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'shift_type_quarters',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL',
+    );
+i1.GeneratedColumn<int> _column_75(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'carry_over',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL DEFAULT 0 CHECK (carry_over IN (0, 1))',
+      defaultValue: const i1.CustomExpression('0'),
+    );
+i1.GeneratedColumn<double> _column_76(String aliasedName) =>
+    i1.GeneratedColumn<double>(
+      'carry_over_max_days',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.double,
+      $customConstraints: 'NULL',
+    );
+i1.GeneratedColumn<double> _column_77(String aliasedName) =>
+    i1.GeneratedColumn<double>(
+      'adjustment_days',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.double,
+      $customConstraints: 'NOT NULL DEFAULT 0.0',
+      defaultValue: const i1.CustomExpression('0.0'),
+    );
+i1.GeneratedColumn<int> _column_78(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'created_at',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NULL',
+    );
+i1.GeneratedColumn<int> _column_79(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'updated_at',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NULL',
+    );
 i0.MigrationStepWithVersion migrationSteps({
   required Future<void> Function(i1.Migrator m, Schema2 schema) from1To2,
   required Future<void> Function(i1.Migrator m, Schema3 schema) from2To3,
   required Future<void> Function(i1.Migrator m, Schema4 schema) from3To4,
+  required Future<void> Function(i1.Migrator m, Schema5 schema) from4To5,
+  required Future<void> Function(i1.Migrator m, Schema6 schema) from5To6,
 }) {
   return (currentVersion, database) async {
     switch (currentVersion) {
@@ -1111,6 +2223,16 @@ i0.MigrationStepWithVersion migrationSteps({
         final migrator = i1.Migrator(database, schema);
         await from3To4(migrator, schema);
         return 4;
+      case 4:
+        final schema = Schema5(database: database);
+        final migrator = i1.Migrator(database, schema);
+        await from4To5(migrator, schema);
+        return 5;
+      case 5:
+        final schema = Schema6(database: database);
+        final migrator = i1.Migrator(database, schema);
+        await from5To6(migrator, schema);
+        return 6;
       default:
         throw ArgumentError.value('Unknown migration from $currentVersion');
     }
@@ -1121,10 +2243,14 @@ i1.OnUpgrade stepByStep({
   required Future<void> Function(i1.Migrator m, Schema2 schema) from1To2,
   required Future<void> Function(i1.Migrator m, Schema3 schema) from2To3,
   required Future<void> Function(i1.Migrator m, Schema4 schema) from3To4,
+  required Future<void> Function(i1.Migrator m, Schema5 schema) from4To5,
+  required Future<void> Function(i1.Migrator m, Schema6 schema) from5To6,
 }) => i0.VersionedSchema.stepByStepHelper(
   step: migrationSteps(
     from1To2: from1To2,
     from2To3: from2To3,
     from3To4: from3To4,
+    from4To5: from4To5,
+    from5To6: from5To6,
   ),
 );

@@ -9,14 +9,22 @@ import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/app_sheet.dart';
 import '../../../core/widgets/choice_row.dart';
 import '../../holidays/data/holiday_bundle_format.dart';
+import '../../holidays/domain/holiday_country.dart';
+import '../../holidays/domain/holiday_subdivision.dart';
 import '../../holidays/domain/spanish_regions.dart';
 import '../../holidays/presentation/holiday_pickers.dart';
 import '../application/onboarding_controller.dart';
 import '../application/onboarding_providers.dart';
 import 'onboarding_widgets.dart';
+import 'profession_step.dart';
 
-/// Step 2, «¿Dónde trabajas?»: the community (a list of 19) and, optionally,
-/// the municipality (a search over the bundled index, filtered by region).
+/// The last step, optional («Paso N de M · Opcional»): «¿Dónde trabajas?»,
+/// the country (proposed from the phone's region) and, in Spain, the
+/// community (a list of 19) and, optionally, the municipality (a search over
+/// the bundled index, filtered by region); outside Spain a line says there
+/// are no official holidays for that country yet and where to add one's
+/// own. Under it, «¿A qué te dedicas?» ([ProfessionSection]). «Saltar»
+/// keeps the country, so a phone outside Spain never gets Spain's holidays.
 class PlaceStep extends ConsumerWidget {
   const PlaceStep({super.key});
 
@@ -28,73 +36,165 @@ class PlaceStep extends ConsumerWidget {
     final controller = ref.read(onboardingControllerProvider.notifier);
     final region = regionByCode(state.regionCode);
     final municipality = state.municipalityCode;
-    final missingLocal = municipality == null
-        ? false
-        : ref.watch(localHolidaysAvailableProvider(municipality)).value ==
-              false;
+    final missingYears = municipality == null
+        ? const <int>[]
+        : ref.watch(localHolidaysMissingYearsProvider(municipality)).value ??
+              const <int>[];
+    final thisYear = state.start.year;
+    final noteStyle = type.body.copyWith(color: context.colors.textSecondary);
 
-    return Column(
+    final country = ValueTile(
+      key: const ValueKey('onboarding-country'),
+      label: l10n.onboardingCountryLabel,
+      placeholder: l10n.onboardingCountryLabel,
+      value: holidayCountryLabel(context, state.countryCode),
+      onTap: () async {
+        final picked = await showCountryPicker(
+          context,
+          title: l10n.onboardingCountrySheetTitle,
+          selected: state.countryCode,
+        );
+        if (picked != null) controller.selectCountry(picked);
+      },
+    );
+
+    // «Paso 3 de 3 · Opcional»: the dots say the number, this says it can
+    // be left.
+    final step = state.stepNumber;
+    final optional = Padding(
+      padding: const EdgeInsets.only(bottom: Sp.xs),
+      child: Text(
+        step == null
+            ? l10n.onboardingOptional
+            : '${l10n.onboardingProgress(step, state.steps.length)} · '
+                  '${l10n.onboardingOptional}',
+        key: const ValueKey('onboarding-optional'),
+        style: type.meta.copyWith(fontWeight: FontWeight.w600),
+      ),
+    );
+
+    Widget withJob(List<Widget> place) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        optional,
+        ...place,
+        const SizedBox(height: Sp.section + Sp.s),
+        const ProfessionSection(),
+      ],
+    );
+
+    if (!state.isSpain) {
+      return withJob([
         StepHeader(
           title: l10n.onboardingPlaceTitle,
           titleKey: const ValueKey('onboarding-title'),
-          help: l10n.onboardingPlaceHelp,
+          help: l10n.onboardingPlaceHelpAbroad,
         ),
-        ValueTile(
-          key: const ValueKey('onboarding-region'),
-          label: l10n.onboardingRegionLabel,
-          placeholder: l10n.onboardingRegionPick,
-          value: region?.name,
-          onTap: () async {
-            // The same sheet and list as Ajustes › Festivos (H-T10-3): the 19
-            // in alphabetical order, the current one marked.
-            final picked = await showRegionPicker(
-              context,
-              title: l10n.onboardingRegionSheetTitle,
-              selected: region?.code,
-            );
-            final code = picked?.value;
-            if (code != null) controller.selectRegion(code);
-          },
-        ),
-        const SizedBox(height: Sp.card),
-        ValueTile(
-          key: const ValueKey('onboarding-municipality'),
-          label: l10n.onboardingMunicipalityLabel,
-          placeholder: region == null
-              ? l10n.onboardingMunicipalityNeedsRegion
-              : l10n.onboardingMunicipalityPick,
-          value: state.municipalityName,
-          onTap: region == null
-              ? null
-              : () async {
-                  final picked = await showAppSheet<Municipality>(
-                    context: context,
-                    builder: (_) => MunicipalitySheet(regionCode: region.code),
-                  );
-                  if (picked != null) {
-                    controller.selectMunicipality(
-                      picked.code,
-                      name: picked.name,
-                    );
-                  }
-                },
-          onClear: () => controller.selectMunicipality(null),
-          clearTooltip: l10n.onboardingMunicipalityClear,
-          clearKey: const ValueKey('onboarding-municipality-clear'),
-        ),
-        if (missingLocal)
-          Padding(
-            padding: const EdgeInsets.only(top: Sp.m),
-            child: Text(
-              l10n.onboardingLocalHolidaysMissing,
-              key: const ValueKey('onboarding-local-missing'),
-              style: type.body.copyWith(color: context.colors.textSecondary),
-            ),
+        country,
+        // A country whose files list subdivisions (states, provinces,
+        // cantons...): the same tile and sheet as in Ajustes › Festivos.
+        if (holidaySubdivisionTitle(context, state.countryCode)
+            case final title?) ...[
+          const SizedBox(height: Sp.card),
+          ValueTile(
+            key: const ValueKey('onboarding-subdivision'),
+            label: title,
+            placeholder: l10n.holidaysSettingsRegionUnset,
+            value: subdivisionName(state.regionCode),
+            onTap: () async {
+              final picked = await showSubdivisionPicker(
+                context,
+                countryCode: state.countryCode,
+                selected: state.regionCode,
+                clearLabel: l10n.holidaysSettingsRegionUnset,
+              );
+              if (picked != null) controller.selectRegion(picked.value);
+            },
           ),
-      ],
-    );
+        ],
+        Padding(
+          padding: const EdgeInsets.only(top: Sp.m),
+          child: Text(
+            state.countryCode == otherCountryCode
+                ? l10n.onboardingCountryNone
+                : countryHasHolidayData(state.countryCode)
+                ? l10n.onboardingCountryIncluded(
+                    holidayCountryLabel(context, state.countryCode),
+                  )
+                : l10n.onboardingCountryNoData(
+                    holidayCountryLabel(context, state.countryCode),
+                  ),
+            key: const ValueKey('onboarding-country-note'),
+            style: noteStyle,
+          ),
+        ),
+      ]);
+    }
+
+    return withJob([
+      StepHeader(
+        title: l10n.onboardingPlaceTitle,
+        titleKey: const ValueKey('onboarding-title'),
+        help: l10n.onboardingPlaceHelp,
+      ),
+      country,
+      const SizedBox(height: Sp.card),
+      ValueTile(
+        key: const ValueKey('onboarding-region'),
+        label: l10n.onboardingRegionLabel,
+        placeholder: l10n.onboardingRegionPick,
+        value: region?.name,
+        onTap: () async {
+          // The same sheet and list as Ajustes › Festivos (H-T10-3): the 19
+          // in alphabetical order, the current one marked.
+          final picked = await showRegionPicker(
+            context,
+            title: l10n.onboardingRegionSheetTitle,
+            selected: region?.code,
+          );
+          final code = picked?.value;
+          if (code != null) controller.selectRegion(code);
+        },
+      ),
+      const SizedBox(height: Sp.card),
+      ValueTile(
+        key: const ValueKey('onboarding-municipality'),
+        label: l10n.onboardingMunicipalityLabel,
+        placeholder: region == null
+            ? l10n.onboardingMunicipalityNeedsRegion
+            : l10n.onboardingMunicipalityPick,
+        value: state.municipalityName,
+        onTap: region == null
+            ? null
+            : () async {
+                final picked = await showAppSheet<Municipality>(
+                  context: context,
+                  builder: (_) => MunicipalitySheet(regionCode: region.code),
+                );
+                if (picked != null) {
+                  controller.selectMunicipality(picked.code, name: picked.name);
+                }
+              },
+        onClear: () => controller.selectMunicipality(null),
+        clearTooltip: l10n.onboardingMunicipalityClear,
+        clearKey: const ValueKey('onboarding-municipality-clear'),
+      ),
+      if (missingYears.isNotEmpty)
+        Padding(
+          padding: const EdgeInsets.only(top: Sp.m),
+          child: Text(
+            // This year missing: none at all for now. Only next year
+            // missing (November, December): they have not come out yet.
+            missingYears.contains(thisYear)
+                ? l10n.onboardingLocalHolidaysMissing
+                : l10n.onboardingLocalHolidaysMissingYear(
+                    '${missingYears.first}',
+                  ),
+            key: const ValueKey('onboarding-local-missing'),
+            style: noteStyle,
+          ),
+        ),
+    ]);
   }
 }
 

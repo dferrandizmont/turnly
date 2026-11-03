@@ -18,6 +18,9 @@ class BackupCounts {
     required this.holidays,
     required this.absenceBalances,
     required this.settings,
+    this.noteAttachments = 0,
+    this.dayTasks = 0,
+    this.shiftSwaps = 0,
   });
 
   factory BackupCounts.of(BackupData data) => BackupCounts(
@@ -29,6 +32,9 @@ class BackupCounts {
     holidays: data.holidays.length,
     absenceBalances: data.absenceBalances.length,
     settings: data.settings.length,
+    noteAttachments: data.noteAttachments.length,
+    dayTasks: data.dayTasks.length,
+    shiftSwaps: data.shiftSwaps.length,
   );
 
   final int calendars;
@@ -42,6 +48,11 @@ class BackupCounts {
   final int absenceBalances;
   final int settings;
 
+  /// Database v6: attachments of notes, tasks of days and swaps.
+  final int noteAttachments;
+  final int dayTasks;
+  final int shiftSwaps;
+
   @override
   bool operator ==(Object other) =>
       other is BackupCounts &&
@@ -52,7 +63,10 @@ class BackupCounts {
       other.dayEntries == dayEntries &&
       other.holidays == holidays &&
       other.absenceBalances == absenceBalances &&
-      other.settings == settings;
+      other.settings == settings &&
+      other.noteAttachments == noteAttachments &&
+      other.dayTasks == dayTasks &&
+      other.shiftSwaps == shiftSwaps;
 
   @override
   int get hashCode => Object.hash(
@@ -64,13 +78,17 @@ class BackupCounts {
     holidays,
     absenceBalances,
     settings,
+    noteAttachments,
+    dayTasks,
+    shiftSwaps,
   );
 
   @override
   String toString() =>
       'BackupCounts(calendars $calendars, types $shiftTypes, patterns $patterns, runs $patternRuns, '
       'entries $dayEntries, holidays $holidays, balances $absenceBalances, '
-      'settings $settings)';
+      'settings $settings, attachments $noteAttachments, tasks $dayTasks, '
+      'swaps $shiftSwaps)';
 }
 
 /// What restoring a backup would do, for the confirmation screen.

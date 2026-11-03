@@ -189,7 +189,14 @@ void main() {
     expect(footer(tester), 'Próximo aviso: lun 19 de octubre, 20:30 · Noche');
     // The real sync scheduled the same plan.
     expect(scheduler.scheduled, isNotEmpty);
-    expect(scheduler.scheduled.every((a) => a.shiftTypeId == 'night'), isTrue);
+    // Every alarm is the Noche's; the renewal notice (A1) comes along
+    // because the rotation goes on past the horizon.
+    expect(
+      scheduler.scheduled
+          .where((a) => a.kind != AlarmKind.renewal)
+          .every((a) => a.shiftTypeId == 'night'),
+      isTrue,
+    );
     expect(scheduler.scheduled.first.fireMinute, 20 * 60 + 30);
 
     // Off again: nothing left, and the type keeps its other choices.
@@ -204,10 +211,7 @@ void main() {
     // Monday 19 at 20:29:30 in the harness: Noche alarm at 20:30 is next.
     var now = DateTime(2026, 10, 19, 20, 29, 30);
 
-    Future<void> openWithClock(
-      WidgetTester tester, {
-      DateTime? at,
-    }) async {
+    Future<void> openWithClock(WidgetTester tester, {DateTime? at}) async {
       now = at ?? DateTime(2026, 10, 19, 20, 29, 30);
       await AppUnderTest.pump(
         tester,
@@ -357,11 +361,14 @@ void main() {
       'Próximo aviso: lun 19 de octubre, 20:00 · Noche, el día anterior',
     );
     final kinds = scheduler.scheduled.map((a) => a.kind).toSet();
-    expect(kinds, {AlarmKind.shift, AlarmKind.dayBefore});
+    expect(kinds, {AlarmKind.shift, AlarmKind.dayBefore, AlarmKind.renewal});
 
     await tapAndSettle(tester, 'alarms-daybefore-switch-night');
     expect((await stored(app)).forShiftType('night').dayBefore, isFalse);
-    expect(scheduler.scheduled.map((a) => a.kind).toSet(), {AlarmKind.shift});
+    expect(scheduler.scheduled.map((a) => a.kind).toSet(), {
+      AlarmKind.shift,
+      AlarmKind.renewal,
+    });
   });
 
   testWidgets('the own text of the notification', (tester) async {

@@ -129,7 +129,7 @@ void main() {
       () {
         final regions = {
           for (final e in entries)
-            if (e.regionCode != null) e.regionCode!,
+            if (e.regionCode != null && e.countryCode == 'ES') e.regionCode!,
         };
         expect(regions, hasLength(19));
         for (final region in regions) {
@@ -192,22 +192,65 @@ void main() {
       );
     });
 
-    test('Murcia: local holidays of the school calendar, by year', () {
+    test('Murcia: local labour holidays (BORM), by year', () {
       final abanilla = calendar(region: 'ES-MC', municipality: '30001');
+      for (final day in const [
+        CivilDate(2026, 5, 4),
+        CivilDate(2026, 9, 14),
+        CivilDate(2027, 5, 3),
+        CivilDate(2027, 9, 14),
+      ]) {
+        expect(abanilla.on(day)?.scope, HolidayScope.local, reason: '$day');
+      }
+      // Murcia city: Bando de la Huerta and 15 September; 7 April 2026 was
+      // not a school-calendar day, so the old data missed it.
+      final murcia = calendar(region: 'ES-MC', municipality: '30030');
       expect(
-        abanilla.on(const CivilDate(2026, 9, 14))?.scope,
+        [
+          for (final h in murcia.list(_year2026.$1, _year2026.$2))
+            if (h.scope == HolidayScope.local) h.date.toIso(),
+        ],
+        ['2026-04-07', '2026-09-15'],
+      );
+    });
+
+    test('a capital outside Cataluña and Madrid: Sevilla', () {
+      final sevilla = calendar(region: 'ES-AN', municipality: '41091');
+      expect(
+        sevilla.on(const CivilDate(2026, 4, 22))?.scope,
         HolidayScope.local,
       );
       expect(
-        abanilla.on(const CivilDate(2027, 5, 3))?.scope,
+        sevilla.on(const CivilDate(2026, 6, 4))?.scope,
+        HolidayScope.local,
+      );
+      expect(
+        sevilla.on(const CivilDate(2027, 5, 27))?.scope,
         HolidayScope.local,
       );
     });
 
+    test(
+      'Canarias: the island holiday, with its name, on every municipality',
+      () {
+        // Arona (Tenerife) has no locals in the bundle, only the island's day.
+        final arona = calendar(region: 'ES-CN', municipality: '38006');
+        final candelaria = arona.on(const CivilDate(2026, 2, 2));
+        expect(candelaria?.scope, HolidayScope.local);
+        expect(candelaria?.name, 'Fiesta insular (Virgen de la Candelaria)');
+        expect(arona.on(const CivilDate(2026, 9, 8)), isNull); // Gran Canaria's
+        // Without a municipality the island is unknown: nothing insular.
+        expect(
+          calendar(region: 'ES-CN').on(const CivilDate(2026, 2, 2)),
+          isNull,
+        );
+      },
+    );
+
     test('a region with nothing local: the municipality changes nothing', () {
-      final sevilla = calendar(region: 'ES-AN', municipality: '41091');
+      final dosHermanas = calendar(region: 'ES-AN', municipality: '41038');
       expect(
-        lines(sevilla, _year2026),
+        lines(dosHermanas, _year2026),
         lines(calendar(region: 'ES-AN'), _year2026),
       );
     });

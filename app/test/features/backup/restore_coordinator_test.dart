@@ -18,6 +18,8 @@ import 'package:cuadrante/features/patterns/application/post_night_provider.dart
 import 'package:cuadrante/features/patterns/data/post_night_settings.dart';
 import 'package:cuadrante/features/schedule/application/schedule_providers.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
+import 'package:cuadrante/features/swaps/application/swaps_controller.dart';
+import 'package:cuadrante/features/swaps/domain/shift_swap.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
@@ -383,6 +385,34 @@ void main() {
       expect(container.read(onboardingTipProvider), isTrue);
     },
   );
+
+  test('a restore reads the swap ledger again (M1)', () async {
+    final real = RestoreCoordinator.fromRef(
+      container.read(_refProvider),
+      service,
+    );
+    // The swaps screen keeps the ledger alive; a restore must not leave the
+    // old one on screen.
+    final sub = container.listen(swapLedgerProvider, (_, _) {});
+    addTearDown(sub.close);
+    await container.read(swapLedgerProvider.future);
+
+    await container
+        .read(swapLedgerProvider.notifier)
+        .register(
+          colleague: 'Marta',
+          date: _today,
+          direction: SwapDirection.theyOwe,
+        );
+    expect(container.read(swapLedgerProvider).value!.balances, hasLength(1));
+
+    await real.restoreAndReload(await service.inspect(goldenBytes));
+
+    // The restored file has no changes at all: a ledger read again is empty.
+    // Without reading it again the balance of Marta would still be there.
+    final ledger = await container.read(swapLedgerProvider.future);
+    expect(ledger.balances, isEmpty);
+  });
 
   test('every step runs, in order, and a failing refresh does not stop '
       'the others', () async {

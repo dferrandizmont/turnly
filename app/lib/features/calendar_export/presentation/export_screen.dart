@@ -11,14 +11,18 @@ import '../../../core/widgets/content_app_bar.dart';
 import '../../../core/widgets/page_body.dart';
 import '../../calendar/application/schedule_controller.dart';
 import '../../calendars/application/calendars_controller.dart';
+import '../../../core/format/app_date_format.dart';
 import '../../import/presentation/import_date_row.dart';
 import '../../import/presentation/import_format.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../../settings/presentation/settings_widgets.dart';
+import '../application/calendar_sync_providers.dart';
 import '../application/export_controller.dart';
 import '../data/calendar_exporter.dart';
+import '../domain/calendar_sync_settings.dart';
 import 'calendar_permission_card.dart';
 import 'export_texts.dart';
+import 'ics_file_export_card.dart';
 
 /// Exportar al calendario del móvil (`/ajustes/exportar`): a one-off copy of
 /// the shifts as events of a calendar of the phone. Running it again replaces
@@ -95,7 +99,9 @@ class ExportScreen extends ConsumerWidget {
                 ),
               ],
               const SizedBox(height: Sp.l),
+              const _SyncNotice(),
               body,
+              const IcsFileExportCard(),
             ],
           ),
         ),
@@ -162,6 +168,9 @@ class _Options extends ConsumerWidget {
     final type = context.type;
     final controller = ref.read(exportControllerProvider.notifier);
     final plan = state.plan;
+    final sync = ref.watch(calendarSyncSettingsProvider).asData?.value;
+    final keepOn = sync?.active ?? false;
+    final calendarsEnabled = !state.running && !state.syncing && !keepOn;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -177,7 +186,7 @@ class _Options extends ConsumerWidget {
                 subtitle: l10n.calExportNewCalendarHelp,
                 color: null,
                 selected: state.targetId == null,
-                enabled: !state.running,
+                enabled: calendarsEnabled,
                 onTap: () => controller.selectCalendar(null),
               ),
               for (final c in state.calendars) ...[
@@ -188,7 +197,7 @@ class _Options extends ConsumerWidget {
                   subtitle: c.accountName,
                   color: c.colorValue,
                   selected: state.targetId == c.id,
-                  enabled: !state.running,
+                  enabled: calendarsEnabled,
                   onTap: () => controller.selectCalendar(c.id),
                 ),
               ],
@@ -268,6 +277,26 @@ class _Options extends ConsumerWidget {
             onChanged: state.running ? (_) {} : controller.setIncludeAbsences,
           ),
         ),
+        const SizedBox(height: Sp.card),
+        AppCard(
+          padding: EdgeInsets.zero,
+          child: SettingsSwitchRow(
+            key: const ValueKey('export-keep-updated'),
+            switchKey: const ValueKey('export-keep-updated-switch'),
+            icon: AppIcons.calendar,
+            title: l10n.calSyncTitle,
+            subtitle: state.syncing ? l10n.calSyncRunning : l10n.calSyncHelp,
+            value: keepOn,
+            onChanged: state.running || state.syncing
+                ? (_) {}
+                : controller.setKeepUpdated,
+          ),
+        ),
+        if (keepOn)
+          Padding(
+            padding: const EdgeInsets.only(top: Sp.s),
+            child: _SyncStatus(settings: sync!),
+          ),
         const SizedBox(height: Sp.l),
         if (plan != null)
           AppCard.tinted(
@@ -306,6 +335,76 @@ class _Options extends ConsumerWidget {
           _ResultCard(result: state.result!),
         ],
       ],
+    );
+  }
+}
+
+/// Why «Mantener al día» turned itself off, until the user has seen it.
+class _SyncNotice extends ConsumerWidget {
+  const _SyncNotice();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notice = ref.watch(calendarSyncSettingsProvider).asData?.value.notice;
+    if (notice == null) return const SizedBox.shrink();
+    final l10n = context.l10n;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: Sp.l),
+      child: Semantics(
+        liveRegion: true,
+        child: AppCallout(
+          titleKey: const ValueKey('export-sync-notice'),
+          icon: AppIcons.error,
+          title: calendarSyncNoticeText(l10n, notice),
+          primaryKey: const ValueKey('export-sync-notice-dismiss'),
+          primaryLabel: l10n.calSyncNoticeDismiss,
+          onPrimary: () =>
+              ref.read(calendarSyncSettingsProvider.notifier).dismissNotice(),
+        ),
+      ),
+    );
+  }
+}
+
+/// When «Mantener al día» last ran, and what it could not write.
+class _SyncStatus extends StatelessWidget {
+  const _SyncStatus({required this.settings});
+
+  final CalendarSyncSettings settings;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final colors = context.colors;
+    final type = context.type;
+    final format = AppDateFormat.of(context);
+    final last = settings.lastSyncAt;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: Sp.xs),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.calSyncLocked,
+            key: const ValueKey('export-sync-locked'),
+            style: type.meta.copyWith(color: colors.textMuted),
+          ),
+          if (last != null)
+            Text(
+              l10n.calSyncLast(
+                '${format.shortDate(last)} ${format.time(last)}',
+              ),
+              key: const ValueKey('export-sync-last'),
+              style: type.meta.copyWith(color: colors.textSecondary),
+            ),
+          if (settings.lastFailed > 0)
+            Text(
+              l10n.calSyncFailed(settings.lastFailed),
+              key: const ValueKey('export-sync-failed'),
+              style: type.meta.copyWith(color: colors.textPrimary),
+            ),
+        ],
+      ),
     );
   }
 }

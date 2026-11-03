@@ -1,13 +1,18 @@
 import 'package:drift/drift.dart';
 
+import '../../features/absences/domain/absence_balance.dart';
 import '../../features/calendars/domain/calendar.dart';
+import '../../features/notes/domain/note_attachment.dart';
 import '../../features/schedule/domain/civil_date.dart';
 import '../../features/schedule/domain/shift_type.dart';
+import '../../features/swaps/domain/shift_swap.dart';
 import 'app_database.steps.dart';
 import 'converters.dart';
 import 'migration_v1_to_v2.dart';
 import 'migration_v2_to_v3.dart';
 import 'migration_v3_to_v4.dart';
+import 'migration_v4_to_v5.dart';
+import 'migration_v5_to_v6.dart';
 import 'tables.dart';
 
 part 'app_database.g.dart';
@@ -18,9 +23,13 @@ part 'app_database.g.dart';
   tables: [
     Calendars,
     ShiftTypes,
+    ShiftTypeVersions,
     Patterns,
     PatternRuns,
     DayEntries,
+    NoteAttachments,
+    DayTasks,
+    ShiftSwaps,
     Holidays,
     AbsenceBalances,
     Settings,
@@ -36,7 +45,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The schema version this code expects. Bump it together with a new
   /// migration step (see docs/datos.md, "Migraciones").
-  static const int latestSchemaVersion = 4;
+  static const int latestSchemaVersion = 6;
 
   @override
   int get schemaVersion => latestSchemaVersion;
@@ -55,6 +64,8 @@ class AppDatabase extends _$AppDatabase {
       from1To2: migrateFrom1To2,
       from2To3: migrateFrom2To3,
       from3To4: migrateFrom3To4,
+      from4To5: migrateFrom4To5,
+      from5To6: migrateFrom5To6,
     ),
     beforeOpen: (details) async {
       _createdThisOpen = details.wasCreated;

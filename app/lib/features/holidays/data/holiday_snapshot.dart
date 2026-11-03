@@ -4,17 +4,18 @@ import '../domain/holiday_entry.dart';
 import '../domain/holiday_place.dart';
 import '../../schedule/domain/civil_date.dart';
 
-/// The chosen place and the stored rows that can apply to it (national, the
-/// region's, the municipality's and the user's own), loaded in one go.
+/// The chosen place and the stored rows that can apply to it (the country's
+/// national ones, the region's, the municipality's and the user's own),
+/// loaded in one go.
 class HolidaySnapshot {
   HolidaySnapshot({
     required this.place,
     required Iterable<HolidayEntry> entries,
   }) : entries = List.unmodifiable(entries);
 
-  /// Nothing loaded yet: no place, no holidays.
+  /// Nothing loaded yet: Spain without a region, no holidays.
   static final HolidaySnapshot empty = HolidaySnapshot(
-    place: HolidayPlace.none,
+    place: HolidayPlace.spain,
     entries: const [],
   );
 
@@ -23,6 +24,7 @@ class HolidaySnapshot {
 
   late final HolidayCalendar calendar = HolidayCalendar(
     entries,
+    countryCode: place.countryCode,
     regionCode: place.regionCode,
     municipalityCode: place.municipalityCode,
   );

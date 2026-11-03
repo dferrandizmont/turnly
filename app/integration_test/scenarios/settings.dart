@@ -155,7 +155,7 @@ Future<void> _settingsScreen(QaContext qa) async {
   await _openSettings(t);
   qa.expectNoFlutterErrors('al abrir Ajustes');
   expect(find.text('Ajustes'), findsOneWidget);
-  for (final heading in ['TU CUADRANTE', 'APARIENCIA']) {
+  for (final heading in ['MI CALENDARIO', 'APARIENCIA']) {
     expect(find.text(heading), findsOneWidget, reason: heading);
   }
   for (final title in [

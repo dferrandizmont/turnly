@@ -77,13 +77,24 @@ void main() {
       expect(idsOn(scheduleOf(tester), october29), 'morning');
       expectSameSchedule(await stored(), original);
 
-      // This is Q05's former failure: revealing a low cell scrolls the
-      // navigation sliver out of the onstage tree. A finder cannot reveal it.
-      expect(find.byTooltip('Mes anterior'), findsNothing);
+      // This was Q05's failure: revealing a low cell scrolled the month row
+      // out of view. Since B1 the row is pinned: its arrows stay in reach.
+      expect(find.byTooltip('Mes anterior').hitTestable(), findsOneWidget);
       final up = find.byKey(const ValueKey('paint-scroll-up'));
-      expect(up.hitTestable(), findsOneWidget);
-      expect(tester.getSize(up).width, greaterThanOrEqualTo(Sp.touch));
-      expect(tester.getSize(up).height, greaterThanOrEqualTo(Sp.touch));
+      if (width >= 400) {
+        // Decision 28: where the whole month fits the arrows are not shown
+        // (nothing to scroll) and every day, the last row included, can be
+        // reached.
+        expect(up, findsNothing);
+        expect(
+          cell(const CivilDate(2026, 11, 8)).hitTestable(),
+          findsOneWidget,
+        );
+      } else {
+        expect(up.hitTestable(), findsOneWidget);
+        expect(tester.getSize(up).width, greaterThanOrEqualTo(Sp.touch));
+        expect(tester.getSize(up).height, greaterThanOrEqualTo(Sp.touch));
+      }
 
       for (var month = 9; month >= 6; month--) {
         await tapMonthArrow(tester, next: false);

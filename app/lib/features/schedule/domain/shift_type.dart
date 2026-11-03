@@ -18,6 +18,17 @@ const int maxHourlyRateCents = 999999;
 /// Largest fixed payment per worked shift (9 999,99 EUR), in cents.
 const int maxFixedPlusCents = 999999;
 
+/// Largest amount the database stores in any money column (schema v6), in
+/// the minor unit of the currency: 9 999 999,99 with 2 decimals, 999 999 999
+/// with 0 (yen, guaraní, rupiah...). The editor limits above
+/// ([maxHourlyRateCents], [maxFixedPlusCents]) are lower and can be raised
+/// up to this without a migration (docs/formatos.md, «Moneda»). Day extra
+/// amounts may be negative down to `-maxStoredMoneyCents`.
+const int maxStoredMoneyCents = 999999999;
+
+/// Longest place of a shift type (`ShiftType.location`), in UTF-16 units.
+const int maxShiftLocationLength = 200;
+
 /// Whether [uri] is a sound of the system itself: the media store (ringtones,
 /// the ones the user added included) or the settings provider (the default
 /// entries). Anything else (the app's own FileProvider, another app's
@@ -118,6 +129,9 @@ class ShiftType {
     this.alarmSound,
     this.segment2StartMinute,
     this.segment2DurationMinutes,
+    this.location,
+    this.nightPlusCentsPerHour,
+    this.holidayPlusCentsPerHour,
   }) : assert(code.length >= 1 && code.length <= 3),
        assert((startMinute == null) == (endMinute == null)),
        assert(
@@ -136,7 +150,8 @@ class ShiftType {
              (segment2DurationMinutes >= 1 &&
                  segment2DurationMinutes <= _minutesPerDay),
        ),
-       assert(alarmSound != '');
+       assert(alarmSound != ''),
+       assert(location != '');
 
   final String id;
 
@@ -184,6 +199,19 @@ class ShiftType {
   /// of both ([scheduledMinutes]), the gap between them is not worked.
   final int? segment2StartMinute;
   final int? segment2DurationMinutes;
+
+  /// Where the shift is worked (ward, base, shop...), free text; `null` =
+  /// not set. Like the name, it applies to every day (not part of
+  /// `ShiftTerms`). Schema v6.
+  final String? location;
+
+  /// Extra pay per hour worked inside the night window, in the minor unit of
+  /// the currency; `null` = none. Schema v6 (the summary uses it from P9).
+  final int? nightPlusCentsPerHour;
+
+  /// Extra pay per hour worked on a holiday, in the minor unit of the
+  /// currency; `null` = none. Schema v6.
+  final int? holidayPlusCentsPerHour;
 
   bool get hasTimes => startMinute != null;
 
@@ -258,6 +286,9 @@ class ShiftType {
     String? alarmSound,
     int? segment2StartMinute,
     int? segment2DurationMinutes,
+    String? location,
+    int? nightPlusCentsPerHour,
+    int? holidayPlusCentsPerHour,
     bool clearTimes = false,
     bool clearPaidMinutes = false,
     bool clearNightOverride = false,
@@ -266,6 +297,9 @@ class ShiftType {
     bool clearIcon = false,
     bool clearAlarmSound = false,
     bool clearSegment2 = false,
+    bool clearLocation = false,
+    bool clearNightPlus = false,
+    bool clearHolidayPlus = false,
   }) => ShiftType(
     id: id ?? this.id,
     code: code ?? this.code,
@@ -291,6 +325,13 @@ class ShiftType {
     segment2DurationMinutes: clearSegment2 || clearTimes
         ? null
         : segment2DurationMinutes ?? this.segment2DurationMinutes,
+    location: clearLocation ? null : location ?? this.location,
+    nightPlusCentsPerHour: clearNightPlus
+        ? null
+        : nightPlusCentsPerHour ?? this.nightPlusCentsPerHour,
+    holidayPlusCentsPerHour: clearHolidayPlus
+        ? null
+        : holidayPlusCentsPerHour ?? this.holidayPlusCentsPerHour,
   );
 
   @override
@@ -310,7 +351,10 @@ class ShiftType {
       other.icon == icon &&
       other.alarmSound == alarmSound &&
       other.segment2StartMinute == segment2StartMinute &&
-      other.segment2DurationMinutes == segment2DurationMinutes;
+      other.segment2DurationMinutes == segment2DurationMinutes &&
+      other.location == location &&
+      other.nightPlusCentsPerHour == nightPlusCentsPerHour &&
+      other.holidayPlusCentsPerHour == holidayPlusCentsPerHour;
 
   @override
   int get hashCode => Object.hash(
@@ -329,6 +373,9 @@ class ShiftType {
     alarmSound,
     segment2StartMinute,
     segment2DurationMinutes,
+    location,
+    nightPlusCentsPerHour,
+    holidayPlusCentsPerHour,
   );
 
   @override

@@ -28,7 +28,7 @@ En Windows se usa la zona del sistema: no definas `TZ=Europe/Madrid`, porque
 su runtime no interpreta ese identificador IANA como Linux.
 
 Salidas versionadas en **`docs/readme/<idioma>/`** para los cinco idiomas de la app
-(`es`, `ca`, `gl`, `eu`, `en`), nueve por idioma. Las capturas son **pantallas en bruto
+(`es`, `ca`, `gl`, `eu`, `en`), once por idioma. Las capturas son **pantallas en bruto
 del móvil, como las de Ink Lab**: 1080 × 2400 (412 dp de ancho a 1080/412), tema claro,
 con barra de estado de Android (10:00, wifi, 3G, cobertura y batería llenas) y píldora
 del gesto abajo, **sin titular, sin marco y sin tinte de fondo**. Una sola va en oscuro
@@ -43,8 +43,10 @@ del gesto abajo, **sin titular, sin marco y sin tinte de fondo**. Una sola va en
 | `03-pintar.png` | 1080 × 2400 | Pintar con la paleta |
 | `04-rotaciones.png` | 1080 × 2400 | Asistente y vista previa de la rotación |
 | `05-horas.png` | 1080 × 2400 | Resumen de horas |
-| `06-festivos.png` | 1080 × 2400 | Festivos, comunidad y municipio |
+| `06-festivos.png` | 1080 × 2400 | Festivos: país, comunidad y municipio |
 | `07-mes-oscuro.png` | 1080 × 2400 | Cuadrícula del mes, tema oscuro |
+| `08-vacaciones.png` | 1080 × 2400 | Vacaciones y permisos: saldos del año |
+| `09-cambios.png` | 1080 × 2400 | Libro de cambios: balance con los compañeros |
 
 En las pantallas largas (`05-horas`, `06-festivos`) el test desplaza la lista lo mínimo
 para que ningún texto quede bajo la píldora del gesto. PNG RGB de 8 bits, opacos y sin metadatos. El escritor comprueba las dimensiones
@@ -63,11 +65,14 @@ antes de guardar cada imagen. Sin datos personales, salud ni importes ficticios.
 El asistente usa otro calendario vacío, «Industria» / «Industry», para enseñar
 la rotación Continental sin las excepciones de «Demo».
 Pintar y la vista previa no se guardan: no alteran el resumen de las otras escenas.
-La sexta escena usa Festivos; no se simula un escritorio ni un widget nativo.
+La sexta escena usa Festivos; las de «Vacaciones y permisos» y «Libro de cambios»
+(08 y 09, solo del README) usan esas pantallas reales, con saldos y cambios de ejemplo,
+y ninguna baja médica. No se simula un escritorio ni un widget nativo.
 
 ## Tamaños de tienda
 
-Los mismos tests pueden componer las seis escenas (con titular y marco; `07-mes-oscuro` es solo del README) para cada tienda, sin estirar
+Los mismos tests pueden componer las seis escenas (con titular y marco; `07-mes-oscuro`,
+`08-vacaciones` y `09-cambios` son solo del README) para cada tienda, sin estirar
 ni cortar la pantalla. Desde `app/`:
 
 ```bash

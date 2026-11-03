@@ -48,9 +48,15 @@ class BackupIcons {
 }
 
 /// "hoy a las 18:20", "ayer a las 18:20", "el jue 23 oct a las 18:20" (with
-/// the year when it is not the current one). [at] is shown in local time.
-String backupWhen(AppLocalizations l10n, DateTime at, DateTime now) {
-  final fmt = AppDateFormat(l10n.localeName);
+/// the year when it is not the current one). [at] is shown in local time, on
+/// the 12 h clock when [hour12].
+String backupWhen(
+  AppLocalizations l10n,
+  DateTime at,
+  DateTime now, {
+  bool hour12 = false,
+}) {
+  final fmt = AppDateFormat(l10n.localeName, hour12);
   final local = at.toLocal();
   final today = DateTime(now.year, now.month, now.day);
   final day = DateTime(local.year, local.month, local.day);
@@ -72,15 +78,16 @@ String backupWhen(AppLocalizations l10n, DateTime at, DateTime now) {
 String pendingCopyMessage(
   AppLocalizations l10n,
   AutoBackupStatus status,
-  DateTime now,
-) {
+  DateTime now, {
+  bool hour12 = false,
+}) {
   final due = status.dueAt;
   if (due == null) return l10n.backupUiStatusPendingLater;
   if (due.difference(now) < const Duration(minutes: 1)) {
     return l10n.backupUiStatusPending;
   }
   return l10n.backupUiStatusPendingAt(
-    AppDateFormat(l10n.localeName).time(due.toLocal()),
+    AppDateFormat(l10n.localeName, hour12).time(due.toLocal()),
   );
 }
 

@@ -276,19 +276,23 @@ void main() {
       app.container.read(routerProvider).go(AppRoutes.compare);
       await tester.pumpAndSettle();
 
-      Finder name(String row, String text) =>
-          find.descendant(of: _key(row), matching: find.text(text));
-      expect(name('compare-first', 'Mi cuadrante'), findsOneWidget);
-      expect(name('compare-second', 'Pareja'), findsOneWidget);
+      final partner = (await stored(app)).last.id;
+      Future<double> rowOf(String id) async {
+        await tester.ensureVisible(_key('compare-name-$id'));
+        await tester.pumpAndSettle();
+        return tester.getCenter(_key('compare-name-$id')).dy;
+      }
+
+      // The calendar on screen is the first row of the grid.
+      expect(await rowOf('main'), lessThan(await rowOf(partner)));
 
       await tester.tap(_key('compare-swap'));
       await tester.pumpAndSettle();
-      expect(name('compare-first', 'Pareja'), findsOneWidget);
-      expect(name('compare-second', 'Mi cuadrante'), findsOneWidget);
+      expect(await rowOf('main'), greaterThan(await rowOf(partner)));
 
       await tester.tap(_key('compare-swap'));
       await tester.pumpAndSettle();
-      expect(name('compare-first', 'Mi cuadrante'), findsOneWidget);
+      expect(await rowOf('main'), lessThan(await rowOf(partner)));
     });
   });
 }

@@ -17,8 +17,9 @@ import '../application/onboarding_controller.dart';
 import '../domain/profession.dart';
 import 'onboarding_widgets.dart';
 
-/// Step 3a, «¿Cómo es tu rotación?»: the catalogue patterns of the job first
-/// (the same cards as the pattern wizard), then the rest, or «Lo pinto a
+/// «¿Cómo es tu rotación?» (first screen of «Usar una rotación»): the
+/// catalogue (the same cards as the pattern wizard), the patterns of the job
+/// first when one is chosen (coming back from the last step), or «Lo pinto a
 /// mano».
 class RotationStep extends ConsumerWidget {
   const RotationStep({super.key});
@@ -108,7 +109,7 @@ class RotationStep extends ConsumerWidget {
   }
 }
 
-/// Step 3b: the day the rotation starts and the day of the cycle that is
+/// «¿Cuándo empiezas?»: the day the rotation starts and the day of the cycle that is
 /// that day (the start step of the pattern wizard).
 class StartStep extends ConsumerWidget {
   const StartStep({super.key});

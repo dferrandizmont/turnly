@@ -10,21 +10,25 @@ tipo de turno** (secciones de más abajo).
 ## Qué hace
 
 Por cada tipo de turno con alarma activada, la app programa un aviso local `minutesBefore` minutos antes de que
-empiece cada turno de los próximos 14 días y, si el usuario lo pide, otro la tarde anterior. Todo en el móvil, sin
-servidor ni cuenta.
+empiece cada turno de los próximos 30 días (14 hasta la 0.7, ver «Límites») y, si el usuario lo pide, otro la tarde
+anterior. Todo en el móvil, sin servidor ni cuenta. Para que no caduquen aunque no se abra la app, un aviso de renovación
+y, en Android, una tarea en segundo plano los vuelven a programar (ver «Renovación de los avisos»).
 
 - **Ajustes** (`AlarmSettings`, tabla `settings`, clave `alarms`, JSON versionado): interruptor global, horizonte en
-  días (14 por defecto, máximo 30), días saltados (`skippedDates`) y, por id de tipo de turno, `enabled`,
+  días (30 por defecto, máximo 30), días saltados (`skippedDates`) y, por id de tipo de turno, `enabled`,
   `minutesBefore` (90 por defecto, 0 a 1440), `label` opcional (sustituye al título del aviso de antes del turno),
   `dayBefore` (aviso el día anterior, apagado por defecto) y `dayBeforeMinute` (minutos desde las 00:00, 1200 = 20:00
-  por defecto). Sin nada guardado, todo apagado. Forma del JSON (la versión sigue en 1: los campos nuevos son
-  opcionales y un valor de la versión anterior se lee como «sin aviso el día anterior, ningún día saltado»):
+  por defecto). Sin nada guardado, todo apagado. Forma del JSON (los campos nuevos son opcionales y un valor antiguo se
+  lee como «sin aviso el día anterior, ningún día saltado»). **Versión 2 (A1):** la versión 1 siempre escribía el
+  horizonte por defecto de entonces (14), que ninguna pantalla deja cambiar, así que un horizonte guardado solo se
+  respeta desde la versión 2; el de una versión 1 (o sin versión) se lee como el valor por defecto actual (30). Una app
+  anterior lee la versión 2 sin problema (no mira la versión y acota el horizonte a 30):
 
   ```json
   {
-    "version": 1,
+    "version": 2,
     "enabled": true,
-    "horizonDays": 14,
+    "horizonDays": 30,
     "types": {
       "night": {
         "enabled": true, "minutesBefore": 90, "label": "A trabajar",
@@ -72,7 +76,7 @@ servidor ni cuenta.
     de la tarde anterior): reprogramar no duplica, los dos avisos de un turno nunca comparten id y los ids de los
     avisos de antes del turno son los de siempre (una actualización no deja avisos huérfanos).
   - `nextAlarm()` devuelve el primero del plan; es lo que enseña «Próximo aviso» en la pantalla de ajustes.
-  - Los textos vienen de `AlarmStrings` (rellenado desde el ARB): «Turno de Noche a las 22:00» y «Noche: de 22:00 a 06:00».
+  - Los textos vienen de `AlarmStrings` (rellenado desde el ARB): «Turno de Noche a las 22:00» y «Noche: de 22:00 a 06:00». Las horas ya vienen escritas (`AlarmStrings.clock`): con el reloj de 12 h de Ajustes › Formato de hora, «Turno de Noche a las 10:00 p. m.»; al cambiar el formato se reprograman (`docs/formatos.md`).
     Un turno que cruza la medianoche solo importa por su inicio.
 - **Programador** (`AlarmScheduler`): `LocalAlarmScheduler` (flutter_local_notifications) y `FakeAlarmScheduler`
   (pruebas y escritorio). `replaceAll` programa cada aviso (el mismo id lo sustituye) y después cancela los avisos
@@ -109,7 +113,11 @@ servidor ni cuenta.
   planificada: su payload (`cuadrante.alarm.test:`) no empieza por el de las alarmas, así que una sincronización no
   la toca.
 - **Pie**: «Próximo aviso: mié 21 de octubre, 20:30 · Noche», calculado por el mismo planificador con el calendario
-  principal (si es el aviso de la tarde anterior lo dice).
+  principal (si es el aviso de la tarde anterior lo dice). Debajo, con el interruptor encendido, **«Avisos programados
+  hasta el jueves 12 de noviembre»** (A1, `alarmsScheduledUntilProvider`): el día del último aviso de turno (antes del
+  turno o la tarde anterior) que la última sincronización entregó de verdad al sistema (`AlarmSync.lastPlan`), no un
+  cálculo aparte. Sin permiso no se programa nada y la línea no sale; tampoco si no hay ningún aviso (la línea de
+  encima ya dice «No hay ningún aviso previsto…» y la tarjeta de permisos, por qué).
 
 ## Posponer y «Ya estoy despierto»
 
@@ -138,7 +146,7 @@ Mac):
 
 ## Recordatorio en una nota (0.6.0, hueco A1)
 
-- **Dónde.** Detalle del día, bajo la nota: «Avisarme» abre un selector de hora de 24 h (propone las 09:00, o la
+- **Dónde.** Detalle del día › «Más opciones» (desde el 31 oct; antes, bajo la nota): «Avisarme» abre un selector de hora (24 h o 12 h según Ajustes › Formato de hora; propone las 09:00, o la
   siguiente hora en punto si es hoy y las 09:00 ya pasaron). Con aviso puesto la fila enseña «Aviso a las 09:00»
   (tocarla cambia la hora) y «Quitar aviso»; al quitarlo aparece «Deshacer» en el sitio mientras no se haga otra cosa.
   No se ofrece en días ya pasados.
@@ -165,8 +173,8 @@ Mac):
   habla de turnos).
 - **Un aviso cuya hora ya pasó no se programa** (el mismo minuto cuenta como pasado) y la fila lo dice: «Esa hora ya
   pasó: no sonará.»
-- **Horizonte y tope.** Mismo horizonte que las alarmas (14 días por defecto, hasta 30): un aviso más lejano se
-  programa al abrir la app cuando entra en la ventana. En el tope de 60, **los recordatorios van primero** (son pocos,
+- **Horizonte y tope.** Mismo horizonte que las alarmas (30 días por defecto): un aviso más lejano se programa al
+  abrir la app (o en la renovación en segundo plano de Android) cuando entra en la ventana. En el tope de 60, **los recordatorios van primero** (son pocos,
   del usuario y no se pueden recalcular desde la rotación), los más próximos primero; las alarmas de turno rellenan lo
   que quede, también las más próximas. El resultado se ordena por hora. Un recordatorio dentro del horizonte nunca se
   descarta por una alarma de turno; solo si hubiera más de 60 recordatorios en la ventana ganarían los más próximos.
@@ -216,11 +224,118 @@ Mac):
 
 ## Límites
 
-- **iOS: 64 notificaciones locales pendientes por app.** Se programan como mucho 60 (`maxPendingAlarms`), 14 días
-  por delante, y se renueva cada vez que se abre la app. Quien no abra la app en dos semanas se queda sin avisos
-  a partir de ahí; con turnos muy densos (3 por día), el tope de 60 cubre unos 20 días. Los recordatorios de notas
-  cuentan en el mismo tope y entran los primeros.
-- **Android:** sin límite práctico, pero se aplica el mismo tope por coherencia.
+- **iOS: 64 notificaciones locales pendientes por app.** Se programan como mucho 60 avisos (`maxPendingAlarms`), más
+  el aviso de renovación (61), y quedan 3 huecos para un aviso pospuesto y el de «Probar aviso». Los recordatorios de
+  notas cuentan en el mismo tope de 60 y entran los primeros.
+- **Horizonte: 30 días por defecto desde la 0.7 (A1; antes, 14).** Por qué cabe en el tope:
+  - Rotación típica, un aviso por turno y 5 o 6 turnos por semana: unos 26 avisos en 30 días. Con el aviso de la tarde
+    anterior, unos 52. Las dos cosas, por debajo de 60: el mes entero queda cubierto.
+  - Rotación densa (turno partido con aviso en los dos tramos y aviso la tarde anterior, o dos turnos al día con
+    víspera): 3 o 4 avisos al día. El tope corta a los 15–20 días, que sigue siendo más que los 14 de antes, y el
+    aviso de renovación avisa antes de que se acaben.
+  - Coste: una sincronización programa hasta 60 avisos en lugar de unos 14–28 (más llamadas al plugin al volver a la
+    app; sigue siendo cuestión de un segundo o dos). Android limita a 500 las alarmas pendientes por app: muy lejos.
+  - Con 14 días, quien vive del widget y no abre la app se quedaba sin avisos a las dos semanas (la queja que hundió a
+    LRHSoft y MyDuty, `docs/propuesta-mejoras.md` A1). Con 30, más la renovación, eso no debería pasar en Android y en
+    iOS hay un mes y un aviso antes de que ocurra.
+- **Android:** sin límite práctico, pero se aplica el mismo tope por coherencia (y porque cada aviso de turno es una
+  alarma de despertador del sistema).
+
+## Renovación de los avisos (A1)
+
+Los avisos se programan con 30 días de margen. Para que no caduquen aunque el usuario no abra la app hay dos piezas:
+
+### Aviso de renovación
+
+- **Cuándo.** `planAlarmSchedule` (el planificador de siempre más esto) marca el plan como **recortado**
+  (`AlarmPlan.truncated`) si queda fuera algún aviso de turno futuro: más allá del horizonte (buscando hasta
+  `renewalLookaheadDays` = 60 días después, para que unas vacaciones largas no lo escondan) o por el tope de 60. Solo
+  cuentan los avisos de turno (antes del turno y la tarde anterior), no los recordatorios de notas.
+- **Qué.** Si el plan está recortado, las alarmas de turno están activadas (`anyActive`) y hay textos, se programa una
+  notificación (`AlarmKind.renewal`): título «Avisos de turno», cuerpo «Tus avisos de turno llegan hasta el {fecha}.
+  Abre Turnly para programar los siguientes.», con la fecha del último aviso de turno programado
+  (`weekdayDayMonth`, «jueves 12 de noviembre»). Sin botones; al tocarla se abre la app, que reprograma al arrancar o
+  al volver a primer plano y mueve el aviso más adelante.
+- **A qué hora.** La víspera del día del último aviso, a las **20:00 hora de pared** (`renewalNoticeMinute`; las
+  mismas reglas de horario de verano que todos los avisos: el 25 de octubre de 2026 a las 20:00 son las 19:00 UTC y el
+  29 de marzo, las 18:00 UTC). Si esa hora ya pasó, no es anterior al último aviso o cae a menos de 10 minutos
+  (`renewalNoticeClearance`) de cualquier aviso programado (el de la tarde anterior es a las 20:00 por defecto), se
+  prueba la media hora más cercana, alternando: 19:30, 20:30, 19:00, 21:00... entre las 17:00 y las 23:00. Si ninguna
+  vale, no hay aviso (solo pasa con un horizonte de un día y casi a medianoche). Sin ningún aviso de turno en la
+  ventana pero con turnos después (unas vacaciones de más de 30 días), el final del horizonte hace de «último aviso».
+- **Cuándo no.** Con las alarmas de turno desactivadas, sin permiso de notificaciones (no se programa nada), si el plan
+  no está recortado o si los textos no traen los de la renovación (las pruebas antiguas; `AlarmStrings.fromL10n`
+  siempre los trae). Si construir el texto falla, se pierde el aviso, nunca las alarmas.
+- **Id, canal y payload.** Id fijo (`renewalNoticeId`, FNV-1a de `cuadrante.renewal`; si chocara con una alarma del
+  plan pasa al siguiente libre), payload con el prefijo `cuadrante.alarm:` (tipo `renewal`): `replaceAll` lo sustituye
+  en cada sincronización y lo cancela cuando ya no toca, como un aviso más. Canal `note_reminders` (el de los
+  recordatorios: importancia alta, volumen de notificación, no de alarma) y en Android `exactAllowWhileIdle` (o
+  inexacto sin «Alarmas y recordatorios»). No sale en «Próximo aviso» ni en «Avisos programados hasta…».
+- **Cuenta en iOS:** 60 + 1, dentro de las 64 (ver «Límites»).
+
+### Renovación en segundo plano (Android)
+
+- **Qué.** Una tarea periódica de WorkManager (paquete `workmanager` 0.10.x) que, con la app cerrada, vuelve a
+  planificar con **el mismo planificador** y el mismo `LocalAlarmScheduler.replaceAll` que la app. Nombre único y de
+  tarea `es.cuadrante.app.alarmRenewal`, cada **12 h** (`alarmRenewalFrequency`; WorkManager puede retrasarla con Doze,
+  ahorro de batería o restricciones del fabricante, nunca adelantarla), la primera, una hora después de registrarla, sin
+  requisitos de red, batería ni carga, reintento exponencial desde 30 min si falla. Política `update`: arrancar la app
+  no reinicia su reloj. WorkManager la conserva tras reiniciar el móvil y tras actualizar la app.
+- **Registro.** `AlarmSync`, tras cada pasada, llama a `AlarmRenewalRegistrar.setEnabled(settings.anyActive)`:
+  `WorkmanagerAlarmRenewal` (Android) inicializa el plugin la primera vez de cada proceso (guarda el punto de entrada
+  **común** `backgroundTaskDispatcher`, que comparte con la copia en carpeta: WorkManager guarda uno solo por app, ver
+  `docs/copia-de-seguridad.md`, apartado 11) y registra o cancela; después solo actúa si cambia el estado. Sigue a los interruptores, no
+  al permiso: sin permiso la tarea no hace nada y el permiso puede volver. Un error al registrar se informa y no toca
+  las alarmas. En iOS es `NoAlarmRenewal` (ver «iOS»).
+- **La pasada** (`runAlarmRenewal`, función pura con todo inyectado; `runAlarmRenewalTask` la monta con lo real y el dispatcher común
+  la llama para `es.cuadrante.app.alarmRenewal`):
+  1. **Si la app está viva en el mismo proceso, la hace la app.** `main`, antes de abrir la base, pone a escuchar
+     `appAlarmForegroundRelay`: un `ReceivePort` registrado en `IsolateNameServer` (`es.cuadrante.app/alarms.resync`,
+     por proceso). La tarea le pide una sincronización y espera la respuesta hasta 60 s. Las peticiones que llegan
+     mientras la app arranca se guardan hasta que `AlarmsHost` engancha `AlarmSync.resync` (serializada con las de la
+     app); al desmontarse, `AlarmsHost` solo se desengancha y el puerto sigue escuchando. Así nunca hay dos
+     planificadores escribiendo los avisos a la vez, tampoco si el proceso arranca en mitad de una renovación (y el paso
+     5 deja la última palabra a la app). Si nadie contesta en 60 s (un puerto que dejó un aislado que ya no existe, o
+     una app que no llega a montar `AlarmsHost`), lo olvida y sigue ella.
+  2. **Base de datos: abrir, leer y cerrar.** `openAlarmRenewalStore` abre `cuadrante.sqlite` **en solo lectura**, con
+     `busy_timeout` de 3 s y **sin migraciones de Drift**, y lee ajustes de alarmas, el calendario principal y el idioma
+     (el de Ajustes › Idioma o el del móvil, resuelto como la app). Si el archivo no existe o su `user_version` no es
+     la de este código (una actualización que aún no se ha abierto: su migración, con la copia previa, solo la hace la
+     app), no hace nada. La base se cierra **antes** de tocar las notificaciones: se tiene abierta milisegundos.
+  3. Alarmas de turno desactivadas: termina sin tocar nada. Sin permiso de notificaciones: tampoco (no cancela; eso
+     lo hace la app al abrirse).
+  4. Mismos pasos que `AlarmSync`: textos (`AlarmStrings.fromL10n` del idioma leído, con `initializeDateFormatting`,
+     y las horas con el mismo reloj que la app: `textFormat` lee `appearance.timeFormat` y lo resuelve como
+     `FormatsHost`, con la configuración regional `formatLocaleName(idioma, idiomas del móvil)`; «Automático» no tiene
+     `MediaQuery` y usa `PlatformDispatcher.alwaysUse24HourFormat`, que un motor sin pantalla normalmente no recibe,
+     así que decide la región, como en la app con el interruptor de 24 h del móvil apagado),
+     `configure`, `initialize`, `planAlarmSchedule` con la zona del móvil y `replaceAll(plan.toSchedule)`.
+  5. Si la app arrancó mientras tanto, le pide otra sincronización para que tenga la última palabra.
+- **Garantías.** Los ids son deterministas y `replaceAll` sustituye por id y solo cancela avisos con el prefijo
+  `cuadrante.alarm:`: reprogramar dos veces da lo mismo (sin duplicados). Un día saltado sigue en silencio (está en los
+  ajustes que lee). Un aviso pospuesto (`cuadrante.alarm.snooze:`) no se toca nunca y no se llama a `cancelSnoozes`.
+- **Sonidos propios.** El aislado de fondo no tiene el canal `app.cuadrante/sounds` (lo registra `MainActivity`), así
+  que el programador va sin servicio de sonidos y con `manageSoundChannels: false`: **no crea, renombra ni borra**
+  canales `shift_alarm_*` (la app los creó con el nombre del sonido, que aquí no se puede leer). Un sonido cuenta solo
+  si su canal sigue en el móvil (`getNotificationChannels`): si la app lo encontró ilegible, lo degradó y borró su
+  canal, y la renovación tampoco lo usa; sus avisos suenan por el canal por defecto, como en la app. Así nunca se
+  recrea un canal con una URI que no se puede leer (alarma muda o `SecurityException`). Si la lista de canales no se
+  puede leer, todos los sonidos propios caen al canal por defecto.
+- **Resultado.** `AlarmRenewalOutcome` (`handledByApp`, `renewed`, `noDatabase`, `alarmsOff`, `noPermission`,
+  `failed`). Solo `failed` (base ocupada, error del plugin) devuelve `false` a WorkManager, que reintenta con su
+  espera. Ningún error sale de la función.
+- **Manifest.** El plugin no pide `Application` propia. Su manifest añade `FOREGROUND_SERVICE` y
+  `FOREGROUND_SERVICE_SHORT_SERVICE` (para trabajo urgente o en primer plano, que Turnly no usa); el nuestro los quita
+  con `tools:node="remove"`: sin notificación fija y nada que declarar en Play Console. El servicio
+  `SystemForegroundService` de WorkManager sigue declarado, pero nunca se arranca. **Por eso nunca se debe registrar
+  una tarea `expedited` ni con `foregroundServiceConfig`**: WorkManager la ejecutaría como servicio en primer plano y,
+  sin esos permisos, fallaría con `SecurityException`. Si algún día hiciera falta, primero hay que devolver los permisos
+  y declararlos en Play Console.
+- **Riesgos conocidos, sin probar en dispositivo:** que OxygenOS u otros fabricantes con ahorro agresivo retrasen
+  o no ejecuten la tarea (el aviso de renovación es la red de seguridad); que una escritura de la app coincida con
+  la lectura de fondo (milisegundos cada 12 h: la conexión de la app tiene `busy_timeout` de 3 s,
+  `configureDatabaseConnection` en `database_opener.dart`, así que la escritura espera en vez de fallar);
+  y el arranque del motor de Flutter de fondo con la app cerrada (lo mismo que «Posponer»).
 
 ## Horario de verano (Europe/Madrid)
 
@@ -258,6 +373,13 @@ a instante está en `data/wall_clock.dart`, con pruebas para 2026-03-29 y 2026-1
   (`alarmClock`, `setAlarmClock`) y los demás (recordatorios, víspera) con `exactAllowWhileIdle`; si no, todos con `inexactAllowWhileIdle`
   (puede retrasarse unos minutos) y la UI debe avisarlo y ofrecer `requestExactAlarmPermission()`, que abre esa
   pantalla del sistema. La app lo comprueba en cada reprogramación, así que concederlo después se aplica al volver.
+- **No molestar durante el turno (P13).** Las dos alarmas de cada ventana de silencio (`DND_SILENCE` / `DND_RELEASE`)
+  usan `setAlarmClock`, como las de turno: en un OnePlus 8T con OxygenOS 13 y `SCHEDULE_EXACT_ALARM` concedido,
+  `dumpsys alarm` las daba con `windowLength 3600000`, así que el móvil podía silenciarse hasta 1 h tarde y, peor,
+  seguir en silencio hasta 1 h después del turno (visto el 3-nov-2026). El `AlarmClockInfo` lleva un `showIntent` que
+  abre la app (código de petición propio, fuera de los dos de las alarmas de difusión), así que el reloj puede
+  mostrarlas como «próxima alarma»; sin «Alarmas y recordatorios» se sigue usando la alarma inexacta de siempre. Se
+  cancelan igual: `AlarmManager.cancel` sobre el mismo `PendingIntent` de difusión.
 - **Icono pequeño (`ic_stat_alarm`).** Solo lo nombra el Dart (`AndroidInitializationSettings('ic_stat_alarm')`), así
   que R8 / `shrinkResources` lo quita del APK de **release** y todos los avisos fallan con «no valid small icon».
   `android/app/src/main/res/raw/keep.xml` (`tools:keep`) lo conserva, y `tool/qa/release_apk_check.sh` (primer paso de
@@ -285,6 +407,10 @@ a instante está en `data/wall_clock.dart`, con pruebas para 2026-03-29 y 2026-1
 
 ## iOS
 
+- **Renovación en segundo plano: pendiente (fase Mac).** `BGTaskScheduler` necesita el identificador en
+  `BGTaskSchedulerPermittedIdentifiers` del `Info.plist`, el modo de fondo `fetch`/`processing` y probarlo en un
+  dispositivo; hasta entonces `NoAlarmRenewal` no hace nada y en iOS los avisos se renuevan al abrir la app, con el
+  aviso de renovación la víspera del último como recordatorio.
 - Notificaciones locales (`UNCalendarNotificationTrigger` vía `zonedSchedule`). El permiso **no se pide al arrancar**:
   `AlarmScheduler.requestPermission()` lo pide la primera vez que el usuario activa un aviso (desde
   `AlarmSettingsController.requestPermission()`).
@@ -345,6 +471,12 @@ Sonido real y volumen de alarma, comportamiento con ahorro de batería y por fab
 con la app cerrada y con ahorro de batería (arranque del motor en segundo plano), «Ya estoy despierto», que el
 aviso pospuesto suene a los 10 minutos, el aviso del día anterior en las noches de cambio de hora, la apertura de
 «Alarmas y recordatorios» y la notificación de «Probar aviso». Las categorías de acciones de iOS no se han probado.
+
+De la 0.7 (A1), **solo probado con pruebas de Dart**: que WorkManager ejecute la renovación cada 12 h con la app
+cerrada (y tras reiniciar o actualizar), con ahorro de batería y en OnePlus/Samsung/Xiaomi; que el motor de fondo
+lea la base y programe; que el aviso de renovación suene la víspera a las 20:00 y que tocarlo abra la app; y que
+con la app abierta la tarea le pase el trabajo. Para probarlo sin esperar 12 h: `adb shell cmd jobscheduler run -f
+es.cuadrante.app <id>` o el inspector de WorkManager de Android Studio (solo el agente de QA).
 
 De la 0.6.0, **solo probado con pruebas de Dart y de JVM y con el plugin simulado** (los escenarios Q93 a Q95 de la
 batería están escritos, no ejecutados): que el selector de sonidos del sistema se abra y devuelva la URI en cada

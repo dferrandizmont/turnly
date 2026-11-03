@@ -66,7 +66,7 @@ void main() {
     });
 
     test('publish stores the JSON under the snapshot key, then redraws the '
-        'five providers', () async {
+        'six providers', () async {
       await publisher.publish('{"v":1}');
       expect(layer.store[kWidgetSnapshotKey], '{"v":1}');
       expect(layer.calls, [
@@ -76,6 +76,7 @@ void main() {
         'android:es.cuadrante.app.widget.CuadranteLargeWidgetProvider',
         'android:es.cuadrante.app.widget.CuadranteAgendaWidgetProvider',
         'android:es.cuadrante.app.widget.CuadranteTwoWeeksWidgetProvider',
+        'android:es.cuadrante.app.widget.CuadranteFourWeeksWidgetProvider',
       ]);
       expect(await publisher.readPublished(), '{"v":1}');
     });
@@ -89,13 +90,13 @@ void main() {
     test('failing providers do not stop the remaining updates', () async {
       layer.failUpdate = true;
       await publisher.publish('{"v":1}');
-      expect(layer.calls.where((c) => c.startsWith('android:')), hasLength(5));
+      expect(layer.calls.where((c) => c.startsWith('android:')), hasLength(6));
     });
 
     test('reloadTimelines redraws without storing', () async {
       await publisher.reloadTimelines();
       expect(layer.calls.where((c) => c.startsWith('save:')), isEmpty);
-      expect(layer.calls.where((c) => c.startsWith('android:')), hasLength(5));
+      expect(layer.calls.where((c) => c.startsWith('android:')), hasLength(6));
     });
 
     test('clear removes the snapshot and redraws', () async {
@@ -105,7 +106,7 @@ void main() {
       expect(layer.store, isEmpty);
       expect(await publisher.readPublished(), isNull);
       expect(layer.calls.first, 'save:$kWidgetSnapshotKey');
-      expect(layer.calls.where((c) => c.startsWith('android:')), hasLength(5));
+      expect(layer.calls.where((c) => c.startsWith('android:')), hasLength(6));
     });
 
     test('pinning asks the launcher for the provider of that size', () async {
@@ -115,12 +116,14 @@ void main() {
       await publisher.requestPin(WidgetSize.large);
       await publisher.requestPin(WidgetSize.agenda);
       await publisher.requestPin(WidgetSize.twoWeeks);
+      await publisher.requestPin(WidgetSize.fourWeeks);
       expect(layer.calls, [
         'pin:es.cuadrante.app.widget.CuadranteSmallWidgetProvider',
         'pin:es.cuadrante.app.widget.CuadranteMediumWidgetProvider',
         'pin:es.cuadrante.app.widget.CuadranteLargeWidgetProvider',
         'pin:es.cuadrante.app.widget.CuadranteAgendaWidgetProvider',
         'pin:es.cuadrante.app.widget.CuadranteTwoWeeksWidgetProvider',
+        'pin:es.cuadrante.app.widget.CuadranteFourWeeksWidgetProvider',
       ]);
       layer.pinSupported = false;
       expect(await publisher.canPin(), isFalse);
@@ -181,8 +184,13 @@ void main() {
       kWidgetTwoWeeksProvider,
       endsWith('.widget.CuadranteTwoWeeksWidgetProvider'),
     );
+    expect(
+      kWidgetFourWeeksProvider,
+      endsWith('.widget.CuadranteFourWeeksWidgetProvider'),
+    );
     expect(WidgetSize.agenda.androidProvider, kWidgetAgendaProvider);
     expect(WidgetSize.twoWeeks.androidProvider, kWidgetTwoWeeksProvider);
+    expect(WidgetSize.fourWeeks.androidProvider, kWidgetFourWeeksProvider);
     // Every size has its provider in the list the snapshot feeds.
     expect(kWidgetProviders, [
       for (final size in WidgetSize.values) size.androidProvider,

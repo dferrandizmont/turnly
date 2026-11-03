@@ -165,14 +165,19 @@ class OnboardingRepository {
     }
     final region = await _read(_holidayRegionKey);
     if (region is String && region.isNotEmpty) return true;
+    final country = await _read(_holidayCountryKey);
+    if (country is String && country.isNotEmpty && country != 'ES') {
+      return true;
+    }
     final alarms = await _read(_alarmSettingsKey);
     return alarms is Map && alarms['enabled'] == true;
   }
 
   // Keys written by other features (`HolidaySettings.region`,
-  // `alarmSettingsKey`); read as plain settings so this file keeps no
-  // dependency on them.
+  // `HolidaySettings.country`, `alarmSettingsKey`); read as plain settings so
+  // this file keeps no dependency on them.
   static const _holidayRegionKey = 'holidays.region';
+  static const _holidayCountryKey = 'holidays.country';
   static const _alarmSettingsKey = 'alarms';
 
   Future<bool> isDone() => _readBool(OnboardingSettings.done);

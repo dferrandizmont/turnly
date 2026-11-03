@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/format/text_measure.dart';
+import '../../../core/format/app_date_format.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../settings/presentation/settings_widgets.dart';
@@ -30,8 +31,14 @@ class BackupCopyList extends StatelessWidget {
   /// out by as much so that its *text* sits on the edge it aligns with.
   static const double buttonPad = Sp.s;
 
-  static String titleOf(AppLocalizations l10n, BackupCopy copy, DateTime now) =>
-      sentenceCase(backupWhen(l10n, copy.entry.modifiedAt, now));
+  static String titleOf(
+    AppLocalizations l10n,
+    BackupCopy copy,
+    DateTime now, {
+    bool hour12 = false,
+  }) => sentenceCase(
+    backupWhen(l10n, copy.entry.modifiedAt, now, hour12: hour12),
+  );
 
   /// «Copia del móvil · 0.5.0 · 2 KB»: the kind, the version of the app that
   /// wrote it (when the file says), and the size.
@@ -63,7 +70,12 @@ class BackupCopyList extends StatelessWidget {
     final largeText = textScaleOf(context) >= 1.3 - 0.001;
     final maxLines = largeText ? 1 : 2;
     for (final copy in copies) {
-      final title = titleOf(l10n, copy, now);
+      final title = titleOf(
+        l10n,
+        copy,
+        now,
+        hour12: AppDateFormat.of(context).hour12,
+      );
       final meta = metaOf(l10n, copy);
       if (longestWordWidth(context, title, titleStyle) > room ||
           longestWordWidth(context, meta, metaStyle) > room ||
@@ -88,10 +100,20 @@ class BackupCopyList extends StatelessWidget {
               _CopyRow(
                 key: ValueKey('backup-copy-${copy.id}'),
                 copy: copy,
-                title: titleOf(l10n, copy, now),
+                title: titleOf(
+                  l10n,
+                  copy,
+                  now,
+                  hour12: AppDateFormat.of(context).hour12,
+                ),
                 meta: metaOf(l10n, copy),
                 restoreLabel: l10n.backupUiCopyRestoreLabel(
-                  backupWhen(l10n, copy.entry.modifiedAt, now),
+                  backupWhen(
+                    l10n,
+                    copy.entry.modifiedAt,
+                    now,
+                    hour12: AppDateFormat.of(context).hour12,
+                  ),
                 ),
                 inline: inline,
                 onRestore: () => onRestore(copy),

@@ -41,10 +41,22 @@ Future<void> _boot(QaContext qa) async {
   expect(allCells, findsNWidgets(42));
   expect(cell(const CivilDate(2026, 9, 28)), findsOneWidget);
   expect(cell(const CivilDate(2026, 11, 8)), findsOneWidget);
+  // Decision 28: on a phone where the whole month would not fit next to the
+  // open card, the Today card starts folded. Open it to read its details,
+  // then fold it again so the next scenarios start from the default.
+  final collapsed = find.byKey(const ValueKey('today-card-collapsed'));
+  final toggle = find.byKey(const ValueKey('today-card-toggle'));
+  final startedFolded = collapsed.evaluate().isNotEmpty;
+  if (startedFolded) {
+    await t.tapAndSettle(toggle, reason: 'abrir la tarjeta de hoy');
+  }
   expect(find.text('ESTA NOCHE'), findsOneWidget);
   expect(find.text('22:00–06:00'), findsOneWidget);
   expect(find.textContaining('Empieza en 3 h 40'), findsOneWidget);
   expect(find.text('Mañana (mar 20): turno de Noche'), findsOneWidget);
+  if (startedFolded) {
+    await t.tapAndSettle(toggle, reason: 'plegar la tarjeta de hoy');
+  }
   // Today's cell: code and time, not only colour.
   expect(inCell(qaToday, find.text('N')), findsOneWidget);
   expect(inCell(qaToday, find.text('22–06')), findsOneWidget);

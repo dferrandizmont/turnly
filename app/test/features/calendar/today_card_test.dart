@@ -290,23 +290,38 @@ void main() {
   });
 
   group('paint tools', () {
-    testWidgets('header names the shift and its hours; pucks show disc + ink', (
-      tester,
-    ) async {
+    testWidgets('the hours of the shift are in the preview; pucks show disc + '
+        'ink', (tester) async {
+      final semantics = tester.ensureSemantics();
       await pumpCalendar(tester);
       await enterPaintMode(tester);
+      // Decision 28: the header is one line and no longer repeats the name
+      // and hours of the shift; they go to the preview of the sheet and to
+      // what the chosen puck reads aloud.
       expect(find.text('PINTANDO'), findsOneWidget);
-      expect(find.text('Mañana · 06:00–14:00'), findsOneWidget);
+      expect(find.text('Mañana · 06:00–14:00'), findsNothing);
+      expect(
+        tester.getSemantics(find.byKey(const ValueKey('paint-preview'))).label,
+        contains('06:00–14:00'),
+      );
+      expect(
+        tester.getSemantics(find.byKey(const ValueKey('tool-morning'))).label,
+        'Mañana, 06:00–14:00',
+      );
 
       await tester.tap(find.widgetWithText(InkWell, 'Tarde'));
       await tester.pumpAndSettle();
-      expect(find.text('Tarde · 14:00–22:00'), findsOneWidget);
+      expect(
+        tester.getSemantics(find.byKey(const ValueKey('paint-preview'))).label,
+        contains('14:00–22:00'),
+      );
 
       await tester.tap(find.widgetWithText(InkWell, 'Borrar'));
       await tester.pumpAndSettle();
-      expect(find.text('Borrar'), findsNWidgets(2)); // header + puck
+      expect(find.text('Borrar'), findsOneWidget); // the puck
+      expect(find.text(' · BORRAR'), findsOneWidget); // the header
 
-      // A puck is a 54 dp circle in the disc colour.
+      // A puck is a 48 dp circle in the disc colour.
       final disc = ShiftSwatch.forColor(
         ShiftPalette.night.toARGB32(),
         Brightness.light,
@@ -322,7 +337,8 @@ void main() {
         ),
       );
       expect(puck, findsOneWidget);
-      expect(tester.getSize(puck), const Size.square(54));
+      expect(tester.getSize(puck), const Size.square(48));
+      semantics.dispose();
     });
 
     testWidgets('the selected puck is ringed and its name is bold', (
@@ -351,12 +367,12 @@ void main() {
       expect(ring('tool-afternoon'), findsOneWidget);
     });
 
-    testWidgets('Doblar toggles and undo / redo are round 48 dp buttons', (
+    testWidgets('«Añadir otro turno» doubles; undo / redo are round 48 dp', (
       tester,
     ) async {
       await pumpCalendar(tester);
       await enterPaintMode(tester);
-      await tester.tap(find.widgetWithText(InkWell, 'Doblar'));
+      await tester.tap(find.byKey(const ValueKey('tool-double')));
       await tester.pumpAndSettle();
       expect(
         containerOf(tester).read(paintControllerProvider).doubling,

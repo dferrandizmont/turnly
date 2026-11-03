@@ -6,9 +6,9 @@ import '../../schedule/domain/schedule_domain.dart';
 const int maxRepeatTimes = 52;
 
 /// One day of a [DayClipboard]: where it sits relative to the first one, the
-/// shifts it had and (if any) its note, the reminder of the note and the
-/// overtime and early-leave minutes. Those four travel together: they are
-/// copied, pasted and repeated exactly when the notes are.
+/// shifts it had and (if any) its note, the reminder of the note, the
+/// overtime and early-leave minutes and the extra amount. Those travel
+/// together: they are copied, pasted and repeated exactly when the notes are.
 class ClipDay {
   const ClipDay({
     required this.offset,
@@ -17,6 +17,7 @@ class ClipDay {
     this.noteReminderMinute,
     this.overtimeMinutes,
     this.earlyLeaveMinutes,
+    this.extraAmountCents,
   });
 
   /// Days after [DayClipboard.origin].
@@ -28,13 +29,15 @@ class ClipDay {
   final int? noteReminderMinute;
   final int? overtimeMinutes;
   final int? earlyLeaveMinutes;
+  final int? extraAmountCents;
 
   /// Whether the day carries anything besides its shifts.
   bool get hasAnnotations =>
       note != null ||
       noteReminderMinute != null ||
       overtimeMinutes != null ||
-      earlyLeaveMinutes != null;
+      earlyLeaveMinutes != null ||
+      extraAmountCents != null;
 
   @override
   bool operator ==(Object other) =>
@@ -44,6 +47,7 @@ class ClipDay {
       other.noteReminderMinute == noteReminderMinute &&
       other.overtimeMinutes == overtimeMinutes &&
       other.earlyLeaveMinutes == earlyLeaveMinutes &&
+      other.extraAmountCents == extraAmountCents &&
       const ListEquality<String>().equals(other.shiftIds, shiftIds);
 
   @override
@@ -53,6 +57,7 @@ class ClipDay {
     noteReminderMinute,
     overtimeMinutes,
     earlyLeaveMinutes,
+    extraAmountCents,
     const ListEquality<String>().hash(shiftIds),
   );
 }
@@ -119,6 +124,7 @@ class DayClipboard {
     final note = day.note;
     final overtime = entry?.overtimeMinutes;
     final early = entry?.earlyLeaveMinutes;
+    final extra = entry?.extraAmountCents;
     return ClipDay(
       offset: offset,
       shiftIds: day.shiftIds,
@@ -127,6 +133,7 @@ class DayClipboard {
       // 0 minutes is the same as nothing.
       overtimeMinutes: overtime == null || overtime == 0 ? null : overtime,
       earlyLeaveMinutes: early == null || early == 0 ? null : early,
+      extraAmountCents: extra == null || extra == 0 ? null : extra,
     );
   }
 
@@ -198,8 +205,8 @@ DayEntry entryWithShifts(Schedule schedule, CivilDate date, List<String> ids) {
 }
 
 /// [entry] with what [day] carries on top of it: a copied note, reminder,
-/// overtime or early leave replaces the entry's own; one the copied day does
-/// not have leaves the entry's alone.
+/// overtime, early leave or extra amount replaces the entry's own; one the
+/// copied day does not have leaves the entry's alone.
 DayEntry withAnnotationsOf(ClipDay day, DayEntry entry) {
   final note = day.note;
   return entry.copyWith(
@@ -207,6 +214,7 @@ DayEntry withAnnotationsOf(ClipDay day, DayEntry entry) {
     noteReminderMinute: day.noteReminderMinute,
     overtimeMinutes: day.overtimeMinutes,
     earlyLeaveMinutes: day.earlyLeaveMinutes,
+    extraAmountCents: day.extraAmountCents,
   );
 }
 

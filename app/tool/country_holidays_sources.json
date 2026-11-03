@@ -1,0 +1,212 @@
+{
+ "2026/mx.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('MX', years=2026, language='es', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2027/mx.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('MX', years=2027, language='es', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2026/ar.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('AR', years=2026, language='es', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2027/ar.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('AR', years=2027, language='es', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2026/co.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('CO', years=2026, language='es', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2027/co.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('CO', years=2027, language='es', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2026/cl.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('CL', years=2026, language='es', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2027/cl.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('CL', years=2027, language='es', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2026/pe.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('PE', years=2026, language='es', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2027/pe.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('PE', years=2027, language='es', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2026/ec.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('EC', years=2026, language='es', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2027/ec.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('EC', years=2027, language='es', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2026/uy.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('UY', years=2026, language='es', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2027/uy.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('UY', years=2027, language='es', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2026/ve.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('VE', years=2026, language='es', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2027/ve.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('VE', years=2027, language='es', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2026/pt.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('PT', years=2026, language='pt_PT', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2027/pt.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('PT', years=2027, language='pt_PT', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2026/br.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('BR', years=2026, language='pt_BR', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2027/br.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('BR', years=2027, language='pt_BR', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2026/fr.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('FR', years=2026, language='fr', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2027/fr.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('FR', years=2027, language='fr', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2026/it.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('IT', years=2026, language='it_IT', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2027/it.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('IT', years=2027, language='it_IT', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2026/de.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('DE', years=2026, language='de', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2027/de.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('DE', years=2027, language='de', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2026/gb.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('GB', years=2026, language='en_GB', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2027/gb.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('GB', years=2027, language='en_GB', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2026/ie.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('IE', years=2026, language=None, observed=True)",
+  "published": "2026-10-31"
+ },
+ "2027/ie.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('IE', years=2027, language=None, observed=True)",
+  "published": "2026-10-31"
+ },
+ "2026/us.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('US', years=2026, language='en_US', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2027/us.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('US', years=2027, language='en_US', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2026/ca.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('CA', years=2026, language='en_CA', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2027/ca.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('CA', years=2027, language='en_CA', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2026/nl.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('NL', years=2026, language='nl', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2027/nl.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('NL', years=2027, language='nl', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2026/be.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('BE', years=2026, language='en_US', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2027/be.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('BE', years=2027, language='en_US', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2026/ch.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('CH', years=2026, language='en_US', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2027/ch.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('CH', years=2027, language='en_US', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2026/at.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('AT', years=2026, language='de', observed=True)",
+  "published": "2026-10-31"
+ },
+ "2027/at.json": {
+  "url": "https://github.com/vacanza/holidays",
+  "ref": "python-holidays 0.107 (MIT), country_holidays('AT', years=2027, language='de', observed=True)",
+  "published": "2026-10-31"
+ }
+}

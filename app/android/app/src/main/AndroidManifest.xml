@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <!-- Shift alarms (docs/alarmas.md). Runtime notification permission on
          Android 13+. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
@@ -12,6 +13,21 @@
          app falls back to inexact alarms. maxSdkVersion is not set: the
          permission is needed on 12L through current. -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <!-- Silence during the shift (P13, docs/ola3-logica.md): «Acceso a No
+         molestar», the permission to change the interruption filter. The user
+         grants it in the system settings; the app never asks at launch and
+         never touches the Wi-Fi or the Bluetooth (Android 10 does not let
+         apps do that). The exact alarms of the silence windows reuse the
+         SCHEDULE_EXACT_ALARM permission above. -->
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY"/>
+    <!-- Background renewal of the alarms (docs/alarmas.md, "Renovación en
+         segundo plano"): the workmanager plugin merges in the foreground
+         service permissions for expedited and foreground work. Turnly only
+         runs a plain periodic task, never in the foreground, so they are
+         removed: no persistent notification and nothing to declare in Play
+         Console. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" tools:node="remove"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SHORT_SERVICE" tools:node="remove"/>
     <!-- Restore preview against tapjacking (MainActivity.setPreviewProtection):
          lets the window hide other apps' overlays on Android 12+. Normal
          permission, granted at install. -->
@@ -129,8 +145,8 @@
             android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver"
             android:exported="false"/>
         <!-- ==== Home-screen widgets (docs/widget-contrato.md, "Android") ====
-             Three widgets: 2x2 (today and tomorrow), 4x2 (seven days) and 4x4
-             (the month grid). The
+             Six widgets: 2x2 (today and tomorrow), 4x2 (seven days), 4x4 (the
+             month grid), the agenda, two weeks and four weeks. The
              class names are part of the contract with the Dart side and with
              the widgets already placed. -->
         <receiver
@@ -174,6 +190,10 @@
             <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/cuadrante_widget_two_weeks" />
         </receiver>
+        <receiver android:name=".widget.CuadranteFourWeeksWidgetProvider" android:exported="true" android:label="@string/widget_four_weeks_label">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/cuadrante_widget_four_weeks" />
+        </receiver>
         <!-- Redraws the widgets (the day is read from the clock on every draw)
              when the date, the time or the time zone change, after a reboot or
              an update of the app, and when our own alarm for the next local
@@ -189,6 +209,18 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
                 <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED"/>
+            </intent-filter>
+        </receiver>
+        <!-- The two alarms of every silence window (P13): the one that
+             silences the phone and the one that frees it. They are ours
+             (explicit intents), so they need no filter; the boot one frees
+             the phone, because the pending alarms do not survive a reboot.
+             Not exported: only our own alarms and the system reach it. -->
+        <receiver
+            android:name=".DndAlarmReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
         <!-- ==== end of the home-screen widgets ==== -->

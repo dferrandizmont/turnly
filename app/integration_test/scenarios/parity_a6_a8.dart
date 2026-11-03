@@ -5,6 +5,7 @@ import 'package:cuadrante/features/summary/presentation/summary_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/day_sheet.dart';
 import '../support/qa_core.dart';
 import '../support/qa_harness.dart';
 
@@ -33,6 +34,8 @@ String _text(WidgetTester t, String key) => t.widget<Text>(_k(key)).data!;
 Future<void> _openDay(WidgetTester t, CivilDate date) async {
   await t.tapAndSettle(cell(date), reason: 'casilla de $date');
   expect(find.byType(BottomSheet), findsOneWidget, reason: 'detalle de $date');
+  // The extras are in «Más opciones».
+  await t.openDayMore();
 }
 
 /// Closes the sheet like a user: the dimmed area, or back when the sheet fills
@@ -168,8 +171,9 @@ Future<void> _summaryExtras(QaContext qa) async {
 
   await t.tapAndSettle(_k('open-summary'), reason: 'icono Resumen del mes');
   expect(find.byType(SummaryScreen), findsOneWidget);
-  // 160 h + 2 h of overtime - 1 h of early leave.
-  expect(_text(t, 'summary-hours'), '161 h');
+  // The extras are on the 19th and later: planned 64 h + 2 h - 1 h.
+  expect(_text(t, 'summary-hours'), '96 h');
+  expect(_text(t, 'summary-legend-planned'), '65 h');
   expect(_text(t, 'summary-overtime-value'), '+2 h');
   expect(_text(t, 'summary-early-leave-value'), '${_minus}1 h');
   expect(find.text('+15,00$_nbsp€ en el estimado'), findsOneWidget);

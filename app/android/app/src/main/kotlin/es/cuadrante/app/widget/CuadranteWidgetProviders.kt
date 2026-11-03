@@ -54,3 +54,6 @@ class CuadranteAgendaWidgetProvider : CuadranteWidgetProvider(WidgetModelBuilder
 
 /** 4x2: current Monday-first week and the following week. */
 class CuadranteTwoWeeksWidgetProvider : CuadranteWidgetProvider(WidgetModelBuilder.Kind.TWO_WEEKS)
+
+/** 4x4: four Monday-first weeks, with the notes and the next day off. */
+class CuadranteFourWeeksWidgetProvider : CuadranteWidgetProvider(WidgetModelBuilder.Kind.FOUR_WEEKS)

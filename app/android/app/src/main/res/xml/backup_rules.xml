@@ -16,4 +16,7 @@
 -->
 <full-backup-content>
     <include domain="file" path="."/>
+    <!-- The folder copy's record (state, lock, temporary files): the folder's
+         permission does not travel to another phone, so neither does this. -->
+    <exclude domain="file" path="folder_backup/"/>
 </full-backup-content>

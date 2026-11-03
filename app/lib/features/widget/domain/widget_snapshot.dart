@@ -29,6 +29,9 @@ const int kWidgetMonthCells = 42;
 /// Maximum agenda length and the two-week grid size.
 const int kWidgetUpcomingDays = 14;
 
+/// Days of the four-week widget: four Monday-first weeks.
+const int kWidgetFourWeeksDays = 28;
+
 /// The encoded snapshot must stay below this many bytes.
 const int kWidgetSnapshotMaxBytes = 200 * 1024;
 
@@ -615,6 +618,23 @@ class WidgetDescriptions {
   };
 }
 
+/// Optional extension (C1, `docs/widget-contrato.md`): the next day off seen
+/// from one day of the timeline, already composed in the snapshot's language.
+class WidgetNextOff {
+  const WidgetNextOff({required this.date, required this.label});
+
+  factory WidgetNextOff.fromJson(Map<String, Object?> j) =>
+      WidgetNextOff(date: _str(j, 'date'), label: _str(j, 'label'));
+
+  /// Civil date (`yyyy-MM-dd`) of that next day off.
+  final String date;
+
+  /// «Libras el jueves 5», «Mañana libras», «Hoy libras; vuelves el lunes 9».
+  final String label;
+
+  Map<String, Object?> toJson() => {'date': date, 'label': label};
+}
+
 /// Everything the native widgets need, as JSON (see `docs/widget-contrato.md`).
 /// Build it with `buildWidgetSnapshot`.
 class WidgetSnapshot {
@@ -633,9 +653,13 @@ class WidgetSnapshot {
     List<WidgetDisplayDay> displayDays = const [],
     this.noShift = '',
     this.descriptions,
+    Map<String, WidgetNextOff>? nextOff,
+    Map<String, String>? notes,
     String? contentHash,
     this.version = kWidgetSnapshotVersion,
-  }) : weekdayHeaders = List.unmodifiable(weekdayHeaders),
+  }) : nextOff = nextOff == null ? null : Map.unmodifiable(nextOff),
+       notes = notes == null ? null : Map.unmodifiable(notes),
+       weekdayHeaders = List.unmodifiable(weekdayHeaders),
        styles = List.unmodifiable(styles),
        months = List.unmodifiable(months),
        days = List.unmodifiable(days),
@@ -670,6 +694,17 @@ class WidgetSnapshot {
       descriptions: j['descriptions'] == null
           ? null
           : WidgetDescriptions.fromJson(_map(j, 'descriptions')),
+      nextOff: j['nextOff'] == null
+          ? null
+          : {
+              for (final e in _map(j, 'nextOff').entries)
+                e.key: WidgetNextOff.fromJson(
+                  (e.value! as Map).cast<String, Object?>(),
+                ),
+            },
+      notes: j['notes'] == null
+          ? null
+          : _map(j, 'notes').cast<String, String>(),
     );
   }
 
@@ -728,6 +763,16 @@ class WidgetSnapshot {
   final String noShift;
   final WidgetDescriptions? descriptions;
 
+  /// Optional extension: for each date of [days], the next day off seen from
+  /// that day. `null` (absent from the JSON) when none is known.
+  final Map<String, WidgetNextOff>? nextOff;
+
+  /// Optional extension (UW): for the dates of the displayed range that have
+  /// a note and no absence shift, the first line of the note, already
+  /// trimmed. The text never leaves the phone for a health day: those dates
+  /// are left out. `null` (absent from the JSON) when none is known.
+  final Map<String, String>? notes;
+
   final String? _storedHash;
 
   /// SHA-256 (hex) of the content: everything except [generatedAt] and the
@@ -768,6 +813,9 @@ class WidgetSnapshot {
     'months': [for (final m in months) m.toJson()],
     'days': [for (final d in days) d.toJson()],
     if (descriptions != null) 'descriptions': descriptions!.toJson(),
+    if (nextOff != null)
+      'nextOff': {for (final e in nextOff!.entries) e.key: e.value.toJson()},
+    if (notes != null) 'notes': notes,
     if (version >= 2) 'noShift': noShift,
     if (version >= 2) 'displayDays': [for (final d in displayDays) d.toJson()],
   };

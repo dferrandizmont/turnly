@@ -1,0 +1,17 @@
+{
+"schema":1,
+"year":2027,
+"country":"IE",
+"national":[
+{"date":"2027-01-01","name":"New Year's Day"},
+{"date":"2027-02-01","name":"Saint Brigid's Day"},
+{"date":"2027-03-17","name":"Saint Patrick's Day"},
+{"date":"2027-03-29","name":"Easter Monday"},
+{"date":"2027-05-03","name":"May Day"},
+{"date":"2027-06-07","name":"June Bank Holiday"},
+{"date":"2027-08-02","name":"August Bank Holiday"},
+{"date":"2027-10-25","name":"October Bank Holiday"},
+{"date":"2027-12-25","name":"Christmas Day"},
+{"date":"2027-12-26","name":"Saint Stephen's Day"}
+]
+}

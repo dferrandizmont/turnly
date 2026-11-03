@@ -2,19 +2,19 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart' show ScrollCacheExtent;
-import 'package:flutter/semantics.dart' show OrdinalSortKey;
+import 'package:flutter/rendering.dart' show RenderProxyBox, ScrollCacheExtent;
+import 'package:flutter/scheduler.dart' show SchedulerBinding;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/format/app_date_format.dart';
 import '../../../core/icons/app_icons.dart';
-import '../../../core/icons/selection_icons.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/providers.dart';
 import '../../../core/router.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/adaptive.dart';
+import '../../../core/widgets/motion_size.dart';
 import '../../../core/widgets/page_body.dart';
 import '../../patterns/presentation/pattern_pick_banner.dart';
 import '../../schedule/domain/civil_date.dart';
@@ -26,25 +26,30 @@ import '../application/schedule_controller.dart';
 import '../application/selection_controller.dart';
 import '../application/visible_month.dart';
 import '../application/week_layout.dart';
+import '../../onboarding/application/onboarding_providers.dart';
 import '../../settings/application/preferences_controller.dart';
+import 'calendar_background_layer.dart';
 import 'calendar_switcher.dart';
 import 'day_cell.dart';
 import 'day_detail_sheet.dart';
 import 'day_pane.dart';
+import 'month_destinations.dart';
 import 'month_grid.dart';
 import 'month_list.dart';
+import 'month_fit.dart';
 import 'month_presentation_control.dart';
-import 'month_tip.dart';
 import 'paint_bar.dart';
 import 'selection_bar.dart';
 import 'shift_format.dart';
 import 'today_card.dart';
+import '../../reports/presentation/report_share_button.dart';
 import '../../../core/widgets/app_snack_bar.dart';
 
-/// Home (`docs/diseno.md`): the date and settings, the "today" card, the month
-/// title with its arrows, the weekday row and the month grid; paint mode swaps
-/// the top for its header and puts the tools sheet at the bottom (floating
-/// "Pintar" button otherwise).
+/// Home (`docs/diseno.md`): the date and settings, the "today" card (it folds
+/// to one line), the month title with Grid/List and its arrows, the weekday
+/// row and the month grid, and the bar of destinations (Mes · Rotación ·
+/// Agenda · Resumen) with the floating "Pintar" above it; paint mode swaps
+/// the top for its header and the bar for the tools sheet.
 ///
 /// On wide screens ([Adaptive.useSplit]: a landscape phone, a tablet) the same
 /// screen has two panes (`docs/diseno.md`, «Pantallas anchas»): the month on
@@ -73,16 +78,102 @@ class MonthScreen extends ConsumerStatefulWidget {
   ConsumerState<MonthScreen> createState() => _MonthScreenState();
 }
 
-class _MonthScreenState extends ConsumerState<MonthScreen> {
+class _MonthScreenState extends ConsumerState<MonthScreen>
+    with SingleTickerProviderStateMixin {
   final _monthScrollController = ScrollController();
   double? _gridMinHeight;
   (CivilDate, int, bool)? _gridLayout;
 
+  // What the month needs besides its rows, measured while it is laid out, so
+  // the paint sheet can be given exactly what is left (decision 28).
+  double? _pinnedHeight;
+  double? _bottomRowHeight;
+  double? _paintTopHeight;
+
+  /// Whether the days scroll: the arrows of paint mode only show then.
+  bool _gridScrolls = false;
+
+  bool _changed(double? now, double next) =>
+      now == null || (now - next).abs() >= 0.5;
+
+  void _onPinned(Size size) {
+    if (mounted && _changed(_pinnedHeight, size.height)) {
+      setState(() => _pinnedHeight = size.height);
+    }
+  }
+
+  void _onBottomRow(Size size) {
+    if (mounted && _changed(_bottomRowHeight, size.height)) {
+      setState(() => _bottomRowHeight = size.height);
+    }
+  }
+
+  void _onPaintTop(Size size) {
+    if (mounted && _changed(_paintTopHeight, size.height)) {
+      setState(() => _paintTopHeight = size.height);
+    }
+  }
+
+  bool _onScrollMetrics(ScrollMetricsNotification n) {
+    final scrolls = n.metrics.maxScrollExtent > 0.5;
+    if (scrolls != _gridScrolls) {
+      // The metrics arrive while the tree is laying out.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _gridScrolls != scrolls) {
+          setState(() => _gridScrolls = scrolls);
+        }
+      });
+    }
+    return false;
+  }
+
+  /// The change of month (`docs/diseno.md`, «Movimiento y tacto»): the days
+  /// of the new month fade in from the side they come from, in 200 ms, or at
+  /// once with «reducir movimiento». Only the days move, never the header.
+  late final AnimationController _monthChange = AnimationController(
+    vsync: this,
+    value: 1,
+  );
+
+  /// 1 when the new month is later (it comes from the right), -1 earlier.
+  double _monthDirection = 1;
+
   @override
   void dispose() {
+    _monthChange.dispose();
     _monthScrollController.dispose();
     super.dispose();
   }
+
+  void _animateMonthChange(CivilDate? previous, CivilDate next) {
+    if (previous == null || previous == next) return;
+    final duration = Motion.of(context, Motion.state);
+    if (duration == Duration.zero) {
+      _monthChange.value = 1;
+      return;
+    }
+    _monthDirection = next.isBefore(previous) ? -1 : 1;
+    _monthChange.duration = duration;
+    unawaited(_monthChange.forward(from: 0));
+  }
+
+  /// [child] (the grid or the list) with the month change applied.
+  Widget _withMonthChange(Widget child) => AnimatedBuilder(
+    animation: _monthChange,
+    builder: (context, child) {
+      final t = Motion.curve.transform(_monthChange.value);
+      // Always the same widgets around the days (at rest: opacity 1 and no
+      // offset, which paint the child as is), so the grid keeps its state.
+      return Opacity(
+        opacity: 0.3 + 0.7 * t,
+        child: FractionalTranslation(
+          translation: Offset(_monthDirection * 0.06 * (1 - t), 0),
+          child: child,
+        ),
+      );
+    },
+    child: child,
+  );
 
   void _scrollPaintGrid(bool down) {
     if (!_monthScrollController.hasClients) return;
@@ -148,6 +239,9 @@ class _MonthScreenState extends ConsumerState<MonthScreen> {
     );
     _followLayout(split);
     final dayOpen = ref.watch(openDayProvider.select((d) => d != null));
+    ref.listen(visibleMonthProvider, _animateMonthChange);
+    // The bar of destinations, outside the editing modes and the keyboard.
+    final showBar = !split && !editing && !keyboardUp;
 
     // A failed save: the controller has already reloaded what is stored.
     ref.listen(scheduleControllerProvider.select((s) => s.saveErrors), (
@@ -178,6 +272,12 @@ class _MonthScreenState extends ConsumerState<MonthScreen> {
               width: width,
               child: Row(
                 children: [
+                  // The destinations, as a rail: a bottom bar would take the
+                  // height the month lacks on a landscape phone.
+                  SizedBox(
+                    height: box.maxHeight,
+                    child: const MonthNavigationRail(),
+                  ),
                   // The month has the whole height: the date, the card and
                   // the tools live in the pane.
                   Expanded(
@@ -213,32 +313,44 @@ class _MonthScreenState extends ConsumerState<MonthScreen> {
         },
       );
     } else {
-      body = PageBody(
+      final foldCard = !MonthFit.fitsWithOpenCard(context);
+      // The fixed row under the grid: «Seleccionar días» and, over the end
+      // of it, the floating button, so the grid ends above both (decision
+      // 28). Without the bar (keyboard up) the body runs under the system
+      // navigation bar and the old room under the grid stays.
+      final fixedRow = editing || keyboardUp ? Sp.touch : MonthFit.fixedRow;
+      Widget month() => PageBody(
         child: Column(
           children: [
             // Fixed in paint mode, so "Listo" is always within reach.
-            if (painting) const PaintHeader(),
-            if (painting) const PatternPickBanner(),
+            if (painting)
+              _ReportSize(
+                onSize: _onPaintTop,
+                child: const Column(
+                  children: [PaintHeader(), PatternPickBanner()],
+                ),
+              ),
             if (selecting) const SelectionHeader(),
             Expanded(
               child: _monthScroll(
                 top: [
-                  if (!editing) ...const [
-                    _DateHeader(),
-                    TodayCard(),
-                    MonthTipCard(),
+                  if (!editing) ...[
+                    const _DateHeader(),
+                    TodayCard(collapsible: true, foldByDefault: foldCard),
                   ],
                   const _MonthNavigation(),
                   const _WeekdayRow(),
                 ],
                 painting: painting,
-                // The body runs under the system navigation bar
-                // (SafeArea bottom: false) while the button floats above it,
-                // so its inset counts too.
-                bottomRoom: editing
-                    ? 0.0
-                    : MonthScreen._fabClearance +
-                          MediaQuery.viewPaddingOf(context).bottom,
+                // Under the grid there is nothing but the fixed row, which
+                // already keeps clear of the floating button. Without the
+                // bar (keyboard up) the body runs under the system
+                // navigation bar, so its inset counts too.
+                bottomRoom: !editing && keyboardUp
+                    ? MonthScreen._fabClearance +
+                          MediaQuery.viewPaddingOf(context).bottom
+                    : 0.0,
+                fixedRow: fixedRow,
                 noticeRoom: noticeRoom,
                 // The rows of the grid are tall enough for the code and its
                 // time at the user's text size: the code grows with the text
@@ -250,6 +362,7 @@ class _MonthScreenState extends ConsumerState<MonthScreen> {
           ],
         ),
       );
+      body = month();
     }
 
     return PopScope(
@@ -270,7 +383,11 @@ class _MonthScreenState extends ConsumerState<MonthScreen> {
         // Notices stay beside the tools, including when the pane scrolls.
         endInset: split ? paneWidth + (windowWidth - splitWidth) / 2 : 0,
         child: Scaffold(
-          body: SafeArea(bottom: false, child: body),
+          // The picture of the background (UX · Extras visuales) goes under
+          // everything, status bar included; without one this is just `body`.
+          body: CalendarBackgroundLayer(
+            child: SafeArea(bottom: false, child: body),
+          ),
           floatingActionButton: editing || keyboardUp
               ? null
               : FloatingActionButton.extended(
@@ -282,17 +399,91 @@ class _MonthScreenState extends ConsumerState<MonthScreen> {
                   icon: Icon(AppIcons.paint, color: colors.highlight),
                   label: Text(l10n.paintFab),
                 ),
-          // With two panes the tools are in the right pane.
+          // With two panes the tools are in the right pane and the
+          // destinations in the rail.
           bottomNavigationBar: split
               ? null
               : painting
-              ? const PaintBar()
+              // The sheet of tools takes what the rows of the month leave
+              // (decision 28): the month is laid out first, at its real
+              // rows, and the sheet gets the rest, never less than its
+              // floor. Where not even the floor is left (large text, short
+              // phones) the sheet keeps its own height and the month
+              // scrolls above it, as before.
+              ? MotionSize(
+                  child: PaintBar(
+                    maxHeight: _paintSheetMax(
+                      MediaQuery.sizeOf(context).height -
+                          MediaQuery.paddingOf(context).top,
+                      noticeRoom,
+                    ),
+                  ),
+                )
               : selecting
               ? const SelectionBar()
+              : showBar
+              ? const MonthNavigationBar()
               : null,
         ),
       ),
     );
+  }
+
+  /// The height of the six rows of the grid at their minimum (the weeks with
+  /// stacked shifts are taller), remembered while a stroke is open so the
+  /// scroll extent stays stable under the finger.
+  double _gridMin(
+    double minCellHeight, {
+    required bool painting,
+    required bool ringOpenDay,
+  }) {
+    final month = ref.watch(visibleMonthProvider);
+    final weekStart = ref.watch(preferencesProvider.select((p) => p.weekStart));
+    final start = monthGridStart(month, weekStart);
+    final layout = (month, weekStart, ringOpenDay);
+    if (_gridLayout != layout) {
+      _gridLayout = layout;
+      _gridMinHeight = null;
+    }
+    final (schedule, strokeEmpty) = ref.watch(
+      scheduleControllerProvider.select(
+        (s) => (s.schedule, s.strokeDays.isEmpty),
+      ),
+    );
+    // Keep the outer scroll extent stable too: shrinking it can move the
+    // grid under the finger or replace its gesture layer with a scroller.
+    if (!painting || strokeEmpty || _gridMinHeight == null) {
+      _gridMinHeight = monthGridMinimumRowHeights(
+        context,
+        schedule.resolveRange(start, start.addDays(41)),
+        minCellHeight: minCellHeight,
+      ).reduce((a, b) => a + b);
+    }
+    return _gridMinHeight!;
+  }
+
+  /// The most height the paint sheet can have so that the month keeps all its
+  /// rows without scrolling, or null when the room left is under the floor of
+  /// the sheet (see [PaintBar.minHeight]): then the sheet is as tall as its
+  /// tools need and the month scrolls above it.
+  double? _paintSheetMax(double bodyHeight, double? noticeRoom) {
+    final listing =
+        ref.watch(monthPresentationProvider) == MonthPresentation.list;
+    if (listing || !monthRowPinned(context)) return null;
+    final grid = _gridMin(
+      dayCellHeightWithTime(context),
+      painting: true,
+      ringOpenDay: false,
+    );
+    // Until the first measure the usual heights stand in for it.
+    final pinned =
+        _pinnedHeight ?? MonthFit.monthRow + MonthFit.weekdayRow(context);
+    final bottomRow = _bottomRowHeight ?? Sp.touch;
+    final top = _paintTopHeight ?? Sp.s + Sp.touch;
+    final room =
+        bodyHeight - top - pinned - grid - bottomRow - (noticeRoom ?? 0) - 0.5;
+    final tip = ref.watch(onboardingTipProvider);
+    return room >= PaintBar.minHeight(context, tip: tip) ? room : null;
   }
 
   /// The [top] (rows above the grid) and the grid, in a screen that scrolls
@@ -306,39 +497,37 @@ class _MonthScreenState extends ConsumerState<MonthScreen> {
     required bool painting,
     required double bottomRoom,
     required double? noticeRoom,
+    double fixedRow = Sp.touch,
     bool ringOpenDay = false,
     double minCellHeight = MonthGrid.defaultMinCellHeight,
   }) {
     final listing =
         ref.watch(monthPresentationProvider) == MonthPresentation.list;
-    var minGridHeight = minCellHeight * 6;
-    if (!listing) {
-      final month = ref.watch(visibleMonthProvider);
-      final weekStart = ref.watch(
-        preferencesProvider.select((p) => p.weekStart),
-      );
-      final start = monthGridStart(month, weekStart);
-      final layout = (month, weekStart, ringOpenDay);
-      if (_gridLayout != layout) {
-        _gridLayout = layout;
-        _gridMinHeight = null;
-      }
-      final (schedule, strokeEmpty) = ref.watch(
-        scheduleControllerProvider.select(
-          (s) => (s.schedule, s.strokeDays.isEmpty),
-        ),
-      );
-      // Keep the outer scroll extent stable too: shrinking it can move the
-      // grid under the finger or replace its gesture layer with a scroller.
-      if (!painting || strokeEmpty || _gridMinHeight == null) {
-        _gridMinHeight = monthGridMinimumRowHeights(
-          context,
-          schedule.resolveRange(start, start.addDays(41)),
-          minCellHeight: minCellHeight,
-        ).reduce((a, b) => a + b);
-      }
-      minGridHeight = _gridMinHeight!;
-    }
+    final minGridHeight = listing
+        ? minCellHeight * 6
+        : _gridMin(minCellHeight, painting: painting, ringOpenDay: ringOpenDay);
+    // The row of the month (title, Grid/List, arrows) and the weekdays stay
+    // pinned while the days scroll under them, so the two presentations are
+    // always within reach (decision D); what is above them (date, card, tip)
+    // scrolls away. With large text or a short window (a landscape phone)
+    // that row would take most of the viewport: then only Grid/List stays
+    // fixed, on a line of its own above the month, and the row scrolls.
+    final rowPinned = monthRowPinned(context);
+    final pinned = [
+      if (rowPinned)
+        for (final child in top)
+          if (child is _MonthNavigation || child is _WeekdayRow)
+            if (!listing || child is! _WeekdayRow) child,
+    ];
+    final above = [
+      for (final child in top)
+        if (rowPinned
+            ? child is! _MonthNavigation && child is! _WeekdayRow
+            : !listing || child is! _WeekdayRow)
+          child is _MonthNavigation
+              ? const _MonthNavigation(withPresentation: false)
+              : child,
+    ];
     final scroll = CustomScrollView(
       controller: _monthScrollController,
       key: const ValueKey('month-scroll'),
@@ -349,16 +538,21 @@ class _MonthScreenState extends ConsumerState<MonthScreen> {
           ? const NeverScrollableScrollPhysics()
           : null,
       slivers: [
-        SliverToBoxAdapter(
-          child: Column(
-            children: [
-              for (final child in top)
-                if (!listing || child is! _WeekdayRow) ...[child],
-            ],
+        if (above.isNotEmpty)
+          SliverToBoxAdapter(child: Column(children: above)),
+        if (pinned.isNotEmpty)
+          PinnedHeaderSliver(
+            child: ColoredBox(
+              key: const ValueKey('month-pinned-header'),
+              color: context.colors.background,
+              child: _ReportSize(
+                onSize: _onPinned,
+                child: Column(children: pinned),
+              ),
+            ),
           ),
-        ),
         if (listing) ...[
-          const SliverToBoxAdapter(child: MonthList()),
+          SliverToBoxAdapter(child: _withMonthChange(const MonthList())),
           SliverToBoxAdapter(child: SizedBox(height: bottomRoom)),
         ] else
           SliverLayoutBuilder(
@@ -375,9 +569,11 @@ class _MonthScreenState extends ConsumerState<MonthScreen> {
                       MonthScreen._gridInset,
                       bottomRoom,
                     ),
-                    child: MonthGrid(
-                      ringOpenDay: ringOpenDay,
-                      minCellHeight: minCellHeight,
+                    child: _withMonthChange(
+                      MonthGrid(
+                        ringOpenDay: ringOpenDay,
+                        minCellHeight: minCellHeight,
+                      ),
                     ),
                   ),
                 ),
@@ -394,45 +590,107 @@ class _MonthScreenState extends ConsumerState<MonthScreen> {
       ],
     );
     return Column(
-      // Keep the month's Scrollable first for existing scroll actions.
-      // Semantic sort keys retain the visual reading order.
-      verticalDirection: VerticalDirection.up,
       children: <Widget>[
-        Semantics(
-          sortKey: const OrdinalSortKey(0),
-          child: const MonthPresentationControl(),
-        ),
+        if (!rowPinned)
+          const Padding(
+            padding: EdgeInsets.fromLTRB(Sp.xs, Sp.xs, Sp.xs, 0),
+            child: Center(child: MonthPresentationControl()),
+          ),
         Expanded(
-          child: Semantics(sortKey: const OrdinalSortKey(1), child: scroll),
-        ),
-        SafeArea(
-          top: false,
-          // In portrait the tools sheet already reserves the system inset.
-          bottom: Adaptive.useSplit(MediaQuery.sizeOf(context)),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              const Expanded(child: MonthSelectDaysControl()),
-              if (painting && !listing)
-                IconButton(
-                  key: const ValueKey('paint-scroll-up'),
-                  tooltip: context.l10n.paintScrollUp,
-                  icon: Icon(AppIcons.arrowUp),
-                  onPressed: () => _scrollPaintGrid(false),
-                ),
-              if (painting && !listing)
-                IconButton(
-                  key: const ValueKey('paint-scroll-down'),
-                  tooltip: context.l10n.paintScrollDown,
-                  icon: Icon(AppIcons.arrowDown),
-                  onPressed: () => _scrollPaintGrid(true),
-                ),
-            ],
+          child: NotificationListener<ScrollMetricsNotification>(
+            onNotification: _onScrollMetrics,
+            child: scroll,
           ),
         ),
-      ].reversed.toList(),
+        // The fixed row: «Seleccionar días» at the start, the floating button
+        // over its end, and in paint mode the arrows that move the month when
+        // (and only when) it does not fit.
+        _ReportSize(
+          onSize: _onBottomRow,
+          child: SafeArea(
+            top: false,
+            // In portrait the tools sheet already reserves the system inset.
+            bottom: Adaptive.useSplit(MediaQuery.sizeOf(context)),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: fixedRow),
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    const Expanded(child: MonthSelectDaysControl()),
+                    if (painting && !listing && _gridScrolls)
+                      IconButton(
+                        key: const ValueKey('paint-scroll-up'),
+                        tooltip: context.l10n.paintScrollUp,
+                        icon: Icon(AppIcons.arrowUp),
+                        onPressed: () => _scrollPaintGrid(false),
+                      ),
+                    if (painting && !listing && _gridScrolls)
+                      IconButton(
+                        key: const ValueKey('paint-scroll-down'),
+                        tooltip: context.l10n.paintScrollDown,
+                        icon: Icon(AppIcons.arrowDown),
+                        onPressed: () => _scrollPaintGrid(true),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
+}
+
+/// Reports the size of [child] after each layout in which it changed, so the
+/// screen can lay the rest out with it (the paint sheet gets what the month
+/// leaves). The report comes after the frame, never during layout.
+class _ReportSize extends SingleChildRenderObjectWidget {
+  const _ReportSize({required this.onSize, required super.child});
+
+  final ValueChanged<Size> onSize;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderReportSize(onSize);
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    _RenderReportSize renderObject,
+  ) {
+    renderObject.onSize = onSize;
+  }
+}
+
+class _RenderReportSize extends RenderProxyBox {
+  _RenderReportSize(this.onSize);
+
+  ValueChanged<Size> onSize;
+  Size? _reported;
+
+  @override
+  void performLayout() {
+    super.performLayout();
+    final now = size;
+    if (now == _reported) return;
+    _reported = now;
+    SchedulerBinding.instance.addPostFrameCallback((_) => onSize(now));
+  }
+}
+
+/// Whether the row of the month (with Grid/List) is pinned at the top of the
+/// days (B1). Not with text from ×1.6, a window under 480 dp tall (a
+/// landscape phone) or under 320 dp wide (split screen): there the row would
+/// leave little room for the days, so Grid/List alone stays fixed above the
+/// month and the row scrolls with them.
+bool monthRowPinned(BuildContext context) {
+  final size = MediaQuery.sizeOf(context);
+  return MediaQuery.textScalerOf(context).scale(10) / 10 < 1.6 &&
+      size.height >= 480 &&
+      size.width >= 320;
 }
 
 /// "Lunes, 19 de octubre" and the settings button.
@@ -449,6 +707,7 @@ class _DateHeader extends ConsumerWidget {
         ? now
         : DateTime(open.year, open.month, open.day);
     final sharing = ref.watch(monthSharingProvider);
+    final month = ref.watch(visibleMonthProvider);
 
     // The three buttons are 48 dp each with a 24 dp glyph, so a 4 dp inset puts
     // the glyph of the last one at `Sp.l` from the edge, flush with the
@@ -492,7 +751,7 @@ class _DateHeader extends ConsumerWidget {
                   ),
                   child: const CalendarSwitcher(),
                 ),
-                ..._buttons(context, ref, sharing),
+                ..._buttons(context, ref, sharing, month),
               ],
             ),
           ],
@@ -501,10 +760,16 @@ class _DateHeader extends ConsumerWidget {
     );
   }
 
-  /// Share, agenda and settings: three touch targets, flush right.
+  /// Share, report and settings: three touch targets, flush right (the
+  /// agenda moved to the bar of destinations).
   static const double _buttonsWidth = 3 * Sp.touch;
 
-  List<Widget> _buttons(BuildContext context, WidgetRef ref, bool sharing) {
+  List<Widget> _buttons(
+    BuildContext context,
+    WidgetRef ref,
+    bool sharing,
+    CivilDate month,
+  ) {
     final l10n = context.l10n;
     final colors = context.colors;
     return [
@@ -517,12 +782,7 @@ class _DateHeader extends ConsumerWidget {
             : () =>
                   shareMonthImage(context, ref, ref.read(visibleMonthProvider)),
       ),
-      IconButton(
-        key: const ValueKey('open-agenda'),
-        tooltip: l10n.agendaOpenTooltip,
-        icon: Icon(SelectionIcons.agenda, color: colors.textMuted),
-        onPressed: () => context.push(AppRoutes.agenda),
-      ),
+      ReportShareButton(month: month),
       IconButton(
         tooltip: l10n.settingsOpenTooltip,
         icon: Icon(AppIcons.settings, color: colors.textMuted),
@@ -582,7 +842,11 @@ class _DateText extends StatelessWidget {
 /// The month ("Octubre", with the year when it is not the current one),
 /// previous / next arrows and, away from the current month, "Hoy".
 class _MonthNavigation extends ConsumerWidget {
-  const _MonthNavigation();
+  const _MonthNavigation({this.withPresentation = true});
+
+  /// Grid/List in the row; false when it is fixed above the month instead
+  /// ([monthRowPinned]).
+  final bool withPresentation;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -597,31 +861,19 @@ class _MonthNavigation extends ConsumerWidget {
     final year = '${month.year}';
     final hasYear = month.year != now.year;
     final title = hasYear ? capitalize(format.monthYear(date)) : monthName;
+    final inputs = watchListRecommendationInputs(ref);
 
-    // The controls of the month row: the year and the summary, then "Hoy"
-    // and the two arrows. They are one row when they fit; when they do not
-    // (the English "Today" at 320 dp with a big text) they go on two rows,
-    // in the same reading order, and none of them loses its touch target.
+    // The controls of the month row (B1): the small Grid/List switch, then
+    // "Hoy" and the two arrows. The year opens from the title and the summary
+    // from the bar of destinations. They are one row when they fit; when they
+    // do not (320 dp with a big text) they go on two rows, in the same
+    // reading order, and none of them loses its touch target.
     final Widget? todayButton = isCurrentMonth
         ? null
         : TextButton(
             onPressed: controller.today,
             child: Text(l10n.calendarToday),
           );
-    final secondary = <Widget>[
-      IconButton(
-        key: const ValueKey('open-year'),
-        tooltip: l10n.yearOpenTooltip,
-        icon: Icon(AppIcons.yearView),
-        onPressed: () => context.push(AppRoutes.year),
-      ),
-      IconButton(
-        key: const ValueKey('open-summary'),
-        tooltip: l10n.summaryOpenTooltip,
-        icon: Icon(AppIcons.summary),
-        onPressed: () => context.push(AppRoutes.summaryFor(month)),
-      ),
-    ];
     final arrows = <Widget>[
       IconButton(
         tooltip: l10n.calendarPreviousMonth,
@@ -657,7 +909,25 @@ class _MonthNavigation extends ConsumerWidget {
             scaler,
             withToday: !isCurrentMonth,
           );
-          final secondaryWidth = secondary.length * Sp.touch;
+          // The width of the month panel: this row has `Sp.l` before it and
+          // `Sp.xs` after it.
+          final panel = box.maxWidth + Sp.l + Sp.xs;
+          final secondaryWidth = !withPresentation
+              ? 0.0
+              : math.min(
+                  box.maxWidth,
+                  MonthPresentationControl.widthFor(
+                    context,
+                    recommended: monthListRecommended(context, inputs, panel),
+                  ),
+                );
+          final secondary = <Widget>[
+            if (withPresentation)
+              ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: box.maxWidth),
+                child: MonthPresentationControl(panelWidth: panel),
+              ),
+          ];
           final primaryWidth = todayWidth + arrows.length * Sp.touch;
           final room = box.maxWidth - secondaryWidth - primaryWidth;
           // One line next to the buttons; the month and the year on two lines
@@ -665,6 +935,14 @@ class _MonthNavigation extends ConsumerWidget {
           // not fit (H-T18-7, punto 5 de docs/propuestas-diseno.md).
           final oneRow = needed <= room;
           final twoLines = !oneRow && monthNeeded <= room;
+          // Grid/List is the widest control: when it does not fit beside
+          // the title, the title keeps "Hoy" and the arrows and the switch
+          // goes on a line of its own below them, not the whole row.
+          final besideArrows =
+              withPresentation &&
+              !oneRow &&
+              !twoLines &&
+              needed <= box.maxWidth - primaryWidth;
 
           // The rows of the controls: one row when they fit, two when they
           // do not (the year and the summary above, "Hoy" and the arrows
@@ -675,18 +953,18 @@ class _MonthNavigation extends ConsumerWidget {
               [...secondary, ...primary],
             ];
           } else if (primaryWidth <= box.maxWidth) {
-            rows = [secondary, primary];
+            rows = [if (secondary.isNotEmpty) secondary, primary];
           } else {
             // Not even "Hoy" with the arrows fits: three rows.
             rows = [
-              secondary,
+              if (secondary.isNotEmpty) secondary,
               if (todayButton != null) [todayButton],
               arrows,
             ];
           }
 
           final Widget titleText;
-          if (oneRow) {
+          if (oneRow || besideArrows) {
             titleText = _fitted(Text(title, style: style));
           } else if (twoLines) {
             titleText = _MonthTitleLines(
@@ -706,21 +984,26 @@ class _MonthNavigation extends ConsumerWidget {
             );
           }
 
-          final titleWidget = Semantics(
-            header: true,
-            button: true,
-            // «Octubre, elegir mes»: it is a button, not just a heading
-            // (H-T18-7). Tapping the month opens the whole year.
-            label: l10n.calendarPickMonth(title),
-            excludeSemantics: true,
-            onTap: () => context.push(AppRoutes.year),
-            child: InkWell(
-              key: const ValueKey('month-title'),
-              borderRadius: Rad.chipSmallRadius,
+          // `open-year`: the entry to the year view, which was an icon of
+          // this row before B1.
+          final titleWidget = KeyedSubtree(
+            key: const ValueKey('open-year'),
+            child: Semantics(
+              header: true,
+              button: true,
+              // «Octubre, elegir mes»: it is a button, not just a heading
+              // (H-T18-7). Tapping the month opens the whole year.
+              label: l10n.calendarPickMonth(title),
+              excludeSemantics: true,
               onTap: () => context.push(AppRoutes.year),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(minHeight: Sp.touch),
-                child: titleText,
+              child: InkWell(
+                key: const ValueKey('month-title'),
+                borderRadius: Rad.chipSmallRadius,
+                onTap: () => context.push(AppRoutes.year),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(minHeight: Sp.touch),
+                  child: titleText,
+                ),
               ),
             ),
           );
@@ -731,6 +1014,26 @@ class _MonthNavigation extends ConsumerWidget {
               children: [
                 Expanded(child: titleWidget),
                 ...rows.first,
+              ],
+            );
+          }
+          if (besideArrows) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Expanded(child: titleWidget),
+                    ...primary,
+                  ],
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: secondary,
+                  ),
+                ),
               ],
             );
           }

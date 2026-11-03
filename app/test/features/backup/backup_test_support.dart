@@ -180,6 +180,12 @@ Future<Map<String, List<Map<String, Object?>>>> dumpAllTables(
       'SELECT * FROM absence_balances ORDER BY year, type',
     ),
     'settings': await rows('SELECT * FROM settings ORDER BY key'),
+    'shift_type_versions': await rows(
+      'SELECT * FROM shift_type_versions ORDER BY shift_type_id, until_date',
+    ),
+    'note_attachments': await rows('SELECT * FROM note_attachments ORDER BY id'),
+    'day_tasks': await rows('SELECT * FROM day_tasks ORDER BY id'),
+    'shift_swaps': await rows('SELECT * FROM shift_swaps ORDER BY id'),
   };
 }
 

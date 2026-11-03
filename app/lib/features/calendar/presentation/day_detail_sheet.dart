@@ -9,10 +9,11 @@ import '../../schedule/domain/schedule_domain.dart';
 import '../application/open_day.dart';
 import 'day_detail_body.dart';
 
-/// Opens the detail of [date] (`turnos-spec.md`, screen 4) in a bottom sheet:
-/// its shifts (add, remove, reorder, "volver al patrón"), the note, the user's
-/// own holiday and the shortcuts to copy or clear the day. Every edit is ONE
-/// undoable step of the schedule, so undo / redo in paint mode reverts it.
+/// Opens the detail of [date] (`turnos-spec.md`, screen 4) in a bottom sheet
+/// as tall as its content: «Deshacer», its shifts (each with its menu), the
+/// palette behind «Añadir turno», the note and «Más opciones» (see
+/// [DayDetailBody]). Every edit is ONE undoable step of the schedule, so undo
+/// / redo in paint mode reverts it too.
 ///
 /// This is the modal way, for any screen (the agenda uses it). The month
 /// screen uses [openDayOnMonth], which on wide screens shows the day in its
@@ -24,7 +25,7 @@ Future<void> showDayDetail(
 }) => showAppSheet<void>(
   context: context,
   // The sheet lays itself out: a fixed header (dragging it closes the
-  // sheet), a scrolling body and a row of chips that bleeds to the edges.
+  // sheet) and a scrolling body, as tall as the content up to a cap.
   builder: (_) => DayDetailSheet(date: date, followsLayout: followsLayout),
 );
 

@@ -5,12 +5,20 @@
 //   dart run tool/build_holidays.dart --check         # fails if it is stale
 //   dart run tool/build_holidays.dart --mochila <path to mochila-app/backend>
 //
+//   dart run tool/build_holidays.dart --manual <tool/holidays_es>
+//
 // Reads (all under backend/src/calendars/): manifest.json, national/{año}.json,
-// regional/ES-XX/{año}.json, municipal/ES-XX/{año}.json and the Murcia school
-// file ES-MC/municipal-non-teaching-*.json (its `local_holidays` are local
-// holidays; `official.ts` serves them too). Only files the manifest marks
-// `verified: true` and `status: complete` go in. The INE names come from
+// regional/ES-XX/{año}.json and municipal/ES-XX/{año}.json. Only files the
+// manifest marks `verified: true` and `status: complete` go in. School
+// calendars (ES-XX/municipal-non-teaching-*.json) never do: their days are
+// non-teaching days, not labour holidays. The INE names come from
 // backend/scripts/calendars/sources/ine-municipios-es.json.
+//
+// On top of Mochila, the local labour holidays checked by hand in this repo
+// (tool/holidays_es/{año}/ES-XX.json, one official source per municipality)
+// and the Canary island holidays (tool/holidays_es/canarias-islands.json),
+// which go to every municipality of their island. A hand-checked municipality
+// replaces Mochila's days for that year. Format: docs/festivos.md.
 //
 // The output is deterministic: same inputs, same bytes. `bundleVersion` is the
 // latest `retrieved` date of the included sources plus 8 hex digits of the
@@ -46,11 +54,23 @@ class HolidayBundleBuild {
 /// Reads Mochila's calendars and produces the bundle in memory.
 ///
 /// [calendarsDir] is `backend/src/calendars`; [ineMunicipalities] the INE
-/// code -> name JSON (skipped when null or missing).
+/// code -> name JSON (skipped when null or missing); [manualDir] the
+/// hand-checked local holidays (`tool/holidays_es`; skipped when null or
+/// missing).
+///
+/// [bundledCountries] is the bundle folder that already holds the files of
+/// other countries (`{year}/<cc>.json`, written by
+/// `tool/export_country_holidays.py`, not by this tool): they are kept as they
+/// are and listed in the manifest, with their provenance taken from
+/// [countrySources] (path -> `{url, ref, published}`). Without it the
+/// manifest would lose them.
 HolidayBundleBuild buildHolidayBundle({
   required Directory calendarsDir,
   File? ineMunicipalities,
+  Directory? manualDir,
   String? bundleVersion,
+  Directory? bundledCountries,
+  File? countrySources,
 }) {
   final skipped = <String>[];
   final notes = <String>[];
@@ -153,57 +173,161 @@ HolidayBundleBuild buildHolidayBundle({
   // 3. {year}/municipal/ES-XX.json.
   // (region, year) -> INE code -> days.
   final municipal = <(String, int), Map<String, Set<(String, String?)>>>{};
-  final municipalSources = <(String, int), Map<String, Object?>?>{};
+  final municipalSources = <(String, int), List<Map<String, Object?>>>{};
+  void addSource((String, int) key, Map<String, Object?>? source) {
+    if (source == null) return;
+    final list = municipalSources.putIfAbsent(key, () => []);
+    if (!list.any((s) => s['url'] == source['url'])) list.add(source);
+  }
+
   final municipalFile = RegExp(r'^municipal/(ES-[A-Z]{2})/(\d{4})\.json$');
   final schoolFile = RegExp(
     r'^(ES-[A-Z]{2})/municipal-non-teaching-\d{4}-\d{2}\.json$',
   );
   for (final file in byFile.keys.toList()..sort()) {
-    final m = municipalFile.firstMatch(file);
-    if (m != null) {
-      if (!usable(file)) continue;
-      final region = m[1]!;
-      final year = int.parse(m[2]!);
-      final json = readJson(file)! as Map<String, Object?>;
-      final target = municipal.putIfAbsent((
-        region,
-        year,
-      ), () => <String, Set<(String, String?)>>{});
-      municipalSources.putIfAbsent((region, year), () => sourceOf(file));
-      for (final MapEntry(key: code, value: value) in json.entries) {
-        final days = (value! as Map)['days']! as List;
-        for (final d in days.cast<Map<String, Object?>>()) {
-          final date = d['date']! as String;
-          _checkDate(date, year, file);
-          target.putIfAbsent(code, () => {}).add((
-            date,
-            _localName(d['label']! as String),
-          ));
-        }
-      }
+    if (schoolFile.hasMatch(file)) {
+      skipped.add('$file: school calendar (non-teaching days), not labour');
       continue;
     }
-    final s = schoolFile.firstMatch(file);
-    if (s != null) {
-      if (!usable(file)) continue;
-      final region = s[1]!;
-      final json = readJson(file)! as Map<String, Object?>;
-      final src = sourceOf(file);
-      final municipalities = json['municipalities']! as Map;
+    final m = municipalFile.firstMatch(file);
+    if (m == null || !usable(file)) continue;
+    final region = m[1]!;
+    final year = int.parse(m[2]!);
+    final json = readJson(file)! as Map<String, Object?>;
+    final target = municipal.putIfAbsent((
+      region,
+      year,
+    ), () => <String, Set<(String, String?)>>{});
+    addSource((region, year), sourceOf(file));
+    for (final MapEntry(key: code, value: value) in json.entries) {
+      final days = (value! as Map)['days']! as List;
+      for (final d in days.cast<Map<String, Object?>>()) {
+        final date = d['date']! as String;
+        _checkDate(date, year, file);
+        target.putIfAbsent(code, () => {}).add((
+          date,
+          _localName(d['label']! as String),
+        ));
+      }
+    }
+  }
+
+  // 3b. Hand-checked local labour holidays (tool/holidays_es).
+  if (manualDir != null && manualDir.existsSync()) {
+    final manualFile = RegExp(r'^(\d{4})/(ES-[A-Z]{2})\.json$');
+    final paths = [
+      for (final e in manualDir.listSync(recursive: true))
+        if (e is File) _relative(manualDir, e),
+    ]..sort();
+    for (final path in paths) {
+      final m = manualFile.firstMatch(path);
+      if (m == null) continue;
+      final year = int.parse(m[1]!);
+      final region = m[2]!;
+      final where = 'holidays_es/$path';
+      final json = jsonDecode(
+        File('${manualDir.path}/$path').readAsStringSync(),
+      ) as Map<String, Object?>;
+      if (json['region'] != region || json['year'] != year) {
+        throw FormatException('$where: region or year differ from the path');
+      }
+      if (json['kind'] != 'labour') {
+        throw FormatException('$where: kind must be "labour"');
+      }
+      final sources = (json['sources']! as Map).cast<String, Object?>();
+      for (final MapEntry(key: id, value: s) in sources.entries) {
+        checkLabourSource(s, '$where, source $id');
+      }
+      final key = (region, year);
+      final target = municipal.putIfAbsent(
+        key,
+        () => <String, Set<(String, String?)>>{},
+      );
+      final used = <String>{};
+      final municipalities = (json['municipalities']! as Map)
+          .cast<String, Object?>();
       for (final MapEntry(key: code, value: value) in municipalities.entries) {
-        for (final date
-            in ((value as Map)['local_holidays'] as List? ?? const [])
-                .cast<String>()) {
-          final year = CivilDate.parse(date).year;
-          municipal
-              .putIfAbsent((
-                region,
-                year,
-              ), () => <String, Set<(String, String?)>>{})
-              .putIfAbsent(code as String, () => {})
-              .add((date, null));
-          municipalSources.putIfAbsent((region, year), () => src);
+        if (regionOfMunicipality(code)?.code != region) {
+          throw FormatException('$where: $code is not in $region');
         }
+        final entry = (value! as Map).cast<String, Object?>();
+        final sourceId = entry['source'];
+        if (sourceId is! String || !sources.containsKey(sourceId)) {
+          throw FormatException('$where: $code has no known source');
+        }
+        used.add(sourceId);
+        final days = (entry['days']! as List).cast<String>();
+        if (days.isEmpty) throw FormatException('$where: $code has no days');
+        for (final d in days) {
+          _checkDate(d, year, where);
+        }
+        // Replaces whatever Mochila had for this municipality and year.
+        target[code] = {for (final d in days) (d, null)};
+      }
+      for (final id in sources.keys.where(used.contains)) {
+        final s = (sources[id]! as Map).cast<String, Object?>();
+        final on = s['retrieved'];
+        if (on is String) retrieved.add(on);
+        addSource(key, {
+          'url': s['url'],
+          'ref': s['ref'],
+          'published': s['published'],
+        });
+      }
+    }
+
+    // 3c. Canary island holidays: every municipality of the island.
+    final islandsFile = File('${manualDir.path}/canarias-islands.json');
+    if (islandsFile.existsSync()) {
+      const where = 'holidays_es/canarias-islands.json';
+      final json =
+          jsonDecode(islandsFile.readAsStringSync()) as Map<String, Object?>;
+      final islands = <String, List<String>>{};
+      final seen = <String>{};
+      for (final MapEntry(key: id, value: v)
+          in (json['islands']! as Map).cast<String, Object?>().entries) {
+        final codes = ((v! as Map)['municipalities']! as List).cast<String>();
+        for (final code in codes) {
+          if (regionOfMunicipality(code)?.code != 'ES-CN') {
+            throw FormatException('$where: $code is not in ES-CN');
+          }
+          if (!seen.add(code)) {
+            throw FormatException('$where: $code is on two islands');
+          }
+        }
+        islands[id] = codes;
+      }
+      final years = (json['years']! as Map).cast<String, Object?>();
+      for (final y in years.keys.toList()..sort()) {
+        final year = int.parse(y);
+        final entry = (years[y]! as Map).cast<String, Object?>();
+        final s = (entry['source']! as Map).cast<String, Object?>();
+        checkLabourSource(s, '$where, $y');
+        final on = s['retrieved'];
+        if (on is String) retrieved.add(on);
+        final days = (entry['days']! as Map).cast<String, Object?>();
+        final key = ('ES-CN', year);
+        final target = municipal.putIfAbsent(
+          key,
+          () => <String, Set<(String, String?)>>{},
+        );
+        for (final MapEntry(key: id, value: codes) in islands.entries) {
+          final day = days[id];
+          if (day is! Map) throw FormatException('$where: $y has no $id day');
+          final date = day['date']! as String;
+          _checkDate(date, year, where);
+          final name = '$islandHolidayPrefix (${day['name']! as String})';
+          for (final code in codes) {
+            final set = target.putIfAbsent(code, () => {});
+            if (set.any((d) => d.$1 == date)) continue; // already local
+            set.add((date, name));
+          }
+        }
+        addSource(key, {
+          'url': s['url'],
+          'ref': s['ref'],
+          'published': s['published'],
+        });
       }
     }
   }
@@ -242,7 +366,7 @@ HolidayBundleBuild buildHolidayBundle({
       kind: HolidayFileKind.municipal,
       year: year,
       region: region,
-      source: municipalSources[key],
+      source: _mergedSource(municipalSources[key]),
     );
   }
 
@@ -267,6 +391,53 @@ HolidayBundleBuild buildHolidayBundle({
     }, kind: HolidayFileKind.municipalities);
   } else {
     notes.add('municipalities.json: INE source not found, not generated');
+  }
+
+  // 5. {year}/<cc>.json of other countries: kept, not rebuilt.
+  if (bundledCountries != null && bundledCountries.existsSync()) {
+    final sources = countrySources != null && countrySources.existsSync()
+        ? (jsonDecode(countrySources.readAsStringSync()) as Map)
+              .cast<String, Object?>()
+        : const <String, Object?>{};
+    final countryFile = RegExp(r'^(\d{4})/([a-z]{2})\.json$');
+    final found = <String, File>{};
+    for (final entity in bundledCountries.listSync(recursive: true)) {
+      if (entity is! File) continue;
+      final relative = entity.path
+          .substring(bundledCountries.path.length)
+          .replaceAll('\\', '/')
+          .replaceFirst(RegExp(r'^/'), '');
+      final m = countryFile.firstMatch(relative);
+      if (m == null || m[2] == 'es') continue;
+      found[relative] = entity;
+    }
+    for (final relative in found.keys.toList()..sort()) {
+      final m = countryFile.firstMatch(relative)!;
+      final bytes = found[relative]!.readAsBytesSync();
+      final json = jsonDecode(utf8.decode(bytes)) as Map<String, Object?>;
+      final country = (json['country'] as String?)?.toUpperCase();
+      if (country != m[2]!.toUpperCase() || json['year'] != int.parse(m[1]!)) {
+        throw FormatException('$relative: country/year do not match its name');
+      }
+      final source = sources[relative];
+      if (source is! Map) {
+        notes.add('$relative: no entry in the country sources file');
+      } else if (source['published'] is String) {
+        retrieved.add(source['published']! as String);
+      }
+      files[relative] = bytes;
+      entries.add(
+        HolidayManifestFile(
+          path: relative,
+          kind: HolidayFileKind.country,
+          year: int.parse(m[1]!),
+          country: country,
+          sha256: sha256.convert(bytes).toString(),
+          bytes: bytes.length,
+          source: source is Map ? source.cast<String, Object?>() : null,
+        ),
+      );
+    }
   }
 
   entries.sort((a, b) => a.path.compareTo(b.path));
@@ -320,6 +491,44 @@ List<Map<String, Object?>> _rows(
     return d != 0 ? d : (a['name']! as String).compareTo(b['name']! as String);
   });
   return rows;
+}
+
+/// Words that give away a school calendar (non-teaching days, terms) rather
+/// than the labour holidays of a municipality. A local holiday never comes
+/// from one (Murcia's did until October 2026). Not «Educación» alone: the
+/// Valencian ministry that publishes the local labour holidays has it in its
+/// name.
+final schoolSourcePattern = RegExp(
+  r'escolar|\blectiv|non-teaching|curso\s+\d{4}|ensenyament|ikasturte',
+  caseSensitive: false,
+);
+
+/// Throws unless [source] is `{url, ref, published}` with an http(s) url and
+/// nothing in it that looks like a school calendar ([schoolSourcePattern]).
+void checkLabourSource(Object? source, String where) {
+  if (source is! Map) throw FormatException('$where: no source');
+  final url = source['url'];
+  final ref = source['ref'];
+  if (url is! String || !RegExp(r'^https?://').hasMatch(url)) {
+    throw FormatException('$where: bad url $url');
+  }
+  if (ref is! String || ref.trim().isEmpty) {
+    throw FormatException('$where: no ref');
+  }
+  if (source['published'] is! String) {
+    throw FormatException('$where: no published date');
+  }
+  if (schoolSourcePattern.hasMatch('$url $ref')) {
+    throw FormatException('$where: looks like a school calendar ($ref)');
+  }
+}
+
+/// One manifest `source` for a municipal file built from several acts: the
+/// first one, plus the rest under `also` (in the order they were read).
+Map<String, Object?>? _mergedSource(List<Map<String, Object?>>? sources) {
+  if (sources == null || sources.isEmpty) return null;
+  if (sources.length == 1) return sources.single;
+  return {...sources.first, 'also': sources.skip(1).toList()};
 }
 
 void _checkDate(String date, int year, String file) {
@@ -419,6 +628,7 @@ Future<void> main(List<String> args) async {
 
 Future<int> _run(List<String> args) async {
   var mochila = '../../mochila-app/backend';
+  var manual = 'tool/holidays_es';
   var out = 'assets/holidays';
   var check = false;
   String? version;
@@ -426,6 +636,8 @@ Future<int> _run(List<String> args) async {
     switch (args[i]) {
       case '--mochila':
         mochila = args[++i];
+      case '--manual':
+        manual = args[++i];
       case '--out':
         out = args[++i];
       case '--bundle-version':
@@ -435,7 +647,8 @@ Future<int> _run(List<String> args) async {
       default:
         stdout.writeln(
           'Uso: dart run tool/build_holidays.dart [--mochila <backend>] '
-          '[--out <carpeta>] [--bundle-version <v>] [--check]',
+          '[--manual <tool/holidays_es>] [--out <carpeta>] '
+          '[--bundle-version <v>] [--check]',
         );
         return args[i] == '--help' ? 0 : 64;
     }
@@ -450,7 +663,10 @@ Future<int> _run(List<String> args) async {
     ineMunicipalities: File(
       '$mochila/scripts/calendars/sources/ine-municipios-es.json',
     ),
+    manualDir: Directory(manual),
     bundleVersion: version,
+    bundledCountries: Directory(out),
+    countrySources: File('tool/country_holidays_sources.json'),
   );
 
   final outDir = Directory(out);

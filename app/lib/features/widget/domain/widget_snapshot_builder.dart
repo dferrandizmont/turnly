@@ -2,8 +2,10 @@ import 'dart:ui' show Brightness;
 
 import 'package:flutter/painting.dart' show Color;
 
+import '../../../core/format/app_date_format.dart';
 import '../../../core/theme/shift_swatch.dart';
 import '../../../core/theme/shift_palette.dart';
+import '../../calendar/application/off_outlook.dart';
 import '../../calendar/application/week_layout.dart';
 import '../../calendar/presentation/shift_format.dart';
 import '../../holidays/domain/holiday.dart';
@@ -57,6 +59,20 @@ WidgetSnapshot buildWidgetSnapshot({
   );
 }
 
+/// Longest note line that travels to the widget (`notes` of the snapshot).
+/// The Android side cuts at the same length (`WidgetModelBuilder.NOTE_MAX_CHARS`).
+const int widgetNoteMaxChars = 120;
+
+/// [text] cut to [widgetNoteMaxChars] characters, counted in code points: an
+/// emoji outside the basic plane is never cut in half (the Android side counts
+/// the same way).
+String truncateWidgetNote(String text) {
+  final runes = text.runes;
+  return runes.length <= widgetNoteMaxChars
+      ? text
+      : String.fromCharCodes(runes.take(widgetNoteMaxChars));
+}
+
 class _Builder {
   _Builder({
     required this.schedule,
@@ -71,6 +87,9 @@ class _Builder {
   final int weekStart;
 
   final _resolved = <CivilDate, ResolvedDay>{};
+  // Kinds for the next-day-off look-ahead. Kept apart from [_resolved] so the
+  // spoken descriptions (and the snapshot size) only cover the timeline.
+  final _kinds = <CivilDate, DayKind>{};
   final _descriptions = <String, String>{};
   final _absenceDescriptions = <String, String>{};
   final _styleIndex = <int, int>{};
@@ -92,6 +111,26 @@ class _Builder {
     return day;
   });
 
+  DayKind _kindOf(CivilDate d) =>
+      _kinds.putIfAbsent(d, () => schedule.resolve(d).kind);
+
+  /// The next day off seen from each day of the timeline (C1); `null` when
+  /// none of them has one.
+  Map<String, WidgetNextOff>? _nextOffs(CivilDate today, int days) {
+    final out = <String, WidgetNextOff>{};
+    for (var i = 0; i < days; i++) {
+      final date = today.addDays(i);
+      final outlook = computeOffOutlookWith(_kindOf, date);
+      final label = strings.nextOffLabel(outlook);
+      if (label == null) continue;
+      out[date.toIso()] = WidgetNextOff(
+        date: outlook.nextOff!.date.toIso(),
+        label: label,
+      );
+    }
+    return out.isEmpty ? null : out;
+  }
+
   WidgetSnapshot build({
     required CivilDate today,
     required String timeZone,
@@ -100,11 +139,18 @@ class _Builder {
   }) {
     final out = [for (var i = 0; i < days; i++) _buildDay(today.addDays(i))];
     final start = today.addDays(1 - today.weekday);
-    final end = today.addDays(days - 1 + kWidgetUpcomingDays - 1);
-    final displayDays = [
-      for (var i = 0; i <= end.differenceInDays(start); i++)
-        _displayDay(start.addDays(i)),
-    ];
+    // The auxiliary range has to serve every timeline day as the start of the
+    // two-week strip (14 days) and of the four-week grid (28 days from the
+    // Monday of that day, up to six days before it): 27 days past the last day.
+    final end = today.addDays(days - 1 + kWidgetFourWeeksDays - 1);
+    final displayDays = <WidgetDisplayDay>[];
+    final notes = <String, String>{};
+    for (var i = 0; i <= end.differenceInDays(start); i++) {
+      final date = start.addDays(i);
+      displayDays.add(_displayDay(date));
+      final note = _noteLine(_day(date));
+      if (note != null) notes[date.toIso()] = note;
+    }
     return WidgetSnapshot(
       generatedAt: generatedAt,
       timeZone: timeZone,
@@ -127,6 +173,8 @@ class _Builder {
         days: _descriptions,
         absences: _absenceDescriptions,
       ),
+      nextOff: _nextOffs(today, days),
+      notes: notes.isEmpty ? null : notes,
     );
   }
 
@@ -184,6 +232,23 @@ class _Builder {
 
   bool _hasNote(ResolvedDay day) => day.note != null && day.note!.isNotEmpty;
 
+  /// The first line of the note of [day], trimmed, like «Ver la nota en el
+  /// mes» (`day_cell.dart`); `null` when there is no note or the day has an
+  /// absence shift: a health day never leaves the phone
+  /// (`docs/widget-contrato.md`).
+  ///
+  /// At most [widgetNoteMaxChars] characters: a note has no length limit of
+  /// its own and the widget's payload (and its remote views) must stay small.
+  String? _noteLine(ResolvedDay day) {
+    if (day.shifts.any((s) => s.category == ShiftCategory.absence)) return null;
+    final note = day.note;
+    if (note == null || note.isEmpty) return null;
+    final line = note.split('\n').first.trim();
+    final text = line.isEmpty ? note.trim() : line;
+    if (text.isEmpty) return null;
+    return truncateWidgetNote(text);
+  }
+
   WidgetDisplayDay _displayDay(CivilDate date) {
     final day = _day(date);
     final weekday = strings.weekdaysShort[date.weekday - 1];
@@ -210,8 +275,17 @@ class _Builder {
   /// A single shift: its time label, else its name. Several: the compact
   /// times (else the names) joined with " + ".
   String _detail(List<ShiftType> shifts, bool single) => single
-      ? (_timeLabel(shifts.first) ?? shifts.first.name)
-      : shifts.map((s) => s.compactTimeLabel ?? s.name).join(' + ');
+      ? (_timeLabelOf(shifts.first, hour12: strings.hour12) ??
+            shifts.first.name)
+      : shifts
+            .map((s) => s.compactTimeLabel(hour12: strings.hour12) ?? s.name)
+            .join(' + ');
+
+  /// The start of a shift for the one-line forms: "22:00", or "10p" on the
+  /// 12 h clock.
+  String _clock(int minute) => strings.hour12
+      ? AppDateFormat.compactClock(minute, hour12: true)
+      : _hhmm(minute);
 
   /// "N · 22:00" (start of the first shift) or just the codes when the first
   /// shift has no schedule.
@@ -219,7 +293,7 @@ class _Builder {
     final start = shifts.first.startMinute;
     return start == null
         ? _codes(shifts)
-        : '${_codes(shifts)} · ${_hhmm(start)}';
+        : '${_codes(shifts)} · ${_clock(start)}';
   }
 
   /// "Mañana: T 14–22", "Mañana: M 06–14 + T 14–22", "Mañana: Sin turno".
@@ -229,9 +303,9 @@ class _Builder {
         ? strings.noShift
         : shifts
               .map(
-                (s) => s.compactTimeLabel == null
+                (s) => s.compactTimeLabel(hour12: strings.hour12) == null
                     ? s.code
-                    : '${s.code} ${s.compactTimeLabel}',
+                    : '${s.code} ${s.compactTimeLabel(hour12: strings.hour12)}',
               )
               .join(' + ');
     return '${strings.tomorrow}: $text';
@@ -247,8 +321,8 @@ class _Builder {
     return WidgetShift(
       code: redacted ? strings.absence : s.code,
       name: redacted ? strings.absence : s.name,
-      timeLabel: redacted ? null : _timeLabel(s),
-      compactTime: redacted ? null : s.compactTimeLabel,
+      timeLabel: redacted ? null : _timeLabelOf(s, hour12: strings.hour12),
+      compactTime: redacted ? null : s.compactTimeLabel(hour12: strings.hour12),
       category: s.category.name,
       barLight: _argb(light.bar),
       tintLight: _argb(light.tint),
@@ -359,9 +433,12 @@ String _hhmm(int minute) => '${_two((minute ~/ 60) % 24)}:${_two(minute % 60)}';
 
 /// "22:00–06:00", or null for a shift without schedule. A split shift (A12)
 /// gives its compact ranges, "09–13 · 17–21": two full ranges would not fit
-/// the widget's line.
-String? _timeLabel(ShiftType s) => s.hasSegment2
-    ? s.compactTimeLabel
+/// the widget's line. On the 12 h clock ([hour12]) every shift gives the
+/// compact form with the AM/PM letter, "10p–6a" (the full "10:00 PM–6:00 AM"
+/// would not fit either; docs/widget-contrato.md).
+String? _timeLabelOf(ShiftType s, {required bool hour12}) =>
+    s.hasSegment2 || (hour12 && s.hasTimes)
+    ? s.compactTimeLabel(hour12: hour12)
     : s.hasTimes
     ? '${_hhmm(s.startMinute!)}–${_hhmm(s.endMinute!)}'
     : null;

@@ -1,0 +1,11 @@
+{
+"region":"ES-IB",
+"year":2026,
+"kind":"labour",
+"sources":{
+"s1":{"url":"https://www.caib.es/sites/calendarilaboral/f/529360","ref":"BOIB núm. 129, 27.9.2025 (anuncio 10694) — Resolución de la consejera de Trabajo, Función Pública y Diálogo Social, por la que se hace público el calendario laboral general y local para el año 2026 en el ámbito de las Illes Balears (firmada 25.9.2025)","published":"2025-09-27","retrieved":"2026-10-31"}
+},
+"municipalities":{
+"07040":{"name":"Palma","days":["2026-01-20","2026-06-24"],"source":"s1"}
+}
+}

@@ -10,6 +10,10 @@ import '../../../core/theme/theme_context.dart';
 class CalendarDot extends StatelessWidget {
   const CalendarDot({super.key, required this.colorValue, this.size = 12});
 
+  /// Dot of a row of a list or a sheet: a touch bigger than the inline one,
+  /// so the colour reads at a glance. Named so no row hardcodes the size.
+  static const double rowSize = 14;
+
   /// ARGB, as stored with the calendar.
   final int colorValue;
   final double size;

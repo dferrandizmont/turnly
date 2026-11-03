@@ -1,0 +1,41 @@
+{
+"schema":1,
+"year":2026,
+"country":"CL",
+"national":[
+{"date":"2026-01-01","name":"Año Nuevo"},
+{"date":"2026-04-03","name":"Viernes Santo"},
+{"date":"2026-04-04","name":"Sábado Santo"},
+{"date":"2026-05-01","name":"Día Nacional del Trabajo"},
+{"date":"2026-05-21","name":"Día de las Glorias Navales"},
+{"date":"2026-06-21","name":"Día Nacional de los Pueblos Indígenas"},
+{"date":"2026-06-29","name":"San Pedro y San Pablo"},
+{"date":"2026-07-16","name":"Virgen del Carmen"},
+{"date":"2026-08-15","name":"Asunción de la Virgen"},
+{"date":"2026-09-18","name":"Día de la Independencia"},
+{"date":"2026-09-19","name":"Día de las Glorias del Ejército"},
+{"date":"2026-10-12","name":"Día del Encuentro de dos Mundos"},
+{"date":"2026-10-31","name":"Día Nacional de las Iglesias Evangélicas y Protestantes"},
+{"date":"2026-11-01","name":"Día de Todos los Santos"},
+{"date":"2026-12-08","name":"La Inmaculada Concepción"},
+{"date":"2026-12-25","name":"Navidad"}
+],
+"regional":{
+"CL-AI":[],
+"CL-AN":[],
+"CL-AP":[{"date":"2026-06-07","name":"Asalto y Toma del Morro de Arica","origin":"regional"}],
+"CL-AR":[],
+"CL-AT":[],
+"CL-BI":[],
+"CL-CO":[],
+"CL-LI":[],
+"CL-LL":[],
+"CL-LR":[],
+"CL-MA":[],
+"CL-ML":[],
+"CL-NB":[{"date":"2026-08-20","name":"Nacimiento del Prócer de la Independencia (Chillán y Chillán Viejo)","origin":"regional"}],
+"CL-RM":[],
+"CL-TA":[],
+"CL-VS":[]
+}
+}

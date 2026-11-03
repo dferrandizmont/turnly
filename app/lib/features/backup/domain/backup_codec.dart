@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:archive/archive.dart' show getCrc32;
 
+import 'backup_container.dart';
 import 'backup_data.dart';
 import 'backup_errors.dart';
 import 'canonical_json.dart';
@@ -16,6 +17,7 @@ class BackupFile {
     required this.exportedAt,
     required this.checksum,
     required this.data,
+    this.attachmentFiles = const {},
   });
 
   final int schemaVersion;
@@ -30,6 +32,10 @@ class BackupFile {
   final String checksum;
 
   final BackupData data;
+
+  /// Attachment id -> bytes, already checked against the size and SHA-256
+  /// of `data.noteAttachments` (database v6). Empty for a plain file.
+  final Map<String, Uint8List> attachmentFiles;
 }
 
 /// Reads and writes the `.turnly` format (also accepted as `.cuadrante`):
@@ -54,7 +60,32 @@ class BackupCodec {
 
   /// Shared reader/writer caps. Large histories and notes may exceed 4 MiB;
   /// the absolute cap and ratio protection still bound untrusted input.
-  static const int maxFileBytes = 8 * 1024 * 1024;
+  ///
+  /// [maxFileBytes] is the cap of a **plain** `.turnly` (gzip JSON, also the
+  /// one inside a container). A container with attachments can be much
+  /// bigger: [maxImportBytes] is the cap every import and export path (Dart
+  /// and native) applies to a file before it is decoded.
+  static const int maxFileBytes = BackupContainer.maxInnerBackupBytes;
+
+  /// Most bytes any file the app reads or writes may have: the size of the
+  /// biggest container ([BackupContainer.maxContainerBytes]).
+  static const int maxImportBytes = BackupContainer.maxContainerBytes;
+
+  /// Whether a file of [length] bytes starting with [head] (at least the
+  /// first four bytes) may be read at all: up to [maxImportBytes] for a
+  /// container (a ZIP), up to [maxFileBytes] for anything else. Whoever can
+  /// only see the size (a listing) uses [maxImportBytes] and leaves the rest
+  /// to [decode].
+  static bool fitsImportLimit(int length, List<int> head) {
+    if (length <= maxFileBytes) return true;
+    if (length > maxImportBytes) return false;
+    return head.length >= 4 &&
+        head[0] == 0x50 &&
+        head[1] == 0x4b &&
+        head[2] == 0x03 &&
+        head[3] == 0x04;
+  }
+
   static const int defaultMaxDecodedBytes = 32 * 1024 * 1024;
 
   /// A file that inflates to more than this many times its own size is
@@ -101,6 +132,17 @@ class BackupCodec {
   /// only**: nothing is decided from it, and a file is only trusted after
   /// [decode].
   static String? peekAppVersion(Uint8List bytes) {
+    if (BackupContainer.looksLikeContainer(bytes)) {
+      // The list of copies hands over only the first [peekCompressedBytes] of
+      // a file, and a container (a copy with attachments) is cut there:
+      // the head of the inner backup is found through the first local
+      // headers of the ZIP, not by opening the whole container.
+      final inner = BackupContainer.peekBackupHead(bytes);
+      if (inner == null || inner.length < 2) return null;
+      return inner[0] == 0x1f && inner[1] == 0x8b
+          ? peekAppVersion(inner)
+          : null;
+    }
     if (bytes.length < 2 || bytes[0] != 0x1f || bytes[1] != 0x8b) return null;
     final inflated = BytesBuilder(copy: false);
     try {
@@ -147,8 +189,46 @@ class BackupCodec {
     });
   }
 
-  /// The file: [encodeJsonBytes] gzip-compressed.
+  /// The file. Without attachments: [encodeJsonBytes] gzip-compressed, the
+  /// format every version reads. With attachments (`data.noteAttachments`,
+  /// database v6) a [BackupContainer] holding that same file and the bytes
+  /// of each attachment, which [attachmentFiles] must give (id -> bytes,
+  /// matching the size and SHA-256 of its row): a missing or different file
+  /// is a [CorruptBackup], never a copy that silently lacks it.
   Uint8List encode(
+    BackupData data, {
+    required String appVersion,
+    required DateTime exportedAt,
+    Map<String, Uint8List> attachmentFiles = const {},
+  }) {
+    final plain = _encodePlain(
+      data,
+      appVersion: appVersion,
+      exportedAt: exportedAt,
+    );
+    if (data.noteAttachments.isEmpty) {
+      if (attachmentFiles.isNotEmpty) {
+        throw ArgumentError.value(
+          attachmentFiles.keys,
+          'attachmentFiles',
+          'files without attachment rows',
+        );
+      }
+      return plain;
+    }
+    final files = <String, Uint8List>{};
+    for (final a in data.noteAttachments) {
+      final bytes = attachmentFiles[a.id];
+      if (bytes == null) {
+        throw CorruptBackup('Attachment "${a.id}" has no file');
+      }
+      _checkFile(a, bytes);
+      files[a.id] = bytes;
+    }
+    return BackupContainer.encode(backup: plain, files: files);
+  }
+
+  Uint8List _encodePlain(
     BackupData data, {
     required String appVersion,
     required DateTime exportedAt,
@@ -180,7 +260,73 @@ class BackupCodec {
   ///   rest of the content is looked at, since a newer file may differ.
   /// - [CorruptBackup]: truncated or damaged (R7), failed checksum or
   ///   inconsistent data.
+  ///
+  /// A [BackupContainer] (attachments, database v6) is opened first: its
+  /// inner file is read as below and every attachment it lists must come
+  /// with its file, of the right size and SHA-256. A plain file that lists
+  /// attachments is a [CorruptBackup] (their files would be missing).
   BackupFile decode(Uint8List bytes) {
+    if (BackupContainer.looksLikeContainer(bytes)) {
+      return _decodeContainer(bytes);
+    }
+    final file = _decodePlain(bytes);
+    if (file.data.noteAttachments.isNotEmpty) {
+      throw const CorruptBackup('Attachments without their files');
+    }
+    return file;
+  }
+
+  BackupFile _decodeContainer(Uint8List bytes) {
+    final ({Uint8List backup, Map<String, Uint8List> files}) opened;
+    try {
+      opened = BackupContainer.decode(bytes);
+    } on BackupException {
+      rethrow;
+    } catch (e) {
+      throw CorruptBackup('Invalid container: $e');
+    }
+    if (!(opened.backup.length >= 2 &&
+        opened.backup[0] == 0x1f &&
+        opened.backup[1] == 0x8b)) {
+      throw const CorruptBackup('The container holds no backup');
+    }
+    final inner = _decodePlain(opened.backup);
+    final declared = inner.data.noteAttachments.fold<int>(
+      0,
+      (sum, a) => sum + a.sizeBytes,
+    );
+    if (declared > bytes.length) {
+      throw const CorruptBackup('Attachments larger than the file');
+    }
+    final files = <String, Uint8List>{};
+    for (final a in inner.data.noteAttachments) {
+      final file = opened.files[a.id];
+      if (file == null) {
+        throw CorruptBackup('Attachment "${a.id}" has no file');
+      }
+      _checkFile(a, file);
+      files[a.id] = file;
+    }
+    return BackupFile(
+      schemaVersion: inner.schemaVersion,
+      appVersion: inner.appVersion,
+      exportedAt: inner.exportedAt,
+      checksum: inner.checksum,
+      data: inner.data,
+      attachmentFiles: Map.unmodifiable(files),
+    );
+  }
+
+  static void _checkFile(BackupNoteAttachment a, Uint8List bytes) {
+    if (bytes.length != a.sizeBytes) {
+      throw CorruptBackup('Attachment "${a.id}" has the wrong size');
+    }
+    if (sha256Hex(bytes) != a.sha256) {
+      throw CorruptBackup('Attachment "${a.id}" does not match its SHA-256');
+    }
+  }
+
+  BackupFile _decodePlain(Uint8List bytes) {
     if (bytes.length < 2 || bytes[0] != 0x1f || bytes[1] != 0x8b) {
       throw const NotACuadranteFile('Not a gzip file');
     }

@@ -11,6 +11,10 @@ import 'package:cuadrante/core/providers.dart';
 import 'package:cuadrante/core/router.dart';
 import 'package:cuadrante/core/theme/app_colors.dart';
 import 'package:cuadrante/core/theme/app_typography.dart';
+import 'package:cuadrante/features/absences/application/absence_providers.dart';
+import 'package:cuadrante/features/absences/data/absence_balances_repository.dart';
+import 'package:cuadrante/features/absences/data/absence_carry_over_store.dart';
+import 'package:cuadrante/features/absences/domain/absence_balance.dart';
 import 'package:cuadrante/features/calendar/application/paint_controller.dart';
 import 'package:cuadrante/features/calendars/data/calendars_repository.dart';
 import 'package:cuadrante/features/calendars/domain/calendar.dart';
@@ -23,6 +27,9 @@ import 'package:cuadrante/features/schedule/application/schedule_providers.dart'
 import 'package:cuadrante/features/settings/application/preferences_controller.dart';
 import 'package:cuadrante/features/settings/domain/preferences.dart';
 import 'package:cuadrante/features/summary/domain/month_summary.dart';
+import 'package:cuadrante/features/swaps/application/swaps_controller.dart';
+import 'package:cuadrante/features/swaps/data/shift_swaps_repository.dart';
+import 'package:cuadrante/features/swaps/domain/shift_swap.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -49,16 +56,19 @@ const _targets = {
   // Required by App Store Connect: iPhone with Dynamic Island, medium display.
   'ios63': Size(1206, 2622),
 };
-// (file name, scene index, dark). The dark month shot is only for the README;
-// the store targets keep their own theme per scene (month and paint in dark).
+// (file name, scene index, dark, README only). The dark month shot and the
+// two settings scenes are only for the README; the store targets keep their
+// own theme per scene (month and paint in dark).
 const _shots = [
-  ('01-mes', 0, false),
-  ('02-lista', 1, false),
-  ('03-pintar', 2, false),
-  ('04-rotaciones', 3, false),
-  ('05-horas', 4, false),
-  ('06-festivos', 5, false),
-  ('07-mes-oscuro', 0, true),
+  ('01-mes', 0, false, false),
+  ('02-lista', 1, false, false),
+  ('03-pintar', 2, false, false),
+  ('04-rotaciones', 3, false, false),
+  ('05-horas', 4, false, false),
+  ('06-festivos', 5, false, false),
+  ('07-mes-oscuro', 0, true, false),
+  ('08-vacaciones', 6, false, true),
+  ('09-cambios', 7, false, true),
 ];
 // One caption per shot, in the order of [_shots]. Vocabulary from
 // docs/glosario-idiomas.md; ca, gl and eu are pending native review.
@@ -112,6 +122,20 @@ const _industry = {
   'en': 'Industry',
 };
 
+/// Names of the two balances of the «Vacation and leave» scene, in the app's
+/// language (the ARB names of the vacation and personal-day shift types).
+const _absenceBalanceNames = {
+  'es': ('Vacaciones', 'Libre disposición'),
+  'ca': ('Vacances', 'Lliure disposició'),
+  'gl': ('Vacacións', 'Libre disposición'),
+  'eu': ('Oporrak', 'Norberaren eguna'),
+  'en': ('Vacation', 'Personal day'),
+};
+
+/// Series keys of the two balances (stable every year, so the days carry over).
+const _vacationSeries = 'abs-vacaciones';
+const _personalSeries = 'abs-libre-disposicion';
+
 void main() {
   setUpAll(() async {
     if (generateStore) await loadStoreFonts();
@@ -119,9 +143,10 @@ void main() {
   tearDownAll(() => AppTypography.debugFamily = null);
 
   for (final language in _captions.keys) {
-    for (final (shot, index, darkShot) in _shots) {
-      // The dark month shot only exists for the README.
-      if (darkShot && !_github) continue;
+    for (final (shot, index, darkShot, readmeOnly) in _shots) {
+      // The dark month shot and the two settings scenes only exist for the
+      // README.
+      if ((darkShot || readmeOnly) && !_github) continue;
       final dark = _github ? darkShot : index == 0 || index == 2;
       testWidgets(
         '$language/$shot ($_targetName)',
@@ -173,14 +198,11 @@ void main() {
               ).create(name: _industry[language]!, colorValue: 0xFF4B4FD1);
             }
             // Keep a useful, compact palette; archived types remain in history.
+            // The «Vacation and leave» scene also needs the absence types.
+            final keep = {'morning', 'afternoon', 'night', 'rest', 'postNight'};
+            if (index == 6) keep.addAll({'vacation', 'personalDay'});
             for (final t in shiftTemplates) {
-              if (![
-                'morning',
-                'afternoon',
-                'night',
-                'rest',
-                'postNight',
-              ].contains(t.key)) {
+              if (!keep.contains(t.key)) {
                 await repository.archiveShiftType(t.key);
               }
             }
@@ -205,6 +227,125 @@ void main() {
             );
             await HolidayRepository(storage.database)
                 .savePlace(regionCode: 'ES-MD', municipalityCode: '28079');
+            if (index == 6) {
+              final stamp = _now.toUtc().millisecondsSinceEpoch;
+              final names = _absenceBalanceNames[language]!;
+              final balances = AbsenceBalancesRepository(storage.database);
+              // 2025: 22 days, 15 taken, the 7 left carry into 2026 (cap 10).
+              await balances.save(
+                AbsenceBalance(
+                  year: 2025,
+                  type: _vacationSeries,
+                  allowedDays: 22,
+                  calendarId: mainCalendarId,
+                  name: names.$1,
+                  shiftTypeQuarters: const {'vacation': 4},
+                  createdAt: stamp,
+                  updatedAt: stamp,
+                ),
+              );
+              await balances.save(
+                AbsenceBalance(
+                  year: 2026,
+                  type: _vacationSeries,
+                  allowedDays: 22,
+                  calendarId: mainCalendarId,
+                  name: names.$1,
+                  shiftTypeQuarters: const {'vacation': 4},
+                  carryOver: true,
+                  carryOverMaxDays: 10,
+                  sortOrder: 0,
+                  createdAt: stamp,
+                  updatedAt: stamp,
+                ),
+              );
+              await balances.save(
+                AbsenceBalance(
+                  year: 2026,
+                  type: _personalSeries,
+                  allowedDays: 4,
+                  calendarId: mainCalendarId,
+                  name: names.$2,
+                  shiftTypeQuarters: const {'personalDay': 4},
+                  sortOrder: 1,
+                  createdAt: stamp,
+                  updatedAt: stamp,
+                ),
+              );
+              await AbsenceCarryOverStore(storage.database).setExpiry(
+                2026,
+                _vacationSeries,
+                const CivilDate(2027, 3, 31),
+                calendarId: mainCalendarId,
+              );
+              // Days taken: 15 in 2025 (the carry-over), 4 enjoyed and 4
+              // planned in 2026, and one personal day.
+              final absences = <CivilDate, EntryChange>{};
+              void taken(CivilDate date, String shift) {
+                absences[date] = EntryChange(
+                  null,
+                  DayEntry(date: date, shiftTypeIds: [shift]),
+                );
+              }
+
+              for (var day = 3; day <= 17; day++) {
+                taken(CivilDate(2025, 8, day), 'vacation');
+              }
+              for (var day = 6; day <= 9; day++) {
+                taken(CivilDate(2026, 7, day), 'vacation');
+              }
+              for (var day = 28; day <= 31; day++) {
+                taken(CivilDate(2026, 12, day), 'vacation');
+              }
+              taken(const CivilDate(2026, 7, 13), 'personalDay');
+              await repository.apply(
+                mainCalendarId,
+                ScheduleChange(patch: EntriesPatch(absences)),
+              );
+            }
+            if (index == 7) {
+              final stamp = _now.toUtc().millisecondsSinceEpoch;
+              final swaps = ShiftSwapsRepository(storage.database);
+              // Two colleagues with something pending and one settled.
+              await swaps.save(
+                ShiftSwap(
+                  id: 'store-swap-laura',
+                  calendarId: mainCalendarId,
+                  date: const CivilDate(2026, 12, 5),
+                  colleague: 'Laura',
+                  direction: SwapDirection.theyOwe,
+                  givenShiftTypeIds: const ['morning', 'afternoon'],
+                  createdAt: stamp,
+                  updatedAt: stamp,
+                ),
+              );
+              await swaps.save(
+                ShiftSwap(
+                  id: 'store-swap-marcos',
+                  calendarId: mainCalendarId,
+                  date: const CivilDate(2026, 12, 12),
+                  colleague: 'Marcos',
+                  direction: SwapDirection.iOwe,
+                  receivedShiftTypeIds: const ['night'],
+                  createdAt: stamp,
+                  updatedAt: stamp,
+                ),
+              );
+              await swaps.save(
+                ShiftSwap(
+                  id: 'store-swap-ana',
+                  calendarId: mainCalendarId,
+                  date: const CivilDate(2026, 11, 20),
+                  colleague: 'Ana',
+                  direction: SwapDirection.theyOwe,
+                  givenShiftTypeIds: const ['morning'],
+                  status: SwapStatus.returned,
+                  createdAt: stamp,
+                  updatedAt: stamp,
+                  closedAt: stamp,
+                ),
+              );
+            }
           });
           final snapshot = (await tester.runAsync(
             storage.withReloadedSnapshot,
@@ -293,6 +434,20 @@ void main() {
                 );
                 await tester.runAsync(
                   () => container.read(regionalNationalEntriesProvider.future),
+                );
+              case 6:
+                router.push(AppRoutes.settingsAbsences);
+                await tester.pumpAndSettle();
+                await tester.runAsync(
+                  () => container.read(
+                    absenceBalancesProvider(_now.year).future,
+                  ),
+                );
+              case 7:
+                router.push(AppRoutes.swaps);
+                await tester.pumpAndSettle();
+                await tester.runAsync(
+                  () => container.read(swapLedgerProvider.future),
                 );
             }
             await tester.pumpAndSettle();

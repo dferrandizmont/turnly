@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/diagnostics/crash_reporting.dart' show redactError;
+import '../../../core/format/app_date_format.dart';
 import '../../../core/icons/app_icons.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/providers.dart';
@@ -50,6 +51,9 @@ class _RestorePreviewScreenState extends ConsumerState<RestorePreviewScreen> {
   Object? _problem;
   RestoreFailure? _failure;
   bool _hasSafetyCopy = false;
+
+  /// What the safety copy made before the restore left out.
+  int _skippedAttachments = 0;
 
   /// Who handed the file over (informational), when the system said.
   String? _sender;
@@ -117,7 +121,7 @@ class _RestorePreviewScreenState extends ConsumerState<RestorePreviewScreen> {
     // Held before the awaits: the screen cannot be replaced meanwhile.
     final inProgress = ref.read(restoreInProgressProvider.notifier)..set(true);
     try {
-      await _actions.restore(pending);
+      final warnings = await _actions.restore(pending);
       BackupCopy? safety;
       try {
         safety = await _actions.latestSafetyCopy();
@@ -128,6 +132,7 @@ class _RestorePreviewScreenState extends ConsumerState<RestorePreviewScreen> {
       if (!mounted) return;
       setState(() {
         _hasSafetyCopy = safety != null;
+        _skippedAttachments = skippedAttachmentCount(warnings);
         _phase = _Phase.done;
       });
     } on RestoreFailure catch (failure, stack) {
@@ -241,7 +246,10 @@ class _RestorePreviewScreenState extends ConsumerState<RestorePreviewScreen> {
             key: const ValueKey('restore-done'),
             icon: AppIcons.check,
             title: l10n.backupUiDoneTitle,
-            message: l10n.backupUiDoneBody,
+            message: _skippedAttachments > 0
+                ? '${l10n.backupUiDoneBody}\n\n'
+                      '${l10n.backupWarnRestoreSkipped(_skippedAttachments)}'
+                : l10n.backupUiDoneBody,
             actionLabel: l10n.backupUiDoneView,
             primaryAction: true,
             onAction: () => context.go(AppRoutes.home),
@@ -393,7 +401,12 @@ class _Preview extends ConsumerWidget {
               const SizedBox(height: Sp.xs),
               Text(
                 l10n.backupUiPreviewSaved(
-                  backupWhen(l10n, file.exportedAt, now),
+                  backupWhen(
+                    l10n,
+                    file.exportedAt,
+                    now,
+                    hour12: AppDateFormat.of(context).hour12,
+                  ),
                 ),
                 key: const ValueKey('restore-saved'),
                 style: type.bodyStrong,

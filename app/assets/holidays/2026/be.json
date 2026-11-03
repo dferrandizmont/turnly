@@ -1,0 +1,19 @@
+{
+"schema":1,
+"year":2026,
+"country":"BE",
+"national":[
+{"date":"2026-01-01","name":"New Year's Day"},
+{"date":"2026-04-05","name":"Easter Sunday"},
+{"date":"2026-04-06","name":"Easter Monday"},
+{"date":"2026-05-01","name":"Labor Day"},
+{"date":"2026-05-14","name":"Ascension Day"},
+{"date":"2026-05-24","name":"Pentecost"},
+{"date":"2026-05-25","name":"Pentecost Monday"},
+{"date":"2026-07-21","name":"National Day"},
+{"date":"2026-08-15","name":"Assumption Day"},
+{"date":"2026-11-01","name":"All Saints' Day"},
+{"date":"2026-11-11","name":"Armistice Day"},
+{"date":"2026-12-25","name":"Christmas Day"}
+]
+}

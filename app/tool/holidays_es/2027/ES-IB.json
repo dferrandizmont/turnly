@@ -1,0 +1,11 @@
+{
+"region":"ES-IB",
+"year":2027,
+"kind":"labour",
+"sources":{
+"s1":{"url":"https://www.caib.es/eboibfront/pdf/es/2026/83/1223136","ref":"BOIB núm. 83, 2.7.2026 (registro 6638) — Ayuntamiento de Palma, Secretaría General del Pleno: Acuerdo del Pleno de 25 de junio de 2026 por el que se aprueba el calendario de las fiestas locales de Palma para el año 2027","published":"2026-07-02","retrieved":"2026-10-31"}
+},
+"municipalities":{
+"07040":{"name":"Palma","days":["2027-01-20","2027-06-24"],"source":"s1"}
+}
+}

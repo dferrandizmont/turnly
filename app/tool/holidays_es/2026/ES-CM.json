@@ -1,0 +1,15 @@
+{
+"region":"ES-CM",
+"year":2026,
+"kind":"labour",
+"sources":{
+"s1":{"url":"https://docm.jccm.es/docm/descargarArchivo.do?ruta=2025/12/12/pdf/2025_9468.pdf&tipo=rutaDocm","ref":"DOCM núm. 240, 12.12.2025 — Anuncio de 04/12/2025, de la Dirección General de Autónomos, Trabajo y Economía Social, por el que se da publicidad a la relación de las fiestas de carácter local, retribuidas y no recuperables para el año 2026, de los municipios de la comunidad autónoma de Castilla-La Mancha [2025/9468]","published":"2025-12-12","retrieved":"2026-10-31"}
+},
+"municipalities":{
+"02003":{"name":"Albacete","days":["2026-06-24","2026-09-08"],"source":"s1"},
+"13034":{"name":"Ciudad Real","days":["2026-05-25","2026-08-22"],"source":"s1"},
+"16078":{"name":"Cuenca","days":["2026-06-01","2026-09-21"],"source":"s1"},
+"19130":{"name":"Guadalajara","days":["2026-09-08","2026-09-18"],"source":"s1"},
+"45168":{"name":"Toledo","days":["2026-01-23","2026-11-26"],"source":"s1"}
+}
+}

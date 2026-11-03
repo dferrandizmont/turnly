@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
+import 'package:cuadrante/core/database/app_database.dart';
 import 'package:cuadrante/core/database/migration_backup.dart';
 import 'package:cuadrante/features/backup/domain/canonical_json.dart';
 import 'package:cuadrante/features/backup/domain/schedule_fingerprint.dart';
@@ -31,12 +32,14 @@ final List<QaScenario> upgradeScenarios = [qaMigrationOnDevice]; // U01
 /// U01.
 const qaMigrationOnDevice = QaScenario(
   'U01',
-  'Migración v1 → v4 en el dispositivo',
+  'Migración v1 → v6 en el dispositivo',
   _migration,
   timeout: Duration(minutes: 5),
 );
 
-final _backupName = RegExp(r'^pre-v1-a-v4-\d{8}-\d{6}\.sqlite$');
+final _backupName = RegExp(
+  '^pre-v1-a-v${AppDatabase.latestSchemaVersion}-\\d{8}-\\d{6}\\.sqlite\$',
+);
 
 Future<void> _migration(QaContext qa) async {
   final t = qa.tester;
@@ -92,8 +95,12 @@ Future<void> _migration(QaContext qa) async {
   expect(readUserVersion(copy), 1, reason: 'la copia es v1');
 
   final version = await app.query('PRAGMA user_version');
-  expect(version.single.values.single, 4, reason: 'esquema v4 tras abrir');
-  expect(readUserVersion(file), 4);
+  expect(
+    version.single.values.single,
+    AppDatabase.latestSchemaVersion,
+    reason: 'esquema al día tras abrir',
+  );
+  expect(readUserVersion(file), AppDatabase.latestSchemaVersion);
   final migratedTypes = await app.query(
     'SELECT id, fixed_plus_cents FROM shift_types ORDER BY id',
   );
@@ -238,7 +245,7 @@ Future<void> _migration(QaContext qa) async {
     copyDigest,
     reason: 'la copia previa no cambia',
   );
-  expect(readUserVersion(file), 4);
+  expect(readUserVersion(file), AppDatabase.latestSchemaVersion);
   final again = await _snapshot(app);
   expect(again, afterBoot, reason: 'reabrir no duplica ni cambia filas');
   expect(

@@ -126,6 +126,57 @@ String _buildMonthChange() {
   ).encode();
 }
 
+/// Four Monday-first weeks (UW): 28 display days from Monday 2026-10-19, with
+/// the first line of the notes (never on the vacation day) and the next day
+/// off of the first day. Used by the four-week widget tests.
+String _buildFourWeeks() {
+  final schedule = Schedule(
+    shiftTypes: allTypes,
+    patterns: const [
+      Pattern(
+        id: 'rot',
+        name: 'rot',
+        steps: [
+          ['night'],
+          ['afternoon'],
+          ['morning'],
+          ['rest'],
+        ],
+      ),
+    ],
+    runs: [PatternRun(id: 'r', patternId: 'rot', startDate: _first, seq: 1)],
+    entries: {
+      // Two lines: only the first one may travel.
+      _first.addDays(2): DayEntry(
+        date: _first.addDays(2),
+        shiftTypeIds: const ['morning', 'afternoon'],
+        note: 'Cambio de turno\nsegunda línea privada',
+      ),
+      // A vacation day that carries a private note: it must never leave.
+      _first.addDays(4): DayEntry(
+        date: _first.addDays(4),
+        shiftTypeIds: const ['vacation'],
+        note: 'Cita médica',
+      ),
+      // A plain one-line note inside the four weeks.
+      _first.addDays(9): DayEntry(
+        date: _first.addDays(9),
+        shiftTypeIds: const ['morning'],
+        note: '  Formación  ',
+      ),
+    },
+  );
+  return buildWidgetSnapshot(
+    schedule: schedule,
+    holidays: const <CivilDate, Holiday>{},
+    today: _first,
+    timeZone: 'Europe/Madrid',
+    strings: WidgetStrings.es,
+    days: 35,
+    generatedAt: DateTime.utc(2026, 10, 19, 8),
+  ).encode();
+}
+
 void _check(String path, String json) {
   final file = File(path);
   if (Platform.environment['UPDATE_WIDGET_FIXTURE'] == '1') {
@@ -151,6 +202,14 @@ Future<void> main() async {
     _check(
       'android/app/src/test/resources/widget_snapshot_month_change.json',
       _buildMonthChange(),
+    );
+  });
+
+  test('the four-week snapshot of the Kotlin tests is what the builder '
+      'writes', () {
+    _check(
+      'android/app/src/test/resources/widget_snapshot_four_weeks.json',
+      _buildFourWeeks(),
     );
   });
 }

@@ -9,13 +9,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'harness.dart';
 import '../../support/real_font.dart';
 
-/// The controls of the month row (the year, the summary, "Hoy" and the two
-/// arrows) have to fit in a narrow phone with a big text, in every language:
-/// the English "Today" is the longest one, and with the text at 200 % it does
-/// not fit next to the four buttons.
+/// The controls of the month row (B1: the small Grid/List switch, "Hoy" and
+/// the two arrows; the year opens from the title and the summary from the bar
+/// of destinations) have to fit in a narrow phone with a big text, in every
+/// language: the English "Today" is the longest one.
 ///
-/// They are laid out in one row when they fit and in two rows when they do
-/// not, in the same reading order, and none of them loses its touch target.
+/// They are laid out in one row when they fit and in more rows when they do
+/// not, and none of them loses its touch target.
 void main() {
   setUpAll(initializeLocale);
 
@@ -36,14 +36,26 @@ void main() {
           );
 
           // The controls of the month row.
-          Finder year() => find.byKey(const ValueKey('open-year'));
-          Finder summary() => find.byKey(const ValueKey('open-summary'));
+          Finder year() => find.byKey(const ValueKey('month-title'));
+          Finder grid() =>
+              find.byKey(const ValueKey('month-presentation-grid'));
+          Finder list() =>
+              find.byKey(const ValueKey('month-presentation-list'));
           Finder today() => find.widgetWithText(TextButton, l10n.calendarToday);
           Finder previous() => find.byTooltip(l10n.calendarPreviousMonth);
           Finder next() => find.byTooltip(l10n.calendarNextMonth);
 
-          /// Every control is on screen, with its touch target.
+          /// Every control is on screen, with its touch target. Grid/List can
+          /// sit on its own fixed line above the month with text from ×1.6
+          /// (B1), centred: there it only has to be inside the screen.
           void expectControlsFit(List<Finder> controls) {
+            for (final control in [grid(), list()]) {
+              expect(control, findsOneWidget);
+              final rect = tester.getRect(control);
+              expect(rect.left, greaterThanOrEqualTo(0));
+              expect(rect.right, lessThanOrEqualTo(320.5));
+              expect(rect.height, greaterThanOrEqualTo(Sp.touch - 0.5));
+            }
             for (final control in controls) {
               expect(control, findsOneWidget);
               final rect = tester.getRect(control);
@@ -66,9 +78,11 @@ void main() {
             expect(tester.takeException(), isNull);
           }
 
+          // The row of the month can start below the «Hoy» card.
+          await revealOnMonth(tester, year());
           // The current month: there is no "Hoy" button yet.
           expect(today(), findsNothing);
-          expectControlsFit([year(), summary(), previous(), next()]);
+          expectControlsFit([year(), previous(), next()]);
 
           // Another month: the "Hoy" button appears.
           await tester.ensureVisible(next());
@@ -76,14 +90,14 @@ void main() {
           await tester.tap(next());
           await tester.pumpAndSettle();
           expect(today(), findsOneWidget);
-          expectControlsFit([year(), summary(), today(), previous(), next()]);
+          expectControlsFit([year(), today(), previous(), next()]);
 
           // Another year: the title says the month and the year.
           containerOf(tester)
               .read(visibleMonthProvider.notifier)
               .goTo(const CivilDate(2025, 12, 1));
           await tester.pumpAndSettle();
-          expectControlsFit([year(), summary(), today(), previous(), next()]);
+          expectControlsFit([year(), today(), previous(), next()]);
         },
       );
     }
@@ -103,9 +117,21 @@ void main() {
           .read(visibleMonthProvider.notifier)
           .goTo(const CivilDate(2025, 12, 1));
       await tester.pumpAndSettle();
+      await revealOnMonth(tester, find.byKey(const ValueKey('month-title')));
+      // Text ×2: Grid/List is fixed on its own line above the month (B1);
+      // "Today" and the arrows stay in the row, on two rows under the title.
+      final switches = [
+        find.byKey(const ValueKey('month-presentation-grid')),
+        find.byKey(const ValueKey('month-presentation-list')),
+      ].map(tester.getRect).toList();
+      for (final rect in switches) {
+        expect(rect.width, greaterThanOrEqualTo(Sp.touch));
+        expect(rect.height, greaterThanOrEqualTo(Sp.touch));
+        expect(rect.left, greaterThanOrEqualTo(0));
+        expect(rect.right, lessThanOrEqualTo(320));
+      }
+      expect(switches[0].overlaps(switches[1]), isFalse);
       final controls = [
-        find.byKey(const ValueKey('open-year')),
-        find.byKey(const ValueKey('open-summary')),
         find.widgetWithText(TextButton, l10n.calendarToday),
         find.byTooltip(l10n.calendarPreviousMonth),
         find.byTooltip(l10n.calendarNextMonth),
@@ -121,8 +147,10 @@ void main() {
           expect(rect.overlaps(other), isFalse);
         }
       }
-      expect(rects.map((r) => r.center.dy).toSet(), hasLength(2));
-      expect(rects[2].top, greaterThanOrEqualTo(rects[0].bottom));
+      final title = tester.getRect(find.byKey(const ValueKey('month-title')));
+      for (final rect in rects) {
+        expect(rect.top, greaterThanOrEqualTo(title.top - 0.5));
+      }
       expect(tester.takeException(), isNull);
     },
   );

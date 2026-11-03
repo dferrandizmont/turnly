@@ -184,7 +184,10 @@ class _SwitcherSheet extends ConsumerWidget {
                   ),
                   child: Row(
                     children: [
-                      CalendarDot(colorValue: calendar.colorValue, size: 14),
+                      CalendarDot(
+                        colorValue: calendar.colorValue,
+                        size: CalendarDot.rowSize,
+                      ),
                       const SizedBox(width: Sp.m),
                       Expanded(
                         child: Text(

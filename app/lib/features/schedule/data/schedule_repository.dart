@@ -58,6 +58,7 @@ class ScheduleRepository {
     final entryRows = await (_db.select(
       _db.dayEntries,
     )..where((e) => e.calendarId.equals(calendarId))).get();
+    final versionRows = await _db.select(_db.shiftTypeVersions).get();
 
     final records = [for (final row in typeRows) row.toRecord()];
     final schedule = Schedule(
@@ -65,6 +66,7 @@ class ScheduleRepository {
       patterns: [for (final row in patternRows) row.toPattern()],
       runs: [for (final row in runRows) row.toRun()],
       entries: {for (final row in entryRows) row.date: row.toEntry()},
+      shiftTypeVersions: groupShiftTypeVersions(versionRows),
     );
     return ScheduleSnapshot(
       schedule: schedule,
@@ -213,6 +215,38 @@ class ScheduleRepository {
           _db.shiftTypes,
         )..where((t) => t.id.equals(type.id))).write(fields);
       });
+
+  /// Saves [type] (its new current terms) and replaces its earlier versions
+  /// with [history], in **one transaction**: a change «only from today on»
+  /// (`historyForChangeFrom`). The type must exist already. Invalid terms
+  /// (or two versions ending the same day) are an [ArgumentError] before
+  /// anything is written.
+  Future<void> saveShiftTypeWithHistory(
+    ShiftType type,
+    List<ShiftTypeVersion> history,
+  ) => _db.transaction(() async {
+    final problem = checkShiftTypeVersions(history);
+    if (problem != null) {
+      throw ArgumentError.value(history, 'history', problem);
+    }
+    final exists = await (_db.select(
+      _db.shiftTypes,
+    )..where((t) => t.id.equals(type.id))).getSingleOrNull();
+    if (exists == null) {
+      throw StateError('Unknown shift type: versions need a stored type');
+    }
+    await saveShiftType(type);
+    await (_db.delete(
+      _db.shiftTypeVersions,
+    )..where((v) => v.shiftTypeId.equals(type.id))).go();
+    final now = _nowMillis;
+    await _db.batch((b) {
+      b.insertAll(_db.shiftTypeVersions, [
+        for (final v in history)
+          v.toCompanion(shiftTypeId: type.id, createdAt: now),
+      ]);
+    });
+  });
 
   /// One-time repair at start-up: a build before the code limit counted
   /// UTF-16 units let codes such as two emojis (4 units) into the database,

@@ -6,12 +6,14 @@ restauración (R4, R6, R7) está en `docs/plan-publicacion.md`; la base de datos
 
 Código: `app/lib/features/backup/`. Las pantallas (Ajustes › Copia de seguridad, vista previa de restauración) están en
 `presentation/` y se describen en el apartado 7; las copias automáticas, en el 8; abrir un archivo desde otra app, en
-el 9; y la copia del sistema de Android, en el 10.
+el 9; la copia del sistema de Android, en el 10; y la copia automática en una carpeta que elige el usuario (Drive,
+Dropbox, OneDrive o una carpeta local), en el 11.
 
 | Pieza | Fichero | Qué hace |
 |---|---|---|
 | Datos | `domain/backup_data.dart` | `BackupData` (una clase por tabla), normalización, `validate()`, `toSchedule()` |
 | Formato | `domain/backup_codec.dart` | `BackupCodec.encode/decode`, gzip, suma de control, versiones |
+| Contenedor | `domain/backup_container.dart` | ZIP con el `.turnly` y los archivos adjuntos (base de datos v6, apartado 1, «Contenedor con adjuntos») |
 | Errores | `domain/backup_errors.dart` | `NotACuadranteFile`, `NewerFormatVersion`, `CorruptBackup` |
 | JSON canónico | `domain/canonical_json.dart` | claves ordenadas, sin espacios, sha256 |
 | Huella | `domain/schedule_fingerprint.dart` | `scheduleFingerprint` (entidades + 730 días resueltos) |
@@ -25,6 +27,7 @@ el 9; y la copia del sistema de Android, en el 10.
 | Proveedores | `application/backup_providers.dart` | carpeta, almacenes, interruptor, `autoBackupRunnerProvider`, compartir y selector de archivo |
 | Plataforma | `data/platform_backup_channel.dart` + `MainActivity.kt` | archivo recibido de otra app y estado de la copia del sistema |
 | Pantallas | `presentation/` | `backup_screen.dart`, `restore_preview_screen.dart`, `backup_host.dart` |
+| Copia en carpeta | `domain/folder_backup.dart`, `data/folder_backup_*.dart`, `application/folder_backup_*.dart`, `presentation/folder_backup_section.dart`, `app/packages/turnly_folder_access/` | copia diaria a una carpeta del usuario por el selector del sistema (apartado 11) |
 
 ## 1. El archivo
 
@@ -75,8 +78,11 @@ versión 3 (marcados abajo), que solo se escriben si tienen valor** (ver «Por q
 | `patternRuns` | `id, calendarId, patternId, startDate, endDate, stepOffset, seq, createdAt` | por `seq` (único en todos los calendarios) |
 | `dayEntries` | `calendarId, date, shiftTypeIds (null = no sustituye al patrón, [] = día vacío), note, noteReminderMinute (v3), overtimeMinutes (v3), earlyLeaveMinutes (v3), updatedAt` | por (`calendarId`, `date`) |
 | `holidays` | solo `source = 'user'`: `date, scope, name, regionCode, municipalityCode` (sin `id`) | por (fecha, ámbito, nombre…) |
-| `absenceBalances` | `year, type, allowedDays` | por (`year`, `type`) |
+| `absenceBalances` | `year, type, allowedDays` y, desde la base de datos v6, las claves opcionales de «Esquema v6» | por (`year`, `type`) |
 | `settings` | objeto `clave → valor`, donde el valor es **el texto JSON tal cual está en la base de datos** | por clave |
+| `noteAttachments` | (v6, opcional) los adjuntos de las notas: ver «Esquema v6» | por `id` |
+| `dayTasks` | (v6, opcional) las tareas de los días | por `id` |
+| `shiftSwaps` | (v6, opcional) el libro de cambios | por `id` |
 
 Los patrones son la única lista que no va ordenada por `id`: la tabla no tiene columna de orden y la app los muestra
 en el orden en que se crearon, así que ese orden es dato. Al restaurar se insertan en ese orden.
@@ -89,6 +95,7 @@ en el orden en que se crearon, así que ese orden es dato. Al restaurar se inser
 | `shiftTypes[].fixedPlusCents` | entero | Extensión opcional del formato v3 (base de datos v4). Plus fijo por turno trabajado, en céntimos, de 0 a 999 999. Ausente o `null` = sin plus; 0 es un importe explícito. Solo se escribe si tiene valor; fuera de rango o con tipo distinto se rechaza antes de restaurar. |
 | `shiftTypes[].icon` | texto | Clave de `ShiftIcon` (30 claves cerradas; nunca emojis). Una clave que esta versión no conoce se **lee como «sin icono»**, no es un error. |
 | `shiftTypes[].alarmSound` | texto | URI del sonido del sistema. No vacío y de hasta 512 caracteres (`maxAlarmSoundLength`). Al restaurar solo se conserva si empieza por `content://media/` o `content://settings/` (`isSystemAlarmSound`); cualquier otra (por ejemplo la del `FileProvider` de la propia app) **se descarta a `null`** (suena el sonido por defecto) sin rechazar el archivo: `BackupData.sanitized`, en `restore` y en `verifyRestore`. El aviso de depuración dice cuántos, nunca cuáles. |
+| `shiftTypes[].pastVersions` | lista | Extensión opcional del formato v3 (base de datos v5, `docs/datos.md`). Lo que el tipo era antes de cada cambio «solo a partir de hoy»: `until` (fecha, último día incluido), `category` y `createdAt` siempre; `startMinute`, `endMinute`, `paidMinutes`, `nightOverride`, `hourlyRateCents`, `fixedPlusCents`, `segment2StartMinute`, `segment2DurationMinutes` solo si tienen valor. Ordenada por `until`. Solo se escribe si el tipo tiene alguna. Términos inválidos o dos versiones con la misma fecha → `CorruptBackup`; una forma rota → `FormatException`. |
 | `shiftTypes[].segment2StartMinute`, `segment2DurationMinutes` | entero | Segundo tramo de un turno partido: los dos o ninguno; inicio 0–1439; duración 1–1440; el tipo tiene horas; empieza después de que acabe el primer tramo y el turno entero cabe en 24 h (`checkSegment2`, `docs/datos.md`). Si no, `CorruptBackup`. |
 | `dayEntries[].noteReminderMinute` | entero | Minuto del día civil (0–1439) en que suena la nota. |
 | `dayEntries[].overtimeMinutes`, `earlyLeaveMinutes` | entero | Minutos extra trabajados y minutos que se salió antes; de 0 a 1440 (`maxDayExtraMinutes`, un día entero: lo mismo que deja el editor). Un valor mayor es `CorruptBackup`: sumado en el resumen desbordaría y daría horas negativas y euros absurdos. Al leer una fila de la base de datos, `DayEntryRowMapper.toEntry` también los acota a 0..1440. |
@@ -106,6 +113,14 @@ una app que solo conoce la versión 2 leería el archivo, ignoraría las claves 
 exportar, **perdería los recordatorios, las horas extra, los iconos y los turnos partidos del usuario sin avisar**.
 Con `schemaVersion` 3, esa app ve `NewerFormatVersion` (R6), no toca nada y propone actualizar.
 
+**Versiones de un tipo (A2, base de datos v5).** El archivo sigue en v3: `pastVersions` es opcional, va dentro de
+su tipo y no se escribe si está vacía, así que unos datos sin versiones dan los mismos bytes canónicos, suma y huella
+que antes (los dorados no cambian). Una app anterior que conoce el v3 la ignora: restaurada allí, el pasado se
+calcularía con los términos actuales del tipo (no se pierde ningún día, pero sí la diferencia de horas o precio de
+los meses anteriores al cambio). Es la misma compatibilidad que el plus fijo. Pruebas:
+`shift_type_versions_backup_test.dart` (códec, restauración real, copia previa, «Probar restauración», huella,
+claves escritas, dorado antiguo y rechazos).
+
 **Plus fijo por tipo (24-oct).** La base de datos sube a v4, pero el archivo sigue en formato v3:
 `fixedPlusCents` es un campo opcional y no cambia el significado de los existentes ni la suma de control.
 Las copias v3 antiguas sin él restauran sin plus y conservan sus bytes canónicos y su huella.
@@ -114,6 +129,124 @@ sin fallar; si restaura o vuelve a exportar desde esa app, **el plus no se conse
 solicitada para este campo; no se añade ningún plus por hora ni dato de pago. Los lectores v1 y v2 siguen
 ignorando las claves que no definían. Pruebas: `fixed_plus_backup_test.dart` (codec, restauración real,
 copia previa, huella, límites y dorado antiguo).
+
+**Esquema v6 (P0, base de datos v6, `docs/datos.md`).** El archivo **sigue en la versión 3**: todo lo nuevo son
+claves opcionales que solo se escriben si tienen valor, como `pastVersions` y `fixedPlusCents`. Unos datos que no las
+usan dan los mismos bytes canónicos, suma y huella que antes (los dorados no cambian).
+
+| Clave | Contenido y límites |
+|---|---|
+| `shiftTypes[].location` | Lugar del turno: no en blanco y hasta 200. |
+| `shiftTypes[].nightPlusCentsPerHour`, `holidayPlusCentsPerHour` | Pluses por hora, de 0 a 999 999 999 (`maxStoredMoneyCents`). También en cada `pastVersions[]`. |
+| `dayEntries[].extraAmountCents` | Importe extra del día, de −999 999 999 a 999 999 999. |
+| `absenceBalances[]` | Además de `year`, `type` y `allowedDays` (que siguen siendo obligatorias y únicas por año y tipo): `calendarId`, `name`, `periodStart`, `periodEnd`, `unit` (si no es `day`), `shiftTypeQuarters` (objeto id → 1..4, claves ordenadas, si no está vacío), `carryOver` (si es `true`), `carryOverMaxDays`, `adjustmentDays` y `sortOrder` (si no son 0), `createdAt`, `updatedAt`. Un saldo de antes se escribe con sus tres claves de siempre. Los lectores v1 y v2 ignoran las claves nuevas. |
+| `noteAttachments` | Lista, solo si no está vacía: `id, calendarId, date, kind (photo/file/sketch), relativePath, mimeType, sizeBytes, sha256, displayName?, sortOrder, createdAt`. Los bytes **no** van en el JSON: van en el contenedor (abajo). |
+| `dayTasks` | Lista, solo si no está vacía: `id, calendarId, date, title, done, sortOrder, createdAt, updatedAt`. |
+| `shiftSwaps` | Lista, solo si no está vacía: `id, calendarId, date, colleague, direction (theyOwe/iOwe), givenShiftTypeIds?, receivedShiftTypeIds?, returnDate?, status (pending/returned), note?, createdAt, updatedAt, closedAt?`. |
+
+`validate` comprueba lo mismo que los CHECK de la base de datos y las reglas del dominio (`NoteAttachment.problem`,
+`DayTask.problem`, `ShiftSwap.problem`): ids únicos, el calendario existe, `closedAt` exactamente cuando está
+devuelto, el periodo de un saldo (los dos o ninguno, fin ≥ inicio), cuartos de 1 a 4, ajustes en cuartos, un saldo con campos de la v6 en unidades enteras y no negativo (uno con solo las tres claves de siempre conserva la regla antigua)... y, en los
+adjuntos, **id y ruta seguros** (`isSafeAttachmentId`, `isSafeAttachmentPath`): un archivo es una entrada no fiable y
+una ruta como `../cuadrante.sqlite` o `/data/...` podría escribir fuera de la carpeta de adjuntos; se rechaza el
+archivo entero (`CorruptBackup`). No rechaza nada que una copia anterior pudiera traer.
+
+**Una app anterior que lee una copia v6** (sin adjuntos): la lee como un v3, ignora las claves que no conoce y
+restaura todos los calendarios, tipos, rotaciones y **días**; pierde, como con el plus fijo, lo nuevo (lugar, pluses
+por hora, importes del día, tareas, cambios y los campos nuevos de los saldos). Una copia con importes por encima de
+999 999 en `hourlyRateCents` o `fixedPlusCents` (solo si P9 sube esos topes) la rechaza (`CorruptBackup`) sin tocar
+nada. Prueba: `schema_v6_backup_test.dart` («an app from before v6 still reads every day»), que quita del JSON las
+claves nuevas y comprueba que queda la misma copia.
+
+### Contenedor con adjuntos
+
+Los archivos adjuntos (fotos, PDF, dibujos) no caben en un JSON de 8 MiB ni deben pasar por base64. Una copia **con
+adjuntos** es un **ZIP** (`domain/backup_container.dart`), con la misma extensión `.turnly`:
+
+| Entrada | Contenido |
+|---|---|
+| `turnly-container.json` | `{"format":"turnly-container","version":1}` |
+| `backup.turnly` | Un `.turnly` normal (gzip), byte a byte el que se escribiría sin adjuntos. Su `noteAttachments` da tamaño y SHA-256 de cada archivo, así que la suma de control del JSON cubre también los archivos. |
+| `attachments/<id>` | Los bytes de cada adjunto, con el id como nombre (nunca la ruta del móvil). |
+
+- Todas las entradas van **sin comprimir** (*stored*): las fotos y los PDF apenas comprimen, y un lector que nunca
+  descomprime no puede recibir una bomba ZIP; el contenedor entero está acotado por su tamaño (**137 MiB**,
+  `BackupContainer.maxContainerBytes` = el almacén entero, 128 MiB, + un `backup.turnly` de hasta 8 MiB + 1 MiB de
+  estructura ZIP; 50 MiB por archivo, **2 000** archivos = `maxAttachmentFiles`, que el almacén también respeta, así que
+  una copia de todo lo que hay en el móvil siempre cabe). Entradas ordenadas y con fecha fija: los mismos datos dan los
+  mismos bytes.
+- **Valor final del tope (revisión de seguridad 2, M1): se mantienen 137 MiB.** No hizo falta bajar el tope nativo ni
+  `maxAttachmentStoreBytes` (128 MiB): los archivos entrantes y las copias leídas de la carpeta se vuelcan a disco por
+  trozos de 64 KiB (`cacheDir/incoming/`, Android) y Dart los lee desde allí, así que el montón de Java nunca guarda
+  más de un trozo. El lado Swift debe hacer lo mismo (ver `docs/mac-ios.md`, R4); si algún día solo pudiera devolver
+  `bytes`, el tope seguro para 3 copias en 256 MiB sería ~80 MiB, y habría que bajar a la vez `maxAttachmentStoreBytes`.
+- **Un solo tope de entrada y salida: `BackupCodec.maxImportBytes`** (= `maxContainerBytes`, 137 MiB). Lo aplican todas
+  las vías, en Dart y en nativo: selector de archivos (`readPickedBackupFile`), archivo recibido de otra app
+  (`readPending`, Android e iOS), carpeta (`write`/`read` del canal SAF y del plugin `turnly_folder_access`), iCloud
+  (`save`/`read`) y la lista de copias. Un `.turnly` **sin adjuntos** (gzip) sigue limitado a **8 MiB**
+  (`BackupCodec.maxFileBytes`): por encima de 8 MiB solo pasa un archivo que empiece por `PK\x03\x04`
+  (`BackupCodec.fitsImportLimit`); lo demás es «demasiado grande» sin llegar al decodificador. El nativo solo conoce el
+  tope grande (no mira el contenido); el Dart aplica el de 8 MiB al recibir los bytes.
+- **El nombre en disco es función del hash verificado.** `relativePath` de un adjunto tiene que ser
+  `<sha[0:2]>/<sha>` o ese mismo con el sufijo `-<n>` (n de 2 a 999) que `AttachmentStore.putCopy` añade a la segunda
+  fila con el mismo contenido (`isCanonicalAttachmentPath`, comprobado en `NoteAttachment.problem` y por tanto en
+  `BackupData.validate`, en la tabla y al guardar). Un contenedor manipulado no puede plantar el contenido X con el
+  nombre de Y. Por la misma razón, restaurar sobre un archivo que ya está en esa ruta con otros bytes lo **sustituye**
+  (es un archivo dañado: su nombre dice que es otra cosa); antes se negaba y bloqueaba la restauración.
+- `displayName` no admite caracteres de control ni de formato bidireccional (U+202A..202E, U+2066..2069, U+200E/F,
+  U+061C, U+2028/9).
+- Antes de leer ninguna entrada se revisa el directorio central: ningún nombre dos veces (el paquete `archive` se
+  quedaría con el primero sin avisar), solo entradas guardadas y sin cifrar, cada cabecera local donde dice el
+  directorio, **ningún par de entradas que compartan bytes** (miles de registros sobre el mismo bloque costarían miles
+  de SHA-256) y la suma de las entradas no mayor que el archivo; tampoco la suma de los `sizeBytes` de
+  `noteAttachments`. El CRC del ZIP **no** se comprueba (`archive` no lo hace): el archivo interior tiene su CRC de
+  gzip y su suma de control, y cada adjunto su SHA-256.
+- Rutas: `isSafeAttachmentPath` no deja `..` en ninguna parte y dos adjuntos no pueden tener rutas que solo difieran
+  en mayúsculas (`validate` compara en minúsculas; la tabla, `UNIQUE (relative_path COLLATE NOCASE)`).
+- **Escribir** (`BackupCodec.encode(..., attachmentFiles:)`): sin adjuntos sale el gzip de siempre; con adjuntos, el
+  contenedor. Si falta el archivo de un adjunto, o no coincide su tamaño o su SHA-256, la copia falla
+  (`CorruptBackup`): nunca sale una copia que parezca buena sin un archivo. Archivos sin fila → `ArgumentError`.
+  Quién lee y comprueba los archivos del almacén: **un solo trabajo en el isolate de fondo**
+  (`BackupRepository.encodeCurrent`: lee cada archivo, comprueba tamaño y SHA-256 y codifica; los bytes cruzan una vez),
+  nunca en el isolate de la interfaz. Al restaurar, los archivos que vienen de `BackupCodec.decode` ya están
+  comprobados (`restore(verified: true)`) y no se vuelven a hashear; los demás se comprueban en el runner.
+- **Leer** (`BackupCodec.decode`): si empieza por `PK\x03\x04` se abre el contenedor; sin manifiesto o con otro
+  formato → `NotACuadranteFile`; versión de contenedor mayor que la soportada → `NewerFormatVersion`; entradas
+  comprimidas, cifradas, repetidas, solapadas o cortadas, sin `backup.turnly` o con algo que no es un gzip dentro →
+  `CorruptBackup`. El `backup.turnly` se lee como cualquier archivo (pasos de abajo) y cada adjunto que lista tiene que
+  estar, con su tamaño y su SHA-256; una entrada que nadie lista se ignora. `BackupFile.attachmentFiles` devuelve los
+  bytes ya comprobados. Un `.turnly` gzip que lista adjuntos se rechaza (`CorruptBackup`): sus archivos faltarían.
+- `peekAppVersion` mira la versión dentro del contenedor **desde los primeros 512 bytes** (recorre las cabeceras locales
+  del ZIP, `BackupContainer.peekBackupHead`, hasta `backup.turnly` y mira el arranque del gzip): la lista de copias solo
+  lee ese trozo y antes las copias con adjuntos salían sin versión.
+- **Adjuntos cuyo archivo se ha perdido** (falta o no es el de su fila). Nunca bloquean la copia previa a restaurar, la
+  copia automática ni la de carpeta/iCloud: esas copias **se hacen sin ellos** y lo dicen con un aviso tipado
+  (`AttachmentsSkipped` en `backup_warnings.dart`: ids y fallo `missing`/`damaged`, nunca nombres de archivo), que sale
+  en `BackupService.lastWarnings` (copia automática), `BackupService.exportDetailed().warnings`,
+  `FolderPayload.warnings` / `FolderBackupOutcome.warnings` (carpeta, primer y segundo plano) y en lo que devuelve
+  `BackupRepository.restore` / `BackupService.restore` (copia previa). Las filas **no se tocan**: solo la acción
+  «reparar adjuntos» (`NoteAttachmentsService.repair`, sin pantalla todavía) borra las filas sin archivo (y, con
+  `removeDamaged`, las de archivo dañado; el archivo dañado queda hasta el siguiente barrido). La **exportación
+  manual** sigue siendo estricta: lanza `BrokenAttachments` (subtipo de `CorruptBackup`) con la lista de ids y fallos,
+  para que la pantalla diga cuáles. Restaurar un contenedor al que le falta un archivo sigue siendo `CorruptBackup`
+  (la copia está dañada).
+- **El almacén no recorre la carpeta en cada escritura**: mide una vez (archivos y bytes) y lleva la cuenta en cada
+  escritura, borrado y barrido; tope de bytes (128 MiB) y de archivos (2 000). El barrido del arranque
+  (`attachmentSweepProvider`) no borra archivos ni temporales de menos de un minuto (puede haber una escritura en curso:
+  el archivo entra antes que su fila); el barrido de después de restaurar borra todo lo que no use ninguna fila.
+- **Una app anterior** ve un ZIP y dice que no es un archivo de Turnly (`NotACuadranteFile`): no toca nada, pero no
+  puede restaurarlo. Es el precio de llevar los archivos; por eso una copia sin adjuntos nunca es un contenedor, y quien
+  necesite una app antigua puede sacar `backup.turnly` del ZIP (es un `.turnly` completo, sin los archivos).
+- **El almacén de archivos (P2, hecho):** los adjuntos viven en el almacén de la app (el `attachments` folder de
+  `Application Support`, `features/notes/data/attachment_store.dart`), cada archivo nombrado por el SHA-256 de sus
+  bytes. `BackupRepository` los lee para `exportBytes`, `backupNow` y la copia previa a restaurar (la exportación manual
+  falla de forma visible si falta un archivo o no es el que su fila dice; las copias automáticas y la previa lo omiten y
+  avisan: ver «Adjuntos cuyo archivo se ha perdido»). Al restaurar, los
+  archivos de `attachmentFiles` se escriben **antes** de la transacción (un disco que no los contiene detiene la
+  restauración antes de tocar nada) y, si la escritura de los archivos falla a mitad o si falla la transacción, los
+  archivos escritos se borran: no queda basura. La copia previa a restaurar también lleva los adjuntos (es un
+  contenedor), y al terminar se borran los archivos que ninguna fila apunte ya. «Probar restauración» funciona con
+  contenedores (reconstruye las filas en memoria; los archivos ya se comprobaron al leer).
 
 ### Qué entra y qué no (y por qué)
 
@@ -131,7 +264,13 @@ copia previa, huella, límites y dorado antiguo).
   de restaurar un cuadrante no es un primer arranque. Un `.turnly` abierto durante el primer uso espera a que
   termine (`BackupHost`).
 - **`appearance.language` tampoco entra**: el idioma de la app es de ese móvil, como `backup.cloud`. No se exporta,
-  un archivo que lo trae no lo cambia y restaurar deja el idioma como estaba (`isDeviceSetting`).
+  un archivo que lo trae no lo cambia y restaurar deja el idioma como estaba (`isDeviceSetting`). Lo mismo
+  `appearance.timeFormat` (reloj de 12 h o 24 h). `appearance.currency` **sí entra**: los importes de la copia solo
+  tienen sentido en su moneda; una copia anterior, sin la fila, se lee como euros.
+- **`calendarSync` (exportación continua) y `deviceEvents` (calendarios del móvil junto a los turnos) tampoco
+  entran**: los dos guardan identificadores de calendarios que reparte este móvil y no significan nada en otro, así
+  que son ajustes de dispositivo (`isDeviceSetting`). No se exportan, un archivo que los traiga no los cambia y
+  restaurar deja intactos los del móvil.
 - **Festivos `bundled` y `remote` no entran**: salen del paquete de la app o del paquete firmado de festivos y se
   vuelven a derivar de la comunidad y el municipio, que sí van en `settings`. Al restaurar no se tocan los que ya
   hay en el móvil; la función de festivos los recalcula desde los ajustes restaurados.
@@ -157,6 +296,8 @@ aborta con el error existente. Las copias anteriores siguen disponibles. La regr
 superior al antiguo límite de 4 MiB y con una compresión que superaría 100:1, y recupera íntegramente los datos.
 ### Lectura (`BackupCodec.decode`), en este orden
 
+0. Empieza por `PK\x03\x04` → es un contenedor con adjuntos: se abre como dice «Contenedor con adjuntos» y su
+   `backup.turnly` sigue por el paso 1.
 1. No empieza por `1f 8b` → `NotACuadranteFile`.
 2. Descomprime. Flujo roto, cortado o con el CRC-32 o la longitud del final (*trailer*) que no cuadran →
    `CorruptBackup`. (El descompresor de `dart:io` entrega en silencio el trozo leído de un archivo cortado, por eso se
@@ -378,13 +519,13 @@ aparece en Archivos › iCloud Drive › Turnly cuando `Info.plist` declara `NSU
 |---|---|---|
 | `status` | — | `{available: bool, reason: String?}`. `available` = `ubiquityIdentityToken != nil` **y** el contenedor existe. `reason` si no: `signed_out` (sin sesión de iCloud), `disabled` (iCloud Drive apagado para la app), `no_container`. **Nunca lanza**: responde `available: false` |
 | `list` | — | `[{id, name, sizeBytes, modifiedAtMs}]`, los ficheros normales de `Documents/`, **también los que aún no se han descargado** (un marcador `.nombre.icloud` se cuenta con su nombre real). `id == name` (el nombre del fichero). El Dart descarta lo que no case con `turnly-yyyyMMdd-HHmmss[-n].turnly` o el nombre antiguo `cuadrante-yyyyMMdd-HHmmss[-n].cuadrante` y **toma la fecha del nombre**, no de `modifiedAtMs` (que es solo informativo) |
-| `save` | `{name: String, bytes: Uint8List}` | `{id, name, sizeBytes, modifiedAtMs}`. Crea `Documents/` si falta y escribe con `NSFileCoordinator` (`.forReplacing`) **de forma atómica** (fichero temporal en el contenedor y `replaceItemAt`). El Dart ya ha elegido un nombre libre (añade `-2`, `-3`... si hay otra copia del mismo segundo); si aun así existe, se sustituye. Hasta 8 MB (`BackupCodec.maxFileBytes`) |
-| `read` | `{id: String}` | `bytes` (`FlutterStandardTypedData`). Antes de descargar o leer, comprobar el tamaño; si pasa de 8 MB responder `too_large` sin descargar. `sizeBytes` de `list` es el tamaño real también para ficheros no descargados. Si el fichero está en la nube, `startDownloadingUbiquitousItem` y espera a que esté `current`, con **plazo de 60 s** (`icloud_timeout`) |
+| `save` | `{name: String, bytes: Uint8List}` | `{id, name, sizeBytes, modifiedAtMs}`. Crea `Documents/` si falta y escribe con `NSFileCoordinator` (`.forReplacing`) **de forma atómica** (fichero temporal en el contenedor y `replaceItemAt`). El Dart ya ha elegido un nombre libre (añade `-2`, `-3`... si hay otra copia del mismo segundo); si aun así existe, se sustituye. Hasta 137 MiB (`BackupCodec.maxImportBytes`; el Dart ya ha comprobado 8 MiB para lo que no es un ZIP) |
+| `read` | `{id: String}` | `bytes` (`FlutterStandardTypedData`). Antes de descargar o leer, comprobar el tamaño; si pasa de 137 MiB (143 654 912 bytes, `maxImportBytes`) responder `too_large` sin descargar. `sizeBytes` de `list` es el tamaño real también para ficheros no descargados. Si el fichero está en la nube, `startDownloadingUbiquitousItem` y espera a que esté `current`, con **plazo de 60 s** (`icloud_timeout`) |
 | `delete` | `{id: String}` | `null`. Coordinado (`.forDeleting`). Un fichero que ya no está cuenta como borrado |
 
 - **Errores** (`FlutterError(code:)`, que llega como `PlatformException.code`): `icloud_unavailable` (en `list`,
   `save`, `read` y `delete` cuando `status` diría que no), `icloud_full` (sin espacio: `NSFileWriteOutOfSpaceError`),
-  `icloud_timeout`, `too_large` (`read` de un fichero de más de 8 MB, sin descargarlo; el Dart lo tipa como
+  `icloud_timeout`, `too_large` (`read` de un fichero de más de 137 MiB, sin descargarlo; el Dart lo tipa como
   `ICloudFailed('read: too large')`, y además lo comprueba él antes de llamar, con el `sizeBytes` del listado, y después,
   con los bytes recibidos). Cualquier otro código se trata como fallo genérico (`ICloudFailed`). `id` con `/` o `..`:
   código `bad_id`. El Dart también lo comprueba, pero el Swift **no se fía** (como el Kotlin no se fía de la URI).
@@ -505,6 +646,7 @@ vacía, y en Kotlin un flujo colgado acaba como `unreadable` al plazo sin bloque
   min). Si falla, lo dice y muestra el aviso anterior.
 - **Copias automáticas** (interruptor, **activado por defecto**; se guarda en `settings` como `backup.auto`; si
   falta o no se entiende, vale «activado»). Desactivarlas no borra nada. Activarlas pide una copia pronto.
+- **Copia automática en una carpeta** (solo Android): bloque propio, debajo del interruptor; ver el apartado 11.
 - **Exportar archivo.** Genera el `.turnly` de lo que hay ahora, lo **lee de vuelta** (`BackupCodec.decode`) antes
   de entregarlo —un archivo que no se puede volver a leer no sale— y abre la hoja de compartir del sistema
   (`share_plus`: WhatsApp, Drive, correo) con el nombre `turnly-AAAA-MM-DD-HHmmss.turnly`. El archivo temporal va a la
@@ -523,7 +665,8 @@ vacía, y en Kotlin un flujo colgado acaba como `unreadable` al plazo sin bloque
   `docs/mac-ios.md`, 4.3.
 - **Importar archivo.** Selector de archivos (`file_selector`; en Android sin filtro de tipo, porque las extensiones
   `.turnly` y `.cuadrante` no tienen tipo MIME y un filtro podría esconder justo el archivo; el contenido se valida
-  igual). Un archivo de más de 8 MB se rechaza sin leerlo entero. En escritorio el filtro «Turnly» acepta ambas extensiones;
+  igual). Un archivo se rechaza sin leerlo entero si pasa de 8 MiB y no es un contenedor ZIP, o si pasa de 137 MiB
+  (`BackupCodec.maxImportBytes`). En escritorio el filtro «Turnly» acepta ambas extensiones;
   en iOS se mantiene `public.data` para que también se puedan seleccionar los archivos antiguos.
 - **Probar restauración.** `BackupService.verifyLatest` sobre la copia más nueva de la app. Resultados:
   «La copia está completa: 730 días comprobados» (y si es idéntica a lo que hay ahora, o anterior —con el primer día que
@@ -557,7 +700,7 @@ la lista:
    | `NewerFormatVersion` (R6) | «Este archivo es de una versión más nueva de Turnly: actualiza la app.» |
    | `CorruptBackup` (R7) | «El archivo está dañado o incompleto y no se puede usar.» |
    | `NotACuadranteFile` | «Este archivo no es una copia de Turnly.» |
-   | más de 8 MB | «Este archivo es demasiado grande para ser una copia de Turnly.» |
+   | más de 8 MiB sin ser un contenedor, o más de 137 MiB | «Este archivo es demasiado grande para ser una copia de Turnly.» |
    | no se pudo leer | «No se ha podido leer el archivo.» |
 
 3. Si sirve: de dónde viene (y, si el móvil lo dice, **qué app lo ha enviado**: «Enviado desde WhatsApp
@@ -667,8 +810,18 @@ archivo que no es nuestro acaba en «Este archivo no es una copia de Turnly» si
   encendido rompería filtros de pantalla y burbujas de otras apps.
 
 **Límites de seguridad**: solo `content://` (un `file://` dejaría que otra app nos apunte a nuestros archivos privados);
-lectura con el permiso temporal que concede el que envía, en trozos de 64 KB y **tope de 8 MB** (el mismo que
-`BackupCodec.maxFileBytes`: más grande se rechaza sin leer el resto); un hilo de lectura; todo fallo (permiso, proveedor
+lectura con el permiso temporal que concede el que envía, en trozos de 64 KB y **tope de 137 MiB** (el mismo que
+`BackupCodec.maxImportBytes`, una copia con adjuntos; Dart rechaza después lo que pase de 8 MiB sin ser un ZIP: más grande
+se rechaza sin leer el resto); **volcado a disco, nunca a un `ByteArray`** (revisión de seguridad 2, M1: con 256 MiB de
+montón, un `ByteArray` de 130 MiB copiado por el canal, Dart y el isolate lanza `OutOfMemoryError` y la app se cierra;
+con «abrir con Turnly» además quedaba en bucle al arrancar): `readPending` escribe el archivo en
+`cacheDir/incoming/incoming-<único>.turnly` (`IncomingFiles`, `DeadlineReader.start(into:)`) y responde
+`{path, sender}`; Dart lee del disco con los mismos topes y **borra el archivo siempre**, también si falla
+(`readAndDeleteIncomingTempFile`: solo rutas absolutas `incoming/*.turnly`, nunca otra). Un archivo que no se entrega
+(plazo, error, tope) se borra en nativo; los restos de un cierre brusco, de más de una hora, se barren al arrancar. La
+URI se **olvida antes de leer** y, además, se apunta en preferencias mientras dura la lectura: si el proceso muere a
+medias, la misma URI no se vuelve a tomar al arrancar (sin bucle). `bytes` sigue aceptándose en la respuesta (otro lado
+nativo, pruebas); un hilo de lectura; todo fallo (permiso, proveedor
 caído, sin red para un archivo de Drive) sale como «No se ha podido leer el archivo»; lo que se lee se valida igual que
 cualquier archivo (`BackupCodec.decode`: gzip, tope descomprimido de 4 MB y de 100:1, versión, suma de control,
 integridad) y **en un isolate aparte**. El canal solo devuelve bytes y el estado de la copia del sistema; no hay nada
@@ -702,7 +855,7 @@ Mac** que `home_widget` y este delegado conviven: `home_widget` solo devuelve `t
 | Método (Dart → Swift) | Respuesta |
 |---|---|
 | `hasPending` | `Bool`: hay una URL recordada que nadie ha tomado. Instantáneo, **no lee nada** |
-| `readPending` | `nil` si no hay; `{bytes: FlutterStandardTypedData}` (sin `sender`: iOS no dice quién lo envió); `{error: "tooLarge"}` si pasa de 8 MB (`BackupCodec.maxFileBytes`, se mira el tamaño **antes** de leer); `{error: "unreadable"}` en cualquier otro fallo o pasados **60 s**. Se lee **una sola vez**: después ya no hay pendiente |
+| `readPending` | `nil` si no hay; `{path: String}` o `{bytes: FlutterStandardTypedData}` (sin `sender`: iOS no dice quién lo envió). **Preferible `path`** (M1 de la revisión de seguridad 2): copiar el archivo por trozos a `<sandbox>/Library/Caches/incoming/incoming-<único>.turnly` (el directorio se llama `incoming` y el nombre acaba en `.turnly`; el Dart rechaza y no toca cualquier otra ruta) en vez de hacer `Data(contentsOf:)` de 137 MiB; el Dart lo lee con los mismos topes y lo borra siempre. Quien no pueda, devuelve `bytes` como hasta ahora (el Dart acepta las dos formas); `{error: "tooLarge"}` si pasa de **137 MiB = 143 654 912 bytes** (`BackupCodec.maxImportBytes`, se mira el tamaño **antes** de leer; antes eran 8 MB y una copia con fotos no se podía abrir); `{error: "unreadable"}` en cualquier otro fallo o pasados **60 s**. Se lee **una sola vez**: después ya no hay pendiente |
 | `discardPending` | olvida la URL sin leerla |
 | `setPreviewProtection`, `systemBackupState` | **no se implementan**: devolver `FlutterMethodNotImplemented` (llega como `MissingPluginException`, que el Dart ya trata como «nada que hacer») |
 
@@ -713,7 +866,7 @@ Mac** que `home_widget` y este delegado conviven: `home_widget` solo devuelve `t
 Reglas de seguridad, las mismas que en Android: al llegar la URL **solo se recuerda** (más
 `startAccessingSecurityScopedResource()`, que se mantiene hasta leer o descartar; una URL nueva sustituye a la
 anterior y suelta el acceso de la vieja, **salvo si la vieja se está leyendo**: ver abajo); solo URLs que entrega el sistema en esas funciones, **nunca una ruta que
-mande el Dart**; la lectura va en una cola propia, con `NSFileCoordinator` (lectura) y el plazo de 60 s; tope de 8 MB;
+mande el Dart**; la lectura va en una cola propia, con `NSFileCoordinator` (lectura) y el plazo de 60 s; tope de 137 MiB (`maxImportBytes`);
 al terminar (o descartar) se suelta el acceso y, si la URL está dentro de `Documents/Inbox` del sandbox, se borra el
 fichero. Lo leído se valida como cualquier archivo en Dart (`BackupCodec.decode`, en un isolate) y **nunca se restaura
 sin que el usuario confirme** en la vista previa. Prueba: matriz R4 de `docs/mac-ios.md` (AirDrop, WhatsApp, Correo,
@@ -721,7 +874,7 @@ Archivos), con la app cerrada y abierta.
 
 - **`Documents/Inbox` (M2).** Al arrancar, y cada vez que se olvida o lee una URL, el Swift vacía `Documents/Inbox` entera (la app no la usa para nada más). Comprueba la ruta con `standardizedFileURL.resolvingSymlinksInPath()` y borra solo si el prefijo es exactamente `<sandbox>/Documents/Inbox/`; nunca borra fuera de ahí (con apertura en el sitio, la URL es el original del usuario).
 - **Una URL nueva mientras `readPending` lee (L3).** La lectura en curso termina (o falla con `unreadable`) con su propio `stopAccessing` al acabar; la nueva se recuerda aparte. Nunca se suelta el acceso de una URL que se está leyendo.
-- **Tope de 8 MB, también en Dart (M1).** `MethodChannelBackupChannel.takeIncomingFile` convierte unos bytes de más de `BackupCodec.maxFileBytes` en `IncomingFileProblem.tooLarge` aunque el Swift los haya dejado pasar: el Swift no es la única barrera.
+- **Tope también en Dart (M1).** `MethodChannelBackupChannel.takeIncomingFile` convierte unos bytes que no caben (`BackupCodec.fitsImportLimit`: 8 MiB si no son un ZIP, `maxImportBytes` si lo son) en `IncomingFileProblem.tooLarge` aunque el Swift los haya dejado pasar: el Swift no es la única barrera.
 
 ## 10. Copia del sistema de Android (Auto Backup)
 
@@ -799,3 +952,217 @@ y se restaura igual que arriba. Para comprobar que las reglas XML se leen y qué
 `backupnow`. Móvil a móvil (`<device-transfer>`): se prueba con el asistente de configuración de un móvil nuevo (cable
 o wifi); `bmgr` no lo ejercita. Probar en Pixel → Samsung y Samsung → Xiaomi como pide la matriz (A1–A4), y que el
 archivo `.turnly` exportado se importa en todos.
+
+## 11. Copia automática en una carpeta (P10)
+
+La pérdida de datos es la queja nº 1 del sector y LRHSoft cobra la copia automática en Drive. Turnly la da gratis y sin
+cuentas: la persona elige **una carpeta** con el selector del sistema (Drive, Dropbox, OneDrive, Nextcloud o una carpeta
+del móvil aparecen ahí como proveedores del sistema) y la app deja en ella una copia `.turnly` al día, rotando las 10
+últimas. Turnly no ve ninguna cuenta: el permiso es el que da el selector a esa carpeta.
+
+**Solo Android por ahora.** En iOS el bloque no se muestra (`folderBackupSupportedProvider`) y la llamada al canal
+responde `unsupported` sin hacer nada: la réplica en iCloud Drive (apartado 4) se hace en el Mac.
+
+| Pieza | Fichero | Qué hace |
+|---|---|---|
+| Reglas | `domain/folder_backup.dart` | nombres propios, rotación, `FolderBackupPolicy` (cuándo toca), `FolderBackupState`, `FolderProblem` |
+| Canal | `data/folder_backup_channel.dart` | `FolderBackupPlatform` y su versión sobre `app.cuadrante/folder_backup` |
+| Estado | `data/folder_backup_state_store.dart` | `folder_backup/state.json` en Application Support (escritura atómica con candado) |
+| Candado entre isolates | `core/background/isolate_mutex.dart` | `IsolateMutex` sobre `IsolateNameServer`: una pasada a la vez entre la app y la tarea |
+| Motor | `application/folder_backup_engine.dart` | una copia: comprobar carpeta, hacer los bytes, escribir, leer de vuelta, rotar, anotar |
+| Tarea | `data/folder_backup_task.dart` | registro en WorkManager y la pasada en segundo plano (base de datos solo lectura) |
+| Proveedores | `application/folder_backup_providers.dart` | `FolderBackupController` (pantalla) y `folderBackupRunnerProvider` (lo mantiene vivo `BackupHost`) |
+| Pantalla | `presentation/folder_backup_section.dart` | el bloque «Copia automática en una carpeta», enganchado en `backup_screen.dart` con una línea |
+| Nativo | `packages/turnly_folder_access/` | plugin local de Android (Kotlin, Storage Access Framework) |
+
+### Por qué un plugin local y no código en `MainActivity`
+
+La copia diaria la hace WorkManager **con la app cerrada**, en un motor de Flutter que crea `workmanager` y que solo
+registra los plugins de `pubspec.yaml` (`GeneratedPluginRegistrant`). Un canal de `MainActivity` (como
+`app.cuadrante/backup`) no existe en ese motor. Por eso el código nativo va en un paquete propio con ruta local
+(`app/packages/turnly_folder_access/`, dependencia `path:` en `pubspec.yaml`), sin Dart: un único fichero Kotlin
+(`FolderAccessPlugin.kt`) que se registra en los dos motores. El selector necesita una actividad (`ActivityAware`); el
+resto de métodos funcionan sin ella.
+
+### Contrato del canal `app.cuadrante/folder_backup`
+
+| Método | Argumentos | Respuesta |
+|---|---|---|
+| `pick` | — | `{uri, name}` o `null` (atrás). `ACTION_OPEN_DOCUMENT_TREE`; con la carpeta elegida, `takePersistableUriPermission` de lectura y escritura (`not_persistable` si el proveedor no lo deja) |
+| `check` | `{uri}` | `{state, name}`, `state` = `ok`, `revoked` (sin permiso persistido), `missing` (borrada, movida o sin proveedor), `unwritable` (no admite archivos nuevos: `FLAG_DIR_SUPPORTS_CREATE`). **Nunca falla** |
+| `list` | `{uri}` | `[{id, name, sizeBytes, modifiedAtMs}]`, los archivos que están directamente en la carpeta (sin subcarpetas). `id` es el id de documento del proveedor, opaco |
+| `write` | `{uri, name, bytes}` | `{id, name, sizeBytes}`. Solo nombres propios (abajo) y hasta 137 MiB (`MAX_BYTES`; 8 MiB si el Dart ve que no es un contenedor). `createDocument`; si el proveedor le da otro nombre («… (1).turnly») lo borra y falla (`renamed`) antes de escribir; si la escritura falla a medias, borra lo creado |
+| `read` | `{uri, id}` | La **ruta** (`String`) de un archivo `cacheDir/incoming/folder-<único>.turnly` donde se ha volcado la copia en trozos de 64 KiB, sin `ByteArray` entero (M1 de la revisión de seguridad 2); Dart lo lee con los mismos topes y lo borra (`readAndDeleteIncomingTempFile`). Solo un hijo directo de la carpeta (se busca el `id` en `list`) **con nombre propio**, hasta 137 MiB (se corta al pasar y se borra lo escrito). `OutOfMemoryError` en cualquier llamada se responde `too_large`, nunca cierra la app. `write` sigue recibiendo `bytes` (un solo `ByteArray`, ya sin copias de lectura) |
+| `delete` | `{uri, id}` | `null`. Solo un hijo directo **con nombre propio**; uno que ya no está cuenta como borrado |
+| `release` | `{uri}` | `null`. Devuelve el permiso persistido (al cambiar de carpeta o dejar de copiar) |
+
+Errores (`PlatformException.code`): `revoked`, `missing`, `unwritable`, `no_space` (ENOSPC en la cadena de causas),
+`too_large`, `bad_name`, `renamed`, `bad_args`, `busy`, `no_activity`, `unavailable`, `not_persistable`, `failed`. El Dart los
+convierte en `FolderProblem`; sin plugin (`MissingPluginException`: iOS, pruebas) es `unsupported`. **El Kotlin no se
+fía del Dart**: toda URI tiene que ser `content://`, de árbol (`isTreeUri`) y con permiso persistido de lectura y
+escritura; los ids se buscan entre los hijos de la carpeta; nombres y tamaños se comprueban otra vez. Todo el trabajo
+de archivos va en un hilo propio; las respuestas, en el principal.
+
+**Nombres propios:** `turnly-auto-AAAAMMDD-HHmmss[-n].turnly` (hora local). Distintos de las exportaciones
+(`turnly-AAAA-MM-DD-HHmmss.turnly`) y de las copias del móvil (`turnly-AAAAMMDD-HHmmss.turnly`): la rotación **solo
+cuenta, lee y borra** estos; los archivos de la persona en esa carpeta no se tocan nunca. Un archivo que el proveedor
+renombre al crearlo («… (1).turnly») se borra en el acto y la copia falla (en Kotlin, y otra vez en Dart), así que nunca
+queda una copia fuera de la rotación. Los nombres con una fecha **más de un día en el futuro** (otro reloj, un archivo
+puesto a propósito) no cuentan ni se borran en la rotación y no los elige «Probar».
+
+### Una copia (`FolderBackupEngine.run`)
+
+0. **Candado de la pasada** (`FolderRunLock`, abajo): sin él, la diaria y la de cambios se saltan (`skipped`); la
+   manual espera hasta 2 minutos.
+1. Sin carpeta, o si no toca todavía (abajo): nada.
+2. **Se comprueba la carpeta primero.** Permiso revocado, carpeta borrada o de solo lectura → se anota el problema.
+3. Se hacen los bytes: **el mismo archivo que «Exportar archivo»** (en un isolate, y leído de vuelta antes de salir).
+4. Si los datos son los mismos que la última copia (misma suma de control de `data`) y esa copia sigue en la carpeta
+   **igual** (mismo id de documento, mismo nombre y mismo tamaño cuando el proveedor lo da), no
+   se escribe nada: se anota «comprobada» (`lastCheckedAt`). Así las 10 copias son **10 versiones distintas**, no diez
+   días iguales que empujan fuera la buena. «Copiar ahora» escribe siempre.
+5. Se escribe un archivo nuevo con un nombre libre, **se lee de vuelta y se compara byte a byte**; si no coincide, se
+   borra y la copia falla. Una copia mala nunca parece buena.
+6. Solo entonces se borran las propias más viejas por encima de 10 (la recién escrita, nunca). Un borrado que falla se
+   deja para la siguiente; no hace fallar la copia.
+7. Se anota el resultado (con id y tamaño del archivo escrito) en `folder_backup/state.json`. Si mientras tanto la
+   persona ha elegido otra carpeta, el resultado de la vieja se descarta.
+
+### Concurrencia: app y tarea en segundo plano
+
+WorkManager lanza la tarea en el **mismo proceso** que la app si la app está viva, en otro isolate. Tres capas:
+
+1. **Relé con respuesta inmediata.** La tarea pregunta a la app por `AlarmForegroundRelay` (puerto
+   `es.cuadrante.app/backup.folder`, `answerFirst: true`): la app contesta «la hago yo» **al momento** y copia después,
+   así que la tarea nunca agota su espera (60 s) por una copia lenta ni copia en paralelo. Arreglo general del relé
+   (también para alarmas): si la tarea se rinde y borra el registro del nombre mientras la app trabaja, la app vuelve a
+   registrarse en cuanto lo nota (después de cada respuesta, en `listen` y en `attach`); nunca le quita el nombre a
+   otro relé que se haya registrado después.
+2. **Candado de la pasada entera** (`IsolateMutex`, nombre `es.cuadrante.app/backup.folder.lock`): un
+   `registerPortWithName` del `IsolateNameServer` del proceso solo funciona si nadie tiene el nombre, que es un
+   test-and-set atómico entre isolates. Los candados de archivo no sirven aquí (en Android son del proceso: dos isolates
+   del mismo proceso los tendrían a la vez). El que lo tiene responde a un ping; un dueño que no contesta en 2 s (su
+   isolate murió con él) se sustituye. Cubren el candado: cada pasada, y elegir carpeta y dejar de copiar
+   (`FolderBackupEngine.locked`), es decir, **todo lo que escribe el estado**. Si la tarea no lo obtiene, se salta sin
+   anotar nada.
+3. **El fichero de estado**, con su propio candado (abajo), por si dos procesos llegaran a escribirlo.
+
+Además, las pasadas de un mismo motor van en fila (`_exclusive`): «Copiar ahora» durante una copia tras cambios espera a
+que termine.
+
+### Cuándo se copia
+
+| Disparo | Cuándo | Separación mínima |
+|---|---|---|
+| Diario | tarea de WorkManager `es.cuadrante.app.folderBackup`, cada 24 h (la primera, 1 h después de registrarla), con batería no baja, sin requisito de red, política `update`, reintento exponencial desde 1 h | 20 h desde la última copia o comprobación |
+| Tras cambios | con la app abierta, cuando termina bien una copia automática del móvil (apartado 8) | 6 h |
+| Manual | «Copiar ahora en la carpeta» y al elegir carpeta | ninguna |
+
+Una fecha anterior «en el futuro» (reloj atrasado) no cuenta: la copia toca. La tarea diaria se registra al elegir la
+carpeta y **otra vez en cada arranque** con carpeta elegida (`folderBackupRunnerProvider`), porque tras una
+actualización hay que volver a guardar el punto de entrada; se cancela al dejar de copiar.
+
+**En segundo plano** (`runFolderBackupTask`): si la app está viva en el mismo proceso, le pasa el trabajo (relé de
+arriba). Si no, toma el candado de la pasada (si lo tiene la app, se salta) y abre la base de datos **solo lectura**, sin migraciones y solo cuando la copia ya toca;
+si no hay base o es de otra versión del esquema (una actualización que aún no se ha abierto), se salta sin anotar
+fallo. A WorkManager solo se le pide reintento (`false`) en un fallo pasajero (`failed`); un permiso revocado o una
+carpeta borrada esperan al día siguiente (la pantalla ya lo dice).
+
+### Un único `callbackDispatcher` para todo WorkManager
+
+WorkManager guarda **un solo** punto de entrada por app: el del último `initialize`. Si la renovación de alarmas y la
+copia en carpeta inicializaran con funciones distintas, la segunda dejaría sin entrada a la primera. Por eso hay uno
+común, `backgroundTaskDispatcher` (`app/lib/core/background/background_tasks.dart`), que reparte por nombre de tarea:
+
+```dart
+Map<String, BackgroundTask> appBackgroundTasks() => {
+  alarmRenewalTaskName: runAlarmRenewalTask,   // es.cuadrante.app.alarmRenewal
+  folderBackupTaskName: runFolderBackupTask,   // es.cuadrante.app.folderBackup
+};
+```
+
+Reglas para una tarea nueva (P5 la siguiente): nombre único propio, una línea en `appBackgroundTasks`, e
+`initialize(backgroundTaskDispatcher)` en su registrador. Un nombre desconocido (tarea de una versión vieja) se da por
+hecho (`true`); una tarea que lanza, `false` (reintento). `alarmRenewalDispatcher` se queda como alias del común por si
+WorkManager aún guarda el punto de entrada de una versión anterior. Probado en `folder_backup_task_test.dart`.
+
+### Estado y pantalla
+
+`folder_backup/state.json` (Application Support) guarda la carpeta (URI de árbol y nombre), la última copia (fecha,
+nombre, id de documento, tamaño y suma de control), la última comprobación y el último problema con su fecha. **No va
+en la base de datos**: no viaja en ningún `.turnly` (un archivo restaurado no puede elegir carpeta por la persona) y la
+tarea en segundo plano lo escribe sin abrir la base para escribir.
+
+- **Escritura:** a un temporal con nombre propio (`state.json.<pid>.<aleatorio>.tmp`) y renombrado encima (atómico; dos
+  escritores nunca comparten temporal), bajo `RandomAccessFile.lock(FileLock.blockingExclusive)` sobre
+  `folder_backup/state.lock` (entre procesos) y en fila dentro del isolate. `update` relee bajo el candado justo antes
+  de escribir.
+- **Dañado:** si el fichero existe pero no se puede leer, `load()` da un estado «dañado» (nunca uno vacío en silencio):
+  el bloque lo dice («No hemos podido leer los ajustes de la copia en carpeta. Elige la carpeta otra vez.») y elegir
+  carpeta escribe uno bueno. El permiso de la carpeta anterior, si lo había, se queda hasta que Android lo libere.
+- **Fuera de la copia del sistema:** la carpeta entera `folder_backup/` está excluida en `backup_rules.xml` y en
+  `data_extraction_rules.xml` (`<exclude domain="file" path="folder_backup/"/>`). El permiso de la carpeta no viaja a
+  otro móvil, así que tampoco su registro: en un móvil restaurado el bloque sale sin carpeta.
+
+El bloque **«Copia automática en una carpeta»** (`FolderBackupSection`, debajo del interruptor de copias automáticas):
+
+- **Sin carpeta:** qué hace (una al día, las 10 últimas, Drive, Dropbox, OneDrive o una carpeta del dispositivo), qué
+  lleva (todo el cuadrante, ausencias y bajas incluidas, y que queda donde esté la carpeta) y **Elegir carpeta**.
+- **Con carpeta:** su nombre (tocar para elegir otra), «Última copia en la carpeta: hoy a las 03:10» o «Todavía no hay
+  ninguna copia», cuándo se copia, **Copiar ahora en la carpeta**, **Probar la copia de la carpeta** (cuando ya hay una)
+  y **Dejar de copiar en esta carpeta** (devuelve el permiso y cancela la tarea; las copias que ya están no se borran).
+- **Aviso rojo, nunca un fallo silencioso:** al abrir la pantalla se pregunta a la carpeta (`check`), y manda lo que
+  diga ahora (permiso revocado, carpeta borrada) sobre lo anotado del último intento (sin espacio, fallo). Cada problema
+  tiene su texto y su arreglo: «Elegir carpeta otra vez» para `revoked`, `missing`, `unwritable` y el estado dañado;
+  «Reintentar» para `noSpace` y `failed`, con la fecha del último intento.
+- **Probar la copia de la carpeta:** lee **la copia que escribió la app la última vez** (por su id de documento; si ya
+  no está, la propia más nueva por nombre, sin las fechadas en el futuro), la decodifica en un isolate (la carpeta está fuera
+  de la app: cualquiera con acceso a ella puede haber cambiado el archivo) y la reconstruye en una base en memoria con
+  `verifyRestore` (`BackupService.verifyBytes`). No escribe nada. El resultado sale con la misma tarjeta que «Probar
+  restauración». **Restaurar** desde la carpeta no tiene botón propio: «Importar archivo» abre el selector del sistema
+  en esa carpeta y pasa por la vista previa y la copia previa como cualquier archivo externo.
+
+### Salud (pregunta 13)
+
+La respuesta del usuario (26-oct) es **dejarlo como está**: las ausencias de salud viajan en las copias `.turnly`. La
+copia en carpeta es exactamente el mismo archivo que la exportación manual (todo, bajas incluidas) y el texto del bloque
+lo dice antes de elegir carpeta. Es una elección expresa de la persona, apagada hasta que elige carpeta, y el destino
+lo decide ella (una nube de terceros, si elige una carpeta de Drive o Dropbox).
+
+### Riesgos (para la revisión de seguridad)
+
+- **Los datos salen del móvil a donde diga la persona.** Una carpeta de Drive o Dropbox es una nube de terceros, sin
+  cifrado de extremo a extremo de Turnly. Mitigación: apagado por defecto, texto explícito (bajas incluidas), elección
+  en el selector del sistema; revocable desde la app y desde Ajustes de Android.
+- **La carpeta es externa.** Otras apps o personas con acceso pueden dejar o cambiar archivos. Mitigación: la rotación
+  solo toca nombres propios e hijos directos; leer tiene tope de 137 MiB (8 MiB si no es un contenedor); «Probar» decodifica en un isolate con los
+  límites del códec; nada se restaura sin la vista previa y la copia previa. Un archivo cambiado por otro con nombre
+  propio podría borrarse en la rotación (es un `.turnly` nuestro por nombre): aceptable, nunca se toca nada más. Uno
+  con fecha en el futuro no puede empujar fuera las copias reales (no cuenta) ni pasar por la última en «Probar».
+- **URI persistida.** Vive en `folder_backup/state.json`, excluido de la copia del sistema: no sale del móvil.
+- **Permisos persistidos limitados** (128 o 512 por app según la versión): se devuelve el de la carpeta anterior al
+  cambiar y al dejar de copiar.
+- **Proveedores que no admiten carpetas.** El selector de carpetas solo enseña los proveedores que admiten
+  `ACTION_OPEN_DOCUMENT_TREE`. Carpetas locales, tarjeta SD y Nextcloud sí; **Google Drive y Dropbox pueden no salir o
+  salir sin poder elegir**, según la versión de su app: está **por verificar en un móvil real**. Si no salen, la
+  alternativa es una carpeta local que sincronice otra app (FolderSync, Autosync) o un modo «un solo archivo» con
+  `ACTION_CREATE_DOCUMENT` y permiso persistido sobre ese archivo (sin rotación), que no está hecho.
+- **Concurrencia app/tarea.** Relé con respuesta inmediata, candado de la pasada entre isolates y candado del fichero de
+  estado (apartado «Concurrencia»). Queda una ventana teórica entre procesos distintos (la app y un proceso de
+  WorkManager que no sea el suyo), que Android no usa con la configuración por defecto; el candado del fichero evita que
+  el estado se corrompa y la peor consecuencia sería una copia de más.
+- **El aviso de fallo solo se ve en la pantalla de copia.** No hay notificación cuando la copia en segundo plano falla
+  con la app cerrada (inicializar `flutter_local_notifications` en ese motor podría interferir con las acciones de las
+  alarmas). Queda como mejora: un aviso en Ajustes o una notificación propia.
+
+### Pruebas
+
+`folder_backup_domain_test.dart` (nombres, rotación con fechas en el futuro, política, estado),
+`folder_backup_concurrency_test.dart` (fichero de estado dañado, actualizaciones a la vez sin pérdidas ni temporales,
+`IsolateMutex`, relé que contesta antes y que se vuelve a registrar), `folder_backup_engine_test.dart` (copia,
+rotación a 10 sin tocar ajenos, «misma información» con id y tamaño, archivo renombrado, candado de la pasada, tiempos, sin permiso, carpeta borrada, solo lectura, sin espacio,
+lectura de vuelta mala, error inesperado, carpeta cambiada a mitad), `folder_backup_channel_test.dart` (códigos de
+error, sin plugin, validaciones de ida y vuelta), `folder_backup_task_test.dart` (dispatcher compartido, registro en
+WorkManager, pasada en segundo plano con base real solo lectura) y `folder_backup_section_test.dart` (el bloque entero
+dentro de la pantalla de copia). El Kotlin se prueba en un móvil real (matriz: carpeta local, tarjeta, Drive, Dropbox,
+revocar en Ajustes de Android, borrar la carpeta, llenar el almacenamiento).

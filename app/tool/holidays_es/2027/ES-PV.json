@@ -1,0 +1,15 @@
+{
+"region":"ES-PV",
+"year":2027,
+"kind":"labour",
+"sources":{
+"s1":{"url":"https://egoitza.gipuzkoa.eus/gao-bog/castell/bog/2026/10/01/c2606250.pdf","ref":"BOG núm. 187 (número según una fuente secundaria), 1.10.2026 — Resolución de 21 de septiembre de 2026 del delegado territorial de Trabajo y Seguridad Social de Gipuzkoa, por la que se aprueba el calendario de las fiestas locales de Gipuzkoa para 2027","published":"2026-10-01","retrieved":"2026-10-31"},
+"s2":{"url":"https://www.bizkaia.eus/lehendakaritza/Bao_bob/2026/09/BOB-2026a181.pdf","ref":"BOB núm. 181, 22.9.2026, BOB-2026a181-(III-145), pp. 220-224 — Resolución de 12 de septiembre de 2026 de la delegada territorial de Trabajo y Seguridad Social de Bizkaia, del Departamento de Economía, Trabajo y Empleo del Gobierno Vasco, por la que se establece el Calendario de Fiestas Locales del Territorio Histórico de Bizkaia para el año 2027","published":"2026-09-22","retrieved":"2026-10-31"},
+"s3":{"url":"https://www.araba.eus/BOTHA/Boletines/2026/116/2026_116_02851_C.pdf","ref":"BOTHA núm. 116, 9.10.2026 (anuncio 2026-02851) — Resolución de 5 de octubre de 2026 del delegado territorial de Álava del Departamento de Economía, Trabajo y Empleo del Gobierno Vasco, que aprueba la determinación de las fiestas locales de Álava para el año 2027","published":"2026-10-09","retrieved":"2026-10-31"}
+},
+"municipalities":{
+"01059":{"name":"Vitoria-Gasteiz","days":["2027-04-28","2027-08-05"],"source":"s3"},
+"20069":{"name":"Donostia/San Sebastián","days":["2027-01-20","2027-07-31"],"source":"s1"},
+"48020":{"name":"Bilbao","days":["2027-07-31","2027-08-27"],"source":"s2"}
+}
+}

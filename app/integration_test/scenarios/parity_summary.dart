@@ -52,8 +52,9 @@ Future<void> _summaryRange(QaContext qa) async {
   final app = await QaApp.open(qa);
 
   await t.tapAndSettle(_k('open-summary'), reason: 'Resumen del mes');
+  // October holds today: 96 h worked before the 19th (and 64 h planned).
   final monthHours = _text(t, 'summary-hours');
-  expect(monthHours, '160 h');
+  expect(monthHours, '96 h');
 
   // «Fechas…» starts on the month on screen and gives the same figures.
   await t.tapAndSettle(_k('summary-mode-range'));

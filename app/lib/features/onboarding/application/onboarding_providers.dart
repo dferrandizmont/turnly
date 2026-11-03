@@ -1,13 +1,15 @@
 import 'dart:async';
 
+import 'package:flutter/widgets.dart' show WidgetsBinding;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/database/database_provider.dart';
+import '../../../core/providers.dart';
 import '../../holidays/application/holidays_provider.dart';
 import '../../holidays/data/holiday_bundle_format.dart';
-import '../../holidays/domain/holiday.dart';
 import '../../holidays/domain/holiday_place.dart';
 import '../../holidays/domain/spanish_regions.dart';
+import '../../schedule/domain/civil_date.dart';
 import '../data/onboarding_repository.dart';
 
 final onboardingRepositoryProvider = Provider<OnboardingRepository>(
@@ -24,22 +26,54 @@ final municipalityIndexProvider = FutureProvider<MunicipalityIndex?>(
   (ref) => ref.watch(holidayBundleLoaderProvider).loadMunicipalities(),
 );
 
-/// Whether the bundle has local holidays for the municipality [code] (INE),
-/// so step 2 can tell the person when they have to add them themselves.
-final localHolidaysAvailableProvider = FutureProvider.autoDispose
-    .family<bool, String>((ref, code) async {
+/// The phone's region (the country of its first preferred locale that has
+/// one; `PlatformDispatcher.locale` is the first of them on a phone), from
+/// which a fresh install proposes the country of its holidays. `null` when
+/// the phone says nothing.
+final systemCountryCodeProvider = Provider<String?>((ref) {
+  try {
+    final dispatcher = WidgetsBinding.instance.platformDispatcher;
+    for (final locale in [...dispatcher.locales, dispatcher.locale]) {
+      final code = locale.countryCode;
+      if (code != null && code.isNotEmpty) return code;
+    }
+  } catch (_) {
+    // No binding (plain unit tests): nothing to propose from.
+  }
+  return null;
+});
+
+/// The years whose local holidays matter in the first-use flow: this year,
+/// and the next one too in November and December (when the person will soon
+/// need them), the same years Ajustes › Festivos looks at.
+List<int> localHolidayYears(CivilDate today) => [
+  today.year,
+  if (today.month >= 11) today.year + 1,
+];
+
+/// The years of [localHolidayYears] for which the bundle has no local
+/// holidays of the municipality [code] (INE), so step 2 can tell the person
+/// when they have to add them themselves. Empty when every year is covered.
+///
+/// Having some year is not enough: Barcelona has 2026 but not 2027 yet, and
+/// in December that is what matters (A5).
+final localHolidaysMissingYearsProvider = FutureProvider.autoDispose
+    .family<List<int>, String>((ref, code) async {
       final region = regionOfMunicipality(code);
+      final today = CivilDate.fromDateTime(ref.watch(clockProvider)());
       final rows = await ref
           .watch(holidayRepositoryProvider)
           .entriesFor(
             HolidayPlace(regionCode: region?.code, municipalityCode: code),
           );
-      return rows.any(
-        (e) =>
-            e.scope == HolidayScope.local &&
-            e.source != HolidaySource.user &&
-            e.municipalityCode == code,
-      );
+      final covered = {
+        for (final e in rows)
+          if (isBundledLocalOf(e, code)) e.date.year,
+      };
+      return [
+        for (final year in localHolidayYears(today))
+          if (!covered.contains(year)) year,
+      ];
     });
 
 /// The tip on the month screen about painting and the pattern button: waiting

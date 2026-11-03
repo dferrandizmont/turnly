@@ -10,8 +10,8 @@ import 'package:flutter_test/flutter_test.dart';
 import '../support/qa_core.dart';
 import '../support/qa_harness.dart';
 
-/// Scenarios Q50 to Q54: the first-use flow (release 0.4.0). The registry
-/// lists [onboardingScenarios].
+/// Scenarios Q50 to Q54: the first-use flow (release 0.4.0; three ways to
+/// start since 2A). The registry lists [onboardingScenarios].
 final List<QaScenario> onboardingScenarios = [
   qaOnboardingNurse, // Q50
   qaOnboardingSkip, // Q51
@@ -37,7 +37,7 @@ Future<(QaApp, List<Override>)> _firstLaunch(QaContext qa) async {
   ];
   final app = await QaApp.open(qa, demo: false, overrides: overrides);
   expect(find.byType(MonthScreen), findsNothing);
-  expect(_key('onboarding-profession-nursing'), findsOneWidget);
+  expect(_key('onboarding-path-rotation'), findsOneWidget);
   return (app, overrides);
 }
 
@@ -80,19 +80,18 @@ Future<void> _nurse(QaContext qa) async {
 
   final watch = Stopwatch()..start();
   final tap = _Taps(t);
-  await tap(_key('onboarding-profession-nursing'), reason: 'Enfermería');
-  await tap(_key('onboarding-next'));
-  expect(_title(t), '¿Dónde trabajas?');
-  await tap(_key('onboarding-region'));
-  await tap(find.text('Comunidad de Madrid'));
-  await tap(_key('onboarding-next'));
+  expect(_title(t), '¿Cómo empiezas tu cuadrante?');
+  await tap(_key('onboarding-path-rotation'), reason: 'Usar una rotación');
   expect(_title(t), '¿Cómo es tu rotación?');
   await tap(_key('onboarding-pattern-12h'));
   await tap(_key('onboarding-next'));
   expect(_title(t), '¿Cuándo empiezas?');
   await tap(_key('onboarding-offset-1'), reason: 'día 2 del ciclo');
   await tap(_key('onboarding-next'));
-  expect(_title(t), '¿Vienes de otra app?');
+  expect(_title(t), '¿Dónde trabajas?');
+  await tap(_key('onboarding-profession-nursing'), reason: 'Enfermería');
+  await tap(_key('onboarding-region'));
+  await tap(find.text('Comunidad de Madrid'));
   await tap(_key('onboarding-next'));
   expect(_title(t), 'Listo');
   await tap(_key('onboarding-next'), reason: 'Ver mi calendario');
@@ -140,19 +139,14 @@ Future<void> _skip(QaContext qa) async {
   final t = qa.tester;
   final (app, overrides) = await _firstLaunch(qa);
 
-  // Back works too: forward two steps, back one, then skip from there.
-  await t.tapAndSettle(_key('onboarding-profession-police'));
-  await t.tapAndSettle(_key('onboarding-next'));
-  expect(_title(t), '¿Dónde trabajas?');
+  // Back works too: into a way, back to the question, then another way.
+  await t.tapAndSettle(_key('onboarding-path-rotation'));
+  expect(_title(t), '¿Cómo es tu rotación?');
   await t.tapAndSettle(_key('onboarding-back'));
-  expect(_title(t), '¿A qué te dedicas?');
+  expect(_title(t), '¿Cómo empiezas tu cuadrante?');
+  await t.tapAndSettle(_key('onboarding-path-import'));
 
-  for (final title in [
-    '¿A qué te dedicas?',
-    '¿Dónde trabajas?',
-    '¿Cómo es tu rotación?',
-    '¿Vienes de otra app?',
-  ]) {
+  for (final title in ['¿Vienes de otra app?', '¿Dónde trabajas?']) {
     expect(_title(t), title);
     await t.tapAndSettle(_key('onboarding-skip'), reason: 'Saltar: $title');
   }
@@ -196,13 +190,15 @@ Future<void> _place(QaContext qa) async {
   final t = qa.tester;
   final (app, overrides) = await _firstLaunch(qa);
 
-  await t.tapAndSettle(_key('onboarding-skip'));
+  await t.tapAndSettle(_key('onboarding-path-import'));
+  await t.tapAndSettle(_key('onboarding-next')); // nothing imported
   expect(_title(t), '¿Dónde trabajas?');
 
-  // Andalucía has no local holidays in the bundle: the note says so.
+  // Most Andalusian towns have no local holidays in the bundle: the note
+  // says so. Algeciras (Cádiz) is one of them.
   await t.tapAndSettle(_key('onboarding-region'));
   await t.tapAndSettle(find.text('Andalucía'));
-  await _pickMunicipality(t, 'sevilla', '41091');
+  await _pickMunicipality(t, 'algeciras', '11004');
   expect(_key('onboarding-local-missing'), findsOneWidget);
   expect(
     find.text(
@@ -217,13 +213,11 @@ Future<void> _place(QaContext qa) async {
   await t.tapAndSettle(_key('onboarding-region'));
   await t.tapAndSettle(find.text('Comunidad de Madrid'));
   expect(_key('onboarding-local-missing'), findsNothing);
-  expect(find.text('Sevilla'), findsNothing);
+  expect(find.text('Algeciras'), findsNothing);
   await _pickMunicipality(t, 'madrid', '28079');
   expect(_key('onboarding-local-missing'), findsNothing);
 
-  await t.tapAndSettle(_key('onboarding-next'));
-  await t.tapAndSettle(_key('onboarding-skip')); // rotation
-  await t.tapAndSettle(_key('onboarding-next')); // import
+  await t.tapAndSettle(_key('onboarding-next')); // last step
   await t.tapAndSettle(_key('onboarding-next')); // listo
   expect(find.byType(MonthScreen), findsOneWidget);
 
@@ -283,30 +277,41 @@ Future<void> _existingUser(QaContext qa) async {
 /// Q54.
 const qaOnboardingTip = QaScenario(
   'Q54',
-  'El consejo del mes se cierra y no vuelve',
+  'El consejo de Pintar se cierra y no vuelve',
   _tip,
 );
 
 Future<void> _tip(QaContext qa) async {
   final t = qa.tester;
   final (app, overrides) = await _firstLaunch(qa);
-  for (var i = 0; i < 4; i++) {
-    await t.tapAndSettle(_key('onboarding-skip'));
-  }
+  await t.tapAndSettle(_key('onboarding-path-import'));
+  await t.tapAndSettle(_key('onboarding-skip'));
+  await t.tapAndSettle(_key('onboarding-skip'));
   await t.tapAndSettle(_key('onboarding-next'));
   expect(find.byType(MonthScreen), findsOneWidget);
+  // Decision 28: the month keeps nothing but the month; the tip is a line of
+  // the paint sheet and shows the first time paint mode opens.
+  expect(_key('onboarding-tip'), findsNothing);
+  await enterPaintMode(t);
   expect(_key('onboarding-tip'), findsOneWidget);
   expect(find.text('Elige un turno y arrastra.'), findsOneWidget);
   await qa.shot('consejo');
+  await t.tapAndSettle(_key('paint-done'));
 
   // Not closed: it is still there after closing and opening the app.
   overrides.clear();
   await app.restart();
   // The tip is read from the database a moment after the first frame.
+  await t.runAsync(
+    () => Future<void>.delayed(const Duration(milliseconds: 400)),
+  );
+  await t.settle();
+  await enterPaintMode(t);
   await t.waitFor(_key('onboarding-tip'), reason: 'el consejo sin cerrar');
 
   await t.tapAndSettle(_key('onboarding-tip-close'));
   expect(_key('onboarding-tip'), findsNothing);
+  await t.tapAndSettle(_key('paint-done'));
   await app.restart();
   expect(find.byType(MonthScreen), findsOneWidget);
   // Give the database read time to (not) bring it back.
@@ -314,6 +319,7 @@ Future<void> _tip(QaContext qa) async {
     () => Future<void>.delayed(const Duration(milliseconds: 400)),
   );
   await t.settle();
+  await enterPaintMode(t);
   expect(_key('onboarding-tip'), findsNothing);
   final stored = await app.query(
     "SELECT value FROM settings WHERE key = 'onboarding.tipPending'",

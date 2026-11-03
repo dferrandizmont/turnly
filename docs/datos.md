@@ -24,11 +24,11 @@ milisegundos UTC. Listas de ids como JSON en texto.
 | `pattern_runs` | `id` TEXT PK, `pattern_id` TEXT → `patterns.id`, `start_date` TEXT, `end_date` TEXT?, `step_offset` INT = 0, `seq` INT UNIQUE, `created_at` | CHECK `end_date IS NULL OR end_date >= start_date`. |
 | `day_entries` | `date` TEXT PK, `shift_type_ids` TEXT? (JSON; **NULL = no sustituye al patrón**, `[]` = día vacío), `note` TEXT?, `updated_at` | Una fila solo si hay override o nota (el motor normaliza; el repositorio borra la fila si queda vacía). Desde la v3 también cuenta un recordatorio, horas extra o salida anticipada (`DayEntry.isEmpty`; ver «Esquema v3»). |
 | `holidays` | `id` INT PK auto, `date` TEXT, `scope` TEXT (`national`/`regional`/`local`), `name` TEXT, `region_code` TEXT?, `municipality_code` TEXT?, `source` TEXT (`bundled`/`remote`/`user`) | Índice por `date`. Se llena en la semana 3. |
-| `absence_balances` | `year` INT, `type` TEXT, `allowed_days` REAL, PK (`year`, `type`) | Lo usado se calcula de los días; aquí solo lo permitido. P1. |
+| `absence_balances` | `year` INT, `type` TEXT, `allowed_days` REAL, PK (`year`, `type`) | Lo usado se calcula de los días; aquí solo lo permitido. P1. Ampliada en la v6 (abajo). |
 | `settings` | `key` TEXT PK, `value` TEXT (JSON) | Preferencias sueltas (comunidad, municipio, franja nocturna…). |
 
-Los campos de la especificación que todavía no se usan (adjuntos y «cambio con…» de `DayEntry`) **no** se crean
-ahora: llegarán con su migración, que además estrena el arnés con un caso real.
+Los campos de la especificación que todavía no se usaban (adjuntos y «cambio con…» de `DayEntry`) llegaron con la v6,
+en tablas propias (abajo).
 
 ## Repositorio
 
@@ -49,7 +49,7 @@ ahora: llegarán con su migración, que además estrena el arnés con un caso re
   `seq` es único en toda la tabla. `Schedule.applyPattern(..., seq: await repo.nextRunSeq())`; sin pasarlo,
   calcula el máximo de las rotaciones de su calendario y dos calendarios podrían chocar (la base de datos lo
   rechaza y el controlador recarga: no se corrompe nada, pero el cambio no se guarda).
-- `saveShiftType` (con `hourlyRateCents`), `archiveShiftType`, `savePattern` (el editor llega en la semana 2; aquí
+- `saveShiftType` (con `hourlyRateCents`), `saveShiftTypeWithHistory` (esquema v5), `archiveShiftType`, `savePattern` (el editor llega en la semana 2; aquí
   basta con lo que usa la siembra).
 - Conversión fila ↔ modelo del motor en un único sitio (`schedule_mappers.dart`), con pruebas de ida y vuelta.
 
@@ -187,6 +187,13 @@ cargadas en `bootstrapApp` antes del primer frame (`initialPreferencesProvider`)
 | `calendar.weekStart` | `1` (lunes), `7` (domingo) | `1` |
 | `calendar.weekNumbers` | `true` / `false` (columna con el número de semana ISO) | `false` |
 | `appearance.language` | `"system"`, `"es"`, `"ca"`, `"gl"`, `"eu"`, `"en"` (Ajustes › Apariencia › Idioma) | `"system"` |
+| `appearance.timeFormat` | `"auto"`, `"24"`, `"12"` (Ajustes › Apariencia › Formato de hora) | `"24"` |
+| `appearance.currency` | código ISO 4217 en mayúsculas (`"EUR"`, `"USD"`...; Ajustes › Apariencia › Moneda) | `"EUR"` |
+
+Los tres últimos valores por defecto son el comportamiento de las versiones anteriores: una instalación existente no tiene
+las filas y no cambia. Una instalación **nueva** recibe `calendar.weekStart`, `appearance.timeFormat = "auto"` y
+`appearance.currency` según la región del móvil al sembrarse la base (`seedRegionDefaults`, solo filas que no existen).
+Los importes se guardan en la unidad menor de la moneda y cambiar de moneda no los convierte: `docs/formatos.md`.
 
 `appearance.language` = `"system"` sigue los idiomas preferidos del móvil, en orden, y se queda con el primero que
 tenga la app; si no hay ninguno, español. Un valor desconocido o un idioma cuyo ARB ya no exista se lee como
@@ -194,7 +201,8 @@ tenga la app; si no hay ninguno, español. Un valor desconocido o un idioma cuyo
 (avisos de las alarmas y del widget).
 
 Con domingo como primer día, cada fila (domingo a sábado) muestra la semana ISO de su jueves. Viajan en la copia de
-seguridad (tabla `settings`) y se releen tras restaurar.
+seguridad (tabla `settings`) y se releen tras restaurar. Excepciones: `appearance.language` y `appearance.timeFormat` son
+ajustes del móvil y no viajan (`isDeviceSetting`); `appearance.currency` sí, con los importes que describe.
 
 ### Primer uso (`features/onboarding/`)
 Texto JSON en `settings`, leído por `OnboardingRepository`. `bootstrapApp` decide **antes del primer frame** si se
@@ -203,17 +211,18 @@ abre `/bienvenida` en lugar del mes (`initialOnboardingProvider`):
 | Clave | Valores | Significado |
 |---|---|---|
 | `onboarding.done` | `true` | El primer uso se hizo, se saltó o no hacía falta. Una vez a `true`, no vuelve. |
-| `onboarding.profile` | `"nursing"`, `"medicine"`, `"police"`, `"firefighters"`, `"industry"`, `"security"`, `"hospitality"`, `"other"` | La profesión elegida en el paso 1 (ausente si se saltó). |
+| `onboarding.profile` | `"nursing"`, `"medicine"`, `"police"`, `"firefighters"`, `"industry"`, `"security"`, `"hospitality"`, `"commerce"`, `"transport"`, `"other"` | La profesión elegida en el último paso, opcional (ausente si se saltó). `commerce` y `transport` solo se ofrecen fuera de España. |
 | `onboarding.tipPending` | `true` / `false` | El consejo del mes («Pinta tu mes en un momento») espera a que lo cierren. |
 | `onboarding.factoryCatalog` | Instantánea JSON de los tipos, patrones y calendario de fábrica | Procedencia provisional, solo al crear una base nueva sin demo. No viaja en las copias. |
 
 Se muestra solo si no hay `onboarding.done` y, además: no hay datos (ni una fila de `pattern_runs` ni de
 `day_entries` en ningún calendario; quien actualiza con datos queda marcado como hecho al arrancar) y no es una
 compilación con datos de demostración (salvo `--dart-define=FORCE_ONBOARDING=true`, que ignora la demo y los datos
-pero no la marca `onboarding.done`). El lugar se guarda en `holidays.region` / `holidays.municipality` por el
-camino de siempre (`HolidayController.setPlace`).
+pero no la marca `onboarding.done`). El lugar se guarda en `holidays.country` / `holidays.region` /
+`holidays.municipality` por el camino de siempre (`HolidayController.setPlace`); el país, siempre (sin él es España;
+ver `festivos.md`, «País»).
 
-El idioma se guarda al elegirlo en el primer paso. Los nombres y códigos de fábrica se fijan en ese idioma antes de abrir el importador o al terminar, solo si la instantánea provisional sigue intacta y no hay datos propios. Se consume entonces la marca: una edición, importación, restauración o un cambio posterior de idioma nunca renombra datos existentes. Una base anterior nunca recibe esta procedencia, aunque sus nombres coincidan con los de fábrica.
+El idioma se guarda al elegirlo en la primera pantalla («¿Cómo empiezas tu cuadrante?»). Los nombres y códigos de fábrica se fijan en ese idioma antes de abrir el importador o al terminar, solo si la instantánea provisional sigue intacta y no hay datos propios. Se consume entonces la marca: una edición, importación, restauración o un cambio posterior de idioma nunca renombra datos existentes. Una base anterior nunca recibe esta procedencia, aunque sus nombres coincidan con los de fábrica.
 
 Las demás elecciones viven en memoria hasta el final del paso 4 (se puede volver atrás o salir sin
 dejar medio calendario hecho). Al terminar, por los controladores de siempre: las horas de la profesión sobre los
@@ -348,9 +357,164 @@ El formato de copia (`.turnly`, antes `.cuadrante`) sigue en **versión 3**: `fi
 Las copias anteriores restauran sin plus. Una app anterior que lee v3 ignora esta clave desconocida y valida su
 suma de control normalmente; no conserva ese importe al volver a exportar. Véase `docs/copia-de-seguridad.md`.
 
+## Esquema v5: versiones de un tipo de turno («Solo a partir de hoy», A2) — hecho
+
+Motivo: cambiar las horas o el precio de un tipo (Noche de 8 a 10 h, otro precio por hora) no puede reescribir los
+meses ya trabajados y cobrados, en ningún calendario. El editor pregunta «Corregir en todos los días» o «Solo a
+partir de hoy» (`docs/motor-de-turnos.md`, «Versiones de un tipo»). La segunda opción guarda lo que el tipo **era**
+hasta ayer en una tabla nueva; el tipo conserva su id, así que rotaciones, patrones, días, deshacer, copias e
+importación siguen apuntando al mismo tipo y **no se reescribe ninguna fila de días ni de rotaciones**.
+
+| Tabla nueva | Columnas | Notas |
+|---|---|---|
+| `shift_type_versions` | `shift_type_id` TEXT → `shift_types.id` (`ON DELETE CASCADE`), `until_date` TEXT (`CivilDate`, último día incluido), `category`, `start_minute`, `end_minute`, `paid_minutes`, `night_override`, `hourly_rate_cents`, `fixed_plus_cents`, `segment2_start_minute`, `segment2_duration_minutes`, `created_at`; PK (`shift_type_id`, `until_date`) | Una fila **por cambio**, nunca por día. Los mismos CHECK que `shift_types` (horas los dos o ninguno, 0–1439; segundo tramo; precio y plus 0–999 999; minutos pagados ≥ 0). Los términos actuales siguen en `shift_types`. |
+
+- **Cómo se lee:** las versiones de un tipo, ordenadas por `until_date`, parten el tiempo: la primera vale para todos
+  los días hasta su fecha, la siguiente para los días después hasta la suya, y la fila de `shift_types` para todos los
+  días posteriores a la última. Nombre, código, color, icono y sonido no están en la versión: son siempre los de
+  `shift_types` (se aplican a todos los días).
+- **Repositorio:** `load` lee la tabla entera y la pasa a `Schedule.shiftTypeVersions` (comunes a todos los
+  calendarios, como los tipos). `saveShiftTypeWithHistory(tipo, versiones)` guarda el tipo y **sustituye** sus
+  versiones en una sola transacción (valida con `checkShiftTypeVersions`: términos válidos y una sola versión por
+  fecha; si no, `ArgumentError` sin escribir nada; el tipo tiene que existir). `saveShiftType` no toca las versiones:
+  ninguna otra escritura (reordenar, archivar, recuperar, importar, el primer uso) puede perderlas. Borrar un tipo
+  (solo uno sin usar, al deshacer una importación) borra sus versiones por la clave foránea. Una fila que el dominio
+  rechace (solo por un fallo o un archivo editado a mano) se ignora al leer (`groupShiftTypeVersions`).
+- **Copia de seguridad:** van dentro de cada tipo, `shiftTypes[].pastVersions`, solo si tiene alguna; el formato sigue
+  en la versión 3 (`docs/copia-de-seguridad.md`). Restaurar borra la tabla antes que los tipos y la vuelve a llenar
+  después. La copia automática (`_userTables`) también la vigila.
+
+`migration_v4_to_v5.dart` solo crea la tabla vacía, dentro de una transacción, y comprueba que las 8 tablas de antes
+quedan idénticas fila a fila y que la nueva está vacía; si no, deshace. Volcado
+`app/drift_schemas/app_database/drift_schema_v5.json`. La copia previa sigue siendo una por destino
+(`pre-v4-a-v5-<fecha>.sqlite`, o `pre-v1/v2/v3-a-v5-…`).
+
+Pruebas: `test/drift/app_database/migration_v4_to_v5_test.dart` (un archivo v4 real con tres calendarios, pluses,
+turno partido, iconos, sonidos y anotaciones: todas las filas iguales, tabla nueva vacía, 730 días de cada calendario
+iguales; el paso que falla deja el v4 intacto y el siguiente arranque migra; escribir y leer versiones tras migrar,
+los CHECK y la clave foránea), las de arranque desde v1, v2 y v3 (`test/core/database/upgrade_from_v*_test.dart`,
+ahora hasta v5) y `test/features/backup/shift_type_versions_backup_test.dart`.
+
+## Esquema v6: lo que piden las funciones de pago que damos gratis (P0) — hecho
+
+Motivo: `docs/paridad-pago.md`, §2, paquete P0. Un solo cambio de esquema para que P2 (notas ricas), P3 (vacaciones y
+permisos con saldo), P4 (libro de cambios) y P9 (horas y dinero) construyan encima sin migrar cada uno. **Solo la
+capa de datos**: sin pantallas, el motor no cambia de comportamiento. Todo lo nuevo empieza vacío en lo que ya existe.
+
+| Tabla | Cambio | Detalle |
+|---|---|---|
+| `shift_types` | `location` | TEXT NULL, CHECK no en blanco y hasta 200 (`maxShiftLocationLength`): lugar del turno. Como el nombre, vale para todos los días (no es un término versionado). |
+| `shift_types` | `night_plus_cents_per_hour`, `holiday_plus_cents_per_hour` | INT NULL, CHECK 0 a 999 999 999: plus por hora nocturna y por hora en festivo, en la unidad menor de la moneda (`docs/formatos.md`). Son **términos** (cuentan para «solo a partir de hoy»). |
+| `shift_types` | `fixed_plus_cents` | El tope del CHECK sube de 999 999 a **999 999 999** (`maxStoredMoneyCents`). |
+| `shift_type_versions` | `night_plus_cents_per_hour`, `holiday_plus_cents_per_hour` | Los mismos dos pluses en cada versión; topes de `hourly_rate_cents` y `fixed_plus_cents` a 999 999 999. |
+| `day_entries` | `extra_amount_cents` | INT NULL, CHECK entre −999 999 999 y 999 999 999: importe extra del día (dietas, un plus suelto; negativo para un descuento). |
+| `absence_balances` | 12 columnas nuevas | Ver «Saldos de ausencias». |
+| `note_attachments` (nueva) | `id` TEXT PK, `calendar_id` → `calendars.id` (`ON DELETE CASCADE`), `date`, `kind` (`photo`/`file`/`sketch`), `relative_path` (UNIQUE `COLLATE NOCASE`: APFS no distingue mayúsculas), `mime_type`, `size_bytes`, `sha256`, `display_name`?, `sort_order` = 0, `created_at`; índice (`calendar_id`, `date`) | Un adjunto de la nota de un día. Los bytes son un archivo de la app en `<Application Support>/attachments/<relative_path>`. CHECK: tipo cerrado; id de 1 a 64; ruta de 1 a 512 sin `/` ni `.` al principio, sin `..` ni barra invertida; MIME de 1 a 255; tamaño de 0 a 50 MiB (`maxAttachmentBytes`); SHA-256 de 64; nombre de 1 a 255 o NULL. El dominio es más estricto (`isSafeAttachmentId`, `isSafeAttachmentPath`: solo letras, cifras, `.`, `_` y `-`, ningún `..`) y nunca acepta una ruta que el CHECK rechace (hay prueba que compara las dos reglas). |
+| `day_tasks` (nueva) | `id` TEXT PK, `calendar_id` → `calendars.id` (cascada), `date`, `title`, `done` = false, `sort_order` = 0, `created_at`, `updated_at`; índice (`calendar_id`, `date`) | Lista de casillas de un día. CHECK: título no en blanco y hasta 500. |
+| `shift_swaps` (nueva) | `id` TEXT PK, `calendar_id` → `calendars.id` (cascada), `date`, `colleague`, `direction` (`theyOwe`/`iOwe`), `given_shift_type_ids`?, `received_shift_type_ids`? (JSON), `return_date`?, `status` (`pending`/`returned`) = `pending`, `note`?, `created_at`, `updated_at`, `closed_at`?; índice (`calendar_id`, `date`) | El libro de cambios: «me debe / le debo». CHECK: compañero no en blanco y hasta 200; nota hasta 2000; `closed_at` existe **exactamente** cuando el estado es `returned`. No cambia el calendario por sí solo. |
+
+### Decisiones
+- **Tareas en tabla propia, no JSON en `day_entries.tasks`.** La fila de `day_entries` la gestiona el motor: existe solo
+  si el día guarda algo y se borra cuando queda vacía, y pasa por deshacer, copiar y pegar, la huella... Con las tareas
+  dentro habría que enseñar todo eso al motor, y marcar una casilla sería un cambio del cuadrante (con su paso de
+  deshacer y reescribiendo la fila entera). En su tabla, marcar es escribir una fila, la lista no depende de que el día
+  tenga fila y `load` no las lee al arrancar. Lo mismo para los adjuntos.
+- **El importe extra sí va en `day_entries`**, como las horas extra: es una anotación del día y sigue sus reglas
+  (`DayEntry.extraAmountCents`, 0 es «nada»; un día con solo importe no está vacío; copiar, pegar, repetir y cortar con
+  «Incluir notas» lo llevan como la nota: `ClipDay`, `withAnnotationsOf`, `cutDays`; «Borrar el día por completo» lo
+  quita; la huella lo añade a la línea del día solo si no es 0, así que las huellas de antes no cambian).
+- **El tope de los importes sube en la base de datos, no en el editor.** En monedas sin decimales (guaraní, rupia,
+  dong) o con cifras altas (forinto) 999 999 no llega para un plus por turno. La base de datos acepta ya hasta
+  999 999 999 en todas las columnas de dinero; el editor y la copia siguen en 999 999 para el precio por hora y el plus
+  fijo (`maxHourlyRateCents`, `maxFixedPlusCents`) y P9 puede subirlos sin migrar. Una copia con importes por encima de
+  999 999 la rechaza una app anterior (no pierde nada: no restaura). `shift_types.hourly_rate_cents` sigue sin CHECK:
+  añadírselo podría impedir la migración de un archivo que ya tenga un valor raro.
+- **Lugar y pluses en el dominio:** `ShiftType.location`, `nightPlusCentsPerHour`, `holidayPlusCentsPerHour`
+  (`ShiftTerms` lleva los dos pluses; `ShiftTerms.applyTo` conserva el lugar actual). El formulario aún no los edita:
+  `ShiftTypeDraft` los lleva de ida y vuelta para que editar un tipo nunca los pierda. Cambiar un plus en un turno
+  trabajado con horas pregunta «todos los días / solo a partir de hoy»; cambiar el lugar, no.
+
+### Saldos de ausencias (`absence_balances`, P3)
+La tabla existía desde la v1 sin pantalla. Se **amplía** en vez de sustituirla: la clave (`year`, `type`) y
+`allowed_days` siguen igual, y un lector de copias anterior a la v6 exige justo esas tres claves (únicas por año y
+tipo) en `absenceBalances`; cambiar su significado haría irrestaurables las copias nuevas en una app antigua.
+`type` pasa a ser la **clave estable de una serie** de saldos (la misma cada año, para el arrastre; la crea la app, por
+ejemplo un id, y es única entre calendarios); lo que ve el usuario es `name`.
+
+| Columna nueva | Detalle |
+|---|---|
+| `calendar_id` | TEXT NULL → `calendars.id` (cascada). El calendario cuyos días cuentan; NULL (filas de antes) = el primario. |
+| `name` | TEXT NULL, no en blanco y hasta 100. NULL = se muestra `type`. |
+| `period_start`, `period_end` | TEXT NULL (`CivilDate`), los dos o ninguno, fin ≥ inicio. Ninguno = el año natural `year`. Un periodo de abril a marzo es del `year` en que empieza. |
+| `unit` | TEXT = `day` (`day`/`half`/`quarter`): la parte más pequeña de un día que cuenta. |
+| `shift_type_quarters` | TEXT NULL, JSON `{"<id de tipo>": cuartos}` con claves ordenadas: qué tipos de ausencia descuentan y cuánto cada día (1 a 4 cuartos; un medio día de vacaciones, 2). |
+| `carry_over`, `carry_over_max_days` | BOOL = false y REAL NULL (≥ 0, en cuartos): si lo que sobra del `year − 1` de la misma serie se suma, con tope opcional. |
+| `adjustment_days` | REAL = 0, en cuartos: días añadidos o quitados a mano (los ya gastados antes de usar la app...). |
+| `sort_order`, `created_at`, `updated_at` | INT = 0, INT NULL, INT NULL. |
+
+Lo **usado** no se guarda: P3 lo cuenta de los días del calendario con alguno de esos tipos. `allowed_days` sigue
+siendo REAL (los cuartos son exactos en coma flotante); el dominio (`AbsenceBalance.problem`) exige al escribir que
+sea un número entero de unidades, y no se le añade CHECK porque una fila de antes podría no cumplirlo.
+
+### Repositorios (sin interfaz)
+`NoteAttachmentsRepository` y `DayTasksRepository` (`features/notes/data/`), `ShiftSwapsRepository`
+(`features/swaps/data/`) y `AbsenceBalancesRepository` (`features/absences/data/`), con sus modelos en `domain/`
+(`NoteAttachment`, `DayTask`, `ShiftSwap`, `AbsenceBalance`; cada uno con `problem`, las mismas reglas que la tabla y la
+copia). Leer por día o por rango, guardar (upsert por clave; uno inválido lanza `ArgumentError` sin escribir), borrar,
+marcar hecha una tarea, marcar devuelto o reabrir un cambio. El repositorio de adjuntos solo lleva las filas: el
+almacén de archivos (P2, `features/notes/data/attachment_store.dart`) escribe el archivo antes de la fila y borra la
+fila antes que el archivo. Cada archivo del almacén se nombra por el SHA-256 de sus bytes (`<dos hex>/<hash>`), así
+que el mismo contenido no se guarda dos veces y un archivo se puede comprobar contra su fila en cualquier momento;
+la tabla no deja que dos filas compartan archivo (la ruta es única), así que un segundo adjunto con el mismo
+contenido recibe su propia copia. El almacén borra los archivos que ninguna fila apunta (una tarea de un día
+borrado, un calendario borrado, una restauración que falló) y avisa con `AttachmentStoreException` cuando un archivo
+es demasiado grande (`maxAttachmentBytes`), cuando el almacén se llena (`maxAttachmentStoreBytes`, 128 MiB, o `maxAttachmentFiles`, 2 000 archivos) o
+cuando una ruta no es segura. La ruta de una fila es siempre `<sha[0:2]>/<sha>` (más `-<n>` de 2 a 999 en las copias):
+`NoteAttachment.problem` rechaza cualquier otra (`isCanonicalAttachmentPath`).
+`ScheduleRepository` lee y escribe el lugar, los pluses (también en las versiones) y el importe extra por
+`schedule_mappers.dart`; un importe fuera del tope se lee como «ninguno» y un lugar en blanco como «sin lugar».
+
+### Los dibujos a mano (P2)
+Un dibujo son **trazos** (`features/notes/domain/sketch.dart`): un lienzo (ancho y alto, hasta 2048 de cada lado y
+4 Mi de píxeles) y trazos con sus puntos, su color (ARGB) y su grosor. Los trazos viajan como **JSON compacto**
+(`{"v":1,"w":1000,"h":1000,"s":[{"c":4278190080,"w":4,"p":[10.5,20,11,22]}]}`, los puntos en parejas) y el archivo que
+la app guarda como adjunto es el **PNG** del dibujo (`features/notes/data/sketch_png.dart`, escrito a mano: `IHDR` +
+`IDAT` + `IEND`, sin dependencias nuevas), que lleva los trazos dentro (un chunk `tEXt` con la palabra
+`turnly:sketch`) para que el dibujo se pueda volver a abrir y editar después de una restauración. Los bytes del PNG
+son los del adjunto (tipo `sketch`, MIME `image/png`): viajan en la copia como cualquier otro adjunto.
+
+### El paso v5 → v6 (código real)
+`app/lib/core/database/migration_v5_to_v6.dart`, en **una transacción** (si algo falla, el archivo queda en v5 tal cual):
+
+1. Vuelca todas las columnas de v5 de las 9 tablas, ordenadas por su clave (`patterns` por `rowid`: su orden es dato).
+2. Guarda en memoria las filas de `shift_type_versions` y **borra esa tabla**; reconstruye `shift_types`
+   (`TableMigration`: los CHECK solo se cambian reconstruyendo); crea la tabla de versiones nueva y vuelve a meter las
+   filas. Así, borrar `shift_types` no puede arrastrar en cascada sus versiones, esté como esté `PRAGMA foreign_keys`
+   (hay prueba con las claves foráneas activas durante la migración).
+3. `day_entries`: añade la columna en el sitio. `absence_balances`: se reconstruye (lleva CHECK de tabla); las filas
+   conservan sus tres columnas y las nuevas quedan a su valor por defecto.
+4. Crea las tres tablas nuevas con sus índices.
+5. Comprueba que cada columna de v5 de cada fila es igual, que lo nuevo está vacío (o a su valor por defecto), que las
+   tablas nuevas están vacías y que `PRAGMA foreign_key_check` no devuelve nada; si no, lanza y se deshace.
+
+La copia previa sigue siendo una por destino (`pre-v5-a-v6-<fecha>.sqlite`, o `pre-v1…v4-a-v6-…`). Volcado
+`app/drift_schemas/app_database/drift_schema_v6.json`.
+
+Pruebas: `test/drift/app_database/migration_v5_to_v6_test.dart` (archivo v5 real: la instalación v3 de tres
+calendarios llevada a v5 por la cadena publicada, con pluses, el plus fijo en el tope antiguo, dos versiones y dos saldos
+de la v1 —`test/support/v5_database.dart`—: todas las columnas iguales, lo nuevo vacío, 730 días de cada calendario,
+versiones intactas también con las claves foráneas activas; el paso que falla deja el v5 exacto, sin tablas
+temporales, y el siguiente arranque migra; escribir y leer todo lo nuevo, los CHECK y la cascada al borrar un
+calendario), la cadena completa desde v1, v2, v3 y v4 (las pruebas de cada paso anterior llegan ahora hasta v6) y las
+de arranque con archivo real (`test/core/database/upgrade_from_v*_test.dart`).
+
+**Copia de seguridad:** el formato sigue en la versión 3 con claves opcionales, y los adjuntos viajan en un
+contenedor (`docs/copia-de-seguridad.md`, «Esquema v6»).
+
 ## Migraciones
-- `schemaVersion` es 4 (la 1 fue la de las versiones 0.1.0 y 0.2.0; la 2, la de 0.3.0 a 0.5.0; la 3 añadió los
-  campos de paridad de la 0.6.0). Esquemas guardados con
+- `schemaVersion` es 6 (la 1 fue la de las versiones 0.1.0 y 0.2.0; la 2, la de 0.3.0 a 0.5.0; la 3 añadió los
+  campos de paridad de la 0.6.0; la 4, el plus fijo; la 5, las versiones de un tipo; la 6, la base de las funciones
+  de pago que damos gratis: adjuntos, tareas, cambios, saldos, lugar, pluses por hora e importe por día). Esquemas guardados con
   `dart run drift_dev make-migrations` (configurado en `build.yaml`, carpeta `app/drift_schemas/`), que también
   genera las pruebas de migración y los pasos (`stepByStep`). Cada versión nueva: subir `schemaVersion`, ejecutar
   `make-migrations`, escribir el paso (en su propio archivo, como `migration_v1_to_v2.dart`, dentro de una

@@ -145,7 +145,50 @@ llamada es un único paso de deshacer** y pasa por la misma cola de escrituras:
   destino); si el origen no tiene nota, el destino conserva la suya.
 - Tipos de turno: `saveShiftType`, `archiveShiftType` y `reorderShiftTypes` actualizan paleta y calendario al
   instante y escriben por la cola; **no tocan el historial de deshacer** (este solo habla de días, y los ids no
-  cambian). Archivar saca el tipo de la paleta, pero los días que lo usan lo siguen mostrando.
+  cambian). Archivar saca el tipo de la paleta, pero los días que lo usan lo siguen mostrando. Un cambio de horas o
+  dinero puede guardarse «solo a partir de hoy» (abajo, «Versiones de un tipo»).
+
+### Versiones de un tipo: «Corregir en todos los días» o «Solo a partir de hoy» (A2)
+
+`shift_type_history.dart`. Cambiar las horas o el dinero de un tipo no puede cambiar los meses ya trabajados y
+cobrados. Un tipo puede tener **versiones** (`ShiftTypeVersion`: `until` + `ShiftTerms`), una por cambio y nunca una
+por día:
+- `ShiftTerms`: lo que decide horas y dinero: categoría, inicio y fin, segundo tramo, minutos pagados, nocturnidad
+  forzada, precio por hora y plus fijo. Nombre, código, color, icono y sonido no son términos: se aplican siempre a
+  todos los días. `applyTo(tipo)` da el tipo con esos términos y su aspecto actual.
+- `Schedule.shiftTypeVersions` (por id, ordenadas por `until`). La primera versión vale hasta su `until` (incluido),
+  la siguiente desde el día después hasta el suyo, y los términos de `shiftTypes` desde el día después de la última
+  (`currentTermsSince`). **El id no cambia**: rotaciones, patrones, días con excepción, normalización al pintar,
+  deshacer, copias e importación no se enteran. `resolve(d)` (y con él ocurrencias, resumen, festivos, alarmas,
+  widget y `.ics`) da a cada día los términos que tenía (`shiftTypeOn(id, d)`); sin versiones devuelve el mismo
+  objeto de siempre. `shiftTypeById` da siempre los términos actuales (editor, paleta).
+- `shiftTypeEditNeedsScope(antes, después)`: función pura; `true` si cambian los términos **tal como cuentan**
+  (minutos pagados como `effectivePaidMinutes`; minutos pagados, nocturnidad y precio solo en un turno de trabajo
+  con horario; plus solo en uno de trabajo). Lo cosmético nunca pregunta.
+- `historyForChangeFrom(versiones, before:, after:, from:)`: las versiones para que los días anteriores a `from`
+  resuelvan exactamente igual que ahora y `from` y lo siguiente tengan `after`. Las que acaban antes de ayer se quedan;
+  la que rige ayer (o los términos actuales si ninguna) se corta en ayer; las posteriores sobran (con el reloj
+  atrasado). Une vecinas iguales y quita una última igual a `after` (volver a lo de antes desde hoy no deja versión;
+  dos cambios el mismo día dejan una).
+- `Schedule.showsShiftTypeBetween(id, from:, before:)`: si algún día de `[from, before)` muestra el tipo. Exacto:
+  resuelve los días con excepción y los de las rotaciones cuyo patrón lo usa (un paso que aún no llegó, o un día tapado
+  por otra rotación o por una excepción, no cuenta).
+
+**Editor** (`ShiftTypeFormScreen._save`): al guardar un tipo existente, `ScheduleController.shiftTypeEditChangesPast`
+mira si el cambio necesita elegir y si algún día anterior a hoy (`clockProvider`) **de cualquier calendario**, los
+archivados incluidos, lo muestra con sus términos actuales (primero el calendario en pantalla, en memoria; los demás
+con `ScheduleRepository.load` tras las escrituras en cola). Si no, guarda sin preguntar. Si sí, el diálogo
+(`shift_type_scope_dialog.dart`) ofrece «Solo a partir de hoy» (cambió tu jornada o tu precio) y «Corregir en todos
+los días» (era un error); cancelar no guarda nada y deja el formulario abierto.
+- «Corregir en todos los días» = `saveShiftType(tipo)`: lo de siempre, sobre los días de los términos actuales. Si el
+  tipo ya tenía versiones, esas se quedan (el texto dice desde qué fecha cambia).
+- «Solo a partir de hoy» = `saveShiftType(tipo, onlyFrom: hoy)`: guarda los términos nuevos y las versiones de
+  `historyForChangeFrom` en una transacción (`saveShiftTypeWithHistory`). Paleta, calendario y editor siguen viendo un
+  solo tipo. El historial de deshacer se conserva (solo habla de días y los ids no cambian).
+
+**Riesgos conocidos:** «hoy» es el del móvil; con el reloj adelantado o atrasado, el corte cae en otro día (no se
+pierde nada: el pasado sigue siendo lo que mostraba). Una app anterior que restaure una copia con versiones las
+ignora y calcula el pasado con los términos actuales (como con el plus fijo; `docs/copia-de-seguridad.md`).
 
 ### Edición por rangos (modo selección)
 
@@ -172,6 +215,36 @@ vive en `features/calendar/domain/range_editing.dart`.
 - `endRun(runId, primerDíaSinElla)` acorta la rotación hasta el día anterior (`null` si no la acorta; para
   dejarla sin días, `deleteRun`); `deleteRun(runId)` la quita entera. Los overrides y las notas no se tocan. No crean
   rotaciones nuevas, así que no usan `nextRunSeq`; deshacer repone la run con su `seq`.
+
+## Clasificación de días y días libres (`day_kind.dart`, `off_outlook.dart`)
+
+Una sola clasificación para todo lo que pregunte «¿libra este día?» (tarjeta de hoy, widget, comparar calendarios).
+`ResolvedDay.kind` (o `dayKindOf(shifts)`) devuelve un `DayKind`, con esta precedencia cuando un día tiene varios
+turnos: **`work`** (algún turno de categoría trabajo, aunque lo acompañe una ausencia o un descanso) > **`absence`**
+(vacaciones, baja, libre disposición, permisos…) > **`rest`** (solo Libre, Saliente…) > **`unrecorded`** (ningún
+turno; una nota, horas extra o un recordatorio solos no anotan el día). `DayKind.isOff` es descanso o ausencia;
+**un día sin anotar nunca es libre por sí mismo**.
+
+**Próximo libre** (`computeOffOutlook(schedule, today)`, funciones puras; «hoy» llega de `clockProvider` por
+`minuteClockProvider` en `offOutlookProvider`):
+- Busca 120 días hacia delante (`kOffLookAheadDays`); más allá la respuesta es «no se sabe», no «nunca».
+- **Un día sin anotar cuenta como libre solo si el calendario tiene algo anotado después, dentro de esa ventana**
+  (un hueco entre días anotados: mucha gente solo pinta sus días de trabajo). Pasado el último día anotado no
+  cuenta, porque decir «libras» ahí sería inventarlo. Un calendario vacío, o una rotación que ha terminado, no dice
+  nada. El resultado marca `inferred` cuando el libre sale de un hueco.
+- `nextOff` (primer libre desde hoy, hoy incluido, con `daysAway`), `returnDate` (si hoy libra: primer día de trabajo
+  después), `freeWeekend` (primer sábado **y** domingo libres, sin contar un sábado ya pasado) y la racha:
+  `workedStreak` (días seguidos de trabajo hasta hoy incluido, mirando hasta 120 atrás; 0 si hoy no se trabaja) y
+  `workDaysLeft` (días de trabajo que quedan después de hoy antes de librar; 0 si mañana libras; `null` si hoy no
+  se trabaja o no hay libre a la vista).
+- Los textos («Libras el jueves 5», «Mañana libras», «Hoy libras; vuelves el lunes 9», «Fin de semana libre: 14–15
+  nov», «Llevas 5 días seguidos; te quedan 2») salen de `calendar/presentation/off_outlook_text.dart`; la racha solo
+  se muestra desde 3 días (`kStreakShownFrom`).
+
+**Comparar calendarios** (`isFreeDay`, `ComparedDay`): libre en los dos = los dos calendarios tienen el día anotado
+como descanso o ausencia. Un día en que ninguno trabaja pero alguno no tiene nada anotado **no** es «libres los dos»:
+`ComparedDay.hasUnrecorded` lo marca como «sin anotar» (`MonthComparison.unrecordedDays`). Si alguien trabaja, el día
+está ocupado, no «sin anotar».
 
 ## Presets (`presets.dart`)
 
@@ -254,9 +327,11 @@ calendario activo; `summarizeYearTotals` junta los doce. Definiciones exactas:
   Horas de reloj (hora civil): el cambio de hora no corrige la noche a 7 o 9 h.
 - **Nocturnas:** solape con la franja 22:00-06:00 (`NightWindow`; en un turno partido, de cada tramo y sumado),
   `nightOverride` manda, y nunca más que los minutos
-  pagados de ese turno.
+  pagados de ese turno. Se miden sobre el turno tal como lo dejan las horas extra y la salida anticipada de su día
+  (A4, más abajo).
 - **Estimado:** minutos pagados de cada tipo x `hourlyRateCents` / 60, redondeado al céntimo (medio hacia arriba) **por
-  tipo**, más los pluses fijos por turno (`fixedPlusCents`). Cada turno de trabajo suma su plus una vez, también sin
+  tipo** (con el precio que tenía **cada día**: un tipo cambiado «solo a partir de hoy» suma cada día a su precio y
+  avisa «sin precio» si alguno de sus días no lo tenía; `ShiftTypeMonth.type` es el tipo con sus términos actuales), más los pluses fijos por turno (`fixedPlusCents`). Cada turno de trabajo suma su plus una vez, también sin
   horario o sin precio por hora; un día con dos turnos suma los dos y un turno partido suma uno. Descansos y ausencias
   no suman plus. La tarjeta muestra «Pluses» con el número de turnos con plus y su importe, incluido en el total.
   Un tipo de trabajo con horas y sin precio por hora no suma pago por horas y se avisa («sin precio»), pero conserva
@@ -266,20 +341,39 @@ calendario activo; `summarizeYearTotals` junta los doce. Definiciones exactas:
 - **Horas en festivo:** minutos del turno que caen en una fecha festiva (`splitByCivilDay`, así la noche que entra en un
   festivo cuenta la parte de después de medianoche; en un turno partido, de cada tramo, sin contar el descanso entre
   ellos), proporcionales a pagado/total si hay descanso no pagado. Se
-  imputan al mes en que **empieza** el turno, de modo que son un subconjunto de sus horas.
+  imputan al mes en que **empieza** el turno, de modo que son un subconjunto de sus horas. Como las nocturnas, se miden
+  sobre los tramos ajustados por los extras del día (A4).
 - **Días libres:** días con un turno `rest` y sin turno `work` ni ausencia. **Ausencias:** días con algún tipo
   `absence` (y los días de cada tipo por separado).
 - **Horas extra y salidas anticipadas (A6):** los minutos que el usuario anota en un día (`DayEntry.overtimeMinutes`,
   `earlyLeaveMinutes`, que `Schedule.resolve` expone en `ResolvedDay`) son **del día**, no de un turno, y van al mes de
   ese día. Por día, con `pagado` = minutos pagados de sus turnos `work` con horario:
   - La **extra suma siempre**, también en un día sin turno, libre o de ausencia (el usuario dice que trabajó). No
-    cambia los días trabajados, los turnos ni las nocturnas (no se sabe a qué hora fue: cuenta como hora diurna).
+    cambia los días trabajados ni los turnos.
   - La **salida resta como mucho `pagado + extra`**: un día nunca baja de 0 h. Lo que se informa en
     `earlyLeaveMinutes` es lo **aplicado** (no lo escrito), de modo que `shiftMinutes + overtimeMinutes -
     earlyLeaveMinutes == workedMinutes` siempre. En un día sin turno de trabajo y sin extra, la salida no resta nada.
   - `workedMinutes` es el **total** (turnos + extra − salida); `shiftMinutes` son solo los turnos. Las horas por tipo
     (`ShiftTypeMonth.paidMinutes`) no incluyen los extras. La comparación con el mes anterior y la tabla del año usan
-    el total. Las horas en festivo siguen siendo solo las de los turnos. Un mes con solo horas extra no está vacío.
+    el total. Un mes con solo horas extra no está vacío.
+  - **Dónde caen en el reloj (A4, 31-oct-2026).** Para que las nocturnas y las de festivo cuadren con el total, los
+    extras se colocan en el reloj del día:
+    - La **extra va justo después del final del último turno del día** (el tramo con horario que termina más tarde,
+      sea cual sea el orden del día). Prolonga ese turno, así que hereda su `nightOverride`. Ejemplos: Tarde 14–22 +
+      2 h → 22–24, 2 h nocturnas; Noche 22–06 + 1 h → 06–07, diurna; partido 18–22 / 23–03 + 1 h → 03–04, nocturna.
+    - La **salida anticipada recorta desde el final** lo que el día tiene entonces: primero la extra, luego el final
+      del último turno y, si es más larga, el tramo o turno anterior, hacia atrás. Cada minuto recortado es un minuto
+      pagado (con descanso no pagado, el reloj conserva la parte no pagada). Ejemplos: Noche 22–06 − 1 h → 22–05,
+      7 h y 7 nocturnas (antes daba 7 h y 8 nocturnas); 15–23 − 1 h → 15–22, 0 nocturnas; Tarde + Noche el mismo día
+      − 9 h → la noche entera y la tarde hasta las 21:00; Noche + 1 h de extra − 2 h → 22–05.
+    - Nocturnas y festivo se calculan sobre esos tramos con las mismas reglas de siempre (franja configurable
+      `NightWindow`, cruce de medianoche, cada tramo del partido, horas de reloj en el cambio de hora) y con el tope de
+      lo que el turno aún paga: **ninguna cifra parcial supera al total** (`nocturnas ≤ total`, `festivo ≤ total`,
+      `diurnas + nocturnas == total`). Una noche que entra en festivo y sale antes de medianoche ya no cuenta como
+      turno en festivo; la extra que cae en festivo suma horas en festivo pero no otro turno.
+    - Una extra en un día sin turno de trabajo con horario no tiene sitio en el reloj: cuenta como hora diurna y nunca
+      en festivo.
+    - Las cifras por tipo (`ShiftTypeMonth`) siguen siendo las del turno tal como está programado, sin extras.
   - **Euros:** la extra y la salida se valoran al precio por hora del **primer turno de trabajo del día, en el orden
     del día, que tenga horario y precio**. Sin ese turno (día libre, ausencia, turnos sin precio) los euros no se
     tocan y los minutos van a `extrasWithoutRateMinutes` (el resumen avisa: «no están en el estimado»). La deducción
@@ -291,6 +385,24 @@ calendario activo; `summarizeYearTotals` junta los doce. Definiciones exactas:
   - Pantalla: en la tarjeta de horas, las líneas «Horas extra» (`+2 h`, con su importe en el estimado) y «Salidas
     anticipadas» (`−1 h`) solo si el mes las tiene; la tabla del año las suma en su total y lo explica en sus notas.
 - Comparación con el mes anterior: diferencia de horas trabajadas.
+- **Trabajadas y previstas (A3, `domain/period_hours.dart`).** El resumen recibe «hoy» (`summaryTodayProvider`, de
+  `clockProvider`) y separa las horas del periodo: los días **anteriores a hoy** son trabajadas y **hoy en adelante**,
+  previstas (el turno de hoy puede no haber terminado). Un periodo que ya terminó dice «Horas trabajadas»; uno que
+  empieza hoy o después, «Horas previstas»; el que contiene hoy enseña el total previsto del periodo y debajo
+  «96 h trabajadas hasta ayer». Las dos partes suman el total (`splitPeriodHours`, dos `summarizeRange`), con sus
+  extras en su día. Igual en el mes, en «Fechas…» y en el objetivo del año.
+- **Objetivo de horas (C2, gratis).** Opcional, en horas enteras al año (de 1 a 8784; ejemplo en la ayuda: 1.642 h,
+  una jornada anual habitual) o al mes (de 1 a 744). Se guarda en la fila `summary.hoursGoal` de la tabla `settings`
+  (`data/hours_goal_store.dart`, JSON `{"period": "year", "hours": 1642}`), así que viaja en la copia de seguridad
+  sin tocar el esquema; una fila mala es «sin objetivo». Reparto al periodo mostrado (`domain/hours_goal.dart`),
+  redondeado al minuto una vez: un **mes** toma el mensual o la doceava parte del anual (1642 h → 136 h 50 min); un
+  **año**, el anual o 12 veces el mensual; unas **fechas**, el anual (o 12 × mensual) en proporción a sus días, cada
+  día 1/365 o 1/366 de su año (un año natural entero da el objetivo exacto). La tarjeta «Objetivo de horas» enseña el
+  objetivo del periodo con su explicación («1642 h al año, entre 12»), las trabajadas (si el periodo ha empezado), las
+  previstas (si no ha terminado) y la diferencia `trabajadas + previstas − objetivo`: «Te faltan 24 h» / «Llevas
+  39 h 10 min de más» en un periodo pasado y «Con lo previsto, …» si quedan días. Sin objetivo solo aparece el botón
+  «Fijar un objetivo de horas»; un periodo vacío enseña solo su estado vacío. Una hoja permite elegir año o mes,
+  escribir las horas, guardar o quitar el objetivo.
 - **Por fechas (gratis, hasta 366 días):** `summarizeRange(schedule, primero, último, ...)` es el único agregado;
   `summarizeMonth` es el rango del primer al último día del mes (hay una prueba que lo exige para varios meses y
   calendarios). Las mismas definiciones: un turno cuenta en el día en que empieza, así que la noche del último día
@@ -316,5 +428,9 @@ lleva el icono del turno cuando cabe, con la misma regla que la casilla del mes.
   (horas, euros = pagados x precio, festivo por día civil y por tramo, mes de inicio, horas extra), días de cambio de
   hora (29 de marzo y 25 de octubre) y la tarjeta de hoy en cada momento (antes, tramo 1, descanso, tramo 2, después,
   descanso pasada la medianoche, cuenta atrás en hora real).
+- Versiones de un tipo (`shift_type_history_test.dart`): qué cambios piden elegir, cortes de `historyForChangeFrom`
+  (primero, segundo, dos el mismo día, vuelta atrás, reloj atrasado), pasado con términos viejos y futuro con nuevos,
+  resumen de un mes pasado sin cambios, excepciones antes y después de hoy, varias rotaciones,
+  `showsShiftTypeBetween` exacto.
 - Pintar: replace/add/erase, normalización contra el patrón, la nota se conserva, `inverse()` deja el mapa
   idéntico, `UndoStack` (undo/redo/límite), `applyPattern` recorta y respeta `clearOverrides`.

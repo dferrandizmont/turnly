@@ -79,6 +79,7 @@ class _FakeAndroid implements AndroidFlutterLocalNotificationsPlugin {
   final deleted = <String>[];
   final existing = <AndroidNotificationChannel>[];
   Object? failCreateFor;
+  bool failListChannels = false;
 
   AndroidNotificationChannel? channel(String id) =>
       created.where((c) => c.id == id).lastOrNull;
@@ -95,6 +96,11 @@ class _FakeAndroid implements AndroidFlutterLocalNotificationsPlugin {
         created.add(c);
         return Future<void>.value();
       case #getNotificationChannels:
+        if (failListChannels) {
+          return Future<List<AndroidNotificationChannel>?>.error(
+            StateError('no channels'),
+          );
+        }
         return Future<List<AndroidNotificationChannel>?>.value([...existing]);
       case #deleteNotificationChannel:
         deleted.add(invocation.namedArguments[#channelId] as String);
@@ -398,6 +404,115 @@ void main() {
       expect(
         plugin.scheduled.single.android.channelId,
         alarmSoundChannelId(_soundA),
+      );
+    });
+
+    test('background renewal (A1): sound channels are neither created, '
+        'renamed nor deleted, and the alarm keeps its sound', () async {
+      final idA = alarmSoundChannelId(_soundA);
+      final unused = alarmSoundChannelId(_soundB);
+      android.existing.addAll([
+        _existingChannel(alarmChannelId),
+        _existingChannel(idA),
+        _existingChannel(unused),
+      ]);
+      final background = LocalAlarmScheduler(
+        plugin: plugin,
+        localZone: () async => 'Europe/Madrid',
+        manageSoundChannels: false,
+      );
+      await background.configure(_strings);
+      android.created.clear();
+      await background.replaceAll([_shift(1, 20, sound: _soundA)]);
+      expect(android.created, isEmpty, reason: 'no rename to the bare name');
+      expect(android.deleted, isEmpty);
+      final call = plugin.scheduled.single;
+      expect(call.android.channelId, idA);
+      expect(
+        (call.android.sound as UriAndroidNotificationSound).sound,
+        _soundA,
+      );
+      expect(AlarmPayload.decode(call.payload)!.sound, _soundA);
+    });
+
+    test('background renewal (A1): a sound whose channel the app deleted '
+        'rings on the default channel, not on a recreated one', () async {
+      final idA = alarmSoundChannelId(_soundA);
+      // The app found _soundB unreadable and deleted its channel.
+      android.existing.addAll([
+        _existingChannel(alarmChannelId),
+        _existingChannel(idA),
+      ]);
+      final background = LocalAlarmScheduler(
+        plugin: plugin,
+        localZone: () async => 'Europe/Madrid',
+        manageSoundChannels: false,
+      );
+      await background.configure(_strings);
+      android.created.clear();
+      await background.replaceAll([
+        _shift(1, 20, sound: _soundA),
+        _shift(2, 21, sound: _soundB),
+      ]);
+      expect(android.created, isEmpty);
+      expect(plugin.scheduled.map((c) => c.android.channelId), [
+        idA,
+        alarmChannelId,
+      ]);
+      expect(plugin.scheduled.last.android.sound, isNull);
+      expect(AlarmPayload.decode(plugin.scheduled.last.payload)!.sound, isNull);
+    });
+
+    test('background renewal (A1): channels that cannot be read send every '
+        'custom sound to the default channel', () async {
+      android
+        ..existing.add(_existingChannel(alarmSoundChannelId(_soundA)))
+        ..failListChannels = true;
+      final background = LocalAlarmScheduler(
+        plugin: plugin,
+        localZone: () async => 'Europe/Madrid',
+        manageSoundChannels: false,
+      );
+      await background.configure(_strings);
+      await background.replaceAll([_shift(1, 20, sound: _soundA)]);
+      expect(plugin.scheduled.single.android.channelId, alarmChannelId);
+      expect(plugin.scheduled.single.android.sound, isNull);
+    });
+
+    test('the renewal notice (A1) rings on the reminders channel, as a '
+        'notification, with no buttons', () async {
+      await scheduler.configure(_strings);
+      android.created.clear();
+      await scheduler.replaceAll([
+        const PlannedAlarm(
+          id: 9,
+          fireDate: CivilDate(2026, 10, 30),
+          fireMinute: 20 * 60,
+          shiftDate: CivilDate(2026, 10, 31),
+          shiftTypeId: '',
+          title: 'Avisos de turno',
+          body: 'Tus avisos de turno llegan hasta el sábado 31 de octubre.',
+          kind: AlarmKind.renewal,
+        ),
+      ]);
+      expect(android.created, isEmpty);
+      final call = plugin.scheduled.single;
+      expect(call.android.channelId, reminderChannelId);
+      expect(call.android.actions, isNull);
+      expect(call.android.sound, isNull);
+      expect(
+        call.android.audioAttributesUsage,
+        AudioAttributesUsage.notification,
+      );
+      expect(call.android.importance, Importance.high);
+      expect(AlarmPayload.decode(call.payload)!.kind, AlarmKind.renewal);
+      expect(
+        androidScheduleModeFor(AlarmKind.renewal, exact: true),
+        AndroidScheduleMode.exactAllowWhileIdle,
+      );
+      expect(
+        androidScheduleModeFor(AlarmKind.renewal, exact: false),
+        AndroidScheduleMode.inexactAllowWhileIdle,
       );
     });
 

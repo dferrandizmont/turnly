@@ -4,11 +4,13 @@ import 'dart:io' show Platform;
 import 'package:flutter/services.dart';
 
 import '../domain/backup_codec.dart';
+import 'incoming_temp_file.dart';
 
 /// Why a file handed to the app by the system (WhatsApp, Files, Drive...)
 /// could not be read.
 enum IncomingFileProblem {
-  /// Larger than `BackupCodec.maxFileBytes`: not a backup.
+  /// Larger than `BackupCodec.maxImportBytes` (or than `maxFileBytes` when it
+  /// is not a container): not a backup.
   tooLarge,
 
   /// The system refused to give the bytes (permission, a provider that went
@@ -140,10 +142,15 @@ class NoPlatformBackupChannel implements PlatformBackupChannel {
 /// - `hasPending` -> `bool`: there is a content URI of a VIEW / SEND intent
 ///   that nobody has taken yet. Does not read anything.
 /// - `discardPending`: forgets it.
-/// - `readPending` -> `null` | `{bytes: Uint8List, sender: String?}` | `{error: String}`: the
-///   content URI of the VIEW / SEND intent that opened the app, read in
-///   chunks with a hard cap of `BackupCodec.maxFileBytes` and a 60 s
-///   deadline (`{error: "unreadable"}` past it).
+/// - `readPending` -> `null` | `{path: String, sender: String?}` |
+///   `{bytes: Uint8List, sender: String?}` | `{error: String}`: the content URI
+///   of the VIEW / SEND intent that opened the app, streamed in chunks to a
+///   file `incoming/*.turnly` in the app's cache with a hard cap of
+///   `BackupCodec.maxImportBytes` and a 60 s deadline (`{error: "unreadable"}`
+///   past it). Android answers with the `path` (the file never exists as one
+///   byte array on the native heap); Dart reads it and deletes it
+///   ([readAndDeleteIncomingTempFile]). `bytes` is still accepted (a native
+///   side with a small file, tests).
 /// - `incomingAvailable` (Android -> Dart): a new intent arrived.
 /// - `systemBackupState` -> `"on"` | `"off"` | `"unknown"` (Android only).
 /// - `setPreviewProtection(bool)`: tapjacking guard of the restore preview
@@ -197,18 +204,31 @@ class MethodChannelBackupChannel implements PlatformBackupChannel {
         'readPending',
       );
       if (reply == null) return null;
+      final sender = reply['sender'];
+      final from = sender is String && sender.isNotEmpty ? sender : null;
+      final path = reply['path'];
+      if (path is String) {
+        try {
+          return IncomingFile.bytes(
+            await readAndDeleteIncomingTempFile(path),
+            sender: from,
+          );
+        } on IncomingTempFileException catch (e) {
+          return IncomingFile.problem(
+            e.tooLarge
+                ? IncomingFileProblem.tooLarge
+                : IncomingFileProblem.unreadable,
+          );
+        }
+      }
       final bytes = reply['bytes'];
       if (bytes is Uint8List) {
         // The native side caps the read, but it is not trusted: a reply over
         // the cap is not a backup and never reaches the decoder.
-        if (bytes.length > BackupCodec.maxFileBytes) {
+        if (!BackupCodec.fitsImportLimit(bytes.length, bytes)) {
           return const IncomingFile.problem(IncomingFileProblem.tooLarge);
         }
-        final sender = reply['sender'];
-        return IncomingFile.bytes(
-          bytes,
-          sender: sender is String && sender.isNotEmpty ? sender : null,
-        );
+        return IncomingFile.bytes(bytes, sender: from);
       }
       return IncomingFile.problem(
         reply['error'] == 'tooLarge'

@@ -1,6 +1,8 @@
 import '../../schedule/domain/civil_date.dart';
 import 'holiday.dart';
+import 'holiday_country.dart';
 import 'holiday_entry.dart';
+import 'holiday_subdivision.dart';
 import 'spanish_regions.dart';
 
 /// The holidays a person sees, from the loaded rows and the place they chose.
@@ -20,18 +22,47 @@ import 'spanish_regions.dart';
 /// On top of that, for the month grid: one holiday per day, the most specific
 /// wins (local > regional > national), and a holiday the user added by hand
 /// wins over everything.
+///
+/// Official rows only apply in their country ([HolidayEntry.countryCode]):
+/// a person in Mexico never sees Spain's 12 October. [otherCountryCode]
+/// matches no row, so only the person's own holidays show.
 class HolidayCalendar {
+  /// [countryCode] that is not two letters counts as [otherCountryCode].
   HolidayCalendar(
     Iterable<HolidayEntry> entries, {
+    String countryCode = spainCountryCode,
     String? regionCode,
-    this.municipalityCode,
-  }) : regionCode = normalizeRegionCode(regionCode),
-       _entries = List.unmodifiable(entries);
+    String? municipalityCode,
+  }) : this._(
+         entries,
+         normalizeCountryCode(countryCode) ?? otherCountryCode,
+         regionCode,
+         municipalityCode,
+       );
+
+  // Municipalities exist only for Spain; another country may have a
+  // subdivision (`DE-BY`) when its files list them.
+  HolidayCalendar._(
+    Iterable<HolidayEntry> entries,
+    this.countryCode,
+    String? regionCode,
+    String? municipalityCode,
+  ) : regionCode = countryCode == spainCountryCode
+          ? normalizeRegionCode(regionCode)
+          : normalizeSubdivisionCode(countryCode, regionCode),
+      municipalityCode = countryCode == spainCountryCode
+          ? municipalityCode
+          : null,
+      _entries = List.unmodifiable(entries);
 
   /// A calendar with no rows: nothing is a holiday.
   static final HolidayCalendar empty = HolidayCalendar(const []);
 
-  /// Chosen region (`ES-CT`) or null: only the national holidays then.
+  /// Chosen country (`ES`), or [otherCountryCode] for «Otro país».
+  final String countryCode;
+
+  /// Chosen region (`ES-CT`) or, outside Spain, subdivision (`DE-BY`); null:
+  /// only the national holidays then.
   final String? regionCode;
 
   /// Chosen municipality (INE code) or null.
@@ -40,12 +71,12 @@ class HolidayCalendar {
 
   bool _applies(HolidayEntry e) {
     if (e.source == HolidaySource.user) return true;
+    if (e.countryCode != countryCode) return false;
     final region = regionCode;
     switch (e.scope) {
       case HolidayScope.national:
         // No region: the national file. A region: its kept national days.
-        return e.regionCode == null ||
-            (region != null && e.regionCode == region);
+        return e.isCountryWide || (region != null && e.regionCode == region);
       case HolidayScope.regional:
         return region != null && e.regionCode == region;
       case HolidayScope.local:

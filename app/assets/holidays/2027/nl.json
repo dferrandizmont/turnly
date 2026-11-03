@@ -1,0 +1,17 @@
+{
+"schema":1,
+"year":2027,
+"country":"NL",
+"national":[
+{"date":"2027-01-01","name":"Nieuwjaarsdag"},
+{"date":"2027-03-26","name":"Goede vrijdag"},
+{"date":"2027-03-28","name":"Eerste paasdag"},
+{"date":"2027-03-29","name":"Tweede paasdag"},
+{"date":"2027-04-27","name":"Koningsdag"},
+{"date":"2027-05-06","name":"Hemelvaartsdag"},
+{"date":"2027-05-16","name":"Eerste pinksterdag"},
+{"date":"2027-05-17","name":"Tweede pinksterdag"},
+{"date":"2027-12-25","name":"Eerste kerstdag"},
+{"date":"2027-12-26","name":"Tweede kerstdag"}
+]
+}

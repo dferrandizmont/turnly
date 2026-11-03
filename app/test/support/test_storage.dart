@@ -97,6 +97,11 @@ void expectSameSchedule(Schedule actual, Schedule expected) {
   expect(actual.patterns, expected.patterns, reason: 'patterns');
   expect(actual.runs, expected.runs, reason: 'runs');
   expect(actual.entries, expected.entries, reason: 'entries');
+  expect(
+    actual.shiftTypeVersions,
+    expected.shiftTypeVersions,
+    reason: 'shift type versions',
+  );
 }
 
 /// Scratch directory removed when the test ends.

@@ -1,14 +1,23 @@
 import 'package:cuadrante/core/bootstrap/bootstrap.dart';
+import 'package:cuadrante/features/calendar_export/application/device_calendar_providers.dart';
+import 'package:cuadrante/features/device_events/application/device_events.dart';
+import 'package:cuadrante/features/device_events/application/device_events_providers.dart';
+import 'package:cuadrante/features/device_events/domain/device_events_settings.dart';
 import 'package:cuadrante/features/schedule/data/schedule_repository.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/fake_device_calendar.dart';
 import 'harness.dart';
 
 /// H-T02-3: the plus of overtime / early leave used to be drawn at the bottom
 /// left, over the time of the shift ("⊕15–22"). It now sits in the top row of
 /// the cell, which the code and the time never enter.
+///
+/// P6: the same top row carries the dot of the appointments of the phone, so
+/// it is checked here too, in the whole matrix of sizes, text scales and
+/// themes: it never touches the code, the time or the edge of the cell.
 void main() {
   setUpAll(initializeLocale);
 
@@ -17,6 +26,38 @@ void main() {
   const plain = CivilDate(2026, 10, 13);
   const widths = [320.0, 360.0, 412.0];
   const scales = [1.0, 1.3, 2.0];
+
+  // The phone of the test: one calendar chosen, two appointments on the 12th
+  // and one on the 13th (so the label says «2 citas» and «1 cita»).
+  final phone = FakeDeviceCalendar();
+  phone.addCalendar('Trabajo');
+  phone.addSimpleEvent(
+    'cal-1',
+    'Dentista',
+    DateTime(2026, 10, 12, 9),
+    DateTime(2026, 10, 12, 10),
+  );
+  phone.addSimpleEvent(
+    'cal-1',
+    'Comida',
+    DateTime(2026, 10, 12, 13),
+    DateTime(2026, 10, 12, 14),
+  );
+  phone.addSimpleEvent(
+    'cal-1',
+    'Cita',
+    DateTime(2026, 10, 13, 16),
+    DateTime(2026, 10, 13, 17),
+  );
+  final deviceEvents = DeviceEvents(
+    api: phone,
+    loadSettings: () async =>
+        const DeviceEventsSettings(calendarIds: ['cal-1']),
+  );
+  final deviceOverrides = [
+    deviceCalendarApiProvider.overrideWithValue(phone),
+    deviceEventsProvider.overrideWithValue(deviceEvents),
+  ];
 
   Future<void> prepare(ScheduleRepository repository) => repository.apply(
     'main',
@@ -47,8 +88,8 @@ void main() {
     for (final width in widths) {
       for (final scale in scales) {
         testWidgets(
-          'at $width dp, text $scale, ${brightness.name}: the plus never '
-          'touches the code or the time',
+          'at $width dp, text $scale, ${brightness.name}: the plus and the '
+          'dot of the appointments never touch the code or the time',
           (tester) async {
             await pumpCalendar(
               tester,
@@ -56,6 +97,7 @@ void main() {
               textScale: scale,
               brightness: brightness,
               prepare: prepare,
+              overrides: deviceOverrides,
             );
             await tester.scrollUntilVisible(
               cell(plain),
@@ -67,25 +109,30 @@ void main() {
               (holiday, 'M', '06–14'),
               (plain, 'T', '14–22'),
             ]) {
-              final mark = tester.getRect(
-                find.byKey(ValueKey('extras-mark-${date.toIso()}')),
-              );
+              final box = tester.getRect(cell(date));
               final codeFinder = find.descendant(
                 of: cell(date),
                 matching: find.text(code),
               );
               expect(codeFinder, findsOneWidget);
-              expect(
-                mark.overlaps(tester.getRect(codeFinder)),
-                isFalse,
-                reason: 'the plus of $date covers the code',
-              );
+              final codeRect = tester.getRect(codeFinder);
               final timeFinder = find.descendant(
                 of: cell(date),
                 matching: find.text(time),
               );
-              if (timeFinder.evaluate().isNotEmpty) {
-                timesSeen++;
+              final timeVisible = timeFinder.evaluate().isNotEmpty;
+              if (timeVisible) timesSeen++;
+
+              // The plus of overtime / early leave.
+              final mark = tester.getRect(
+                find.byKey(ValueKey('extras-mark-${date.toIso()}')),
+              );
+              expect(
+                mark.overlaps(codeRect),
+                isFalse,
+                reason: 'the plus of $date covers the code',
+              );
+              if (timeVisible) {
                 expect(
                   mark.overlaps(tester.getRect(timeFinder)),
                   isFalse,
@@ -93,10 +140,32 @@ void main() {
                 );
               }
               // And it stays inside its own cell.
-              final box = tester.getRect(cell(date));
               expect(mark.left, greaterThanOrEqualTo(box.left));
               expect(mark.right, lessThanOrEqualTo(box.right));
               expect(mark.top, greaterThanOrEqualTo(box.top));
+
+              // The dot of the appointments of the phone (P6), in the same
+              // top row: never on the code, the time or the edge of the cell.
+              final deviceFinder = find.byKey(
+                ValueKey('device-event-mark-${date.toIso()}'),
+              );
+              expect(deviceFinder, findsOneWidget);
+              final device = tester.getRect(deviceFinder);
+              expect(
+                device.overlaps(codeRect),
+                isFalse,
+                reason: 'the dot of the appointments of $date covers the code',
+              );
+              if (timeVisible) {
+                expect(
+                  device.overlaps(tester.getRect(timeFinder)),
+                  isFalse,
+                  reason: 'the dot of the appointments of $date covers the time',
+                );
+              }
+              expect(device.left, greaterThanOrEqualTo(box.left));
+              expect(device.right, lessThanOrEqualTo(box.right));
+              expect(device.top, greaterThanOrEqualTo(box.top));
             }
             // Large text drops the time, as designed; the rest keep it, so
             // the check above really compares against it.
@@ -110,7 +179,7 @@ void main() {
 
   testWidgets('the plus lives in the top half of the cell, by the note and '
       'the holiday dot', (tester) async {
-    await pumpCalendar(tester, prepare: prepare);
+    await pumpCalendar(tester, prepare: prepare, overrides: deviceOverrides);
     final box = tester.getRect(cell(holiday));
     final mark = tester.getRect(
       find.byKey(ValueKey('extras-mark-${holiday.toIso()}')),
@@ -121,5 +190,17 @@ void main() {
     expect(mark.center.dy, lessThan(box.center.dy));
     expect(mark.right, lessThanOrEqualTo(dot.left));
     expect(mark.overlaps(dot), isFalse);
+  });
+
+  testWidgets('the day cell says out loud how many appointments it has', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await pumpCalendar(tester, prepare: prepare, overrides: deviceOverrides);
+    // The mark is only a dot, so the count is said out loud (never colour
+    // alone, rule 5): «2 citas» on the 12th, «1 cita» on the 13th.
+    expect(find.bySemanticsLabel(RegExp('2 citas')), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('1 cita')), findsOneWidget);
+    handle.dispose();
   });
 }

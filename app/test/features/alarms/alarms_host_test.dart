@@ -1,6 +1,7 @@
 import 'package:cuadrante/features/alarms/application/alarm_providers.dart';
 import 'package:cuadrante/features/alarms/data/alarm_scheduler.dart';
 import 'package:cuadrante/features/alarms/data/alarm_system.dart';
+import 'package:cuadrante/features/alarms/domain/alarm_planner.dart';
 import 'package:cuadrante/features/alarms/domain/alarm_settings.dart';
 import 'package:cuadrante/features/calendar/application/schedule_controller.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
@@ -96,7 +97,14 @@ void main() {
     await tester.pump(const Duration(seconds: 2));
     expect(scheduler.replaceCalls, 2);
     expect(scheduler.scheduled.map((a) => a.shiftDate), contains(day));
-    expect(scheduler.scheduled.every((a) => a.shiftTypeId == 'morning'), true);
+    // Every alarm is the morning's; the renewal notice (A1) may come along,
+    // since the demo rotation goes on past the horizon.
+    expect(
+      scheduler.scheduled
+          .where((a) => a.kind != AlarmKind.renewal)
+          .every((a) => a.shiftTypeId == 'morning'),
+      true,
+    );
 
     await tester.runAsync(() => notifier.pendingWrites);
   });

@@ -96,6 +96,31 @@ void main() {
     expect(atTheCap.bytes, hasLength(BackupCodec.maxFileBytes));
   });
 
+  test('a container of 9 MiB (a copy with photos) comes through; a plain '
+      'file of that size does not', () async {
+    final container = Uint8List(9 * 1024 * 1024)
+      ..setRange(0, 4, const [0x50, 0x4b, 0x03, 0x04]);
+    reply = (_) => {'bytes': container};
+    final file = (await platform.takeIncomingFile())!;
+    expect(file.problem, isNull);
+    expect(file.bytes, hasLength(9 * 1024 * 1024));
+
+    reply = (_) => {'bytes': Uint8List(9 * 1024 * 1024)};
+    expect(
+      (await platform.takeIncomingFile())!.problem,
+      IncomingFileProblem.tooLarge,
+    );
+
+    reply = (_) => {
+      'bytes': Uint8List(BackupCodec.maxImportBytes + 1)
+        ..setRange(0, 4, const [0x50, 0x4b, 0x03, 0x04]),
+    };
+    expect(
+      (await platform.takeIncomingFile())!.problem,
+      IncomingFileProblem.tooLarge,
+    );
+  });
+
   test('the tapjacking guard is switched with a bool', () async {
     await platform.setPreviewProtection(enabled: true);
     await platform.setPreviewProtection(enabled: false);

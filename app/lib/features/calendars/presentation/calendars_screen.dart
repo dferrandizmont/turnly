@@ -200,7 +200,10 @@ class _ArchivedCalendarsState extends ConsumerState<_ArchivedCalendars> {
                   children: [
                     Row(
                       children: [
-                        CalendarDot(colorValue: calendar.colorValue, size: 14),
+                        CalendarDot(
+                          colorValue: calendar.colorValue,
+                          size: CalendarDot.rowSize,
+                        ),
                         const SizedBox(width: Sp.m),
                         Expanded(
                           child: Text(
@@ -266,7 +269,10 @@ class _CalendarRow extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  CalendarDot(colorValue: calendar.colorValue, size: 14),
+                  CalendarDot(
+                    colorValue: calendar.colorValue,
+                    size: CalendarDot.rowSize,
+                  ),
                   const SizedBox(width: Sp.m),
                   Expanded(
                     child: Column(

@@ -11,7 +11,10 @@ import '../../../core/widgets/app_callout.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/buttons.dart';
 import '../../calendar/application/schedule_controller.dart';
+import '../../holidays/domain/holiday_country.dart';
+import '../../holidays/domain/holiday_subdivision.dart';
 import '../../holidays/domain/spanish_regions.dart';
+import '../../holidays/presentation/holiday_pickers.dart';
 import '../../import/data/import_file_picker.dart';
 import '../../import/presentation/import_icons.dart';
 import '../../patterns/domain/pattern_catalog.dart';
@@ -48,8 +51,9 @@ class _HeroDisc extends StatelessWidget {
   }
 }
 
-/// Step 4, «¿Vienes de otra app?»: a button opens the import (phone calendar,
-/// `.ics` or CSV); the step can also be skipped with «Continuar».
+/// «Importar mis turnos» (first screen of that way), «¿Vienes de otra app?»:
+/// a button opens the import (phone calendar, `.ics` or CSV), another the
+/// LRHSoft backup; «Continuar» goes on to the last step, imported or not.
 class ImportStep extends ConsumerWidget {
   const ImportStep({super.key});
 
@@ -66,6 +70,9 @@ class ImportStep extends ConsumerWidget {
       });
       if (prepared && context.mounted) {
         await context.push(AppRoutes.settingsImport, extra: kind);
+        // What was imported is the person's own: the last step must still
+        // write their country and job over it.
+        ref.read(onboardingControllerProvider.notifier).acceptImported();
       }
     }
 
@@ -99,7 +106,7 @@ class ImportStep extends ConsumerWidget {
   }
 }
 
-/// Step 5, «Listo»: what was set up. The choices are already saved.
+/// «Listo»: what was set up. The choices are already saved.
 class ReadyStep extends ConsumerWidget {
   const ReadyStep({super.key});
 
@@ -132,8 +139,19 @@ class ReadyStep extends ConsumerWidget {
 
     final lines = <String>[
       if (state.profession != null)
-        l10n.onboardingReadyProfession(state.profession!.label(l10n)),
-      if (state.regionCode != null)
+        l10n.onboardingReadyProfession(
+          state.profession!.label(l10n, spain: state.isSpain),
+        ),
+      if (state.countryCode == otherCountryCode)
+        l10n.onboardingReadyNoOfficialHolidays
+      else if (!state.isSpain)
+        l10n.onboardingReadyPlace(
+          [
+            subdivisionName(state.regionCode),
+            holidayCountryLabel(context, state.countryCode),
+          ].whereType<String>().join(', '),
+        )
+      else if (state.regionCode != null)
         l10n.onboardingReadyPlace(
           [
             state.municipalityName,

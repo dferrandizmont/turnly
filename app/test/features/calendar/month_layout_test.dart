@@ -1,6 +1,6 @@
 import 'package:cuadrante/core/bootstrap/bootstrap.dart';
 import 'package:cuadrante/core/theme/theme_context.dart';
-import 'package:cuadrante/features/onboarding/application/onboarding_providers.dart';
+import 'package:cuadrante/features/calendar/presentation/today_card.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -78,8 +78,6 @@ void main() {
         tester,
       ) async {
         await pumpCalendar(tester, size: sizeFor(width));
-        containerOf(tester).read(onboardingTipProvider.notifier).show();
-        await tester.pumpAndSettle();
 
         double glyphRight(String tooltip) => tester
             .getRect(
@@ -95,11 +93,14 @@ void main() {
         expect(gear, closeTo(width - Sp.l, 1));
         expect(next, closeTo(gear, 0.5));
 
-        final tip = tester.getRect(
-          find.byKey(const ValueKey('onboarding-tip')),
+        final card = tester.getRect(
+          find.descendant(
+            of: find.byType(TodayCard),
+            matching: find.byType(ClipRRect),
+          ),
         );
-        expect(tip.left, closeTo(Sp.l, 0.5));
-        expect(tip.right, closeTo(width - Sp.l, 0.5));
+        expect(card.left, closeTo(Sp.l, 0.5));
+        expect(card.right, closeTo(width - Sp.l, 0.5));
 
         final title = tester.getRect(find.byKey(const ValueKey('month-title')));
         expect(title.left, closeTo(Sp.l, 0.5));
@@ -123,12 +124,8 @@ void main() {
   group('H-T02-10: the last row is always reachable', () {
     for (final width in widths) {
       for (final scale in scales) {
-        testWidgets('at $width dp, text $scale, with the tip on', (
-          tester,
-        ) async {
+        testWidgets('at $width dp, text $scale', (tester) async {
           await pumpCalendar(tester, size: sizeFor(width), textScale: scale);
-          containerOf(tester).read(onboardingTipProvider.notifier).show();
-          await tester.pumpAndSettle();
 
           final last = cell(const CivilDate(2026, 11, 8));
           await tester.scrollUntilVisible(

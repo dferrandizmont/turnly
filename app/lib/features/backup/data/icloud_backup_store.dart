@@ -149,14 +149,14 @@ class ICloudBackupStore implements BackupStore {
     _checkOwn(entry);
     // The size comes before the bytes: a file that is not a backup (the
     // folder is visible in Files) is never downloaded or held in memory.
-    if (entry.sizeBytes > BackupCodec.maxFileBytes) {
+    if (entry.sizeBytes > BackupCodec.maxImportBytes) {
       throw const ICloudFailed('read: too large');
     }
     final bytes = await _call<Uint8List>('read', {'id': entry.id});
     if (bytes == null) {
       throw const ICloudFailed('read: unexpected reply from the native side');
     }
-    if (bytes.length > BackupCodec.maxFileBytes) {
+    if (!BackupCodec.fitsImportLimit(bytes.length, bytes)) {
       throw const ICloudFailed('read: too large');
     }
     return bytes;

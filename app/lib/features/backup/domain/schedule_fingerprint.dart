@@ -36,19 +36,25 @@ List<String> resolvedDayLines(
     ]),
 ];
 
-/// The reminder, overtime and early leave of [entry], or `null` when it has
-/// none of them.
+/// The reminder, overtime, early leave and extra amount of [entry], or
+/// `null` when it has none of them. The extra amount (schema v6) only appears
+/// when it is not zero, so the lines of older data stay the same.
 Map<String, Object?>? _annotations(DayEntry? entry) {
   if (entry == null) return null;
   final overtime = entry.overtimeMinutes ?? 0;
   final early = entry.earlyLeaveMinutes ?? 0;
-  if (entry.noteReminderMinute == null && overtime == 0 && early == 0) {
+  final extra = entry.extraAmountCents ?? 0;
+  if (entry.noteReminderMinute == null &&
+      overtime == 0 &&
+      early == 0 &&
+      extra == 0) {
     return null;
   }
   return {
     'noteReminderMinute': entry.noteReminderMinute,
     'overtimeMinutes': entry.overtimeMinutes,
     'earlyLeaveMinutes': entry.earlyLeaveMinutes,
+    if (extra != 0) 'extraAmountCents': extra,
   };
 }
 

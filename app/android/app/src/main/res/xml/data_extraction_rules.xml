@@ -8,13 +8,17 @@
   Both get the same: the "file" domain, which is files/ (cuadrante.sqlite and
   backups/). Nothing else: not the shared preferences (the scheduled alarms are
   derived from the data and planned again at start-up), not the cache, not
-  no_backup/. An <include> limits the backup to what it names.
+  no_backup/. An <include> limits the backup to what it names. folder_backup/
+  (the record of the automatic folder copy) is excluded: the folder's
+  permission does not travel, so neither does the record of it.
 -->
 <data-extraction-rules>
     <cloud-backup>
         <include domain="file" path="."/>
+        <exclude domain="file" path="folder_backup/"/>
     </cloud-backup>
     <device-transfer>
         <include domain="file" path="."/>
+        <exclude domain="file" path="folder_backup/"/>
     </device-transfer>
 </data-extraction-rules>

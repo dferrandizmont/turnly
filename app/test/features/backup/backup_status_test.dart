@@ -2,9 +2,12 @@ import 'dart:io';
 
 import 'package:cuadrante/core/bootstrap/bootstrap.dart';
 import 'package:cuadrante/core/router.dart';
+import 'package:cuadrante/features/backup/application/backup_actions.dart';
 import 'package:cuadrante/features/backup/application/backup_providers.dart';
 import 'package:cuadrante/features/backup/data/platform_backup_channel.dart';
 import 'package:cuadrante/features/backup/domain/backup_codec.dart';
+import 'package:cuadrante/features/backup/domain/backup_warnings.dart';
+import 'package:cuadrante/features/notes/domain/note_attachment.dart';
 import 'package:cuadrante/features/backup/presentation/backup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -68,7 +71,7 @@ void main() {
       expect(key('backup-copies-empty'), findsOneWidget);
       expect(key('backup-failed-title'), findsNothing);
       expect(find.text('Hacer copia ahora'), findsOneWidget);
-      expect(find.text('Exportar archivo'), findsOneWidget);
+      expect(find.text('Guardar una copia fuera de Turnly'), findsOneWidget);
       expect(find.text('Importar archivo'), findsOneWidget);
       expect(find.text('Probar restauración'), findsOneWidget);
       expect(h.files, isEmpty);
@@ -103,6 +106,22 @@ void main() {
       expect(find.textContaining('Copia del dispositivo · '), findsOneWidget);
       expect(find.text('Restaurar esta'), findsOneWidget);
       expect(key('backup-copies-empty'), findsNothing);
+    });
+
+    testWidgets('a copy that left attachments out says so instead of '
+        '"Copia hecha"', (tester) async {
+      final h = BackupUiHarness(tester);
+      await h.open(
+        extraOverrides: [
+          backupActionsProvider.overrideWith(_SkippingActions.new),
+        ],
+      );
+      await tapIo(
+        tester,
+        key('backup-now'),
+        until: find.textContaining('sin 1 adjunto'),
+      );
+      expect(find.text('Copia hecha'), findsNothing);
     });
 
     testWidgets('an older copy is shown as such ("Ayer a las…")', (
@@ -263,4 +282,14 @@ void main() {
       expect(key('backup-failed-title'), findsOneWidget);
     });
   });
+}
+
+/// A copy that reports one attachment left out.
+class _SkippingActions extends BackupActions {
+  _SkippingActions(super.ref);
+
+  @override
+  Future<List<BackupWarning>> lastCopyWarnings() async => const [
+    AttachmentsSkipped([BrokenAttachment('a', AttachmentFault.unreadable)]),
+  ];
 }

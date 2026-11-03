@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/format/app_date_format.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/providers.dart';
 import '../../../core/router.dart';
@@ -54,6 +55,7 @@ class _WidgetHostState extends ConsumerState<WidgetHost> {
   Timer? _watch;
   bool _started = false;
   String? _locale;
+  bool? _hour12;
 
   // What the minute watch compares the clock with.
   late CivilDate _seenDay;
@@ -103,16 +105,19 @@ class _WidgetHostState extends ConsumerState<WidgetHost> {
     super.didChangeDependencies();
     final l10n = context.l10n;
     final sync = ref.read(widgetSyncProvider);
-    sync.strings = WidgetStrings.fromL10n(l10n);
+    final hour12 = AppDateFormat.of(context).hour12;
+    sync.strings = WidgetStrings.fromL10n(l10n, hour12: hour12);
     if (!_started) {
       _started = true;
       sync.request(WidgetSyncTrigger.appStart);
       _armTimers();
       unawaited(_listenToTaps());
-    } else if (_locale != l10n.localeName) {
+    } else if (_locale != l10n.localeName || _hour12 != hour12) {
+      // The texts of the snapshot come written: the language and the clock.
       sync.request(WidgetSyncTrigger.localeChanged);
     }
     _locale = l10n.localeName;
+    _hour12 = hour12;
   }
 
   @override

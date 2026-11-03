@@ -91,6 +91,9 @@ void main() {
           prepare: _prepare,
         );
         expect(tester.takeException(), isNull, reason: 'x$scale');
+        // The card of today (with its day-off lines) pushes the lower rows of
+        // a small screen out of the build range: bring the cell into view.
+        await revealCell(tester, _sat);
         expect(
           _inCell(_sat, find.text('P')),
           findsOneWidget,
@@ -166,6 +169,7 @@ void main() {
       tester,
     ) async {
       await pumpCalendar(tester, size: const Size(320, 640), prepare: _prepare);
+      await revealCell(tester, _sat);
       final context = tester.element(cell(_sat));
       final style = context.type.cellTime;
       // The two full ranges fit in a cell of 100 dp with the normal text,
@@ -313,7 +317,8 @@ void main() {
       expect(
         find.descendant(
           of: find.byType(BottomSheet),
-          matching: find.text('09:00–13:00 · 17:00–21:00'),
+          // Day detail 4A: the hours worked follow the times.
+          matching: find.text('09:00–13:00 · 17:00–21:00 · 8 h'),
         ),
         findsOneWidget,
       );
@@ -401,12 +406,12 @@ void main() {
         startMinute: 7 * 60 + 30,
         endMinute: 15 * 60,
       );
-      expect(plain.compactTimeRange, '07:30–15');
-      expect(plain.compactTimeLabel, '07:30–15');
-      expect(plain.compactStart, '07:30');
-      expect(_partido.compactTimeRange, '09–13/17–21');
-      expect(_partido.compactTimeLabel, '09–13 · 17–21');
-      expect(_partido.compactStart, '09');
+      expect(plain.compactTimeRange(), '07:30–15');
+      expect(plain.compactTimeLabel(), '07:30–15');
+      expect(plain.compactStart(), '07:30');
+      expect(_partido.compactTimeRange(), '09–13/17–21');
+      expect(_partido.compactTimeLabel(), '09–13 · 17–21');
+      expect(_partido.compactStart(), '09');
       expect(
         _partido
             .copyWith(
@@ -414,7 +419,7 @@ void main() {
               segment2StartMinute: 16 * 60 + 30,
               segment2DurationMinutes: 3 * 60 + 30,
             )
-            .compactTimeRange,
+            .compactTimeRange(),
         '07:30–13/16:30–20',
       );
       const rest = ShiftType(
@@ -424,9 +429,9 @@ void main() {
         colorValue: 0,
         category: ShiftCategory.rest,
       );
-      expect(rest.compactTimeRange, isNull);
-      expect(rest.compactTimeLabel, isNull);
-      expect(rest.compactStart, isNull);
+      expect(rest.compactTimeRange(), isNull);
+      expect(rest.compactTimeLabel(), isNull);
+      expect(rest.compactStart(), isNull);
     });
   });
 }

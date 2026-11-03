@@ -20,6 +20,8 @@ const String kWidgetAgendaProvider =
     'es.cuadrante.app.widget.CuadranteAgendaWidgetProvider';
 const String kWidgetTwoWeeksProvider =
     'es.cuadrante.app.widget.CuadranteTwoWeeksWidgetProvider';
+const String kWidgetFourWeeksProvider =
+    'es.cuadrante.app.widget.CuadranteFourWeeksWidgetProvider';
 
 /// Every Android provider the snapshot feeds.
 const List<String> kWidgetProviders = [
@@ -28,6 +30,7 @@ const List<String> kWidgetProviders = [
   kWidgetLargeProvider,
   kWidgetAgendaProvider,
   kWidgetTwoWeeksProvider,
+  kWidgetFourWeeksProvider,
 ];
 
 /// The widget sizes the app can ask the launcher to pin.
@@ -45,7 +48,11 @@ enum WidgetSize {
   agenda,
 
   /// 4x2 (Android): the current and next weeks in two rows, from Monday.
-  twoWeeks;
+  twoWeeks,
+
+  /// 4x4 (Android): four weeks in four rows, from Monday, with the notes and
+  /// the next day off.
+  fourWeeks;
 
   /// The Android provider of this size.
   String get androidProvider => switch (this) {
@@ -54,6 +61,7 @@ enum WidgetSize {
     large => kWidgetLargeProvider,
     agenda => kWidgetAgendaProvider,
     twoWeeks => kWidgetTwoWeeksProvider,
+    fourWeeks => kWidgetFourWeeksProvider,
   };
 }
 

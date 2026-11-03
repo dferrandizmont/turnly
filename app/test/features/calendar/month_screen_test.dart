@@ -92,7 +92,8 @@ void main() {
       expect(
         find.bySemanticsLabel(
           'esta noche, Noche, 22:00–06:00, Empieza en 10 h, '
-          'Mañana (mar 20): turno de Noche',
+          'Mañana (mar 20): turno de Noche, '
+          'Libras el jueves 22, Fin de semana libre: 24–25 oct',
         ),
         findsOneWidget,
       );
@@ -261,7 +262,8 @@ void main() {
       expect(
         find.descendant(
           of: find.byType(BottomSheet),
-          matching: find.text('22:00–06:00'),
+          // Day detail 4A: the hours worked follow the times.
+          matching: find.text('22:00–06:00 · 8 h'),
         ),
         findsOneWidget,
       );
@@ -348,22 +350,25 @@ void main() {
       expect(find.text('ESTA NOCHE'), findsOneWidget);
     });
 
-    testWidgets('bar has a chip per shift, eraser, Doblar, undo and redo', (
-      tester,
-    ) async {
-      await pumpCalendar(tester);
-      await enterPaintMode(tester);
+    testWidgets(
+      'bar has a chip per shift, eraser, the two modes, undo and redo',
+      (tester) async {
+        await pumpCalendar(tester);
+        await enterPaintMode(tester);
 
-      for (final name in ['Mañana', 'Tarde', 'Noche', 'Libre', 'Saliente']) {
-        expect(find.widgetWithText(InkWell, name), findsOneWidget);
-      }
-      expect(find.text('Borrar'), findsOneWidget);
-      expect(find.text('Doblar'), findsOneWidget);
-      IconButton button(String key) =>
-          tester.widget<IconButton>(find.byKey(ValueKey(key)));
-      expect(button('undo').onPressed, isNull);
-      expect(button('redo').onPressed, isNull);
-    });
+        for (final name in ['Mañana', 'Tarde', 'Noche', 'Libre', 'Saliente']) {
+          expect(find.widgetWithText(InkWell, name), findsOneWidget);
+        }
+        expect(find.text('Borrar'), findsOneWidget);
+        // «Doblar» became the second of the two modes (B3).
+        expect(find.text('Cambiar el turno'), findsOneWidget);
+        expect(find.text('Añadir otro turno'), findsOneWidget);
+        IconButton button(String key) =>
+            tester.widget<IconButton>(find.byKey(ValueKey(key)));
+        expect(button('undo').onPressed, isNull);
+        expect(button('redo').onPressed, isNull);
+      },
+    );
 
     testWidgets('a tap paints the day with the selected shift', (tester) async {
       await pumpCalendar(tester);
@@ -484,12 +489,15 @@ void main() {
       expect(idsOn(scheduleOf(tester), oct12), 'morning');
     });
 
-    testWidgets('"Doblar" adds the shift to the day', (tester) async {
+    testWidgets('"Añadir otro turno" (doblar) adds the shift to the day', (
+      tester,
+    ) async {
       await pumpCalendar(tester);
       await enterPaintMode(tester);
 
       await tester.tap(find.widgetWithText(InkWell, 'Tarde'));
-      await tapChip(tester, 'Doblar');
+      await tester.tap(find.byKey(const ValueKey('tool-double')));
+      await tester.pumpAndSettle();
       await tester.tap(cell(oct23)); // night
       await tester.pumpAndSettle();
 

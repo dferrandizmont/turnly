@@ -14,6 +14,7 @@ void main() {
       await pumpCalendar(tester, textScale: scale);
 
       final title = find.byKey(const ValueKey('month-title'));
+      await revealOnMonth(tester, title);
       expect(tester.getSize(title).height, greaterThanOrEqualTo(48));
 
       final node = tester.getSemantics(

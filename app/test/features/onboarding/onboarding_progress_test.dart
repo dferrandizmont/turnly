@@ -6,6 +6,8 @@ import 'onboarding_support.dart';
 
 /// H-T01-9: «¿Cómo es tu rotación?» and «¿Cuándo empiezas?» both said
 /// «Paso 3 de 5», so pressing «Siguiente» looked like nothing had happened.
+/// Each way to start counts its own screens (2A): the first question and
+/// «Listo» carry no number.
 void main() {
   setUpAll(initializeLocale);
 
@@ -22,44 +24,53 @@ void main() {
       .evaluate()
       .length;
 
-  testWidgets('every screen of the flow has its own «Paso N de M»', (
+  bool dots() => key('onboarding-dots').evaluate().isNotEmpty;
+
+  testWidgets('every screen of a way has its own «Paso N de M»', (
     tester,
   ) async {
     final app = await FirstLaunch.open(tester);
+    expect(dots(), isFalse, reason: 'the first question has no number');
     final seen = <String, String>{};
 
     Future<void> record() async => seen[app.title] = progress(tester);
 
-    await record(); // ¿A qué te dedicas?
-    await app.tap(key('onboarding-profession-nursing'));
-    await app.tap(key('onboarding-next'));
-    await record(); // ¿Dónde trabajas?
-    await app.tap(key('onboarding-next'));
+    await app.choosePath('rotation');
     await record(); // ¿Cómo es tu rotación?
+    expect(dashes(tester), 3);
     await app.tap(key('onboarding-pattern-12h'));
     await app.tap(key('onboarding-next'));
     await record(); // ¿Cuándo empiezas?
     await app.tap(key('onboarding-next'));
-    await record(); // ¿Vienes de otra app?
-    await app.tap(key('onboarding-next'));
-    await record(); // Listo
+    await record(); // ¿Dónde trabajas?
+    expect(find.text('Paso 3 de 3 · Opcional'), findsOneWidget);
 
     expect(seen.keys, [
-      '¿A qué te dedicas?',
-      '¿Dónde trabajas?',
       '¿Cómo es tu rotación?',
       '¿Cuándo empiezas?',
-      '¿Vienes de otra app?',
-      'Listo',
+      '¿Dónde trabajas?',
     ]);
-    expect(seen.values, [
-      'Paso 1 de 6',
-      'Paso 2 de 6',
-      'Paso 3 de 6',
-      'Paso 4 de 6',
-      'Paso 5 de 6',
-      'Paso 6 de 6',
-    ]);
-    expect(dashes(tester), 6);
+    expect(seen.values, ['Paso 1 de 3', 'Paso 2 de 3', 'Paso 3 de 3']);
+
+    await app.tap(key('onboarding-next'));
+    expect(app.title, 'Listo');
+    expect(dots(), isFalse, reason: '«Listo» has no number');
+  });
+
+  testWidgets('importing: two screens', (tester) async {
+    final app = await FirstLaunch.open(tester);
+    await app.choosePath('import');
+    expect(progress(tester), 'Paso 1 de 2');
+    expect(dashes(tester), 2);
+    await app.tap(key('onboarding-next'));
+    expect(progress(tester), 'Paso 2 de 2');
+    expect(find.text('Paso 2 de 2 · Opcional'), findsOneWidget);
+  });
+
+  testWidgets('by hand: the last step alone', (tester) async {
+    final app = await FirstLaunch.open(tester);
+    await app.choosePath('paint');
+    expect(progress(tester), 'Paso 1 de 1');
+    expect(dashes(tester), 1);
   });
 }

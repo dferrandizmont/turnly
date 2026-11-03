@@ -21,6 +21,8 @@ Future<AppUnderTest> openExport(
     overrides: importOverrides(phone: phone, picker: FakePicker()),
   );
   await app.openSettings();
+  await tester.ensureVisible(byKey('settings-export-calendar'));
+  await tester.pumpAndSettle();
   await tester.tap(byKey('settings-export-calendar'));
   await tester.pumpAndSettle();
   return app;
@@ -66,15 +68,16 @@ void main() {
     expect(stateOf(app).targetId, id);
   });
 
-  testWidgets('the «Cuadrante» calendar from before the rename is still found', (
-    tester,
-  ) async {
-    final phone = FakeDeviceCalendar();
-    final id = phone.addCalendar('Cuadrante');
-    phone.addCalendar('Personal');
-    final app = await openExport(tester, phone);
-    expect(stateOf(app).targetId, id);
-  });
+  testWidgets(
+    'the «Cuadrante» calendar from before the rename is still found',
+    (tester) async {
+      final phone = FakeDeviceCalendar();
+      final id = phone.addCalendar('Cuadrante');
+      phone.addCalendar('Personal');
+      final app = await openExport(tester, phone);
+      expect(stateOf(app).targetId, id);
+    },
+  );
 
   testWidgets('exports, then a second export changes nothing', (tester) async {
     final phone = FakeDeviceCalendar();
@@ -92,10 +95,7 @@ void main() {
     expect(first, greaterThan(0));
     expect(byKey('export-result'), findsOneWidget);
     expect(find.text('Exportación hecha'), findsOneWidget);
-    expect(
-      find.text('Se ha creado el calendario «Turnly».'),
-      findsOneWidget,
-    );
+    expect(find.text('Se ha creado el calendario «Turnly».'), findsOneWidget);
     expect(
       find.text(first == 1 ? '1 evento añadido' : '$first eventos añadidos'),
       findsOneWidget,

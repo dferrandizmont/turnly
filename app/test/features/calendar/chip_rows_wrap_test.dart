@@ -69,10 +69,21 @@ void main() {
     expect(tester.takeException(), isNull);
   }
 
+  /// «Añadir turno» opens the palette of a day that has shifts.
+  Future<void> openPalette(WidgetTester tester) async {
+    final add = key('day-add-open');
+    if (add.evaluate().isEmpty) return;
+    await tester.ensureVisible(add);
+    await tester.pumpAndSettle();
+    await tester.tap(add);
+    await tester.pumpAndSettle();
+  }
+
   Future<void> openDay(WidgetTester tester) async {
     await revealCell(tester, oct21);
     await tester.tap(cell(oct21));
     await tester.pumpAndSettle();
+    await openPalette(tester);
   }
 
   Rect screen(WidgetTester tester) =>
@@ -89,7 +100,7 @@ void main() {
       ) async {
         await pumpCalendar(tester, size: size, textScale: scale);
         await openDay(tester);
-        expect(find.text('DOBLAR CON OTRO TURNO'), findsOneWidget);
+        expect(find.text('Doblar con otro turno'), findsOneWidget);
         await expectWhole(
           tester,
           keys: [for (final id in paletteIds(tester)) 'day-add-$id'],
@@ -132,6 +143,7 @@ void main() {
       await revealCell(tester, harnessToday);
       await tester.tap(cell(harnessToday));
       await tester.pumpAndSettle();
+      await openPalette(tester);
       final ids = paletteIds(tester);
       await expectWhole(
         tester,

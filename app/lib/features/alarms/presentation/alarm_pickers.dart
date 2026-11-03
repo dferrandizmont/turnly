@@ -7,6 +7,7 @@ import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/app_sheet.dart';
 import '../../../core/widgets/buttons.dart';
 import '../../../core/widgets/choice_sheet.dart';
+import '../../../core/widgets/minute_picker.dart';
 import '../../calendar/presentation/shift_format.dart';
 import '../domain/alarm_settings.dart';
 
@@ -109,24 +110,13 @@ Future<int?> pickDayBeforeTime(BuildContext context, {required int current}) =>
       help: context.l10n.alarmsDayBeforeTimeTitle,
     );
 
-/// A time of day on a 24 h clock with the Material picker; [help] is the
-/// title. Returns minutes after midnight, or null when dismissed.
+/// A time of day on the clock of Ajustes (see [showMinutePicker]); [help] is
+/// the title. Returns minutes after midnight, or null when dismissed.
 Future<int?> pickMinuteOfDay(
   BuildContext context, {
   required int current,
   required String help,
-}) async {
-  final picked = await showTimePicker(
-    context: context,
-    helpText: help,
-    initialTime: TimeOfDay(hour: current ~/ 60, minute: current % 60),
-    builder: (context, child) => MediaQuery(
-      data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-      child: child!,
-    ),
-  );
-  return picked == null ? null : picked.hour * 60 + picked.minute;
-}
+}) => showMinutePicker(context, current: current, help: help);
 
 /// Asks for the custom text of the notification. Returns the new text (empty
 /// = back to the default one), or null when dismissed.

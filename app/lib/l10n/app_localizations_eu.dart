@@ -131,6 +131,43 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
+  String get offToday => 'Gaur libre zaude';
+
+  @override
+  String offTodayBack(String date) {
+    return 'Gaur libre zaude; itzultzea: $date';
+  }
+
+  @override
+  String get offTomorrow => 'Bihar libre zaude';
+
+  @override
+  String offOn(String date) {
+    return 'Hurrengo egun librea: $date';
+  }
+
+  @override
+  String offWeekend(String range) {
+    return 'Asteburu librea: $range';
+  }
+
+  @override
+  String offStreak(int worked) {
+    return '$worked egun jarraian lanean';
+  }
+
+  @override
+  String offStreakLeft(int worked, int left) {
+    String _temp0 = intl.Intl.pluralLogic(
+      left,
+      locale: localeName,
+      other: '$left geratzen zaizkizu',
+      one: '1 geratzen zaizu',
+    );
+    return '$worked egun jarraian lanean; $_temp0';
+  }
+
+  @override
   String durationDaysHours(int days, int hours) {
     return '$days egun $hours h';
   }
@@ -307,6 +344,44 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
+  String get dayDetailUndo => 'Desegin egun honetako azken aldaketa';
+
+  @override
+  String dayDetailShiftMenu(String name) {
+    return 'Aukerak: $name';
+  }
+
+  @override
+  String get dayDetailChange => 'Aldatu';
+
+  @override
+  String dayDetailChangeTitle(String name) {
+    return 'Aldatu txanda: $name';
+  }
+
+  @override
+  String get dayDetailChangeHint =>
+      'Txanda bat beste batekin aldatzeko, ukitu haren menua.';
+
+  @override
+  String get dayDetailMore => 'Aukera gehiago';
+
+  @override
+  String get dayMoreExtras => 'Aparteko orduak';
+
+  @override
+  String get dayMoreReminder => 'Abisua';
+
+  @override
+  String get dayMoreAlarm => 'Alarma';
+
+  @override
+  String get dayMoreDuplicate => 'Bikoiztu';
+
+  @override
+  String get dayMoreClear => 'Ezabatu';
+
+  @override
   String get dayExtrasTitle => 'Aparteko orduak / Lehenago irten naiz';
 
   @override
@@ -418,6 +493,32 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get shiftTypesDiscardConfirm => 'Baztertu';
+
+  @override
+  String get shiftTypesScopeTitle => 'Zer egunetan eragiten du aldaketak?';
+
+  @override
+  String get shiftTypesScopeBody =>
+      'Txanda honen orduak edo dirua aldatu dituzu, eta dagoeneko iraganeko egunetan duzu.';
+
+  @override
+  String get shiftTypesScopeAll => 'Zuzendu egun guztietan';
+
+  @override
+  String get shiftTypesScopeAllHint =>
+      'Akats bat zen: iraganeko egunen orduak eta dirua ere aldatzen dira.';
+
+  @override
+  String shiftTypesScopeAllHintSince(String date) {
+    return 'Akats bat zen: data honetatik aurrerako egunak aldatzen dira: $date (txanda hau azkenekoz aldatu zenuen eguna). Aurrekoak dauden bezala geratzen dira.';
+  }
+
+  @override
+  String get shiftTypesScopeFromToday => 'Gaurtik aurrera bakarrik';
+
+  @override
+  String get shiftTypesScopeFromTodayHint =>
+      'Zure lanaldia edo prezioa aldatu da: iraganeko egunak lehen bezala geratzen dira.';
 
   @override
   String get shiftTypesNoTimes => 'Ordutegirik gabe';
@@ -814,9 +915,6 @@ class AppLocalizationsEu extends AppLocalizations {
   String get shiftTypesFixedPlusHint => 'Osagarririk gabe';
 
   @override
-  String get shiftTypesFixedPlusUnit => '€';
-
-  @override
   String get shiftTypesRateLabel => 'Orduko prezioa (aukerakoa)';
 
   @override
@@ -824,7 +922,9 @@ class AppLocalizationsEu extends AppLocalizations {
       'Hileko laburpenean zenbat irabazten duzun kalkulatzeko.';
 
   @override
-  String get shiftTypesRateUnit => '€/h';
+  String shiftTypesRateUnit(String symbol) {
+    return '$symbol/h';
+  }
 
   @override
   String get shiftTypesPreviewLabel => 'Honela ikusiko da hilean';
@@ -885,6 +985,64 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get paintToolsLabel => 'Margotzeko tresnak';
+
+  @override
+  String get paintModeReplace => 'Aldatu txanda';
+
+  @override
+  String get paintModeAdd => 'Gehitu beste txanda bat';
+
+  @override
+  String get paintModeAddSpoken => 'Gehitu beste txanda bat (bikoiztu)';
+
+  @override
+  String paintHeaderMode(String header, String mode) {
+    return '$header · $mode';
+  }
+
+  @override
+  String get paintPreviewTitle => 'Egun bat ukitzean';
+
+  @override
+  String get paintPreviewTitleDouble => 'Egun bat ukitzean (bikoiztu)';
+
+  @override
+  String get paintPreviewReplace => 'Dagoena ordezkatzen du';
+
+  @override
+  String get paintPreviewAdd => 'Dagoenari gehitzen zaio';
+
+  @override
+  String get paintPreviewErase => 'Eguna hutsik uzten du';
+
+  @override
+  String get paintPreviewEmpty => 'hutsik';
+
+  @override
+  String paintPreviewSpoken(
+    String title,
+    String before,
+    String after,
+    String effect,
+  ) {
+    return '$title. Lehen: $before. Gero: $after. $effect';
+  }
+
+  @override
+  String paintPreviewSpokenTimes(
+    String title,
+    String before,
+    String after,
+    String times,
+    String effect,
+  ) {
+    return '$title. Lehen: $before. Gero: $after, $times. $effect';
+  }
+
+  @override
+  String paintToolSpoken(String name, String times) {
+    return '$name, $times';
+  }
 
   @override
   String get selectionHeader => 'Hautapena';
@@ -1458,6 +1616,47 @@ class AppLocalizationsEu extends AppLocalizations {
   String get onboardingContinue => 'Jarraitu';
 
   @override
+  String get onboardingChooseTitle => 'Nola hasiko duzu zure txanden egutegia?';
+
+  @override
+  String get onboardingChooseHelp =>
+      'Aukeratu modu bat. Minutu bat baino lehen hilabetea prest izango duzu, eta gero nahi duzunean alda dezakezu.';
+
+  @override
+  String get onboardingPathImport => 'Inportatu nire txandak';
+
+  @override
+  String get onboardingPathImportHint =>
+      'Mugikorreko egutegitik, .ics edo CSV fitxategi batetik, edo LRHSoft kopia batetik.';
+
+  @override
+  String get onboardingPathRotation => 'Erabili txandaketa bat';
+
+  @override
+  String get onboardingPathRotationHint =>
+      'Aukeratu zure zikloa (goizak, arratsaldeak, gauak, gau-ondokoa…) eta bere kasa betetzen da, hilabetez hilabete.';
+
+  @override
+  String get onboardingPathRotationTag => 'Zure txanda errepikatzen bada';
+
+  @override
+  String get onboardingPathPaint => 'Margotu eskuz';
+
+  @override
+  String get onboardingPathPaintHint =>
+      'Aukeratu txanda bat eta arrastatu egunen gainetik. Hilabete bakoitza desberdina denean.';
+
+  @override
+  String get onboardingChooseLater =>
+      'Gero herrialdea galdetuko dizugu, jaiegunak markatzeko. Salta dezakezu.';
+
+  @override
+  String get onboardingRestore => 'Berreskuratu babeskopia bat';
+
+  @override
+  String get onboardingOptional => 'Aukerakoa';
+
+  @override
   String onboardingProgress(int current, int total) {
     return 'Urratsa: $current/$total';
   }
@@ -1467,7 +1666,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get onboardingProfessionHelp =>
-      'Horrela, zure laneko txandak eta txandaketak prest utziko dizkizugu. Nahi duzunean alda dezakezu.';
+      'Zure laneko ohiko ordutegiak prest uzteko bakarrik. Nahi duzunean alda dezakezu.';
 
   @override
   String get onboardingProfessionNursing =>
@@ -1525,11 +1724,54 @@ class AppLocalizationsEu extends AppLocalizations {
   String get onboardingProfessionOtherHint => 'Betiko txandekin hasiko zara';
 
   @override
+  String get onboardingProfessionNursingAbroad => 'Erizaintza eta osasuna';
+
+  @override
+  String get onboardingProfessionNursingAbroadHint =>
+      'Goi 08–15, Arr 15–22 eta Gau 22–08';
+
+  @override
+  String get onboardingProfessionPoliceAbroad => 'Polizia';
+
+  @override
+  String get onboardingProfessionSecurityAbroad => 'Segurtasuna';
+
+  @override
+  String get onboardingProfessionHospitalityAbroad => 'Ostalaritza';
+
+  @override
+  String get onboardingProfessionIndustryAbroadHint =>
+      'Txanda birakariak: Goi 06–14, Arr 14–22 eta Gau 22–06';
+
+  @override
+  String get onboardingProfessionCommerce => 'Merkataritza';
+
+  @override
+  String get onboardingProfessionCommerceHint => 'Goi 09–15 eta Arr 15–21';
+
+  @override
+  String get onboardingProfessionTransport => 'Garraioa';
+
+  @override
+  String get onboardingProfessionTransportHint =>
+      'Goi 06–14, Arr 14–22 eta Gau 22–06';
+
+  @override
   String get onboardingPlaceTitle => 'Non egiten duzu lan?';
 
   @override
   String get onboardingPlaceHelp =>
       'Zure erkidegoko eta udalerriko jaiegunak egutegian markatzeko.';
+
+  @override
+  String get onboardingPlaceHelpAbroad =>
+      'Zure herrialdeko jaiegun ofizialak egutegian markatzeko.';
+
+  @override
+  String get onboardingCountryLabel => 'Herrialdea';
+
+  @override
+  String get onboardingCountrySheetTitle => 'Zure herrialdea';
 
   @override
   String get onboardingRegionLabel => 'Erkidegoa';
@@ -1564,6 +1806,25 @@ class AppLocalizationsEu extends AppLocalizations {
   @override
   String get onboardingLocalHolidaysMissing =>
       'Zure udalerriko tokiko jaiegunak zuk zeuk gehi ditzakezu, bi ukitutan.';
+
+  @override
+  String onboardingLocalHolidaysMissingYear(String year) {
+    return 'Zure udalerriko tokiko jaiegunak oraindik ez dira argitaratu ($year): gehitu zuk zeuk bi ukitutan edo itxaron eguneratze bati.';
+  }
+
+  @override
+  String onboardingCountryNoData(String country) {
+    return 'Oraindik ez ditugu herrialde honetako jaiegun ofizialak: $country. Zureak Ezarpenak › Jaiegunak atalean gehi ditzakezu.';
+  }
+
+  @override
+  String get onboardingCountryNone =>
+      'Jaiegun ofizialik gabe. Zureak Ezarpenak › Jaiegunak atalean gehi ditzakezu.';
+
+  @override
+  String onboardingCountryIncluded(String country) {
+    return 'Zure egutegian $country herrialdeko jaiegun ofizialak markatuko ditugu. Zureak Ezarpenak › Jaiegunak atalean gehi ditzakezu.';
+  }
 
   @override
   String get onboardingRotationTitle => 'Nolakoa da zure txandaketa?';
@@ -1631,6 +1892,10 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get onboardingReadyByHand => 'Txandaketa: zuk margotzen duzu eskuz';
+
+  @override
+  String get onboardingReadyNoOfficialHolidays =>
+      'Jaiegunak: zuk gehitzen dituzunak bakarrik';
 
   @override
   String get onboardingReadyNothing =>
@@ -1799,6 +2064,14 @@ class AppLocalizationsEu extends AppLocalizations {
   String get summaryHoursWorked => 'Lan egindako orduak';
 
   @override
+  String get summaryHoursPlanned => 'Aurreikusitako orduak';
+
+  @override
+  String summaryWorkedToDate(String hours) {
+    return 'Atzo arte lan egindakoak: $hours';
+  }
+
+  @override
   String get summaryShiftsWorked => 'Lan egindako txandak';
 
   @override
@@ -1841,7 +2114,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get summaryNoteExtras =>
-      'Aparteko orduak eta irteera aurreratuak: egun bakoitzean idazten dituzunak. Aparteko orduak gehitu egiten zaizkie lan egindako orduei, eta irteerak kendu (egun bat ez da 0 h-tik jaisten). Egun horretan prezioa duen lehen txandaren orduko prezioan baloratzen dira.';
+      'Aparteko orduak eta irteera aurreratuak: egun bakoitzean idazten dituzunak. Aparteko orduak gehitu egiten zaizkie lan egindako orduei, eta irteerak kendu (egun bat ez da 0 h-tik jaisten). Irteerak eguneko azken txandaren amaiera mozten du, eta aparteko orduak haren ondoren doaz: horrela, gaueko eta jaiegunetako orduetan ere zenbatzen dira. Egun horretan prezioa duen lehen txandaren orduko prezioan baloratzen dira.';
 
   @override
   String summaryDays(int count) {
@@ -1947,6 +2220,162 @@ class AppLocalizationsEu extends AppLocalizations {
       'Jaiegunetako orduak: zure erkidegoko eta udalerriko jaiegun batean egiten direnak, baita txandak gauerdia gainditzen badu ere.';
 
   @override
+  String get summaryNoteTense =>
+      'Lan egindakoak: gaur aurreko egunak. Aurreikusitakoak: gaurtik aurrera, zure txanden egutegiaren arabera.';
+
+  @override
+  String get summaryNoteGoal =>
+      'Helburua: hilabete batean urtekoaren hamabirena hartzen da; urte batean, hilekoa bider 12; data batzuetan, egun horiei dagokien zatia. Aldeak lan egindakoak eta aurreikusitakoak batzen ditu.';
+
+  @override
+  String get summaryGoalTitle => 'Ordu-helburua';
+
+  @override
+  String get summaryGoalAdd => 'Ezarri ordu-helburu bat';
+
+  @override
+  String get summaryGoalEdit => 'Aldatu helburua';
+
+  @override
+  String get summaryGoalTarget => 'Helburua';
+
+  @override
+  String get summaryGoalDone => 'Lan egindakoak';
+
+  @override
+  String get summaryGoalPlanned => 'Aurreikusitakoak';
+
+  @override
+  String summaryGoalShort(String hours) {
+    return 'Falta zaizkizu: $hours';
+  }
+
+  @override
+  String summaryGoalShortPlanned(String hours) {
+    return 'Aurreikusitakoarekin, falta zaizkizu: $hours';
+  }
+
+  @override
+  String summaryGoalOver(String hours) {
+    return 'Soberan daramatzazu: $hours';
+  }
+
+  @override
+  String summaryGoalOverPlanned(String hours) {
+    return 'Aurreikusitakoarekin, soberan: $hours';
+  }
+
+  @override
+  String get summaryGoalMet => 'Helburua zehatz-mehatz';
+
+  @override
+  String get summaryGoalMetPlanned =>
+      'Aurreikusitakoarekin, helburua zehatz-mehatz';
+
+  @override
+  String get summaryGoalPerMonth => 'Hileko helburua';
+
+  @override
+  String get summaryGoalPerYear => 'Urteko helburua';
+
+  @override
+  String summaryGoalFromYear(String goal) {
+    return 'Urtean $goal, zati 12';
+  }
+
+  @override
+  String summaryGoalFromMonth(String goal) {
+    return 'Hilean $goal, bider 12';
+  }
+
+  @override
+  String summaryGoalRangeFromYear(String goal, int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days egunei',
+      one: 'egun bati',
+    );
+    return 'Urtean $goal, $_temp0 dagokien zatia';
+  }
+
+  @override
+  String summaryGoalRangeFromMonth(String goal, int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days egunei',
+      one: 'egun bati',
+    );
+    return 'Hilean $goal bider 12, $_temp0 dagokien zatia';
+  }
+
+  @override
+  String get summaryGoalChoiceYear => 'Urtean';
+
+  @override
+  String get summaryGoalChoiceMonth => 'Hilean';
+
+  @override
+  String get summaryGoalHoursYear => 'Orduak urtean';
+
+  @override
+  String get summaryGoalHoursMonth => 'Orduak hilean';
+
+  @override
+  String get summaryGoalHelpYear =>
+      'Adibidez, 1.642 h, ohiko urteko lanaldia. Begiratu zure hitzarmenekoa. Hilabete bakoitzean hamabirena hartzen da.';
+
+  @override
+  String get summaryGoalHelpMonth =>
+      'Adibidez, 140 h. Urtean 12 aldiz hartzen da.';
+
+  @override
+  String get summaryGoalUnit => 'h';
+
+  @override
+  String summaryGoalInvalid(int max) {
+    return 'Idatzi 1 eta $max arteko ordu kopurua.';
+  }
+
+  @override
+  String get summaryGoalRemove => 'Kendu helburua';
+
+  @override
+  String get summaryGoalSaveFailed => 'Ezin izan da helburua gorde.';
+
+  @override
+  String get summaryHowTitle => 'Nola noa?';
+
+  @override
+  String get summaryHowWorked => 'lan eginda';
+
+  @override
+  String get summaryHowWorkedToDate => 'lan eginda atzo arte';
+
+  @override
+  String get summaryHowPlanned => 'aurreikusita';
+
+  @override
+  String summaryHowPlannedRest(String hours, String date) {
+    return 'eta $hours aurreikusita, $date arte';
+  }
+
+  @override
+  String summaryHowBarLabel(String worked, String planned) {
+    return 'Lan eginda: $worked. Aurreikusita: $planned';
+  }
+
+  @override
+  String get summaryBreakdownTitle => 'Xehetasunak';
+
+  @override
+  String get summaryAbsencesNone => 'Bat ere ez';
+
+  @override
+  String get summaryEstimateNoPrices => 'Preziorik gabe';
+
+  @override
   String get summaryYearEmpty => 'Urte honek ez du txandarik.';
 
   @override
@@ -1983,7 +2412,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get summaryYearRowBody =>
-      'Hilabete bakoitzeko txandak, orduak eta euroak';
+      'Hilabete bakoitzeko txandak, orduak eta zenbatekoak';
 
   @override
   String summaryYearMonthSemantics(String month, String shifts, String hours) {
@@ -2008,6 +2437,123 @@ class AppLocalizationsEu extends AppLocalizations {
   String get shareMonthLegendEmpty => 'Hilabete honek ez du txandarik.';
 
   @override
+  String get reportShareTooltip => 'Txostena PDF edo CSV formatuan';
+
+  @override
+  String get reportSheetTitle => 'Txanden txostena';
+
+  @override
+  String get reportSheetIntro =>
+      'PDF garbi bat inprimatzeko edo bidaltzeko, edo kalkulu-orri bat zure txandekin.';
+
+  @override
+  String get reportFormatPdf => 'PDFa inprimatzeko edo bidaltzeko';
+
+  @override
+  String get reportFormatCsv => 'CSV Excel edo Sheets-erako';
+
+  @override
+  String get reportIncludeTitle => 'Zer sartu';
+
+  @override
+  String get reportIncludeNotes => 'Egunetako oharrak';
+
+  @override
+  String get reportIncludeEarnings => 'Zenbateko estimatuak';
+
+  @override
+  String get reportAbsencesTitle => 'Absentziak';
+
+  @override
+  String get reportAbsencesHidden => 'Ez erakutsi';
+
+  @override
+  String get reportAbsencesGeneric => '«Absentzia» gisa soilik';
+
+  @override
+  String get reportAbsencesDetailed => 'Izenarekin eta oharrarekin';
+
+  @override
+  String get reportAbsencesHint =>
+      'Gaixotasun-baja bat ez da bere izenarekin edo oharrarekin agertzen, «Izenarekin eta oharrarekin» aukeratzen ez baduzu.';
+
+  @override
+  String get reportCreate => 'Sortu eta partekatu';
+
+  @override
+  String get reportFailed => 'Ezin izan da txostena sortu';
+
+  @override
+  String reportSubject(String period) {
+    return 'Txandak: $period';
+  }
+
+  @override
+  String get reportUntitled => 'Nire txandak';
+
+  @override
+  String get reportLegendTitle => 'Legenda';
+
+  @override
+  String get reportTotalsTitle => 'Guztira';
+
+  @override
+  String get reportNotesTitle => 'Oharrak';
+
+  @override
+  String get reportHolidaysTitle => 'Jaiegunak';
+
+  @override
+  String get reportHolidayMark => 'Jaieguna';
+
+  @override
+  String get reportAbsenceName => 'Absentzia';
+
+  @override
+  String get reportAbsenceCode => 'ABS';
+
+  @override
+  String get reportHoursTotal => 'Orduak';
+
+  @override
+  String get reportHoursDone => 'Atzora arte landuak';
+
+  @override
+  String get reportHoursPlannedFrom => 'Gaurtik aurrera aurreikusiak';
+
+  @override
+  String get reportFooter => 'Turnly-rekin sortua';
+
+  @override
+  String reportPageOf(int page, int total) {
+    return 'Orria: $page/$total';
+  }
+
+  @override
+  String get reportColDate => 'Data';
+
+  @override
+  String get reportColDay => 'Eguna';
+
+  @override
+  String get reportColShifts => 'Txanda';
+
+  @override
+  String get reportColCode => 'Kodea';
+
+  @override
+  String get reportColStart => 'Hasiera';
+
+  @override
+  String get reportColEnd => 'Amaiera';
+
+  @override
+  String get reportColHours => 'Orduak';
+
+  @override
+  String get reportColNote => 'Oharra';
+
+  @override
   String get saveFailed => 'Ezin izan da aldaketa gorde';
 
   @override
@@ -2017,7 +2563,7 @@ class AppLocalizationsEu extends AppLocalizations {
   String get settingsOpenTooltip => 'Ireki ezarpenak';
 
   @override
-  String get settingsSectionSchedule => 'Zure txanden egutegia';
+  String get settingsSectionSchedule => 'Nire egutegia';
 
   @override
   String get settingsShiftsTitle => 'Nire txandak';
@@ -2045,6 +2591,50 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get settingsThemeDark => 'Iluna';
+
+  @override
+  String get appearanceAccentTitle => 'Azentu-kolorea';
+
+  @override
+  String get appearanceAccentIndigo => 'Indigoa';
+
+  @override
+  String get appearanceAccentBlue => 'Urdina';
+
+  @override
+  String get appearanceAccentPetrol => 'Petrolioa';
+
+  @override
+  String get appearanceAccentRaspberry => 'Mugurdia';
+
+  @override
+  String get appearanceAccentGraphite => 'Grafitoa';
+
+  @override
+  String get appearanceAccentDefault => 'Lehenetsia';
+
+  @override
+  String get appearanceAccentNote =>
+      'Estekak, etengailuak, hautapena eta fitxak aldatzen ditu. Zure txanden koloreak ez dira aldatzen.';
+
+  @override
+  String get appearanceCellSizeTitle => 'Txandaren tamaina hilabetean';
+
+  @override
+  String get appearanceCellSizeNormal => 'Normala';
+
+  @override
+  String get appearanceCellSizeLarge => 'Handia';
+
+  @override
+  String get appearanceCellSizeExtraLarge => 'Oso handia';
+
+  @override
+  String get appearanceCellSizeNote =>
+      'Hilabeteko egun bakoitzaren kodea eta ordua. Gelaxka batean sartzen ez badira, berez egokitzen dira.';
+
+  @override
+  String get appearanceCellSizeSampleCode => 'G';
 
   @override
   String get settingsWeekStartTitle => 'Asteko lehen eguna';
@@ -2085,11 +2675,53 @@ class AppLocalizationsEu extends AppLocalizations {
   String get languageNameEn => 'English';
 
   @override
+  String get settingsTimeFormatTitle => 'Ordu-formatua';
+
+  @override
+  String settingsTimeFormatAuto(String format) {
+    return 'Automatikoa ($format)';
+  }
+
+  @override
+  String get settingsTimeFormat24 => '24 h (22:00)';
+
+  @override
+  String get settingsTimeFormat12 => '12 h (10:00 PM)';
+
+  @override
+  String get settingsTimeFormatShort24 => '24 h';
+
+  @override
+  String get settingsTimeFormatShort12 => '12 h';
+
+  @override
+  String get settingsCurrencyTitle => 'Moneta';
+
+  @override
+  String get settingsCurrencyNote =>
+      'Moneta aldatzeak ez ditu zenbatekoak bihurtzen. Berrikusi orduko prezioak eta osagarriak.';
+
+  @override
+  String get settingsCurrencySearchHint => 'Bilatu moneta edo kode bat';
+
+  @override
+  String get settingsCurrencyCommon => 'Ohikoenak';
+
+  @override
+  String get settingsCurrencyAll => 'Guztiak';
+
+  @override
+  String get settingsCurrencyNone => 'Ez dago bat datorren monetarik';
+
+  @override
   String get settingsSaveFailed =>
       'Ezin izan da ezarpena gorde. Saiatu berriro.';
 
   @override
-  String get settingsSectionMore => 'Abisuak eta datuak';
+  String get settingsSectionMore => 'Abisuak eta widgeta';
+
+  @override
+  String get settingsSectionBackup => 'Kopiak eta mugikorrez aldatzea';
 
   @override
   String get settingsHolidaysTitle => 'Jaiegunak';
@@ -2098,7 +2730,17 @@ class AppLocalizationsEu extends AppLocalizations {
   String get settingsAlarmsTitle => 'Alarmak';
 
   @override
+  String settingsAlarmsUntil(String date) {
+    return 'Abisuak: $date arte';
+  }
+
+  @override
   String get settingsBackupTitle => 'Babeskopia';
+
+  @override
+  String settingsBackupLast(String when) {
+    return 'Azkena: $when, egiaztatuta';
+  }
 
   @override
   String get settingsPrivacyTitle => 'Pribatutasun-politika';
@@ -2206,7 +2848,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get faqDoubleA =>
-      'Bikoiztea egun berean bi txanda egitea da. Ukitu eguna eta, haren xehetasunetan, erabili «Gehitu bigarren txanda». Margotzen ari bazara, aktibatu «Bikoiztu» eta ukitu egunak. Egun batzuk aukeratuta, «Bikoiztu…» aukerak txanda guztiei gehitzen die.\n\nEgun batek behar dituzun txandak izan ditzake, eta bakoitzak bere orduak gehitzen ditu bereiz.';
+      'Bikoiztea egun berean bi txanda egitea da. Ukitu eguna eta, haren xehetasunetan, erabili «Gehitu bigarren txanda». Margotzen ari bazara, aukeratu «Gehitu beste txanda bat» modua eta ukitu egunak. Egun batzuk aukeratuta, «Bikoiztu…» aukerak txanda guztiei gehitzen die.\n\nEgun batek behar dituzun txandak izan ditzake, eta bakoitzak bere orduak gehitzen ditu bereiz.';
 
   @override
   String get faqPostNightQ => 'Zer da gau-ondoko automatikoa?';
@@ -2269,11 +2911,11 @@ class AppLocalizationsEu extends AppLocalizations {
       'Bai. Ezarpenak › Egutegiak atalean, egutegi bat sortzen duzu zure bikotearentzat, bigarren lan batentzat edo seme-alaba batentzat: bakoitzak bere txandaketak eta egunak ditu, eta txanda motak berak dira. Bi edo gehiago dituzunean, hilaren gaineko egutegi-izenarekin batetik bestera alda zaitezke. Widgetak eta alarmek «Widgeta eta alarmak» gisa markatutako egutegia jarraitzen dute.\n\nNoiz zaudeten biak libre ikusteko, sakatu «Alderatu egutegiak» orri berean: bi aukeratzen dituzu eta haien txandak elkarrekin ikusten dituzu, baita hilabeteko egun libre komunak ere.';
 
   @override
-  String get faqSummaryQ => 'Nola kalkulatzen dira orduak eta euroak?';
+  String get faqSummaryQ => 'Nola kalkulatzen dira orduak eta dirua?';
 
   @override
   String get faqSummaryA =>
-      'Egutegiko laburpen-ikonoak txandak, orduak, gaueko orduak eta jaiegunetakoak erakusten ditu, hilabetekoak, urte osokoak edo «Datak…» atalean aukeratzen dituzun datetakoak (366 egun arte). Txanda bat hasten den egunean kontatzen da, gauerdia gainditzen badu ere.\n\nEuroak ikusteko, jarri txanden orduko prezioa eta, baduzu, txanda motaren osagarri finkoa Ezarpenak › Nire txandak atalean. Estimazioak osagarri finko horiek barne hartzen ditu, zergen aurretik. Ez ditu gaueko edo jaiegunetako orduen osagarriak ez atxikipenak barne hartzen.\n\n«Txandako osagarria» behin gehitzen da mota horretako txanda landu bakoitzeko, baita zatitutakoa bada ere; ez da ordu kopuruaren araberakoa. Atsedenek eta absentziek ez dute gehitzen.';
+      'Egutegiko laburpen-ikonoak txandak, orduak, gaueko orduak eta jaiegunetakoak erakusten ditu, hilabetekoak, urte osokoak edo «Datak…» atalean aukeratzen dituzun datetakoak (366 egun arte). Txanda bat hasten den egunean kontatzen da, gauerdia gainditzen badu ere.\n\nZenbatekoak ikusteko, jarri txanden orduko prezioa eta, baduzu, txanda motaren osagarri finkoa Ezarpenak › Nire txandak atalean. Estimazioak osagarri finko horiek barne hartzen ditu, zergen aurretik, Ezarpenak › Itxura atalean aukeratzen duzun monetan. Ez ditu gaueko edo jaiegunetako orduen osagarriak ez atxikipenak barne hartzen.\n\n«Txandako osagarria» behin gehitzen da mota horretako txanda landu bakoitzeko, baita zatitutakoa bada ere; ez da ordu kopuruaren araberakoa. Atsedenek eta absentziek ez dute gehitzen.';
 
   @override
   String get settingsVersionCopied => 'Bertsioa kopiatu da';
@@ -3098,6 +3740,237 @@ class AppLocalizationsEu extends AppLocalizations {
   String get calExportRangeClamped => 'Gehienez urtebete: amaiera moztu da.';
 
   @override
+  String get calSyncTitle => 'Eguneratuta mantendu';
+
+  @override
+  String get calSyncHelp =>
+      'Turnly-k berak eguneratzen ditu gertaera horiek, txanden egutegia aldatzen duzun bakoitzean eta aplikazioa irekitzean: duela astebetetik hurrengo hiru hilabeteetara. Berak sortutako gertaerei bakarrik eragiten die. Itzaltzen baduzu, dagoeneko daudenak han geratzen dira.';
+
+  @override
+  String calSyncLast(String when) {
+    return 'Azken eguneratzea: $when';
+  }
+
+  @override
+  String calSyncFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Ezin izan dira $count gertaera eguneratu. Hurrengo eguneratzean berriro saiatuko da.',
+      one: 'Ezin izan da gertaera 1 eguneratu. Hurrengo eguneratzean berriro saiatuko da.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get calSyncLocked =>
+      'Beste egutegi bat aukeratzeko, itzali lehenago «Eguneratuta mantendu».';
+
+  @override
+  String get calSyncRunning => 'Egutegia eguneratzen…';
+
+  @override
+  String get calSyncNoticePermission =>
+      '«Eguneratuta mantendu» itzali egin da: Turnly-k ez du jada zure egutegia erabiltzeko baimenik.';
+
+  @override
+  String get calSyncNoticeCalendarGone =>
+      '«Eguneratuta mantendu» itzali egin da: mugikorreko egutegia ez dago jada edo izena aldatu du.';
+
+  @override
+  String get calSyncNoticeSourceGone =>
+      '«Eguneratuta mantendu» itzali egin da: esportatzen zen Turnly-ko egutegia ez da jada existitzen.';
+
+  @override
+  String get calSyncNoticeDismiss => 'Ulertuta';
+
+  @override
+  String get calExportIcsTitle => 'Gorde .ics fitxategi gisa';
+
+  @override
+  String get calExportIcsHelp =>
+      'Google Calendar, Outlook eta Apple Calendar-ek irekitzen duten fitxategia, nahi duzunera bidaltzeko edo gordetzeko. Ez du baimenik behar.';
+
+  @override
+  String calExportIcsRange(String from, String to) {
+    return 'Noiztik: $from. Noiz arte: $to';
+  }
+
+  @override
+  String get calExportIcsButton => 'Gorde .ics fitxategia';
+
+  @override
+  String get calExportIcsRunning => 'Fitxategia prestatzen…';
+
+  @override
+  String get calExportIcsFailed =>
+      'Ezin izan da fitxategia sortu. Saiatu berriro.';
+
+  @override
+  String get shareLinkRowTitle => 'Partekatu esteka bidez';
+
+  @override
+  String get shareLinkRowSubtitle =>
+      'Zure familiak zure txandak ikusten ditu bere egutegian';
+
+  @override
+  String get shareLinkRowPublished => 'Esteka argitaratuta';
+
+  @override
+  String get shareLinkTitle => 'Partekatu esteka bidez';
+
+  @override
+  String get shareLinkIntro =>
+      'Argitaratu irakurtzeko soilik den esteka bat: daukanak zure txandak ikusiko ditu bere egutegian (Google, Apple, Outlook), ezer instalatu gabe. Bere kabuz eguneratzen da txanden egutegia aldatzen duzunean.';
+
+  @override
+  String get shareLinkUnavailableTitle => 'Oraindik ez dago erabilgarri';
+
+  @override
+  String get shareLinkUnavailableBody =>
+      'Bertsio honek oraindik ezin du estekarik argitaratu. Bitartean, zure txandak .ics fitxategi gisa gorde ditzakezu Esportatu txandak atalean.';
+
+  @override
+  String get shareLinkCalendarLabel => 'Egutegia';
+
+  @override
+  String get shareLinkOptionsLabel => 'Zer partekatzen den';
+
+  @override
+  String get shareLinkIncludeRest => 'Sartu egun libreak';
+
+  @override
+  String get shareLinkIncludeRestHelp =>
+      'Libre eta Gau-ondokoa, egun osoko gertaera gisa.';
+
+  @override
+  String get shareLinkIncludeAbsences => 'Erakutsi absentziak «Absentzia» gisa';
+
+  @override
+  String get shareLinkIncludeAbsencesHelp =>
+      'Arrazoirik gabe: ez da jakiten baja, oporrak edo norberaren eguna den.';
+
+  @override
+  String get shareLinkPrivacyTitle => 'Zer ateratzen den eta zer ez';
+
+  @override
+  String get shareLinkPrivacyBody =>
+      'Txanda bakoitzaren izena, kodea eta ordua ateratzen dira, eta egutegiaren izena. Ez dira inoiz ateratzen zure oharrak, bajak edo absentzien arrazoiak. Esteka daukanak zure txandak ikus ditzake: nahi duzunari bakarrik eman, eta baliogabetu nahi duzunean.';
+
+  @override
+  String get shareLinkPublishButton => 'Argitaratu esteka';
+
+  @override
+  String get shareLinkPublishConfirmTitle => 'Zure txandak argitaratu?';
+
+  @override
+  String get shareLinkPublishConfirmBody =>
+      'Zure txandak Turnly-ren zerbitzarira igoko dira esteka ibil dadin. Hori da aplikazioak mugikorretik kanpora bidaltzen duen gauza bakarra. Esteka baliogabetzean edo sei hilabetez eguneratu gabe egon ondoren ezabatzen dira.';
+
+  @override
+  String get shareLinkPublishConfirm => 'Argitaratu';
+
+  @override
+  String get shareLinkQrLabel => 'Zure txanden esteka duen QR kodea';
+
+  @override
+  String get shareLinkLinkLabel => 'Esteka';
+
+  @override
+  String get shareLinkCopy => 'Kopiatu';
+
+  @override
+  String get shareLinkCopied => 'Esteka kopiatuta';
+
+  @override
+  String get shareLinkShare => 'Partekatu';
+
+  @override
+  String shareLinkShareText(String url) {
+    return 'Nire txandak Turnly-n. Gehitu zure egutegira esteka honekin: $url';
+  }
+
+  @override
+  String shareLinkLastPublished(String date) {
+    return 'Azken argitalpena: $date';
+  }
+
+  @override
+  String get shareLinkPublishing => 'Argitaratzen…';
+
+  @override
+  String get shareLinkWaiting => 'Laster eguneratuko da.';
+
+  @override
+  String get shareLinkNotPublished => 'Oraindik ezin izan da argitaratu.';
+
+  @override
+  String get shareLinkRefresh => 'Eguneratu orain';
+
+  @override
+  String shareLinkSharedCalendar(String name) {
+    return 'Egutegi honen txandak partekatzen dira: $name.';
+  }
+
+  @override
+  String get shareLinkCalendarMissing =>
+      'Partekatzen zenuen egutegia ez dago jada. Aukeratu beste bat esteka eguneratzen jarraitzeko.';
+
+  @override
+  String get shareLinkHowTitle => 'Nola harpidetu';
+
+  @override
+  String get shareLinkHowBody =>
+      'Google Calendar-en: Beste egutegi batzuk › URL bidez, eta itsatsi esteka. iPhone-an: ireki esteka, edo joan Ezarpenak › Egutegia › Kontuak › Gehitu kontua › Bestelakoa › Gehitu harpidetutako egutegia. Egutegi bakoitzak erabakitzen du noizero begiratzen dituen aldaketak: ordu batzuk behar ditzakete.';
+
+  @override
+  String get shareLinkRevoke => 'Baliogabetu esteka';
+
+  @override
+  String get shareLinkRevokeConfirmTitle => 'Esteka baliogabetu?';
+
+  @override
+  String get shareLinkRevokeConfirmBody =>
+      'Zerbitzaritik ezabatzen da eta inorentzat ez du funtzionatzen. Berriro argitaratzen baduzu, esteka berri bat sortzen da.';
+
+  @override
+  String get shareLinkRevokeConfirm => 'Baliogabetu';
+
+  @override
+  String get shareLinkRevoking => 'Baliogabetzen…';
+
+  @override
+  String get shareLinkRevokePending =>
+      'Baliogabetzea zain dago: laster saiatuko da berriro bere kabuz. Bitartean ez da ezer argitaratzen.';
+
+  @override
+  String get shareLinkProblemNetwork =>
+      'Ez dago zerbitzariarekin konexiorik. Geroago saiatuko gara berriro.';
+
+  @override
+  String get shareLinkProblemRateLimited =>
+      'Eguneratze gehiegi jarraian. Laster saiatuko gara berriro.';
+
+  @override
+  String get shareLinkProblemTooLarge =>
+      'Txanden egutegia handiegia da argitaratzeko.';
+
+  @override
+  String get shareLinkProblemRejected =>
+      'Zerbitzariak ez du esteka onartu. Baliogabetu eta argitaratu berri bat.';
+
+  @override
+  String get shareLinkProblemRevoked =>
+      'Esteka hau baliogabetu egin zen eta ez du funtzionatzen. Argitaratu berri bat zure txandak berriro partekatu nahi badituzu.';
+
+  @override
+  String get shareLinkProblemServer => 'Ezin izan da osatu. Saiatu berriro.';
+
+  @override
+  String get shareLinkAbsence => 'Absentzia';
+
+  @override
   String get onboardingImportButton => 'Inportatu orain';
 
   @override
@@ -3118,6 +3991,9 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get backupUiStatusWhere => 'Gailu honetan';
+
+  @override
+  String get backupUiStatusVerified => 'Egiaztatuta: osorik berreskura daiteke';
 
   @override
   String get backupUiStatusRunning => 'Kopia gordetzen…';
@@ -3184,6 +4060,30 @@ class AppLocalizationsEu extends AppLocalizations {
       'Ezin izan da kopia egin. Zure datuak lehen bezala daude.';
 
   @override
+  String backupWarnRestoreSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Lehenago egin dugun kopiak ez dauzka $count eranskin: haien fitxategiak ez zeuden edo ezin izan ziren irakurri.',
+      one: 'Lehenago egin dugun kopiak ez dauka eranskin 1: haren fitxategia ez zegoen edo ezin izan zen irakurri.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String backupWarnCopySkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Kopia eginda, baina $count eranskin gabe: haien fitxategiak ez daude edo ezin dira irakurri.',
+      one: 'Kopia eginda, baina eranskin 1 gabe: haren fitxategia ez dago edo ezin da irakurri.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get backupUiAutoTitle => 'Kopia automatikoak';
 
   @override
@@ -3193,6 +4093,112 @@ class AppLocalizationsEu extends AppLocalizations {
   @override
   String get backupUiAutoOff =>
       'Desaktibatuta: zuk eskatzen duzunean bakarrik egiten da kopia.';
+
+  @override
+  String get autoBackupFolderTitle => 'Kopia automatikoa karpeta batean';
+
+  @override
+  String get autoBackupFolderIntro =>
+      'Egunean kopia bat zuk aukeratutako karpetan: Drive, Dropbox, OneDrive edo gailuko karpeta bat. Gailua galtzen baduzu, han izango duzu. Azken 10ak gordetzen ditugu.';
+
+  @override
+  String get autoBackupFolderPrivacy =>
+      'Kopiak zure txanden egutegi osoa darama, absentziak eta baja medikoak barne, eta karpeta hori dagoen tokian gordetzen da (adibidez, zure hodeian). Ez da konturik behar Turnly erabiltzeko.';
+
+  @override
+  String get autoBackupFolderChoose => 'Aukeratu karpeta';
+
+  @override
+  String get autoBackupFolderChooseSubtitle =>
+      'Sistemaren karpeta-hautatzailea irekiko da';
+
+  @override
+  String get autoBackupFolderFolder => 'Karpeta';
+
+  @override
+  String get autoBackupFolderUnnamed => 'Aukeratutako karpeta';
+
+  @override
+  String get autoBackupFolderChange => 'Sakatu beste bat aukeratzeko';
+
+  @override
+  String autoBackupFolderLast(String when) {
+    return 'Karpetako azken kopia: $when';
+  }
+
+  @override
+  String get autoBackupFolderNone => 'Oraindik ez dago kopiarik karpetan.';
+
+  @override
+  String get autoBackupFolderSchedule =>
+      'Egunean behin kopiatzen da eta, aplikazioa irekita dagoenean, zure aldaketen ondoren (gehienez 6 orduan behin).';
+
+  @override
+  String get autoBackupFolderCopyNow => 'Kopiatu orain karpetan';
+
+  @override
+  String get autoBackupFolderCopyDone => 'Kopia karpetan gorde da';
+
+  @override
+  String get autoBackupFolderVerify => 'Probatu karpetako kopia';
+
+  @override
+  String get autoBackupFolderVerifySubtitle =>
+      'Karpetako azken kopia osorik berreskura daitekeela egiaztatzen du';
+
+  @override
+  String get autoBackupFolderStop => 'Utzi karpeta honetan kopiatzeari';
+
+  @override
+  String get autoBackupFolderStopSubtitle =>
+      'Karpetan dauden kopiak ez dira ezabatzen';
+
+  @override
+  String get autoBackupFolderStopped =>
+      'Jada ez da kopiarik egiten karpeta horretan';
+
+  @override
+  String get autoBackupFolderFailedTitle =>
+      'Karpetako kopiak ez du funtzionatzen';
+
+  @override
+  String autoBackupFolderFailedWhen(String when) {
+    return 'Azken saiakera: $when.';
+  }
+
+  @override
+  String get autoBackupFolderErrRevoked =>
+      'Turnlyk jada ez du karpeta hori erabiltzeko baimenik. Aukeratu berriro.';
+
+  @override
+  String get autoBackupFolderErrMissing =>
+      'Ez dugu karpeta aurkitu: agian ezabatu edo lekuz aldatu da. Aukeratu beste bat.';
+
+  @override
+  String get autoBackupFolderErrUnwritable =>
+      'Karpeta horrek ez du fitxategiak gordetzen uzten. Aukeratu beste bat.';
+
+  @override
+  String get autoBackupFolderErrNoSpace =>
+      'Ez dago lekurik karpeta dagoen tokian (gailuan edo zure hodeian). Egin lekua eta saiatu berriro.';
+
+  @override
+  String get autoBackupFolderErrTooLarge => 'Kopia handiegia da gordetzeko.';
+
+  @override
+  String get autoBackupFolderErrFailed =>
+      'Ezin izan da kopia karpetan gorde. Berriro saiatuko gara.';
+
+  @override
+  String get autoBackupFolderErrDamaged =>
+      'Ezin izan dugu karpetako kopiaren konfigurazioa irakurri. Aukeratu karpeta berriro.';
+
+  @override
+  String get autoBackupFolderChooseAgain => 'Aukeratu karpeta berriro';
+
+  @override
+  String get autoBackupFolderPickFailed =>
+      'Ezin izan da karpeta hori erabili. Saiatu beste batekin.';
 
   @override
   String get backupUiSectionFile => 'Fitxategia';
@@ -3205,6 +4211,13 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get backupUiExport => 'Esportatu fitxategia';
+
+  @override
+  String get backupUiSaveOutside => 'Gorde kopia bat Turnly-tik kanpo';
+
+  @override
+  String get backupUiSaveOutsideHelp =>
+      'Zure hodeian, beste gailu batean edo posta bidez. Mugikorra galtzen baduzu edo aldatzen baduzu, «Inportatu fitxategia» erabiliz berreskuratuko duzu.';
 
   @override
   String get backupUiExportSubtitle =>
@@ -3535,6 +4548,41 @@ class AppLocalizationsEu extends AppLocalizations {
       'Eduki sakatuta hasierako pantaila, ukitu goiko + ikurra eta bilatu Turnly.';
 
   @override
+  String get widgetNameSmall => 'Txikia';
+
+  @override
+  String get widgetNameMedium => 'Ertaina';
+
+  @override
+  String get widgetNameLarge => 'Handia';
+
+  @override
+  String get widgetNameAgenda => 'Agenda';
+
+  @override
+  String get widgetNameTwoWeeks => 'Bi aste';
+
+  @override
+  String get widgetDescSmall => 'Gaur eta bihar';
+
+  @override
+  String get widgetDescMedium => 'Hurrengo 7 egunak';
+
+  @override
+  String get widgetDescLarge => 'Hilabete osoa';
+
+  @override
+  String get widgetDescAgenda => 'Hurrengo txandak';
+
+  @override
+  String get widgetDescTwoWeeks => 'Aste hau eta hurrengoa';
+
+  @override
+  String widgetAddNamed(String name) {
+    return 'Gehitu: $name';
+  }
+
+  @override
   String get compareTitle => 'Alderatu egutegiak';
 
   @override
@@ -3548,16 +4596,10 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get compareIntro =>
-      'Aukeratu bi egutegi eta ikusi haien txandak elkarrekin. Bien egun libreak markatuta daude.';
+      'Aukeratu bi egutegietatik sei artean eta ikusi haien txandak elkarrekin. Egun libre guztiak markatuta daude.';
 
   @override
-  String get compareFirstLabel => 'Lehen egutegia';
-
-  @override
-  String get compareSecondLabel => 'Bigarren egutegia';
-
-  @override
-  String get comparePickTitle => 'Aukeratu egutegi bat';
+  String get comparePickTitle => 'Aukeratu egutegiak';
 
   @override
   String get compareNeedTwoTitle => 'Bi egutegi behar dituzu';
@@ -3582,22 +4624,39 @@ class AppLocalizationsEu extends AppLocalizations {
   String get compareFreeListTitle => 'Egun libre komunak';
 
   @override
-  String get compareLegendFree => 'Biak libre';
+  String get compareLegendFree => 'Denak libre';
 
   @override
   String get compareNote =>
-      'Lan-txandarik gabeko eguna libretzat hartzen da: hutsik, libre edo absentzia batekin (oporrak, baja…). Txanda bakoitza hasten den egunean kontatzen da.';
+      'Egun bat libretzat hartzen da inork lan egiten ez duenean eta guztiak libre bat edo absentzia bat (oporrak, baja…) idatzita dutenean. Txandarik idatzi gabeko eguna ez da libretzat hartzen: «idatzi gabe» markatzen da. Txanda bakoitza hasten den egunean kontatzen da.';
 
   @override
   String get compareNoShiftMark => '–';
 
   @override
-  String get compareBothFree => 'biak libre';
+  String get compareBothFree => 'denak libre';
 
   @override
   String compareCellCalendar(String calendar, String shifts) {
     return '$calendar: $shifts';
   }
+
+  @override
+  String get compareLegendUnrecorded => 'Bat batean idatzi gabe';
+
+  @override
+  String compareUnrecordedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count egun bat batean idatzi gabe',
+      one: 'Egun 1 bat batean idatzi gabe',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get compareUnrecorded => 'bat batean idatzi gabe';
 
   @override
   String get compareLoadFailed => 'Ezin izan dira egutegiak irakurri.';
@@ -3792,6 +4851,16 @@ class AppLocalizationsEu extends AppLocalizations {
   String get holidaysSettingsRegionClear => 'Erkidegorik gabe';
 
   @override
+  String get holidaysSettingsCountryTitle => 'Herrialdea';
+
+  @override
+  String get holidaysSettingsCountryOther =>
+      'Beste herrialde bat: jaiegun ofizialik gabe';
+
+  @override
+  String get holidaysSettingsCountryNone => 'Jaiegun ofizialik gabe';
+
+  @override
   String get holidaysSettingsMunicipalityTitle => 'Udalerria';
 
   @override
@@ -3818,6 +4887,15 @@ class AppLocalizationsEu extends AppLocalizations {
       'Aukeratu zure udalerria haren tokiko jaiegunak ikusteko, edo gehitu zuk zeuk behean.';
 
   @override
+  String holidaysSettingsStatusCountryNoData(String country) {
+    return 'Oraindik ez ditugu herrialde honetako jaiegun ofizialak: $country. Gehitu zureak behean';
+  }
+
+  @override
+  String get holidaysSettingsStatusNoOfficial =>
+      'Jaiegun ofizialik gabe: behean zuk gehitzen dituzunak bakarrik agertzen dira';
+
+  @override
   String holidaysSettingsStatusLocalIncluded(String municipality) {
     return 'Tokiko jaiegunak ($municipality): barne';
   }
@@ -3840,8 +4918,35 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
-  String get holidaysSettingsStatusLocalPartial =>
-      'Baliteke bat falta izatea: egiaztatu.';
+  String get holidaysSubdivisionKindState => 'Estatu';
+
+  @override
+  String get holidaysSubdivisionKindFederalState => 'Estatu federala';
+
+  @override
+  String get holidaysSubdivisionKindProvince => 'Probintzia';
+
+  @override
+  String get holidaysSubdivisionKindRegion => 'Eskualdea';
+
+  @override
+  String get holidaysSubdivisionKindNation => 'Nazioa';
+
+  @override
+  String get holidaysSubdivisionKindCanton => 'Kantoia';
+
+  @override
+  String get holidaysSubdivisionKindCity => 'Hiria';
+
+  @override
+  String get holidaysSubdivisionKindCityOrRegion => 'Hiria edo eskualdea';
+
+  @override
+  String get holidaysSubdivisionSearch => 'Bilatu';
+
+  @override
+  String get holidaysSettingsStatusNoSubdivision =>
+      'Aukeratu gabe, herrialde osoko jaiegunak bakarrik agertzen dira. Aukeratu zurea, zure eremukoak ere ikusteko.';
 
   @override
   String get holidaysSettingsAdd => 'Gehitu tokiko jaieguna';
@@ -4083,6 +5188,19 @@ class AppLocalizationsEu extends AppLocalizations {
   String get alarmsNextOff => 'Alarmak desaktibatuta daude.';
 
   @override
+  String alarmsScheduledUntil(String date) {
+    return 'Abisuak programatuta data honetara arte: $date';
+  }
+
+  @override
+  String get alarmsRenewalTitle => 'Txanden abisuak';
+
+  @override
+  String alarmsRenewalBody(String date) {
+    return 'Txanden abisuak data honetara arte daude programatuta: $date. Ireki Turnly hurrengoak programatzeko.';
+  }
+
+  @override
   String get alarmsSkipDay => 'Alarmarik ez egun honetan';
 
   @override
@@ -4133,6 +5251,61 @@ class AppLocalizationsEu extends AppLocalizations {
   String agendaSemanticsReminder(String time) {
     return 'abisua: $time';
   }
+
+  @override
+  String get dndSection => 'Ez molestatu txandan zehar';
+
+  @override
+  String get dndMasterTitle => 'Isildu mugikorra nire txandetan';
+
+  @override
+  String get dndMasterHelp =>
+      '«Ez molestatu» modua aktibatzen da txanda hastean, eta desaktibatu egiten da amaitzean.';
+
+  @override
+  String get dndFilterTitle => 'Zer onartzen den';
+
+  @override
+  String get dndFilterSheetTitle => 'Zer onartzen den txandan zehar';
+
+  @override
+  String get dndFilterAll => 'Dena';
+
+  @override
+  String get dndFilterPriority => 'Lehentasunezkoa soilik';
+
+  @override
+  String get dndFilterAlarms => 'Alarmak soilik';
+
+  @override
+  String get dndFilterNone => 'Isiltasun osoa';
+
+  @override
+  String get dndPermOkTitle => 'Dena prest';
+
+  @override
+  String get dndPermOkBody =>
+      'Turnly-k mugikorra «Ez molestatu» moduan jar dezake zure txandetan. Sistemaren alarma gisa programatzen da: erlojuak txandaren hasiera edo amaiera hurrengo alarma gisa erakutsi dezake.';
+
+  @override
+  String get dndPermTitle => 'Ez molestatu modurako sarbidea falta da';
+
+  @override
+  String get dndPermBody =>
+      'Txandan zehar mugikorra isiltzeko, eman Turnly-ri «Ez molestatu» modurako sarbidea sistemaren ezarpenetan.';
+
+  @override
+  String get dndPermOpen => 'Ireki ezarpenak';
+
+  @override
+  String get dndShiftSection => 'Ez molestatu';
+
+  @override
+  String get dndShiftSwitch => 'Gaitu Ez molestatu txanda honetan';
+
+  @override
+  String get dndShiftHelper =>
+      'Mugikorra isiltzen da txanda honetan lan egiten duzun bitartean.';
 
   @override
   String get shiftTypesAlarmSection => 'Alarma';
@@ -4367,6 +5540,24 @@ class AppLocalizationsEu extends AppLocalizations {
   String get monthSelectDays => 'Hautatu egunak';
 
   @override
+  String get monthNavMonth => 'Hilabetea';
+
+  @override
+  String get monthNavRotation => 'Txandaketa';
+
+  @override
+  String get monthNavAgenda => 'Agenda';
+
+  @override
+  String get monthNavSummary => 'Laburpena';
+
+  @override
+  String get todayCardCollapse => 'Tolestu gaurko txartela';
+
+  @override
+  String get todayCardExpand => 'Zabaldu gaurko txartela';
+
+  @override
   String get monthSelectDay => 'Sakatu egun hau hautatzeko';
 
   @override
@@ -4378,4 +5569,967 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get monthGridSelected => 'Sareta ikuspegia';
+
+  @override
+  String get absenceRowTitle => 'Oporrak eta baimenak';
+
+  @override
+  String get absenceRowSubtitle =>
+      'Baimendutako egunak, erabilitakoak eta geratzen zaizkizunak';
+
+  @override
+  String get absenceTitle => 'Oporrak eta baimenak';
+
+  @override
+  String get absenceYearPrevious => 'Aurreko urtea';
+
+  @override
+  String get absenceYearNext => 'Hurrengo urtea';
+
+  @override
+  String absenceDays(num days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$daysString egun',
+      one: 'egun 1',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get absenceEmptyTitle => 'Oraindik ez dago saldorik';
+
+  @override
+  String get absenceEmptyBody =>
+      'Sortu saldo bat (oporrak, norberaren egunak…), eta aplikazioak zure txanden egutegitik kontatuko ditu egunak.';
+
+  @override
+  String get absenceAdd => 'Gehitu saldoa';
+
+  @override
+  String get absenceContinueSeries => 'Serie bat jarraitu';
+
+  @override
+  String get absenceContinueSeriesHelper =>
+      'Aurreko urteko serie bat jarraitzen baduzu, haren izena, motak eta muga kopiatzen dira, eta sobratu zaizuna arrastatu egiten da. Zeuk baimendutako egunak betetzen dituzu.';
+
+  @override
+  String get absenceCopyNextYear => 'Hurrengo urtera kopiatu';
+
+  @override
+  String absenceCopiedNextYear(int year) {
+    return 'Saldoa hurrengo urtera kopiatu da ($year).';
+  }
+
+  @override
+  String absenceLeftCaption(num days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'egun geratzen zaizkizu',
+      one: 'egun geratzen zaizu',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String absenceLeftSemantics(String name, String days) {
+    return '$name: $days geratzen zaizkizu';
+  }
+
+  @override
+  String get absenceAllowed => 'Baimenduak';
+
+  @override
+  String get absenceCarried => 'Ekarritakoak';
+
+  @override
+  String get absenceAdjustment => 'Doikuntzak';
+
+  @override
+  String get absenceEnjoyed => 'Hartutakoak';
+
+  @override
+  String get absencePlanned => 'Planifikatuak';
+
+  @override
+  String absenceCarriedUntil(String date) {
+    return 'Iraungitzen dira: $date';
+  }
+
+  @override
+  String get absenceCarriedNoExpiry => 'Iraungitze-datarik gabe';
+
+  @override
+  String absenceCarriedExpired(String date) {
+    return 'Iraungi ziren: $date';
+  }
+
+  @override
+  String absenceWarnExpiring(String days, String date) {
+    return 'Aurreko urteko $days geratzen zaizkizu. Iraungitze-data: $date.';
+  }
+
+  @override
+  String absenceWarnPlanned(String planned, String left) {
+    return 'Dituzunak baino gehiago planifikatu dituzu: $planned planifikatuta eta $left erabilgarri.';
+  }
+
+  @override
+  String get absenceNewTitle => 'Saldo berria';
+
+  @override
+  String get absenceEditTitle => 'Editatu saldoa';
+
+  @override
+  String absenceEditTooltip(String name) {
+    return 'Editatu: $name';
+  }
+
+  @override
+  String get absenceFieldName => 'Izena';
+
+  @override
+  String get absenceFieldNameHint => 'Oporrak';
+
+  @override
+  String get absenceFieldAllowed => 'Baimendutako egunak';
+
+  @override
+  String get absenceFieldAllowedHelper =>
+      'Aurten dagozkizunak, aurreko urtetik ekarritakoak kontatu gabe.';
+
+  @override
+  String get absenceFieldAdjustment => 'Eskuzko doikuntza';
+
+  @override
+  String get absenceFieldAdjustmentHelper =>
+      'Gehitu edo kendu egunak eskuz: aplikazioa erabili aurretik gastatu dituzunak edo eman dizuten egun gehigarri bat. Negatiboak onartzen ditu.';
+
+  @override
+  String get absenceDaysSuffix => 'egun';
+
+  @override
+  String get absenceFieldCarry => 'Ekarri aurreko urteko soberakina';
+
+  @override
+  String get absenceFieldCarryCap => 'Ekar daitekeen gehienezkoa';
+
+  @override
+  String get absenceFieldCarryCapHelper => 'Utzi hutsik, dena ekartzen bada.';
+
+  @override
+  String get absenceFieldExpiry => 'Iraungitze-data';
+
+  @override
+  String get absenceFieldExpiryNone => 'Iraungitze-datarik gabe';
+
+  @override
+  String get absenceFieldExpiryClear => 'Kendu iraungitze-data';
+
+  @override
+  String get absenceFieldTypes => 'Kontatzen diren txanda motak';
+
+  @override
+  String get absenceFieldTypesHelper =>
+      'Mota hauetako batekin margotutako egun bakoitzak saldo honetako egun bat gastatzen du.';
+
+  @override
+  String get absenceFieldTypesNone =>
+      'Ez duzu absentzia-txanda motarik. Sortu bat Nire txandak atalean, Absentzia kategoriarekin.';
+
+  @override
+  String absenceInvalidName(int max) {
+    return 'Jarri izen bat (gehienez $max letra).';
+  }
+
+  @override
+  String get absenceInvalidAllowed =>
+      'Idatzi baliozko egun kopuru bat; adibidez, 22.';
+
+  @override
+  String get absenceInvalidAdjustment =>
+      'Idatzi egunak laurdenka; adibidez, -1 edo 0,5.';
+
+  @override
+  String get absenceInvalidCap => 'Idatzi baliozko muga bat; adibidez, 5.';
+
+  @override
+  String get absenceRemove => 'Kendu saldoa';
+
+  @override
+  String get absenceRemoveTitle => 'Saldo hau kendu nahi duzu?';
+
+  @override
+  String absenceRemoveBody(String name, int year) {
+    return '«$name» saldoa ezabatuko da ($year). Zure txandak ez dira aldatuko.';
+  }
+
+  @override
+  String get absenceRemoveConfirm => 'Kendu';
+
+  @override
+  String get absenceSaveFailed => 'Ezin izan da saldoa gorde. Saiatu berriro.';
+
+  @override
+  String absenceSummaryLeft(String days, String name) {
+    return '$name: $days geratzen zaizkizu';
+  }
+
+  @override
+  String get absenceSummaryOpen => 'Ireki oporrak eta baimenak';
+
+  @override
+  String get moneyNightPlusLabel => 'Orduko gaueko plusa';
+
+  @override
+  String get moneyNightPlusHelper => 'Gaueko lan-ordu bakoitzeko gehitzen da.';
+
+  @override
+  String get moneyHolidayPlusLabel => 'Orduko jaiegun-plusa';
+
+  @override
+  String get moneyHolidayPlusHelper =>
+      'Jaiegunetan lan egindako ordu bakoitzeko gehitzen da.';
+
+  @override
+  String get moneyLocationLabel => 'Lekua';
+
+  @override
+  String get moneyLocationHint => 'Ospitalea, 3. solairua';
+
+  @override
+  String get moneyLocationHelper =>
+      'Txostenetan (PDF eta CSV) agertzen da, txandaren izenaren ondoan.';
+
+  @override
+  String get moneyExtraTitle => 'Zenbateko gehigarria';
+
+  @override
+  String get moneyExtraHelper =>
+      'Dietak, kilometrajea, bonus bat… Erabili zenbateko negatibo bat kenkari baterako. Eguneko zenbatespenari gehitzen zaio.';
+
+  @override
+  String get moneyExtraHint => 'Zenbatekorik gabe';
+
+  @override
+  String get moneyExtraInvalid =>
+      'Idatzi baliozko zenbateko bat; adibidez, 25 edo -10,50';
+
+  @override
+  String get moneyExtraClear => 'Kendu zenbateko gehigarria';
+
+  @override
+  String get moneySectionTitle => 'Orduak eta dirua';
+
+  @override
+  String get moneyWithholdingTitle => 'Atxikipena (%)';
+
+  @override
+  String get moneyWithholdingSubtitle => 'Zenbatetsitako garbia kalkulatzeko';
+
+  @override
+  String moneyWithholdingValue(int percent) {
+    return '$percent %';
+  }
+
+  @override
+  String get moneyWithholdingNone => 'Atxikipenik gabe';
+
+  @override
+  String get moneyWithholdingHelper =>
+      'Nominatik atxikitzen dizuten ehunekoa (PFEZ eta kotizazioak). Horrekin gutxi gorabeherako soldata garbia kalkulatzen dugu; ez du zure nomina ordezkatzen.';
+
+  @override
+  String get moneyWithholdingField => 'Atxikipen-ehunekoa';
+
+  @override
+  String get moneyWithholdingInvalid =>
+      'Idatzi 0 eta 100 arteko zenbaki oso bat.';
+
+  @override
+  String get moneyGross => 'Zenbatetsitako gordina';
+
+  @override
+  String get moneyNet => 'Zenbatetsitako garbia';
+
+  @override
+  String moneyNetNote(int percent) {
+    return '$percent % atxikipenarekin';
+  }
+
+  @override
+  String get moneyNetSetup => 'Ezarri zure atxikipena garbia ikusteko';
+
+  @override
+  String get moneyEarnedTitle => 'Orain arte irabazita';
+
+  @override
+  String get moneyEarnedNote =>
+      'Igarotako egunak eta gaur lan egindakoa, orain arte.';
+
+  @override
+  String get moneyModeQuarter => 'Hiruhilekoa';
+
+  @override
+  String moneyQuarterLabel(int quarter, int year) {
+    return '${quarter}H $year';
+  }
+
+  @override
+  String get moneyQuarterPrevious => 'Aurreko hiruhilekoa';
+
+  @override
+  String get moneyQuarterNext => 'Hurrengo hiruhilekoa';
+
+  @override
+  String get moneyBagTitle => 'Ordu-poltsa';
+
+  @override
+  String moneyBagFavour(String hours) {
+    return '$hours gehiago';
+  }
+
+  @override
+  String moneyBagOwed(String hours) {
+    return '$hours falta zaizkizu';
+  }
+
+  @override
+  String get moneyBagEven => 'Zeroan';
+
+  @override
+  String moneyBagNote(String month) {
+    return 'Lan egindako orduak ken helburua, hilez hil metatuta (azken hilabetea: $month). Abenduko saldoa urtarrilera igarotzen da.';
+  }
+
+  @override
+  String get moneyReportExtraColumn => 'Zenbateko gehigarria';
+
+  @override
+  String get moneyReportExtraTotal => 'Zenbateko gehigarriak';
+
+  @override
+  String get moneyPlusHint => 'Zenbatekorik gabe';
+
+  @override
+  String get swapRowTitle => 'Trukeen liburua';
+
+  @override
+  String get swapRowSubtitle => 'Zor dizkizuten txandak eta zuk zor dituzunak';
+
+  @override
+  String get swapTitle => 'Trukeen liburua';
+
+  @override
+  String get swapBalancesTitle => 'Balantzea';
+
+  @override
+  String swapBalanceTheyOwe(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count txanda zor dizkit',
+      one: 'Txanda bat zor dit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String swapBalanceIOwe(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count txanda zor dizkiot',
+      one: 'Txanda bat zor diot',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get swapBalanceEven => 'Zorrik ez';
+
+  @override
+  String get swapChangesTitle => 'Trukeak';
+
+  @override
+  String get swapEmptyTitle => 'Oraindik ez dago trukerik';
+
+  @override
+  String get swapEmptyBody =>
+      'Idatzi txanda-truke bat lankide batekin, eta aplikazioak gogoratuko du nork zer zor dizun.';
+
+  @override
+  String get swapAdd => 'Gehitu trukea';
+
+  @override
+  String get swapNewTitle => 'Truke berria';
+
+  @override
+  String get swapEditTitle => 'Editatu trukea';
+
+  @override
+  String get swapStagePending => 'Zain';
+
+  @override
+  String get swapStageReturned => 'Itzulita';
+
+  @override
+  String get swapStageSettled => 'Kitatuta';
+
+  @override
+  String get swapDirectionTheyOwe => 'Zor didate';
+
+  @override
+  String get swapDirectionIOwe => 'Zor diot';
+
+  @override
+  String get swapFieldService => 'Zerbitzuaren datuak';
+
+  @override
+  String get swapFieldColleague => 'Norekin';
+
+  @override
+  String get swapFieldColleagueHint => 'Marta';
+
+  @override
+  String get swapInvalidColleague => 'Idatzi norekin den trukea.';
+
+  @override
+  String get swapFieldDirection => 'Nork zor du txanda';
+
+  @override
+  String get swapFieldDirectionHelper =>
+      'Aukeratu nor geratzen den zorretan trukearen ondoren.';
+
+  @override
+  String get swapFieldDate => 'Txanda uzten duzun eguna';
+
+  @override
+  String get swapFieldReturnDate => 'Txanda jasotzen duzun eguna';
+
+  @override
+  String get swapFieldReturnNone => 'Oraindik ez duzu jaso';
+
+  @override
+  String get swapFieldReturnClear => 'Kendu eguna';
+
+  @override
+  String get swapFieldGivenTypes => 'Uzten duzun txanda';
+
+  @override
+  String get swapFieldReceivedTypes => 'Jasotzen duzun txanda';
+
+  @override
+  String get swapFieldTypesHelper =>
+      'Aukeratu trukeko txandak, txanden egutegian aplikatu ahal izateko.';
+
+  @override
+  String get swapFieldNote => 'Oharra';
+
+  @override
+  String get swapNoteHint => 'Adibidez: astelehenean itzuliko dit';
+
+  @override
+  String get swapRemove => 'Kendu trukea';
+
+  @override
+  String get swapRemoveTitle => 'Truke hau kendu nahi duzu?';
+
+  @override
+  String swapRemoveBody(String name, String date) {
+    return 'Trukea ezabatuko da ($name, $date). Zure txandak ez dira aldatuko.';
+  }
+
+  @override
+  String get swapRemoveConfirm => 'Kendu';
+
+  @override
+  String get swapSaveFailed => 'Trukea ezin izan da gorde. Saiatu berriro.';
+
+  @override
+  String get swapRemoved => 'Trukea kenduta';
+
+  @override
+  String swapEditTooltip(String name) {
+    return 'Editatu trukea: $name';
+  }
+
+  @override
+  String get swapMarkReturned => 'Markatu itzulitzat';
+
+  @override
+  String get swapMarkReturnedTitle => 'Zein egunetan itzuliko dizute?';
+
+  @override
+  String get swapMarkedReturned => 'Trukea itzulitzat markatu da';
+
+  @override
+  String get swapMarkSettled => 'Markatu kitatutzat';
+
+  @override
+  String get swapMarkedSettled => 'Trukea kitatuta';
+
+  @override
+  String get swapReopen => 'Markatu zain';
+
+  @override
+  String get swapReopened => 'Trukea berriro zain dago';
+
+  @override
+  String get swapApplyToCalendar => 'Aplikatu txanden egutegian';
+
+  @override
+  String get swapUndoFromCalendar => 'Kendu txanden egutegitik';
+
+  @override
+  String get swapApplied => 'Trukea txanden egutegian aplikatu da';
+
+  @override
+  String get swapUnapplied => 'Trukea txanden egutegitik kendu da';
+
+  @override
+  String get swapNothingToApply => 'Egunak jada trukeak dioen bezala daude';
+
+  @override
+  String get swapNotApplied => 'Truke hau ez dago txanden egutegian aplikatuta';
+
+  @override
+  String get swapDaySection => 'Txanda-trukea';
+
+  @override
+  String get swapDayAdd => 'Idatzi truke bat';
+
+  @override
+  String get swapDayEmpty => 'Egun horrek ez dauka trukerik idatzita.';
+
+  @override
+  String get swapMenuTooltip => 'Trukearen aukerak';
+
+  @override
+  String get swapGivesLabel => 'Uzten duzu';
+
+  @override
+  String get swapReceivesLabel => 'Jasotzen duzu';
+
+  @override
+  String get noteAttachmentsSection => 'Eranskinak';
+
+  @override
+  String get noteAttachmentsEmptyTitle =>
+      'Oraindik ez dago argazkirik edo fitxategirik';
+
+  @override
+  String get noteAttachmentsEmptyBody =>
+      'Argazki bat, fitxategi bat edo marrazki bat gehi diezaiokezu egun honi.';
+
+  @override
+  String get noteAttachmentsAdd => 'Gehitu';
+
+  @override
+  String get noteAttachmentsAddPhoto => 'Atera argazki bat';
+
+  @override
+  String get noteAttachmentsAddGallery => 'Aukeratu galeriatik';
+
+  @override
+  String get noteAttachmentsAddFile => 'Aukeratu fitxategi bat';
+
+  @override
+  String get noteAttachmentsAddSketch => 'Marraztu';
+
+  @override
+  String get noteAttachmentKindPhoto => 'Argazkia';
+
+  @override
+  String get noteAttachmentKindFile => 'Fitxategia';
+
+  @override
+  String get noteAttachmentKindSketch => 'Marrazkia';
+
+  @override
+  String noteAttachmentOpen(String name) {
+    return 'Ireki: $name';
+  }
+
+  @override
+  String noteAttachmentRemove(String name) {
+    return 'Kendu: $name';
+  }
+
+  @override
+  String noteAttachmentRemoveHint(String name) {
+    return 'Luze sakatu kentzeko: $name';
+  }
+
+  @override
+  String noteAttachmentRemoved(String name) {
+    return 'Kenduta: $name';
+  }
+
+  @override
+  String get noteAttachmentsViewerTitle => 'Eranskina';
+
+  @override
+  String get noteAttachmentTooLarge =>
+      'Fitxategi hori handiegia da (gehienez 50 MB).';
+
+  @override
+  String get noteAttachmentStoreFull => 'Ez dago lekurik eranskin gehiagorako.';
+
+  @override
+  String get noteAttachmentUnreadable => 'Ezin izan da fitxategia irakurri.';
+
+  @override
+  String get noteAttachmentCameraDenied =>
+      'Baimenik gabe ezin dugu kamera ireki.';
+
+  @override
+  String get noteAttachmentGalleryDenied =>
+      'Baimenik gabe ezin dugu galeria ireki.';
+
+  @override
+  String get noteAttachmentFailed => 'Ezin izan da eranskina gorde.';
+
+  @override
+  String get noteAttachmentRemoveFailed => 'Ezin izan da eranskina kendu.';
+
+  @override
+  String get noteTasksSection => 'Zereginak';
+
+  @override
+  String get noteTasksEmpty => 'Egun honek ez dauka zereginik.';
+
+  @override
+  String get noteTasksAdd => 'Gehitu zeregina';
+
+  @override
+  String get noteTasksHint => 'Zer egin behar da';
+
+  @override
+  String get noteTasksInvalid => 'Idatzi zer egin behar den.';
+
+  @override
+  String get noteTasksUndo => 'Desegin zereginen azken aldaketa';
+
+  @override
+  String get noteTaskMenu => 'Zereginaren aukerak';
+
+  @override
+  String get noteTaskMoveUp => 'Igo';
+
+  @override
+  String get noteTaskMoveDown => 'Jaitsi';
+
+  @override
+  String get noteTaskRemove => 'Kendu zeregina';
+
+  @override
+  String get sketchTitle => 'Marrazkia';
+
+  @override
+  String get sketchPen => 'Trazua';
+
+  @override
+  String get sketchEraser => 'Goma';
+
+  @override
+  String get sketchUndo => 'Desegin trazua';
+
+  @override
+  String get sketchRedo => 'Berregin trazua';
+
+  @override
+  String get sketchClear => 'Ezabatu marrazkia';
+
+  @override
+  String get sketchSave => 'Gorde';
+
+  @override
+  String get sketchColor => 'Trazuaren kolorea';
+
+  @override
+  String get sketchColorInk => 'Tinta';
+
+  @override
+  String get sketchColorAccent => 'Azentua';
+
+  @override
+  String get sketchColorHighlight => 'Anbarra';
+
+  @override
+  String get sketchColorHoliday => 'Gorria';
+
+  @override
+  String get sketchColorSuccess => 'Berdea';
+
+  @override
+  String get sketchEmpty => 'Marraztu zerbait gorde ahal izateko.';
+
+  @override
+  String get sketchFailed => 'Ezin izan da marrazkia gorde.';
+
+  @override
+  String get appearanceNoteInMonthTitle => 'Erakutsi oharra hilabetean';
+
+  @override
+  String get appearanceNoteInMonthSubtitle =>
+      'Oharraren lehen lerroa eguneko laukian';
+
+  @override
+  String get appearancePaintSoundTitle => 'Soa margotzean';
+
+  @override
+  String get appearancePaintSoundSubtitle =>
+      'Klik bat egun bat margotzean, mugikorra isilik ez badago';
+
+  @override
+  String get appearancePresetsTitle => 'Prestatutako paletak';
+
+  @override
+  String get appearancePresetsNote =>
+      'Fabrikako koloreak dituzten txanden kolorea aldi berean aldatzen dute. Zuk zure gustura margotutakoak ez dira aldatzen.';
+
+  @override
+  String get appearancePresetsChoose => 'Aukeratu';
+
+  @override
+  String get appearancePresetsApplied => 'Paleta aplikatuta. Desegin dezakezu.';
+
+  @override
+  String get appearancePresetSunset => 'Ilunabarra';
+
+  @override
+  String get appearancePresetSea => 'Itsasoa';
+
+  @override
+  String get appearancePresetForest => 'Basoa';
+
+  @override
+  String get appearancePresetCandy => 'Karrameloa';
+
+  @override
+  String get appearancePresetNocturnal => 'Gau beltza';
+
+  @override
+  String get appearanceBackgroundTitle => 'Egutegiaren atzeko irudia';
+
+  @override
+  String get appearanceBackgroundChoose => 'Aukeratu';
+
+  @override
+  String get appearanceBackgroundChange => 'Aldatu';
+
+  @override
+  String get appearanceBackgroundPick => 'Aukeratu galeriatik';
+
+  @override
+  String get appearanceBackgroundRemove => 'Kendu irudia';
+
+  @override
+  String get appearanceBackgroundOnDevice =>
+      'Mugikor honetan geratzen da: ez doa babeskopian';
+
+  @override
+  String get appearanceBackgroundNote =>
+      'Zure galeriatik aukeratzen da, eta hilabetearen atzean ikusten da, geruza erdi-garden batekin dena ondo irakurtzeko. Txanden laukiak ez dira aldatzen.';
+
+  @override
+  String get appearanceBackgroundTooLarge =>
+      'Irudi hori handiegia da. Saiatu txikiago batekin.';
+
+  @override
+  String get appearanceBackgroundFailed => 'Ezin izan da irudia gorde.';
+
+  @override
+  String get widgetAddFourWeeks => 'Lau aste: hilabete bat';
+
+  @override
+  String get widgetNameFourWeeks => 'Lau aste';
+
+  @override
+  String get widgetDescFourWeeks => 'Hilabetea asteka';
+
+  @override
+  String get compareSelectorTitle => 'Konparatutako egutegiak';
+
+  @override
+  String get compareSelectorAction => 'Aldatu';
+
+  @override
+  String get compareSheetHint => '2 eta 6 egutegi artean konpara ditzakezu.';
+
+  @override
+  String get compareSheetDone => 'Eginda';
+
+  @override
+  String get compareSheetMinWarning =>
+      'Konparatzeko gutxienez 2 egutegi behar dira.';
+
+  @override
+  String get compareSheetMaxWarning =>
+      'Dagoeneko 6 egutegi konparatzen ari zara, gehienekoa.';
+
+  @override
+  String get compareWeekendTitle => 'Asteburu libre amankomunak';
+
+  @override
+  String compareWeekendCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count asteburu libre amankomun hilabete honetan',
+      one: 'Asteburu libre amankomun 1 hilabete honetan',
+      zero: 'Hilabete honetan ez dago asteburu libre amankomunik',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String compareWeekendDaysCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Asteburuko $count egun libre amankomun',
+      one: 'Asteburuko egun libre amankomun 1',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String compareWeekendSpoken(String saturday, String sunday) {
+    return '$saturday eta $sunday, denek libre';
+  }
+
+  @override
+  String get compareTableNames => 'Egutegiak';
+
+  @override
+  String get devEventsRowTitle => 'Mugikorreko hitzorduak';
+
+  @override
+  String get devEventsRowSubtitle => 'Zure egutegiko hitzorduak txanden ondoan';
+
+  @override
+  String get devEventsTitle => 'Mugikorreko hitzorduak';
+
+  @override
+  String get devEventsHelp =>
+      'Aukeratu zein mugikorreko egutegiren hitzorduak ikusi nahi dituzun txanden ondoan. Turnly-k irakurri besterik ez ditu egiten: ez du ezer idazten ez aldatzen.';
+
+  @override
+  String get devEventsPermissionTitle => 'Egutegiaren baimena falta da';
+
+  @override
+  String get devEventsPermissionBody =>
+      'Mugikorreko hitzorduak irakurtzeko, Turnly-k zure egutegiak ikusteko baimena behar du. Ez da eskatzen aplikazioa irekitzean: hemen onartzen baduzu bakarrik.';
+
+  @override
+  String get devEventsPermissionDeniedTitle =>
+      'Egutegirako sarbidea desaktibatuta dago';
+
+  @override
+  String get devEventsPermissionDeniedBody =>
+      'Aktibatu sistemaren ezarpenetan (Baimenak › Egutegia) eta itzuli hona.';
+
+  @override
+  String get devEventsPermissionDeniedBodyIos =>
+      'Aktibatu sistemaren ezarpenetan (Turnly › Egutegiak) eta itzuli hona.';
+
+  @override
+  String get devEventsPermissionRestrictedTitle =>
+      'Mugikor honek ez du egutegia erabiltzen uzten';
+
+  @override
+  String get devEventsPermissionRestrictedBody =>
+      'Gurasoen kontrola edo laneko profil bat izan daiteke. Baimen hori gabe ezin dira hitzorduak erakutsi.';
+
+  @override
+  String get devEventsPermissionDeclinedBody =>
+      'Ez duzu baimena eman. Hura gabe ezin ditugu zure egutegiak irakurri, baina orain eman dezakezu.';
+
+  @override
+  String get devEventsPermissionAllow => 'Eman sarbidea';
+
+  @override
+  String get devEventsPermissionSettings => 'Ireki ezarpenak';
+
+  @override
+  String get devEventsPermissionRecheck => 'Egiaztatu berriro';
+
+  @override
+  String get devEventsCalendarsTitle => 'Mugikorreko egutegiak';
+
+  @override
+  String devEventsChosenCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count egutegi hautatuta',
+      one: 'Egutegi 1 hautatuta',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get devEventsEmptyTitle => 'Ez dago egutegirik';
+
+  @override
+  String get devEventsEmptyBody =>
+      'Mugikor honek ez du Turnly-k irakurri dezakeen egutegirik.';
+
+  @override
+  String get devEventsReadFailedTitle =>
+      'Ezin izan dira zure egutegiak irakurri';
+
+  @override
+  String get devEventsReadFailedBody =>
+      'Mugikorreko egutegiak ez du erantzun. Egiaztatu berriro.';
+
+  @override
+  String get devEventsOffTitle => 'Orain ez da hitzordurik erakusten';
+
+  @override
+  String get devEventsOffBody =>
+      'Ez duzu egutegirik aukeratu. Bat aukeratu arte, hilabetean eta egunean ez da hitzordurik agertuko.';
+
+  @override
+  String get devEventsSaveFailed => 'Ezin izan dira aldaketak gorde.';
+
+  @override
+  String get devEventsSectionTitle => 'Mugikorreko hitzorduak';
+
+  @override
+  String get devEventsAllDay => 'Egun osoa';
+
+  @override
+  String devEventsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hitzordu',
+      one: 'Hitzordu 1',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String devEventsEventSemantics(String time, String title) {
+    return '$time, $title';
+  }
+
+  @override
+  String devEventsEventWithCalendarSemantics(
+    String time,
+    String title,
+    String calendar,
+  ) {
+    return '$time, $title, $calendar';
+  }
 }

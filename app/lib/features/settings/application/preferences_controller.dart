@@ -69,6 +69,61 @@ class PreferencesController extends Notifier<Preferences> {
     (repository) => repository.setLanguage(language),
   );
 
+  /// Ajustes › Apariencia › Formato de hora; applied at once.
+  Future<void> setTimeFormat(TimeFormatPreference timeFormat) => _change(
+    state.copyWith(timeFormat: timeFormat),
+    (repository) => repository.setTimeFormat(timeFormat),
+  );
+
+  /// Ajustes › Apariencia › Moneda ([currency] is an ISO 4217 code). The
+  /// amounts already stored are not converted (`money.dart`).
+  Future<void> setCurrency(String currency) => _change(
+    state.copyWith(currency: currency),
+    (repository) => repository.setCurrency(currency),
+  );
+
+  /// Ajustes › Apariencia › Color de acento; the whole app repaints at once
+  /// (`CuadranteApp` builds the theme with it).
+  Future<void> setAccent(AppAccent accent) => _change(
+    state.copyWith(accent: accent),
+    (repository) => repository.setAccent(accent),
+  );
+
+  /// Ajustes › Apariencia › Tamaño del turno en el mes; applied at once.
+  Future<void> setCellTextSize(CellTextSize size) => _change(
+    state.copyWith(cellTextSize: size),
+    (repository) => repository.setCellTextSize(size),
+  );
+
+  /// The percentage of the withholding of the estimated pay (P9): a whole
+  /// number between 0 and 100.
+  Future<void> setWithholdingPercent(int percent) => _change(
+    state.copyWith(withholdingPercent: percent),
+    (repository) => repository.setWithholdingPercent(percent),
+  );
+
+  /// Ajustes › Apariencia › «Ver la nota en el mes»: applied at once.
+  Future<void> setShowNoteInMonth(bool show) => _change(
+    state.copyWith(showNoteInMonth: show),
+    (repository) => repository.setShowNoteInMonth(show),
+  );
+
+  /// Ajustes › Apariencia › «Sonido al pintar»: applied at once.
+  Future<void> setPaintSound(bool enabled) => _change(
+    state.copyWith(paintSound: enabled),
+    (repository) => repository.setPaintSound(enabled),
+  );
+
+  /// Ajustes › Apariencia › «Imagen de fondo del calendario»: `null` removes
+  /// it. The controller does not touch the file: the background screen does.
+  Future<void> setCalendarBackground(String? relativePath) => _change(
+    state.copyWith(
+      calendarBackgroundPath: relativePath,
+      clearCalendarBackground: relativePath == null,
+    ),
+    (repository) => repository.setCalendarBackground(relativePath),
+  );
+
   Future<void> _change(
     Preferences next,
     Future<void> Function(PreferencesRepository repository) write,

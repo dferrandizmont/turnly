@@ -17,6 +17,9 @@ package es.cuadrante.app.widget
 object WidgetRenderPlan {
     const val MAX_AGENDA_ROWS = 14
 
+    /** Days of the four-week widget: four Monday-first weeks. */
+    const val MAX_FOUR_WEEKS_DAYS = 28
+
     /** Current launcher bounds in dp, after selecting portrait/landscape options. */
     data class Size(val width: Int = 250, val height: Int = 110, val fontScale: Float = 1f)
 

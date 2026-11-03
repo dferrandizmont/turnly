@@ -12,6 +12,7 @@ import '../application/schedule_controller.dart';
 import '../application/selection_controller.dart';
 import '../application/visible_month.dart';
 import 'day_detail_sheet.dart';
+import 'paint_feedback.dart';
 
 /// Tap/keyboard activation has exactly the same meaning in both presentations.
 void activateMonthDay(BuildContext context, WidgetRef ref, CivilDate date) {
@@ -27,6 +28,7 @@ void activateMonthDay(BuildContext context, WidgetRef ref, CivilDate date) {
     controller.beginStroke(ref.read(paintControllerProvider).tool);
     if (controller.paintDay(date)) {
       unawaited(HapticFeedback.selectionClick().catchError((Object _) {}));
+      playPaintSound(ref);
     }
     controller.endStroke();
   } else {

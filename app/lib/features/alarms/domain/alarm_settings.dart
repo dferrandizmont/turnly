@@ -137,8 +137,11 @@ class AlarmSettings {
     this.skippedDates = const {},
   });
 
-  /// Days ahead that get scheduled (docs/plan-publicacion.md).
-  static const int defaultHorizonDays = 14;
+  /// Days ahead that get scheduled (docs/alarmas.md, «Límites»). 30 since
+  /// A1 (it was 14): with the cap of `maxPendingAlarms` a typical rotation
+  /// (one alarm a day) fits a month, and a denser one is cut by the cap and
+  /// announced by the renewal notice.
+  static const int defaultHorizonDays = 30;
   static const int maxHorizonDays = 30;
 
   /// Most skipped days we read back (old ones are pruned and nothing plans
@@ -200,7 +203,10 @@ class AlarmSettings {
     );
   }
 
-  static const int jsonVersion = 1;
+  /// 2 since A1: version 1 always wrote the old default horizon (14), which
+  /// no screen lets the user change, so a stored horizon is only honoured
+  /// from version 2 on (a version 1 value reads as [defaultHorizonDays]).
+  static const int jsonVersion = 2;
 
   Map<String, Object?> toJson() => {
     'version': jsonVersion,
@@ -212,8 +218,10 @@ class AlarmSettings {
   };
 
   /// Tolerant: unknown or malformed parts fall back to the defaults (all off).
+  /// The horizon of a version 1 value is ignored (see [jsonVersion]).
   factory AlarmSettings.fromJson(Map<String, Object?> json) {
-    final horizon = json['horizonDays'];
+    final version = json['version'];
+    final horizon = version is num && version >= 2 ? json['horizonDays'] : null;
     final types = json['types'];
     final skipped = json['skipped'];
     final byType = <String, AlarmTypeSettings>{};

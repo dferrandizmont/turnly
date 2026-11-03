@@ -41,7 +41,9 @@ void main() {
         ),
       );
       await app.openSettings();
-      expect(find.text('IMPORTAR Y EXPORTAR'), findsOneWidget);
+      // Design 6A: importing is in «Mi calendario», the copy to the phone's
+      // calendar in «Avisos y widget».
+      expect(find.text('MI CALENDARIO'), findsOneWidget);
       expect(byKey('settings-import'), findsOneWidget);
       expect(byKey('settings-export-calendar'), findsOneWidget);
       expect(find.text('Importar turnos'), findsOneWidget);
@@ -590,8 +592,10 @@ void main() {
       tester,
     ) async {
       final phone = FakeDeviceCalendar();
-      phone.failNext = CalendarApiError.permissionDenied;
       await openImport(tester, phone: phone, picker: FakePicker());
+      // The month read the phone's calendar when the app opened, so the
+      // failure is set here, right before the import reads it.
+      phone.failNext = CalendarApiError.permissionDenied;
       await tapKey(tester, 'import-source-device');
       expect(
         find.text('Sin el permiso no podemos leer tus calendarios.'),

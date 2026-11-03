@@ -16,11 +16,11 @@ void main() {
   });
   tearDown(() => db.close());
 
-  test('nothing stored: everything off, 14 days', () async {
+  test('nothing stored: everything off, 30 days', () async {
     final settings = await repository.load();
     expect(settings, AlarmSettings.disabled);
     expect(settings.enabled, isFalse);
-    expect(settings.horizonDays, 14);
+    expect(settings.horizonDays, 30);
     expect(settings.anyActive, isFalse);
   });
 

@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/format/app_formats.dart';
+import '../../../../core/format/money.dart';
 import '../../../../core/icons/settings_icons.dart';
 import '../../../../core/l10n/app_locales.dart';
 import '../../../../core/l10n/l10n.dart';
 import '../../../../core/widgets/choice_sheet.dart';
+import '../../../holidays/presentation/holidays_settings_row.dart';
 import '../../application/preferences_controller.dart';
 import '../../domain/preferences.dart';
+import '../appearance_extras_rows.dart';
+import '../appearance_style_rows.dart';
+import '../currency_sheet.dart';
 import '../settings_widgets.dart';
 
-/// "Apariencia": theme, language, first day of the week and week numbers.
+/// «Apariencia» (design 6A): theme, language, time format, first day of the
+/// week, week numbers, currency, and country and holidays. The rows of
+/// another feature (accent colour, cell size) are one more line in
+/// `children`, as the holidays row is.
 class AppearanceSection extends ConsumerWidget {
   const AppearanceSection({super.key});
 
@@ -59,6 +68,29 @@ class AppearanceSection extends ConsumerWidget {
           language,
     ];
 
+    // «Automático» says which clock it gives now: the phone's 24 h switch,
+    // else the clock of the region (the same rule as the rest of the app).
+    final formats = AppFormats.maybeOf(context);
+    final localeName =
+        formats?.localeName ?? Localizations.localeOf(context).toString();
+    final autoHour12 = TimeFormatPreference.auto.resolve(
+      phoneUses24Hour: MediaQuery.alwaysUse24HourFormatOf(context),
+      localeUses12Hour: localeUses12HourClock(localeName),
+    );
+    String timeFormatName(TimeFormatPreference option) => switch (option) {
+      TimeFormatPreference.auto => l10n.settingsTimeFormatAuto(
+        autoHour12
+            ? l10n.settingsTimeFormatShort12
+            : l10n.settingsTimeFormatShort24,
+      ),
+      TimeFormatPreference.h24 => l10n.settingsTimeFormat24,
+      TimeFormatPreference.h12 => l10n.settingsTimeFormat12,
+    };
+    String currencyName(String code) {
+      final symbol = currencySymbol(localeName, code);
+      return symbol == code ? code : '$code ($symbol)';
+    }
+
     return SettingsSection(
       title: l10n.settingsSectionAppearance,
       children: [
@@ -82,6 +114,11 @@ class AppearanceSection extends ConsumerWidget {
             }
           },
         ),
+        // B10 «Color de acento» and the cell size: right below Tema.
+        ...appearanceStyleRows,
+        // UX · Extras visuales: note in the month, paint sound, prepared
+        // colours and the background picture.
+        ...appearanceExtraRows,
         SettingsRow(
           key: const ValueKey('settings-language'),
           icon: SettingsIcons.language,
@@ -99,6 +136,29 @@ class AppearanceSection extends ConsumerWidget {
             );
             if (picked != null && context.mounted) {
               await saveSetting(context, () => controller.setLanguage(picked));
+            }
+          },
+        ),
+        SettingsRow(
+          key: const ValueKey('settings-time-format'),
+          icon: SettingsIcons.timeFormat,
+          title: l10n.settingsTimeFormatTitle,
+          value: timeFormatName(preferences.timeFormat),
+          onTap: () async {
+            final picked = await showChoiceSheet<TimeFormatPreference>(
+              context: context,
+              title: l10n.settingsTimeFormatTitle,
+              selected: preferences.timeFormat,
+              options: [
+                for (final option in TimeFormatPreference.values)
+                  ChoiceOption(option, timeFormatName(option)),
+              ],
+            );
+            if (picked != null && context.mounted) {
+              await saveSetting(
+                context,
+                () => controller.setTimeFormat(picked),
+              );
             }
           },
         ),
@@ -131,6 +191,23 @@ class AppearanceSection extends ConsumerWidget {
           onChanged: (show) =>
               saveSetting(context, () => controller.setWeekNumbers(show)),
         ),
+        SettingsRow(
+          key: const ValueKey('settings-currency'),
+          icon: SettingsIcons.currency,
+          title: l10n.settingsCurrencyTitle,
+          value: currencyName(preferences.currency),
+          onTap: () async {
+            final picked = await showCurrencySheet(
+              context: context,
+              selected: preferences.currency,
+              locale: localeName,
+            );
+            if (picked != null && context.mounted) {
+              await saveSetting(context, () => controller.setCurrency(picked));
+            }
+          },
+        ),
+        const HolidaysSettingsRow(),
       ],
     );
   }

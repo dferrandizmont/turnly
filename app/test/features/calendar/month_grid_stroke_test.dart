@@ -25,7 +25,10 @@ void main() {
   setUpAll(initializeLocale);
   _transitionTests();
 
-  for (final size in [const Size(320, 844), const Size(1280, 1000)]) {
+  // 800 dp tall: since the rail of destinations (B1) narrows the month, at
+  // 1000 dp the rows of a tablet reach their 1.5 × width limit and a doubled
+  // day could no longer grow its week.
+  for (final size in [const Size(320, 844), const Size(1280, 800)]) {
     for (final (name, tool) in [
       ('erase', const PaintTool.erase()),
       ('replace', const PaintTool.replace('afternoon')),

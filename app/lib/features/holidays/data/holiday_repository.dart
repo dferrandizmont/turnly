@@ -5,9 +5,11 @@ import 'package:drift/drift.dart';
 import '../../../core/database/app_database.dart';
 import '../../schedule/domain/civil_date.dart';
 import '../domain/holiday.dart';
+import '../domain/holiday_country.dart';
 import '../domain/holiday_entry.dart';
 import '../domain/holiday_import.dart';
 import '../domain/holiday_place.dart';
+import '../domain/holiday_subdivision.dart';
 import '../domain/spanish_regions.dart';
 import 'holiday_bundle_format.dart';
 import 'holiday_bundle_loader.dart';
@@ -15,6 +17,10 @@ import 'holiday_snapshot.dart';
 
 /// Settings keys (table `settings`, JSON values) of the holidays feature.
 abstract final class HolidaySettings {
+  /// ISO 3166-1 alpha-2 (`"MX"`), or `"ZZ"` for «Otro país: sin festivos
+  /// oficiales». Absent means Spain: every place stored before countries
+  /// existed, and every backup made back then, keeps what it showed.
+  static const country = 'holidays.country';
   static const region = 'holidays.region';
   static const municipality = 'holidays.municipality';
   static const bundleVersion = 'holidays.bundleVersion';
@@ -102,7 +108,24 @@ class HolidayRepository {
 
   // ---- place --------------------------------------------------------------
 
+  /// The stored place. No country stored (an install or a backup from before
+  /// countries existed) or an unreadable one is Spain, so nobody loses the
+  /// holidays they saw. Outside Spain only a subdivision of that country is
+  /// read; a stored municipality or a region of another country is ignored.
   Future<HolidayPlace> loadPlace() async {
+    final country =
+        normalizeCountryCode(await _readSetting(HolidaySettings.country)) ??
+        spainCountryCode;
+    if (country != spainCountryCode) {
+      // A subdivision of that country (`DE-BY`); a municipality is Spain's.
+      return HolidayPlace(
+        countryCode: country,
+        regionCode: normalizeSubdivisionCode(
+          country,
+          await _readSetting(HolidaySettings.region),
+        ),
+      );
+    }
     final region = normalizeRegionCode(
       await _readSetting(HolidaySettings.region),
     );
@@ -113,13 +136,40 @@ class HolidayRepository {
     );
   }
 
-  /// Stores the chosen region and municipality (null clears them). A
-  /// municipality alone implies its region. Throws [ArgumentError] for codes
-  /// that do not exist or a municipality outside the region.
+  /// Stores the chosen country, region and municipality (null clears the
+  /// last two). A municipality alone implies its region. Municipalities
+  /// exist only in Spain; another country may carry one of its subdivisions
+  /// as [regionCode] (`DE-BY`). Throws [ArgumentError] for codes that do not
+  /// exist, a municipality outside the region, a region of another country or
+  /// a municipality outside Spain.
   Future<HolidayPlace> savePlace({
+    String countryCode = spainCountryCode,
     String? regionCode,
     String? municipalityCode,
   }) async {
+    final country = normalizeCountryCode(countryCode);
+    if (country == null) {
+      throw ArgumentError.value(countryCode, 'countryCode', 'not alpha-2');
+    }
+    if (country != spainCountryCode) {
+      // Outside Spain: no municipality, and a subdivision only of that
+      // country (`DE-BY` for DE) that the bundle lists.
+      final subdivision = normalizeSubdivisionCode(country, regionCode);
+      if (municipalityCode != null ||
+          (regionCode != null && subdivision == null)) {
+        throw ArgumentError.value(
+          regionCode ?? municipalityCode,
+          'regionCode',
+          'not a subdivision of $country',
+        );
+      }
+      await _db.transaction(() async {
+        await _writeSetting(HolidaySettings.country, country);
+        await _writeSetting(HolidaySettings.region, subdivision);
+        await _writeSetting(HolidaySettings.municipality, null);
+      });
+      return HolidayPlace(countryCode: country, regionCode: subdivision);
+    }
     var region = normalizeRegionCode(regionCode);
     if (regionCode != null && region == null) {
       throw ArgumentError.value(regionCode, 'regionCode', 'unknown region');
@@ -143,6 +193,7 @@ class HolidayRepository {
       region = owner.code;
     }
     await _db.transaction(() async {
+      await _writeSetting(HolidaySettings.country, spainCountryCode);
       await _writeSetting(HolidaySettings.region, region);
       await _writeSetting(HolidaySettings.municipality, municipalityCode);
     });
@@ -151,10 +202,38 @@ class HolidayRepository {
 
   // ---- reading ------------------------------------------------------------
 
-  /// The rows that can apply to [place]: national, the region's national and
-  /// regional ones, the municipality's local ones, and every user holiday.
-  /// (`HolidayCalendar` applies the exact rules; this keeps the read small.)
+  /// The rows that can apply to [place]: the country's national ones, the
+  /// region's national and regional ones, the municipality's local ones, and
+  /// every user holiday. (`HolidayCalendar` applies the exact rules; this
+  /// keeps the read small.)
   Future<List<HolidayEntry>> entriesFor(HolidayPlace place) async {
+    if (!place.isSpain) {
+      // Another country: its national rows (stored with the country code as
+      // region, see HolidayEntry), those of its chosen subdivision and the
+      // person's own. «Otro país» matches no row.
+      final subdivision = place.regionCode;
+      final rows =
+          await (_db.select(_db.holidays)
+                ..where(
+                  (h) =>
+                      h.source.equals(HolidaySource.user.name) |
+                      (h.scope.equals(HolidayScope.national.name) &
+                          h.regionCode.equals(place.countryCode)) |
+                      (subdivision == null
+                          ? const Constant(false)
+                          : h.regionCode.equals(subdivision) &
+                                h.scope.isIn([
+                                  HolidayScope.national.name,
+                                  HolidayScope.regional.name,
+                                ])),
+                )
+                ..orderBy([
+                  (h) => OrderingTerm.asc(h.date),
+                  (h) => OrderingTerm.asc(h.id),
+                ]))
+              .get();
+      return [for (final row in rows) ?_entry(row)];
+    }
     final region = place.regionCode;
     final municipality = place.municipalityCode;
     final rows =
@@ -189,7 +268,7 @@ class HolidayRepository {
     return [for (final row in rows) ?_entry(row)];
   }
 
-  /// Every national holiday that some region keeps (`origin:
+  /// Every national holiday that some Spanish region keeps (`origin:
   /// national-optional` in the files), for all regions: what the holidays
   /// screen needs to say which replaceable national days the chosen region
   /// does not apply.
@@ -199,7 +278,7 @@ class HolidayRepository {
               ..where(
                 (h) =>
                     h.scope.equals(HolidayScope.national.name) &
-                    h.regionCode.isNotNull() &
+                    h.regionCode.like('ES-%') &
                     h.source.equals(HolidaySource.user.name).not(),
               )
               ..orderBy([(h) => OrderingTerm.asc(h.date)]))

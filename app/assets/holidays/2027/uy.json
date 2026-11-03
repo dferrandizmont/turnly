@@ -1,0 +1,12 @@
+{
+"schema":1,
+"year":2027,
+"country":"UY",
+"national":[
+{"date":"2027-01-01","name":"Año Nuevo"},
+{"date":"2027-05-01","name":"Día de los Trabajadores"},
+{"date":"2027-07-18","name":"Jura de la Constitución"},
+{"date":"2027-08-25","name":"Declaratoria de la Independencia"},
+{"date":"2027-12-25","name":"Día de la Familia"}
+]
+}

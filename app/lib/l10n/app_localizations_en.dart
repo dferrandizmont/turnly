@@ -131,6 +131,43 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get offToday => 'Off today';
+
+  @override
+  String offTodayBack(String date) {
+    return 'Off today; back $date';
+  }
+
+  @override
+  String get offTomorrow => 'Off tomorrow';
+
+  @override
+  String offOn(String date) {
+    return 'Next day off: $date';
+  }
+
+  @override
+  String offWeekend(String range) {
+    return 'Weekend off: $range';
+  }
+
+  @override
+  String offStreak(int worked) {
+    return '$worked days in a row';
+  }
+
+  @override
+  String offStreakLeft(int worked, int left) {
+    String _temp0 = intl.Intl.pluralLogic(
+      left,
+      locale: localeName,
+      other: '$left to go',
+      one: '1 to go',
+    );
+    return '$worked days in a row; $_temp0';
+  }
+
+  @override
   String durationDaysHours(int days, int hours) {
     return '$days d $hours h';
   }
@@ -307,6 +344,44 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get dayDetailUndo => 'Undo the last change to this day';
+
+  @override
+  String dayDetailShiftMenu(String name) {
+    return 'Options for $name';
+  }
+
+  @override
+  String get dayDetailChange => 'Change';
+
+  @override
+  String dayDetailChangeTitle(String name) {
+    return 'Change $name to…';
+  }
+
+  @override
+  String get dayDetailChangeHint =>
+      'To swap a shift for another, tap its menu.';
+
+  @override
+  String get dayDetailMore => 'More options';
+
+  @override
+  String get dayMoreExtras => 'Overtime';
+
+  @override
+  String get dayMoreReminder => 'Alert';
+
+  @override
+  String get dayMoreAlarm => 'Alarm';
+
+  @override
+  String get dayMoreDuplicate => 'Duplicate';
+
+  @override
+  String get dayMoreClear => 'Clear';
+
+  @override
   String get dayExtrasTitle => 'Overtime / Left early';
 
   @override
@@ -418,6 +493,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shiftTypesDiscardConfirm => 'Discard';
+
+  @override
+  String get shiftTypesScopeTitle => 'Which days does the change affect?';
+
+  @override
+  String get shiftTypesScopeBody =>
+      'You changed the hours or the pay of this shift, and you already have it on past days.';
+
+  @override
+  String get shiftTypesScopeAll => 'Fix it on every day';
+
+  @override
+  String get shiftTypesScopeAllHint =>
+      'It was a mistake: past days change their hours and pay too.';
+
+  @override
+  String shiftTypesScopeAllHintSince(String date) {
+    return 'It was a mistake: days from $date change, when you last changed this shift. Earlier days stay as they are.';
+  }
+
+  @override
+  String get shiftTypesScopeFromToday => 'Only from today';
+
+  @override
+  String get shiftTypesScopeFromTodayHint =>
+      'Your working hours or your rate changed: past days stay as they were.';
 
   @override
   String get shiftTypesNoTimes => 'No times';
@@ -813,9 +914,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shiftTypesFixedPlusHint => 'No allowance';
 
   @override
-  String get shiftTypesFixedPlusUnit => '€';
-
-  @override
   String get shiftTypesRateLabel => 'Hourly rate (optional)';
 
   @override
@@ -823,7 +921,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'To work out how much you earn in the monthly summary.';
 
   @override
-  String get shiftTypesRateUnit => '€/h';
+  String shiftTypesRateUnit(String symbol) {
+    return '$symbol/h';
+  }
 
   @override
   String get shiftTypesPreviewLabel => 'How it will look in the month';
@@ -883,6 +983,64 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get paintToolsLabel => 'Painting tools';
+
+  @override
+  String get paintModeReplace => 'Change the shift';
+
+  @override
+  String get paintModeAdd => 'Add another shift';
+
+  @override
+  String get paintModeAddSpoken => 'Add another shift (double)';
+
+  @override
+  String paintHeaderMode(String header, String mode) {
+    return '$header · $mode';
+  }
+
+  @override
+  String get paintPreviewTitle => 'When you tap a day';
+
+  @override
+  String get paintPreviewTitleDouble => 'When you tap a day (double)';
+
+  @override
+  String get paintPreviewReplace => 'Replaces what is there';
+
+  @override
+  String get paintPreviewAdd => 'Goes next to what is there';
+
+  @override
+  String get paintPreviewErase => 'Leaves the day empty';
+
+  @override
+  String get paintPreviewEmpty => 'empty';
+
+  @override
+  String paintPreviewSpoken(
+    String title,
+    String before,
+    String after,
+    String effect,
+  ) {
+    return '$title: $before becomes $after. $effect';
+  }
+
+  @override
+  String paintPreviewSpokenTimes(
+    String title,
+    String before,
+    String after,
+    String times,
+    String effect,
+  ) {
+    return '$title: $before becomes $after, $times. $effect';
+  }
+
+  @override
+  String paintToolSpoken(String name, String times) {
+    return '$name, $times';
+  }
 
   @override
   String get selectionHeader => 'Selection';
@@ -1454,6 +1612,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingContinue => 'Continue';
 
   @override
+  String get onboardingChooseTitle => 'How do you want to start your schedule?';
+
+  @override
+  String get onboardingChooseHelp =>
+      'Pick one. In under a minute your month will be ready, and you can change it whenever you like.';
+
+  @override
+  String get onboardingPathImport => 'Import my shifts';
+
+  @override
+  String get onboardingPathImportHint =>
+      'From your phone calendar, an .ics or CSV file, or an LRHSoft backup.';
+
+  @override
+  String get onboardingPathRotation => 'Use a rotation';
+
+  @override
+  String get onboardingPathRotationHint =>
+      'Pick your cycle (mornings, afternoons, nights, post-night…) and it fills itself in, month after month.';
+
+  @override
+  String get onboardingPathRotationTag => 'If your shifts repeat';
+
+  @override
+  String get onboardingPathPaint => 'Paint by hand';
+
+  @override
+  String get onboardingPathPaintHint =>
+      'Pick a shift and drag across the days. For when every month is different.';
+
+  @override
+  String get onboardingChooseLater =>
+      'Next we’ll ask your country to mark the public holidays. You can skip it.';
+
+  @override
+  String get onboardingRestore => 'Restore a backup';
+
+  @override
+  String get onboardingOptional => 'Optional';
+
+  @override
   String onboardingProgress(int current, int total) {
     return 'Step $current of $total';
   }
@@ -1463,7 +1662,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingProfessionHelp =>
-      'We’ll set up the shifts and rotations of your job. You can change it whenever you like.';
+      'Only to set the usual hours of your job. You can change it whenever you like.';
 
   @override
   String get onboardingProfessionNursing =>
@@ -1519,11 +1718,54 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingProfessionOtherHint => 'You start with the usual shifts';
 
   @override
+  String get onboardingProfessionNursingAbroad => 'Nursing and healthcare';
+
+  @override
+  String get onboardingProfessionNursingAbroadHint =>
+      'M 08–15, A 15–22 and N 22–08';
+
+  @override
+  String get onboardingProfessionPoliceAbroad => 'Police';
+
+  @override
+  String get onboardingProfessionSecurityAbroad => 'Security';
+
+  @override
+  String get onboardingProfessionHospitalityAbroad => 'Hospitality';
+
+  @override
+  String get onboardingProfessionIndustryAbroadHint =>
+      'Rotating shifts: M 06–14, A 14–22 and N 22–06';
+
+  @override
+  String get onboardingProfessionCommerce => 'Retail';
+
+  @override
+  String get onboardingProfessionCommerceHint => 'M 09–15 and A 15–21';
+
+  @override
+  String get onboardingProfessionTransport => 'Transport';
+
+  @override
+  String get onboardingProfessionTransportHint =>
+      'M 06–14, A 14–22 and N 22–06';
+
+  @override
   String get onboardingPlaceTitle => 'Where do you work?';
 
   @override
   String get onboardingPlaceHelp =>
       'So we can mark the public holidays of your region and your town on the calendar.';
+
+  @override
+  String get onboardingPlaceHelpAbroad =>
+      'So we can mark your country’s public holidays on the calendar.';
+
+  @override
+  String get onboardingCountryLabel => 'Country';
+
+  @override
+  String get onboardingCountrySheetTitle => 'Your country';
 
   @override
   String get onboardingRegionLabel => 'Region';
@@ -1558,6 +1800,25 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get onboardingLocalHolidaysMissing =>
       'You can add your town’s local holidays yourself in two taps.';
+
+  @override
+  String onboardingLocalHolidaysMissingYear(String year) {
+    return 'Your town’s local holidays for $year aren’t out yet: add them yourself in two taps or wait for an update.';
+  }
+
+  @override
+  String onboardingCountryNoData(String country) {
+    return 'We don’t have the public holidays of $country yet. You can add your own in Settings › Public holidays.';
+  }
+
+  @override
+  String get onboardingCountryNone =>
+      'No public holidays. You can add your own in Settings › Public holidays.';
+
+  @override
+  String onboardingCountryIncluded(String country) {
+    return 'We’ll mark the official public holidays of $country on your calendar. You can add your own in Settings › Public holidays.';
+  }
 
   @override
   String get onboardingRotationTitle => 'What’s your rotation like?';
@@ -1625,6 +1886,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingReadyByHand => 'Rotation: you paint it by hand';
+
+  @override
+  String get onboardingReadyNoOfficialHolidays =>
+      'Public holidays: only the ones you add';
 
   @override
   String get onboardingReadyNothing =>
@@ -1793,6 +2058,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get summaryHoursWorked => 'Hours worked';
 
   @override
+  String get summaryHoursPlanned => 'Planned hours';
+
+  @override
+  String summaryWorkedToDate(String hours) {
+    return '$hours worked up to yesterday';
+  }
+
+  @override
   String get summaryShiftsWorked => 'Shifts worked';
 
   @override
@@ -1835,7 +2108,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get summaryNoteExtras =>
-      'Overtime and early leave: what you log on each day. Overtime adds to and early leave takes from the hours worked (a day never goes below 0 h). They’re valued at the hourly rate of the first shift with a rate that day.';
+      'Overtime and early leave: what you log on each day. Overtime adds to and early leave takes from the hours worked (a day never goes below 0 h). Early leave cuts the end of the day’s last shift and overtime goes right after it, so night and holiday hours count them too. They’re valued at the hourly rate of the first shift with a rate that day.';
 
   @override
   String summaryDays(int count) {
@@ -1947,6 +2220,161 @@ class AppLocalizationsEn extends AppLocalizations {
       'Hours on public holidays: those that fall on a public holiday of your region and town, even if the shift crosses midnight.';
 
   @override
+  String get summaryNoteTense =>
+      'Worked: the days before today. Planned: from today on, according to your schedule.';
+
+  @override
+  String get summaryNoteGoal =>
+      'Goal: a month counts a twelfth of the yearly goal; a year, the monthly goal times 12; a date range, the share of its days. The difference adds up worked and planned hours.';
+
+  @override
+  String get summaryGoalTitle => 'Hours goal';
+
+  @override
+  String get summaryGoalAdd => 'Set an hours goal';
+
+  @override
+  String get summaryGoalEdit => 'Change goal';
+
+  @override
+  String get summaryGoalTarget => 'Goal';
+
+  @override
+  String get summaryGoalDone => 'Worked';
+
+  @override
+  String get summaryGoalPlanned => 'Planned';
+
+  @override
+  String summaryGoalShort(String hours) {
+    return '$hours to go';
+  }
+
+  @override
+  String summaryGoalShortPlanned(String hours) {
+    return 'With what’s planned, $hours to go';
+  }
+
+  @override
+  String summaryGoalOver(String hours) {
+    return '$hours over';
+  }
+
+  @override
+  String summaryGoalOverPlanned(String hours) {
+    return 'With what’s planned, $hours over';
+  }
+
+  @override
+  String get summaryGoalMet => 'Right on the goal';
+
+  @override
+  String get summaryGoalMetPlanned => 'With what’s planned, right on the goal';
+
+  @override
+  String get summaryGoalPerMonth => 'Monthly goal';
+
+  @override
+  String get summaryGoalPerYear => 'Yearly goal';
+
+  @override
+  String summaryGoalFromYear(String goal) {
+    return '$goal a year, divided by 12';
+  }
+
+  @override
+  String summaryGoalFromMonth(String goal) {
+    return '$goal a month, times 12';
+  }
+
+  @override
+  String summaryGoalRangeFromYear(String goal, int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+      one: '1 day',
+    );
+    return '$goal a year, the share of $_temp0';
+  }
+
+  @override
+  String summaryGoalRangeFromMonth(String goal, int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+      one: '1 day',
+    );
+    return '$goal a month times 12, the share of $_temp0';
+  }
+
+  @override
+  String get summaryGoalChoiceYear => 'Per year';
+
+  @override
+  String get summaryGoalChoiceMonth => 'Per month';
+
+  @override
+  String get summaryGoalHoursYear => 'Hours per year';
+
+  @override
+  String get summaryGoalHoursMonth => 'Hours per month';
+
+  @override
+  String get summaryGoalHelpYear =>
+      'For example, 1,642 h, a common yearly working time in Spain. Check your collective agreement. Each month counts a twelfth.';
+
+  @override
+  String get summaryGoalHelpMonth =>
+      'For example, 140 h. A year counts it 12 times.';
+
+  @override
+  String get summaryGoalUnit => 'h';
+
+  @override
+  String summaryGoalInvalid(int max) {
+    return 'Enter between 1 and $max hours.';
+  }
+
+  @override
+  String get summaryGoalRemove => 'Remove goal';
+
+  @override
+  String get summaryGoalSaveFailed => 'Couldn’t save the goal.';
+
+  @override
+  String get summaryHowTitle => 'How am I doing?';
+
+  @override
+  String get summaryHowWorked => 'worked';
+
+  @override
+  String get summaryHowWorkedToDate => 'worked up to yesterday';
+
+  @override
+  String get summaryHowPlanned => 'planned';
+
+  @override
+  String summaryHowPlannedRest(String hours, String date) {
+    return 'and $hours planned until $date';
+  }
+
+  @override
+  String summaryHowBarLabel(String worked, String planned) {
+    return '$worked worked, $planned planned';
+  }
+
+  @override
+  String get summaryBreakdownTitle => 'Breakdown';
+
+  @override
+  String get summaryAbsencesNone => 'None';
+
+  @override
+  String get summaryEstimateNoPrices => 'No prices';
+
+  @override
   String get summaryYearEmpty => 'This year has no shifts.';
 
   @override
@@ -1982,7 +2410,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get summaryYearRowTitle => 'Hours and estimate';
 
   @override
-  String get summaryYearRowBody => 'Shifts, hours and euros for each month';
+  String get summaryYearRowBody => 'Shifts, hours and amounts for each month';
 
   @override
   String summaryYearMonthSemantics(String month, String shifts, String hours) {
@@ -2007,6 +2435,123 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shareMonthLegendEmpty => 'This month has no shifts.';
 
   @override
+  String get reportShareTooltip => 'Report as PDF or CSV';
+
+  @override
+  String get reportSheetTitle => 'Shift report';
+
+  @override
+  String get reportSheetIntro =>
+      'A clean PDF to print or send, or a spreadsheet with your shifts.';
+
+  @override
+  String get reportFormatPdf => 'PDF to print or send';
+
+  @override
+  String get reportFormatCsv => 'CSV for Excel or Sheets';
+
+  @override
+  String get reportIncludeTitle => 'What to include';
+
+  @override
+  String get reportIncludeNotes => 'Notes of the days';
+
+  @override
+  String get reportIncludeEarnings => 'Estimated earnings';
+
+  @override
+  String get reportAbsencesTitle => 'Absences';
+
+  @override
+  String get reportAbsencesHidden => 'Don’t show them';
+
+  @override
+  String get reportAbsencesGeneric => 'Only as “Absence”';
+
+  @override
+  String get reportAbsencesDetailed => 'With their name and note';
+
+  @override
+  String get reportAbsencesHint =>
+      'A medical leave is never shown with its name or note unless you pick “With their name and note”.';
+
+  @override
+  String get reportCreate => 'Create and share';
+
+  @override
+  String get reportFailed => 'The report could not be created';
+
+  @override
+  String reportSubject(String period) {
+    return 'Shifts: $period';
+  }
+
+  @override
+  String get reportUntitled => 'My shifts';
+
+  @override
+  String get reportLegendTitle => 'Key';
+
+  @override
+  String get reportTotalsTitle => 'Totals';
+
+  @override
+  String get reportNotesTitle => 'Notes';
+
+  @override
+  String get reportHolidaysTitle => 'Public holidays';
+
+  @override
+  String get reportHolidayMark => 'Public holiday';
+
+  @override
+  String get reportAbsenceName => 'Absence';
+
+  @override
+  String get reportAbsenceCode => 'ABS';
+
+  @override
+  String get reportHoursTotal => 'Hours';
+
+  @override
+  String get reportHoursDone => 'Worked up to yesterday';
+
+  @override
+  String get reportHoursPlannedFrom => 'Planned from today';
+
+  @override
+  String get reportFooter => 'Created with Turnly';
+
+  @override
+  String reportPageOf(int page, int total) {
+    return 'Page $page of $total';
+  }
+
+  @override
+  String get reportColDate => 'Date';
+
+  @override
+  String get reportColDay => 'Day';
+
+  @override
+  String get reportColShifts => 'Shift';
+
+  @override
+  String get reportColCode => 'Code';
+
+  @override
+  String get reportColStart => 'Start';
+
+  @override
+  String get reportColEnd => 'End';
+
+  @override
+  String get reportColHours => 'Hours';
+
+  @override
+  String get reportColNote => 'Note';
+
+  @override
   String get saveFailed => 'Couldn’t save the change';
 
   @override
@@ -2016,7 +2561,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsOpenTooltip => 'Open settings';
 
   @override
-  String get settingsSectionSchedule => 'Your schedule';
+  String get settingsSectionSchedule => 'My calendar';
 
   @override
   String get settingsShiftsTitle => 'My shifts';
@@ -2044,6 +2589,50 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsThemeDark => 'Dark';
+
+  @override
+  String get appearanceAccentTitle => 'Accent color';
+
+  @override
+  String get appearanceAccentIndigo => 'Indigo';
+
+  @override
+  String get appearanceAccentBlue => 'Blue';
+
+  @override
+  String get appearanceAccentPetrol => 'Teal';
+
+  @override
+  String get appearanceAccentRaspberry => 'Raspberry';
+
+  @override
+  String get appearanceAccentGraphite => 'Graphite';
+
+  @override
+  String get appearanceAccentDefault => 'Default';
+
+  @override
+  String get appearanceAccentNote =>
+      'Changes links, switches, selection and tabs. Your shift colors stay the same.';
+
+  @override
+  String get appearanceCellSizeTitle => 'Shift size in the month';
+
+  @override
+  String get appearanceCellSizeNormal => 'Normal';
+
+  @override
+  String get appearanceCellSizeLarge => 'Large';
+
+  @override
+  String get appearanceCellSizeExtraLarge => 'Extra large';
+
+  @override
+  String get appearanceCellSizeNote =>
+      'The code and time of each day in the month. If they do not fit a cell, they shrink to fit.';
+
+  @override
+  String get appearanceCellSizeSampleCode => 'N';
 
   @override
   String get settingsWeekStartTitle => 'First day of the week';
@@ -2084,10 +2673,52 @@ class AppLocalizationsEn extends AppLocalizations {
   String get languageNameEn => 'English';
 
   @override
+  String get settingsTimeFormatTitle => 'Time format';
+
+  @override
+  String settingsTimeFormatAuto(String format) {
+    return 'Automatic ($format)';
+  }
+
+  @override
+  String get settingsTimeFormat24 => '24-hour (22:00)';
+
+  @override
+  String get settingsTimeFormat12 => '12-hour (10:00 PM)';
+
+  @override
+  String get settingsTimeFormatShort24 => '24-hour';
+
+  @override
+  String get settingsTimeFormatShort12 => '12-hour';
+
+  @override
+  String get settingsCurrencyTitle => 'Currency';
+
+  @override
+  String get settingsCurrencyNote =>
+      'Changing the currency does not convert amounts. Check your hourly rates and allowances.';
+
+  @override
+  String get settingsCurrencySearchHint => 'Search a currency or code';
+
+  @override
+  String get settingsCurrencyCommon => 'Common';
+
+  @override
+  String get settingsCurrencyAll => 'All';
+
+  @override
+  String get settingsCurrencyNone => 'No currency matches';
+
+  @override
   String get settingsSaveFailed => 'Couldn’t save the setting. Try again.';
 
   @override
-  String get settingsSectionMore => 'Alerts and data';
+  String get settingsSectionMore => 'Alerts and widget';
+
+  @override
+  String get settingsSectionBackup => 'Backups and new phone';
 
   @override
   String get settingsHolidaysTitle => 'Public holidays';
@@ -2096,7 +2727,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAlarmsTitle => 'Alarms';
 
   @override
+  String settingsAlarmsUntil(String date) {
+    return 'Alerts until $date';
+  }
+
+  @override
   String get settingsBackupTitle => 'Backup';
+
+  @override
+  String settingsBackupLast(String when) {
+    return 'Last: $when, verified';
+  }
 
   @override
   String get settingsPrivacyTitle => 'Privacy policy';
@@ -2202,7 +2843,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get faqDoubleA =>
-      'A double is working two shifts on the same day. Tap the day and, in its details, use “Add a second shift”. If you’re painting, turn on “Double” and tap the days. With several days selected, “Double with…” adds the shift to all of them.\n\nA day can have as many shifts as you need, and each one adds its own hours.';
+      'A double is working two shifts on the same day. Tap the day and, in its details, use “Add a second shift”. If you’re painting, choose the “Add another shift” mode and tap the days. With several days selected, “Double with…” adds the shift to all of them.\n\nA day can have as many shifts as you need, and each one adds its own hours.';
 
   @override
   String get faqPostNightQ => 'What’s the automatic post-night?';
@@ -2268,7 +2909,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get faqSummaryA =>
-      'The summary icon on the calendar shows the shifts, hours, night hours and public holiday hours of the month, a whole year or the dates you choose in “Dates…” (up to 366 days). A shift counts on the day it starts, even if it crosses midnight.\n\nTo see euros, set each shift type’s hourly rate and, if you have one, fixed allowance in Settings › My shifts. The estimate includes those fixed allowances, before tax. It excludes allowances per night or public holiday hour and deductions.\n\n“Shift allowance” is added once for each worked shift of that type, including split shifts; it does not depend on the hours. Rest days and absences do not add it.';
+      'The summary icon on the calendar shows the shifts, hours, night hours and public holiday hours of the month, a whole year or the dates you choose in “Dates…” (up to 366 days). A shift counts on the day it starts, even if it crosses midnight.\n\nTo see amounts, set each shift type’s hourly rate and, if you have one, fixed allowance in Settings › My shifts. The estimate includes those fixed allowances, before tax, in the currency you pick in Settings › Appearance. It excludes allowances per night or public holiday hour and deductions.\n\n“Shift allowance” is added once for each worked shift of that type, including split shifts; it does not depend on the hours. Rest days and absences do not add it.';
 
   @override
   String get settingsVersionCopied => 'Version copied';
@@ -3088,6 +3729,236 @@ class AppLocalizationsEn extends AppLocalizations {
       'The maximum is one year: the end has been cut.';
 
   @override
+  String get calSyncTitle => 'Keep up to date';
+
+  @override
+  String get calSyncHelp =>
+      'Turnly updates those events on its own, whenever your schedule changes and when you open the app: from a week ago to the next three months. It only touches the events it created. If you turn it off, the ones already there stay.';
+
+  @override
+  String calSyncLast(String when) {
+    return 'Last updated: $when';
+  }
+
+  @override
+  String calSyncFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count events couldn’t be updated. They will be tried again at the next update.',
+      one: '1 event couldn’t be updated. It will be tried again at the next update.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get calSyncLocked =>
+      'To pick another calendar, turn off “Keep up to date” first.';
+
+  @override
+  String get calSyncRunning => 'Updating the calendar…';
+
+  @override
+  String get calSyncNoticePermission =>
+      '“Keep up to date” has been turned off: Turnly no longer has permission to use your calendar.';
+
+  @override
+  String get calSyncNoticeCalendarGone =>
+      '“Keep up to date” has been turned off: the phone calendar is gone or has been renamed.';
+
+  @override
+  String get calSyncNoticeSourceGone =>
+      '“Keep up to date” has been turned off: the Turnly calendar that was being exported no longer exists.';
+
+  @override
+  String get calSyncNoticeDismiss => 'Got it';
+
+  @override
+  String get calExportIcsTitle => 'Save as an .ics file';
+
+  @override
+  String get calExportIcsHelp =>
+      'A file Google Calendar, Outlook and Apple Calendar open, to send or save wherever you like. No permission needed.';
+
+  @override
+  String calExportIcsRange(String from, String to) {
+    return 'From $from to $to';
+  }
+
+  @override
+  String get calExportIcsButton => 'Save .ics file';
+
+  @override
+  String get calExportIcsRunning => 'Preparing the file…';
+
+  @override
+  String get calExportIcsFailed => 'The file couldn’t be created. Try again.';
+
+  @override
+  String get shareLinkRowTitle => 'Share by link';
+
+  @override
+  String get shareLinkRowSubtitle =>
+      'Your family sees your shifts in their calendar';
+
+  @override
+  String get shareLinkRowPublished => 'Link published';
+
+  @override
+  String get shareLinkTitle => 'Share by link';
+
+  @override
+  String get shareLinkIntro =>
+      'Publish a read-only link: anyone who has it sees your shifts in their calendar (Google, Apple, Outlook) without installing anything. It updates by itself when you change your schedule.';
+
+  @override
+  String get shareLinkUnavailableTitle => 'Not available yet';
+
+  @override
+  String get shareLinkUnavailableBody =>
+      'This version can’t publish links yet. Meanwhile, you can save your shifts as an .ics file in Export shifts.';
+
+  @override
+  String get shareLinkCalendarLabel => 'Calendar';
+
+  @override
+  String get shareLinkOptionsLabel => 'What is shared';
+
+  @override
+  String get shareLinkIncludeRest => 'Include days off';
+
+  @override
+  String get shareLinkIncludeRestHelp =>
+      'Off and Post-night, as all-day events.';
+
+  @override
+  String get shareLinkIncludeAbsences => 'Show absences as “Absence”';
+
+  @override
+  String get shareLinkIncludeAbsencesHelp =>
+      'Without the reason: nobody can tell sick leave from vacation or a personal day.';
+
+  @override
+  String get shareLinkPrivacyTitle => 'What goes out and what doesn’t';
+
+  @override
+  String get shareLinkPrivacyBody =>
+      'The name, code and times of each shift go out, and the calendar’s name. Your notes, sick leave and the reason for any absence never do. Anyone with the link can see your shifts: only give it to people you choose, and revoke it whenever you want.';
+
+  @override
+  String get shareLinkPublishButton => 'Publish link';
+
+  @override
+  String get shareLinkPublishConfirmTitle => 'Publish your shifts?';
+
+  @override
+  String get shareLinkPublishConfirmBody =>
+      'Your shifts will be uploaded to the Turnly server so the link works. It’s the only thing the app sends off your phone. They’re deleted when you revoke the link or after six months without updates.';
+
+  @override
+  String get shareLinkPublishConfirm => 'Publish';
+
+  @override
+  String get shareLinkQrLabel => 'QR code with the link to your shifts';
+
+  @override
+  String get shareLinkLinkLabel => 'Link';
+
+  @override
+  String get shareLinkCopy => 'Copy';
+
+  @override
+  String get shareLinkCopied => 'Link copied';
+
+  @override
+  String get shareLinkShare => 'Share';
+
+  @override
+  String shareLinkShareText(String url) {
+    return 'My shifts in Turnly. Add them to your calendar with this link: $url';
+  }
+
+  @override
+  String shareLinkLastPublished(String date) {
+    return 'Last published: $date';
+  }
+
+  @override
+  String get shareLinkPublishing => 'Publishing…';
+
+  @override
+  String get shareLinkWaiting => 'It will update in a moment.';
+
+  @override
+  String get shareLinkNotPublished => 'It couldn’t be published yet.';
+
+  @override
+  String get shareLinkRefresh => 'Update now';
+
+  @override
+  String shareLinkSharedCalendar(String name) {
+    return 'Sharing the shifts of “$name”.';
+  }
+
+  @override
+  String get shareLinkCalendarMissing =>
+      'The calendar you were sharing is gone. Choose another one to keep the link up to date.';
+
+  @override
+  String get shareLinkHowTitle => 'How to subscribe';
+
+  @override
+  String get shareLinkHowBody =>
+      'In Google Calendar: Other calendars › From URL, and paste the link. On iPhone: open the link, or go to Settings › Calendar › Accounts › Add Account › Other › Add Subscribed Calendar. Each calendar decides how often it checks for changes: it can take a few hours.';
+
+  @override
+  String get shareLinkRevoke => 'Revoke link';
+
+  @override
+  String get shareLinkRevokeConfirmTitle => 'Revoke the link?';
+
+  @override
+  String get shareLinkRevokeConfirmBody =>
+      'It’s deleted from the server and stops working for everyone. If you publish again, a new link is created.';
+
+  @override
+  String get shareLinkRevokeConfirm => 'Revoke';
+
+  @override
+  String get shareLinkRevoking => 'Revoking…';
+
+  @override
+  String get shareLinkRevokePending =>
+      'Revoking is pending: it will retry by itself in a moment. Nothing is published meanwhile.';
+
+  @override
+  String get shareLinkProblemNetwork =>
+      'No connection to the server. It will try again later.';
+
+  @override
+  String get shareLinkProblemRateLimited =>
+      'Too many updates in a row. It will try again in a moment.';
+
+  @override
+  String get shareLinkProblemTooLarge =>
+      'The schedule is too large to publish.';
+
+  @override
+  String get shareLinkProblemRejected =>
+      'The server didn’t accept the link. Revoke it and publish a new one.';
+
+  @override
+  String get shareLinkProblemRevoked =>
+      'This link was revoked and no longer works. Publish a new one if you want to share your shifts again.';
+
+  @override
+  String get shareLinkProblemServer => 'It couldn’t be completed. Try again.';
+
+  @override
+  String get shareLinkAbsence => 'Absence';
+
+  @override
   String get onboardingImportButton => 'Import now';
 
   @override
@@ -3108,6 +3979,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backupUiStatusWhere => 'On this device';
+
+  @override
+  String get backupUiStatusVerified => 'Verified: it can be restored in full';
 
   @override
   String get backupUiStatusRunning => 'Saving the backup…';
@@ -3173,6 +4047,30 @@ class AppLocalizationsEn extends AppLocalizations {
       'Couldn’t make the backup. Your data is as it was.';
 
   @override
+  String backupWarnRestoreSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'The backup we made beforehand doesn’t include $count attachments: their files were missing or couldn’t be read.',
+      one: 'The backup we made beforehand doesn’t include 1 attachment: its file was missing or couldn’t be read.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String backupWarnCopySkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Backup done, but without $count attachments: their files are missing or can’t be read.',
+      one: 'Backup done, but without 1 attachment: its file is missing or can’t be read.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get backupUiAutoTitle => 'Automatic backups';
 
   @override
@@ -3182,6 +4080,109 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get backupUiAutoOff =>
       'Off: a backup is only made when you ask for it.';
+
+  @override
+  String get autoBackupFolderTitle => 'Automatic backup to a folder';
+
+  @override
+  String get autoBackupFolderIntro =>
+      'One backup a day in the folder you choose: Drive, Dropbox, OneDrive or one on your device. If you lose your device, it’s still there. We keep the last 10.';
+
+  @override
+  String get autoBackupFolderPrivacy =>
+      'The backup holds your whole schedule, absences and sick leave included, and is saved wherever that folder lives (for example, your cloud). No Turnly account needed.';
+
+  @override
+  String get autoBackupFolderChoose => 'Choose folder';
+
+  @override
+  String get autoBackupFolderChooseSubtitle => 'Opens the system folder picker';
+
+  @override
+  String get autoBackupFolderFolder => 'Folder';
+
+  @override
+  String get autoBackupFolderUnnamed => 'Chosen folder';
+
+  @override
+  String get autoBackupFolderChange => 'Tap to choose another';
+
+  @override
+  String autoBackupFolderLast(String when) {
+    return 'Last backup in the folder: $when';
+  }
+
+  @override
+  String get autoBackupFolderNone => 'There’s no backup in the folder yet.';
+
+  @override
+  String get autoBackupFolderSchedule =>
+      'Backs up once a day and, while the app is open, after your changes (at most every 6 hours).';
+
+  @override
+  String get autoBackupFolderCopyNow => 'Back up to the folder now';
+
+  @override
+  String get autoBackupFolderCopyDone => 'Backup saved to the folder';
+
+  @override
+  String get autoBackupFolderVerify => 'Test the folder backup';
+
+  @override
+  String get autoBackupFolderVerifySubtitle =>
+      'Checks that the latest backup in the folder can be fully recovered';
+
+  @override
+  String get autoBackupFolderStop => 'Stop backing up to this folder';
+
+  @override
+  String get autoBackupFolderStopSubtitle =>
+      'Backups already in the folder are not deleted';
+
+  @override
+  String get autoBackupFolderStopped => 'No more backups to that folder';
+
+  @override
+  String get autoBackupFolderFailedTitle => 'The folder backup isn’t working';
+
+  @override
+  String autoBackupFolderFailedWhen(String when) {
+    return 'Last attempt: $when.';
+  }
+
+  @override
+  String get autoBackupFolderErrRevoked =>
+      'Turnly no longer has permission to use that folder. Choose it again.';
+
+  @override
+  String get autoBackupFolderErrMissing =>
+      'We can’t find the folder: it may have been deleted or moved. Choose another.';
+
+  @override
+  String get autoBackupFolderErrUnwritable =>
+      'That folder doesn’t allow saving files. Choose another.';
+
+  @override
+  String get autoBackupFolderErrNoSpace =>
+      'There’s no space where the folder lives (your device or your cloud). Free up space and try again.';
+
+  @override
+  String get autoBackupFolderErrTooLarge => 'The backup is too large to save.';
+
+  @override
+  String get autoBackupFolderErrFailed =>
+      'The backup couldn’t be saved to the folder. We’ll try again.';
+
+  @override
+  String get autoBackupFolderErrDamaged =>
+      'We couldn’t read the folder backup settings. Choose the folder again.';
+
+  @override
+  String get autoBackupFolderChooseAgain => 'Choose the folder again';
+
+  @override
+  String get autoBackupFolderPickFailed =>
+      'That folder couldn’t be used. Try another.';
 
   @override
   String get backupUiSectionFile => 'File';
@@ -3194,6 +4195,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backupUiExport => 'Export file';
+
+  @override
+  String get backupUiSaveOutside => 'Save a backup outside Turnly';
+
+  @override
+  String get backupUiSaveOutsideHelp =>
+      'In your cloud, on another device or by email. If you lose your phone or get a new one, get it back with “Import file”.';
 
   @override
   String get backupUiExportSubtitle =>
@@ -3518,6 +4526,41 @@ class AppLocalizationsEn extends AppLocalizations {
       'Touch and hold the home screen, tap the + at the top and look for Turnly.';
 
   @override
+  String get widgetNameSmall => 'Small';
+
+  @override
+  String get widgetNameMedium => 'Medium';
+
+  @override
+  String get widgetNameLarge => 'Large';
+
+  @override
+  String get widgetNameAgenda => 'Agenda';
+
+  @override
+  String get widgetNameTwoWeeks => 'Two weeks';
+
+  @override
+  String get widgetDescSmall => 'Today and tomorrow';
+
+  @override
+  String get widgetDescMedium => 'The next 7 days';
+
+  @override
+  String get widgetDescLarge => 'The whole month';
+
+  @override
+  String get widgetDescAgenda => 'Upcoming shifts';
+
+  @override
+  String get widgetDescTwoWeeks => 'Current and next';
+
+  @override
+  String widgetAddNamed(String name) {
+    return 'Add $name';
+  }
+
+  @override
   String get compareTitle => 'Compare calendars';
 
   @override
@@ -3531,16 +4574,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get compareIntro =>
-      'Choose two calendars and see their shifts together. Days when both are off are marked.';
+      'Choose two to six calendars and see their shifts together. Days when all of them are off are marked.';
 
   @override
-  String get compareFirstLabel => 'First calendar';
-
-  @override
-  String get compareSecondLabel => 'Second calendar';
-
-  @override
-  String get comparePickTitle => 'Choose a calendar';
+  String get comparePickTitle => 'Choose the calendars';
 
   @override
   String get compareNeedTwoTitle => 'You need two calendars';
@@ -3565,22 +4602,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get compareFreeListTitle => 'Shared days off';
 
   @override
-  String get compareLegendFree => 'Both off';
+  String get compareLegendFree => 'All off';
 
   @override
   String get compareNote =>
-      'A day counts as off when it has no work shift: empty, off, or an absence (vacation, sick leave…). Each shift counts on the day it starts.';
+      'A day counts as off when nobody works and all of them have an off day or an absence entered (vacation, sick leave…). A day with no shifts entered does not count as off: it is marked as empty. Each shift counts on the day it starts.';
 
   @override
   String get compareNoShiftMark => '–';
 
   @override
-  String get compareBothFree => 'both off';
+  String get compareBothFree => 'all off';
 
   @override
   String compareCellCalendar(String calendar, String shifts) {
     return '$calendar: $shifts';
   }
+
+  @override
+  String get compareLegendUnrecorded => 'Nothing entered in one';
+
+  @override
+  String compareUnrecordedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days with nothing entered in one of them',
+      one: '1 day with nothing entered in one of them',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get compareUnrecorded => 'nothing entered in one';
 
   @override
   String get compareLoadFailed => 'Couldn’t read the calendars.';
@@ -3774,6 +4828,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get holidaysSettingsRegionClear => 'No region';
 
   @override
+  String get holidaysSettingsCountryTitle => 'Country';
+
+  @override
+  String get holidaysSettingsCountryOther =>
+      'Other country: no public holidays';
+
+  @override
+  String get holidaysSettingsCountryNone => 'No public holidays';
+
+  @override
   String get holidaysSettingsMunicipalityTitle => 'Town';
 
   @override
@@ -3800,6 +4864,15 @@ class AppLocalizationsEn extends AppLocalizations {
       'Choose your town to see its local holidays, or add them yourself below.';
 
   @override
+  String holidaysSettingsStatusCountryNoData(String country) {
+    return 'We don’t have the public holidays of $country yet: add your own below';
+  }
+
+  @override
+  String get holidaysSettingsStatusNoOfficial =>
+      'No public holidays: only the ones you add below show';
+
+  @override
   String holidaysSettingsStatusLocalIncluded(String municipality) {
     return 'Local holidays of $municipality: included';
   }
@@ -3822,8 +4895,35 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get holidaysSettingsStatusLocalPartial =>
-      'Some may be missing: check them.';
+  String get holidaysSubdivisionKindState => 'State';
+
+  @override
+  String get holidaysSubdivisionKindFederalState => 'Federal state';
+
+  @override
+  String get holidaysSubdivisionKindProvince => 'Province';
+
+  @override
+  String get holidaysSubdivisionKindRegion => 'Region';
+
+  @override
+  String get holidaysSubdivisionKindNation => 'Nation';
+
+  @override
+  String get holidaysSubdivisionKindCanton => 'Canton';
+
+  @override
+  String get holidaysSubdivisionKindCity => 'City';
+
+  @override
+  String get holidaysSubdivisionKindCityOrRegion => 'City or region';
+
+  @override
+  String get holidaysSubdivisionSearch => 'Search';
+
+  @override
+  String get holidaysSettingsStatusNoSubdivision =>
+      'Without a choice, only nationwide public holidays show. Choose yours to see the local ones too.';
 
   @override
   String get holidaysSettingsAdd => 'Add local holiday';
@@ -4062,6 +5162,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get alarmsNextOff => 'Alarms are off.';
 
   @override
+  String alarmsScheduledUntil(String date) {
+    return 'Alerts scheduled until $date';
+  }
+
+  @override
+  String get alarmsRenewalTitle => 'Shift alerts';
+
+  @override
+  String alarmsRenewalBody(String date) {
+    return 'Your shift alerts are scheduled until $date. Open Turnly to schedule the next ones.';
+  }
+
+  @override
   String get alarmsSkipDay => 'No alarm this day';
 
   @override
@@ -4112,6 +5225,61 @@ class AppLocalizationsEn extends AppLocalizations {
   String agendaSemanticsReminder(String time) {
     return 'alert at $time';
   }
+
+  @override
+  String get dndSection => 'Do Not Disturb during shifts';
+
+  @override
+  String get dndMasterTitle => 'Silence the phone on my shifts';
+
+  @override
+  String get dndMasterHelp =>
+      'Turns on Do Not Disturb when the shift starts and off when it ends.';
+
+  @override
+  String get dndFilterTitle => 'What gets through';
+
+  @override
+  String get dndFilterSheetTitle => 'What gets through during the shift';
+
+  @override
+  String get dndFilterAll => 'Everything';
+
+  @override
+  String get dndFilterPriority => 'Priority only';
+
+  @override
+  String get dndFilterAlarms => 'Alarms only';
+
+  @override
+  String get dndFilterNone => 'Total silence';
+
+  @override
+  String get dndPermOkTitle => 'All set';
+
+  @override
+  String get dndPermOkBody =>
+      'Turnly can turn on Do Not Disturb during your shifts. It’s scheduled as a system alarm: the clock may show the start or the end of the shift as the next alarm.';
+
+  @override
+  String get dndPermTitle => 'Do Not Disturb access needed';
+
+  @override
+  String get dndPermBody =>
+      'To silence the phone during shifts, allow Turnly to access Do Not Disturb in system settings.';
+
+  @override
+  String get dndPermOpen => 'Open settings';
+
+  @override
+  String get dndShiftSection => 'Do Not Disturb';
+
+  @override
+  String get dndShiftSwitch => 'Turn on Do Not Disturb during this shift';
+
+  @override
+  String get dndShiftHelper =>
+      'The phone is silenced while you work this shift.';
 
   @override
   String get shiftTypesAlarmSection => 'Alarm';
@@ -4343,6 +5511,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get monthSelectDays => 'Select days';
 
   @override
+  String get monthNavMonth => 'Month';
+
+  @override
+  String get monthNavRotation => 'Rotation';
+
+  @override
+  String get monthNavAgenda => 'Agenda';
+
+  @override
+  String get monthNavSummary => 'Summary';
+
+  @override
+  String get todayCardCollapse => 'Fold today’s card';
+
+  @override
+  String get todayCardExpand => 'Unfold today’s card';
+
+  @override
   String get monthSelectDay => 'Tap to select this day';
 
   @override
@@ -4354,4 +5540,963 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get monthGridSelected => 'Grid view';
+
+  @override
+  String get absenceRowTitle => 'Vacation and leave';
+
+  @override
+  String get absenceRowSubtitle => 'Days allowed, used and left';
+
+  @override
+  String get absenceTitle => 'Vacation and leave';
+
+  @override
+  String get absenceYearPrevious => 'Previous year';
+
+  @override
+  String get absenceYearNext => 'Next year';
+
+  @override
+  String absenceDays(num days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$daysString days',
+      one: '1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get absenceEmptyTitle => 'No balances yet';
+
+  @override
+  String get absenceEmptyBody =>
+      'Create a balance (vacation, personal days…) and the app counts the days from your schedule.';
+
+  @override
+  String get absenceAdd => 'Add balance';
+
+  @override
+  String get absenceContinueSeries => 'Continue a series';
+
+  @override
+  String get absenceContinueSeriesHelper =>
+      'If you continue the series of a previous year, its name, its types and its cap are copied, and what was left is carried over. You only fill in the days allowed.';
+
+  @override
+  String get absenceCopyNextYear => 'Copy to next year';
+
+  @override
+  String absenceCopiedNextYear(int year) {
+    return 'Balance copied to $year.';
+  }
+
+  @override
+  String absenceLeftCaption(num days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'days left',
+      one: 'day left',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String absenceLeftSemantics(String name, String days) {
+    return '$name: $days left';
+  }
+
+  @override
+  String get absenceAllowed => 'Allowed';
+
+  @override
+  String get absenceCarried => 'Carried over';
+
+  @override
+  String get absenceAdjustment => 'Adjustments';
+
+  @override
+  String get absenceEnjoyed => 'Taken';
+
+  @override
+  String get absencePlanned => 'Planned';
+
+  @override
+  String absenceCarriedUntil(String date) {
+    return 'Expire on $date';
+  }
+
+  @override
+  String get absenceCarriedNoExpiry => 'No expiry';
+
+  @override
+  String absenceCarriedExpired(String date) {
+    return 'Expired on $date';
+  }
+
+  @override
+  String absenceWarnExpiring(String days, String date) {
+    return 'You have $days left from last year that expire on $date.';
+  }
+
+  @override
+  String absenceWarnPlanned(String planned, String left) {
+    return 'You’ve planned more than you have: $planned planned, $left available.';
+  }
+
+  @override
+  String get absenceNewTitle => 'New balance';
+
+  @override
+  String get absenceEditTitle => 'Edit balance';
+
+  @override
+  String absenceEditTooltip(String name) {
+    return 'Edit $name';
+  }
+
+  @override
+  String get absenceFieldName => 'Name';
+
+  @override
+  String get absenceFieldNameHint => 'Vacation';
+
+  @override
+  String get absenceFieldAllowed => 'Days allowed';
+
+  @override
+  String get absenceFieldAllowedHelper =>
+      'Days you’re entitled to this year, not counting carried-over ones.';
+
+  @override
+  String get absenceFieldAdjustment => 'Manual adjustment';
+
+  @override
+  String get absenceFieldAdjustmentHelper =>
+      'Add or subtract days by hand: ones you used before starting the app, or an extra day you were given. Negative numbers allowed.';
+
+  @override
+  String get absenceDaysSuffix => 'days';
+
+  @override
+  String get absenceFieldCarry => 'Carry over what is left from last year';
+
+  @override
+  String get absenceFieldCarryCap => 'Maximum carried over';
+
+  @override
+  String get absenceFieldCarryCapHelper =>
+      'Leave it empty if everything carries over.';
+
+  @override
+  String get absenceFieldExpiry => 'Expire on';
+
+  @override
+  String get absenceFieldExpiryNone => 'No expiry';
+
+  @override
+  String get absenceFieldExpiryClear => 'Remove expiry';
+
+  @override
+  String get absenceFieldTypes => 'Shift types that count';
+
+  @override
+  String get absenceFieldTypesHelper =>
+      'Each day painted with one of these types uses a day of this balance.';
+
+  @override
+  String get absenceFieldTypesNone =>
+      'You have no absence shift types. Create one in My shifts with the Absence category.';
+
+  @override
+  String absenceInvalidName(int max) {
+    return 'Give it a name ($max letters at most).';
+  }
+
+  @override
+  String get absenceInvalidAllowed =>
+      'Enter a valid number of days, for example 22.';
+
+  @override
+  String get absenceInvalidAdjustment =>
+      'Enter days in steps of a quarter, for example -1 or 0.5.';
+
+  @override
+  String get absenceInvalidCap => 'Enter a valid maximum, for example 5.';
+
+  @override
+  String get absenceRemove => 'Remove balance';
+
+  @override
+  String get absenceRemoveTitle => 'Remove this balance?';
+
+  @override
+  String absenceRemoveBody(String name, int year) {
+    return 'Deletes the “$name” balance for $year. Your shifts won’t change.';
+  }
+
+  @override
+  String get absenceRemoveConfirm => 'Remove';
+
+  @override
+  String get absenceSaveFailed => 'Couldn’t save the balance. Try again.';
+
+  @override
+  String absenceSummaryLeft(String days, String name) {
+    return 'You have $days of $name left';
+  }
+
+  @override
+  String get absenceSummaryOpen => 'Open vacation and leave';
+
+  @override
+  String get moneyNightPlusLabel => 'Night premium per hour';
+
+  @override
+  String get moneyNightPlusHelper => 'Added for every night hour worked.';
+
+  @override
+  String get moneyHolidayPlusLabel => 'Holiday premium per hour';
+
+  @override
+  String get moneyHolidayPlusHelper =>
+      'Added for every hour worked on a public holiday.';
+
+  @override
+  String get moneyLocationLabel => 'Location';
+
+  @override
+  String get moneyLocationHint => 'Hospital, floor 3';
+
+  @override
+  String get moneyLocationHelper =>
+      'Shown in reports (PDF and CSV) next to the shift name.';
+
+  @override
+  String get moneyExtraTitle => 'Extra amount';
+
+  @override
+  String get moneyExtraHelper =>
+      'Expenses, mileage, a bonus… Use a negative amount for a deduction. It’s added to the day’s estimate.';
+
+  @override
+  String get moneyExtraHint => 'No amount';
+
+  @override
+  String get moneyExtraInvalid =>
+      'Enter a valid amount, for example 25 or -10.50';
+
+  @override
+  String get moneyExtraClear => 'Remove the extra amount';
+
+  @override
+  String get moneySectionTitle => 'Hours and money';
+
+  @override
+  String get moneyWithholdingTitle => 'Withholding (%)';
+
+  @override
+  String get moneyWithholdingSubtitle => 'To estimate your net pay';
+
+  @override
+  String moneyWithholdingValue(int percent) {
+    return '$percent%';
+  }
+
+  @override
+  String get moneyWithholdingNone => 'No withholding';
+
+  @override
+  String get moneyWithholdingHelper =>
+      'The percentage withheld from your payslip (tax and social security). We use it to estimate your net pay; it does not replace your payslip.';
+
+  @override
+  String get moneyWithholdingField => 'Withholding percentage';
+
+  @override
+  String get moneyWithholdingInvalid =>
+      'Enter a whole number between 0 and 100.';
+
+  @override
+  String get moneyGross => 'Estimated gross';
+
+  @override
+  String get moneyNet => 'Estimated net';
+
+  @override
+  String moneyNetNote(int percent) {
+    return 'With $percent% withheld';
+  }
+
+  @override
+  String get moneyNetSetup => 'Set your withholding to see net pay';
+
+  @override
+  String get moneyEarnedTitle => 'Earned so far';
+
+  @override
+  String get moneyEarnedNote =>
+      'Past days plus what you’ve worked today so far.';
+
+  @override
+  String get moneyModeQuarter => 'Quarter';
+
+  @override
+  String moneyQuarterLabel(int quarter, int year) {
+    return 'Q$quarter $year';
+  }
+
+  @override
+  String get moneyQuarterPrevious => 'Previous quarter';
+
+  @override
+  String get moneyQuarterNext => 'Next quarter';
+
+  @override
+  String get moneyBagTitle => 'Hours bank';
+
+  @override
+  String moneyBagFavour(String hours) {
+    return '$hours ahead';
+  }
+
+  @override
+  String moneyBagOwed(String hours) {
+    return '$hours behind';
+  }
+
+  @override
+  String get moneyBagEven => 'Even';
+
+  @override
+  String moneyBagNote(String month) {
+    return 'Hours worked minus your target, added up month by month through $month. December’s balance carries into January.';
+  }
+
+  @override
+  String get moneyReportExtraColumn => 'Extra amount';
+
+  @override
+  String get moneyReportExtraTotal => 'Extra amounts';
+
+  @override
+  String get moneyPlusHint => 'No amount';
+
+  @override
+  String get swapRowTitle => 'Swap book';
+
+  @override
+  String get swapRowSubtitle => 'Shifts owed to you and shifts you owe';
+
+  @override
+  String get swapTitle => 'Swap book';
+
+  @override
+  String get swapBalancesTitle => 'Balance';
+
+  @override
+  String swapBalanceTheyOwe(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Owes me $count shifts',
+      one: 'Owes me 1 shift',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String swapBalanceIOwe(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'I owe $count shifts',
+      one: 'I owe 1 shift',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get swapBalanceEven => 'Nothing pending';
+
+  @override
+  String get swapChangesTitle => 'Swaps';
+
+  @override
+  String get swapEmptyTitle => 'No swaps yet';
+
+  @override
+  String get swapEmptyBody =>
+      'Log a shift swap with a colleague and the app keeps track of who owes what.';
+
+  @override
+  String get swapAdd => 'Add swap';
+
+  @override
+  String get swapNewTitle => 'New swap';
+
+  @override
+  String get swapEditTitle => 'Edit swap';
+
+  @override
+  String get swapStagePending => 'Pending';
+
+  @override
+  String get swapStageReturned => 'Returned';
+
+  @override
+  String get swapStageSettled => 'Settled';
+
+  @override
+  String get swapDirectionTheyOwe => 'They owe me';
+
+  @override
+  String get swapDirectionIOwe => 'I owe them';
+
+  @override
+  String get swapFieldService => 'Shift details';
+
+  @override
+  String get swapFieldColleague => 'Colleague';
+
+  @override
+  String get swapFieldColleagueHint => 'Marta';
+
+  @override
+  String get swapInvalidColleague => 'Enter who the swap is with.';
+
+  @override
+  String get swapFieldDirection => 'Who owes the shift';
+
+  @override
+  String get swapFieldDirectionHelper =>
+      'Choose who ends up owing after the swap.';
+
+  @override
+  String get swapFieldDate => 'Day you give the shift';
+
+  @override
+  String get swapFieldReturnDate => 'Day you get a shift back';
+
+  @override
+  String get swapFieldReturnNone => 'Not returned yet';
+
+  @override
+  String get swapFieldReturnClear => 'Clear the date';
+
+  @override
+  String get swapFieldGivenTypes => 'The shift you give';
+
+  @override
+  String get swapFieldReceivedTypes => 'The shift you get';
+
+  @override
+  String get swapFieldTypesHelper =>
+      'Pick the shifts in the swap so you can apply it to the schedule.';
+
+  @override
+  String get swapFieldNote => 'Note';
+
+  @override
+  String get swapNoteHint => 'For example: pays me back on Monday';
+
+  @override
+  String get swapRemove => 'Remove the swap';
+
+  @override
+  String get swapRemoveTitle => 'Remove this swap?';
+
+  @override
+  String swapRemoveBody(String name, String date) {
+    return 'Deletes the swap with $name on $date. Your shifts won’t change.';
+  }
+
+  @override
+  String get swapRemoveConfirm => 'Remove';
+
+  @override
+  String get swapSaveFailed => 'Couldn’t save the swap. Try again.';
+
+  @override
+  String get swapRemoved => 'Swap removed';
+
+  @override
+  String swapEditTooltip(String name) {
+    return 'Edit the swap with $name';
+  }
+
+  @override
+  String get swapMarkReturned => 'Mark as returned';
+
+  @override
+  String get swapMarkReturnedTitle => 'When do you get it back?';
+
+  @override
+  String get swapMarkedReturned => 'Swap marked as returned';
+
+  @override
+  String get swapMarkSettled => 'Mark as settled';
+
+  @override
+  String get swapMarkedSettled => 'Swap settled';
+
+  @override
+  String get swapReopen => 'Mark as pending';
+
+  @override
+  String get swapReopened => 'The swap is pending again';
+
+  @override
+  String get swapApplyToCalendar => 'Apply to the schedule';
+
+  @override
+  String get swapUndoFromCalendar => 'Remove from the schedule';
+
+  @override
+  String get swapApplied => 'Swap applied to the schedule';
+
+  @override
+  String get swapUnapplied => 'Swap removed from the schedule';
+
+  @override
+  String get swapNothingToApply => 'The days already match the swap';
+
+  @override
+  String get swapNotApplied => 'This swap is not applied to the schedule';
+
+  @override
+  String get swapDaySection => 'Shift swap';
+
+  @override
+  String get swapDayAdd => 'Log a swap';
+
+  @override
+  String get swapDayEmpty => 'No swap logged on that day.';
+
+  @override
+  String get swapMenuTooltip => 'Swap options';
+
+  @override
+  String get swapGivesLabel => 'You give';
+
+  @override
+  String get swapReceivesLabel => 'You get';
+
+  @override
+  String get noteAttachmentsSection => 'Attachments';
+
+  @override
+  String get noteAttachmentsEmptyTitle => 'No photos or files yet';
+
+  @override
+  String get noteAttachmentsEmptyBody =>
+      'You can add a photo, a file or a drawing to this day.';
+
+  @override
+  String get noteAttachmentsAdd => 'Add';
+
+  @override
+  String get noteAttachmentsAddPhoto => 'Take a photo';
+
+  @override
+  String get noteAttachmentsAddGallery => 'Choose from the gallery';
+
+  @override
+  String get noteAttachmentsAddFile => 'Choose a file';
+
+  @override
+  String get noteAttachmentsAddSketch => 'Draw';
+
+  @override
+  String get noteAttachmentKindPhoto => 'Photo';
+
+  @override
+  String get noteAttachmentKindFile => 'File';
+
+  @override
+  String get noteAttachmentKindSketch => 'Drawing';
+
+  @override
+  String noteAttachmentOpen(String name) {
+    return 'Open $name';
+  }
+
+  @override
+  String noteAttachmentRemove(String name) {
+    return 'Remove $name';
+  }
+
+  @override
+  String noteAttachmentRemoveHint(String name) {
+    return 'Press and hold to remove $name';
+  }
+
+  @override
+  String noteAttachmentRemoved(String name) {
+    return '$name removed';
+  }
+
+  @override
+  String get noteAttachmentsViewerTitle => 'Attachment';
+
+  @override
+  String get noteAttachmentTooLarge => 'That file is too big (50 MB at most).';
+
+  @override
+  String get noteAttachmentStoreFull => 'No room left for more attachments.';
+
+  @override
+  String get noteAttachmentUnreadable => 'Couldn’t read the file.';
+
+  @override
+  String get noteAttachmentCameraDenied =>
+      'Without permission we can’t open the camera.';
+
+  @override
+  String get noteAttachmentGalleryDenied =>
+      'Without permission we can’t open the gallery.';
+
+  @override
+  String get noteAttachmentFailed => 'Couldn’t save the attachment.';
+
+  @override
+  String get noteAttachmentRemoveFailed => 'Couldn’t remove the attachment.';
+
+  @override
+  String get noteTasksSection => 'Tasks';
+
+  @override
+  String get noteTasksEmpty => 'This day has no tasks.';
+
+  @override
+  String get noteTasksAdd => 'Add task';
+
+  @override
+  String get noteTasksHint => 'What needs doing';
+
+  @override
+  String get noteTasksInvalid => 'Enter what needs doing.';
+
+  @override
+  String get noteTasksUndo => 'Undo the last task change';
+
+  @override
+  String get noteTaskMenu => 'Task options';
+
+  @override
+  String get noteTaskMoveUp => 'Move up';
+
+  @override
+  String get noteTaskMoveDown => 'Move down';
+
+  @override
+  String get noteTaskRemove => 'Remove the task';
+
+  @override
+  String get sketchTitle => 'Drawing';
+
+  @override
+  String get sketchPen => 'Pen';
+
+  @override
+  String get sketchEraser => 'Eraser';
+
+  @override
+  String get sketchUndo => 'Undo the stroke';
+
+  @override
+  String get sketchRedo => 'Redo the stroke';
+
+  @override
+  String get sketchClear => 'Erase the drawing';
+
+  @override
+  String get sketchSave => 'Save';
+
+  @override
+  String get sketchColor => 'Stroke color';
+
+  @override
+  String get sketchColorInk => 'Ink';
+
+  @override
+  String get sketchColorAccent => 'Accent';
+
+  @override
+  String get sketchColorHighlight => 'Amber';
+
+  @override
+  String get sketchColorHoliday => 'Red';
+
+  @override
+  String get sketchColorSuccess => 'Green';
+
+  @override
+  String get sketchEmpty => 'Draw something before saving.';
+
+  @override
+  String get sketchFailed => 'Couldn’t save the drawing.';
+
+  @override
+  String get appearanceNoteInMonthTitle => 'Show the note in the month';
+
+  @override
+  String get appearanceNoteInMonthSubtitle =>
+      'The first line of the note in the day’s box';
+
+  @override
+  String get appearancePaintSoundTitle => 'Paint sound';
+
+  @override
+  String get appearancePaintSoundSubtitle =>
+      'A click when painting a day, except in silent mode';
+
+  @override
+  String get appearancePresetsTitle => 'Ready-made palettes';
+
+  @override
+  String get appearancePresetsNote =>
+      'They recolor, in one go, the shifts that use the default colors. Shifts you colored yourself stay as they are.';
+
+  @override
+  String get appearancePresetsChoose => 'Choose';
+
+  @override
+  String get appearancePresetsApplied => 'Palette applied. You can undo it.';
+
+  @override
+  String get appearancePresetSunset => 'Sunset';
+
+  @override
+  String get appearancePresetSea => 'Sea';
+
+  @override
+  String get appearancePresetForest => 'Forest';
+
+  @override
+  String get appearancePresetCandy => 'Candy';
+
+  @override
+  String get appearancePresetNocturnal => 'Deep night';
+
+  @override
+  String get appearanceBackgroundTitle => 'Calendar background image';
+
+  @override
+  String get appearanceBackgroundChoose => 'Choose';
+
+  @override
+  String get appearanceBackgroundChange => 'Change';
+
+  @override
+  String get appearanceBackgroundPick => 'Choose from gallery';
+
+  @override
+  String get appearanceBackgroundRemove => 'Remove the image';
+
+  @override
+  String get appearanceBackgroundOnDevice =>
+      'Stays on this phone: it isn’t included in the backup';
+
+  @override
+  String get appearanceBackgroundNote =>
+      'Picked from your gallery and shown behind the month, dimmed so everything stays readable. Shift boxes don’t change.';
+
+  @override
+  String get appearanceBackgroundTooLarge =>
+      'That image is too large. Try a smaller one.';
+
+  @override
+  String get appearanceBackgroundFailed => 'Couldn’t save the image.';
+
+  @override
+  String get widgetAddFourWeeks => 'Four weeks: a month';
+
+  @override
+  String get widgetNameFourWeeks => 'Four weeks';
+
+  @override
+  String get widgetDescFourWeeks => 'The month, week by week';
+
+  @override
+  String get compareSelectorTitle => 'Compared calendars';
+
+  @override
+  String get compareSelectorAction => 'Change';
+
+  @override
+  String get compareSheetHint => 'You can compare 2 to 6 calendars.';
+
+  @override
+  String get compareSheetDone => 'Done';
+
+  @override
+  String get compareSheetMinWarning =>
+      'You need at least 2 calendars to compare.';
+
+  @override
+  String get compareSheetMaxWarning =>
+      'You’re already comparing 6 calendars, the maximum.';
+
+  @override
+  String get compareWeekendTitle => 'Shared weekends off';
+
+  @override
+  String compareWeekendCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count shared weekends off this month',
+      one: '1 shared weekend off this month',
+      zero: 'No shared weekends off this month',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String compareWeekendDaysCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count shared weekend days off',
+      one: '1 shared weekend day off',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String compareWeekendSpoken(String saturday, String sunday) {
+    return '$saturday and $sunday, off for everyone';
+  }
+
+  @override
+  String get compareTableNames => 'Calendars';
+
+  @override
+  String get devEventsRowTitle => 'Phone events';
+
+  @override
+  String get devEventsRowSubtitle => 'Your calendar events next to your shifts';
+
+  @override
+  String get devEventsTitle => 'Phone events';
+
+  @override
+  String get devEventsHelp =>
+      'Choose the phone calendars whose events you want to see next to your shifts. Turnly only reads them: it doesn’t write or change anything in them.';
+
+  @override
+  String get devEventsPermissionTitle => 'Calendar permission needed';
+
+  @override
+  String get devEventsPermissionBody =>
+      'To read the events on your phone, Turnly needs permission to see your calendars. It isn’t asked for when you open the app: only if you allow it here.';
+
+  @override
+  String get devEventsPermissionDeniedTitle => 'Calendar access is turned off';
+
+  @override
+  String get devEventsPermissionDeniedBody =>
+      'Turn it on in the system settings (Permissions › Calendar) and come back here.';
+
+  @override
+  String get devEventsPermissionDeniedBodyIos =>
+      'Turn it on in the system settings (Turnly › Calendars) and come back here.';
+
+  @override
+  String get devEventsPermissionRestrictedTitle =>
+      'This phone doesn’t allow using the calendar';
+
+  @override
+  String get devEventsPermissionRestrictedBody =>
+      'It may be parental controls or a work profile. Without that permission the events can’t be shown.';
+
+  @override
+  String get devEventsPermissionDeclinedBody =>
+      'You haven’t granted permission. Without it we can’t read your calendars, but you can allow it now.';
+
+  @override
+  String get devEventsPermissionAllow => 'Allow access';
+
+  @override
+  String get devEventsPermissionSettings => 'Open settings';
+
+  @override
+  String get devEventsPermissionRecheck => 'Check again';
+
+  @override
+  String get devEventsCalendarsTitle => 'Phone calendars';
+
+  @override
+  String devEventsChosenCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count calendars chosen',
+      one: '1 calendar chosen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get devEventsEmptyTitle => 'No calendars';
+
+  @override
+  String get devEventsEmptyBody =>
+      'This phone has no calendar Turnly can read.';
+
+  @override
+  String get devEventsReadFailedTitle => 'Your calendars couldn’t be read';
+
+  @override
+  String get devEventsReadFailedBody =>
+      'Your phone calendar didn’t respond. Check again.';
+
+  @override
+  String get devEventsOffTitle => 'No events shown right now';
+
+  @override
+  String get devEventsOffBody =>
+      'You haven’t chosen a calendar yet. Until you choose one, the month and the day show no events.';
+
+  @override
+  String get devEventsSaveFailed => 'The changes couldn’t be saved.';
+
+  @override
+  String get devEventsSectionTitle => 'Phone events';
+
+  @override
+  String get devEventsAllDay => 'All day';
+
+  @override
+  String devEventsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count events',
+      one: '1 event',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String devEventsEventSemantics(String time, String title) {
+    return '$time, $title';
+  }
+
+  @override
+  String devEventsEventWithCalendarSemantics(
+    String time,
+    String title,
+    String calendar,
+  ) {
+    return '$time, $title, $calendar';
+  }
 }

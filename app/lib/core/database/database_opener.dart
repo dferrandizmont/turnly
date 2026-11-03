@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:sqlite3/common.dart' show CommonDatabase;
 
 import 'app_database.dart';
 import 'migration_backup.dart';
@@ -11,6 +12,16 @@ import 'migration_backup.dart';
 const String databaseName = 'cuadrante';
 const String databaseFileName = '$databaseName.sqlite';
 const String backupsDirectoryName = 'backups';
+
+/// How long a statement of the app waits for a lock held by another
+/// connection (the background renewal of the alarms reads the file for a few
+/// milliseconds, docs/alarmas.md) before failing with SQLITE_BUSY.
+const Duration databaseBusyTimeout = Duration(seconds: 3);
+
+/// Runs on every new connection of the app's database. Top level: drift sends
+/// it to the isolate that opens the connection.
+void configureDatabaseConnection(CommonDatabase db) =>
+    db.execute('PRAGMA busy_timeout = ${databaseBusyTimeout.inMilliseconds}');
 
 /// Opens the on-disk database: `cuadrante.sqlite` in Application Support (not
 /// Documents, not cache: docs/datos.md), making the pre-migration backup
@@ -37,6 +48,9 @@ Future<AppDatabase> openAppDatabase({
         databaseDirectory: () async => dir,
         // Outside the app (no path_provider plugin) keep sqlite's default.
         tempDirectoryPath: directory == null ? null : () async => null,
+        // A write that meets another connection's lock waits instead of
+        // failing at once.
+        setup: configureDatabaseConnection,
       ),
     ),
   );

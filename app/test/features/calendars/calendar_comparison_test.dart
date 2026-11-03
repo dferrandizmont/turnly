@@ -57,9 +57,9 @@ ResolvedDay _resolve(List<String> ids) =>
 
 void main() {
   group('isFreeDay: the precise definition', () {
-    test('an empty day is free', () {
-      expect(isFreeDay(_resolve(const [])), isTrue);
-      expect(isFreeDay(_days(const {}).resolve(_oct(7))), isTrue);
+    test('an empty day is NOT free: it is just not annotated (A6)', () {
+      expect(isFreeDay(_resolve(const [])), isFalse);
+      expect(isFreeDay(_days(const {}).resolve(_oct(7))), isFalse);
     });
 
     test('a rest day is free', () {
@@ -86,20 +86,108 @@ void main() {
     });
 
     test('a shift counts on the day it starts: the morning after a night is '
-        'free', () {
+        'free once it is marked as rest', () {
       final schedule = _days({
         _oct(5): ['night'],
+        _oct(6): ['rest'],
       });
       expect(isFreeDay(schedule.resolve(_oct(5))), isFalse);
       expect(isFreeDay(schedule.resolve(_oct(6))), isTrue);
+      // Not annotated, the day after is not busy but not free either.
+      final bare = _days({
+        _oct(5): ['night'],
+      });
+      expect(isFreeDay(bare.resolve(_oct(6))), isFalse);
     });
 
-    test('a note alone does not make a day busy', () {
+    test('a note alone neither makes a day busy nor annotates it', () {
       final schedule = Schedule(
         shiftTypes: _types,
         entries: {_oct(1): DayEntry(date: _oct(1), note: 'Cena')},
       );
-      expect(isFreeDay(schedule.resolve(_oct(1))), isTrue);
+      expect(isFreeDay(schedule.resolve(_oct(1))), isFalse);
+      expect(schedule.resolve(_oct(1)).kind, DayKind.unrecorded);
+    });
+  });
+
+  group('A6: free in both is not the same as not annotated', () {
+    ComparedDay day(List<String> a, List<String> b) => compareDays(
+      _days({_oct(1): a}),
+      _days({_oct(1): b}),
+      _oct(1),
+      _oct(1),
+    ).single;
+
+    test('rest or absence in both: free in both', () {
+      for (final (a, b) in [
+        (['rest'], ['rest']),
+        (['rest'], ['vacation']),
+        (['vacation'], ['vacation']),
+        (['rest', 'vacation'], ['rest']),
+      ]) {
+        final d = day(a, b);
+        expect(d.bothFree, isTrue, reason: '$a $b');
+        expect(d.hasUnrecorded, isFalse, reason: '$a $b');
+      }
+    });
+
+    test('nothing annotated in one of them: not free, shown as unrecorded', () {
+      for (final (a, b) in [
+        (['rest'], <String>[]),
+        (<String>[], ['rest']),
+        (['vacation'], <String>[]),
+        (<String>[], <String>[]),
+      ]) {
+        final d = day(a, b);
+        expect(d.bothFree, isFalse, reason: '$a $b');
+        expect(d.hasUnrecorded, isTrue, reason: '$a $b');
+      }
+    });
+
+    test('anybody working makes it busy, never unrecorded', () {
+      for (final (a, b) in [
+        (['work'], ['rest']),
+        (['work'], <String>[]),
+        (<String>[], ['night']),
+        (['work'], ['work']),
+        (['vacation', 'work'], <String>[]),
+      ]) {
+        final d = day(a, b);
+        expect(d.bothFree, isFalse, reason: '$a $b');
+        expect(d.hasUnrecorded, isFalse, reason: '$a $b');
+      }
+    });
+
+    test('the kinds of each side are exposed', () {
+      final d = day(['rest'], ['vacation']);
+      expect((d.kindA, d.kindB), (DayKind.rest, DayKind.absence));
+      final e = day(const [], ['work']);
+      expect((e.kindA, e.kindB), (DayKind.unrecorded, DayKind.work));
+    });
+
+    test('a month counts both, and they never overlap', () {
+      final a = _days({
+        _oct(1): ['rest'],
+        _oct(2): ['rest'],
+        _oct(3): ['rest'],
+        _oct(4): ['work'],
+      });
+      final b = _days({
+        _oct(1): ['rest'],
+        _oct(2): ['vacation'],
+        _oct(4): ['rest'],
+      });
+      final month = compareMonth(a, b, _oct(1));
+      expect(month.commonFreeDays, [_oct(1), _oct(2)]);
+      // 3: B has nothing. 5-31: nothing in either.
+      expect(month.unrecordedDays, [
+        _oct(3),
+        for (var d = 5; d <= 31; d++) _oct(d),
+      ]);
+      expect(
+        month.commonFreeDays.toSet().intersection(month.unrecordedDays.toSet()),
+        isEmpty,
+      );
     });
   });
 
@@ -143,15 +231,14 @@ void main() {
       expect(fourth.bothFree, isTrue);
     });
 
-    test('the days free in both: empty days count, and rest + absence', () {
+    test('the days free in both: rest + absence; empty days do not count', () {
       final month = compareMonth(a, b, _oct(1));
       // 1: A busy. 2: both busy. 3: A busy. 4: both free (rest + vacation).
-      // 5: B busy. 6-31: both empty, so both free.
-      expect(month.commonFreeDays, [
-        _oct(4),
-        for (var d = 6; d <= 31; d++) _oct(d),
-      ]);
-      expect(month.commonFreeCount, 27);
+      // 5: B busy. 6-31: both empty: not annotated, not free.
+      expect(month.commonFreeDays, [_oct(4)]);
+      expect(month.commonFreeCount, 1);
+      expect(month.unrecordedDays, [for (var d = 6; d <= 31; d++) _oct(d)]);
+      expect(month.unrecordedCount, 26);
     });
 
     test('is symmetric', () {
@@ -159,13 +246,18 @@ void main() {
       final ba = compareMonth(b, a, _oct(1));
       expect(ab.commonFreeDays, ba.commonFreeDays);
       expect(ab.commonFreeCount, ba.commonFreeCount);
+      expect(ab.unrecordedDays, ba.unrecordedDays);
     });
 
-    test('a calendar compared with itself is free on its free days', () {
-      final month = compareMonth(a, a, _oct(1));
-      expect(month.commonFreeDays.first, _oct(4));
-      expect(month.commonFreeCount, 28); // all but 1, 2 and 3
-    });
+    test(
+      'a calendar compared with itself is free on its annotated days off',
+      () {
+        final month = compareMonth(a, a, _oct(1));
+        expect(month.commonFreeDays, [_oct(4), _oct(5)]);
+        expect(month.commonFreeCount, 2);
+        expect(month.unrecordedCount, 26); // 6 to 31, nothing annotated
+      },
+    );
 
     test('a month with no free day in common says zero', () {
       final busy = Schedule(
@@ -178,12 +270,14 @@ void main() {
       final month = compareMonth(busy, busy, _oct(1));
       expect(month.commonFreeCount, 0);
       expect(month.commonFreeDays, isEmpty);
+      expect(month.unrecordedCount, 0, reason: 'busy is not unrecorded');
     });
 
     test('February of a leap year has 29 days', () {
       final month = compareMonth(a, b, const CivilDate(2028, 2, 10));
       expect(month.days, hasLength(29));
-      expect(month.commonFreeCount, 29);
+      expect(month.commonFreeCount, 0);
+      expect(month.unrecordedCount, 29);
     });
   });
 
@@ -205,7 +299,9 @@ void main() {
             !d.isAfter(month.lastDayOfMonth);
             d = d.addDays(1)
           )
-            if (a
+            if (a.resolve(d).shifts.isNotEmpty &&
+                b.resolve(d).shifts.isNotEmpty &&
+                a
                     .resolve(d)
                     .shifts
                     .every((s) => s.category != ShiftCategory.work) &&
@@ -221,9 +317,10 @@ void main() {
       }
     });
 
-    test('before the rotations start every day is free', () {
+    test('before the rotations start no day is free: nothing is annotated', () {
       final month = compareMonth(a, b, const CivilDate(2026, 8, 1));
-      expect(month.commonFreeCount, 31);
+      expect(month.commonFreeCount, 0);
+      expect(month.unrecordedCount, 31);
     });
 
     test('the same rotation shifted by a week still shares its rest days', () {
@@ -308,7 +405,8 @@ void main() {
       final empty = _days(const {});
       final days = compareDays(empty, empty, _oct(5), _oct(5));
       expect(days, hasLength(1));
-      expect(days.single.bothFree, isTrue);
+      expect(days.single.bothFree, isFalse);
+      expect(days.single.hasUnrecorded, isTrue);
     });
 
     test('works across months', () {
@@ -357,14 +455,15 @@ void main() {
             shiftTypeIds: const ['vacation'],
             noteReminderMinute: 600,
           ),
-          // Nothing but an extra: the day is empty, so free.
+          // Nothing but an extra: the day is empty, so not annotated.
           _oct(8): DayEntry(date: _oct(8), overtimeMinutes: 30),
         },
       );
       expect(isFreeDay(annotated.resolve(_oct(5))), isFalse);
       expect(isFreeDay(annotated.resolve(_oct(6))), isTrue);
       expect(isFreeDay(annotated.resolve(_oct(7))), isTrue);
-      expect(isFreeDay(annotated.resolve(_oct(8))), isTrue);
+      expect(isFreeDay(annotated.resolve(_oct(8))), isFalse);
+      expect(annotated.resolve(_oct(8)).kind, DayKind.unrecorded);
 
       final a = compareMonth(plain, annotated, _oct(1));
       final b = compareMonth(plain, plain, _oct(1));

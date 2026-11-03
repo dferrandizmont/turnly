@@ -8,6 +8,7 @@ import '../data/holiday_bundle_loader.dart';
 import '../data/holiday_repository.dart';
 import '../data/holiday_snapshot.dart';
 import '../domain/holiday.dart';
+import '../domain/holiday_country.dart';
 import '../domain/holiday_import.dart';
 import '../domain/holiday_place.dart';
 
@@ -62,9 +63,16 @@ class HolidayController extends Notifier<HolidaySnapshot> {
     }
   }
 
-  /// Chooses the region and municipality (null clears them) and reloads.
-  Future<void> setPlace({String? regionCode, String? municipalityCode}) async {
+  /// Chooses the country and, in Spain, the region and municipality (null
+  /// clears them) and reloads. Another country clears region and
+  /// municipality.
+  Future<void> setPlace({
+    String countryCode = spainCountryCode,
+    String? regionCode,
+    String? municipalityCode,
+  }) async {
     await _repository.savePlace(
+      countryCode: countryCode,
       regionCode: regionCode,
       municipalityCode: municipalityCode,
     );
@@ -109,8 +117,9 @@ final holidayPlaceProvider = Provider<HolidayPlace>(
   (ref) => ref.watch(holidayControllerProvider.select((s) => s.place)),
 );
 
-/// Holidays by day for the chosen region and municipality (national only when
-/// none is chosen), the user's own on top. What the month screen reads.
+/// Holidays by day for the chosen country, region and municipality (national
+/// only when no region is chosen, none for «Otro país»), the user's own on
+/// top. What the month screen reads.
 final holidaysProvider = Provider<Map<CivilDate, Holiday>>(
   (ref) => ref.watch(holidayControllerProvider.select((s) => s.byDay)),
 );

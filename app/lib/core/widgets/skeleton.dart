@@ -11,6 +11,10 @@ import 'app_card.dart';
 class SkeletonList extends StatelessWidget {
   const SkeletonList({super.key, this.cards = 3, this.header = true});
 
+  /// Height the list reserves while it loads (a few cards). Named so a
+  /// placeholder is not a loose 240 in the screens that use it.
+  static const double placeholderHeight = 240;
+
   final int cards;
 
   /// Draws a short title bar above the cards.

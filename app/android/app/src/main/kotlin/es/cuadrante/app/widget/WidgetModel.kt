@@ -39,6 +39,8 @@ data class DisplayDay(
     val hasNote: Boolean,
     val shifts: List<DisplayShift>,
     val description: String? = null,
+    /** First line of the note ([WidgetContent.FourWeeks]); null when none. */
+    val note: String? = null,
 ) {
     val link: String get() = WidgetLinks.day(date) + "?homeWidget"
 }
@@ -81,6 +83,21 @@ sealed interface WidgetContent {
 
     /** Two Monday-first weeks, independent of the user's month-grid preference. */
     data class TwoWeeks(val date: String, val noShift: String?, val days: List<DisplayDay>) : WidgetContent
+
+    /**
+     * Four Monday-first weeks ([WidgetRenderPlan.MAX_FOUR_WEEKS_DAYS] days),
+     * with the notes and the next day off of today (the first day of a
+     * Monday-first grid, up to six days before today).
+     */
+    data class FourWeeks(
+        val date: String,
+        val noShift: String?,
+        /** Localised next-day-off label of [date], or null when unknown. */
+        val nextOff: String?,
+        val days: List<DisplayDay>,
+    ) : WidgetContent {
+        val link: String get() = WidgetLinks.day(date) + "?homeWidget"
+    }
 
     /** The "open the app" message. */
     data class Stale(
@@ -152,7 +169,17 @@ object WidgetLinks {
 object WidgetModelBuilder {
     const val SUPPORTED_VERSION = 2
 
-    enum class Kind { SMALL, MEDIUM, LARGE, AGENDA, TWO_WEEKS }
+    /** Longest note line the widgets show (the Dart side cuts at the same length). */
+    const val NOTE_MAX_CHARS = 120
+
+    /** [text] cut to [NOTE_MAX_CHARS] characters (code points, never half a pair). */
+    fun cappedNote(text: String?): String? {
+        if (text == null) return null
+        if (text.codePointCount(0, text.length) <= NOTE_MAX_CHARS) return text
+        return text.substring(0, text.offsetByCodePoints(0, NOTE_MAX_CHARS))
+    }
+
+    enum class Kind { SMALL, MEDIUM, LARGE, AGENDA, TWO_WEEKS, FOUR_WEEKS }
 
     /** The content of a [kind] widget at [nowMillis] in [zone] (the device's zone). */
     fun build(json: String?, kind: Kind, nowMillis: Long, zone: ZoneId): WidgetContent {
@@ -184,6 +211,16 @@ object WidgetModelBuilder {
                     day.getString("date"), root.optStringOrNull("noShift"),
                     displayDays(root, WidgetRenderPlan.monday(WidgetDayLogic.today(nowMillis, zone)), WidgetDayLogic.today(nowMillis, zone)),
                 )
+                Kind.FOUR_WEEKS -> WidgetContent.FourWeeks(
+                    day.getString("date"), root.optStringOrNull("noShift"),
+                    root.optJSONObject("nextOff")?.optJSONObject(day.getString("date"))?.optStringOrNull("label"),
+                    displayDays(
+                        root,
+                        WidgetRenderPlan.monday(WidgetDayLogic.today(nowMillis, zone)),
+                        WidgetDayLogic.today(nowMillis, zone),
+                        WidgetRenderPlan.MAX_FOUR_WEEKS_DAYS,
+                    ),
+                )
             }
         } catch (_: JSONException) {
             WidgetContent.Stale(WidgetDayLogic.StaleReason.NOT_FOUND, null, null)
@@ -206,12 +243,18 @@ object WidgetModelBuilder {
         }
     }
 
-    private fun displayDays(root: JSONObject, start: LocalDate, today: LocalDate): List<DisplayDay> {
+    private fun displayDays(
+        root: JSONObject,
+        start: LocalDate,
+        today: LocalDate,
+        count: Int = WidgetRenderPlan.MAX_AGENDA_ROWS,
+    ): List<DisplayDay> {
         val v1 = root.getInt("v") == 1
         val source = root.getJSONArray(if (v1) "days" else "displayDays")
         val byDate = (0 until source.length()).map { source.getJSONObject(it) }
             .associateBy { it.getString("date") }
-        return List(WidgetRenderPlan.MAX_AGENDA_ROWS) { i ->
+        val notes = root.optJSONObject("notes")
+        return List(count) { i ->
             val iso = start.plusDays(i.toLong()).toString()
             val d = byDate[iso] ?: throw JSONException("incomplete display range")
             val shifts = d.getJSONArray("shifts")
@@ -224,11 +267,14 @@ object WidgetModelBuilder {
                     s.optStringOrNull("timeLabel"), s.optStringOrNull("compactTime"),
                     s.getString("category"), colorsOf(s))
             }
+            val absent = parsed.any { it.category == "absence" }
             DisplayDay(iso, d.getString("weekdayShort"), d.getInt("dayOfMonth"),
                 d.getString("dateLabel"), d.getBoolean("isHoliday"),
                 // Even malformed auxiliary data must not expose a note marker on an absence.
-                d.getBoolean("hasNote") && parsed.none { it.category == "absence" }, parsed,
-                description(root, iso, iso == today.toString(), auxiliary = true))
+                d.getBoolean("hasNote") && !absent, parsed,
+                description(root, iso, iso == today.toString(), auxiliary = true),
+                // The text of a note never names a health day, even in a forged payload.
+                note = if (absent) null else cappedNote(notes?.optStringOrNull(iso)))
         }
     }
 

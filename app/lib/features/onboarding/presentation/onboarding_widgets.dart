@@ -173,30 +173,56 @@ class GroupLabel extends StatelessWidget {
   );
 }
 
-/// The names of a [Profession] in the app's language.
+/// The names of a [Profession] in the app's language. [spain] picks the
+/// names of the Spanish sector («Policía y Guardia Civil», «Enfermería, TCAE
+/// y celadores»); elsewhere the neutral ones («Policía», «Enfermería y
+/// sanidad»).
 extension ProfessionText on Profession {
-  String label(AppLocalizations l10n) => switch (this) {
-    Profession.nursing => l10n.onboardingProfessionNursing,
+  String label(AppLocalizations l10n, {bool spain = true}) => switch (this) {
+    Profession.nursing =>
+      spain
+          ? l10n.onboardingProfessionNursing
+          : l10n.onboardingProfessionNursingAbroad,
     Profession.medicine => l10n.onboardingProfessionMedicine,
-    Profession.police => l10n.onboardingProfessionPolice,
+    Profession.police =>
+      spain
+          ? l10n.onboardingProfessionPolice
+          : l10n.onboardingProfessionPoliceAbroad,
     Profession.firefighters => l10n.onboardingProfessionFirefighters,
     Profession.industry => l10n.onboardingProfessionIndustry,
-    Profession.security => l10n.onboardingProfessionSecurity,
-    Profession.hospitality => l10n.onboardingProfessionHospitality,
+    Profession.security =>
+      spain
+          ? l10n.onboardingProfessionSecurity
+          : l10n.onboardingProfessionSecurityAbroad,
+    Profession.hospitality =>
+      spain
+          ? l10n.onboardingProfessionHospitality
+          : l10n.onboardingProfessionHospitalityAbroad,
+    Profession.commerce => l10n.onboardingProfessionCommerce,
+    Profession.transport => l10n.onboardingProfessionTransport,
     Profession.other => l10n.onboardingProfessionOther,
   };
 
   /// The line under the name, with its time ranges unbreakable.
-  String hint(AppLocalizations l10n) => keepTimeRangesTogether(_hint(l10n));
+  String hint(AppLocalizations l10n, {bool spain = true}) =>
+      keepTimeRangesTogether(_hint(l10n, spain));
 
-  String _hint(AppLocalizations l10n) => switch (this) {
-    Profession.nursing => l10n.onboardingProfessionNursingHint,
+  String _hint(AppLocalizations l10n, bool spain) => switch (this) {
+    Profession.nursing =>
+      spain
+          ? l10n.onboardingProfessionNursingHint
+          : l10n.onboardingProfessionNursingAbroadHint,
     Profession.medicine => l10n.onboardingProfessionMedicineHint,
     Profession.police => l10n.onboardingProfessionPoliceHint,
     Profession.firefighters => l10n.onboardingProfessionFirefightersHint,
-    Profession.industry => l10n.onboardingProfessionIndustryHint,
+    Profession.industry =>
+      spain
+          ? l10n.onboardingProfessionIndustryHint
+          : l10n.onboardingProfessionIndustryAbroadHint,
     Profession.security => l10n.onboardingProfessionSecurityHint,
     Profession.hospitality => l10n.onboardingProfessionHospitalityHint,
+    Profession.commerce => l10n.onboardingProfessionCommerceHint,
+    Profession.transport => l10n.onboardingProfessionTransportHint,
     Profession.other => l10n.onboardingProfessionOtherHint,
   };
 }

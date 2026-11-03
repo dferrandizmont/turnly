@@ -74,6 +74,14 @@
 	<string>Para leer turnos de tu calendario al importar y, si tú lo pides, añadir tus turnos al calendario que elijas. Si ese calendario se sincroniza con una cuenta, esa cuenta también los recibirá.</string>
 	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
 	<string>Para añadir tus turnos al calendario que elijas, sin leer lo que ya tienes en él. Si ese calendario se sincroniza con una cuenta, esa cuenta también los recibirá.</string>
+	<!-- Attachments of the day notes (P2): the camera of the system takes the
+	     photo and the photo library gives the one that is already there. The
+	     app never reads the library on its own: it only asks for the picture
+	     the person chooses. -->
+	<key>NSCameraUsageDescription</key>
+	<string>Para hacer una foto y añadirla a la nota de un día de tu cuadrante.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Para elegir una foto de tu galería, ya sea para añadirla a la nota de un día de tu cuadrante o para usarla como fondo del calendario. Solo se lee la foto que eliges.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

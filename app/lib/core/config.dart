@@ -14,6 +14,7 @@ class AppConfig {
     this.supportEmail = _supportEmail,
     this.privacyUrl = _privacyUrl,
     this.privacyUrlEn = _privacyUrlEn,
+    this.shareLinkBaseUrl = _shareLinkBaseUrl,
   });
 
   /// The configuration of this build (the `--dart-define` values).
@@ -56,6 +57,14 @@ class AppConfig {
     defaultValue: 'https://turnly.mainshai.com/en/privacy/',
   );
 
+  /// Base URL of the worker that serves the shared `.ics` feeds
+  /// (`worker/`, docs/compartir.md), e.g. `https://share.example.com`.
+  /// Empty by default: the «Compartir por enlace» screen then says it is not
+  /// available yet and the app never talks to any server.
+  static const String _shareLinkBaseUrl = String.fromEnvironment(
+    'SHARE_LINK_BASE_URL',
+  );
+
   /// Shows the developer entries outside debug builds. Off by default.
   final bool showDevTools;
 
@@ -74,6 +83,32 @@ class AppConfig {
   /// See `PRIVACY_URL` and `PRIVACY_URL_EN`.
   final String privacyUrl;
   final String privacyUrlEn;
+
+  /// See `SHARE_LINK_BASE_URL`; empty when the build did not set it.
+  final String shareLinkBaseUrl;
+
+  /// The worker's base URL when it is usable: `https`, a host, no query, no
+  /// fragment and no credentials. `null` otherwise (feature off).
+  Uri? get shareLinkBase => parseShareLinkBase(shareLinkBaseUrl);
+
+  /// See [shareLinkBase].
+  static Uri? parseShareLinkBase(String text) {
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) return null;
+    final uri = Uri.tryParse(trimmed);
+    if (uri == null ||
+        uri.scheme != 'https' ||
+        uri.host.isEmpty ||
+        uri.hasQuery ||
+        uri.hasFragment ||
+        uri.userInfo.isNotEmpty) {
+      return null;
+    }
+    final path = uri.path.endsWith('/')
+        ? uri.path.substring(0, uri.path.length - 1)
+        : uri.path;
+    return uri.replace(path: path);
+  }
 
   /// Other supported languages use the authoritative Spanish policy.
   String privacyUrlFor(String languageCode) =>

@@ -70,8 +70,10 @@ También puedes descargar el APK de la [última versión](https://github.com/dfe
 <summary>Más capturas</summary>
 
 <p>
-  <a href="docs/readme/es/06-festivos.png"><img src="docs/readme/es/06-festivos.png" width="19%" alt="Festivos de la Comunidad de Madrid y del municipio Madrid"></a>
+  <a href="docs/readme/es/06-festivos.png"><img src="docs/readme/es/06-festivos.png" width="19%" alt="Festivos por país, comunidad y municipio"></a>
   <a href="docs/readme/es/07-mes-oscuro.png"><img src="docs/readme/es/07-mes-oscuro.png" width="19%" alt="El mismo mes con el tema oscuro"></a>
+  <a href="docs/readme/es/08-vacaciones.png"><img src="docs/readme/es/08-vacaciones.png" width="19%" alt="Saldos de vacaciones y permisos, con los días que quedan y los arrastrados"></a>
+  <a href="docs/readme/es/09-cambios.png"><img src="docs/readme/es/09-cambios.png" width="19%" alt="Libro de cambios con el balance de cada compañero y los turnos de cada cambio"></a>
 </p>
 
 </details>
@@ -81,29 +83,49 @@ por [tests de Flutter](app/test/store/), también [en inglés](README.md#screens
 
 ## Funciones
 
-- **Mes en Cuadrícula o Lista.** Vista anual, agenda y notas por día. Cada turno
-  lleva color, código y horario; la Lista permite leer los horarios completos.
-  Exportación puntual al calendario del móvil e imágenes del mes y del año.
+- **Mes, rotación, agenda y resumen.** Barra inferior (Mes · Rotación · Agenda ·
+  Resumen) y tarjeta de hoy plegable con el próximo turno, el próximo día libre y
+  la racha. Cada turno lleva color, código y horario, en cuadrícula o lista, con
+  vista anual y notas por día.
 - **Pintar turnos y rotaciones.** Toca o arrastra para seleccionar varios días,
   doblar, copiar y pegar, deshacer y rehacer; asistente de rotaciones con vista
   previa: correturnos, 24/72, 4×4, 6×4, 5×2, 2-2-3 y patrones propios. Tipos de
   turno, colores, iconos y horarios editables.
-- **Festivos de España.** Nacionales y autonómicos incluidos sin conexión; locales
-  para los municipios disponibles y opción de añadir los tuyos.
-- **Alarmas y widgets.** Alarma por tipo de turno, recordatorios de notas y widgets
-  de Android. La puntualidad depende de los permisos y las restricciones del
-  sistema. El widget de iPhone (WidgetKit) está pendiente de desarrollo en el Mac.
-- **Copias de seguridad e importación.** Copias de seguridad locales automáticas,
-  exportación a `.turnly` (las copias antiguas `.cuadrante` se siguen abriendo), vista previa al restaurar y «Probar restauración».
-  Importar copias `.Shifter` de LRHSoft, archivos `.ics` o CSV y eventos del
-  calendario del móvil, revisando los turnos antes de guardarlos.
-- **Resumen de horas.** Trabajadas, nocturnas, festivas, extras y salidas
-  anticipadas; estimación de ingresos con precio por hora y plus fijo por turno.
+- **Festivos por país.** España con sus comunidades y municipios, y 21 países más
+  (Portugal, Brasil, Latinoamérica, Europa, Estados Unidos y Canadá), todo sin
+  conexión, además de los que añadas tú.
+- **Alarmas, widgets y no molestar.** Alarma por tipo de turno, recordatorios de
+  notas y widgets de Android, incluido uno de cuatro semanas. En Android,
+  «Silenciar el móvil en mis turnos» lo silencia mientras trabajas. La puntualidad
+  depende de los permisos y las restricciones del sistema. El widget de iPhone está
+  pendiente.
+- **Copia, informes y calendario del móvil.** Copias de seguridad locales
+  automáticas y, en Android, una copia diaria en la carpeta que elijas (Drive,
+  Dropbox, OneDrive o el móvil), con vista previa al restaurar y «Probar
+  restauración». Informes en PDF y CSV de un mes o de las fechas que quieras,
+  «Mantener al día» para seguir tus turnos en el calendario del móvil, e
+  importación desde LRHSoft, `.ics`, CSV y el calendario del móvil.
+- **Horas, dinero y permisos.** Horas trabajadas, nocturnas y festivas, extras y
+  salidas anticipadas; pluses de noche y de festivo por hora; estimación bruta y
+  neta con la retención que pongas. Saldos de vacaciones y permisos por año y tipo,
+  con los días arrastrados y los que te quedan.
 
 <details>
 <summary>Más funciones</summary>
 
-- **Varios calendarios.** Sin límite de pago, y comparación entre dos cuadrantes.
+- **Libro de cambios.** Anota un turno que cedas o recibas de un compañero, mira
+  su balance («Me debe 2 turnos», «Le debo 1 turno»), el estado y los turnos de
+  cada cambio, y aplícalo al calendario con un solo deshacer.
+- **Adjuntos y tareas.** En «Más opciones» de un día, «Adjuntos» guarda sus fotos,
+  dibujos y archivos, y «Tareas» es su lista de comprobación, cada una con un
+  deshacer.
+- **Comparar calendarios y citas del móvil.** Hasta seis calendarios a la vez y
+  las citas de tu móvil junto a tus turnos; Turnly solo las lee.
+- **Apariencia.** Colores de acento, paletas preparadas, imagen de fondo del
+  calendario, la primera línea de la nota en la casilla del mes, un clic al pintar
+  y el código del turno más grande.
+- **Varios calendarios.** Todos los que quieras, cada uno con sus rotaciones y sus
+  días.
 - **Accesibilidad.** Selector de idioma, lector de pantalla, texto ampliable y
   turnos que nunca dependen solo del color.
 

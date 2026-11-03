@@ -40,6 +40,7 @@ final widgetSyncProvider = Provider<WidgetSyncService>((ref) {
     publisher: ref.watch(widgetPublisherProvider),
     buildSnapshot: (strings) async {
       final schedule = await readPrimarySchedule(ref);
+      if (!ref.mounted) throw StateError('Widget snapshot builder disposed');
       final now = clock();
       String zone;
       try {
@@ -47,6 +48,7 @@ final widgetSyncProvider = Provider<WidgetSyncService>((ref) {
       } catch (_) {
         zone = now.timeZoneName;
       }
+      if (!ref.mounted) throw StateError('Widget snapshot builder disposed');
       return buildWidgetSnapshot(
         schedule: schedule,
         holidays: ref.read(holidaysProvider),
@@ -58,6 +60,7 @@ final widgetSyncProvider = Provider<WidgetSyncService>((ref) {
       );
     },
     onError: (error, stack) {
+      if (!ref.mounted) return;
       final reporter = ref.read(crashReporterProvider);
       unawaited(
         reporter

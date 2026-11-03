@@ -1,14 +1,16 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/format/app_date_format.dart';
+import '../../../core/icons/app_icons.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/theme_context.dart';
-import '../../../core/icons/app_icons.dart';
-import '../../schedule/domain/civil_date.dart';
+import '../../schedule/domain/schedule_domain.dart';
 import '../../settings/application/preferences_controller.dart';
 import '../application/month_presentation.dart';
 import '../application/open_day.dart';
@@ -19,9 +21,105 @@ import 'day_cell.dart';
 import 'month_grid.dart';
 import 'shift_format.dart';
 
-/// Available in every editing mode and layout, beside the month navigation.
+/// Whether the List is suggested for the visible month on a panel
+/// [panelWidth] wide (`docs/diseno.md`, «Mes: Cuadrícula / Lista»): cells
+/// under 48 dp, a code or time that the grid would shrink or drop, several
+/// shifts on a day, or text at 150 % or more. It is a suggestion, never a
+/// change of presentation.
+///
+/// [inputs] come from [watchListRecommendationInputs], read in the build
+/// method (the measure itself runs inside layout builders).
+bool monthListRecommended(
+  BuildContext context,
+  ListRecommendationInputs inputs,
+  double panelWidth,
+) {
+  final (:schedule, :month, :weekNumbers) = inputs;
+  final width =
+      (panelWidth -
+          2 * (Sp.l - Sp.cellGap / 2) -
+          (weekNumbers ? MonthGrid.weekNumberWidth : 0)) /
+      7;
+  final scaler = MediaQuery.textScalerOf(context);
+  final hour12 = AppDateFormat.of(context).hour12;
+  final codeStyle = context.type.cellCode;
+  final timeStyle = context.type.cellTime;
+  final contentWidth = width - Sp.cellGap - 2 * cellContentInset;
+  var reduced = false;
+  for (final day in schedule.resolveRange(month, month.lastDayOfMonth)) {
+    for (final shift in day.shifts) {
+      final time = shift.compactTimeRange(hour12: hour12);
+      if (day.shifts.length > 1 ||
+          textWidth(shift.code, codeStyle, scaler) > contentWidth ||
+          (time != null && textWidth(time, timeStyle, scaler) > contentWidth)) {
+        reduced = true;
+        break;
+      }
+    }
+    if (reduced) break;
+  }
+  return width < Sp.touch ||
+      reduced ||
+      scaler.scale(codeStyle.fontSize!) / codeStyle.fontSize! >= 1.5 ||
+      scaler.scale(timeStyle.fontSize!) / timeStyle.fontSize! >= 1.5;
+}
+
+/// What [monthListRecommended] depends on.
+typedef ListRecommendationInputs = ({
+  Schedule schedule,
+  CivilDate month,
+  bool weekNumbers,
+});
+
+ListRecommendationInputs watchListRecommendationInputs(WidgetRef ref) => (
+  schedule: ref.watch(scheduleControllerProvider.select((s) => s.schedule)),
+  month: ref.watch(visibleMonthProvider),
+  weekNumbers: ref.watch(preferencesProvider.select((p) => p.weekNumbers)),
+);
+
+/// «Cuadrícula | Lista» as a small segmented control in the row of the month
+/// (B1, option 1A of the 31-oct canvas): smaller text than before and no
+/// icons, but each half keeps a 48 dp touch target (the track is drawn
+/// thinner inside it). When even the two labels do not fit side by side
+/// (very large text) they stack.
+///
+/// [panelWidth] is the width of the month panel, for the recommendation dot;
+/// without it the control measures the room it is given.
 class MonthPresentationControl extends ConsumerWidget {
-  const MonthPresentationControl({super.key});
+  const MonthPresentationControl({super.key, this.panelWidth});
+
+  final double? panelWidth;
+
+  /// What the track leaves above and below it inside the 48 dp target.
+  static const double _trackInset = Sp.s - Sp.hair;
+
+  /// The labels: measured in the bolder weight, so selecting a half never
+  /// makes the control wider.
+  static TextStyle _labelStyle(BuildContext context) =>
+      context.type.meta.copyWith(fontWeight: FontWeight.w800);
+
+  /// The width of one half for [label] (without the minimum target).
+  static double _segmentWidth(BuildContext context, String label) =>
+      textWidth(label, _labelStyle(context), MediaQuery.textScalerOf(context)) +
+      2 * Sp.s +
+      2 * Sp.hair +
+      2;
+
+  /// The width the control needs in one row, with the dot of the
+  /// recommendation when [recommended]; never less than two touch targets.
+  static double widthFor(BuildContext context, {required bool recommended}) {
+    final l10n = context.l10n;
+    return math.max(
+          Sp.touch,
+          _segmentWidth(context, l10n.monthPresentationGrid),
+        ) +
+        math.max(
+          Sp.touch,
+          _segmentWidth(context, l10n.monthPresentationList) +
+              (recommended ? Sp.xs + Sp.cellSegmentDot : 0),
+        ) +
+        2;
+  }
 
   void _choose(BuildContext context, WidgetRef ref, MonthPresentation value) {
     if (ref.read(monthPresentationProvider) == value) return;
@@ -52,114 +150,78 @@ class MonthPresentationControl extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final presentation = ref.watch(monthPresentationProvider);
-    final preferences = ref.watch(preferencesProvider);
-    final month = ref.watch(visibleMonthProvider);
-    final schedule = ref.watch(scheduleControllerProvider).schedule;
+    final inputs = watchListRecommendationInputs(ref);
     final l10n = context.l10n;
     return LayoutBuilder(
       builder: (context, box) {
-        final width =
-            (box.maxWidth -
-                2 * (Sp.l - Sp.cellGap / 2) -
-                (preferences.weekNumbers ? MonthGrid.weekNumberWidth : 0)) /
-            7;
-        final scaler = MediaQuery.textScalerOf(context);
-        final codeStyle = context.type.cellCode;
-        final timeStyle = context.type.cellTime;
-        final contentWidth = width - Sp.cellGap - 2 * cellContentInset;
-        var reduced = false;
-        for (final day in schedule.resolveRange(month, month.lastDayOfMonth)) {
-          for (final shift in day.shifts) {
-            final time = shift.compactTimeRange;
-            if (day.shifts.length > 1 ||
-                textWidth(shift.code, codeStyle, scaler) > contentWidth ||
-                (time != null &&
-                    textWidth(time, timeStyle, scaler) > contentWidth)) {
-              reduced = true;
-              break;
-            }
-          }
-          if (reduced) break;
-        }
-        final recommended =
-            width < Sp.touch ||
-            reduced ||
-            scaler.scale(codeStyle.fontSize!) / codeStyle.fontSize! >= 1.5 ||
-            scaler.scale(timeStyle.fontSize!) / timeStyle.fontSize! >= 1.5;
-        // The icons only repeat the labels: they go first when large text
-        // would otherwise wrap a label and push the month down.
-        final labelStyle = context.type.body.copyWith(
-          fontWeight: FontWeight.w800,
-        );
-        double segment(String label, {required bool icon}) =>
-            textWidth(label, labelStyle, scaler) +
-            2 * Sp.l +
-            (icon ? IconSize.inline + Sp.s : 0);
-        double both({required bool icons}) =>
-            segment(l10n.monthPresentationGrid, icon: icons) +
-            segment(l10n.monthPresentationList, icon: icons) +
-            2 * (Sp.xs + Sp.hair + 1) +
-            (recommended ? Sp.xs + Sp.cellSegmentDot : 0);
-        final showIcons = both(icons: true) <= box.maxWidth;
-        // Each half keeps its natural width; when even the bare labels do
-        // not fit side by side (very large text), they stack.
-        final inOneRow = both(icons: false) <= box.maxWidth;
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: Sp.xs),
-          child: Center(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: context.colors.surfaceMuted,
-                borderRadius: BorderRadius.circular(Rad.button),
-                border: Border.all(color: context.colors.border),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(Sp.hair),
-                child: Flex(
-                  direction: inOneRow ? Axis.horizontal : Axis.vertical,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _Segment(
-                      key: const ValueKey('month-presentation-grid'),
-                      icon: showIcons ? AppIcons.gridView : null,
-                      label: l10n.monthPresentationGrid,
-                      selected: presentation == MonthPresentation.grid,
-                      onTap: () =>
-                          _choose(context, ref, MonthPresentation.grid),
-                    ),
-                    Tooltip(
-                      message: recommended
-                          ? l10n.monthListRecommended
-                          : l10n.monthPresentationList,
-                      child: _Segment(
-                        key: const ValueKey('month-presentation-list'),
-                        icon: showIcons ? AppIcons.listView : null,
-                        label: l10n.monthPresentationList,
-                        selected: presentation == MonthPresentation.list,
-                        // A dot, not a colour change of the whole control:
-                        // the list is suggested, never imposed.
-                        badge: recommended
-                            ? Container(
-                                key: const ValueKey(
-                                  'month-list-recommendation',
-                                ),
-                                width: Sp.cellSegmentDot,
-                                height: Sp.cellSegmentDot,
-                                decoration: BoxDecoration(
-                                  color: context.colors.accent,
-                                  shape: BoxShape.circle,
-                                ),
-                              )
-                            : null,
-                        onTap: () =>
-                            _choose(context, ref, MonthPresentation.list),
+        final panel =
+            panelWidth ??
+            (box.maxWidth.isFinite
+                ? box.maxWidth
+                : MediaQuery.sizeOf(context).width);
+        final recommended = monthListRecommended(context, inputs, panel);
+        final inOneRow =
+            !box.maxWidth.isFinite ||
+            widthFor(context, recommended: recommended) <= box.maxWidth;
+        final colors = context.colors;
+        final segments = [
+          _Segment(
+            key: const ValueKey('month-presentation-grid'),
+            label: l10n.monthPresentationGrid,
+            selected: presentation == MonthPresentation.grid,
+            onTap: () => _choose(context, ref, MonthPresentation.grid),
+          ),
+          Tooltip(
+            message: recommended
+                ? l10n.monthListRecommended
+                : l10n.monthPresentationList,
+            child: _Segment(
+              key: const ValueKey('month-presentation-list'),
+              label: l10n.monthPresentationList,
+              selected: presentation == MonthPresentation.list,
+              // A dot, not a colour change of the whole control: the list
+              // is suggested, never imposed.
+              badge: recommended
+                  ? Container(
+                      key: const ValueKey('month-list-recommendation'),
+                      width: Sp.cellSegmentDot,
+                      height: Sp.cellSegmentDot,
+                      decoration: BoxDecoration(
+                        color: colors.accent,
+                        shape: BoxShape.circle,
                       ),
-                    ),
-                  ],
+                    )
+                  : null,
+              onTap: () => _choose(context, ref, MonthPresentation.list),
+            ),
+          ),
+        ];
+        return Stack(
+          children: [
+            // The track, thinner than the touch targets on top of it.
+            Positioned.fill(
+              top: _trackInset,
+              bottom: _trackInset,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: colors.surfaceMuted,
+                  borderRadius: BorderRadius.circular(Rad.inner),
+                  border: Border.all(color: colors.border),
                 ),
               ),
             ),
-          ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 1),
+              child: inOneRow
+                  ? Row(mainAxisSize: MainAxisSize.min, children: segments)
+                  : IntrinsicWidth(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: segments,
+                      ),
+                    ),
+            ),
+          ],
         );
       },
     );
@@ -168,18 +230,16 @@ class MonthPresentationControl extends ConsumerWidget {
 
 /// One half of the grid/list switch: the selected half sits on a raised
 /// thumb with a bolder label (never colour alone), like a native segmented
-/// control on iOS and Android.
+/// control on iOS and Android. The whole 48 dp rectangle is the target.
 class _Segment extends StatelessWidget {
   const _Segment({
     super.key,
-    required this.icon,
     required this.label,
     required this.selected,
     required this.onTap,
     this.badge,
   });
 
-  final IconData? icon;
   final String label;
   final bool selected;
   final VoidCallback onTap;
@@ -189,7 +249,7 @@ class _Segment extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final ink = selected ? colors.textPrimary : colors.textSecondary;
-    final radius = BorderRadius.circular(Rad.inner);
+    final radius = BorderRadius.circular(Rad.chipSmall);
     return Semantics(
       container: true,
       button: true,
@@ -198,45 +258,62 @@ class _Segment extends StatelessWidget {
       excludeSemantics: true,
       label: label,
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: Motion.state,
-        constraints: const BoxConstraints(minHeight: Sp.touch),
-        decoration: BoxDecoration(
-          // The soft accent, not `surface`: in dark mode `surface` and the
-          // track are almost the same colour.
-          color: selected ? colors.accentSoft : Colors.transparent,
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
           borderRadius: radius,
-          border: Border.all(
-            color: selected ? colors.borderStrong : Colors.transparent,
-          ),
-        ),
-        child: Material(
-          type: MaterialType.transparency,
-          child: InkWell(
-            borderRadius: radius,
-            onTap: onTap,
+          onTap: onTap,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              minHeight: Sp.touch,
+              minWidth: Sp.touch,
+            ),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: Sp.l),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (icon != null) ...[
-                    Icon(icon, size: IconSize.inline, color: ink),
-                    const SizedBox(width: Sp.s),
-                  ],
-                  Flexible(
-                    child: Text(
-                      label,
-                      style: context.type.body.copyWith(
-                        color: ink,
-                        fontWeight: selected
-                            ? FontWeight.w800
-                            : FontWeight.w600,
-                      ),
+              padding: const EdgeInsets.symmetric(
+                horizontal: Sp.hair,
+                vertical: MonthPresentationControl._trackInset + Sp.hair,
+              ),
+              child: Center(
+                widthFactor: 1,
+                child: AnimatedContainer(
+                  duration: Motion.of(context, Motion.state),
+                  curve: Motion.curve,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: Sp.s,
+                    vertical: Sp.xs,
+                  ),
+                  decoration: BoxDecoration(
+                    // The soft accent, not `surface`: in dark mode `surface`
+                    // and the track are almost the same colour.
+                    color: selected ? colors.accentSoft : Colors.transparent,
+                    borderRadius: radius,
+                    border: Border.all(
+                      color: selected
+                          ? colors.borderStrong
+                          : Colors.transparent,
                     ),
                   ),
-                  if (badge != null) ...[const SizedBox(width: Sp.xs), badge!],
-                ],
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          label,
+                          style: context.type.meta.copyWith(
+                            color: ink,
+                            fontWeight: selected
+                                ? FontWeight.w800
+                                : FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      if (badge != null) ...[
+                        const SizedBox(width: Sp.xs),
+                        badge!,
+                      ],
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
@@ -246,8 +323,8 @@ class _Segment extends StatelessWidget {
   }
 }
 
-/// Selection shares the fixed navigation row with the paint scroll buttons,
-/// leaving only the two presentation choices above the days.
+/// «Seleccionar días» shares the fixed row under the month with the paint
+/// scroll buttons (and, outside editing, with the floating «Pintar»).
 class MonthSelectDaysControl extends ConsumerWidget {
   const MonthSelectDaysControl({super.key});
 
@@ -256,13 +333,22 @@ class MonthSelectDaysControl extends ConsumerWidget {
     alignment: Alignment.centerLeft,
     child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: Sp.xs),
-      child: TextButton(
+      // A real button, not a link: in dark mode the accent text alone was
+      // hard to see next to the grid (1-nov-2026).
+      child: OutlinedButton.icon(
         key: const ValueKey('month-select-days'),
-        style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: Sp.xs),
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size(Sp.touch, Sp.touch),
+          padding: const EdgeInsets.symmetric(horizontal: Sp.m),
+          foregroundColor: context.colors.textPrimary,
+          backgroundColor: context.colors.surfaceMuted,
+          side: BorderSide(color: context.colors.border),
+          shape: RoundedRectangleBorder(borderRadius: Rad.inputRadius),
+          textStyle: context.type.meta.copyWith(fontWeight: FontWeight.w700),
         ),
         onPressed: ref.read(selectionControllerProvider.notifier).enter,
-        child: Text(context.l10n.monthSelectDays),
+        icon: Icon(AppIcons.selectDays, size: IconSize.button),
+        label: Text(context.l10n.monthSelectDays),
       ),
     ),
   );

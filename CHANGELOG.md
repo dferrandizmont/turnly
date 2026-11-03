@@ -10,6 +10,91 @@ at once, so they can skip numbers.
 
 ## Unreleased
 
+## 0.8.2 · 2026-11-03
+
+Release candidate for Google Play (closed test) and the public GitHub release. It updates 0.8.1 without losing anything.
+
+- READMEs and screenshots updated for 0.8: the five READMEs now describe the new features, and the readme and store screenshots show the current UI, with two new ones (vacation and leave balances, and the shift-changes book).
+- Catalan: the swap book balance says «Em deu» instead of «Em deve».
+- Android: «Silence the phone on my shifts» really silences the phone: it was asking Android for the wrong mode, so the phone kept ringing, and the permission card could show the wrong current mode.
+- Android: «Silence the phone on my shifts» now starts and ends on time on phones that delay alarms (OnePlus, Oppo, Realme…); the clock may show it as the next alarm.
+
+## 0.8.1 · 2026-11-03
+
+Internal test build (private prerelease). It updates 0.8.0 without losing anything.
+
+- Catalan, Galician, Basque and English: the new texts of 0.8.0 reviewed (wrong words in Basque, Spanish forms in
+  Catalan, broken sentences in Galician, first person in the shift-changes book).
+- Vacation and leave: the days carried over from last year are spent before the year's own, and only the carried days still left to spend expire on their date, so a balance can no longer go negative; and two absences of the same series on one day now count as a single day.
+- Vacation and leave: when creating a balance you can continue the series of the year before (it copies its name, its types and its cap), and any balance has a «Copy to the next year» action that sets the series up once and repeats it year after year.
+- Shift changes book: writing down a change with only one side («I owe them» or «They owe me») no longer shows a balance of 0, and taking a change back from the calendar no longer wipes the note, the extra hours or the extra amount added to the day after it was applied.
+- After restoring a backup, the shift-changes book and the tasks' undo no longer hold on to the data from before the restore and overwrite what was just restored; undoing a day's tasks is now all-or-nothing.
+- Hours and money: the hours bank counts from the day you set your goal, so a note or a shift from years ago no longer drags months of debt into this month.
+
+## 0.8.0 · 2026-11-02
+
+Internal test build (private prerelease). It updates 0.7.1 without losing anything. The new texts in Catalan, Galician
+and Basque still have to be reviewed.
+
+- Opening a big backup from another app, or reading one from the backup folder, no longer risks closing Turnly (the file is streamed to disk instead of held in memory); a restore now tells you when the copy it made beforehand had to leave attachments out, a copy says so when it could not include some, and a restore stops (changing nothing) if an attachment's file exists but cannot be read right now, instead of deleting it.
+- Backups that carry attachments (photos, drawings, PDFs) now import, restore and copy to the folder or iCloud even when they are bigger than 8 MB (up to 137 MB); an attachment whose file was lost no longer blocks the automatic copy, the copy made before a restore or the restore itself.
+- Vacation and leave (Settings): a balance per year and type (vacation, personal days...) with the days allowed, the ones carried over from last year (with the day they expire), manual adjustments, the ones taken and the ones planned, and in big how many you have left. It warns when carried days are about to expire or when you planned more than you have. The Summary shows a «You have N days of vacation left» card that opens it.
+- Hours and money: each shift type can have a night plus and a holiday plus per hour and a place (which shows in the PDF and CSV reports); each day has an «Extra amount» in «More options» (allowances, mileage, a bonus, or a negative deduction) that counts in the estimate and the reports.
+- Settings › Hours and money › Withholding (%): the Summary then shows the estimated net pay beside the gross. It also shows «Earned so far» this month, a «Quarter» view (Q1 to Q4) next to month, year and dates, and the hours bank (hours worked minus your goal, month by month) under the goal.
+- Shift changes book (Settings › Shift changes): the balance of every colleague («They owe me 2 shifts», «I owe them 1 shift») with the ones still pending first, the list of changes with their state (pending, returned, settled) and the shifts on each side, and a sheet to write one down (who, who owes it, the day you give the shift and the day you get it back, the shifts of each side and a note). A change can be marked as returned or settled, applied to the calendar (the day you gave loses the shift and the day you receive gets it) and taken back with a single undo. The day detail has a «Shift change» section under «More options».
+- Day notes: under «More options» in the day detail there are now «Attachments» and «Tasks». Attachments keeps the photos, the drawings and the files of that day as a strip of thumbnails; you can add a photo (camera or gallery) or any file, draw a sketch (pen, eraser, undo and redo, with a few colours) and open any attachment full screen. A long press (or «Remove» in the full screen) takes it off the day, and the «Undo» next to the strip brings it back. Tasks is the checklist of that day: write one, tick it, move it up or down and delete it, with a single undo for the last change.
+- Do not disturb during the shift (Settings › Alarms, Android): a switch per shift type in «My shifts» silences the phone while that shift works, the global switch and the interruption filter («priority only», «alarms only» or total silence) live in Settings › Alarms, and it explains and opens the system's Do Not Disturb access when it is missing.
+- Comparing calendars: the screen now takes from two to six calendars (you pick them in a sheet, each one with its colour), the grid has one row per calendar and one column per day (the days scroll sideways, the column of names stays put), and the summary adds the weekends you are all off.
+- Appointments of your phone (Settings › «Appointments of the phone»): choose the phone calendars you want to see next to your shifts (the permission is explained and only asked when you accept it), the month marks the days that have appointments, the day detail lists them with their time, and the Agenda shows them next to your notes. Turnly only reads them: it never writes or changes anything in your phone's calendars.
+- Appearance › «See the note in the month»: the first line of a day's note is written in the month cell when the day number leaves it room (on a phone the small clip of always stays).
+- Appearance › «Sound when painting»: a soft click of the system when you paint a day, off by default and keeping the silent mode.
+- Appearance › «Ready-made palettes»: five colour sets for your shift types, applied to them all in one tap with a single undo, each passing AA contrast.
+- Appearance › «Calendar background picture»: pick one from your gallery and it shows behind the month under a veil of the background colour (the day cells keep their opaque background and their contrast), with a way to remove it. The picture stays on your phone: a backup carries the setting but not the file.
+- Android widget «Four weeks» (4×4): a month by weeks from Monday (28 days) with the number, the shift and the first line of the note of each day, plus the next day off of today on top; it stays honest at midnight without opening the app, and a day of health never shows its note text.
+- Wave 3 visual pass: in the shift changes book the shifts of a change are chips with their colour, code and hours (in the sheet too), the state badge lines up with the first line and the empty and footer buttons are the same one; «Do not disturb» has a shorter title and its notice reads as one more settings row; the compare grid keeps its free-day marks off the day number and does not repeat the free-days idea three times; and the agenda gives an appointment the same text weight as its note and shift.
+
+## 0.7.1 · 2026-11-01
+
+Internal test build (private prerelease). It updates 0.7.0 without losing anything.
+
+- «Select days» under the month is a real button (icon, border and full-contrast text) instead of a faint link.
+- The whole month now fits on the screen without scrolling, in the month and in paint mode: the Today card starts folded when the month would not fit with it open (your own choice still wins), the six rows end above the fixed row and the «Paint» button never covers a day, and the paint sheet takes only the height the month leaves (only the shift buttons scroll). The paint header is one line and the shift hours moved to the preview line. The «Pick a shift and drag» tip now shows inside the paint sheet the first time you paint.
+
+## 0.7.0 · 2026-11-01
+
+Internal test build (private prerelease). It updates 0.6.17 without losing anything (checked on the emulator by
+upgrading from 0.6.13).
+
+- Avoid a widget sync error when closing the app while a snapshot is still being prepared.
+- Redesign chosen by the user on 31-oct: month with a named bottom bar (Month · Rotation · Agenda · Summary), a foldable
+  Today card and a remembered Grid/List switch; paint modes «Change the shift | Add another shift» with a live preview;
+  day detail in layers (as tall as its content, Undo, a menu per shift, «More options»); first use in three paths
+  (import, rotation, paint by hand, or restore a backup) with country and job in an optional last step; Summary with
+  a «How am I doing?» card; Settings in five groups with their status; a widget gallery with your real shifts;
+  illustrated empty states.
+- Shift alarms no longer run out: they are scheduled 30 days ahead, renewed in the background on Android, a notice the
+  evening before the last one asks you to open the app, and Settings › Alarms shows «Alerts scheduled until…».
+- Editing a shift's hours or pay asks whether to fix every day or apply it only from today, so months you already
+  worked keep their hours and pay.
+- Summary: past days count as worked and upcoming ones as planned; overtime and early leave also adjust night and
+  holiday hours; optional yearly or monthly hours goal with the difference.
+- The Today card and the widget show your next day off, the next free weekend and your streak of work days; «Compare
+  calendars» no longer counts days with nothing filled in as shared days off.
+- Public holidays depend on your country: official holidays of 21 more countries (Latin America, Portugal, Brazil,
+  Europe, the US and Canada) with a state/province picker, and «Other country: no public holidays». Spain: local
+  holidays of all 50 province capitals, Ceuta and Melilla, every municipality of Murcia from the official labour
+  calendar, and the Canary Islands' island holidays. Outside Spain the job list is neutral.
+- Time format (automatic, 24 h or 12 h), regional dates and week start, and the currency are now settings.
+- Accent colour (Indigo, Blue, Teal, Raspberry, Graphite) and a bigger shift code and time in the month cells.
+- The month header and the summary have a report button: a PDF or CSV of a month or any dates, ready to share.
+- «Keep up to date» keeps your phone calendar in sync with your shifts; shifts can also be saved as an .ics file.
+- Android: automatic daily backup to a folder you choose (Drive, Dropbox, OneDrive or the phone), keeping the last 10
+  copies, with clear warnings if the folder or its permission is lost.
+- Share your shifts by read-only link and QR code (built, switched off until the server is deployed).
+- Database schema v6, ready for note attachments, day tasks, the swap ledger, leave balances, shift locations, hourly
+  night/holiday pluses and per-day extra amounts.
+- The FAQ answer on double shifts explains the new «Añadir otro turno» painting mode.
+
 ## 0.6.17 · 2026-10-30
 
 Internal test build (private prerelease). It updates 0.6.16 without losing anything.

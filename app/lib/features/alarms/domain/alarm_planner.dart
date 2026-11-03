@@ -258,6 +258,8 @@ String _hhmm(int minuteOfDay) {
 ///   time. So a reminder inside the horizon is never dropped for a shift
 ///   alarm; only more than [maxPendingAlarms] reminders in the window (then
 ///   the nearest win) can push one out.
+///
+/// It never contains the renewal notice: [planAlarmSchedule] adds it.
 List<PlannedAlarm> planAlarms({
   required Schedule schedule,
   required AlarmSettings settings,
@@ -265,9 +267,112 @@ List<PlannedAlarm> planAlarms({
   required AlarmStrings strings,
   bool includeReminders = true,
   tz.Location? location,
+}) => _plan(
+  schedule: schedule,
+  settings: settings,
+  now: now,
+  strings: strings,
+  includeReminders: includeReminders,
+  location: location,
+  lookaheadDays: 0,
+).alarms;
+
+/// Days past the horizon in which a shift alarm still counts as "left out
+/// by the horizon" (and so asks for the renewal notice). Two months: a long
+/// holiday right after the horizon still gets its notice.
+const int renewalLookaheadDays = 60;
+
+/// Wall-clock minute (20:00) the renewal notice prefers, on the day before
+/// the last alarm. Other minutes are tried around it (see
+/// [planAlarmSchedule]).
+const int renewalNoticeMinute = 20 * 60;
+
+/// Closest a renewal notice may get to any planned alarm, so it never rings
+/// on top of one (the default evening-before notice is also at 20:00).
+const Duration renewalNoticeClearance = Duration(minutes: 10);
+
+/// Id of the renewal notice: there is only ever one (moved to the next free
+/// id in the unlikely case it collides with an alarm of the plan).
+final int renewalNoticeId = fnv31('cuadrante.renewal');
+
+/// What [planAlarmSchedule] decided: the alarms ([planAlarms]), the renewal
+/// notice when one is due and how far the shift alarms reach.
+class AlarmPlan {
+  const AlarmPlan({
+    required this.alarms,
+    this.renewal,
+    this.truncated = false,
+    this.lastShiftAlarm,
+    this.coveredUntil,
+  });
+
+  /// Nothing scheduled (alarms off, no permission).
+  static const AlarmPlan empty = AlarmPlan(alarms: []);
+
+  /// Exactly what [planAlarms] returns for the same input.
+  final List<PlannedAlarm> alarms;
+
+  /// The renewal notice ([AlarmKind.renewal]), or null when none is due.
+  final PlannedAlarm? renewal;
+
+  /// Whether shift alarms that would ring were left out of [alarms], by the
+  /// horizon or by the cap of [maxPendingAlarms]. Only shift alarms count
+  /// (before a shift and the evening before), not the note reminders.
+  final bool truncated;
+
+  /// The last shift alarm of [alarms] (before a shift or the evening
+  /// before), or null when there is none.
+  final PlannedAlarm? lastShiftAlarm;
+
+  /// The instant [lastShiftAlarm] rings at, in the planning zone.
+  final DateTime? coveredUntil;
+
+  /// What goes to the scheduler: [alarms] and, when due, the [renewal].
+  List<PlannedAlarm> get toSchedule => List.unmodifiable([...alarms, ?renewal]);
+}
+
+/// [planAlarms] plus the renewal notice and the coverage (A1, docs/alarmas.md
+/// «Renovación»): what the app and the background renewal hand to the
+/// scheduler.
+///
+/// The renewal notice is planned only when the shift alarms are on
+/// (`settings.anyActive`), [strings] has its texts and the plan was cut
+/// ([AlarmPlan.truncated]: an alarm within [renewalLookaheadDays] days past
+/// the horizon, or one dropped by the cap). It rings on the day before the
+/// last planned shift alarm, at [renewalNoticeMinute] (20:00 wall-clock
+/// time, same daylight-saving rules as every alarm) or, when that is taken
+/// or invalid, at the nearest half hour between 17:00 and 23:00 that is
+/// after [now], before that last alarm and at least
+/// [renewalNoticeClearance] away from every planned alarm. If no minute
+/// fits, there is no notice. With no shift alarm in the window at all (a
+/// long holiday) the end of the horizon takes the place of the last alarm.
+AlarmPlan planAlarmSchedule({
+  required Schedule schedule,
+  required AlarmSettings settings,
+  required DateTime now,
+  required AlarmStrings strings,
+  tz.Location? location,
+}) => _plan(
+  schedule: schedule,
+  settings: settings,
+  now: now,
+  strings: strings,
+  includeReminders: true,
+  location: location,
+  lookaheadDays: renewalLookaheadDays,
+);
+
+AlarmPlan _plan({
+  required Schedule schedule,
+  required AlarmSettings settings,
+  required DateTime now,
+  required AlarmStrings strings,
+  required bool includeReminders,
+  required tz.Location? location,
+  required int lookaheadDays,
 }) {
   final withShifts = settings.anyActive;
-  if (!withShifts && !includeReminders) return const [];
+  if (!withShifts && !includeReminders) return AlarmPlan.empty;
   final zone =
       location ??
       (now is tz.TZDateTime ? now.location : defaultAlarmLocation());
@@ -285,8 +390,17 @@ List<PlannedAlarm> planAlarms({
   final reminders = includeReminders
       ? _planReminders(schedule, strings)
       : <PlannedAlarm>[];
+  // An alarm can ring up to a day before its shift, so shifts up to
+  // horizon + 1 day ahead can still fall inside the window; the lookahead
+  // only tells whether more would ring after it.
   final shiftAlarms = withShifts
-      ? _planShiftAlarms(schedule, settings, today, strings)
+      ? _planShiftAlarms(
+          schedule,
+          settings,
+          today,
+          strings,
+          today.addDays(settings.horizonDays + 1 + lookaheadDays),
+        )
       : <PlannedAlarm>[];
 
   // Compare resolved instants, never raw wall minutes: a spring-gap 02:30
@@ -311,11 +425,90 @@ List<PlannedAlarm> planAlarms({
           .toList();
 
   final keptReminders = soonest(reminders, maxPendingAlarms);
-  final kept = [
-    ...keptReminders,
-    ...soonest(shiftAlarms, maxPendingAlarms - keptReminders.length),
-  ]..sort(byTime);
-  return List.unmodifiable(_withUniqueIds(kept));
+  final keptShifts = soonest(
+    shiftAlarms,
+    maxPendingAlarms - keptReminders.length,
+  );
+  final kept = [...keptReminders, ...keptShifts]..sort(byTime);
+  final alarms = List<PlannedAlarm>.unmodifiable(_withUniqueIds(kept));
+  if (lookaheadDays == 0) return AlarmPlan(alarms: alarms);
+
+  // Every future shift alarm that did not make it: past the horizon or
+  // pushed out by the cap.
+  final truncated =
+      shiftAlarms.where((a) => instants[a]!.isAfter(now)).length >
+      keptShifts.length;
+  final lastShift = keptShifts.isEmpty ? null : keptShifts.last;
+  PlannedAlarm? renewal;
+  if (withShifts && truncated) {
+    renewal = _renewalNotice(
+      alarms: alarms,
+      anchorDate: lastShift?.fireDate ?? lastDate,
+      anchorInstant: lastShift == null ? last : instants[lastShift]!,
+      now: now,
+      zone: zone,
+      strings: strings,
+    );
+  }
+  return AlarmPlan(
+    alarms: alarms,
+    renewal: renewal,
+    truncated: truncated,
+    // The scheduled copy (its id may have moved to stay unique).
+    lastShiftAlarm: lastShift == null
+        ? null
+        : alarms.lastWhere((a) => a.kind != AlarmKind.reminder),
+    coveredUntil: lastShift == null ? null : instants[lastShift],
+  );
+}
+
+/// The renewal notice for a plan whose last shift alarm rings on
+/// [anchorDate] at [anchorInstant] (see [planAlarmSchedule]), or null when
+/// [strings] has no renewal texts or no minute fits. Never throws: a notice
+/// that cannot be built must not cost the alarms.
+PlannedAlarm? _renewalNotice({
+  required List<PlannedAlarm> alarms,
+  required CivilDate anchorDate,
+  required tz.TZDateTime anchorInstant,
+  required DateTime now,
+  required tz.Location zone,
+  required AlarmStrings strings,
+}) {
+  final title = strings.renewalTitle;
+  final body = strings.renewalBody;
+  if (title == null || body == null) return null;
+  try {
+    final day = anchorDate.addDays(-1);
+    final taken = [for (final a in alarms) resolveAlarmInstant(a, zone)];
+    final used = {for (final a in alarms) a.id};
+    // 20:00, then 19:30, 20:30, 19:00, 21:00... down to 17:00, up to 23:00.
+    for (var step = 0; step <= 12; step++) {
+      final offset = (step + 1) ~/ 2 * 30 * (step.isOdd ? -1 : 1);
+      final minute = renewalNoticeMinute + offset;
+      final at = resolveWallClock(zone, day.year, day.month, day.day, minute);
+      if (!at.isAfter(now) || !at.isBefore(anchorInstant)) continue;
+      if (taken.any((t) => t.difference(at).abs() < renewalNoticeClearance)) {
+        continue;
+      }
+      var id = renewalNoticeId;
+      while (used.contains(id)) {
+        id = (id + 1) & 0x7FFFFFFF;
+      }
+      return PlannedAlarm(
+        id: id,
+        fireDate: day,
+        fireMinute: minute,
+        shiftDate: anchorDate,
+        shiftTypeId: '',
+        title: title,
+        body: body(anchorDate),
+        kind: AlarmKind.renewal,
+      );
+    }
+  } catch (_) {
+    // Texts or time zone failed: no notice, the alarms stay as planned.
+  }
+  return null;
 }
 
 List<PlannedAlarm> _planShiftAlarms(
@@ -323,10 +516,8 @@ List<PlannedAlarm> _planShiftAlarms(
   AlarmSettings settings,
   CivilDate today,
   AlarmStrings strings,
+  CivilDate lastShiftDay,
 ) {
-  // An alarm can ring up to a day before its shift, so shifts up to
-  // horizon + 1 day ahead can still fall inside the window.
-  final lastShiftDay = today.addDays(settings.horizonDays + 1);
   final alarms = <PlannedAlarm>[];
   // A second segment can belong to yesterday's shift and start today.
   // Keep resolving that owner day; the plan filters by the alarm's fire time.
@@ -342,8 +533,12 @@ List<PlannedAlarm> _planShiftAlarms(
       if (!typeSettings.enabled || !canShiftTypeRing(shift)) continue;
 
       final startAbs = shift.startMinute!;
-      final start = _hhmm(startAbs);
-      final body = strings.body(shift.name, start, _hhmm(shift.endMinute!));
+      final start = strings.time(startAbs);
+      final body = strings.body(
+        shift.name,
+        start,
+        strings.time(shift.endMinute!),
+      );
 
       void add(
         AlarmKind kind,
@@ -385,14 +580,18 @@ List<PlannedAlarm> _planShiftAlarms(
       // after midnight: the wall-clock minute is counted from the shift's day.
       if (shift.hasSegment2 && typeSettings.secondSegment) {
         final second = ShiftOccurrence.allOf(day.date, shift).last;
-        final start2 = _hhmm(second.startMinuteAbs);
+        final start2 = strings.time(second.startMinuteAbs);
         add(
           AlarmKind.shift,
           dayStart + second.startMinuteAbs - typeSettings.minutesBefore,
           typeSettings.cleanLabel ?? strings.title(shift.name, start2),
           buttons: true,
           segment: 1,
-          text: strings.body(shift.name, start2, _hhmm(second.endMinuteAbs)),
+          text: strings.body(
+            shift.name,
+            start2,
+            strings.time(second.endMinuteAbs),
+          ),
         );
       }
       if (typeSettings.dayBefore) {

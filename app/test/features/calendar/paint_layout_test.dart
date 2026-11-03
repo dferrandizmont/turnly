@@ -3,6 +3,7 @@ import 'package:cuadrante/core/theme/theme_context.dart';
 import 'package:cuadrante/features/calendar/application/schedule_controller.dart';
 import 'package:cuadrante/features/calendar/application/visible_month.dart';
 import 'package:cuadrante/features/calendar/presentation/month_grid.dart';
+import 'package:cuadrante/features/calendar/presentation/paint_bar.dart';
 import 'package:cuadrante/features/calendar/presentation/day_cell.dart';
 import 'package:cuadrante/features/schedule/data/schedule_repository.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
@@ -192,9 +193,8 @@ void main() {
               ];
 
               double gridTop() => tester.getTopLeft(find.byType(MonthGrid)).dy;
-              double headerHeight() => tester
-                  .getSize(find.byKey(const ValueKey('paint-title')))
-                  .height;
+              double headerHeight() =>
+                  tester.getSize(find.byType(PaintHeader)).height;
 
               final top = gridTop();
               final height = headerHeight();
@@ -212,21 +212,13 @@ void main() {
                 );
                 expect(paragraphLines(label), hasLength(1));
                 expect(label.didExceedMaxLines, isFalse);
-                // The title is one line; hours are not cut.
-                final title = find.descendant(
-                  of: find.byKey(const ValueKey('paint-title')),
-                  matching: find.byType(Text),
+                // So is the mode, and the header has no second line with the
+                // name and hours of the tool any more (decision 28).
+                final mode = tester.renderObject<RenderParagraph>(
+                  find.byKey(const ValueKey('paint-mode-label')),
                 );
-                for (final element in title.evaluate()) {
-                  final text = element.widget as Text;
-                  final data = text.data!;
-                  final paragraph = element.renderObject as RenderParagraph;
-                  expect(paragraphLines(paragraph), hasLength(1));
-                  if (data.contains('–') && tool != 'tool-eraser') {
-                    // Hours: whole (no ellipsis in the text that holds them).
-                    expect(text.overflow, isNot(TextOverflow.ellipsis));
-                  }
-                }
+                expect(paragraphLines(mode), hasLength(1));
+                expect(find.byKey(const ValueKey('paint-title')), findsNothing);
                 expect(tester.takeException(), isNull);
               }
             },
@@ -235,9 +227,10 @@ void main() {
       }
     }
 
-    testWidgets('the name is cut with an ellipsis, the hours stay whole', (
+    testWidgets('the hours of the tool are in the preview line, whole', (
       tester,
     ) async {
+      final semantics = tester.ensureSemantics();
       await pumpCalendar(tester, size: const Size(360, 900), textScale: 1.3);
       await enterPaintMode(tester);
       containerOf(tester)
@@ -245,21 +238,24 @@ void main() {
           .saveShiftType(_longName);
       await tester.pumpAndSettle();
       await pick(tester, 'tool-longname');
-      final texts = find.descendant(
-        of: find.byKey(const ValueKey('paint-title')),
-        matching: find.byType(Text),
+      // Read aloud: the preview and the chosen puck say name and hours.
+      expect(
+        tester.getSemantics(find.byKey(const ValueKey('paint-preview'))).label,
+        contains('08:00–15:00'),
       );
-      // Name and hours are two Texts; the hours never ellipsize.
-      final hours = [
-        for (final e in texts.evaluate())
-          if ((e.widget as Text).data!.contains('08:00–15:00'))
-            e.widget as Text,
-      ];
-      expect(hours, isNotEmpty);
-      for (final t in hours) {
-        expect(t.overflow, isNot(TextOverflow.ellipsis));
+      expect(
+        tester.getSemantics(find.byKey(const ValueKey('tool-longname'))).label,
+        'Libre disposición, 08:00–15:00',
+      );
+      // On screen, when there is room for them, the hours are never cut.
+      final times = find.byKey(const ValueKey('paint-preview-times'));
+      if (times.evaluate().isNotEmpty) {
+        expect(tester.widget<Text>(times).data, '08:00–15:00');
+        final paragraph = tester.renderObject<RenderParagraph>(times);
+        expect(paragraph.didExceedMaxLines, isFalse);
       }
       expect(tester.takeException(), isNull);
+      semantics.dispose();
     });
   });
 

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One shift of a four-week cell: its code on its tint with its bar below. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1">
+    <ImageView
+        android:id="@+id/fw_shift_tint"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/widget_month_cell"
+        android:scaleType="fitXY"
+        android:importantForAccessibility="no"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/widget_shift_bar_height">
+        <TextView
+            android:id="@+id/fw_code"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:singleLine="true"
+            android:textSize="@dimen/widget_label_size"
+            android:textStyle="bold"
+            android:textColor="@color/widget_text_primary"/>
+    </LinearLayout>
+    <ImageView
+        android:id="@+id/fw_bar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/widget_shift_bar_height"
+        android:layout_gravity="bottom"
+        android:src="@drawable/widget_pill"
+        android:scaleType="fitXY"
+        android:importantForAccessibility="no"/>
+</FrameLayout>

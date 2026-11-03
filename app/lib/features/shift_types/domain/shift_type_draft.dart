@@ -45,31 +45,62 @@ String sanitizeShiftCode(String text) {
   return fitShiftCode(kept, fallback: '');
 }
 
-/// "12,50" / "12.5" / "12" -> cents (1250 / 1250 / 1200). A blank text is
-/// `null` (no rate). Throws [FormatException] for anything else: letters,
-/// more than two decimals, negative numbers, more than [maxHourlyRateCents].
-int? parseEuroCents(String text) {
+/// "12,50" / "12.5" / "12" -> the minor unit of the currency (1250 / 1250 /
+/// 1200 with [decimals] 2; see `core/format/money.dart`). [decimals] are the
+/// ones of the currency: 0 takes whole units only ("1500" is 1500, "15,5" is
+/// refused), 3 takes up to three. A blank text is `null` (no rate). Throws
+/// [FormatException] for anything else: letters, more decimals than
+/// [decimals], negative numbers, more than [maxHourlyRateCents].
+int? parseMoneyCents(String text, {int decimals = 2}) {
   final trimmed = text.trim();
   if (trimmed.isEmpty) return null;
-  final match = RegExp(r'^(\d{1,6})(?:[.,](\d{1,2}))?$').firstMatch(trimmed);
+  final fraction = decimals > 0
+      ? r'(?:[.,](\d{1,'
+            '$decimals'
+            r'}))?'
+      : '';
+  final match = RegExp('^(\\d{1,6})$fraction\$').firstMatch(trimmed);
   if (match == null) throw FormatException('Not an amount', text);
-  final euros = int.parse(match.group(1)!);
-  final decimals = (match.group(2) ?? '').padRight(2, '0');
-  final cents = euros * 100 + int.parse(decimals);
+  final units = int.parse(match.group(1)!);
+  final rest = decimals > 0
+      ? (match.group(2) ?? '').padRight(decimals, '0')
+      : '';
+  final cents = units * _pow10(decimals) + (rest.isEmpty ? 0 : int.parse(rest));
   if (cents > maxHourlyRateCents) throw FormatException('Too large', text);
   return cents;
 }
 
-/// Cents as the editor shows them: "12,50", "12" for whole euros.
-String formatCentsInput(int cents) {
-  final euros = cents ~/ 100;
-  final rest = cents % 100;
-  if (rest == 0) return '$euros';
-  return '$euros,${rest.toString().padLeft(2, '0')}';
+int _pow10(int exponent) {
+  var result = 1;
+  for (var i = 0; i < exponent; i++) {
+    result *= 10;
+  }
+  return result;
+}
+
+/// A stored amount as the editor shows it: "12,50", "12" for whole units
+/// ([decimals] are the ones of the currency, 2 by default).
+String formatCentsInput(int cents, {int decimals = 2}) {
+  if (decimals <= 0) return '$cents';
+  final scale = _pow10(decimals);
+  final units = cents ~/ scale;
+  final rest = cents % scale;
+  if (rest == 0) return '$units';
+  return '$units,${rest.toString().padLeft(decimals, '0')}';
 }
 
 /// The field a [ShiftTypeProblem] belongs to.
-enum ShiftTypeField { code, name, unpaidBreak, rate, fixedPlus, segment2 }
+enum ShiftTypeField {
+  code,
+  name,
+  unpaidBreak,
+  rate,
+  fixedPlus,
+  segment2,
+  location,
+  nightPlus,
+  holidayPlus,
+}
 
 enum ShiftTypeIssue {
   codeEmpty,
@@ -86,6 +117,13 @@ enum ShiftTypeIssue {
   segment2DurationOutOfRange,
   segment2NotAfterFirst,
   segment2TooLong,
+
+  /// The place is too long (a blank place is no place).
+  locationTooLong,
+
+  /// The plus per hour is outside the range the database accepts.
+  nightPlusInvalid,
+  holidayPlusInvalid,
 }
 
 ShiftTypeIssue _issueOf(Segment2Problem problem) => switch (problem) {
@@ -137,10 +175,22 @@ class ShiftTypeDraft {
     this.alarmSound,
     this.segment2StartMinute,
     this.segment2DurationMinutes,
+    this.moneyDecimals = 2,
+    this.location,
+    this.nightPlusCentsPerHour,
+    this.holidayPlusCentsPerHour,
+    this.dndEnabled = false,
   });
 
-  /// A draft that shows [type] as it is stored.
-  factory ShiftTypeDraft.fromShiftType(ShiftType type) {
+  /// A draft that shows [type] as it is stored. [moneyDecimals] are the
+  /// decimals of the currency the rate and the plus are typed in.
+  /// [dndEnabled] is the «No molestar durante este turno» choice (P13), which
+  /// lives with the silence settings, not in the shift type row.
+  factory ShiftTypeDraft.fromShiftType(
+    ShiftType type, {
+    int moneyDecimals = 2,
+    bool dndEnabled = false,
+  }) {
     final paid = type.paidMinutes;
     final unpaid = paid == null ? 0 : type.scheduledMinutes - paid;
     return ShiftTypeDraft(
@@ -155,14 +205,19 @@ class ShiftTypeDraft {
       nightOverride: type.nightOverride,
       rateText: type.hourlyRateCents == null
           ? ''
-          : formatCentsInput(type.hourlyRateCents!),
+          : formatCentsInput(type.hourlyRateCents!, decimals: moneyDecimals),
       fixedPlusText: type.fixedPlusCents == null
           ? ''
-          : formatCentsInput(type.fixedPlusCents!),
+          : formatCentsInput(type.fixedPlusCents!, decimals: moneyDecimals),
       icon: type.icon,
       alarmSound: type.alarmSound,
       segment2StartMinute: type.segment2StartMinute,
       segment2DurationMinutes: type.segment2DurationMinutes,
+      moneyDecimals: moneyDecimals,
+      location: type.location,
+      nightPlusCentsPerHour: type.nightPlusCentsPerHour,
+      holidayPlusCentsPerHour: type.holidayPlusCentsPerHour,
+      dndEnabled: dndEnabled,
     );
   }
 
@@ -184,11 +239,15 @@ class ShiftTypeDraft {
   /// `null` = automatic, `true` = always night, `false` = never.
   final bool? nightOverride;
 
-  /// Hourly rate in euros as typed ("12,50"; "" = none).
+  /// Hourly rate as typed, in the currency of Ajustes ("12,50"; "" = none).
   final String rateText;
 
-  /// Fixed euros earned once per work shift ("30,50"; "" = none).
+  /// Fixed amount earned once per work shift ("30,50"; "" = none).
   final String fixedPlusText;
+
+  /// Decimals of the currency the two texts above are typed in (2 for the
+  /// euro, 0 for the yen): what [parseMoneyCents] accepts.
+  final int moneyDecimals;
 
   bool get fixedPlusApplies => category == ShiftCategory.work;
 
@@ -204,6 +263,24 @@ class ShiftTypeDraft {
   /// saved: nothing is dropped silently.
   final int? segment2StartMinute;
   final int? segment2DurationMinutes;
+
+  /// Place and night/holiday pluses per hour (schema v6, P9). The place is
+  /// free text and the pluses are money per hour; the form does not edit them
+  /// yet, it only carries them through.
+  final String? location;
+  final int? nightPlusCentsPerHour;
+  final int? holidayPlusCentsPerHour;
+
+  /// «Activar No molestar durante este turno» (P13, Android only). The choice
+  /// is stored with the silence settings (`DndSettings`), not in the shift
+  /// type; the form carries it so leaving with a change asks first.
+  final bool dndEnabled;
+
+  /// The place as it is written (trimmed); `null` when there is none.
+  String? get place {
+    final trimmed = location?.trim();
+    return trimmed == null || trimmed.isEmpty ? null : trimmed;
+  }
 
   /// The «Turno partido» switch is on.
   bool get isSplit => segment2StartMinute != null;
@@ -240,6 +317,11 @@ class ShiftTypeDraft {
   /// for: with times and not an absence (the same rule as `canShiftTypeRing`
   /// of the alarm planner). The chosen sound is kept in the draft either way.
   bool get alarmSectionApplies => hasTimes && category != ShiftCategory.absence;
+
+  /// The «No molestar» switch only applies to shifts the phone can be
+  /// silenced during: worked shifts with times (the same rule as
+  /// `canSilenceDuring` of the silence planner).
+  bool get dndSectionApplies => hasTimes && category == ShiftCategory.work;
 
   /// `(end - start) mod 1440`, 0 meaning 24 h (as the engine counts it).
   int get durationMinutes => hasTimes ? _duration(startMinute, endMinute) : 0;
@@ -280,6 +362,14 @@ class ShiftTypeDraft {
     int? segment2DurationMinutes,
     int? segment2EndMinute,
     bool clearSegment2 = false,
+    int? moneyDecimals,
+    String? location,
+    bool clearLocation = false,
+    int? nightPlusCentsPerHour,
+    bool clearNightPlus = false,
+    int? holidayPlusCentsPerHour,
+    bool clearHolidayPlus = false,
+    bool? dndEnabled,
   }) => ShiftTypeDraft(
     code: code ?? this.code,
     name: name ?? this.name,
@@ -296,6 +386,15 @@ class ShiftTypeDraft {
     fixedPlusText: fixedPlusText ?? this.fixedPlusText,
     icon: clearIcon ? null : icon ?? this.icon,
     alarmSound: clearAlarmSound ? null : alarmSound ?? this.alarmSound,
+    moneyDecimals: moneyDecimals ?? this.moneyDecimals,
+    location: clearLocation ? null : location ?? this.location,
+    nightPlusCentsPerHour: clearNightPlus
+        ? null
+        : nightPlusCentsPerHour ?? this.nightPlusCentsPerHour,
+    holidayPlusCentsPerHour: clearHolidayPlus
+        ? null
+        : holidayPlusCentsPerHour ?? this.holidayPlusCentsPerHour,
+    dndEnabled: dndEnabled ?? this.dndEnabled,
     segment2StartMinute: clearSegment2
         ? null
         : segment2StartMinute ?? this.segment2StartMinute,
@@ -329,8 +428,13 @@ class ShiftTypeDraft {
       other.fixedPlusText == fixedPlusText &&
       other.icon == icon &&
       other.alarmSound == alarmSound &&
+      other.moneyDecimals == moneyDecimals &&
       other.segment2StartMinute == segment2StartMinute &&
-      other.segment2DurationMinutes == segment2DurationMinutes;
+      other.segment2DurationMinutes == segment2DurationMinutes &&
+      other.location == location &&
+      other.nightPlusCentsPerHour == nightPlusCentsPerHour &&
+      other.holidayPlusCentsPerHour == holidayPlusCentsPerHour &&
+      other.dndEnabled == dndEnabled;
 
   @override
   int get hashCode => Object.hash(
@@ -347,8 +451,13 @@ class ShiftTypeDraft {
     fixedPlusText,
     icon,
     alarmSound,
+    moneyDecimals,
     segment2StartMinute,
     segment2DurationMinutes,
+    location,
+    nightPlusCentsPerHour,
+    holidayPlusCentsPerHour,
+    dndEnabled,
   );
 
   /// The draft with the «Turno partido» switch on: a second segment of 4 h
@@ -406,7 +515,7 @@ class ShiftTypeDraft {
         );
       }
       try {
-        parseEuroCents(rateText);
+        parseMoneyCents(rateText, decimals: moneyDecimals);
       } on FormatException {
         problems[ShiftTypeField.rate] = const ShiftTypeProblem(
           ShiftTypeIssue.rateInvalid,
@@ -415,11 +524,38 @@ class ShiftTypeDraft {
     }
     if (fixedPlusApplies) {
       try {
-        parseEuroCents(fixedPlusText);
+        parseMoneyCents(fixedPlusText, decimals: moneyDecimals);
       } on FormatException {
         problems[ShiftTypeField.fixedPlus] = const ShiftTypeProblem(
           ShiftTypeIssue.rateInvalid,
         );
+      }
+    }
+
+    // The place (P9): free text of the user. A blank place is no place (it is
+    // not a problem: clearing the field removes it), but it cannot be longer
+    // than the database accepts.
+    if (location != null && location!.trim().length > maxShiftLocationLength) {
+      problems[ShiftTypeField.location] = const ShiftTypeProblem(
+        ShiftTypeIssue.locationTooLong,
+      );
+    }
+
+    // The pluses per hour (P9): money the database accepts.
+    for (final (field, issue, value) in [
+      (
+        ShiftTypeField.nightPlus,
+        ShiftTypeIssue.nightPlusInvalid,
+        nightPlusCentsPerHour,
+      ),
+      (
+        ShiftTypeField.holidayPlus,
+        ShiftTypeIssue.holidayPlusInvalid,
+        holidayPlusCentsPerHour,
+      ),
+    ]) {
+      if (value != null && (value < 0 || value > maxStoredMoneyCents)) {
+        problems[field] = ShiftTypeProblem(issue);
       }
     }
     return problems;
@@ -430,6 +566,7 @@ class ShiftTypeDraft {
   ShiftType toShiftType(String id) {
     final pay = paySectionApplies;
     final unpaid = pay ? unpaidBreakMinutes ?? 0 : 0;
+    final where = place;
     return ShiftType(
       id: id,
       code: code.trim(),
@@ -440,14 +577,21 @@ class ShiftTypeDraft {
       endMinute: hasTimes ? endMinute : null,
       paidMinutes: unpaid > 0 ? scheduledMinutes - unpaid : null,
       nightOverride: pay ? nightOverride : null,
-      hourlyRateCents: pay ? parseEuroCents(rateText) : null,
-      fixedPlusCents: fixedPlusApplies ? parseEuroCents(fixedPlusText) : null,
+      hourlyRateCents: pay
+          ? parseMoneyCents(rateText, decimals: moneyDecimals)
+          : null,
+      fixedPlusCents: fixedPlusApplies
+          ? parseMoneyCents(fixedPlusText, decimals: moneyDecimals)
+          : null,
       icon: icon,
       alarmSound: alarmSound,
       // A valid draft has a valid second segment or none; a type without
       // times has none (the form hides the section and the switch is moot).
       segment2StartMinute: segment2Fits ? segment2StartMinute : null,
       segment2DurationMinutes: segment2Fits ? segment2DurationMinutes : null,
+      location: where,
+      nightPlusCentsPerHour: pay ? nightPlusCentsPerHour : null,
+      holidayPlusCentsPerHour: pay ? holidayPlusCentsPerHour : null,
     );
   }
 

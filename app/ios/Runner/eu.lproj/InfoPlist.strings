@@ -1,0 +1,4 @@
+"CFBundleDisplayName" = "Turnly";
+"NSCalendarsFullAccessUsageDescription" = "Inportatzean zure egutegiko txandak irakurtzeko eta, zuk eskatuz gero, zure txandak aukeratzen duzun egutegian gehitzeko. Egutegi hori kontu batekin sinkronizatzen bada, kontu horrek ere jasoko ditu.";
+"NSCalendarsUsageDescription" = "Inportatzean zure egutegiko txandak irakurtzeko eta, zuk eskatuz gero, zure txandak aukeratzen duzun egutegian gehitzeko. Egutegi hori kontu batekin sinkronizatzen bada, kontu horrek ere jasoko ditu.";
+"NSCalendarsWriteOnlyAccessUsageDescription" = "Zure txandak aukeratzen duzun egutegian gehitzeko, bertan duzuna irakurri gabe. Egutegi hori kontu batekin sinkronizatzen bada, kontu horrek ere jasoko ditu.";

@@ -4,23 +4,28 @@ import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/content_app_bar.dart';
 import '../../../core/widgets/page_body.dart';
+import 'sections/alerts_section.dart';
 import 'sections/appearance_section.dart';
+import 'sections/backup_section.dart';
 import 'sections/help_section.dart';
-import 'sections/import_export_section.dart';
-import 'sections/more_section.dart';
+import 'sections/money_section.dart';
 import 'sections/schedule_section.dart';
 
-/// Settings (`/ajustes`): grouped sections of rows (`docs/diseno.md`). Each
+/// Settings (`/ajustes`): grouped sections of rows, each with its state at
+/// the right (`docs/diseno.md`, design 6A). Each
 /// area is its own section widget in `sections/`; a new setting goes in its
 /// section, and a new area is one more entry in [_sections].
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
+  /// Design 6A: Mi calendario · Horas y dinero (P9) · Avisos y widget · Copias y cambio de móvil
+  /// · Apariencia · Ayuda.
   static const List<Widget> _sections = [
     ScheduleSection(),
+    MoneySection(),
+    AlertsSection(),
+    BackupSection(),
     AppearanceSection(),
-    MoreSection(),
-    ImportExportSection(),
     HelpSection(),
   ];
 

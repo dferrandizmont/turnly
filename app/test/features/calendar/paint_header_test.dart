@@ -9,11 +9,11 @@ import '../../support/text_lines.dart';
 import 'harness.dart';
 
 // QA campaign, T02 (H-T02-11, H-T02-6): the title of paint mode showed
-// «Mañ… · 08:00–15:00» at 412 dp and text x1.0 with the room of the whole
-// screen width next to it, and at x2.0 the names of the tools broke inside
-// a word. With the real font, on every width and text size: a name is only
-// cut when it does not fit even the full width, and no word of a tool is
-// ever split.
+// «Mañ… · 08:00–15:00» at 412 dp and text x1.0, and at x2.0 the names of the
+// tools broke inside a word. Since decision 28 the header is one line
+// without the name of the tool (the hours moved to the preview); with the
+// real font, on every width and text size, the header is never broken and no
+// word of a tool is ever split.
 
 void main() {
   setUpAll(() async {
@@ -24,8 +24,8 @@ void main() {
 
   for (final width in [320.0, 360.0, 412.0]) {
     for (final scale in [1.0, 1.3, 2.0]) {
-      testWidgets('at $width dp, text $scale: no name is cut that fits, no '
-          'word is split', (tester) async {
+      testWidgets('at $width dp, text $scale: a one-line header, no word is '
+          'split', (tester) async {
         await pumpCalendar(tester, size: Size(width, 900), textScale: scale);
         await enterPaintMode(tester);
         final ids = [
@@ -42,39 +42,15 @@ void main() {
           await tester.tap(tool);
           await tester.pumpAndSettle();
 
-          // The title: one Text when it fits whole, or the name and the
-          // hours as two. The name is only ellipsized if the whole line is
-          // wider than the most room it could have.
-          // The most room a title can have: the width of the screen less the
-          // margins, as when it goes under the buttons.
-          final room = width - 2 * 20;
-          final texts = find
-              .descendant(
-                of: find.byKey(const ValueKey('paint-title')),
-                matching: find.byType(RichText),
-              )
-              .evaluate()
-              .map((e) => e.renderObject! as RenderParagraph)
-              .toList();
-          var natural = 0.0;
-          for (final p in texts) {
-            natural += p.getMaxIntrinsicWidth(double.infinity);
-          }
-          final cut = texts.any((p) => p.didExceedMaxLines);
-          if (cut) {
-            expect(
-              natural,
-              greaterThan(room),
-              reason:
-                  '$id is cut at $width dp x$scale but fits: '
-                  '$natural in $room',
+          // The header is one line, «PINTANDO · CAMBIAR EL TURNO» (decision
+          // 28): the name and hours of the tool are not there any more.
+          expect(find.byKey(const ValueKey('paint-title')), findsNothing);
+          for (final key in ['paint-label', 'paint-mode-label']) {
+            final paragraph = tester.renderObject<RenderParagraph>(
+              find.byKey(ValueKey(key)),
             );
-          }
-          // The hours are never cut.
-          for (final p in texts) {
-            if (p.text.toPlainText().contains('–')) {
-              expect(p.didExceedMaxLines, isFalse, reason: '$id hours');
-            }
+            expect(paragraphLines(paragraph), hasLength(1), reason: key);
+            expect(paragraph.didExceedMaxLines, isFalse, reason: key);
           }
 
           // The names of the tools: whole words.
@@ -96,4 +72,18 @@ void main() {
       });
     }
   }
+
+  testWidgets('the header reads naturally, with no stray separator', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    await pumpCalendar(tester, size: const Size(412, 900));
+    await enterPaintMode(tester);
+    final header = find.byKey(const ValueKey('paint-label'));
+    expect(tester.getSemantics(header).label, 'Pintando, Cambiar el turno');
+    await tester.tap(find.byKey(const ValueKey('tool-double')));
+    await tester.pumpAndSettle();
+    expect(tester.getSemantics(header).label, 'Pintando, Añadir otro turno');
+    semantics.dispose();
+  });
 }

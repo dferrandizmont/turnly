@@ -14,6 +14,7 @@ import '../../schedule/application/schedule_providers.dart';
 import '../../schedule/data/schedule_repository.dart';
 import '../../schedule/data/schedule_snapshot.dart';
 import '../../schedule/domain/schedule_domain.dart';
+import '../../shift_types/domain/shift_color_presets.dart';
 import '../domain/range_editing.dart';
 
 /// Current schedule plus what the undo history allows.
@@ -220,6 +221,19 @@ class ScheduleController extends Notifier<ScheduleState> {
     if (!identical(_undo.last, step)) return false;
     undo();
     return true;
+  }
+
+  /// The latest step of the history when it changed [date] and nothing else
+  /// (a shift, the note, its reminder, the extra minutes, «Borrar día»), or
+  /// `null`. The «Deshacer» of the day detail (A7) undoes only such a step:
+  /// a stroke over several days or a rotation would undo more than the
+  /// person sees in that sheet.
+  ScheduleChange? lastStepOnlyOn(CivilDate date) {
+    if (!ref.mounted || strokeActive) return null;
+    final last = _undo.last;
+    if (last == null || last.runsAfter != null) return null;
+    final days = last.patch.changes.keys;
+    return days.length == 1 && days.first == date ? last : null;
   }
 
   /// Undoes an import ([step]) and takes away the shift types it created
@@ -647,17 +661,39 @@ class ScheduleController extends Notifier<ScheduleState> {
   /// edited one keeps its place (and stays archived if it was). Days show the
   /// new look at once. The undo history is kept: it only talks about days
   /// and the ids it uses do not change.
-  void saveShiftType(ShiftType type) {
+  ///
+  /// Without [onlyFrom] the new terms apply to every day the type's current
+  /// terms governed («Corregir en todos los días»: what an edit always did;
+  /// earlier versions stay). With [onlyFrom] and a change of hours or money
+  /// ([shiftTypeEditNeedsScope]), «Solo a partir de hoy»: every day before
+  /// [onlyFrom], in every calendar, keeps the terms it had (a
+  /// [ShiftTypeVersion] keeps them, `historyForChangeFrom`) and [onlyFrom]
+  /// and after get the new ones. Same id, so no rotation, day or pattern is
+  /// rewritten. A change of name, code, colour, icon or sound always applies
+  /// to every day.
+  void saveShiftType(ShiftType type, {CivilDate? onlyFrom}) {
     if (!ref.mounted) return;
     if (strokeActive) endStroke();
     final schedule = state.schedule;
-    final exists = schedule.shiftTypeById(type.id) != null;
+    final previous = schedule.shiftTypeById(type.id);
+    final exists = previous != null;
     final inPalette = state.palette.any((t) => t.id == type.id);
+    final history = onlyFrom != null && exists
+        ? historyForChangeFrom(
+            schedule.versionsOf(type.id),
+            before: ShiftTerms.of(previous),
+            after: ShiftTerms.of(type),
+            from: onlyFrom,
+          )
+        : null;
     state = state.copyWith(
       schedule: schedule.copyWith(
         shiftTypes: exists
             ? [for (final t in schedule.shiftTypes) t.id == type.id ? type : t]
             : [...schedule.shiftTypes, type],
+        shiftTypeVersions: history == null
+            ? null
+            : {...schedule.shiftTypeVersions, type.id: history},
       ),
       palette: inPalette
           ? [for (final t in state.palette) t.id == type.id ? type : t]
@@ -665,7 +701,46 @@ class ScheduleController extends Notifier<ScheduleState> {
           ? state.palette
           : [...state.palette, type],
     );
-    _enqueueTask((repository) => repository.saveShiftType(type));
+    _enqueueTask(
+      (repository) => history == null
+          ? repository.saveShiftType(type)
+          : repository.saveShiftTypeWithHistory(type, history),
+    );
+  }
+
+  /// Whether saving [edited] over the stored shift type would change a day
+  /// before [today] in **any** calendar (the archived ones too: types are
+  /// shared): its hours or money change ([shiftTypeEditNeedsScope]) and a
+  /// day already gone shows it with its current terms. Then the editor asks
+  /// «Corregir en todos los días» or «Solo a partir de hoy»; if not, saving
+  /// changes nothing gone and it does not ask. A new type is never used.
+  Future<bool> shiftTypeEditChangesPast(
+    ShiftType edited,
+    CivilDate today,
+  ) async {
+    if (!ref.mounted) return false;
+    final current = state.schedule.shiftTypeById(edited.id);
+    if (current == null || !shiftTypeEditNeedsScope(current, edited)) {
+      return false;
+    }
+    final from = currentTermsSince(state.schedule.versionsOf(edited.id));
+    bool shows(Schedule s) =>
+        s.showsShiftTypeBetween(edited.id, from: from, before: today);
+    // The calendar on screen first: it is in memory and the usual answer.
+    if (shows(state.schedule)) return true;
+    final active = state.calendarId;
+    // What is queued for other calendars must be in the database first.
+    await pendingWrites;
+    if (!ref.mounted) return false;
+    final calendars = await ref
+        .read(calendarsRepositoryProvider)
+        .list(includeArchived: true);
+    final repository = ref.read(scheduleRepositoryProvider);
+    for (final calendar in calendars) {
+      if (calendar.id == active) continue;
+      if (shows((await repository.load(calendar.id)).schedule)) return true;
+    }
+    return false;
   }
 
   /// Takes [id] out of the palette. Days that already use it keep showing it.
@@ -707,6 +782,48 @@ class ScheduleController extends Notifier<ScheduleState> {
       ],
     );
     _enqueueTask((repository) => repository.unarchiveShiftType(id));
+  }
+
+  /// Applies a prepared set of colours (UX · Extras visuales) to the shift
+  /// types of the palette: each type whose colour is a default role takes the
+  /// colour the set gives that role (a custom colour is left alone, and Libre
+  /// is never touched). Saves every changed type through the normal shift-type
+  /// path (a change of colour applies to every day), so the whole set is one
+  /// action. Returns the types as they were for the «Deshacer» of the snack
+  /// bar, or `null` when nothing changed.
+  List<ShiftType>? applyColorPreset(ShiftColorPreset preset) {
+    if (!ref.mounted) return null;
+    if (strokeActive) endStroke();
+    final previous = <ShiftType>[];
+    final changed = <ShiftType>[];
+    for (final type in state.palette) {
+      final next = withPresetColor(preset, type);
+      if (next != null) {
+        previous.add(type);
+        changed.add(next);
+      }
+    }
+    if (changed.isEmpty) return null;
+    for (final type in changed) {
+      saveShiftType(type);
+    }
+    return previous;
+  }
+
+  /// Puts the shift types [types] back as they were (the «Deshacer» of a
+  /// prepared set of colours).
+  ///
+  /// Only the **colour** comes back: a prepared set never touches anything
+  /// else, so an edition made after it (a name, a rate, an hour) is not undone
+  /// by mistake.
+  void restoreShiftTypes(Iterable<ShiftType> types) {
+    if (!ref.mounted) return;
+    if (strokeActive) endStroke();
+    for (final type in types) {
+      final current = state.schedule.shiftTypeById(type.id);
+      if (current == null || current.colorValue == type.colorValue) continue;
+      saveShiftType(current.copyWith(colorValue: type.colorValue));
+    }
   }
 
   /// Puts the palette in the order of [orderedIds] (every id of the current
@@ -812,6 +929,25 @@ class ScheduleController extends Notifier<ScheduleState> {
           : entry.copyWith(earlyLeaveMinutes: minutes);
     }
     return _editEntries({date: entry});
+  }
+
+  /// Sets the extra money of [date] (P9: allowances, mileage, a bonus;
+  /// negative for a deduction), in the minor unit of the currency. `null` or
+  /// 0 clears it; more than [maxStoredMoneyCents] is cut to it. One undo step,
+  /// shifts, note and reminder stay. Returns the step, or `null` when nothing
+  /// changed.
+  ScheduleChange? setDayExtraAmount(CivilDate date, int? cents) {
+    if (!ref.mounted) return null;
+    if (strokeActive) endStroke();
+    final before = state.schedule.entries[date] ?? DayEntry(date: date);
+    final amount = cents == null || cents == 0
+        ? null
+        : cents.clamp(-maxStoredMoneyCents, maxStoredMoneyCents);
+    return _editEntries({
+      date: amount == null
+          ? before.copyWith(clearExtraAmount: true)
+          : before.copyWith(extraAmountCents: amount),
+    });
   }
 
   // ---- Patterns and automatic saliente (docs/motor-de-turnos.md) ----------
@@ -963,6 +1099,7 @@ class ScheduleController extends Notifier<ScheduleState> {
         clearNoteReminder: day.noteReminderMinute != null,
         clearOvertime: day.overtimeMinutes != null,
         clearEarlyLeave: day.earlyLeaveMinutes != null,
+        clearExtraAmount: day.extraAmountCents != null,
       );
       final after = stripped.isEmpty ? null : stripped;
       if (after == before) {

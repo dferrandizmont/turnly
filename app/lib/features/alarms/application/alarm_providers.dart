@@ -9,6 +9,8 @@ import '../../../core/providers.dart';
 import '../../calendar/application/schedule_controller.dart';
 import '../../calendars/application/primary_schedule.dart';
 import '../../schedule/domain/schedule_domain.dart';
+import '../data/alarm_foreground_relay.dart';
+import '../data/alarm_renewal_task.dart';
 import '../data/alarm_scheduler.dart';
 import '../data/alarm_settings_repository.dart';
 import '../data/alarm_sounds.dart';
@@ -18,6 +20,7 @@ import '../domain/alarm_planner.dart';
 import '../domain/alarm_settings.dart';
 import '../domain/alarm_strings.dart';
 import '../domain/wall_clock.dart';
+import 'alarm_renewal.dart';
 import 'alarm_sync.dart';
 
 /// The plugin on a phone; an in-memory fake on the host (tests, desktop).
@@ -42,6 +45,23 @@ final alarmSystemProvider = Provider<AlarmSystem>(
 final alarmSoundsProvider = Provider<AlarmSounds>(
   (ref) =>
       Platform.isAndroid ? const PlatformAlarmSounds() : const NoAlarmSounds(),
+);
+
+/// The background renewal of the alarms (A1): WorkManager on Android; on iOS
+/// nothing yet (`BGTaskScheduler` is set up on the Mac, see [NoAlarmRenewal]).
+/// Tests get [NoAlarmRenewal] (the host is neither) or override it.
+final alarmRenewalRegistrarProvider = Provider<AlarmRenewalRegistrar>(
+  (ref) =>
+      Platform.isAndroid ? WorkmanagerAlarmRenewal() : const NoAlarmRenewal(),
+);
+
+/// Where the background renewal asks a running app to replan instead of
+/// doing it itself (Android only: it is the only platform with a background
+/// renewal): the process-wide [appAlarmForegroundRelay], which `main` starts
+/// listening before the first frame. Null elsewhere; tests override it with
+/// their own port name.
+final alarmForegroundRelayProvider = Provider<AlarmForegroundRelay?>(
+  (ref) => Platform.isAndroid ? appAlarmForegroundRelay : null,
 );
 
 final alarmSettingsRepositoryProvider = Provider<AlarmSettingsRepository>(
@@ -222,6 +242,18 @@ final nextAlarmProvider = FutureProvider.autoDispose<PlannedAlarm?>((
   return next;
 });
 
+/// When the last shift alarm the app handed to the scheduler rings (the
+/// «Avisos programados hasta el…» line of Ajustes › Alarmas), or null when
+/// none is scheduled: alarms off, no permission, nothing in the window, or
+/// no sync has run yet. It follows what `AlarmSync` really scheduled, not a
+/// fresh plan: without the permission nothing is scheduled and this says so.
+final alarmsScheduledUntilProvider = Provider.autoDispose<DateTime?>((ref) {
+  final sync = ref.watch(alarmSyncProvider);
+  final subscription = sync.plans.listen((_) => ref.invalidateSelf());
+  ref.onDispose(subscription.cancel);
+  return sync.lastPlan?.coveredUntil;
+});
+
 /// The coalescing rescheduler. Reads the schedule and the settings fresh on
 /// every run, so it never plans from a stale copy.
 final alarmSyncProvider = Provider<AlarmSync>((ref) {
@@ -230,6 +262,7 @@ final alarmSyncProvider = Provider<AlarmSync>((ref) {
     loadSettings: () => ref.read(alarmSettingsRepositoryProvider).load(),
     readSchedule: () => readPrimarySchedule(ref),
     now: ref.watch(clockProvider),
+    renewal: ref.watch(alarmRenewalRegistrarProvider),
     onError: (error, stack) {
       if (!ref.mounted) return;
       final reporter = ref.read(crashReporterProvider);

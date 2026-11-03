@@ -69,8 +69,10 @@ També pots baixar l’APK de la [darrera versió](https://github.com/dferrandiz
 <summary>Més captures</summary>
 
 <p>
-  <a href="docs/readme/ca/06-festivos.png"><img src="docs/readme/ca/06-festivos.png" width="19%" alt="Festius de la Comunitat de Madrid i del municipi de Madrid"></a>
+  <a href="docs/readme/ca/06-festivos.png"><img src="docs/readme/ca/06-festivos.png" width="19%" alt="Festius per país, comunitat i municipi"></a>
   <a href="docs/readme/ca/07-mes-oscuro.png"><img src="docs/readme/ca/07-mes-oscuro.png" width="19%" alt="El mateix mes amb el tema fosc"></a>
+  <a href="docs/readme/ca/08-vacaciones.png"><img src="docs/readme/ca/08-vacaciones.png" width="19%" alt="Saldos de vacances i permisos, amb els dies que queden i els arrossegats"></a>
+  <a href="docs/readme/ca/09-cambios.png"><img src="docs/readme/ca/09-cambios.png" width="19%" alt="Llibre de canvis amb el balanç de cada company i els torns de cada canvi"></a>
 </p>
 
 </details>
@@ -80,32 +82,51 @@ per [tests de Flutter](app/test/store/), també [en castellà](README.es.md#capt
 
 ## Funcions
 
-- **Mes en Quadrícula o Llista.** Vista anual, agenda i notes per dia. Cada torn
-  porta color, codi i horari; la Llista permet llegir els horaris complets.
-  Exportació puntual al calendari del mòbil i imatges del mes i de l’any.
+- **Mes, rotació, agenda i resum.** Barra inferior (Mes · Rotació · Agenda ·
+  Resum) i targeta d’avui plegable amb el proper torn, el proper dia lliure i la
+  ratxa. Cada torn porta color, codi i horari, en quadrícula o llista, amb vista
+  anual i notes per dia.
 - **Pintar torns i rotacions.** Toca o arrossega per seleccionar diversos dies,
   doblar, copiar i enganxar, desfer i refer; assistent de rotacions amb vista
   prèvia: torns rotatius, 24/72, 4×4, 6×4, 5×2, 2-2-3 i patrons propis. Tipus de
   torn, colors, icones i horaris editables.
-- **Festius d’Espanya.** Nacionals i autonòmics inclosos sense connexió; locals
-  per als municipis disponibles i opció d’afegir-hi els teus.
-- **Alarmes i widgets.** Alarma per tipus de torn, recordatoris de notes i widgets
-  d’Android per consultar els teus torns des de la pantalla d’inici. La seva
-  puntualitat depèn dels permisos i les restriccions del sistema. El widget d’iPhone
-  (WidgetKit) està pendent de desenvolupar al Mac.
-- **Còpies de seguretat i importació.** Còpies de seguretat locals automàtiques,
-  exportació a `.turnly` (les còpies antigues `.cuadrante` encara s’obren), vista prèvia en restaurar i «Prova la restauració».
-  Importar còpies `.Shifter` de LRHSoft, fitxers `.ics` o CSV i esdeveniments del
-  calendari del mòbil, revisant els torns abans de desar-los.
-- **Resum d’hores.** Treballades, nocturnes, festives, extra i sortides
-  anticipades; estimació d’ingressos amb preu per hora i plus fix per torn.
+- **Festius per país.** Espanya amb les seves comunitats i municipis, i 21 països
+  més (Portugal, Brasil, Llatinoamèrica, Europa, Estats Units i Canadà), tot
+  sense connexió, a més dels que hi afegeixis tu.
+- **Alarmes, widgets i no molestar.** Alarma per tipus de torn, recordatoris de
+  notes i widgets d’Android, inclòs un de quatre setmanes. A Android, «Silencia
+  el mòbil durant els meus torns» el silencia mentre treballes. La puntualitat
+  depèn dels permisos i les restriccions del sistema. El widget d’iPhone està
+  pendent.
+- **Còpia, informes i calendari del mòbil.** Còpies de seguretat locals
+  automàtiques i, a Android, una còpia diària a la carpeta que triïs (Drive,
+  Dropbox, OneDrive o el mòbil), amb vista prèvia en restaurar i «Prova la
+  restauració». Informes en PDF i CSV d’un mes o de les dates que vulguis,
+  «Mantenir al dia» per seguir els teus torns al calendari del mòbil, i
+  importació des de LRHSoft, `.ics`, CSV i el calendari del mòbil.
+- **Hores, diners i permisos.** Hores treballades, nocturnes i festives, extres
+  i sortides anticipades; plusos de nit i de festiu per hora; estimació bruta i
+  neta amb la retenció que posis. Saldos de vacances i permisos per any i tipus,
+  amb els dies arrossegats i els que et queden.
 
 <details>
 <summary>Més funcions</summary>
 
-- **Diversos calendaris.** Sense límit de pagament, i comparació entre dos quadrants.
+- **Llibre de canvis.** Anota un torn que cedeixis o rebis d’un company, mira el
+  seu balanç («Em deu 2 torns», «Li dec 1 torn»), l’estat i els torns de cada
+  canvi, i aplica’l al calendari amb un sol desfer.
+- **Adjunts i tasques.** A «Més opcions» d’un dia, «Adjunts» desa les fotos, els
+  dibuixos i els fitxers d’aquell dia, i «Tasques» n’és la llista de comprovació,
+  cadascuna amb un desfer.
+- **Comparar calendaris i cites del mòbil.** Fins a sis calendaris alhora i les
+  cites del mòbil al costat dels teus torns; Turnly només les llegeix.
+- **Aparença.** Colors d’accent, paletes preparades, imatge de fons del
+  calendari, la primera línia de la nota a la casella del mes, un clic en pintar
+  i el codi del torn més gran.
+- **Diversos calendaris.** Tots els que vulguis, cadascun amb les seves rotacions
+  i els seus dies.
 - **Accessibilitat.** Selector d’idioma, lector de pantalla, text ampliable i
-  torns que mai no depenen només del color.
+  torns que no depenen mai només del color.
 
 </details>
 

@@ -8,13 +8,8 @@ import '../../schedule/domain/schedule_domain.dart';
 DateTime _clock(int minute) =>
     DateTime(2000, 1, 1, (minute ~/ 60) % 24, minute % 60);
 
-String _two(int n) => n.toString().padLeft(2, '0');
-
-String _compact(int minute) {
-  final h = (minute ~/ 60) % 24;
-  final m = minute % 60;
-  return m == 0 ? _two(h) : '${_two(h)}:${_two(m)}';
-}
+String _compact(int minute, bool hour12) =>
+    AppDateFormat.compactClock(minute, hour12: hour12);
 
 String capitalize(String s) =>
     s.isEmpty ? s : '${s[0].toUpperCase()}${s.substring(1)}';
@@ -26,7 +21,7 @@ extension ShiftTypeFormat on ShiftType {
   ShiftSwatch swatch(Brightness brightness, {bool outOfMonth = false}) =>
       ShiftSwatch.forColor(colorValue, brightness, outOfMonth: outOfMonth);
 
-  /// 24 h range "22:00–06:00", or null for shifts without schedule. A split
+  /// Range "22:00–06:00" ("10:00 PM–6:00 AM" on the 12 h clock), or null for shifts without schedule. A split
   /// shift (A12) gives both ranges: "09:00–13:00 · 17:00–21:00".
   String? timeRange(AppDateFormat format) {
     if (!hasTimes) return null;
@@ -42,34 +37,49 @@ extension ShiftTypeFormat on ShiftType {
   /// Cell form "22–06" (minutes only when they are not :00: "07:30–15"), or
   /// null for shifts without schedule. A split shift gives both ranges
   /// joined by a slash: "09–13/17–21" (the cell only shows it when it fits).
-  String? get compactTimeRange => _compactRanges('/');
+  /// On the 12 h clock ([hour12]) the hours carry a letter: "10p–6a",
+  /// "7:30a–3p" (see [AppDateFormat.compactClock]); it is as wide as the 24 h
+  /// form, so the cell keeps its room.
+  String? compactTimeRange({bool hour12 = false}) =>
+      _compactRanges('/', hour12);
 
   /// The start of the first range in the cell form: "09" (or "09:30" when
-  /// the minutes are not :00), or null for shifts without schedule. It is
-  /// what the cell says of a split shift whose two ranges do not fit: the
-  /// cell always has a code and a time (H-T22-9).
-  String? get compactStart => hasTimes ? _compact(startMinute!) : null;
+  /// the minutes are not :00; "9a" / "9:30a" on the 12 h clock), or null for
+  /// shifts without schedule. It is what the cell says of a split shift
+  /// whose two ranges do not fit: the cell always has a code and a time
+  /// (H-T22-9).
+  String? compactStart({bool hour12 = false}) =>
+      hasTimes ? _compact(startMinute!, hour12) : null;
+
+  /// [compactStart] without the minutes ("09", "9a"): what is left of the
+  /// start in a very narrow cell.
+  String? compactStartHour({bool hour12 = false}) => hasTimes
+      ? AppDateFormat.compactClockHour(startMinute!, hour12: hour12)
+      : null;
 
   /// The start of each range of a split shift in the cell form: "09/17", or
   /// null for a shift with a single range. It is what the cell says of a
   /// split shift whose two full ranges do not fit: the cell tells that the
   /// shift has two segments without shrinking the code (H-T23-1).
-  String? get compactSplitStarts {
+  String? compactSplitStarts({bool hour12 = false}) {
     if (!hasTimes || !hasSegment2) return null;
-    return '${_compact(startMinute!)}/${_compact(segment2StartMinute!)}';
+    return '${_compact(startMinute!, hour12)}/'
+        '${_compact(segment2StartMinute!, hour12)}';
   }
 
   /// Like [compactTimeRange], but a split shift's ranges are joined by
   /// " · " ("09–13 · 17–21"), as the widget and its lock screen line show
   /// them.
-  String? get compactTimeLabel => _compactRanges(' · ');
+  String? compactTimeLabel({bool hour12 = false}) =>
+      _compactRanges(' · ', hour12);
 
-  String? _compactRanges(String separator) {
+  String? _compactRanges(String separator, bool hour12) {
     if (!hasTimes) return null;
-    final first = '${_compact(startMinute!)}–${_compact(endMinute!)}';
+    final first =
+        '${_compact(startMinute!, hour12)}–${_compact(endMinute!, hour12)}';
     if (!hasSegment2) return first;
-    return '$first$separator${_compact(segment2StartMinute!)}–'
-        '${_compact(segment2EndMinute!)}';
+    return '$first$separator${_compact(segment2StartMinute!, hour12)}–'
+        '${_compact(segment2EndMinute!, hour12)}';
   }
 
   /// "Noche 22:00–06:00", or just the name when it has no schedule.

@@ -9,8 +9,10 @@ import '../../calendars/domain/calendar.dart';
 import '../../import/domain/import_models.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../data/calendar_exporter.dart';
+import '../domain/calendar_sync_settings.dart';
 import '../domain/device_calendar_api.dart';
 import '../domain/export_events.dart';
+import 'calendar_sync_providers.dart';
 import 'device_calendar_providers.dart';
 
 /// Why an export could not run or finish.
@@ -36,6 +38,7 @@ class ExportState {
     this.rangeCut = false,
     this.plan,
     this.running = false,
+    this.syncing = false,
     this.done = 0,
     this.total = 0,
     this.result,
@@ -72,6 +75,9 @@ class ExportState {
   /// What exporting now would do (counts shown before the button).
   final ExportPlan? plan;
   final bool running;
+
+  /// Turning «Mantener al día» on: the first pass is running.
+  final bool syncing;
   final int done;
   final int total;
   final ExportResult? result;
@@ -98,6 +104,7 @@ class ExportState {
     ExportPlan? plan,
     bool clearPlan = false,
     bool? running,
+    bool? syncing,
     int? done,
     int? total,
     ExportResult? result,
@@ -117,6 +124,7 @@ class ExportState {
     rangeCut: rangeCut ?? this.rangeCut,
     plan: clearPlan ? null : plan ?? this.plan,
     running: running ?? this.running,
+    syncing: syncing ?? this.syncing,
     done: done ?? this.done,
     total: total ?? this.total,
     result: clearResult ? null : result ?? this.result,
@@ -179,6 +187,13 @@ class ExportController extends Notifier<ExportState> {
       }
       final writable = await _exporter.writableCalendars();
       if (!ref.mounted) return;
+      // «Mantener al día» on: the screen shows what it keeps up to date.
+      final sync = await _syncSettings();
+      if (!ref.mounted) return;
+      final syncTarget = sync.active
+          ? writable.where((c) => c.id == sync.deviceCalendarId).firstOrNull
+          : null;
+      if (syncTarget != null) _chosen = true;
       final kept =
           _chosen &&
           (state.targetId == null ||
@@ -197,8 +212,18 @@ class ExportController extends Notifier<ExportState> {
         loading: false,
         access: access,
         calendars: writable,
-        targetId: kept ? state.targetId : existing?.id,
-        newCalendar: kept ? state.targetId == null : existing == null,
+        targetId: syncTarget != null
+            ? syncTarget.id
+            : kept
+            ? state.targetId
+            : existing?.id,
+        newCalendar: syncTarget != null
+            ? false
+            : kept
+            ? state.targetId == null
+            : existing == null,
+        includeRest: syncTarget != null ? sync.includeRest : null,
+        includeAbsences: syncTarget != null ? sync.includeAbsences : null,
       );
       await _updatePlan();
     } catch (error, stack) {
@@ -237,7 +262,22 @@ class ExportController extends Notifier<ExportState> {
     }
   }
 
+  Future<CalendarSyncSettings> _syncSettings() async {
+    try {
+      return await ref.read(calendarSyncSettingsProvider.future);
+    } catch (_) {
+      return CalendarSyncSettings.off;
+    }
+  }
+
+  /// «Mantener al día» is on: the calendar and the options chosen are what
+  /// it keeps current.
+  bool get _keepingUpdated =>
+      ref.read(calendarSyncSettingsProvider).asData?.value.active ?? false;
+
   void selectCalendar(String? id) {
+    // Locked while it is on (the screen disables the rows too).
+    if (_keepingUpdated) return;
     _chosen = true;
     state = state.copyWith(
       targetId: id,
@@ -263,11 +303,78 @@ class ExportController extends Notifier<ExportState> {
   void setIncludeRest(bool value) {
     state = state.copyWith(includeRest: value, clearResult: true);
     unawaited(_updatePlan());
+    if (_keepingUpdated) unawaited(_updateSyncOptions(includeRest: value));
   }
 
   void setIncludeAbsences(bool value) {
     state = state.copyWith(includeAbsences: value, clearResult: true);
     unawaited(_updatePlan());
+    if (_keepingUpdated) {
+      unawaited(_updateSyncOptions(includeAbsences: value));
+    }
+  }
+
+  /// The options changed while «Mantener al día» is on: it follows them.
+  Future<void> _updateSyncOptions({
+    bool? includeRest,
+    bool? includeAbsences,
+  }) async {
+    await ref
+        .read(calendarSyncSettingsProvider.notifier)
+        .setOptions(includeRest: includeRest, includeAbsences: includeAbsences);
+    ref.read(calendarSyncProvider).requestSync();
+  }
+
+  /// The switch «Mantener al día». Turning it on (with the calendar and the
+  /// options chosen) creates the «Turnly» calendar when that is the choice,
+  /// stores what to keep current and runs the first pass at once; turning it
+  /// off leaves the events already written where they are.
+  Future<void> setKeepUpdated(bool on) async {
+    final settings = ref.read(calendarSyncSettingsProvider.notifier);
+    if (!on) {
+      await settings.disable();
+      return;
+    }
+    if (state.running || state.syncing || !state.hasAccess) return;
+    state = state.copyWith(
+      syncing: true,
+      clearResult: true,
+      clearProblem: true,
+    );
+    try {
+      final api = ref.read(deviceCalendarApiProvider);
+      var id = state.targetId;
+      if (id == null) {
+        id = await api.createCalendar(
+          name: exportCalendarName,
+          colorValue: mainCalendarColor,
+        );
+        _chosen = true;
+      }
+      final writable = await _exporter.writableCalendars();
+      final target = writable.where((c) => c.id == id).firstOrNull;
+      if (target == null) {
+        throw const CalendarApiException(CalendarApiError.notFound);
+      }
+      await settings.enable(
+        deviceCalendarId: target.id,
+        deviceCalendarName: target.name,
+        appCalendarId: ref.read(scheduleControllerProvider).calendarId,
+        includeRest: state.includeRest,
+        includeAbsences: state.includeAbsences,
+      );
+      if (!ref.mounted) return;
+      state = state.copyWith(calendars: writable, targetId: target.id);
+      await ref.read(calendarSyncProvider).sync();
+      if (!ref.mounted) return;
+      state = state.copyWith(syncing: false);
+      await _updatePlan();
+    } catch (error, stack) {
+      if (!ref.mounted) return;
+      final problem = _problemOf(error, stack);
+      state = state.copyWith(syncing: false, problem: problem);
+      if (problem == ExportProblem.permissionDenied) await refresh();
+    }
   }
 
   Future<void> _updatePlan() async {
@@ -293,7 +400,7 @@ class ExportController extends Notifier<ExportState> {
 
   /// Writes the shifts to the phone's calendar.
   Future<void> start() async {
-    if (state.running || !state.hasAccess) return;
+    if (state.running || state.syncing || !state.hasAccess) return;
     final scheduleState = ref.read(scheduleControllerProvider);
     state = state.copyWith(
       running: true,
@@ -306,20 +413,28 @@ class ExportController extends Notifier<ExportState> {
     );
     try {
       final id = state.targetId;
-      final result = await _exporter.export(
-        schedule: scheduleState.schedule,
-        appCalendarId: scheduleState.calendarId,
-        target: id == null
-            ? const NewCalendar(colorValue: mainCalendarColor)
-            : ExistingCalendar(id),
-        from: state.from,
-        to: state.to,
-        includeRest: state.includeRest,
-        includeAbsences: state.includeAbsences,
-        onProgress: (done, total) {
-          if (ref.mounted) state = state.copyWith(done: done, total: total);
-        },
-      );
+      // One writer at a time: a pass of «Mantener al día» waits for this
+      // export (and the other way round), so the two never interleave.
+      final result = await ref
+          .read(calendarWriteLockProvider)
+          .run(
+            () => _exporter.export(
+              schedule: scheduleState.schedule,
+              appCalendarId: scheduleState.calendarId,
+              target: id == null
+                  ? const NewCalendar(colorValue: mainCalendarColor)
+                  : ExistingCalendar(id),
+              from: state.from,
+              to: state.to,
+              includeRest: state.includeRest,
+              includeAbsences: state.includeAbsences,
+              onProgress: (done, total) {
+                if (ref.mounted) {
+                  state = state.copyWith(done: done, total: total);
+                }
+              },
+            ),
+          );
       if (!ref.mounted) return;
       // A calendar created now is the choice from now on (a second export
       // writes to it instead of creating another), and the plan is stale.

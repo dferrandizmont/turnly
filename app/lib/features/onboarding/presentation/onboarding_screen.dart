@@ -8,16 +8,19 @@ import '../../../core/router.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/buttons.dart';
 import '../../../core/widgets/page_body.dart';
+import '../../calendar/application/paint_controller.dart';
 import '../application/onboarding_controller.dart';
+import 'choose_step.dart';
 import 'import_ready_steps.dart';
 import 'place_step.dart';
-import 'profession_step.dart';
 import 'rotation_step.dart';
 
-/// First use (turnos-spec.md section 4, «Primer uso»): six full-screen steps
-/// (the rotation and its start day are two), each skippable ("Saltar") and
-/// reversible, ending on the month already painted. Nothing is written until
-/// the import step is left.
+/// First use (turnos-spec.md section 4, «Primer uso»; docs/diseno.md, 2A):
+/// one question, «¿Cómo empiezas tu cuadrante?», with three ways (import,
+/// rotation, by hand) and «Recuperar una copia de seguridad». Each way has
+/// its own screens, then an optional last step (holidays and job) and
+/// «Listo». Every screen after the question can be skipped ("Saltar") and
+/// undone. Nothing is written until the last step is left.
 class OnboardingScreen extends ConsumerWidget {
   const OnboardingScreen({super.key});
 
@@ -37,10 +40,18 @@ class OnboardingScreen extends ConsumerWidget {
     final ready = stage == OnboardingStage.ready;
 
     final label = switch (stage) {
-      OnboardingStage.importCalendar => l10n.onboardingContinue,
+      OnboardingStage.importCalendar ||
+      OnboardingStage.place => l10n.onboardingContinue,
       OnboardingStage.ready => l10n.onboardingOpenCalendar,
       _ => l10n.onboardingNext,
     };
+
+    // «Pintar a mano» (or «Lo pinto a mano») lands on the month ready to
+    // paint.
+    void openCalendar() {
+      if (state.byHand) ref.read(paintControllerProvider.notifier).enter();
+      context.go(AppRoutes.home);
+    }
 
     // With big text or a short screen (landscape) the bar and the title
     // would take most of the screen and leave a card and a half of the list
@@ -51,9 +62,14 @@ class OnboardingScreen extends ConsumerWidget {
     final bigText = media.textScaler.scale(14) / 14 >= compactTextScale - 0.001;
     final compact = media.size.height < compactHeight || bigText;
 
-    final header = _Header(stage: stage, busy: state.finishing);
+    // The first question has its own top (the language) and no main
+    // button: its cards go on by themselves.
+    final choose = stage == OnboardingStage.choose;
+    final header = choose
+        ? const SizedBox.shrink()
+        : _Header(state: state, busy: state.finishing);
     final step = switch (stage) {
-      OnboardingStage.profession => const ProfessionStep(),
+      OnboardingStage.choose => const ChooseStep(),
       OnboardingStage.place => const PlaceStep(),
       OnboardingStage.rotation => const RotationStep(),
       OnboardingStage.start => const StartStep(),
@@ -62,27 +78,29 @@ class OnboardingScreen extends ConsumerWidget {
     };
     const buttonPadding = EdgeInsets.fromLTRB(Sp.page, Sp.s, Sp.page, Sp.m);
 
-    final next = Padding(
-      padding: buttonPadding,
-      child: PrimaryButton(
-        key: const ValueKey('onboarding-next'),
-        label: label,
-        loading: state.finishing,
-        onPressed: !controller.canAdvance
-            ? null
-            : ready
-            ? () => context.go(AppRoutes.home)
-            : controller.next,
-      ),
-    );
+    final Widget next = choose
+        ? const SizedBox(height: Sp.m)
+        : Padding(
+            padding: buttonPadding,
+            child: PrimaryButton(
+              key: const ValueKey('onboarding-next'),
+              label: label,
+              loading: state.finishing,
+              onPressed: ready
+                  ? openCalendar
+                  : !controller.canAdvance
+                  ? null
+                  : controller.next,
+            ),
+          );
 
     return PopScope(
-      // The first step leaves the app; "Listo" is already saved and ends.
-      canPop: stage == OnboardingStage.profession,
+      // The first question leaves the app; "Listo" is already saved and ends.
+      canPop: choose,
       onPopInvokedWithResult: (didPop, _) {
         if (didPop) return;
         if (ready) {
-          context.go(AppRoutes.home);
+          openCalendar();
         } else {
           controller.back();
         }
@@ -173,11 +191,12 @@ class OnboardingScreen extends ConsumerWidget {
   }
 }
 
-/// Back arrow, progress dots and «Saltar».
+/// Back arrow, progress dots and «Saltar». «Listo» has none of them: its
+/// choices are saved and its only way is the calendar.
 class _Header extends ConsumerWidget {
-  const _Header({required this.stage, required this.busy});
+  const _Header({required this.state, required this.busy});
 
-  final OnboardingStage stage;
+  final OnboardingState state;
   final bool busy;
 
   @override
@@ -185,9 +204,9 @@ class _Header extends ConsumerWidget {
     final l10n = context.l10n;
     final colors = context.colors;
     final controller = ref.read(onboardingControllerProvider.notifier);
-    final canGoBack =
-        stage != OnboardingStage.profession && stage != OnboardingStage.ready;
-    final ready = stage == OnboardingStage.ready;
+    final ready = state.stage == OnboardingStage.ready;
+    final current = state.stepNumber;
+    final total = state.steps.length;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(Sp.xs, Sp.xs, Sp.xs, 0),
@@ -195,50 +214,51 @@ class _Header extends ConsumerWidget {
         children: [
           SizedBox(
             width: Sp.touch + Sp.s,
-            child: canGoBack
-                ? IconButton(
+            child: ready
+                ? null
+                : IconButton(
                     key: const ValueKey('onboarding-back'),
                     tooltip: l10n.back,
                     icon: Icon(AppIcons.back),
                     onPressed: busy ? null : controller.back,
-                  )
-                : null,
+                  ),
           ),
           // The dots yield space (they scale down) before «Saltar» does.
           Expanded(
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Semantics(
-                label: l10n.onboardingProgress(
-                  stage.dot + 1,
-                  OnboardingStage.dots,
-                ),
-                excludeSemantics: true,
-                child: Row(
-                  key: const ValueKey('onboarding-dots'),
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    for (var i = 0; i < OnboardingStage.dots; i++)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: Sp.xs),
-                        // The current step is a longer dash, so it is not
-                        // told by colour alone.
-                        child: AnimatedContainer(
-                          duration: Motion.of(context, Motion.state),
-                          width: i == stage.dot ? Sp.xl : Sp.s,
-                          height: Sp.s,
-                          decoration: BoxDecoration(
-                            color: i <= stage.dot
-                                ? colors.accent
-                                : colors.borderStrong,
-                            borderRadius: Rad.pill,
-                          ),
-                        ),
+            child: current == null
+                ? const SizedBox.shrink()
+                : FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Semantics(
+                      label: l10n.onboardingProgress(current, total),
+                      excludeSemantics: true,
+                      child: Row(
+                        key: const ValueKey('onboarding-dots'),
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          for (var i = 1; i <= total; i++)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: Sp.xs,
+                              ),
+                              // The current step is a longer dash, so it is
+                              // not told by colour alone.
+                              child: AnimatedContainer(
+                                duration: Motion.of(context, Motion.state),
+                                width: i == current ? Sp.xl : Sp.s,
+                                height: Sp.s,
+                                decoration: BoxDecoration(
+                                  color: i <= current
+                                      ? colors.accent
+                                      : colors.borderStrong,
+                                  borderRadius: Rad.pill,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
-                  ],
-                ),
-              ),
-            ),
+                    ),
+                  ),
           ),
           // Its own width, never squeezed: one line at any width and scale.
           ready

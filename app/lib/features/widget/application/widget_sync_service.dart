@@ -91,7 +91,9 @@ class WidgetSyncService {
         try {
           await _once(_representative(batch), _strings!);
         } catch (error, stack) {
-          onError?.call(error, stack);
+          // A run already in flight can finish after the provider is gone.
+          // Its error callback belongs to that provider's lifetime too.
+          if (!_disposed) onError?.call(error, stack);
         }
       }
     } finally {

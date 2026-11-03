@@ -4,10 +4,14 @@ import 'alarms_settings.dart';
 import 'appearance.dart';
 import 'backup_ui.dart';
 import 'boot.dart';
+import 'compare_many.dart';
 import 'day_detail.dart';
+import 'dnd.dart';
+import 'device_events.dart';
 import 'holidays.dart';
 import 'import.dart';
 import 'navigation.dart';
+import 'notes_attachments.dart';
 import 'onboarding.dart';
 import 'painting.dart';
 import 'parity_a6_a8.dart';
@@ -21,7 +25,9 @@ import 'selection.dart';
 import 'settings.dart';
 import 'shift_types.dart';
 import 'summary.dart';
+import 'swaps.dart';
 import 'upgrade.dart';
+import 'ux_extras.dart';
 
 /// Every scenario of the battery, in report order. A new feature adds its
 /// scenario here (docs/qa.md, "Cómo añadir un escenario").
@@ -39,6 +45,7 @@ final List<QaScenario> qaScenarios = [
   qaAlarms, // Q11
   qaBackup, // Q12
   qaPerformance, // Q13
+  ...swapsScenarios, // Q14
   ...shiftTypesScenarios, // Q20–Q23
   ...dayDetailScenarios, // Q24–Q29
   ...patternScenarios, // Q30–Q39
@@ -54,5 +61,10 @@ final List<QaScenario> qaScenarios = [
   ...paritySplitScenarios, // Q99
   ...parityScenarios, // Q85–Q92
   ...reminderSoundScenarios, // Q93–Q95
+  ...compareManyScenarios, // Q100
+  ...deviceEventsScenarios, // Q101
+  ...uxExtrasScenarios, // Q102
   ...upgradeScenarios, // U01
+  ...notesScenarios, // Q103
+  ...dndScenarios, // Q104
 ];

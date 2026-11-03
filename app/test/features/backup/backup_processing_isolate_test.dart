@@ -24,9 +24,15 @@ class _ProcessingProbe extends BackupCodec {
     BackupData data, {
     required String appVersion,
     required DateTime exportedAt,
+    Map<String, Uint8List> attachmentFiles = const {},
   }) {
     port.send(('encode', Isolate.current.controlPort));
-    return super.encode(data, appVersion: appVersion, exportedAt: exportedAt);
+    return super.encode(
+      data,
+      appVersion: appVersion,
+      exportedAt: exportedAt,
+      attachmentFiles: attachmentFiles,
+    );
   }
 
   @override

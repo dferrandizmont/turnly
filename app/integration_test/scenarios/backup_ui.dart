@@ -11,6 +11,7 @@ import 'package:cuadrante/features/backup/domain/canonical_json.dart';
 import 'package:cuadrante/features/backup/domain/schedule_fingerprint.dart';
 import 'package:cuadrante/features/calendar/presentation/month_screen.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
+import 'package:cuadrante/l10n/app_localizations_es.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
@@ -35,6 +36,7 @@ final List<QaScenario> backupUiScenarios = [
 
 const _oct30 = CivilDate(2026, 10, 30);
 const _oct27 = CivilDate(2026, 10, 27);
+final _l10n = AppLocalizationsEs();
 
 // ---- helpers ---------------------------------------------------------------
 
@@ -82,7 +84,10 @@ class _Env {
   List<String> files(String prefix) => backups.existsSync()
       ? ([
           for (final f in backups.listSync())
-            if (p.basename(f.path).startsWith(prefix)) p.basename(f.path),
+            if (f is File &&
+                p.basename(f.path).startsWith(prefix) &&
+                p.extension(f.path) == '.turnly')
+              p.basename(f.path),
         ]..sort())
       : <String>[];
 
@@ -211,7 +216,7 @@ Future<void> _fileRoundTrip(QaContext qa) async {
   }
   await qa.shot('pantalla');
 
-  // Export: the share sheet gets a real .cuadrante named for today.
+  // Export: the share sheet gets a real .turnly named for today.
   await t.tapAndSettle(_key('backup-export'));
   await t.waitFor(_key('backup-export'));
   expect(env.shared, hasLength(1), reason: 'se entregó un archivo');
@@ -287,17 +292,8 @@ Future<void> _newerFile(QaContext qa) async {
   await _import(t, env, newer);
 
   expect(_key('restore-unusable'), findsOneWidget);
-  expect(
-    find.text(
-      'Este archivo es de una versión más nueva de Cuadrante: actualiza la '
-      'app.',
-    ),
-    findsOneWidget,
-  );
-  expect(
-    find.text('No hemos cambiado nada: tus datos siguen como estaban.'),
-    findsOneWidget,
-  );
+  expect(find.text(_l10n.backupUiErrorNewer), findsOneWidget);
+  expect(find.text(_l10n.backupUiErrorUntouched), findsOneWidget);
   expect(_key('restore-confirm'), findsNothing, reason: 'nada que confirmar');
   await qa.shot('rechazado');
 
@@ -336,27 +332,15 @@ Future<void> _damagedFile(QaContext qa) async {
   final notOurs = Uint8List.fromList(List<int>.generate(64, (i) => i));
 
   for (final (name, bytes, message) in [
-    (
-      'cortado',
-      truncated,
-      'El archivo está dañado o incompleto y no se puede usar.',
-    ),
-    (
-      'un byte cambiado',
-      flipped,
-      'El archivo está dañado o incompleto y no se puede usar.',
-    ),
-    (
-      'no es un .cuadrante',
-      notOurs,
-      'Este archivo no es una copia de Cuadrante.',
-    ),
+    ('cortado', truncated, _l10n.backupUiErrorCorrupt),
+    ('un byte cambiado', flipped, _l10n.backupUiErrorCorrupt),
+    ('no es una copia de Turnly', notOurs, _l10n.backupUiErrorNotOurs),
   ]) {
     await _import(t, env, bytes);
     expect(_key('restore-unusable'), findsOneWidget, reason: name);
     expect(find.text(message), findsOneWidget, reason: name);
     expect(
-      find.text('No hemos cambiado nada: tus datos siguen como estaban.'),
+      find.text(_l10n.backupUiErrorUntouched),
       findsOneWidget,
       reason: name,
     );
@@ -393,7 +377,7 @@ Future<void> _undoRestore(QaContext qa) async {
   // A copy of the data as it is now...
   await _openBackup(t);
   await t.tapAndSettle(_key('backup-now'));
-  await _waitForFiles(qa, env, 'cuadrante-');
+  await _waitForFiles(qa, env, 'turnly-');
   await t.waitFor(find.textContaining('Hoy a las 18:20'));
   await _dismissSnackBars(t);
   await _home(t);
@@ -406,7 +390,7 @@ Future<void> _undoRestore(QaContext qa) async {
 
   // Restore the earlier copy from the list.
   await _openBackup(t);
-  final copy = env.files('cuadrante-').single;
+  final copy = env.files('turnly-').single;
   await t.tapAndSettle(_key('backup-restore-$copy'));
   await t.waitFor(_key('restore-preview'));
   expect(
@@ -450,12 +434,12 @@ Future<void> _autoCopy(QaContext qa) async {
       maxDebounce: Duration(seconds: 6),
     );
   final app = await env.open();
-  expect(env.files('cuadrante-'), isEmpty, reason: 'ninguna copia al empezar');
+  expect(env.files('turnly-'), isEmpty, reason: 'ninguna copia al empezar');
 
   await _paintNights(t, app, [_oct30]);
 
   // Nobody pressed anything: a copy shows up by itself.
-  final names = await _waitForFiles(qa, env, 'cuadrante-');
+  final names = await _waitForFiles(qa, env, 'turnly-');
   expect(names, hasLength(1));
   final bytes = await t.runAsync(
     () => File(p.join(env.backups.path, names.single)).readAsBytes(),

@@ -2,8 +2,10 @@
 <resources>
     <string name="widget_agenda_label">Turnly: pròxims dies</string>
     <string name="widget_two_weeks_label">Turnly: dues setmanes</string>
+    <string name="widget_four_weeks_label">Turnly: quatre setmanes</string>
     <string name="widget_agenda_description">Avui i els pròxims dies, amb torns i notes. Canvia de dia sol.</string>
     <string name="widget_two_weeks_description">Aquesta setmana i la següent, des de dilluns. Canvia de dia sol.</string>
+    <string name="widget_four_weeks_description">Quatre setmanes des de dilluns, amb notes i el pròxim lliure. Canvia de dia sol.</string>
     <string name="widget_no_shift">Sense torn</string>
     <string name="widget_has_note">Té nota</string>
     <string name="widget_today">avui</string>

@@ -1,0 +1,14 @@
+{
+"region":"ES-GA",
+"year":2027,
+"kind":"labour",
+"sources":{
+"s1":{"url":"https://www.xunta.gal/dog/Publicados/2026/20261026/AnuncioG0767-161026-0001_es.html","ref":"DOG núm. 204, 26.10.2026 — Resolución de 15 de octubre de 2026, de la Secretaría General de Empleo y Relaciones Laborales, por la que se da publicidad a las fiestas laborales de carácter local para el año 2027, correspondientes a los ayuntamientos de las cuatro provincias de la Comunidad Autónoma de Galicia","published":"2026-10-26","retrieved":"2026-10-31"}
+},
+"municipalities":{
+"15030":{"name":"A Coruña","days":["2027-02-09","2027-06-24"],"source":"s1"},
+"27028":{"name":"Lugo","days":["2027-02-09","2027-10-05"],"source":"s1"},
+"32054":{"name":"Ourense","days":["2027-02-09","2027-11-11"],"source":"s1"},
+"36038":{"name":"Pontevedra","days":["2027-02-10","2027-03-29"],"source":"s1"}
+}
+}

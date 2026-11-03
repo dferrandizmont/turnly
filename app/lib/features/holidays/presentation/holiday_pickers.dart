@@ -6,6 +6,8 @@ import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/app_sheet.dart';
 import '../../../core/widgets/choice_row.dart';
 import '../data/holiday_bundle_format.dart';
+import '../domain/holiday_country.dart';
+import '../domain/holiday_subdivision.dart';
 import '../domain/spanish_provinces.dart';
 import '../domain/spanish_regions.dart';
 import '../domain/text_fold.dart';
@@ -19,6 +21,84 @@ class HolidayPick<T> {
   const HolidayPick(this.value);
 
   final T value;
+}
+
+/// How a holiday country reads in the app's language: its name, or «Sin
+/// festivos oficiales» for [otherCountryCode].
+String holidayCountryLabel(BuildContext context, String code) =>
+    code == otherCountryCode
+    ? context.l10n.holidaysSettingsCountryNone
+    : countryName(code, Localizations.localeOf(context).languageCode);
+
+/// Which country: Spain first, the rest in alphabetical order of their names
+/// in the app's language, and last «Otro país: sin festivos oficiales». The
+/// current one is marked with a check. A plain list with no scrolling of its
+/// own, like [RegionPicker].
+///
+/// Row keys: `country-option-ES`, `country-option-ZZ` (the last one).
+class CountryPicker extends StatelessWidget {
+  const CountryPicker({
+    super.key,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  /// Code of the current country (`ES`, `ZZ`...).
+  final String selected;
+  final ValueChanged<String> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final language = Localizations.localeOf(context).languageCode;
+    final current = normalizeCountryCode(selected);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final country in countriesForPicker(language))
+          PickerOptionRow(
+            key: ValueKey('country-option-${country.code}'),
+            label: country.nameIn(language),
+            selected: country.code == current,
+            onTap: () => onSelected(country.code),
+          ),
+        PickerOptionRow(
+          key: const ValueKey('country-option-$otherCountryCode'),
+          label: context.l10n.holidaysSettingsCountryOther,
+          // A country the list does not have also lands here.
+          selected:
+              current == otherCountryCode || countryByCode(current) == null,
+          onTap: () => onSelected(otherCountryCode),
+        ),
+      ],
+    );
+  }
+}
+
+/// Opens [CountryPicker] in a bottom sheet (it scrolls). Returns the code, or
+/// null if the sheet was dismissed.
+Future<String?> showCountryPicker(
+  BuildContext context, {
+  required String selected,
+
+  /// Title of the sheet; «País» when null.
+  String? title,
+}) {
+  return showAppSheet<String>(
+    context: context,
+    padded: true,
+    builder: (ctx) => Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        PickerSheetTitle(title ?? ctx.l10n.holidaysSettingsCountryTitle),
+        CountryPicker(
+          selected: selected,
+          onSelected: (code) => Navigator.pop(ctx, code),
+        ),
+      ],
+    ),
+  );
 }
 
 /// The 19 autonomous territories in alphabetical order of their names (accents
@@ -327,6 +407,191 @@ Future<HolidayPick<Municipality?>?> showMunicipalityPicker(
                   autofocus: true,
                   onSelected: (m) =>
                       Navigator.pop(ctx, HolidayPick<Municipality?>(m)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+/// The word for the subdivision of [countryCode] in the app's language
+/// («Estado», «Provincia», «Cantón»...): the title of its row and sheet.
+/// Null when the country has none to offer.
+String? holidaySubdivisionTitle(BuildContext context, String? countryCode) {
+  final l10n = context.l10n;
+  return switch (subdivisionKindOf(countryCode)) {
+    HolidaySubdivisionKind.state => l10n.holidaysSubdivisionKindState,
+    HolidaySubdivisionKind.federalState =>
+      l10n.holidaysSubdivisionKindFederalState,
+    HolidaySubdivisionKind.province => l10n.holidaysSubdivisionKindProvince,
+    HolidaySubdivisionKind.region => l10n.holidaysSubdivisionKindRegion,
+    HolidaySubdivisionKind.nation => l10n.holidaysSubdivisionKindNation,
+    HolidaySubdivisionKind.canton => l10n.holidaysSubdivisionKindCanton,
+    HolidaySubdivisionKind.city => l10n.holidaysSubdivisionKindCity,
+    HolidaySubdivisionKind.cityOrRegion =>
+      l10n.holidaysSubdivisionKindCityOrRegion,
+    null => null,
+  };
+}
+
+/// Which subdivision of a country other than Spain (state, province, canton...)
+/// whose files list them: the bundled list in alphabetical order (accents
+/// ignored), the current one marked, and a search field when the list is long
+/// (Italy has 107). With [clearLabel] the list starts with that option, which
+/// calls [onSelected] with `null`.
+///
+/// It fills the height its parent gives it (the list scrolls): see
+/// [showSubdivisionPicker].
+///
+/// Keys: `subdivision-search`, `subdivision-option-DE-BY`,
+/// `subdivision-option-none`.
+class SubdivisionPicker extends StatefulWidget {
+  const SubdivisionPicker({
+    super.key,
+    required this.countryCode,
+    required this.selected,
+    required this.onSelected,
+    this.clearLabel,
+  });
+
+  final String countryCode;
+
+  /// Code of the current subdivision (`DE-BY`), or null.
+  final String? selected;
+  final ValueChanged<String?> onSelected;
+  final String? clearLabel;
+
+  /// From this many subdivisions on, the search field shows.
+  static const int searchFrom = 13;
+
+  @override
+  State<SubdivisionPicker> createState() => _SubdivisionPickerState();
+}
+
+class _SubdivisionPickerState extends State<SubdivisionPicker> {
+  final _query = TextEditingController();
+
+  @override
+  void dispose() {
+    _query.dispose();
+    super.dispose();
+  }
+
+  /// Names that start with the text first, then the ones that contain it.
+  List<HolidaySubdivision> _filter(List<HolidaySubdivision> all, String text) {
+    final q = foldSpanish(text.trim());
+    if (q.isEmpty) return all;
+    bool starts(HolidaySubdivision s) => foldSpanish(s.name).startsWith(q);
+    bool has(HolidaySubdivision s) => foldSpanish(s.name).contains(q);
+    return [...all.where(starts), ...all.where((s) => !starts(s) && has(s))];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final all = subdivisionsOf(widget.countryCode);
+    final searchable = all.length >= SubdivisionPicker.searchFrom;
+    final current = normalizeSubdivisionCode(
+      widget.countryCode,
+      widget.selected,
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (searchable)
+          Padding(
+            padding: const EdgeInsets.only(bottom: Sp.s),
+            child: TextField(
+              key: const ValueKey('subdivision-search'),
+              controller: _query,
+              textInputAction: TextInputAction.search,
+              decoration: InputDecoration(
+                hintText: l10n.holidaysSubdivisionSearch,
+                prefixIcon: Icon(
+                  HolidaysIcons.search,
+                  color: context.colors.textMuted,
+                ),
+              ),
+            ),
+          ),
+        Expanded(
+          child: ListenableBuilder(
+            listenable: _query,
+            builder: (context, _) {
+              final shown = _filter(all, _query.text);
+              final withClear =
+                  widget.clearLabel != null && _query.text.trim().isEmpty;
+              return ListView.builder(
+                itemCount: shown.length + (withClear ? 1 : 0),
+                itemBuilder: (context, i) {
+                  if (withClear && i == 0) {
+                    return PickerOptionRow(
+                      key: const ValueKey('subdivision-option-none'),
+                      label: widget.clearLabel!,
+                      selected: current == null,
+                      onTap: () => widget.onSelected(null),
+                    );
+                  }
+                  final item = shown[i - (withClear ? 1 : 0)];
+                  return PickerOptionRow(
+                    key: ValueKey('subdivision-option-${item.code}'),
+                    label: item.name,
+                    selected: item.code == current,
+                    onTap: () => widget.onSelected(item.code),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Opens [SubdivisionPicker] in a tall bottom sheet titled with the country's
+/// word for it. Returns the choice wrapped in a [HolidayPick] (null value for
+/// [clearLabel]), or null if the sheet was dismissed.
+Future<HolidayPick<String?>?> showSubdivisionPicker(
+  BuildContext context, {
+  required String countryCode,
+  String? selected,
+  String? clearLabel,
+
+  /// Title of the sheet; the country's word for its subdivisions when null.
+  String? title,
+}) {
+  final heading = title ?? holidaySubdivisionTitle(context, countryCode) ?? '';
+  return showAppSheet<HolidayPick<String?>>(
+    context: context,
+    builder: (ctx) {
+      final media = MediaQuery.of(ctx);
+      final height =
+          (media.size.height - media.padding.top - media.viewInsets.bottom) *
+          0.9;
+      return Padding(
+        padding: EdgeInsets.fromLTRB(
+          Sp.page,
+          0,
+          Sp.page,
+          media.viewInsets.bottom,
+        ),
+        child: SizedBox(
+          height: height,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              PickerSheetTitle(heading),
+              Expanded(
+                child: SubdivisionPicker(
+                  countryCode: countryCode,
+                  selected: selected,
+                  clearLabel: clearLabel,
+                  onSelected: (code) =>
+                      Navigator.pop(ctx, HolidayPick<String?>(code)),
                 ),
               ),
             ],

@@ -28,11 +28,12 @@ void main() {
       testWidgets('«Saltar» is one line at $width dp, text scale $scale', (
         tester,
       ) async {
-        await FirstLaunch.open(
+        final app = await FirstLaunch.open(
           tester,
           size: Size(width, 800),
           textScale: scale,
         );
+        await app.choosePath('rotation');
         expect(skip, findsOneWidget);
         expect(lines(tester), 1);
         expect(tester.takeException(), isNull);

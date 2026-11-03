@@ -5,6 +5,7 @@ import '../data/alarm_scheduler.dart';
 import '../domain/alarm_planner.dart';
 import '../domain/alarm_settings.dart';
 import '../domain/alarm_strings.dart';
+import 'alarm_renewal.dart';
 
 /// Keeps the alarms on the device equal to the plan for the current schedule
 /// and settings.
@@ -16,6 +17,10 @@ import '../domain/alarm_strings.dart';
 ///   costs at most two reschedules.
 /// - Without permission nothing is scheduled (and what was is cancelled);
 ///   it is picked up on the next resume.
+/// - The plan includes the renewal notice when it is due
+///   (`planAlarmSchedule`, A1); [lastPlan] and [plans] tell what was handed
+///   to the scheduler (the «Avisos programados hasta…» line), and [renewal]
+///   keeps the background renewal registered while the shift alarms are on.
 class AlarmSync {
   AlarmSync({
     required this.scheduler,
@@ -25,6 +30,7 @@ class AlarmSync {
     this.strings,
     this.debounce = const Duration(seconds: 1),
     this.onError,
+    this.renewal,
   });
 
   final AlarmScheduler scheduler;
@@ -35,6 +41,18 @@ class AlarmSync {
 
   /// Called with errors of a run (it never stops later runs).
   final void Function(Object error, StackTrace stack)? onError;
+
+  /// Registers or cancels the background renewal after every run (A1).
+  final AlarmRenewalRegistrar? renewal;
+
+  /// The plan of the last run that reached the scheduler, or null before
+  /// the first one. Empty when the permission is missing.
+  AlarmPlan? get lastPlan => _lastPlan;
+  AlarmPlan? _lastPlan;
+
+  /// Emits [lastPlan] every time a run hands a plan to the scheduler.
+  Stream<AlarmPlan> get plans => _plans.stream;
+  final StreamController<AlarmPlan> _plans = StreamController.broadcast();
 
   /// Texts of the current locale. Until they are set (the host sets them as
   /// soon as it has a context) runs wait; setting them triggers a resync.
@@ -71,6 +89,7 @@ class AlarmSync {
     _disposed = true;
     _timer?.cancel();
     _timer = null;
+    unawaited(_plans.close());
   }
 
   Future<void> _run() async {
@@ -105,19 +124,31 @@ class AlarmSync {
     final permission = await scheduler.permissionStatus();
     final granted = permission == AlarmPermission.granted;
     final plan = granted
-        ? planAlarms(
+        ? planAlarmSchedule(
             schedule: await readSchedule(),
             settings: settings,
             now: now(),
             strings: texts,
             location: await scheduler.planningZone(),
           )
-        : const <PlannedAlarm>[];
+        : AlarmPlan.empty;
     if (_disposed) return;
     runs++;
-    await scheduler.replaceAll(plan);
+    await scheduler.replaceAll(plan.toSchedule);
+    _lastPlan = plan;
+    if (!_plans.isClosed) _plans.add(plan);
     // A snoozed alarm survives a resync (it is not part of the plan), but
     // not turning the alarms off or losing the permission.
     if (!granted || !settings.anyActive) await scheduler.cancelSnoozes();
+    // The background renewal follows the switches, not the permission: a
+    // run without it does nothing, and the permission may come back.
+    final registrar = renewal;
+    if (registrar != null && !_disposed) {
+      try {
+        await registrar.setEnabled(settings.anyActive);
+      } catch (error, stack) {
+        if (!_disposed) onError?.call(error, stack);
+      }
+    }
   }
 }

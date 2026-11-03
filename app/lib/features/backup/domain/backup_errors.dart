@@ -1,3 +1,5 @@
+import '../../notes/domain/note_attachment.dart' show BrokenAttachment;
+
 /// Why a `.cuadrante` file cannot be used. Every failure of reading a backup
 /// is one of these, so the UI can show a clear message and nothing else is
 /// touched (docs/copia-de-seguridad.md, matrix rows R6 and R7).
@@ -32,4 +34,20 @@ class NewerFormatVersion extends BackupException {
 /// failed checksum or inconsistent data.
 class CorruptBackup extends BackupException {
   const CorruptBackup(super.message);
+}
+
+/// A copy (or an export) cannot be made as it is because some attachments
+/// have no usable file: it is missing or is not what the row says. The
+/// strict paths (the manual export) refuse with this, naming which
+/// attachments ([attachments]: ids and faults, never file names), instead of
+/// writing a copy that lacks them silently; the automatic copies skip those
+/// attachments and report them as a `BackupWarning` instead.
+class BrokenAttachments extends CorruptBackup {
+  BrokenAttachments(this.attachments)
+    : super(
+        'Attachments without a usable file: '
+        '${attachments.map((a) => '${a.id} (${a.fault.name})').join(', ')}',
+      );
+
+  final List<BrokenAttachment> attachments;
 }

@@ -34,6 +34,7 @@ String daySemanticsLabel(
   required Holiday? holiday,
   required bool isToday,
   bool selected = false,
+  int deviceEventCount = 0,
 }) {
   final l10n = context.l10n;
   final format = AppDateFormat.of(context);
@@ -51,12 +52,23 @@ String daySemanticsLabel(
           .reduce((a, b) => l10n.daySemanticsAnd(a, b)),
     if (holiday != null) holidaySpoken(l10n, holidayDisplayName(l10n, holiday)),
     if (day.note != null && day.note!.isNotEmpty) l10n.daySemanticsNote,
+    // The appointments of the phone (P6): the dot of the cell is only a
+    // mark, so the count is said out loud.
+    if (deviceEventCount > 0) l10n.devEventsCount(deviceEventCount),
     if (day.overtimeMinutes > 0)
       l10n.daySemanticsOvertime(durationText(l10n, day.overtimeMinutes)),
     if (day.earlyLeaveMinutes > 0)
       l10n.daySemanticsEarlyLeave(durationText(l10n, day.earlyLeaveMinutes)),
   ];
   return parts.join(', ');
+}
+
+/// The first line of a note, trimmed, for the cell («Ver la nota en el mes»).
+/// The cell holds one line; everything from the first newline on is left for
+/// the day detail.
+String _firstNoteLine(String note) {
+  final line = note.split('\n').first.trim();
+  return line.isEmpty ? note.trim() : line;
 }
 
 /// One day of the month grid (`docs/diseno.md`, "Celda del día"): a soft
@@ -94,6 +106,8 @@ class DayCell extends StatefulWidget {
     this.painted = false,
     this.selected = false,
     this.focused = false,
+    this.deviceEventCount = 0,
+    this.showNoteInMonth = false,
     this.onTap,
     this.onLongPress,
     this.focusNode,
@@ -118,6 +132,15 @@ class DayCell extends StatefulWidget {
   /// selection colour (no darker background: it is not a choice of days).
   final bool focused;
 
+  /// How many appointments of the phone the day has (P6): the cell marks it
+  /// with a discreet dot, and the label says how many.
+  final int deviceEventCount;
+
+  /// «Ver la nota en el mes» (UX): the first line of the note of the day is
+  /// written in the cell, in place of its clip, when it fits. Off, the cell
+  /// shows the clip as always.
+  final bool showNoteInMonth;
+
   /// Accessibility tap and long press. Pointer taps and drags go through the
   /// grid's single gesture layer, not through the cell.
   final VoidCallback? onTap;
@@ -130,6 +153,10 @@ class DayCell extends StatefulWidget {
   static const double _noteIconSize = 11;
   static const double _dotSize = 6;
   static const double _extrasIconSize = 11;
+
+  /// Room the note text needs to be worth drawing in a cell instead of its
+  /// clip (UX · Extras visuales). Below it the clip of always stays.
+  static const double _minNoteTextWidth = 28;
 
   @override
   State<DayCell> createState() => _DayCellState();
@@ -186,6 +213,8 @@ class _DayCellState extends State<DayCell> {
       :painted,
       :selected,
       :focused,
+      :deviceEventCount,
+      :showNoteInMonth,
       :onTap,
       :onLongPress,
     ) = widget;
@@ -201,6 +230,11 @@ class _DayCellState extends State<DayCell> {
         ? ShiftSwatch.none(brightness, outOfMonth: !inMonth)
         : swatches.first;
     final hasNote = day.note != null && day.note!.isNotEmpty;
+    // «Ver la nota en el mes»: the first line of the note, trimmed, only when
+    // there is a note to show.
+    final noteText = showNoteInMonth && hasNote
+        ? _firstNoteLine(day.note!)
+        : null;
     final radius = Rad.cellRadius;
 
     // The background of the cell: the tint of the shift, its disc (a bit
@@ -308,19 +342,29 @@ class _DayCellState extends State<DayCell> {
             ),
           ),
           // Everything that marks the day sits in one row at the top right,
-          // opposite the day number: overtime / early-leave plus, note clip
-          // and holiday dot. The first band keeps room for the number row, so
-          // none of them can ever land on the code or the time.
-          if (holiday != null || hasNote || day.hasExtras)
+          // opposite the day number: overtime / early-leave plus, note clip,
+          // the dot of the appointments of the phone and holiday dot. The
+          // first band keeps room for the number row, so none of them can
+          // ever land on the code or the time.
+          if (holiday != null ||
+              hasNote ||
+              day.hasExtras ||
+              deviceEventCount > 0)
             Positioned.fill(
               child: _DayMarks(
                 date: day.date,
                 extras: day.hasExtras,
                 note: hasNote,
                 holiday: holiday != null,
+                deviceEvents: deviceEventCount > 0,
                 isToday: isToday,
                 color: secondaryColor,
                 dotColor: colors.holiday,
+                noteText: noteText,
+                deviceColor: lead.legible(
+                  colors.accentText,
+                  background: background,
+                ),
               ),
             ),
           if (ringColor != null)
@@ -360,6 +404,7 @@ class _DayCellState extends State<DayCell> {
         holiday: holiday,
         isToday: isToday,
         selected: selected,
+        deviceEventCount: deviceEventCount,
       ),
       onTap: onTap,
       onLongPress: onLongPress,
@@ -437,29 +482,44 @@ double dayCellHeightForShifts(BuildContext context, List<ShiftType> shifts) {
 }
 
 /// The marks of a day, in one row at the top right (opposite the day number):
-/// the plus of overtime / early leave, the clip of the note and the dot of a
-/// holiday, right to left. The first band of the cell keeps that row free, so
-/// they can never land on the code or the time. In a cramped cell (a 320 dp
-/// phone, large text, several marks) the row shrinks to what the number
-/// leaves, down to 60 % of its size, rather than leave the cell.
+/// the plus of overtime / early leave, the clip of the note, the dot of the
+/// appointments of the phone and the dot of a holiday, right to left. The
+/// first band of the cell keeps that row free, so they can never land on the
+/// code or the time. In a cramped cell (a 320 dp phone, large text, several
+/// marks) the row shrinks to what the number leaves, down to 60 % of its
+/// size, rather than leave the cell.
 class _DayMarks extends StatelessWidget {
   const _DayMarks({
     required this.date,
     required this.extras,
     required this.note,
     required this.holiday,
+    required this.deviceEvents,
     required this.isToday,
     required this.color,
     required this.dotColor,
+    required this.deviceColor,
+    this.noteText,
   });
 
   final CivilDate date;
   final bool extras;
   final bool note;
   final bool holiday;
+
+  /// The first line of the note when «Ver la nota en el mes» is on and there
+  /// is one; `null` otherwise (the clip marks the note instead).
+  final String? noteText;
+
+  /// The day has appointments of the phone (P6): a discreet dot of its own,
+  /// next to the dot of the holiday (never on the code or the time).
+  final bool deviceEvents;
   final bool isToday;
   final Color color;
   final Color dotColor;
+
+  /// Colour of the dot of the appointments.
+  final Color deviceColor;
 
   @override
   Widget build(BuildContext context) {
@@ -475,19 +535,98 @@ class _DayMarks extends StatelessWidget {
     final numberWidth = painter.width;
     painter.dispose();
 
-    final widths = [
-      if (extras) DayCell._extrasIconSize,
-      if (note) DayCell._noteIconSize,
-      if (holiday) DayCell._dotSize,
-    ];
-    final natural =
-        widths.fold<double>(0, (a, b) => a + b) + (widths.length - 1) * Sp.xs;
     final inset = holiday ? Sp.s : Sp.xs;
 
     return LayoutBuilder(
       builder: (context, box) {
         // Number: 8 dp from the left edge, then a gap before the marks.
         final free = box.maxWidth - inset - Sp.s - numberWidth - Sp.xs;
+
+        // «Ver la nota en el mes» (UX): the first line of the note, in place
+        // of its clip, when the room the number leaves holds it at a legible
+        // size. Otherwise the clip of always is drawn.
+        final text = noteText;
+        if (text != null) {
+          final others = [
+            if (extras) DayCell._extrasIconSize,
+            if (deviceEvents) DayCell._dotSize,
+            if (holiday) DayCell._dotSize,
+          ];
+          final othersRoom =
+              others.fold<double>(0, (a, b) => a + b) +
+              (others.isEmpty ? 0 : others.length * Sp.xs);
+          if (free - othersRoom >= DayCell._minNoteTextWidth) {
+            return Padding(
+              padding: EdgeInsets.only(top: Sp.xs, right: inset),
+              child: Align(
+                alignment: Alignment.topRight,
+                child: SizedBox(
+                  width: math.max(0.0, free),
+                  child: Row(
+                    children: [
+                      if (extras) ...[
+                        Icon(
+                          AppIcons.extras,
+                          key: ValueKey('extras-mark-${date.toIso()}'),
+                          size: DayCell._extrasIconSize,
+                          color: color,
+                        ),
+                        const SizedBox(width: Sp.xs),
+                      ],
+                      Flexible(
+                        child: Text(
+                          text,
+                          key: ValueKey('note-text-${date.toIso()}'),
+                          maxLines: 1,
+                          softWrap: false,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.right,
+                          style: context.type.cellTime.copyWith(color: color),
+                        ),
+                      ),
+                      if (deviceEvents) ...[
+                        const SizedBox(width: Sp.xs),
+                        DecoratedBox(
+                          key: ValueKey('device-event-mark-${date.toIso()}'),
+                          decoration: BoxDecoration(
+                            color: deviceColor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const SizedBox.square(
+                            dimension: DayCell._dotSize,
+                          ),
+                        ),
+                      ],
+                      if (holiday) ...[
+                        const SizedBox(width: Sp.xs),
+                        DecoratedBox(
+                          key: ValueKey('holiday-dot-${date.toIso()}'),
+                          decoration: BoxDecoration(
+                            color: dotColor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const SizedBox.square(
+                            dimension: DayCell._dotSize,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+        }
+
+        final widths = [
+          if (extras) DayCell._extrasIconSize,
+          if (note) DayCell._noteIconSize,
+          if (deviceEvents) DayCell._dotSize,
+          if (holiday) DayCell._dotSize,
+        ];
+        final natural =
+            widths.fold<double>(0, (a, b) => a + b) +
+            (widths.length - 1) * Sp.xs;
         final width = math
             .max(free, natural * 0.6)
             .clamp(0.0, box.maxWidth - inset);
@@ -513,7 +652,7 @@ class _DayMarks extends StatelessWidget {
                           size: DayCell._extrasIconSize,
                           color: color,
                         ),
-                      if (extras && (note || holiday))
+                      if (extras && (note || holiday || deviceEvents))
                         const SizedBox(width: Sp.xs),
                       if (note)
                         Icon(
@@ -521,7 +660,20 @@ class _DayMarks extends StatelessWidget {
                           size: DayCell._noteIconSize,
                           color: color,
                         ),
-                      if (note && holiday) const SizedBox(width: Sp.xs),
+                      if (note && (holiday || deviceEvents))
+                        const SizedBox(width: Sp.xs),
+                      if (deviceEvents)
+                        DecoratedBox(
+                          key: ValueKey('device-event-mark-${date.toIso()}'),
+                          decoration: BoxDecoration(
+                            color: deviceColor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const SizedBox.square(
+                            dimension: DayCell._dotSize,
+                          ),
+                        ),
+                      if (deviceEvents && holiday) const SizedBox(width: Sp.xs),
                       if (holiday)
                         DecoratedBox(
                           key: ValueKey('holiday-dot-${date.toIso()}'),
@@ -609,6 +761,7 @@ class _ShiftBand extends StatelessWidget {
               style: timeStyle,
               scaler: scaler,
               width: box.maxWidth,
+              hour12: AppDateFormat.of(context).hour12,
             );
             // The time keeps its line whatever happens: the cell is never
             // only a code («nunca solo color»).
@@ -816,12 +969,13 @@ void _rememberMeasure(
   required TextScaler scaler,
   required double width,
   double minSize = AppTypography.cellTimeMinSize,
+  bool hour12 = false,
 }) {
   final base = style.fontSize!;
   // The room of the cell: the width of its own thickest border is kept
   // free, so the border of a chosen day never covers the text.
   final room = width - 2 * cellContentInset;
-  final full = shift.compactTimeRange;
+  final full = shift.compactTimeRange(hour12: hour12);
   if (full == null) return null;
 
   /// The size at which [text] fits in the room of the cell.
@@ -841,18 +995,18 @@ void _rememberMeasure(
     final picked = pick(full, room);
     return (text: picked.text, size: picked.size, twoSegments: false);
   }
-  final starts = shift.compactSplitStarts;
+  final starts = shift.compactSplitStarts(hour12: hour12);
   if (starts != null && fitsAtMin(starts, room)) {
     final picked = pick(starts, room);
     return (text: picked.text, size: picked.size, twoSegments: false);
   }
   final startRoom =
       room - (shift.hasSegment2 ? Sp.hair + Sp.cellSegmentDot : 0);
-  final start = shift.compactStart ?? full;
+  final start = shift.compactStart(hour12: hour12) ?? full;
   // Minutes stay visible when they fit. In a narrow cell keep the hour
   // (09 for 09:30); the exact start and both segments remain in the detail
   // and the cell's spoken label.
-  final compactStart = start.split(':').first;
+  final compactStart = shift.compactStartHour(hour12: hour12) ?? start;
   final picked = pick(
     fitsAtMin(start, startRoom) ? start : compactStart,
     startRoom,

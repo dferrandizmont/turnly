@@ -25,8 +25,8 @@ Future<Schedule> _seeded() async {
   ).load(mainCalendarId)).schedule;
 }
 
-/// H-T17-4: the hours step 4 shows for «that day» are the ones the calendar
-/// gets when the wizard finishes.
+/// H-T17-4: the hours the start step shows for «that day» are the ones the
+/// calendar gets when the wizard finishes.
 void main() {
   setUpAll(initializeLocale);
 
@@ -63,16 +63,20 @@ void main() {
     expect(scheduleWithProfession(seeded, Profession.other), same(seeded));
   });
 
-  testWidgets('step 4 shows the hours the calendar ends up with', (
+  testWidgets('the start step shows the hours the calendar ends up with', (
     tester,
   ) async {
     final app = await FirstLaunch.open(tester);
-    await app.tap(key('onboarding-profession-nursing'));
-    await app.tap(key('onboarding-next'));
-    await app.tap(key('onboarding-skip'));
+    await app.choosePath('rotation');
     await app.tap(key('onboarding-pattern-continental'));
     await app.tap(key('onboarding-next'));
     expect(app.title, '¿Cuándo empiezas?');
+    // No job yet: the hours as they are.
+    expect(find.text('Ese día te toca: Mañana 06:00–14:00'), findsOneWidget);
+    // The job is chosen in the last step; back on the start day it shows.
+    await app.tap(key('onboarding-next'));
+    await app.tap(key('onboarding-profession-nursing'));
+    await app.tap(key('onboarding-back'));
     // Day 1 of the cycle is a Mañana: 08:00-15:00 for a nurse, not 06:00-14:00.
     expect(find.text('Ese día te toca: Mañana 08:00–15:00'), findsOneWidget);
 

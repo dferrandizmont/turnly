@@ -3,6 +3,7 @@ import 'package:collection/collection.dart';
 import 'civil_date.dart';
 import 'pattern.dart';
 import 'shift_type.dart';
+import 'shift_type_history.dart';
 
 enum DaySource { override, pattern, none }
 
@@ -50,15 +51,27 @@ class Schedule {
     Iterable<Pattern> patterns = const [],
     Iterable<PatternRun> runs = const [],
     Map<CivilDate, DayEntry> entries = const {},
+    Map<String, List<ShiftTypeVersion>> shiftTypeVersions = const {},
   }) : shiftTypes = List.unmodifiable(shiftTypes),
        patterns = List.unmodifiable(patterns),
        runs = List.unmodifiable(runs),
-       entries = Map.unmodifiable(entries);
+       entries = Map.unmodifiable(entries),
+       shiftTypeVersions = Map.unmodifiable({
+         for (final MapEntry(:key, :value) in shiftTypeVersions.entries)
+           if (value.isNotEmpty)
+             key: List<ShiftTypeVersion>.unmodifiable(sortedVersions(value)),
+       });
 
   final List<ShiftType> shiftTypes;
   final List<Pattern> patterns;
   final List<PatternRun> runs;
   final Map<CivilDate, DayEntry> entries;
+
+  /// Earlier terms of the shift types changed «only from today on», by type
+  /// id, each list sorted by `until` (`shift_type_history.dart`). A type
+  /// without versions has always had its current terms. [shiftTypes] always
+  /// hold the **current** terms; [resolve] gives each day the terms it had.
+  final Map<String, List<ShiftTypeVersion>> shiftTypeVersions;
 
   late final Map<String, ShiftType> _typeById = {
     for (final t in shiftTypes) t.id: t,
@@ -79,7 +92,56 @@ class Schedule {
     return list;
   }();
 
+  /// The shift type [id] with its **current** terms (the editor, the
+  /// palette). What a given day used is [shiftTypeOn].
   ShiftType? shiftTypeById(String id) => _typeById[id];
+
+  /// The shift type [id] with the terms it had on [day].
+  ShiftType? shiftTypeOn(String id, CivilDate day) {
+    final type = _typeById[id];
+    if (type == null) return null;
+    final history = shiftTypeVersions[id];
+    return history == null ? type : shiftTypeAsOf(type, history, day);
+  }
+
+  /// The earlier versions of [id] (sorted), empty when it has none.
+  List<ShiftTypeVersion> versionsOf(String id) =>
+      shiftTypeVersions[id] ?? const [];
+
+  /// Whether a day in `[from, before)` (from the beginning when [from] is
+  /// null) shows the shift type [id]: what has to be true for an edit of its
+  /// current terms to change a day already gone. Exact: it resolves the
+  /// candidate days (overrides and the days of the rotations whose pattern
+  /// uses [id]), so a rotation step that never came, or a day covered by a
+  /// newer rotation or an override, does not count.
+  bool showsShiftTypeBetween(
+    String id, {
+    CivilDate? from,
+    required CivilDate before,
+  }) {
+    bool inRange(CivilDate d) =>
+        d.isBefore(before) && (from == null || !d.isBefore(from));
+    for (final date in entries.keys) {
+      if (inRange(date) && resolve(date).shiftIds.contains(id)) return true;
+    }
+    final last = before.addDays(-1);
+    for (final run in runs) {
+      final pattern = _patternById[run.patternId];
+      if (pattern == null || !pattern.steps.any((s) => s.contains(id))) {
+        continue;
+      }
+      var day = from != null && from.isAfter(run.startDate)
+          ? from
+          : run.startDate;
+      final end = run.endDate != null && run.endDate!.isBefore(last)
+          ? run.endDate!
+          : last;
+      for (; !day.isAfter(end); day = day.addDays(1)) {
+        if (resolve(day).shiftIds.contains(id)) return true;
+      }
+    }
+    return false;
+  }
 
   Pattern? patternById(String id) => _patternById[id];
 
@@ -90,7 +152,7 @@ class Schedule {
     if (ids == null) return _fromPattern(d, entry);
     return ResolvedDay(
       date: d,
-      shifts: _lookup(ids),
+      shifts: _lookup(ids, d),
       source: DaySource.override,
       note: entry!.note,
       overtimeMinutes: entry.overtimeMinutes ?? 0,
@@ -114,11 +176,13 @@ class Schedule {
     Iterable<Pattern>? patterns,
     Iterable<PatternRun>? runs,
     Map<CivilDate, DayEntry>? entries,
+    Map<String, List<ShiftTypeVersion>>? shiftTypeVersions,
   }) => Schedule(
     shiftTypes: shiftTypes ?? this.shiftTypes,
     patterns: patterns ?? this.patterns,
     runs: runs ?? this.runs,
     entries: entries ?? this.entries,
+    shiftTypeVersions: shiftTypeVersions ?? this.shiftTypeVersions,
   );
 
   ResolvedDay _fromPattern(CivilDate d, DayEntry? entry) {
@@ -130,7 +194,7 @@ class Schedule {
       final step = run.stepIndexOn(d, pattern.lengthDays);
       return ResolvedDay(
         date: d,
-        shifts: _lookup(pattern.steps[step]),
+        shifts: _lookup(pattern.steps[step], d),
         source: DaySource.pattern,
         runId: run.id,
         stepIndex: step,
@@ -147,8 +211,12 @@ class Schedule {
     );
   }
 
-  /// Unknown ids (deleted types) are skipped.
-  List<ShiftType> _lookup(List<String> ids) => [
-    for (final id in ids) ?_typeById[id],
-  ];
+  /// The types of [ids] with the terms they had on [day]. Unknown ids
+  /// (deleted types) are skipped.
+  List<ShiftType> _lookup(List<String> ids, CivilDate day) {
+    if (shiftTypeVersions.isEmpty) {
+      return [for (final id in ids) ?_typeById[id]];
+    }
+    return [for (final id in ids) ?shiftTypeOn(id, day)];
+  }
 }

@@ -17,6 +17,7 @@ import '../../../core/widgets/app_snack_bar.dart';
 import '../../../core/widgets/buttons.dart';
 import '../../../core/widgets/confirm_dialog.dart';
 import '../../../core/widgets/content_app_bar.dart';
+import '../../../core/widgets/empty_illustration.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/page_body.dart';
 import '../../calendar/application/schedule_controller.dart';
@@ -117,6 +118,9 @@ class ShiftTypesScreen extends ConsumerWidget {
         child: !showList
             ? EmptyState(
                 icon: AppIcons.paint,
+                illustration: const EmptyIllustration(
+                  kind: EmptyIllustrationKind.calendar,
+                ),
                 title: l10n.shiftTypesEmptyTitle,
                 message: l10n.shiftTypesEmptyMessage,
                 primaryAction: true,
@@ -177,9 +181,9 @@ class ShiftTypesScreen extends ConsumerWidget {
   final rest = [
     category,
     if (rate != null)
-      l10n.shiftTypesRatePerHour(formatEuro(context, rate / 100)),
+      l10n.shiftTypesRatePerHour(formatMoneyCents(context, rate)),
     if (plus != null)
-      l10n.shiftTypesFixedPlusPerShift(formatEuroCents(context, plus)),
+      l10n.shiftTypesFixedPlusPerShift(formatMoneyCents(context, plus)),
   ].join(' · ');
   // Two segments make a long line: the times get their own, so the category
   // never ends up alone on a second line by chance (H-T05-8).

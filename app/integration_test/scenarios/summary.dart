@@ -81,7 +81,9 @@ Future<void> _monthWithRates(QaContext qa) async {
   await _openSummary(t);
   expect(_text(t, 'summary-period'), 'Octubre 2026');
 
-  expect(_text(t, 'summary-hours'), '160 h');
+  // «¿Cómo voy?»: 96 h worked before the 19th and 64 h planned (160 h).
+  expect(_text(t, 'summary-hours'), '96 h');
+  expect(_text(t, 'summary-legend-planned'), '64 h');
   expect(_text(t, 'summary-shifts-value'), '20');
   expect(_text(t, 'summary-night-value'), '40 h');
   expect(_text(t, 'summary-rest-value'), '9');
@@ -204,8 +206,9 @@ Future<void> _holidaysAndAbsences(QaContext qa) async {
   await _openSummary(t);
   expect(_text(t, 'summary-holiday-value'), '14 h');
   expect(find.text('2 turnos en festivo'), findsOneWidget);
-  // Hours worked do not change: the part after midnight is still October's.
-  expect(_text(t, 'summary-hours'), '160 h');
+  // Hours do not change: the part after midnight is still October's.
+  expect(_text(t, 'summary-hours'), '96 h');
+  expect(_text(t, 'summary-legend-planned'), '64 h');
   await qa.shot('festivos');
   qa.expectNoFlutterErrors('festivos');
 }
@@ -280,8 +283,11 @@ Future<void> _shareMonth(QaContext qa) async {
   // than duplicating it in this scenario. The picture is not in the tree, so
   // it is measured from a context at the normal text size too.
   final context = t.element(_k('summary-share'));
-  expect(MediaQuery.textScalerOf(context).scale(10), 10,
-      reason: 'la batería corre con el texto normal');
+  expect(
+    MediaQuery.textScalerOf(context).scale(10),
+    10,
+    reason: 'la batería corre con el texto normal',
+  );
   final rowHeight = MonthShareCard.cellHeightOf(context);
   expect(
     mondayFirst.height - sundayFirst.height,
@@ -320,6 +326,11 @@ Future<void> _rateFromEditor(QaContext qa) async {
   await t.enterText(_k('shift-rate'), '13,00');
   await t.pump();
   await t.tapAndSettle(_k('shift-save'));
+  // A rate on a type Noche already worked on days gone asks which days it
+  // reaches; «Corregir en todos los días» is what makes the whole month count.
+  if (_k('shift-scope-every-day').evaluate().isNotEmpty) {
+    await t.tapAndSettle(_k('shift-scope-every-day'), reason: 'todos los días');
+  }
   expect(_k('shift-list'), findsOneWidget, reason: 'vuelve a la lista');
   await _back(t);
   expect(find.byType(SummaryScreen), findsOneWidget);

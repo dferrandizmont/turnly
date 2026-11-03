@@ -12,6 +12,11 @@ import 'holiday.dart';
 /// - Regional: only in that region.
 /// - Local: only in that municipality (INE code).
 /// - User: added by hand, applies whatever the chosen place is.
+///
+/// The country of a row is in [regionCode] too, so the table needs no new
+/// column: `null` or `ES-..` is Spain (every row stored before countries
+/// existed), `MX` alone is a national row of Mexico, `MX-CMX` a row of one of
+/// its subdivisions (docs/festivos.md, «Paquetes por país»).
 class HolidayEntry {
   const HolidayEntry({
     required this.date,
@@ -26,12 +31,29 @@ class HolidayEntry {
   final HolidayScope scope;
   final String name;
 
-  /// `ES-CT` or null.
+  /// `ES-CT`, a country code alone (`MX`, a national row of that country)
+  /// or null (a national row of Spain).
   final String? regionCode;
 
   /// INE code, five digits, or null.
   final String? municipalityCode;
   final HolidaySource source;
+
+  /// ISO 3166-1 alpha-2 country of an official row: the part of
+  /// [regionCode] before the dash, Spain when there is none.
+  String get countryCode {
+    final region = regionCode;
+    if (region == null) return 'ES';
+    final dash = region.indexOf('-');
+    return dash < 0 ? region : region.substring(0, dash);
+  }
+
+  /// A national row that applies in the whole country (not one a region
+  /// keeps): no [regionCode], or the country code alone.
+  bool get isCountryWide {
+    final region = regionCode;
+    return region == null || !region.contains('-');
+  }
 
   Holiday toHoliday() =>
       Holiday(date: date, name: name, scope: scope, source: source);

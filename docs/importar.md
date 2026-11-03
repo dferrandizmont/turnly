@@ -4,7 +4,7 @@ Estado: asistente de importación (calendario del móvil, `.ics`, CSV y la copia
 hechos y probados en Dart (`app/lib/features/import/`, `app/lib/features/calendar_export/`). Falta la prueba en
 dispositivos reales (ver el final). Referencias: `turnos-spec.md` §3 P0.6 y §6 («Importar desde calendario»),
 `docs/paridad.md` y `docs/roadmap.md` (exportar **una vez** al calendario del móvil es gratis; la sincronización
-continua, más adelante, también será gratuita), `docs/motor-de-turnos.md` (una escritura es **un** paso de deshacer),
+continua, «Mantener al día», ya está hecha: `docs/calendario-del-movil.md`), `docs/motor-de-turnos.md` (una escritura es **un** paso de deshacer),
 `docs/alarmas.md` (patrón de permisos).
 
 ## Qué hace
@@ -196,7 +196,7 @@ puede representar) se salta; nunca aborta la importación.
 
 ## Exportar una vez al calendario del móvil
 
-`/ajustes/exportar`. Gratis; la sincronización continua no forma parte de esto (más adelante, y también gratuita).
+`/ajustes/exportar`. Gratis. Esto es la exportación **única**; el interruptor «Mantener al día» (exportación continua, que reutiliza este formato de eventos) está en `docs/calendario-del-movil.md`.
 
 - **Calendario**: uno que ya exista y se pueda escribir (los de solo lectura y los ocultos no salen) o **«Crear el
   calendario "Turnly"»** (en Android, una cuenta local «Turnly»; en iOS, iCloud o local). Si ya hay uno que se
@@ -243,6 +243,17 @@ puede representar) se salta; nunca aborta la importación.
   o las ausencias): «Se quitarán 14 eventos de una exportación anterior», «14 eventos quitados». Con las dos cosas a
   la vez salen las dos líneas. Al terminar, la tarjeta del resultado se desplaza sola hasta quedar a la vista
   (H-T14-4). El título de la pantalla es «Exportar turnos» (el largo no cabía a 320 dp, H-T14-2).
+
+### Guardar como archivo `.ics`
+
+Tarjeta «Guardar como archivo .ics» al final de `/ajustes/exportar` (`IcsFileExportCard`,
+`calendar_export/application/ics_export.dart`). Se ve **aunque no haya permiso de calendario**: escribe un `.ics`
+(RFC 5545) con las fechas y los interruptores de la pantalla (sin permiso, los de por defecto: próximos 3 meses, sin
+libres ni ausencias), lo pasa a la hoja de compartir del sistema (`text/calendar`) y lo borra al volver. El escritor
+(`domain/ics_writer.dart`) y la conversión de turnos en eventos (`domain/ics_events.dart`) son los mismos que usa el
+enlace de suscripción: horas en UTC, turnos de noche al día siguiente, partido en dos eventos, todo el día si no hay
+horario, UID estables, nunca notas. Detalle y casos límite en `docs/compartir.md`. En el archivo propio las ausencias
+salen con su nombre si se activa «Incluir ausencias»; en el enlace compartido nunca (solo «Ausencia»).
 
 ## Cómo traer el historial de LRHSoft (Shifter) o Supershift
 

@@ -14,6 +14,8 @@ class ChoicePill extends StatelessWidget {
     required this.selected,
     required this.onTap,
     this.icon,
+    this.leading,
+    this.reserveIcon = false,
   });
 
   final String label;
@@ -22,6 +24,16 @@ class ChoicePill extends StatelessWidget {
 
   /// Shown when the pill is not selected (a check replaces it otherwise).
   final IconData? icon;
+
+  /// Drawn before the label, selected or not (a shift's colour swatch, a
+  /// badge): the pill says its colour while the icon still says whether it is
+  /// chosen.
+  final Widget? leading;
+
+  /// Keeps the icon's room even when the pill has none of its own, so a row
+  /// of pills does not shift sideways as the choice moves from one to the
+  /// other.
+  final bool reserveIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +45,7 @@ class ChoicePill extends StatelessWidget {
       ),
     );
     final glyph = selected ? AppIcons.check : icon;
+    final showIconSlot = glyph != null || reserveIcon;
     return Semantics(
       container: true,
       button: true,
@@ -54,11 +67,21 @@ class ChoicePill extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (glyph != null) ...[
-                    Icon(
-                      glyph,
-                      size: IconSize.inline,
-                      color: colors.textPrimary,
+                  if (leading != null) ...[
+                    leading!,
+                    const SizedBox(width: Sp.s),
+                  ],
+                  if (showIconSlot) ...[
+                    SizedBox(
+                      width: IconSize.inline,
+                      height: IconSize.inline,
+                      child: glyph == null
+                          ? null
+                          : Icon(
+                              glyph,
+                              size: IconSize.inline,
+                              color: colors.textPrimary,
+                            ),
                     ),
                     const SizedBox(width: Sp.s),
                   ],

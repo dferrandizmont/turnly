@@ -131,6 +131,43 @@ class AppLocalizationsCa extends AppLocalizations {
   }
 
   @override
+  String get offToday => 'Avui tens lliure';
+
+  @override
+  String offTodayBack(String date) {
+    return 'Avui tens lliure; tornes el $date';
+  }
+
+  @override
+  String get offTomorrow => 'Demà tens lliure';
+
+  @override
+  String offOn(String date) {
+    return 'Tens lliure el $date';
+  }
+
+  @override
+  String offWeekend(String range) {
+    return 'Cap de setmana lliure: $range';
+  }
+
+  @override
+  String offStreak(int worked) {
+    return 'Portes $worked dies seguits';
+  }
+
+  @override
+  String offStreakLeft(int worked, int left) {
+    String _temp0 = intl.Intl.pluralLogic(
+      left,
+      locale: localeName,
+      other: 'te’n queden $left',
+      one: 'te’n queda 1',
+    );
+    return 'Portes $worked dies seguits; $_temp0';
+  }
+
+  @override
   String durationDaysHours(int days, int hours) {
     return '$days d $hours h';
   }
@@ -307,6 +344,44 @@ class AppLocalizationsCa extends AppLocalizations {
   }
 
   @override
+  String get dayDetailUndo => 'Desfés l’últim canvi d’aquest dia';
+
+  @override
+  String dayDetailShiftMenu(String name) {
+    return 'Opcions de $name';
+  }
+
+  @override
+  String get dayDetailChange => 'Canvia';
+
+  @override
+  String dayDetailChangeTitle(String name) {
+    return 'Canvia $name per…';
+  }
+
+  @override
+  String get dayDetailChangeHint =>
+      'Per canviar un torn per un altre, toca’n el menú.';
+
+  @override
+  String get dayDetailMore => 'Més opcions';
+
+  @override
+  String get dayMoreExtras => 'Hores extra';
+
+  @override
+  String get dayMoreReminder => 'Avís';
+
+  @override
+  String get dayMoreAlarm => 'Alarma';
+
+  @override
+  String get dayMoreDuplicate => 'Duplica';
+
+  @override
+  String get dayMoreClear => 'Esborra';
+
+  @override
   String get dayExtrasTitle => 'Hores extra / He sortit abans';
 
   @override
@@ -418,6 +493,32 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get shiftTypesDiscardConfirm => 'Descarta';
+
+  @override
+  String get shiftTypesScopeTitle => 'A quins dies afecta el canvi?';
+
+  @override
+  String get shiftTypesScopeBody =>
+      'Has canviat les hores o els diners d’aquest torn i ja el tens en dies passats.';
+
+  @override
+  String get shiftTypesScopeAll => 'Corregeix-ho a tots els dies';
+
+  @override
+  String get shiftTypesScopeAllHint =>
+      'Era un error: els dies passats també canvien les hores i els diners.';
+
+  @override
+  String shiftTypesScopeAllHintSince(String date) {
+    return 'Era un error: canvien els dies des del $date, quan vas canviar aquest torn per última vegada. Els anteriors es queden com estan.';
+  }
+
+  @override
+  String get shiftTypesScopeFromToday => 'Només a partir d’avui';
+
+  @override
+  String get shiftTypesScopeFromTodayHint =>
+      'Ha canviat la teva jornada o el teu preu: els dies passats es queden com estaven.';
 
   @override
   String get shiftTypesNoTimes => 'Sense horari';
@@ -814,9 +915,6 @@ class AppLocalizationsCa extends AppLocalizations {
   String get shiftTypesFixedPlusHint => 'Sense plus';
 
   @override
-  String get shiftTypesFixedPlusUnit => '€';
-
-  @override
   String get shiftTypesRateLabel => 'Preu per hora (opcional)';
 
   @override
@@ -824,7 +922,9 @@ class AppLocalizationsCa extends AppLocalizations {
       'Per calcular quant guanyes al resum del mes.';
 
   @override
-  String get shiftTypesRateUnit => '€/h';
+  String shiftTypesRateUnit(String symbol) {
+    return '$symbol/h';
+  }
 
   @override
   String get shiftTypesPreviewLabel => 'Així es veurà al mes';
@@ -883,6 +983,64 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get paintToolsLabel => 'Eines per pintar';
+
+  @override
+  String get paintModeReplace => 'Canvia el torn';
+
+  @override
+  String get paintModeAdd => 'Afegeix un altre torn';
+
+  @override
+  String get paintModeAddSpoken => 'Afegeix un altre torn (doblar)';
+
+  @override
+  String paintHeaderMode(String header, String mode) {
+    return '$header · $mode';
+  }
+
+  @override
+  String get paintPreviewTitle => 'En tocar un dia';
+
+  @override
+  String get paintPreviewTitleDouble => 'En tocar un dia (doblar)';
+
+  @override
+  String get paintPreviewReplace => 'Substitueix el que hi hagi';
+
+  @override
+  String get paintPreviewAdd => 'S’afegeix al que ja hi ha';
+
+  @override
+  String get paintPreviewErase => 'Deixa el dia buit';
+
+  @override
+  String get paintPreviewEmpty => 'buit';
+
+  @override
+  String paintPreviewSpoken(
+    String title,
+    String before,
+    String after,
+    String effect,
+  ) {
+    return '$title: $before passa a $after. $effect';
+  }
+
+  @override
+  String paintPreviewSpokenTimes(
+    String title,
+    String before,
+    String after,
+    String times,
+    String effect,
+  ) {
+    return '$title: $before passa a $after, $times. $effect';
+  }
+
+  @override
+  String paintToolSpoken(String name, String times) {
+    return '$name, $times';
+  }
 
   @override
   String get selectionHeader => 'Selecció';
@@ -1454,6 +1612,47 @@ class AppLocalizationsCa extends AppLocalizations {
   String get onboardingContinue => 'Continua';
 
   @override
+  String get onboardingChooseTitle => 'Com comences el teu quadrant?';
+
+  @override
+  String get onboardingChooseHelp =>
+      'Tria una manera. En menys d’un minut tindràs el mes a punt, i després el pots canviar quan vulguis.';
+
+  @override
+  String get onboardingPathImport => 'Importa els meus torns';
+
+  @override
+  String get onboardingPathImportHint =>
+      'Des del calendari del mòbil, un fitxer .ics o CSV, o una còpia de LRHSoft.';
+
+  @override
+  String get onboardingPathRotation => 'Fes servir una rotació';
+
+  @override
+  String get onboardingPathRotationHint =>
+      'Tria el teu cicle (matins, tardes, nits, sortint…) i s’omple sol, mes rere mes.';
+
+  @override
+  String get onboardingPathRotationTag => 'Si el teu torn es repeteix';
+
+  @override
+  String get onboardingPathPaint => 'Pinta a mà';
+
+  @override
+  String get onboardingPathPaintHint =>
+      'Tria un torn i arrossega pels dies. Per quan cada mes és diferent.';
+
+  @override
+  String get onboardingChooseLater =>
+      'Després et preguntem el país per marcar els festius. Ho pots ometre.';
+
+  @override
+  String get onboardingRestore => 'Recupera una còpia de seguretat';
+
+  @override
+  String get onboardingOptional => 'Opcional';
+
+  @override
   String onboardingProgress(int current, int total) {
     return 'Pas $current de $total';
   }
@@ -1463,7 +1662,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get onboardingProfessionHelp =>
-      'Així et deixem preparats els torns i les rotacions de la teva feina. Ho pots canviar quan vulguis.';
+      'Només per deixar-te els horaris típics de la teva feina. Ho pots canviar quan vulguis.';
 
   @override
   String get onboardingProfessionNursing => 'Infermeria, TCAI i zeladors';
@@ -1520,11 +1719,53 @@ class AppLocalizationsCa extends AppLocalizations {
       'Comences amb els torns de sempre';
 
   @override
+  String get onboardingProfessionNursingAbroad => 'Infermeria i sanitat';
+
+  @override
+  String get onboardingProfessionNursingAbroadHint =>
+      'M 08–15, T 15–22 i N 22–08';
+
+  @override
+  String get onboardingProfessionPoliceAbroad => 'Policia';
+
+  @override
+  String get onboardingProfessionSecurityAbroad => 'Seguretat';
+
+  @override
+  String get onboardingProfessionHospitalityAbroad => 'Hostaleria';
+
+  @override
+  String get onboardingProfessionIndustryAbroadHint =>
+      'Torns rotatius: M 06–14, T 14–22 i N 22–06';
+
+  @override
+  String get onboardingProfessionCommerce => 'Comerç';
+
+  @override
+  String get onboardingProfessionCommerceHint => 'M 09–15 i T 15–21';
+
+  @override
+  String get onboardingProfessionTransport => 'Transport';
+
+  @override
+  String get onboardingProfessionTransportHint => 'M 06–14, T 14–22 i N 22–06';
+
+  @override
   String get onboardingPlaceTitle => 'On treballes?';
 
   @override
   String get onboardingPlaceHelp =>
       'Per marcar-te al calendari els festius de la teva comunitat i del teu municipi.';
+
+  @override
+  String get onboardingPlaceHelpAbroad =>
+      'Per marcar-te al calendari els festius oficials del teu país.';
+
+  @override
+  String get onboardingCountryLabel => 'País';
+
+  @override
+  String get onboardingCountrySheetTitle => 'El teu país';
 
   @override
   String get onboardingRegionLabel => 'Comunitat';
@@ -1559,6 +1800,25 @@ class AppLocalizationsCa extends AppLocalizations {
   @override
   String get onboardingLocalHolidaysMissing =>
       'Els festius locals del teu municipi els pots afegir tu en dos tocs.';
+
+  @override
+  String onboardingLocalHolidaysMissingYear(String year) {
+    return 'Els festius locals del $year del teu municipi encara no han sortit: afegeix-los tu en dos tocs o espera una actualització.';
+  }
+
+  @override
+  String onboardingCountryNoData(String country) {
+    return 'Encara no tenim els festius oficials de $country. Pots afegir els teus a Configuració › Festius.';
+  }
+
+  @override
+  String get onboardingCountryNone =>
+      'Sense festius oficials. Pots afegir els teus a Configuració › Festius.';
+
+  @override
+  String onboardingCountryIncluded(String country) {
+    return 'Marcarem al teu calendari els festius oficials de $country. Pots afegir els teus a Configuració › Festius.';
+  }
 
   @override
   String get onboardingRotationTitle => 'Com és la teva rotació?';
@@ -1626,6 +1886,10 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get onboardingReadyByHand => 'Rotació: la pintes tu a mà';
+
+  @override
+  String get onboardingReadyNoOfficialHolidays =>
+      'Festius: només els que afegeixis tu';
 
   @override
   String get onboardingReadyNothing =>
@@ -1794,6 +2058,14 @@ class AppLocalizationsCa extends AppLocalizations {
   String get summaryHoursWorked => 'Hores treballades';
 
   @override
+  String get summaryHoursPlanned => 'Hores previstes';
+
+  @override
+  String summaryWorkedToDate(String hours) {
+    return '$hours treballades fins ahir';
+  }
+
+  @override
   String get summaryShiftsWorked => 'Torns treballats';
 
   @override
@@ -1836,7 +2108,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get summaryNoteExtras =>
-      'Hores extra i sortides anticipades: les que anotes a cada dia. Les extra sumen i les sortides resten de les hores treballades (un dia no baixa de 0 h). Es valoren al preu per hora del primer torn amb preu d’aquell dia.';
+      'Hores extra i sortides anticipades: les que anotes a cada dia. Les extra sumen i les sortides resten de les hores treballades (un dia no baixa de 0 h). La sortida retalla el final de l’últim torn del dia i les extra van just després: així compten també en les nocturnes i en festiu. Es valoren al preu per hora del primer torn amb preu d’aquell dia.';
 
   @override
   String summaryDays(int count) {
@@ -1948,6 +2220,162 @@ class AppLocalizationsCa extends AppLocalizations {
       'Hores en festiu: les que cauen en un festiu de la teva comunitat i municipi, també si el torn passa la mitjanit.';
 
   @override
+  String get summaryNoteTense =>
+      'Treballades: els dies anteriors a avui. Previstes: d’avui endavant, segons el teu quadrant.';
+
+  @override
+  String get summaryNoteGoal =>
+      'Objectiu: en un mes compta la dotzena part de l’anual; en un any, el mensual per 12; en unes dates, la part dels seus dies. La diferència suma les treballades i les previstes.';
+
+  @override
+  String get summaryGoalTitle => 'Objectiu d’hores';
+
+  @override
+  String get summaryGoalAdd => 'Fixa un objectiu d’hores';
+
+  @override
+  String get summaryGoalEdit => 'Canvia l’objectiu';
+
+  @override
+  String get summaryGoalTarget => 'Objectiu';
+
+  @override
+  String get summaryGoalDone => 'Treballades';
+
+  @override
+  String get summaryGoalPlanned => 'Previstes';
+
+  @override
+  String summaryGoalShort(String hours) {
+    return 'Et falten $hours';
+  }
+
+  @override
+  String summaryGoalShortPlanned(String hours) {
+    return 'Amb el que hi ha previst, et falten $hours';
+  }
+
+  @override
+  String summaryGoalOver(String hours) {
+    return 'Portes $hours de més';
+  }
+
+  @override
+  String summaryGoalOverPlanned(String hours) {
+    return 'Amb el que hi ha previst, $hours de més';
+  }
+
+  @override
+  String get summaryGoalMet => 'Just l’objectiu';
+
+  @override
+  String get summaryGoalMetPlanned =>
+      'Amb el que hi ha previst, just l’objectiu';
+
+  @override
+  String get summaryGoalPerMonth => 'Objectiu mensual';
+
+  @override
+  String get summaryGoalPerYear => 'Objectiu anual';
+
+  @override
+  String summaryGoalFromYear(String goal) {
+    return '$goal per any, entre 12';
+  }
+
+  @override
+  String summaryGoalFromMonth(String goal) {
+    return '$goal per mes, per 12';
+  }
+
+  @override
+  String summaryGoalRangeFromYear(String goal, int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days dies',
+      one: '1 dia',
+    );
+    return '$goal per any, la part de $_temp0';
+  }
+
+  @override
+  String summaryGoalRangeFromMonth(String goal, int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days dies',
+      one: '1 dia',
+    );
+    return '$goal per mes per 12, la part de $_temp0';
+  }
+
+  @override
+  String get summaryGoalChoiceYear => 'Per any';
+
+  @override
+  String get summaryGoalChoiceMonth => 'Per mes';
+
+  @override
+  String get summaryGoalHoursYear => 'Hores per any';
+
+  @override
+  String get summaryGoalHoursMonth => 'Hores per mes';
+
+  @override
+  String get summaryGoalHelpYear =>
+      'Per exemple, 1.642 h, una jornada anual habitual. Mira la del teu conveni. Cada mes compta la dotzena part.';
+
+  @override
+  String get summaryGoalHelpMonth =>
+      'Per exemple, 140 h. A l’any compta 12 vegades.';
+
+  @override
+  String get summaryGoalUnit => 'h';
+
+  @override
+  String summaryGoalInvalid(int max) {
+    return 'Escriu entre 1 i $max hores.';
+  }
+
+  @override
+  String get summaryGoalRemove => 'Treu l’objectiu';
+
+  @override
+  String get summaryGoalSaveFailed => 'No s’ha pogut desar l’objectiu.';
+
+  @override
+  String get summaryHowTitle => 'Com vaig?';
+
+  @override
+  String get summaryHowWorked => 'treballades';
+
+  @override
+  String get summaryHowWorkedToDate => 'treballades fins ahir';
+
+  @override
+  String get summaryHowPlanned => 'previstes';
+
+  @override
+  String summaryHowPlannedRest(String hours, String date) {
+    return 'i $hours previstes fins al $date';
+  }
+
+  @override
+  String summaryHowBarLabel(String worked, String planned) {
+    return '$worked treballades, $planned previstes';
+  }
+
+  @override
+  String get summaryBreakdownTitle => 'Detall';
+
+  @override
+  String get summaryAbsencesNone => 'Cap';
+
+  @override
+  String get summaryEstimateNoPrices => 'Sense preus';
+
+  @override
   String get summaryYearEmpty => 'Aquest any no té torns.';
 
   @override
@@ -1983,7 +2411,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get summaryYearRowTitle => 'Hores i estimació';
 
   @override
-  String get summaryYearRowBody => 'Torns, hores i euros de cada mes';
+  String get summaryYearRowBody => 'Torns, hores i imports de cada mes';
 
   @override
   String summaryYearMonthSemantics(String month, String shifts, String hours) {
@@ -2008,6 +2436,123 @@ class AppLocalizationsCa extends AppLocalizations {
   String get shareMonthLegendEmpty => 'Aquest mes no té torns.';
 
   @override
+  String get reportShareTooltip => 'Informe en PDF o CSV';
+
+  @override
+  String get reportSheetTitle => 'Informe de torns';
+
+  @override
+  String get reportSheetIntro =>
+      'Un PDF net per imprimir o enviar, o un full de càlcul amb els teus torns.';
+
+  @override
+  String get reportFormatPdf => 'PDF per imprimir o enviar';
+
+  @override
+  String get reportFormatCsv => 'CSV per a Excel o Sheets';
+
+  @override
+  String get reportIncludeTitle => 'Què vols incloure';
+
+  @override
+  String get reportIncludeNotes => 'Notes dels dies';
+
+  @override
+  String get reportIncludeEarnings => 'Imports estimats';
+
+  @override
+  String get reportAbsencesTitle => 'Absències';
+
+  @override
+  String get reportAbsencesHidden => 'No mostrar-les';
+
+  @override
+  String get reportAbsencesGeneric => 'Només com a «Absència»';
+
+  @override
+  String get reportAbsencesDetailed => 'Amb el seu nom i la seva nota';
+
+  @override
+  String get reportAbsencesHint =>
+      'Una baixa mèdica no surt amb el seu nom ni la seva nota tret que triïs «Amb el seu nom i la seva nota».';
+
+  @override
+  String get reportCreate => 'Crea i comparteix';
+
+  @override
+  String get reportFailed => 'No s’ha pogut crear l’informe';
+
+  @override
+  String reportSubject(String period) {
+    return 'Torns: $period';
+  }
+
+  @override
+  String get reportUntitled => 'Els meus torns';
+
+  @override
+  String get reportLegendTitle => 'Llegenda';
+
+  @override
+  String get reportTotalsTitle => 'Totals';
+
+  @override
+  String get reportNotesTitle => 'Notes';
+
+  @override
+  String get reportHolidaysTitle => 'Festius';
+
+  @override
+  String get reportHolidayMark => 'Festiu';
+
+  @override
+  String get reportAbsenceName => 'Absència';
+
+  @override
+  String get reportAbsenceCode => 'ABS';
+
+  @override
+  String get reportHoursTotal => 'Hores';
+
+  @override
+  String get reportHoursDone => 'Treballades fins ahir';
+
+  @override
+  String get reportHoursPlannedFrom => 'Previstes des d’avui';
+
+  @override
+  String get reportFooter => 'Creat amb Turnly';
+
+  @override
+  String reportPageOf(int page, int total) {
+    return 'Pàgina $page de $total';
+  }
+
+  @override
+  String get reportColDate => 'Data';
+
+  @override
+  String get reportColDay => 'Dia';
+
+  @override
+  String get reportColShifts => 'Torn';
+
+  @override
+  String get reportColCode => 'Codi';
+
+  @override
+  String get reportColStart => 'Inici';
+
+  @override
+  String get reportColEnd => 'Fi';
+
+  @override
+  String get reportColHours => 'Hores';
+
+  @override
+  String get reportColNote => 'Nota';
+
+  @override
   String get saveFailed => 'No s’ha pogut desar el canvi';
 
   @override
@@ -2017,7 +2562,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get settingsOpenTooltip => 'Obre la configuració';
 
   @override
-  String get settingsSectionSchedule => 'El teu quadrant';
+  String get settingsSectionSchedule => 'El meu calendari';
 
   @override
   String get settingsShiftsTitle => 'Els meus torns';
@@ -2045,6 +2590,50 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get settingsThemeDark => 'Fosc';
+
+  @override
+  String get appearanceAccentTitle => 'Color d’accent';
+
+  @override
+  String get appearanceAccentIndigo => 'Indi';
+
+  @override
+  String get appearanceAccentBlue => 'Blau';
+
+  @override
+  String get appearanceAccentPetrol => 'Petroli';
+
+  @override
+  String get appearanceAccentRaspberry => 'Gerd';
+
+  @override
+  String get appearanceAccentGraphite => 'Grafit';
+
+  @override
+  String get appearanceAccentDefault => 'Per defecte';
+
+  @override
+  String get appearanceAccentNote =>
+      'Canvia enllaços, interruptors, selecció i pestanyes. Els colors dels teus torns no canvien.';
+
+  @override
+  String get appearanceCellSizeTitle => 'Mida del torn al mes';
+
+  @override
+  String get appearanceCellSizeNormal => 'Normal';
+
+  @override
+  String get appearanceCellSizeLarge => 'Gran';
+
+  @override
+  String get appearanceCellSizeExtraLarge => 'Molt gran';
+
+  @override
+  String get appearanceCellSizeNote =>
+      'El codi i l’hora de cada dia del mes. Si no caben en una casella, s’ajusten sols.';
+
+  @override
+  String get appearanceCellSizeSampleCode => 'N';
 
   @override
   String get settingsWeekStartTitle => 'Primer dia de la setmana';
@@ -2085,11 +2674,53 @@ class AppLocalizationsCa extends AppLocalizations {
   String get languageNameEn => 'English';
 
   @override
+  String get settingsTimeFormatTitle => 'Format d’hora';
+
+  @override
+  String settingsTimeFormatAuto(String format) {
+    return 'Automàtic ($format)';
+  }
+
+  @override
+  String get settingsTimeFormat24 => '24 h (22:00)';
+
+  @override
+  String get settingsTimeFormat12 => '12 h (10:00 p. m.)';
+
+  @override
+  String get settingsTimeFormatShort24 => '24 h';
+
+  @override
+  String get settingsTimeFormatShort12 => '12 h';
+
+  @override
+  String get settingsCurrencyTitle => 'Moneda';
+
+  @override
+  String get settingsCurrencyNote =>
+      'Canviar la moneda no converteix els imports. Revisa els preus per hora i els plusos.';
+
+  @override
+  String get settingsCurrencySearchHint => 'Cerca una moneda o un codi';
+
+  @override
+  String get settingsCurrencyCommon => 'Habituals';
+
+  @override
+  String get settingsCurrencyAll => 'Totes';
+
+  @override
+  String get settingsCurrencyNone => 'Cap moneda coincideix';
+
+  @override
   String get settingsSaveFailed =>
       'No s’ha pogut desar la configuració. Torna-ho a provar.';
 
   @override
-  String get settingsSectionMore => 'Avisos i dades';
+  String get settingsSectionMore => 'Avisos i widget';
+
+  @override
+  String get settingsSectionBackup => 'Còpies i canvi de mòbil';
 
   @override
   String get settingsHolidaysTitle => 'Festius';
@@ -2098,7 +2729,17 @@ class AppLocalizationsCa extends AppLocalizations {
   String get settingsAlarmsTitle => 'Alarmes';
 
   @override
+  String settingsAlarmsUntil(String date) {
+    return 'Avisos fins al $date';
+  }
+
+  @override
   String get settingsBackupTitle => 'Còpia de seguretat';
+
+  @override
+  String settingsBackupLast(String when) {
+    return 'Última: $when, comprovada';
+  }
 
   @override
   String get settingsPrivacyTitle => 'Política de privacitat';
@@ -2203,7 +2844,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get faqDoubleA =>
-      'Doblar és fer dos torns el mateix dia. Toca el dia i, al detall, fes servir «Afegeix un segon torn». Si estàs pintant, activa «Dobla» i toca els dies. Amb diversos dies triats, «Dobla amb…» afegeix el torn a tots.\n\nUn dia pot tenir els torns que calgui i cadascun suma les seves hores per separat.';
+      'Doblar és fer dos torns el mateix dia. Toca el dia i, al detall, fes servir «Afegeix un segon torn». Si estàs pintant, tria el mode «Afegeix un altre torn» i toca els dies. Amb diversos dies triats, «Dobla amb…» afegeix el torn a tots.\n\nUn dia pot tenir els torns que calgui i cadascun suma les seves hores per separat.';
 
   @override
   String get faqPostNightQ => 'Què és el sortint automàtic?';
@@ -2264,11 +2905,11 @@ class AppLocalizationsCa extends AppLocalizations {
       'Sí. A Configuració › Calendaris en crees un per a la teva parella, una segona feina o un fill: cadascun té les seves rotacions i els seus dies, i els tipus de torn són els mateixos. Amb dos o més, el nom del calendari damunt del mes et permet canviar de l’un a l’altre. El widget i les alarmes segueixen el calendari marcat com a «Widget i alarmes».\n\nPer veure quan coincidiu lliures, toca «Compara calendaris» en aquesta mateixa fulla: en tries dos i en veus els torns junts i els dies lliures en comú del mes.';
 
   @override
-  String get faqSummaryQ => 'Com es calculen les hores i els euros?';
+  String get faqSummaryQ => 'Com es calculen les hores i els diners?';
 
   @override
   String get faqSummaryA =>
-      'La icona de resum del calendari mostra els torns, les hores, les nocturnes i les de festiu del mes, d’un any sencer o de les dates que triïs a «Dates…» (fins a 366 dies). Un torn compta el dia que comença, encara que passi la mitjanit.\n\nPer veure euros, posa el preu per hora i, si en tens, el plus fix per tipus de torn a Configuració › Els meus torns. L’estimació inclou aquests plusos fixos, abans d’impostos. No inclou plusos per hora nocturna o festiva ni retencions.\n\nEl «Plus per torn» se suma una vegada per cada torn treballat d’aquell tipus, també si és partit; no depèn de les hores. Els descansos i les absències no el sumen.';
+      'La icona de resum del calendari mostra els torns, les hores, les nocturnes i les de festiu del mes, d’un any sencer o de les dates que triïs a «Dates…» (fins a 366 dies). Un torn compta el dia que comença, encara que passi la mitjanit.\n\nPer veure imports, posa el preu per hora i, si en tens, el plus fix per tipus de torn a Configuració › Els meus torns. L’estimació inclou aquests plusos fixos, abans d’impostos, en la moneda que triïs a Configuració › Aparença. No inclou plusos per hora nocturna o festiva ni retencions.\n\nEl «Plus per torn» se suma una vegada per cada torn treballat d’aquell tipus, també si és partit; no depèn de les hores. Els descansos i les absències no el sumen.';
 
   @override
   String get settingsVersionCopied => 'S’ha copiat la versió';
@@ -3094,6 +3735,239 @@ class AppLocalizationsCa extends AppLocalizations {
       'El màxim és un any: s’ha retallat el final.';
 
   @override
+  String get calSyncTitle => 'Mantenir al dia';
+
+  @override
+  String get calSyncHelp =>
+      'Turnly actualitza aquests esdeveniments tot sol, cada cop que canvies el quadrant i en obrir l’app: des de fa una setmana fins als propers tres mesos. Només toca els esdeveniments que va crear ell. Si ho apagues, els que ja hi són es queden.';
+
+  @override
+  String calSyncLast(String when) {
+    return 'Última actualització: $when';
+  }
+
+  @override
+  String calSyncFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'No s’han pogut actualitzar $count esdeveniments. Es tornarà a provar en la propera actualització.',
+      one: 'No s’ha pogut actualitzar 1 esdeveniment. Es tornarà a provar en la propera actualització.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get calSyncLocked =>
+      'Per triar un altre calendari, apaga abans «Mantenir al dia».';
+
+  @override
+  String get calSyncRunning => 'S’està actualitzant el calendari…';
+
+  @override
+  String get calSyncNoticePermission =>
+      '«Mantenir al dia» s’ha apagat: Turnly ja no té permís per usar el teu calendari.';
+
+  @override
+  String get calSyncNoticeCalendarGone =>
+      '«Mantenir al dia» s’ha apagat: el calendari del mòbil ja no hi és o ha canviat de nom.';
+
+  @override
+  String get calSyncNoticeSourceGone =>
+      '«Mantenir al dia» s’ha apagat: el calendari de Turnly que s’exportava ja no existeix.';
+
+  @override
+  String get calSyncNoticeDismiss => 'Entesos';
+
+  @override
+  String get calExportIcsTitle => 'Desa com a fitxer .ics';
+
+  @override
+  String get calExportIcsHelp =>
+      'Un fitxer que obren Google Calendar, Outlook i Apple Calendar, per enviar-lo o desar-lo on vulguis. No necessita permís.';
+
+  @override
+  String calExportIcsRange(String from, String to) {
+    return 'Del $from al $to';
+  }
+
+  @override
+  String get calExportIcsButton => 'Desa el fitxer .ics';
+
+  @override
+  String get calExportIcsRunning => 'S’està preparant el fitxer…';
+
+  @override
+  String get calExportIcsFailed =>
+      'No s’ha pogut crear el fitxer. Torna-ho a provar.';
+
+  @override
+  String get shareLinkRowTitle => 'Comparteix per enllaç';
+
+  @override
+  String get shareLinkRowSubtitle =>
+      'La teva família veu els teus torns al seu calendari';
+
+  @override
+  String get shareLinkRowPublished => 'Enllaç publicat';
+
+  @override
+  String get shareLinkTitle => 'Comparteix per enllaç';
+
+  @override
+  String get shareLinkIntro =>
+      'Publica un enllaç només de lectura: qui el tingui veurà els teus torns al seu calendari (Google, Apple, Outlook) sense instal·lar res. S’actualitza sol quan canvies el quadrant.';
+
+  @override
+  String get shareLinkUnavailableTitle => 'Encara no disponible';
+
+  @override
+  String get shareLinkUnavailableBody =>
+      'Aquesta versió encara no pot publicar enllaços. Mentrestant, pots desar els teus torns com a fitxer .ics a Exporta torns.';
+
+  @override
+  String get shareLinkCalendarLabel => 'Calendari';
+
+  @override
+  String get shareLinkOptionsLabel => 'Què es comparteix';
+
+  @override
+  String get shareLinkIncludeRest => 'Inclou els dies lliures';
+
+  @override
+  String get shareLinkIncludeRestHelp =>
+      'Lliure i Sortint, com a esdeveniments de tot el dia.';
+
+  @override
+  String get shareLinkIncludeAbsences =>
+      'Mostra les absències com a «Absència»';
+
+  @override
+  String get shareLinkIncludeAbsencesHelp =>
+      'Sense el motiu: no se sap si és una baixa, vacances o un dia de lliure disposició.';
+
+  @override
+  String get shareLinkPrivacyTitle => 'Què surt i què no';
+
+  @override
+  String get shareLinkPrivacyBody =>
+      'Surten el nom, el codi i l’hora de cada torn, i el nom del calendari. Mai no surten les teves notes, les baixes ni el motiu de cap absència. Qui tingui l’enllaç pot veure els teus torns: passa’l només a qui vulguis i revoca’l quan vulguis.';
+
+  @override
+  String get shareLinkPublishButton => 'Publica l’enllaç';
+
+  @override
+  String get shareLinkPublishConfirmTitle => 'Vols publicar els teus torns?';
+
+  @override
+  String get shareLinkPublishConfirmBody =>
+      'Els teus torns es pujaran al servidor de Turnly perquè l’enllaç funcioni. És l’únic que l’app envia fora del mòbil. S’esborren en revocar l’enllaç o després de sis mesos sense actualitzar-se.';
+
+  @override
+  String get shareLinkPublishConfirm => 'Publica';
+
+  @override
+  String get shareLinkQrLabel => 'Codi QR amb l’enllaç dels teus torns';
+
+  @override
+  String get shareLinkLinkLabel => 'Enllaç';
+
+  @override
+  String get shareLinkCopy => 'Copia';
+
+  @override
+  String get shareLinkCopied => 'Enllaç copiat';
+
+  @override
+  String get shareLinkShare => 'Comparteix';
+
+  @override
+  String shareLinkShareText(String url) {
+    return 'Els meus torns a Turnly. Afegeix-los al teu calendari amb aquest enllaç: $url';
+  }
+
+  @override
+  String shareLinkLastPublished(String date) {
+    return 'Darrera publicació: $date';
+  }
+
+  @override
+  String get shareLinkPublishing => 'S’està publicant…';
+
+  @override
+  String get shareLinkWaiting => 'S’actualitzarà d’aquí a un moment.';
+
+  @override
+  String get shareLinkNotPublished => 'Encara no s’ha pogut publicar.';
+
+  @override
+  String get shareLinkRefresh => 'Actualitza ara';
+
+  @override
+  String shareLinkSharedCalendar(String name) {
+    return 'Es comparteixen els torns de «$name».';
+  }
+
+  @override
+  String get shareLinkCalendarMissing =>
+      'El calendari que comparties ja no hi és. Tria’n un altre per continuar actualitzant l’enllaç.';
+
+  @override
+  String get shareLinkHowTitle => 'Com subscriure-s’hi';
+
+  @override
+  String get shareLinkHowBody =>
+      'A Google Calendar: Altres calendaris › Des d’un URL, i enganxa l’enllaç. A l’iPhone: obre l’enllaç, o ves a Configuració › Calendari › Comptes › Afegeix un compte › Altres › Afegeix un calendari subscrit. Cada calendari decideix cada quan mira els canvis: poden trigar unes hores.';
+
+  @override
+  String get shareLinkRevoke => 'Revoca l’enllaç';
+
+  @override
+  String get shareLinkRevokeConfirmTitle => 'Vols revocar l’enllaç?';
+
+  @override
+  String get shareLinkRevokeConfirmBody =>
+      'S’esborra del servidor i deixa de funcionar per a tothom. Si tornes a publicar, es crea un enllaç nou.';
+
+  @override
+  String get shareLinkRevokeConfirm => 'Revoca';
+
+  @override
+  String get shareLinkRevoking => 'S’està revocant…';
+
+  @override
+  String get shareLinkRevokePending =>
+      'La revocació està pendent: es tornarà a provar sola d’aquí a un moment. Mentrestant no es publica res.';
+
+  @override
+  String get shareLinkProblemNetwork =>
+      'No hi ha connexió amb el servidor. Es tornarà a provar més tard.';
+
+  @override
+  String get shareLinkProblemRateLimited =>
+      'Massa actualitzacions seguides. Es tornarà a provar d’aquí a un moment.';
+
+  @override
+  String get shareLinkProblemTooLarge =>
+      'El quadrant és massa gran per publicar-lo.';
+
+  @override
+  String get shareLinkProblemRejected =>
+      'El servidor no ha acceptat l’enllaç. Revoca’l i publica’n un de nou.';
+
+  @override
+  String get shareLinkProblemRevoked =>
+      'Aquest enllaç es va revocar i ja no funciona. Publica’n un de nou si vols tornar a compartir els teus torns.';
+
+  @override
+  String get shareLinkProblemServer =>
+      'No s’ha pogut completar. Torna-ho a provar.';
+
+  @override
+  String get shareLinkAbsence => 'Absència';
+
+  @override
   String get onboardingImportButton => 'Importa ara';
 
   @override
@@ -3114,6 +3988,9 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get backupUiStatusWhere => 'En aquest dispositiu';
+
+  @override
+  String get backupUiStatusVerified => 'Comprovada: es pot recuperar sencera';
 
   @override
   String get backupUiStatusRunning => 'S’està desant la còpia…';
@@ -3180,6 +4057,30 @@ class AppLocalizationsCa extends AppLocalizations {
       'No s’ha pogut fer la còpia. Les teves dades continuen com estaven.';
 
   @override
+  String backupWarnRestoreSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'La còpia que hem fet abans no inclou $count adjunts: els fitxers no hi eren o no es van poder llegir.',
+      one: 'La còpia que hem fet abans no inclou 1 adjunt: el fitxer no hi era o no es va poder llegir.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String backupWarnCopySkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Còpia feta, però sense $count adjunts: els fitxers no hi són o no es poden llegir.',
+      one: 'Còpia feta, però sense 1 adjunt: el fitxer no hi és o no es pot llegir.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get backupUiAutoTitle => 'Còpies automàtiques';
 
   @override
@@ -3189,6 +4090,112 @@ class AppLocalizationsCa extends AppLocalizations {
   @override
   String get backupUiAutoOff =>
       'Desactivades: només es copia quan tu ho demanes.';
+
+  @override
+  String get autoBackupFolderTitle => 'Còpia automàtica en una carpeta';
+
+  @override
+  String get autoBackupFolderIntro =>
+      'Una còpia al dia a la carpeta que triïs: Drive, Dropbox, OneDrive o una del dispositiu. Si perds el dispositiu, la tens allà. Desem les 10 últimes.';
+
+  @override
+  String get autoBackupFolderPrivacy =>
+      'La còpia porta tot el teu quadrant, absències i baixes incloses, i es desa allà on sigui aquesta carpeta (per exemple, al teu núvol). No cal cap compte a Turnly.';
+
+  @override
+  String get autoBackupFolderChoose => 'Tria una carpeta';
+
+  @override
+  String get autoBackupFolderChooseSubtitle =>
+      'S’obre el selector de carpetes del sistema';
+
+  @override
+  String get autoBackupFolderFolder => 'Carpeta';
+
+  @override
+  String get autoBackupFolderUnnamed => 'Carpeta triada';
+
+  @override
+  String get autoBackupFolderChange => 'Toca per triar-ne una altra';
+
+  @override
+  String autoBackupFolderLast(String when) {
+    return 'Última còpia a la carpeta: $when';
+  }
+
+  @override
+  String get autoBackupFolderNone => 'Encara no hi ha cap còpia a la carpeta.';
+
+  @override
+  String get autoBackupFolderSchedule =>
+      'Es copia un cop al dia i, amb l’app oberta, després dels teus canvis (com a molt cada 6 hores).';
+
+  @override
+  String get autoBackupFolderCopyNow => 'Copia ara a la carpeta';
+
+  @override
+  String get autoBackupFolderCopyDone => 'Còpia desada a la carpeta';
+
+  @override
+  String get autoBackupFolderVerify => 'Prova la còpia de la carpeta';
+
+  @override
+  String get autoBackupFolderVerifySubtitle =>
+      'Comprova que l’última còpia de la carpeta es pot recuperar sencera';
+
+  @override
+  String get autoBackupFolderStop => 'Deixa de copiar en aquesta carpeta';
+
+  @override
+  String get autoBackupFolderStopSubtitle =>
+      'Les còpies que ja són a la carpeta no s’esborren';
+
+  @override
+  String get autoBackupFolderStopped =>
+      'Ja no es fan còpies en aquesta carpeta';
+
+  @override
+  String get autoBackupFolderFailedTitle => 'La còpia a la carpeta no funciona';
+
+  @override
+  String autoBackupFolderFailedWhen(String when) {
+    return 'Últim intent: $when.';
+  }
+
+  @override
+  String get autoBackupFolderErrRevoked =>
+      'Turnly ja no té permís per fer servir aquesta carpeta. Torna-la a triar.';
+
+  @override
+  String get autoBackupFolderErrMissing =>
+      'No trobem la carpeta: potser s’ha esborrat o s’ha mogut. Tria’n una altra.';
+
+  @override
+  String get autoBackupFolderErrUnwritable =>
+      'Aquesta carpeta no deixa desar fitxers. Tria’n una altra.';
+
+  @override
+  String get autoBackupFolderErrNoSpace =>
+      'No queda espai on és la carpeta (el dispositiu o el teu núvol). Allibera espai i torna-ho a provar.';
+
+  @override
+  String get autoBackupFolderErrTooLarge =>
+      'La còpia és massa gran per desar-la.';
+
+  @override
+  String get autoBackupFolderErrFailed =>
+      'No s’ha pogut desar la còpia a la carpeta. Ho tornarem a intentar.';
+
+  @override
+  String get autoBackupFolderErrDamaged =>
+      'No hem pogut llegir la configuració de la còpia a la carpeta. Torna a triar la carpeta.';
+
+  @override
+  String get autoBackupFolderChooseAgain => 'Torna a triar la carpeta';
+
+  @override
+  String get autoBackupFolderPickFailed =>
+      'No s’ha pogut fer servir aquesta carpeta. Prova’n una altra.';
 
   @override
   String get backupUiSectionFile => 'Fitxer';
@@ -3201,6 +4208,13 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get backupUiExport => 'Exporta un fitxer';
+
+  @override
+  String get backupUiSaveOutside => 'Desa una còpia fora de Turnly';
+
+  @override
+  String get backupUiSaveOutsideHelp =>
+      'Al teu núvol, en un altre dispositiu o per correu. Si perds el mòbil o en canvies, la recuperes amb «Importa un fitxer».';
 
   @override
   String get backupUiExportSubtitle =>
@@ -3526,6 +4540,41 @@ class AppLocalizationsCa extends AppLocalizations {
       'Mantén premuda la pantalla d’inici, toca el + de dalt i cerca Turnly.';
 
   @override
+  String get widgetNameSmall => 'Petit';
+
+  @override
+  String get widgetNameMedium => 'Mitjà';
+
+  @override
+  String get widgetNameLarge => 'Gran';
+
+  @override
+  String get widgetNameAgenda => 'Agenda';
+
+  @override
+  String get widgetNameTwoWeeks => 'Dues setmanes';
+
+  @override
+  String get widgetDescSmall => 'Avui i demà';
+
+  @override
+  String get widgetDescMedium => 'Els propers 7 dies';
+
+  @override
+  String get widgetDescLarge => 'El mes sencer';
+
+  @override
+  String get widgetDescAgenda => 'Propers torns';
+
+  @override
+  String get widgetDescTwoWeeks => 'Actual i següent';
+
+  @override
+  String widgetAddNamed(String name) {
+    return 'Afegeix $name';
+  }
+
+  @override
   String get compareTitle => 'Compara calendaris';
 
   @override
@@ -3539,16 +4588,10 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get compareIntro =>
-      'Tria dos calendaris i mira’n els torns junts. Es marquen els dies lliures de tots dos.';
+      'Tria de dos a sis calendaris i mira’n els torns junts. Es marquen els dies lliures de tots.';
 
   @override
-  String get compareFirstLabel => 'Primer calendari';
-
-  @override
-  String get compareSecondLabel => 'Segon calendari';
-
-  @override
-  String get comparePickTitle => 'Tria un calendari';
+  String get comparePickTitle => 'Tria els calendaris';
 
   @override
   String get compareNeedTwoTitle => 'Necessites dos calendaris';
@@ -3573,22 +4616,39 @@ class AppLocalizationsCa extends AppLocalizations {
   String get compareFreeListTitle => 'Dies lliures en comú';
 
   @override
-  String get compareLegendFree => 'Lliures tots dos';
+  String get compareLegendFree => 'Lliures en comú';
 
   @override
   String get compareNote =>
-      'Compta com a lliure un dia sense torn de feina: buit, lliure o amb una absència (vacances, baixa…). Cada torn compta el dia que comença.';
+      'Compta com a lliure un dia en què cap treballa i tots tenen anotat un lliure o una absència (vacances, baixa…). Un dia sense torns anotats no compta com a lliure: es marca com a «sense anotar». Cada torn compta el dia que comença.';
 
   @override
   String get compareNoShiftMark => '–';
 
   @override
-  String get compareBothFree => 'lliures tots dos';
+  String get compareBothFree => 'lliures en comú';
 
   @override
   String compareCellCalendar(String calendar, String shifts) {
     return '$calendar: $shifts';
   }
+
+  @override
+  String get compareLegendUnrecorded => 'Sense anotar en algun';
+
+  @override
+  String compareUnrecordedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dies sense anotar en algun',
+      one: '1 dia sense anotar en algun',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get compareUnrecorded => 'sense anotar en algun';
 
   @override
   String get compareLoadFailed => 'No s’han pogut llegir els calendaris.';
@@ -3783,6 +4843,16 @@ class AppLocalizationsCa extends AppLocalizations {
   String get holidaysSettingsRegionClear => 'Sense comunitat';
 
   @override
+  String get holidaysSettingsCountryTitle => 'País';
+
+  @override
+  String get holidaysSettingsCountryOther =>
+      'Un altre país: sense festius oficials';
+
+  @override
+  String get holidaysSettingsCountryNone => 'Sense festius oficials';
+
+  @override
   String get holidaysSettingsMunicipalityTitle => 'Municipi';
 
   @override
@@ -3809,6 +4879,15 @@ class AppLocalizationsCa extends AppLocalizations {
       'Tria el teu municipi per veure’n els festius locals, o afegeix-los tu a sota.';
 
   @override
+  String holidaysSettingsStatusCountryNoData(String country) {
+    return 'Encara no tenim els festius oficials de $country: afegeix els teus a sota';
+  }
+
+  @override
+  String get holidaysSettingsStatusNoOfficial =>
+      'Sense festius oficials: només surten els que afegeixes tu a sota';
+
+  @override
   String holidaysSettingsStatusLocalIncluded(String municipality) {
     return 'Festius locals de $municipality: inclosos';
   }
@@ -3831,8 +4910,35 @@ class AppLocalizationsCa extends AppLocalizations {
   }
 
   @override
-  String get holidaysSettingsStatusLocalPartial =>
-      'Potser en falta algun: comprova’ls.';
+  String get holidaysSubdivisionKindState => 'Estat';
+
+  @override
+  String get holidaysSubdivisionKindFederalState => 'Estat federat';
+
+  @override
+  String get holidaysSubdivisionKindProvince => 'Província';
+
+  @override
+  String get holidaysSubdivisionKindRegion => 'Regió';
+
+  @override
+  String get holidaysSubdivisionKindNation => 'Nació';
+
+  @override
+  String get holidaysSubdivisionKindCanton => 'Cantó';
+
+  @override
+  String get holidaysSubdivisionKindCity => 'Ciutat';
+
+  @override
+  String get holidaysSubdivisionKindCityOrRegion => 'Ciutat o regió';
+
+  @override
+  String get holidaysSubdivisionSearch => 'Cerca';
+
+  @override
+  String get holidaysSettingsStatusNoSubdivision =>
+      'Sense triar només surten els festius de tot el país. Tria el teu per veure també els de la teva zona.';
 
   @override
   String get holidaysSettingsAdd => 'Afegeix un festiu local';
@@ -4070,6 +5176,19 @@ class AppLocalizationsCa extends AppLocalizations {
   String get alarmsNextOff => 'Les alarmes estan desactivades.';
 
   @override
+  String alarmsScheduledUntil(String date) {
+    return 'Avisos programats fins al $date';
+  }
+
+  @override
+  String get alarmsRenewalTitle => 'Avisos de torn';
+
+  @override
+  String alarmsRenewalBody(String date) {
+    return 'Els teus avisos de torn arriben fins al $date. Obre Turnly per programar els següents.';
+  }
+
+  @override
   String get alarmsSkipDay => 'Sense alarma aquest dia';
 
   @override
@@ -4120,6 +5239,60 @@ class AppLocalizationsCa extends AppLocalizations {
   String agendaSemanticsReminder(String time) {
     return 'avís a les $time';
   }
+
+  @override
+  String get dndSection => 'No molestis durant el torn';
+
+  @override
+  String get dndMasterTitle => 'Silencia el mòbil durant els meus torns';
+
+  @override
+  String get dndMasterHelp =>
+      'S’activa «No molestis» quan comença el torn i es desactiva quan acaba.';
+
+  @override
+  String get dndFilterTitle => 'Què deixa passar';
+
+  @override
+  String get dndFilterSheetTitle => 'Què deixa passar durant el torn';
+
+  @override
+  String get dndFilterAll => 'Tot';
+
+  @override
+  String get dndFilterPriority => 'Només el que és prioritari';
+
+  @override
+  String get dndFilterAlarms => 'Només les alarmes';
+
+  @override
+  String get dndFilterNone => 'Silenci total';
+
+  @override
+  String get dndPermOkTitle => 'Tot a punt';
+
+  @override
+  String get dndPermOkBody =>
+      'Turnly pot activar «No molestis» al mòbil durant els teus torns. Es programa com una alarma del sistema: el rellotge pot mostrar l’inici o el final del torn com a propera alarma.';
+
+  @override
+  String get dndPermTitle => 'Falta l’accés a No molestis';
+
+  @override
+  String get dndPermBody =>
+      'Per silenciar el mòbil durant el torn, permet que Turnly accedeixi a «No molestis» a la configuració del sistema.';
+
+  @override
+  String get dndPermOpen => 'Obre la configuració';
+
+  @override
+  String get dndShiftSection => 'No molestis';
+
+  @override
+  String get dndShiftSwitch => 'Activa No molestis durant aquest torn';
+
+  @override
+  String get dndShiftHelper => 'El mòbil se silencia mentre fas aquest torn.';
 
   @override
   String get shiftTypesAlarmSection => 'Alarma';
@@ -4351,6 +5524,24 @@ class AppLocalizationsCa extends AppLocalizations {
   String get monthSelectDays => 'Selecciona dies';
 
   @override
+  String get monthNavMonth => 'Mes';
+
+  @override
+  String get monthNavRotation => 'Rotació';
+
+  @override
+  String get monthNavAgenda => 'Agenda';
+
+  @override
+  String get monthNavSummary => 'Resum';
+
+  @override
+  String get todayCardCollapse => 'Plega la targeta d’avui';
+
+  @override
+  String get todayCardExpand => 'Desplega la targeta d’avui';
+
+  @override
   String get monthSelectDay => 'Toca per triar aquest dia';
 
   @override
@@ -4362,4 +5553,967 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get monthGridSelected => 'Presentació de quadrícula';
+
+  @override
+  String get absenceRowTitle => 'Vacances i permisos';
+
+  @override
+  String get absenceRowSubtitle => 'Dies permesos, usats i els que et queden';
+
+  @override
+  String get absenceTitle => 'Vacances i permisos';
+
+  @override
+  String get absenceYearPrevious => 'Any anterior';
+
+  @override
+  String get absenceYearNext => 'Any següent';
+
+  @override
+  String absenceDays(num days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$daysString dies',
+      one: '1 dia',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get absenceEmptyTitle => 'Encara no hi ha saldos';
+
+  @override
+  String get absenceEmptyBody =>
+      'Crea un saldo (vacances, assumptes particulars…) i l’app compta els dies a partir del teu quadrant.';
+
+  @override
+  String get absenceAdd => 'Afegeix un saldo';
+
+  @override
+  String get absenceContinueSeries => 'Continuar una sèrie';
+
+  @override
+  String get absenceContinueSeriesHelper =>
+      'Si continues la sèrie d’un any anterior, se’n copien el nom, els tipus i el topall, i el que et va sobrar s’arrossega. Tu només omples els dies permesos.';
+
+  @override
+  String get absenceCopyNextYear => 'Copiar a l’any següent';
+
+  @override
+  String absenceCopiedNextYear(int year) {
+    return 'Saldo copiat a $year.';
+  }
+
+  @override
+  String absenceLeftCaption(num days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'dies que et queden',
+      one: 'dia que et queda',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String absenceLeftSemantics(String name, String days) {
+    return '$name: et queden $days';
+  }
+
+  @override
+  String get absenceAllowed => 'Permesos';
+
+  @override
+  String get absenceCarried => 'Arrossegats';
+
+  @override
+  String get absenceAdjustment => 'Ajustos';
+
+  @override
+  String get absenceEnjoyed => 'Gaudits';
+
+  @override
+  String get absencePlanned => 'Planificats';
+
+  @override
+  String absenceCarriedUntil(String date) {
+    return 'Caduquen el $date';
+  }
+
+  @override
+  String get absenceCarriedNoExpiry => 'Sense caducitat';
+
+  @override
+  String absenceCarriedExpired(String date) {
+    return 'Van caducar el $date';
+  }
+
+  @override
+  String absenceWarnExpiring(String days, String date) {
+    return 'Et queden $days de l’any anterior que caduquen el $date.';
+  }
+
+  @override
+  String absenceWarnPlanned(String planned, String left) {
+    return 'Has planificat més dels que tens: $planned planificats i $left disponibles.';
+  }
+
+  @override
+  String get absenceNewTitle => 'Nou saldo';
+
+  @override
+  String get absenceEditTitle => 'Edita el saldo';
+
+  @override
+  String absenceEditTooltip(String name) {
+    return 'Edita $name';
+  }
+
+  @override
+  String get absenceFieldName => 'Nom';
+
+  @override
+  String get absenceFieldNameHint => 'Vacances';
+
+  @override
+  String get absenceFieldAllowed => 'Dies permesos';
+
+  @override
+  String get absenceFieldAllowedHelper =>
+      'Els que et corresponen aquest any, sense comptar els que arrossegues.';
+
+  @override
+  String get absenceFieldAdjustment => 'Ajust manual';
+
+  @override
+  String get absenceFieldAdjustmentHelper =>
+      'Suma o resta dies a mà: els que ja vas gastar abans d’usar l’app o un dia extra que t’han donat. Admet negatius.';
+
+  @override
+  String get absenceDaysSuffix => 'dies';
+
+  @override
+  String get absenceFieldCarry => 'Arrossega el que sobri de l’any anterior';
+
+  @override
+  String get absenceFieldCarryCap => 'Màxim que s’arrossega';
+
+  @override
+  String get absenceFieldCarryCapHelper => 'Deixa-ho buit si s’arrossega tot.';
+
+  @override
+  String get absenceFieldExpiry => 'Caduquen el';
+
+  @override
+  String get absenceFieldExpiryNone => 'Sense caducitat';
+
+  @override
+  String get absenceFieldExpiryClear => 'Treu la caducitat';
+
+  @override
+  String get absenceFieldTypes => 'Tipus de torn que compten';
+
+  @override
+  String get absenceFieldTypesHelper =>
+      'Cada dia pintat amb un d’aquests tipus gasta un dia d’aquest saldo.';
+
+  @override
+  String get absenceFieldTypesNone =>
+      'No tens tipus de torn d’absència. Crea’n un a Els meus torns amb la categoria Absència.';
+
+  @override
+  String absenceInvalidName(int max) {
+    return 'Posa-hi un nom (màxim $max lletres).';
+  }
+
+  @override
+  String get absenceInvalidAllowed =>
+      'Escriu un nombre de dies vàlid, per exemple 22.';
+
+  @override
+  String get absenceInvalidAdjustment =>
+      'Escriu dies en passos d’un quart, per exemple -1 o 0,5.';
+
+  @override
+  String get absenceInvalidCap => 'Escriu un màxim vàlid, per exemple 5.';
+
+  @override
+  String get absenceRemove => 'Treu el saldo';
+
+  @override
+  String get absenceRemoveTitle => 'Vols treure aquest saldo?';
+
+  @override
+  String absenceRemoveBody(String name, int year) {
+    return 'S’esborra el saldo «$name» de $year. Els teus torns no canvien.';
+  }
+
+  @override
+  String get absenceRemoveConfirm => 'Treu';
+
+  @override
+  String get absenceSaveFailed =>
+      'No s’ha pogut desar el saldo. Torna-ho a provar.';
+
+  @override
+  String absenceSummaryLeft(String days, String name) {
+    return 'Et queden $days de $name';
+  }
+
+  @override
+  String get absenceSummaryOpen => 'Obre vacances i permisos';
+
+  @override
+  String get moneyNightPlusLabel => 'Plus nocturn per hora';
+
+  @override
+  String get moneyNightPlusHelper =>
+      'S’afegeix per cada hora nocturna treballada.';
+
+  @override
+  String get moneyHolidayPlusLabel => 'Plus festiu per hora';
+
+  @override
+  String get moneyHolidayPlusHelper =>
+      'S’afegeix per cada hora treballada en festiu.';
+
+  @override
+  String get moneyLocationLabel => 'Lloc';
+
+  @override
+  String get moneyLocationHint => 'Hospital, planta 3';
+
+  @override
+  String get moneyLocationHelper =>
+      'Surt als informes (PDF i CSV) al costat del nom del torn.';
+
+  @override
+  String get moneyExtraTitle => 'Import extra';
+
+  @override
+  String get moneyExtraHelper =>
+      'Dietes, quilometratge, un bonus… Fes servir un import negatiu per a una deducció. S’afegeix a l’estimació del dia.';
+
+  @override
+  String get moneyExtraHint => 'Sense import';
+
+  @override
+  String get moneyExtraInvalid =>
+      'Escriu un import vàlid, per exemple 25 o -10,50';
+
+  @override
+  String get moneyExtraClear => 'Treu l’import extra';
+
+  @override
+  String get moneySectionTitle => 'Hores i diners';
+
+  @override
+  String get moneyWithholdingTitle => 'Retenció (%)';
+
+  @override
+  String get moneyWithholdingSubtitle => 'Per calcular el net estimat';
+
+  @override
+  String moneyWithholdingValue(int percent) {
+    return '$percent %';
+  }
+
+  @override
+  String get moneyWithholdingNone => 'Sense retenció';
+
+  @override
+  String get moneyWithholdingHelper =>
+      'El percentatge que et retenen de la nòmina (IRPF i cotitzacions). Amb aquest valor calculem un net aproximat; no substitueix la teva nòmina.';
+
+  @override
+  String get moneyWithholdingField => 'Percentatge de retenció';
+
+  @override
+  String get moneyWithholdingInvalid => 'Escriu un nombre enter entre 0 i 100.';
+
+  @override
+  String get moneyGross => 'Brut estimat';
+
+  @override
+  String get moneyNet => 'Net estimat';
+
+  @override
+  String moneyNetNote(int percent) {
+    return 'Amb una retenció del $percent %';
+  }
+
+  @override
+  String get moneyNetSetup => 'Posa la teva retenció per veure el net';
+
+  @override
+  String get moneyEarnedTitle => 'Guanyat fins ara';
+
+  @override
+  String get moneyEarnedNote =>
+      'Els dies que han passat i el que has treballat avui, fins ara.';
+
+  @override
+  String get moneyModeQuarter => 'Trimestre';
+
+  @override
+  String moneyQuarterLabel(int quarter, int year) {
+    return 'T$quarter $year';
+  }
+
+  @override
+  String get moneyQuarterPrevious => 'Trimestre anterior';
+
+  @override
+  String get moneyQuarterNext => 'Trimestre següent';
+
+  @override
+  String get moneyBagTitle => 'Borsa d’hores';
+
+  @override
+  String moneyBagFavour(String hours) {
+    return '$hours de més';
+  }
+
+  @override
+  String moneyBagOwed(String hours) {
+    return 'Et falten $hours';
+  }
+
+  @override
+  String get moneyBagEven => 'A zero';
+
+  @override
+  String moneyBagNote(String month) {
+    return 'Hores treballades menys objectiu, acumulades mes a mes fins a $month. El saldo de desembre passa al gener.';
+  }
+
+  @override
+  String get moneyReportExtraColumn => 'Import extra';
+
+  @override
+  String get moneyReportExtraTotal => 'Imports extra';
+
+  @override
+  String get moneyPlusHint => 'Sense import';
+
+  @override
+  String get swapRowTitle => 'Llibre de canvis';
+
+  @override
+  String get swapRowSubtitle => 'Els torns que et deuen i els que els deus';
+
+  @override
+  String get swapTitle => 'Llibre de canvis';
+
+  @override
+  String get swapBalancesTitle => 'Balanç';
+
+  @override
+  String swapBalanceTheyOwe(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Em deu $count torns',
+      one: 'Em deu 1 torn',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String swapBalanceIOwe(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Li dec $count torns',
+      one: 'Li dec 1 torn',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get swapBalanceEven => 'No res pendent';
+
+  @override
+  String get swapChangesTitle => 'Canvis';
+
+  @override
+  String get swapEmptyTitle => 'Encara no hi ha canvis';
+
+  @override
+  String get swapEmptyBody =>
+      'Anota un canvi de torn amb un company i l’app recordarà qui et deu què.';
+
+  @override
+  String get swapAdd => 'Afegeix un canvi';
+
+  @override
+  String get swapNewTitle => 'Canvi nou';
+
+  @override
+  String get swapEditTitle => 'Edita el canvi';
+
+  @override
+  String get swapStagePending => 'Pendent';
+
+  @override
+  String get swapStageReturned => 'Retornat';
+
+  @override
+  String get swapStageSettled => 'Saldat';
+
+  @override
+  String get swapDirectionTheyOwe => 'Me’l deuen';
+
+  @override
+  String get swapDirectionIOwe => 'L’hi dec';
+
+  @override
+  String get swapFieldService => 'Dades del servei';
+
+  @override
+  String get swapFieldColleague => 'Amb qui';
+
+  @override
+  String get swapFieldColleagueHint => 'Marta';
+
+  @override
+  String get swapInvalidColleague => 'Escriu amb qui és el canvi.';
+
+  @override
+  String get swapFieldDirection => 'Qui deu el torn';
+
+  @override
+  String get swapFieldDirectionHelper =>
+      'Tria qui queda en deute amb el canvi.';
+
+  @override
+  String get swapFieldDate => 'El dia que cedeixes el torn';
+
+  @override
+  String get swapFieldReturnDate => 'El dia que reps el torn';
+
+  @override
+  String get swapFieldReturnNone => 'Encara no l’has rebut';
+
+  @override
+  String get swapFieldReturnClear => 'Treu el dia';
+
+  @override
+  String get swapFieldGivenTypes => 'El torn que cedeixes';
+
+  @override
+  String get swapFieldReceivedTypes => 'El torn que reps';
+
+  @override
+  String get swapFieldTypesHelper =>
+      'Tria els torns del canvi per poder aplicar-lo al quadrant.';
+
+  @override
+  String get swapFieldNote => 'Nota';
+
+  @override
+  String get swapNoteHint => 'Per exemple: me’l torna el dilluns';
+
+  @override
+  String get swapRemove => 'Treu el canvi';
+
+  @override
+  String get swapRemoveTitle => 'Vols treure aquest canvi?';
+
+  @override
+  String swapRemoveBody(String name, String date) {
+    return 'S’esborra el canvi amb $name del $date. Els teus torns no canvien.';
+  }
+
+  @override
+  String get swapRemoveConfirm => 'Treu';
+
+  @override
+  String get swapSaveFailed =>
+      'No s’ha pogut desar el canvi. Torna-ho a provar.';
+
+  @override
+  String get swapRemoved => 'Canvi tret';
+
+  @override
+  String swapEditTooltip(String name) {
+    return 'Edita el canvi amb $name';
+  }
+
+  @override
+  String get swapMarkReturned => 'Marca com a retornat';
+
+  @override
+  String get swapMarkReturnedTitle => 'Quin dia te’l tornen?';
+
+  @override
+  String get swapMarkedReturned => 'Canvi marcat com a retornat';
+
+  @override
+  String get swapMarkSettled => 'Marca com a saldat';
+
+  @override
+  String get swapMarkedSettled => 'Canvi saldat';
+
+  @override
+  String get swapReopen => 'Marca com a pendent';
+
+  @override
+  String get swapReopened => 'El canvi torna a estar pendent';
+
+  @override
+  String get swapApplyToCalendar => 'Aplica al quadrant';
+
+  @override
+  String get swapUndoFromCalendar => 'Treu del quadrant';
+
+  @override
+  String get swapApplied => 'Canvi aplicat al quadrant';
+
+  @override
+  String get swapUnapplied => 'Canvi tret del quadrant';
+
+  @override
+  String get swapNothingToApply => 'Els dies ja estan com diu el canvi';
+
+  @override
+  String get swapNotApplied => 'Aquest canvi no està aplicat al quadrant';
+
+  @override
+  String get swapDaySection => 'Canvi de torn';
+
+  @override
+  String get swapDayAdd => 'Anota un canvi';
+
+  @override
+  String get swapDayEmpty => 'Aquest dia no té cap canvi anotat.';
+
+  @override
+  String get swapMenuTooltip => 'Opcions del canvi';
+
+  @override
+  String get swapGivesLabel => 'Cedeixes';
+
+  @override
+  String get swapReceivesLabel => 'Reps';
+
+  @override
+  String get noteAttachmentsSection => 'Adjunts';
+
+  @override
+  String get noteAttachmentsEmptyTitle => 'Encara no hi ha fotos ni fitxers';
+
+  @override
+  String get noteAttachmentsEmptyBody =>
+      'Pots afegir una foto, un fitxer o un dibuix a aquest dia.';
+
+  @override
+  String get noteAttachmentsAdd => 'Afegeix';
+
+  @override
+  String get noteAttachmentsAddPhoto => 'Fes una foto';
+
+  @override
+  String get noteAttachmentsAddGallery => 'Tria de la galeria';
+
+  @override
+  String get noteAttachmentsAddFile => 'Tria un fitxer';
+
+  @override
+  String get noteAttachmentsAddSketch => 'Dibuixa';
+
+  @override
+  String get noteAttachmentKindPhoto => 'Foto';
+
+  @override
+  String get noteAttachmentKindFile => 'Fitxer';
+
+  @override
+  String get noteAttachmentKindSketch => 'Dibuix';
+
+  @override
+  String noteAttachmentOpen(String name) {
+    return 'Obre $name';
+  }
+
+  @override
+  String noteAttachmentRemove(String name) {
+    return 'Treu $name';
+  }
+
+  @override
+  String noteAttachmentRemoveHint(String name) {
+    return 'Mantén premut per treure $name';
+  }
+
+  @override
+  String noteAttachmentRemoved(String name) {
+    return 'S’ha tret $name';
+  }
+
+  @override
+  String get noteAttachmentsViewerTitle => 'Adjunt';
+
+  @override
+  String get noteAttachmentTooLarge =>
+      'Aquest fitxer és massa gran (el màxim són 50 MB).';
+
+  @override
+  String get noteAttachmentStoreFull => 'No queda espai per a més adjunts.';
+
+  @override
+  String get noteAttachmentUnreadable => 'No s’ha pogut llegir el fitxer.';
+
+  @override
+  String get noteAttachmentCameraDenied =>
+      'Sense el permís no podem obrir la càmera.';
+
+  @override
+  String get noteAttachmentGalleryDenied =>
+      'Sense el permís no podem obrir la galeria.';
+
+  @override
+  String get noteAttachmentFailed => 'No s’ha pogut desar l’adjunt.';
+
+  @override
+  String get noteAttachmentRemoveFailed => 'No s’ha pogut treure l’adjunt.';
+
+  @override
+  String get noteTasksSection => 'Tasques';
+
+  @override
+  String get noteTasksEmpty => 'Aquest dia no té tasques.';
+
+  @override
+  String get noteTasksAdd => 'Afegeix una tasca';
+
+  @override
+  String get noteTasksHint => 'Què cal fer';
+
+  @override
+  String get noteTasksInvalid => 'Escriu què cal fer.';
+
+  @override
+  String get noteTasksUndo => 'Desfés l’últim canvi de les tasques';
+
+  @override
+  String get noteTaskMenu => 'Opcions de la tasca';
+
+  @override
+  String get noteTaskMoveUp => 'Puja';
+
+  @override
+  String get noteTaskMoveDown => 'Baixa';
+
+  @override
+  String get noteTaskRemove => 'Treu la tasca';
+
+  @override
+  String get sketchTitle => 'Dibuix';
+
+  @override
+  String get sketchPen => 'Traç';
+
+  @override
+  String get sketchEraser => 'Esborrador';
+
+  @override
+  String get sketchUndo => 'Desfés el traç';
+
+  @override
+  String get sketchRedo => 'Refés el traç';
+
+  @override
+  String get sketchClear => 'Esborra el dibuix';
+
+  @override
+  String get sketchSave => 'Desa';
+
+  @override
+  String get sketchColor => 'Color del traç';
+
+  @override
+  String get sketchColorInk => 'Tinta';
+
+  @override
+  String get sketchColorAccent => 'Accent';
+
+  @override
+  String get sketchColorHighlight => 'Ambre';
+
+  @override
+  String get sketchColorHoliday => 'Vermell';
+
+  @override
+  String get sketchColorSuccess => 'Verd';
+
+  @override
+  String get sketchEmpty => 'Dibuixa alguna cosa per poder desar-la.';
+
+  @override
+  String get sketchFailed => 'No s’ha pogut desar el dibuix.';
+
+  @override
+  String get appearanceNoteInMonthTitle => 'Mostra la nota al mes';
+
+  @override
+  String get appearanceNoteInMonthSubtitle =>
+      'La primera línia de la nota a la casella del dia';
+
+  @override
+  String get appearancePaintSoundTitle => 'So en pintar';
+
+  @override
+  String get appearancePaintSoundSubtitle =>
+      'Un clic en pintar un dia, tret del mode silenci';
+
+  @override
+  String get appearancePresetsTitle => 'Paletes preparades';
+
+  @override
+  String get appearancePresetsNote =>
+      'Canvien alhora el color dels torns que fan servir els colors de fàbrica. Els que hagis pintat al teu gust es queden igual.';
+
+  @override
+  String get appearancePresetsChoose => 'Tria';
+
+  @override
+  String get appearancePresetsApplied => 'Paleta aplicada. Pots desfer-ho.';
+
+  @override
+  String get appearancePresetSunset => 'Capvespre';
+
+  @override
+  String get appearancePresetSea => 'Mar';
+
+  @override
+  String get appearancePresetForest => 'Bosc';
+
+  @override
+  String get appearancePresetCandy => 'Caramel';
+
+  @override
+  String get appearancePresetNocturnal => 'Nit tancada';
+
+  @override
+  String get appearanceBackgroundTitle => 'Imatge de fons del calendari';
+
+  @override
+  String get appearanceBackgroundChoose => 'Tria';
+
+  @override
+  String get appearanceBackgroundChange => 'Canvia';
+
+  @override
+  String get appearanceBackgroundPick => 'Tria de la galeria';
+
+  @override
+  String get appearanceBackgroundRemove => 'Treu la imatge';
+
+  @override
+  String get appearanceBackgroundOnDevice =>
+      'Es queda en aquest mòbil: no viatja amb la còpia de seguretat';
+
+  @override
+  String get appearanceBackgroundNote =>
+      'Es tria de la teva galeria i es veu darrere del mes, amb un vel perquè tot es llegeixi bé. Les caselles del torn no canvien.';
+
+  @override
+  String get appearanceBackgroundTooLarge =>
+      'Aquesta imatge és massa gran. Prova’n una de més petita.';
+
+  @override
+  String get appearanceBackgroundFailed => 'No s’ha pogut desar la imatge.';
+
+  @override
+  String get widgetAddFourWeeks => 'Quatre setmanes: un mes';
+
+  @override
+  String get widgetNameFourWeeks => 'Quatre setmanes';
+
+  @override
+  String get widgetDescFourWeeks => 'El mes per setmanes';
+
+  @override
+  String get compareSelectorTitle => 'Calendaris comparats';
+
+  @override
+  String get compareSelectorAction => 'Canvia';
+
+  @override
+  String get compareSheetHint => 'Pots comparar de 2 a 6 calendaris.';
+
+  @override
+  String get compareSheetDone => 'Fet';
+
+  @override
+  String get compareSheetMinWarning =>
+      'Fan falta com a mínim 2 calendaris per comparar.';
+
+  @override
+  String get compareSheetMaxWarning => 'Ja compares 6 calendaris, el màxim.';
+
+  @override
+  String get compareWeekendTitle => 'Caps de setmana lliures en comú';
+
+  @override
+  String compareWeekendCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count caps de setmana lliures en comú aquest mes',
+      one: '1 cap de setmana lliure en comú aquest mes',
+      zero: 'Cap cap de setmana lliure en comú aquest mes',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String compareWeekendDaysCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dies de cap de setmana lliures en comú',
+      one: '1 dia de cap de setmana lliure en comú',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String compareWeekendSpoken(String saturday, String sunday) {
+    return '$saturday i $sunday, lliures en comú';
+  }
+
+  @override
+  String get compareTableNames => 'Calendaris';
+
+  @override
+  String get devEventsRowTitle => 'Cites del mòbil';
+
+  @override
+  String get devEventsRowSubtitle =>
+      'Les cites del teu calendari al costat dels torns';
+
+  @override
+  String get devEventsTitle => 'Cites del mòbil';
+
+  @override
+  String get devEventsHelp =>
+      'Tria els calendaris del mòbil les cites dels quals vols veure al costat dels torns. Turnly només els llegeix: no hi escriu ni hi canvia res.';
+
+  @override
+  String get devEventsPermissionTitle => 'Falta el permís del calendari';
+
+  @override
+  String get devEventsPermissionBody =>
+      'Per llegir les cites del mòbil, Turnly necessita permís per veure els teus calendaris. No es demana en obrir l’app: només si ho acceptes aquí.';
+
+  @override
+  String get devEventsPermissionDeniedTitle =>
+      'L’accés al calendari està desactivat';
+
+  @override
+  String get devEventsPermissionDeniedBody =>
+      'Activa’l a la configuració del sistema (Permisos › Calendari) i torna aquí.';
+
+  @override
+  String get devEventsPermissionDeniedBodyIos =>
+      'Activa’l a la configuració del sistema (Turnly › Calendaris) i torna aquí.';
+
+  @override
+  String get devEventsPermissionRestrictedTitle =>
+      'Aquest mòbil no deixa fer servir el calendari';
+
+  @override
+  String get devEventsPermissionRestrictedBody =>
+      'Pot ser un control parental o un perfil de feina. Sense aquest permís no es poden mostrar les cites.';
+
+  @override
+  String get devEventsPermissionDeclinedBody =>
+      'No has donat el permís. Sense ell no podem llegir els teus calendaris, però pots permetre-ho ara.';
+
+  @override
+  String get devEventsPermissionAllow => 'Permet l’accés';
+
+  @override
+  String get devEventsPermissionSettings => 'Obre la configuració';
+
+  @override
+  String get devEventsPermissionRecheck => 'Torna-ho a comprovar';
+
+  @override
+  String get devEventsCalendarsTitle => 'Calendaris del mòbil';
+
+  @override
+  String devEventsChosenCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count calendaris triats',
+      one: '1 calendari triat',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get devEventsEmptyTitle => 'No hi ha calendaris';
+
+  @override
+  String get devEventsEmptyBody =>
+      'Aquest mòbil no té cap calendari que Turnly pugui llegir.';
+
+  @override
+  String get devEventsReadFailedTitle =>
+      'No s’han pogut llegir els teus calendaris';
+
+  @override
+  String get devEventsReadFailedBody =>
+      'El calendari del mòbil no ha respost. Comprova’l una altra vegada.';
+
+  @override
+  String get devEventsOffTitle => 'Ara no es mostren cites';
+
+  @override
+  String get devEventsOffBody =>
+      'No has triat cap calendari. Fins que en triïs un, el mes i el dia no mostren cites.';
+
+  @override
+  String get devEventsSaveFailed => 'No s’han pogut desar els canvis.';
+
+  @override
+  String get devEventsSectionTitle => 'Cites del mòbil';
+
+  @override
+  String get devEventsAllDay => 'Tot el dia';
+
+  @override
+  String devEventsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cites',
+      one: '1 cita',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String devEventsEventSemantics(String time, String title) {
+    return '$time, $title';
+  }
+
+  @override
+  String devEventsEventWithCalendarSemantics(
+    String time,
+    String title,
+    String calendar,
+  ) {
+    return '$time, $title, $calendar';
+  }
 }

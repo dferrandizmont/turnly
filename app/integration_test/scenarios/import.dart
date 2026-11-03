@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:cuadrante/features/calendar/presentation/month_screen.dart';
+import 'package:cuadrante/features/calendar_export/data/calendar_exporter.dart';
 import 'package:cuadrante/features/calendar_export/domain/export_events.dart';
 import 'package:cuadrante/features/import/application/import_providers.dart';
 import 'package:cuadrante/features/import/data/import_file_picker.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
+import 'package:cuadrante/l10n/app_localizations.dart';
 import 'package:device_calendar_plus/device_calendar_plus.dart' as dcp;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
@@ -89,6 +91,9 @@ List<Override> _overrides(PickedImportFile? file) => [
 ];
 
 Finder _key(String k) => find.byKey(ValueKey(k));
+
+/// The user-visible texts of the export screen, in the QA locale.
+final _l10n = lookupAppLocalizations(const Locale('es', 'ES'));
 
 Future<void> _openImport(WidgetTester t) async {
   await t.tapAndSettle(find.byTooltip('Abrir ajustes'), reason: 'Ajustes');
@@ -308,7 +313,7 @@ Future<void> _cleanCalendars(QaContext qa, String name) async {
   });
 }
 
-/// The events of the calendar called [name] that Cuadrante exported, by their
+/// The events of the calendar called [name] that Turnly exported, by their
 /// tag: `tag -> title`.
 Future<Map<String, String>> _exported(QaContext qa, String name) async {
   return (await qa.tester.runAsync(() async {
@@ -334,18 +339,18 @@ Future<Map<String, String>> _exported(QaContext qa, String name) async {
 Future<void> _exportTwice(QaContext qa) async {
   final t = qa.tester;
   await _requireCalendarAccess(qa);
-  await _cleanCalendars(qa, 'Cuadrante');
+  await _cleanCalendars(qa, exportCalendarName);
   final app = await QaApp.open(qa);
 
   await _openExport(t);
-  expect(find.text('Crear el calendario «Cuadrante»'), findsOneWidget);
+  expect(find.text(_l10n.calExportNewCalendar), findsOneWidget);
   await qa.shot('opciones');
   await t.tapAndSettle(_key('export-start'), reason: 'Exportar');
   await t.waitFor(_key('export-result'), reason: 'resultado de la exportación');
-  expect(find.text('Se ha creado el calendario «Cuadrante».'), findsOneWidget);
+  expect(find.text(_l10n.calExportDoneCalendar), findsOneWidget);
   await qa.shot('exportado');
 
-  final first = await _exported(qa, 'Cuadrante');
+  final first = await _exported(qa, exportCalendarName);
   expect(first, isNotEmpty, reason: 'eventos en el calendario del móvil');
   // Every event carries the tag of the active calendar and one of today's
   // shifts is there (Noche on the 19th).
@@ -365,7 +370,7 @@ Future<void> _exportTwice(QaContext qa) async {
     find.text('Todo está al día: no hay nada que cambiar.'),
     reason: 'plan sin cambios',
   );
-  expect((await _exported(qa, 'Cuadrante')).length, first.length);
+  expect((await _exported(qa, exportCalendarName)).length, first.length);
 
   // One day changes (Mañana on 30 Oct becomes Tarde): re-exporting REPLACES
   // that event, it does not add one.
@@ -381,7 +386,7 @@ Future<void> _exportTwice(QaContext qa) async {
   );
   await t.tapAndSettle(_key('export-start'), reason: 'Exportar otra vez');
   await t.waitFor(_key('export-result-replaced'), reason: 'evento sustituido');
-  final second = await _exported(qa, 'Cuadrante');
+  final second = await _exported(qa, exportCalendarName);
   expect(second.length, first.length, reason: 'mismo número de eventos');
   expect(second['cuadrante:v1:main:2026-10-30:afternoon:0'], 'Tarde · T');
   expect(second['cuadrante:v1:main:2026-10-30:morning:0'], isNull);

@@ -8,6 +8,7 @@ import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'day_sheet_finders.dart';
 import 'harness.dart';
 
 // Demo data around Monday 19 Oct 2026 (see day_edit_controller_test.dart):
@@ -46,12 +47,8 @@ Future<void> closeDay(WidgetTester tester) async {
   expect(_sheet, findsNothing);
 }
 
-Future<void> tapInSheet(WidgetTester tester, String key) async {
-  await tester.ensureVisible(_key(key));
-  await tester.pumpAndSettle();
-  await tester.tap(_key(key));
-  await tester.pumpAndSettle();
-}
+Future<void> tapInSheet(WidgetTester tester, String key) =>
+    tapDayControl(tester, key);
 
 /// The app leaves the foreground the way the system says it (resumed,
 /// inactive, hidden, paused); the test comes back by itself at the end.
@@ -124,7 +121,7 @@ void main() {
 
       await openDay(tester, oct20);
       expect(
-        find.descendant(of: _sheet, matching: find.text('22:00–06:00')),
+        find.descendant(of: _sheet, matching: find.text('22:00–06:00 · 8 h')),
         findsOneWidget,
       );
       expect(find.text('Cambio con Marta si sale el turno'), findsOneWidget);
@@ -150,12 +147,20 @@ void main() {
     ) async {
       await pumpCalendar(tester);
       await openDay(tester, oct24);
-      expect(find.text('Añadir turno'.toUpperCase()), findsNothing);
-      expect(find.text('DOBLAR CON OTRO TURNO'), findsOneWidget);
+      // A day with a shift keeps the palette folded behind «Añadir turno».
+      expect(_key('day-palette'), findsNothing);
+      await tapInSheet(tester, 'day-add-open');
+      expect(find.text('Doblar con otro turno'), findsOneWidget);
+      expect(
+        find.text('Para cambiar un turno por otro, toca su menú.'),
+        findsOneWidget,
+      );
 
       await tapInSheet(tester, 'day-add-guard24');
       expect(schedule(tester).resolve(oct24).shiftIds, ['rest', 'guard24']);
       expect(_key('day-shift-1'), findsOneWidget);
+      // The palette closes: the new row says what happened.
+      expect(_key('day-palette'), findsNothing);
       // The one already in the day cannot be added again.
       await tapInSheet(tester, 'day-add-guard24');
       expect(schedule(tester).resolve(oct24).shiftIds, ['rest', 'guard24']);
@@ -174,7 +179,10 @@ void main() {
     testWidgets('an empty day offers "Añadir turno"', (tester) async {
       await pumpCalendar(tester);
       await openDay(tester, oct22);
-      expect(find.text('AÑADIR TURNO'), findsOneWidget);
+      // An empty day opens with the palette already out.
+      expect(_key('day-palette'), findsOneWidget);
+      expect(find.text('Añadir turno'), findsOneWidget);
+      expect(_key('day-add-open'), findsNothing);
       await tapInSheet(tester, 'day-add-morning');
       expect(schedule(tester).resolve(oct22).shiftIds, ['morning']);
       expect(find.text('Este día no tiene turno.'), findsNothing);
@@ -187,7 +195,10 @@ void main() {
       expect(schedule(tester).resolve(oct21).shiftIds, ['afternoon']);
       expect(_key('day-shift-1'), findsNothing);
       // With a single shift there is nothing to reorder.
+      await revealDayControl(tester, 'day-remove-0');
       expect(_key('day-up-0'), findsNothing);
+      expect(_key('day-down-0'), findsNothing);
+      await dismissMenu(tester);
       await expectStoredIsShown(tester);
 
       await tapInSheet(tester, 'day-remove-0');
@@ -204,8 +215,18 @@ void main() {
         'afternoon',
       ]);
       // The ends cannot move further.
-      expect(tester.widget<IconButton>(_key('day-up-0')).onPressed, isNull);
-      expect(tester.widget<IconButton>(_key('day-down-1')).onPressed, isNull);
+      await revealDayControl(tester, 'day-up-0');
+      expect(
+        tester.widget<PopupMenuItem<Object?>>(_key('day-up-0')).enabled,
+        isFalse,
+      );
+      await dismissMenu(tester);
+      await revealDayControl(tester, 'day-down-1');
+      expect(
+        tester.widget<PopupMenuItem<Object?>>(_key('day-down-1')).enabled,
+        isFalse,
+      );
+      await dismissMenu(tester);
 
       await tapInSheet(tester, 'day-down-0');
       expect(schedule(tester).resolve(oct21).shiftIds, [
@@ -242,6 +263,7 @@ void main() {
     testWidgets('"Borrar día" is off on an empty day', (tester) async {
       await pumpCalendar(tester);
       await openDay(tester, oct22);
+      await revealDayControl(tester, 'day-clear');
       expect(
         tester.widget<SecondaryButton>(_key('day-clear')).onPressed,
         isNull,
@@ -515,6 +537,7 @@ void main() {
 
       // Reopened, the switch is on with the name.
       await openDay(tester, oct24);
+      await openDayMore(tester);
       expect(
         tester.widget<TextField>(_key('day-holiday-name')).controller?.text,
         'Cumple de Ana',
@@ -537,6 +560,7 @@ void main() {
     ) async {
       await pumpCalendar(tester);
       await openDay(tester, oct12);
+      await revealDayControl(tester, 'day-holiday-switch');
       expect(
         tester.widget<SwitchListTile>(_key('day-holiday-switch')).value,
         isFalse,
@@ -762,8 +786,7 @@ void main() {
           size: size,
         );
         await openDay(tester, oct21);
-        await tester.ensureVisible(_key('day-clear'));
-        await tester.pumpAndSettle();
+        await revealDayControl(tester, 'day-clear');
         expect(tester.takeException(), isNull);
         expect(_key('day-reset'), findsOneWidget);
         expect(_key('day-note'), findsOneWidget);

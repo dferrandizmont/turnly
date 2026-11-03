@@ -17,3 +17,6 @@ Thumbs.db
 
 # Salidas de compilación y de la batería del emulador
 build/
+
+# Entorno virtual del generador de festivos (app/tool/export_country_holidays.py)
+.venv/

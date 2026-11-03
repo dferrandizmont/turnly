@@ -53,7 +53,8 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(dayCell(harnessToday));
         await tester.pumpAndSettle();
-        expect(find.text(l10n.daySheetNote), findsWidgets);
+        // Day detail 4A: the note is a field with its hint, no label.
+        expect(find.text(l10n.dayDetailNoteHint), findsOneWidget);
         expect(tester.takeException(), isNull);
 
         // And the day after, with its own shifts.

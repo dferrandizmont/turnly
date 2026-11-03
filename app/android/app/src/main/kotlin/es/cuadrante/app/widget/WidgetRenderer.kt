@@ -38,6 +38,7 @@ object WidgetRenderer {
         CuadranteLargeWidgetProvider::class.java to WidgetModelBuilder.Kind.LARGE,
         CuadranteAgendaWidgetProvider::class.java to WidgetModelBuilder.Kind.AGENDA,
         CuadranteTwoWeeksWidgetProvider::class.java to WidgetModelBuilder.Kind.TWO_WEEKS,
+        CuadranteFourWeeksWidgetProvider::class.java to WidgetModelBuilder.Kind.FOUR_WEEKS,
     )
 
     private fun preferences(context: Context): SharedPreferences =
@@ -99,6 +100,7 @@ object WidgetRenderer {
             WidgetModelBuilder.Kind.LARGE -> R.layout.widget_month
             WidgetModelBuilder.Kind.AGENDA -> R.layout.widget_agenda
             WidgetModelBuilder.Kind.TWO_WEEKS -> R.layout.widget_two_weeks
+            WidgetModelBuilder.Kind.FOUR_WEEKS -> R.layout.widget_four_weeks
         }
         val views = RemoteViews(context.packageName, layout)
         val painter = Painter(context, views)
@@ -107,12 +109,18 @@ object WidgetRenderer {
         // previous draw survives unless this one sets it again (H-T12-2).
         painter.root(kind, WidgetRenderPlan.root(content))
         when (content) {
-            is WidgetContent.Stale -> painter.stale(content, kind == WidgetModelBuilder.Kind.AGENDA || kind == WidgetModelBuilder.Kind.TWO_WEEKS)
+            is WidgetContent.Stale -> painter.stale(
+                content,
+                kind == WidgetModelBuilder.Kind.AGENDA ||
+                    kind == WidgetModelBuilder.Kind.TWO_WEEKS ||
+                    kind == WidgetModelBuilder.Kind.FOUR_WEEKS,
+            )
             is WidgetContent.Small -> painter.small(content)
             is WidgetContent.Medium -> painter.medium(content)
             is WidgetContent.Large -> painter.large(content)
             is WidgetContent.Agenda -> painter.agenda(content, size)
             is WidgetContent.TwoWeeks -> painter.twoWeeks(content, size)
+            is WidgetContent.FourWeeks -> painter.fourWeeks(content, size)
         }
         return views
     }
@@ -139,6 +147,7 @@ object WidgetRenderer {
                 WidgetModelBuilder.Kind.LARGE -> views.setViewVisibility(R.id.month_content, content)
                 WidgetModelBuilder.Kind.AGENDA -> views.setViewVisibility(R.id.agenda_content, content)
                 WidgetModelBuilder.Kind.TWO_WEEKS -> views.setViewVisibility(R.id.two_weeks_content, content)
+                WidgetModelBuilder.Kind.FOUR_WEEKS -> views.setViewVisibility(R.id.four_weeks_content, content)
             }
         }
 
@@ -413,6 +422,56 @@ object WidgetRenderer {
                 views.addView(rows[i / 7], cell)
             }
             open(R.id.widget_root, WidgetLinks.day(c.date) + "?homeWidget")
+        }
+
+        fun fourWeeks(c: WidgetContent.FourWeeks, size: WidgetRenderPlan.Size) {
+            views.setTextViewText(R.id.four_weeks_next_off, c.nextOff.orEmpty())
+            views.setViewVisibility(R.id.four_weeks_next_off, visible(c.nextOff != null))
+            val headers = intArrayOf(
+                R.id.fw_h0, R.id.fw_h1, R.id.fw_h2, R.id.fw_h3,
+                R.id.fw_h4, R.id.fw_h5, R.id.fw_h6,
+            )
+            headers.forEachIndexed { i, id ->
+                views.setTextViewText(id, c.days.getOrNull(i)?.weekdayShort.orEmpty())
+            }
+            val rows = intArrayOf(
+                R.id.four_weeks_row0, R.id.four_weeks_row1,
+                R.id.four_weeks_row2, R.id.four_weeks_row3,
+            )
+            rows.forEach { views.removeAllViews(it) }
+            val noShift = c.noShift ?: context.getString(R.string.widget_no_shift)
+            c.days.forEachIndexed { i, day ->
+                val cell = RemoteViews(context.packageName, R.layout.widget_four_weeks_cell)
+                val p = Painter(context, cell)
+                val cellWidth = (size.width - 16) / 7f - 4
+                cell.setTextViewText(R.id.fw_date, day.dayOfMonth.toString())
+                p.color(R.id.fw_date, "setTextColor",
+                    if (day.isHoliday) R.color.widget_holiday else R.color.widget_text_secondary)
+                cell.setViewVisibility(R.id.fw_ring, visible(day.date == c.date))
+                p.color(R.id.fw_ring, "setColorFilter", R.color.widget_today_ring)
+                // The first line of the note when it travels; otherwise the
+                // clip of always marks it (never on an absence day).
+                cell.setTextViewText(R.id.fw_note, WidgetModelBuilder.cappedNote(day.note).orEmpty())
+                cell.setViewVisibility(R.id.fw_note, visible(day.note != null))
+                cell.setViewVisibility(R.id.fw_note_mark, visible(day.hasNote && day.note == null))
+                cell.removeAllViews(R.id.fw_shifts)
+                for (slot in WidgetRenderPlan.twoWeeksSlots(day.shifts, size)) {
+                    val s = slot.shift
+                    val shift = RemoteViews(context.packageName, R.layout.widget_four_weeks_shift)
+                    val sp = Painter(context, shift)
+                    shift.setTextViewText(R.id.fw_code, slot.code)
+                    shift.setTextViewTextSize(R.id.fw_code, TypedValue.COMPLEX_UNIT_SP,
+                        fittedSize(slot.code, 13f, (cellWidth - 6).coerceAtLeast(1f), size.fontScale))
+                    sp.paint(R.id.fw_code, "setTextColor", s.colors.ink)
+                    sp.paint(R.id.fw_shift_tint, "setColorFilter", s.colors.tint)
+                    sp.paint(R.id.fw_bar, "setColorFilter", s.colors.bar)
+                    cell.addView(R.id.fw_shifts, shift)
+                }
+                cell.setContentDescription(R.id.fw_cell, displayDescription(day, noShift))
+                p.open(R.id.fw_cell, day.link)
+                views.addView(rows[i / 7], cell)
+            }
+            open(R.id.widget_root, c.link)
         }
 
         private fun displayDescription(day: DisplayDay, noShift: String): String =

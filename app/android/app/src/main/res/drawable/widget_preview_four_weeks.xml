@@ -1,0 +1,974 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="300dp"
+    android:height="268dp"
+    android:viewportWidth="300"
+    android:viewportHeight="268">
+    <path
+        android:fillColor="@color/widget_surface"
+        android:pathData="M0,0 h300 v268 h-300 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_n_tint"
+        android:pathData="M8,8 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_n_bar"
+        android:pathData="M8,62 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_n_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M20,52 V36 L32,52 V36"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M26.7,14.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M26.7,18.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_n_tint"
+        android:pathData="M49,8 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_n_bar"
+        android:pathData="M49,62 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_n_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M61,52 V36 L73,52 V36"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M64.9,14 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M67.7,14.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M64.9,21 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M64.2,18.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M64.9,17.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_t_tint"
+        android:pathData="M90,8 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_t_bar"
+        android:pathData="M90,62 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_t_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M103,36 H115 M109,36 V52"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M105.9,14 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M108.7,14.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M108.7,18.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M105.9,21 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M105.9,17.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_t_tint"
+        android:pathData="M131,8 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_t_bar"
+        android:pathData="M131,62 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_t_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M144,36 H156 M150,36 V52"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M149.7,14.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M149.7,18.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M146.2,14.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M146.9,17.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_m_tint"
+        android:pathData="M172,8 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_m_bar"
+        android:pathData="M172,62 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_m_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M184,52 V36 L190,44 L196,36 V52"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M187.9,14 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M190.7,18.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M187.9,21 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M187.2,14.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M187.9,17.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_m_tint"
+        android:pathData="M213,8 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_m_bar"
+        android:pathData="M213,62 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_m_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M225,52 V36 L231,44 L237,36 V52"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M228.9,14 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M231.7,18.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M228.9,21 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M228.2,18.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M228.2,14.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M228.9,17.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_l_tint"
+        android:pathData="M254,8 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_l_bar"
+        android:pathData="M254,62 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_l_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M266,36 V52 H278"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M269.9,14 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M272.7,14.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M272.7,18.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_n_tint"
+        android:pathData="M8,72 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_n_bar"
+        android:pathData="M8,126 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_n_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M20,116 V100 L32,116 V100"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M23.9,78 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M26.7,78.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M26.7,82.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M23.9,85 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M23.2,82.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M23.2,78.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M23.9,81.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_n_tint"
+        android:pathData="M49,72 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_n_bar"
+        android:pathData="M49,126 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_n_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M61,116 V100 L73,116 V100"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M64.9,78 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M67.7,78.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M67.7,82.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M64.9,85 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M64.2,78.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M64.9,81.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_t_tint"
+        android:pathData="M90,72 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_t_bar"
+        android:pathData="M90,126 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_t_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M103,100 H115 M109,100 V116"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M105.9,78.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M105.9,82.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M108.7,78 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M111.5,78.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M111.5,82.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M108.7,85 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M108,82.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M108,78.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_t_tint"
+        android:pathData="M131,72 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_t_bar"
+        android:pathData="M131,126 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_t_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M144,100 H156 M150,100 V116"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M146.9,78.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M146.9,82.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M152.5,78.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M152.5,82.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_m_tint"
+        android:pathData="M172,72 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_m_bar"
+        android:pathData="M172,126 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_m_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M184,116 V100 L190,108 L196,100 V116"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M187.9,78.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M187.9,82.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M190.7,78 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M193.5,78.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M190.7,85 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M190,82.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M190.7,81.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_m_tint"
+        android:pathData="M213,72 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_m_bar"
+        android:pathData="M213,126 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_m_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M225,116 V100 L231,108 L237,100 V116"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M228.9,78.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M228.9,82.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M231.7,78 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M234.5,78.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M234.5,82.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M231.7,85 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M231.7,81.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_l_tint"
+        android:pathData="M254,72 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_l_bar"
+        android:pathData="M254,126 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_l_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M266,100 V116 H278"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M269.9,78.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M269.9,82.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M275.5,78.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M275.5,82.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M272,78.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M272.7,81.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_n_tint"
+        android:pathData="M8,136 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_n_bar"
+        android:pathData="M8,190 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_n_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M20,180 V164 L32,180 V164"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M23.9,142.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M23.9,146.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M26.7,142 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M29.5,146.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M26.7,149 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M26,142.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M26.7,145.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_n_tint"
+        android:pathData="M49,136 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_n_bar"
+        android:pathData="M49,190 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_n_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M61,180 V164 L73,180 V164"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M64.9,142.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M64.9,146.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M67.7,142 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M70.5,146.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M67.7,149 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M67,146.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M67,142.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M67.7,145.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_t_tint"
+        android:pathData="M90,136 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_t_bar"
+        android:pathData="M90,190 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_t_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M103,164 H115 M109,164 V180"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M105.9,142.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M105.9,146.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M108.7,142 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M111.5,142.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M111.5,146.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_t_tint"
+        android:pathData="M131,136 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_t_bar"
+        android:pathData="M131,190 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_t_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M144,164 H156 M150,164 V180"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M146.9,142.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M146.9,146.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M149.7,142 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M152.5,142.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M152.5,146.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M149.7,149 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M149,146.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M149,142.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M149.7,145.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_m_tint"
+        android:pathData="M172,136 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_m_bar"
+        android:pathData="M172,190 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_m_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M184,180 V164 L190,172 L196,164 V180"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M187.9,142.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M187.9,146.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M190.7,142 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M193.5,142.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M193.5,146.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M190.7,149 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M190,142.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M190.7,145.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_m_tint"
+        android:pathData="M213,136 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_m_bar"
+        android:pathData="M213,190 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_m_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M225,180 V164 L231,172 L237,164 V180"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M226.1,142 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M228.9,142.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M226.1,149 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M225.4,146.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M226.1,145.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M231.7,142 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M234.5,142.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M234.5,146.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M231.7,149 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M231,146.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M231,142.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_l_tint"
+        android:pathData="M254,136 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_l_bar"
+        android:pathData="M254,190 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_l_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M266,164 V180 H278"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M267.1,142 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M269.9,142.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M267.1,149 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M266.4,146.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M267.1,145.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M275.5,142.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M275.5,146.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_n_tint"
+        android:pathData="M8,200 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_n_bar"
+        android:pathData="M8,254 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_n_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M20,244 V228 L32,244 V228"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M21.1,206 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M23.9,206.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M21.1,213 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M20.4,210.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M21.1,209.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M26.7,206 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M29.5,206.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M26.7,213 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M26,210.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M26.7,209.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_n_tint"
+        android:pathData="M49,200 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_n_bar"
+        android:pathData="M49,254 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_n_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M61,244 V228 L73,244 V228"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M62.1,206 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M64.9,206.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M62.1,213 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M61.4,210.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M62.1,209.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M67.7,206 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M70.5,206.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M70.5,210.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M67.7,213 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M67.7,209.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_t_tint"
+        android:pathData="M90,200 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_t_bar"
+        android:pathData="M90,254 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_t_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M103,228 H115 M109,228 V244"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M103.1,206 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M105.9,206.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M103.1,213 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M102.4,210.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M103.1,209.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M111.5,206.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M111.5,210.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M108,206.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M108.7,209.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_t_tint"
+        android:pathData="M131,200 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_t_bar"
+        android:pathData="M131,254 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_t_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M144,228 H156 M150,228 V244"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M144.1,206 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M146.9,206.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M144.1,213 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M143.4,210.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M144.1,209.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M149.7,206 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M152.5,210.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M149.7,213 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M149,206.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M149.7,209.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_m_tint"
+        android:pathData="M172,200 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_m_bar"
+        android:pathData="M172,254 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_m_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M184,244 V228 L190,236 L196,228 V244"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M185.1,206 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M187.9,206.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M185.1,213 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M184.4,210.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M185.1,209.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M190.7,206 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M193.5,210.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M190.7,213 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M190,210.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M190,206.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M190.7,209.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_m_tint"
+        android:pathData="M213,200 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_m_bar"
+        android:pathData="M213,254 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_m_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M225,244 V228 L231,236 L237,228 V244"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M226.1,206 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M228.9,206.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M226.1,213 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M225.4,210.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M226.1,209.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M231.7,206 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M234.5,206.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M234.5,210.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_l_tint"
+        android:pathData="M254,200 h36 v58 h-36 Z"/>
+    <path
+        android:fillColor="@color/widget_preview_l_bar"
+        android:pathData="M254,254 h36 v4 h-36 Z"/>
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@color/widget_preview_l_ink"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M266,228 V244 H278"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M267.1,206 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M269.9,206.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M267.1,213 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M266.4,210.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M267.1,209.5 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M272.7,206 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M275.5,206.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M275.5,210.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M272.7,213 h2.8 v0.7 h-2.8 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M272,210.2 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M272,206.7 h0.7 v2.8 h-0.7 Z"/>
+    <path
+        android:fillColor="@color/widget_text_secondary"
+        android:pathData="M272.7,209.5 h2.8 v0.7 h-2.8 Z"/>
+</vector>

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/day_sheet.dart';
 import '../support/qa_core.dart';
 import '../support/qa_harness.dart';
 
@@ -57,7 +58,9 @@ Future<void> _close(WidgetTester t) async {
   expect(sheet, findsNothing, reason: 'la hoja debe cerrarse');
 }
 
-Future<void> _tap(WidgetTester t, String key) => t.tapAndSettle(_k(key));
+/// Taps a control of the day detail, opening the layer it is in first (the
+/// menu of a row, the palette or «Más opciones»).
+Future<void> _tap(WidgetTester t, String key) => t.tapDayControl(key);
 
 Future<void> _undoFromMonth(WidgetTester t, {int times = 1}) async {
   await enterPaintMode(t);
@@ -238,6 +241,7 @@ Future<void> _holiday(QaContext qa) async {
   await app.restart();
   expect(dot(), findsOneWidget);
   await _open(t, _oct24);
+  await t.openDayMore();
   expect(
     t.widget<TextField>(_k('day-holiday-name')).controller?.text,
     'Cumple de Ana',
@@ -313,6 +317,7 @@ Future<void> _duplicate(QaContext qa) async {
 
   await _open(t, _oct26);
   expect(find.text('Este día no tiene turno.'), findsOneWidget);
+  await t.openDayMore();
   expect(t.widget<SecondaryButton>(_k('day-clear')).onPressed, isNull);
   await _close(t);
   // Let the notice clear the paint toolbar before using its undo button.

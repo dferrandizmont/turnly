@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../icons/app_icons.dart';
+import 'app_appearance.dart';
 import 'app_colors.dart';
 import 'app_typography.dart';
 import 'page_transitions.dart';
@@ -17,8 +18,39 @@ class AppTheme {
   /// Minimum touch target (48 dp, see design system).
   static const double minTouch = Sp.touch;
 
-  static ThemeData light() => _build(AppColors.light);
-  static ThemeData dark() => _build(AppColors.dark);
+  /// The light theme with the user's [accent] and «Tamaño del turno en el
+  /// mes» ([cellSize]); without them, the defaults (Índigo, normal).
+  static ThemeData light({
+    AppAccent accent = AppAccent.defaultAccent,
+    CellTextSize cellSize = CellTextSize.normal,
+  }) => _cached(Brightness.light, accent, cellSize);
+
+  /// The dark theme; see [light].
+  static ThemeData dark({
+    AppAccent accent = AppAccent.defaultAccent,
+    CellTextSize cellSize = CellTextSize.normal,
+  }) => _cached(Brightness.dark, accent, cellSize);
+
+  // Fifteen combinations per brightness at most: built once each, so the
+  // app does not rebuild a whole ThemeData whenever another preference
+  // changes.
+  static final Map<(Brightness, AppAccent, CellTextSize), ThemeData> _themes =
+      {};
+
+  static ThemeData _cached(
+    Brightness brightness,
+    AppAccent accent,
+    CellTextSize cellSize,
+  ) => _themes.putIfAbsent((brightness, accent, cellSize), () {
+    final base = brightness == Brightness.dark
+        ? AppColors.dark
+        : AppColors.light;
+    return _build(
+      base.withAccent(accent),
+      accent: accent,
+      cellScale: cellSize.factor,
+    );
+  });
 
   /// Transparent bars, icon brightness following the theme (edge-to-edge).
   static SystemUiOverlayStyle overlayStyle(Brightness brightness) {
@@ -36,8 +68,12 @@ class AppTheme {
     );
   }
 
-  static ThemeData _build(AppColors c) {
-    final type = AppTypography.from(c);
+  static ThemeData _build(
+    AppColors c, {
+    required AppAccent accent,
+    required double cellScale,
+  }) {
+    final type = AppTypography.from(c, cellScale: cellScale);
     final brightness = c.brightness;
     const clear = Color(0x00000000);
 
@@ -453,7 +489,8 @@ class AppTheme {
         contentTextStyle: type.body.copyWith(
           color: c.isDark ? c.textPrimary : c.background,
         ),
-        actionTextColor: AppColors.dark.accentText,
+        // The bar is near-black in both modes: the dark accent reads on it.
+        actionTextColor: AppColors.dark.withAccent(accent).accentText,
         elevation: 0,
         insetPadding: const EdgeInsets.all(Sp.l),
         shape: shape14,

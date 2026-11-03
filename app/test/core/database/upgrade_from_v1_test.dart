@@ -14,7 +14,7 @@ import '../../support/v1_database.dart';
 
 /// What a user of 0.1.0 / 0.2.0 goes through when the app starts after the
 /// updates: the real opener, a real file on disk, the pre-migration copy and
-/// the whole chain of migrations (v1 -> v2 -> v3 -> v4).
+/// the whole chain of migrations (v1 -> v2 -> v3 -> v4 -> v5 -> v6).
 void main() {
   late Directory dir;
   late File file;
@@ -49,12 +49,12 @@ void main() {
     expect(backups.existsSync(), isFalse);
   });
 
-  test('opening it migrates to v4 (through v2) and keeps the copy made just '
+  test('opening it migrates to v6 (through v2) and keeps the copy made just '
       'before', () async {
     final db = await open();
 
-    // Migrated: v4, the same data, attached to main, the same days.
-    expect(readUserVersion(file), 4);
+    // Migrated: v6, the same data, attached to main, the same days.
+    expect(readUserVersion(file), 6);
     expect(await dumpV1Columns(db), before);
     final loaded = await ScheduleRepository(db).load('main');
     expect(
@@ -63,8 +63,8 @@ void main() {
     );
     await db.close();
 
-    // The copy: pre-v1-a-v4-<stamp>.sqlite, made before the migration.
-    expect(backupNames(), ['pre-v1-a-v4-20261102-083015.sqlite']);
+    // The copy: pre-v1-a-v6-<stamp>.sqlite, made before the migration.
+    expect(backupNames(), ['pre-v1-a-v6-20261102-083015.sqlite']);
     final copy = File(p.join(backups.path, backupNames().single));
     expect(readUserVersion(copy), 1);
 
@@ -90,7 +90,7 @@ void main() {
     final again = AppDatabase(NativeDatabase(restored));
     expect(await dumpV1Columns(again), before);
     await again.close();
-    expect(readUserVersion(restored), 4);
+    expect(readUserVersion(restored), 6);
   });
 
   test('opening twice does not migrate twice', () async {
@@ -107,14 +107,14 @@ void main() {
     await second.customSelect('SELECT 1').get();
 
     // No second copy, nothing recreated, nothing changed.
-    expect(backupNames(), ['pre-v1-a-v4-20261102-083015.sqlite']);
+    expect(backupNames(), ['pre-v1-a-v6-20261102-083015.sqlite']);
     expect(await _everything(second), afterFirst);
     expect(
       (await second.select(second.calendars).getSingle()).createdAt,
       calendarStamp,
     );
     await second.close();
-    expect(readUserVersion(file), 4);
+    expect(readUserVersion(file), 6);
   });
 
   test('without the safety copy there is no migration', () async {
@@ -140,7 +140,7 @@ void main() {
     expect([for (final c in calendars) c.id], ['main']);
     expect(calendars.single.name, 'Mi cuadrante');
     await db.close();
-    expect(readUserVersion(File(p.join(fresh.path, databaseFileName))), 4);
+    expect(readUserVersion(File(p.join(fresh.path, databaseFileName))), 6);
     expect(
       Directory(p.join(fresh.path, backupsDirectoryName)).existsSync(),
       isFalse,

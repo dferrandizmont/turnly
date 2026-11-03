@@ -3,6 +3,8 @@ import 'package:cuadrante/core/database/app_database.steps.dart';
 import 'package:cuadrante/core/database/migration_v1_to_v2.dart';
 import 'package:cuadrante/core/database/migration_v2_to_v3.dart';
 import 'package:cuadrante/core/database/migration_v3_to_v4.dart';
+import 'package:cuadrante/core/database/migration_v4_to_v5.dart';
+import 'package:cuadrante/core/database/migration_v5_to_v6.dart';
 import 'package:cuadrante/features/schedule/data/schedule_repository.dart';
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift_dev/api/migrations_native.dart';
@@ -26,6 +28,8 @@ class _FailingMigrationDatabase extends AppDatabase {
         schema,
         afterAdd: () async => throw StateError('failure after adding plus'),
       ),
+      from4To5: migrateFrom4To5,
+      from5To6: migrateFrom5To6,
     ),
   );
 }
@@ -68,7 +72,7 @@ void main() {
       );
       final db = AppDatabase(schema.newConnection());
       addTearDown(db.close);
-      await verifier.migrateAndValidate(db, 4);
+      await verifier.migrateAndValidate(db, 6);
       expect(await dumpV3Columns(db), before);
       final types = await db.select(db.shiftTypes).get();
       expect(types, hasLength(8));
@@ -92,7 +96,7 @@ void main() {
       expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
       expect(
         schema.rawDatabase.select('PRAGMA user_version').single.values.single,
-        4,
+        6,
       );
     },
   );
@@ -101,7 +105,7 @@ void main() {
     final (:schema, before: _) = await seededV3();
     final db = AppDatabase(schema.newConnection());
     addTearDown(db.close);
-    await verifier.migrateAndValidate(db, 4);
+    await verifier.migrateAndValidate(db, 6);
     final repo = ScheduleRepository(db);
     final night = (await repo.load('main')).schedule.shiftTypeById('night')!;
     for (final cents in [3000, 0, 999999]) {
@@ -113,7 +117,8 @@ void main() {
         cents,
       );
     }
-    for (final cents in [-1, 1000000]) {
+    // Schema v6 raised the upper bound from 999 999 to 999 999 999.
+    for (final cents in [-1, 1000000000]) {
       await expectLater(
         db.customStatement(
           "UPDATE shift_types SET fixed_plus_cents = ? WHERE id = 'night'",
@@ -154,7 +159,7 @@ void main() {
       await old.close();
       final retried = AppDatabase(schema.newConnection());
       addTearDown(retried.close);
-      await verifier.migrateAndValidate(retried, 4);
+      await verifier.migrateAndValidate(retried, 6);
       expect(await dumpV3Columns(retried), before);
     },
   );

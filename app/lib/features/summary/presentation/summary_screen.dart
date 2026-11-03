@@ -12,6 +12,7 @@ import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/buttons.dart';
 import '../../../core/widgets/choice_pill.dart';
 import '../../../core/widgets/content_app_bar.dart';
+import '../../../core/widgets/empty_illustration.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/page_body.dart';
 import '../../../core/widgets/value_row.dart';
@@ -19,8 +20,11 @@ import '../../../core/providers.dart';
 import '../../../core/widgets/app_snack_bar.dart';
 import '../../calendar/application/schedule_controller.dart';
 import '../../calendar/application/visible_month.dart';
+import '../../absences/presentation/absence_icons.dart';
+import '../../absences/presentation/absence_summary_card.dart';
 import '../../holidays/application/holidays_provider.dart';
 import '../../settings/application/preferences_controller.dart';
+import '../../settings/presentation/withholding_sheet.dart';
 import '../../year/application/year_providers.dart';
 import '../../year/presentation/year_image.dart';
 import '../../calendar/presentation/shift_badge.dart';
@@ -28,9 +32,15 @@ import '../../calendar/presentation/shift_format.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../application/summary_providers.dart';
 import '../domain/month_summary.dart';
+import '../domain/payroll.dart';
+import '../domain/period_hours.dart';
 import '../domain/summary_range.dart';
+import 'hours_goal_section.dart';
+import 'how_am_i_doing_card.dart';
+import '../../reports/presentation/report_share_button.dart';
 import 'month_sharing.dart';
 import 'summary_format.dart';
+import 'summary_stat_row.dart';
 import 'year_table.dart';
 
 /// "Resumen del mes" (free, `docs/roadmap.md`): per shift type the days, the
@@ -52,8 +62,9 @@ class SummaryScreen extends ConsumerStatefulWidget {
   ConsumerState<SummaryScreen> createState() => _SummaryScreenState();
 }
 
-/// What the summary covers: one month, one year, or two dates of the user.
-enum _Period { month, year, range }
+/// What the summary covers: one month, one quarter, one year, or two dates of
+/// the user.
+enum _Period { month, quarter, year, range }
 
 DateTime _dateTime(CivilDate d) => DateTime(d.year, d.month, d.day);
 
@@ -61,6 +72,10 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
   late CivilDate _month;
   late _Period _period;
   late SummaryRange _range;
+
+  /// The quarter shown by «Trimestre» (P9): T1 to T4 of a civil year.
+  late int _quarterYear;
+  late Quarter _quarter;
 
   /// The user already chose the dates of the range (it is no longer just the
   /// month on screen).
@@ -82,7 +97,12 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
     _month = start.firstDayOfMonth;
     _period = widget.yearView ? _Period.year : _Period.month;
     _range = SummaryRange.month(_month);
+    _quarterYear = _month.year;
+    _quarter = _quarterOf(_month);
   }
+
+  static Quarter _quarterOf(CivilDate day) =>
+      Quarter.values[(day.month - 1) ~/ 3];
 
   @override
   void dispose() {
@@ -102,6 +122,10 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
       if (period == _Period.range && !_rangeTouched) {
         _range = SummaryRange.month(_month);
       }
+      if (period == _Period.quarter) {
+        _quarterYear = _month.year;
+        _quarter = _quarterOf(_month);
+      }
     });
   }
 
@@ -114,12 +138,19 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
         _month = direction < 0
             ? _month.addDays(-1).firstDayOfMonth
             : _month.addDays(_month.daysInMonth);
+      case _Period.quarter:
+        final index = _quarter.number - 1 + direction;
+        _quarterYear += (index / 4).floor();
+        _quarter = Quarter.values[index % 4];
       case _Period.range:
         _range = _range.shifted(direction);
         _rangeTouched = true;
         _rangeClamped = false;
     }
   });
+
+  SummaryRange get _quarterRange =>
+      SummaryRange.quarter(_quarterYear, _quarter);
 
   void _openMonth(CivilDate month) => setState(() {
     _toTop();
@@ -189,6 +220,7 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
       _Period.month => capitalize(
         format.monthYear(DateTime(_month.year, _month.month)),
       ),
+      _Period.quarter => l10n.moneyQuarterLabel(_quarter.number, _quarterYear),
       _Period.range => formatRange(format.locale, _range.from, _range.to),
     };
 
@@ -206,6 +238,8 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                   ? null
                   : () => shareMonthImage(context, ref, _month),
             ),
+          // PDF or CSV of the month or any dates (features/reports).
+          if (_period != _Period.year) ReportShareButton(month: _month),
           // The same picture as the annual view's (H-T08-5). «Fechas…» has
           // none: a free range is not a calendar page.
           if (_period == _Period.year)
@@ -240,6 +274,12 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                   onTap: () => _setPeriod(_Period.month),
                 ),
                 ChoicePill(
+                  key: const ValueKey('summary-mode-quarter'),
+                  label: l10n.moneyModeQuarter,
+                  selected: _period == _Period.quarter,
+                  onTap: () => _setPeriod(_Period.quarter),
+                ),
+                ChoicePill(
                   key: const ValueKey('summary-mode-year'),
                   label: l10n.summaryModeYear,
                   selected: _yearView,
@@ -261,6 +301,7 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                   tooltip: switch (_period) {
                     _Period.year => l10n.yearPrevious,
                     _Period.month => l10n.calendarPreviousMonth,
+                    _Period.quarter => l10n.moneyQuarterPrevious,
                     _Period.range => l10n.summaryRangePrevious,
                   },
                   icon: Icon(AppIcons.chevronLeft),
@@ -285,6 +326,7 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                   tooltip: switch (_period) {
                     _Period.year => l10n.yearNext,
                     _Period.month => l10n.calendarNextMonth,
+                    _Period.quarter => l10n.moneyQuarterNext,
                     _Period.range => l10n.summaryRangeNext,
                   },
                   icon: Icon(AppIcons.chevronRight),
@@ -292,6 +334,20 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                 ),
               ],
             ),
+            if (_period == _Period.quarter)
+              Center(
+                child: Text(
+                  formatRange(
+                    format.locale,
+                    _quarterRange.from,
+                    _quarterRange.to,
+                  ),
+                  key: const ValueKey('summary-quarter-dates'),
+                  style: type.meta.copyWith(
+                    color: context.colors.textSecondary,
+                  ),
+                ),
+              ),
             if (_period == _Period.range) ...[
               const SizedBox(height: Sp.s),
               _RangePicker(
@@ -303,11 +359,22 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
             ],
             const SizedBox(height: Sp.s),
             switch (_period) {
-              _Period.year => YearTable(
+              _Period.year => _YearBody(
                 year: _month.year,
                 onOpenMonth: _openMonth,
               ),
               _Period.month => _MonthBody(month: _month),
+              _Period.quarter => _RangeBody(
+                range: _quarterRange,
+                previous: SummaryRange.quarter(
+                  _quarter == Quarter.first ? _quarterYear - 1 : _quarterYear,
+                  Quarter.values[(_quarter.number + 2) % 4],
+                ),
+                previousName: l10n.moneyQuarterLabel(
+                  Quarter.values[(_quarter.number + 2) % 4].number,
+                  _quarter == Quarter.first ? _quarterYear - 1 : _quarterYear,
+                ),
+              ),
               _Period.range => _RangeBody(range: _range),
             },
           ],
@@ -342,6 +409,35 @@ class _MonthBody extends ConsumerWidget {
       summary: summary,
       previous: previous,
       previousName: previousName,
+      period: SummaryRange.month(month),
+    );
+  }
+}
+
+/// The year: «¿Cómo voy?» (when the year has shifts) above the table of its
+/// twelve months.
+class _YearBody extends ConsumerWidget {
+  const _YearBody({required this.year, required this.onOpenMonth});
+
+  final int year;
+  final ValueChanged<CivilDate> onOpenMonth;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final empty = ref.watch(yearTotalsProvider(year).select((t) => t.isEmpty));
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (!empty) ...[
+          HowAmIDoingCard(
+            span: GoalSpan.year,
+            range: SummaryRange(CivilDate(year, 1, 1), CivilDate(year, 12, 31)),
+          ),
+          AbsenceSummaryCard(year: year),
+          const SizedBox(height: Sp.section),
+        ],
+        YearTable(year: year, onOpenMonth: onOpenMonth),
+      ],
     );
   }
 }
@@ -349,9 +445,14 @@ class _MonthBody extends ConsumerWidget {
 /// Everything under the dates of a free range (`docs/paridad.md` A7): the
 /// same cards as a month, compared with the same number of days before.
 class _RangeBody extends ConsumerWidget {
-  const _RangeBody({required this.range});
+  const _RangeBody({required this.range, this.previous, this.previousName});
 
   final SummaryRange range;
+
+  /// The period to compare with when it is not the same number of days
+  /// before (the quarter before a quarter), and how it is named.
+  final SummaryRange? previous;
+  final String? previousName;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -363,27 +464,36 @@ class _RangeBody extends ConsumerWidget {
         message: l10n.summaryRangeEmptyBody,
       );
     }
-    final previous = ref.watch(rangeSummaryProvider(range.previous));
+    final before = ref.watch(rangeSummaryProvider(previous ?? range.previous));
     return _PeriodBody(
       summary: summary,
-      previous: previous,
-      previousName: l10n.summaryRangePreviousName(range.days),
-      range: true,
+      previous: before,
+      previousName: previousName ?? l10n.summaryRangePreviousName(range.days),
+      period: range,
+      isRange: true,
     );
   }
 }
 
-class _EmptyPeriod extends StatelessWidget {
+class _EmptyPeriod extends ConsumerWidget {
   const _EmptyPeriod({required this.title, required this.message});
 
   final String title;
   final String message;
 
   @override
-  Widget build(BuildContext context) => Padding(
+  Widget build(BuildContext context, WidgetRef ref) => Padding(
     key: const ValueKey('summary-empty'),
     padding: const EdgeInsets.symmetric(vertical: Sp.x3),
-    child: EmptyState(icon: AppIcons.summary, title: title, message: message),
+    child: EmptyState(
+      icon: AppIcons.summary,
+      illustration: EmptyIllustration(
+        kind: EmptyIllustrationKind.calendar,
+        shifts: ref.watch(scheduleControllerProvider.select((s) => s.palette)),
+      ),
+      title: title,
+      message: message,
+    ),
   );
 }
 
@@ -519,12 +629,13 @@ class _DateRow extends StatelessWidget {
 }
 
 /// The cards of a period that has shifts.
-class _PeriodBody extends StatelessWidget {
+class _PeriodBody extends ConsumerWidget {
   const _PeriodBody({
     required this.summary,
     required this.previous,
     required this.previousName,
-    this.range = false,
+    required this.period,
+    this.isRange = false,
   });
 
   final MonthSummary summary;
@@ -534,29 +645,53 @@ class _PeriodBody extends StatelessWidget {
   /// días anteriores").
   final String previousName;
 
+  /// The days of the period (a whole month, or the free range).
+  final SummaryRange period;
+
   /// A free range: the notes do not talk about months.
-  final bool range;
+  final bool isRange;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
+    final hours = ref.watch(periodHoursProvider(period));
+    final hasGoal = ref.watch(
+      hoursGoalProvider.select((goal) => goal.value != null),
+    );
     // «Horas en festivo: 0 h / 0 turnos en festivo» says nothing: like the
     // overtime lines, it is left out when both are 0 (H-T08-6 / H-T10-4).
     final showHolidays =
         summary.holidayMinutes > 0 || summary.holidayShifts > 0;
+    // B5: what has no data is folded into one line each at the end (the
+    // absences when there are none, the pay while no shift has a price).
+    final absencesNone = summary.absenceTypes.isEmpty;
+    final estimateNone = !summary.hasEarnings && summary.workedMinutes > 0;
+    // «Llevas ganado» is about the month that is running now.
+    final today = ref.watch(summaryTodayProvider);
+    final runningMonth =
+        !isRange &&
+        period.from.year == today.year &&
+        period.from.month == today.month;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _HoursCard(
+        HowAmIDoingCard(
+          span: isRange ? GoalSpan.range : GoalSpan.month,
+          range: period,
+        ),
+        const SizedBox(height: Sp.card),
+        AbsenceSummaryCard(year: period.from.year),
+        _BreakdownCard(
           summary: summary,
           previous: previous,
           previousName: previousName,
           showHolidays: showHolidays,
         ),
-        if (summary.workedMinutes > 0 || summary.hasEarnings) ...[
+        if (summary.hasEarnings) ...[
           const SizedBox(height: Sp.card),
           _EstimateCard(summary: summary),
         ],
+        if (runningMonth) _EarnedSoFarCard(month: period.from),
         for (final group in [
           (l10n.summaryGroupWork, summary.workTypes),
           (l10n.summaryGroupRest, summary.restTypes),
@@ -566,17 +701,32 @@ class _PeriodBody extends StatelessWidget {
             const SizedBox(height: Sp.section),
             _TypeGroup(title: group.$1, rows: group.$2),
           ],
+        if (absencesNone || estimateNone) ...[
+          const SizedBox(height: Sp.section),
+          _FoldedCard(
+            summary: summary,
+            absencesNone: absencesNone,
+            estimateNone: estimateNone,
+          ),
+        ],
         const SizedBox(height: Sp.section),
-        _Notes(summary: summary, range: range, holidays: showHolidays),
+        _Notes(
+          summary: summary,
+          range: isRange,
+          holidays: showHolidays,
+          tense: hours.tense,
+          goal: hasGoal,
+        ),
       ],
     );
   }
 }
 
-/// Hours worked, the change against the previous period and the other
-/// totals.
-class _HoursCard extends StatelessWidget {
-  const _HoursCard({
+/// The totals of the period under «¿Cómo voy?»: the change in hours against
+/// the previous period, the shifts, the overtime and early leave, the night
+/// hours, the rest days, the absences and the hours on holidays.
+class _BreakdownCard extends StatelessWidget {
+  const _BreakdownCard({
     required this.summary,
     required this.previous,
     required this.previousName,
@@ -603,30 +753,18 @@ class _HoursCard extends StatelessWidget {
         : l10n.summaryDelta(formatSignedHours(l10n, delta), previousName);
 
     Widget stat(String id, String label, String value, [String? detail]) =>
-        _StatRow(id: id, label: label, value: value, detail: detail);
+        SummaryStatRow(id: id, label: label, value: value, detail: detail);
 
     return AppCard(
+      key: const ValueKey('summary-breakdown'),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            l10n.summaryHoursWorked.toUpperCase(),
-            style: type.label.copyWith(color: colors.textMuted),
-          ),
-          const SizedBox(height: Sp.xs),
           Semantics(
-            label:
-                '${l10n.summaryHoursWorked}: '
-                '${formatHours(l10n, summary.workedMinutes)}',
-            excludeSemantics: true,
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.centerLeft,
-              child: Text(
-                formatHours(l10n, summary.workedMinutes),
-                key: const ValueKey('summary-hours'),
-                style: AppTypography.tabular(type.display),
-              ),
+            header: true,
+            child: Text(
+              l10n.summaryBreakdownTitle.toUpperCase(),
+              style: type.label.copyWith(color: colors.textMuted),
             ),
           ),
           const SizedBox(height: Sp.xs),
@@ -652,7 +790,7 @@ class _HoursCard extends StatelessWidget {
               formatSignedHours(l10n, summary.overtimeMinutes),
               summary.overtimeCents > 0
                   ? l10n.summaryExtrasPay(
-                      '+${formatEuroCents(context, summary.overtimeCents)}',
+                      '+${formatMoneyCents(context, summary.overtimeCents)}',
                     )
                   : null,
             ),
@@ -663,7 +801,7 @@ class _HoursCard extends StatelessWidget {
               formatSignedHours(l10n, -summary.earlyLeaveMinutes),
               summary.earlyLeaveCents > 0
                   ? l10n.summaryExtrasPay(
-                      '−${formatEuroCents(context, summary.earlyLeaveCents)}',
+                      '−${formatMoneyCents(context, summary.earlyLeaveCents)}',
                     )
                   : null,
             ),
@@ -691,66 +829,19 @@ class _HoursCard extends StatelessWidget {
   }
 }
 
-/// One "label ... value" line of the totals, with an optional quiet detail.
-class _StatRow extends StatelessWidget {
-  const _StatRow({
-    required this.id,
-    required this.label,
-    required this.value,
-    this.detail,
-  });
-
-  /// Key prefix: `<id>` for the row, `<id>-value` for the figure.
-  final String id;
-  final String label;
-  final String value;
-  final String? detail;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    final type = context.type;
-    return MergeSemantics(
-      key: ValueKey(id),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: Sp.s),
-        child: ValueRow(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          valueGap: Sp.m,
-          title: Text(label, style: type.body),
-          // The figure flush right, or under the label when the row does not
-          // fit; the detail travels with it, in the same column (H-T08-1).
-          value: Text(
-            value,
-            key: ValueKey('$id-value'),
-            style: AppTypography.tabular(
-              type.body.copyWith(fontWeight: FontWeight.w700),
-            ),
-          ),
-          detail: detail == null
-              ? null
-              : Text(
-                  detail!,
-                  key: ValueKey('$id-detail'),
-                  style: type.meta.copyWith(color: colors.textSecondary),
-                ),
-        ),
-      ),
-    );
-  }
-}
-
-/// The estimated pay, or what is missing to see it.
-class _EstimateCard extends StatelessWidget {
+/// The estimated pay (gross and, with a withholding, net), or what is missing
+/// to see it.
+class _EstimateCard extends ConsumerWidget {
   const _EstimateCard({required this.summary});
 
   final MonthSummary summary;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final colors = context.colors;
     final type = context.type;
+    final withholding = ref.watch(withholdingPercentProvider);
     final earnings = summary.earningsCents;
     final unpriced = summary.unpricedTypes;
     return AppCard(
@@ -767,14 +858,14 @@ class _EstimateCard extends StatelessWidget {
             Semantics(
               label:
                   '${l10n.summaryEstimateTitle}: '
-                  '${formatEuroCents(context, earnings)}. '
+                  '${formatMoneyCents(context, earnings)}. '
                   '${l10n.summaryEstimateNote}',
               excludeSemantics: true,
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  formatEuroCents(context, earnings),
+                  formatMoneyCents(context, earnings),
                   key: const ValueKey('summary-earnings'),
                   style: AppTypography.tabular(type.display),
                 ),
@@ -785,6 +876,11 @@ class _EstimateCard extends StatelessWidget {
               l10n.summaryEstimateNote,
               style: type.body.copyWith(color: colors.textSecondary),
             ),
+            _NetRow(
+              idPrefix: 'summary',
+              grossCents: earnings,
+              withholdingPercent: withholding,
+            ),
           ] else
             Text(
               l10n.summaryEstimateNone,
@@ -792,10 +888,10 @@ class _EstimateCard extends StatelessWidget {
               style: type.body.copyWith(color: colors.textSecondary),
             ),
           if (summary.fixedPlusCount > 0)
-            _StatRow(
+            SummaryStatRow(
               id: 'summary-fixed-plus',
               label: l10n.summaryFixedPluses,
-              value: formatEuroCents(context, summary.fixedPlusCents),
+              value: formatMoneyCents(context, summary.fixedPlusCents),
               detail: l10n.summaryFixedPlusCount(summary.fixedPlusCount),
             ),
           if (summary.extrasWithoutRateMinutes > 0) ...[
@@ -825,6 +921,122 @@ class _EstimateCard extends StatelessWidget {
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+/// B5: the parts of the summary without data, folded into one line each in
+/// a single card. «Ausencias · Ninguna» only says so; «Ingresos estimados ·
+/// Sin precios» opens what to do to see the estimate.
+class _FoldedCard extends StatefulWidget {
+  const _FoldedCard({
+    required this.summary,
+    required this.absencesNone,
+    required this.estimateNone,
+  });
+
+  final MonthSummary summary;
+  final bool absencesNone;
+  final bool estimateNone;
+
+  @override
+  State<_FoldedCard> createState() => _FoldedCardState();
+}
+
+class _FoldedCardState extends State<_FoldedCard> {
+  bool _estimateOpen = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final colors = context.colors;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        AppCard(
+          padding: EdgeInsets.zero,
+          child: Column(
+            children: [
+              if (widget.absencesNone)
+                _FoldRow(
+                  key: const ValueKey('summary-absences-fold'),
+                  label: l10n.summaryAbsences,
+                  value: l10n.summaryAbsencesNone,
+                ),
+              if (widget.absencesNone && widget.estimateNone)
+                Divider(height: 1, color: colors.border),
+              if (widget.estimateNone)
+                _FoldRow(
+                  key: const ValueKey('summary-estimate-fold'),
+                  label: l10n.summaryEstimateTitle,
+                  value: l10n.summaryEstimateNoPrices,
+                  expanded: _estimateOpen,
+                  onTap: () => setState(() => _estimateOpen = !_estimateOpen),
+                ),
+            ],
+          ),
+        ),
+        if (widget.estimateNone && _estimateOpen) ...[
+          const SizedBox(height: Sp.card),
+          _EstimateCard(summary: widget.summary),
+        ],
+      ],
+    );
+  }
+}
+
+/// One folded line: the name, what it holds and, when it opens, a chevron.
+class _FoldRow extends StatelessWidget {
+  const _FoldRow({
+    super.key,
+    required this.label,
+    required this.value,
+    this.expanded,
+    this.onTap,
+  });
+
+  final String label;
+  final String value;
+
+  /// Open or closed; `null` for a line that does not open.
+  final bool? expanded;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final type = context.type;
+    final row = ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: Sp.touch),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: Sp.l, vertical: Sp.m),
+        child: ValueRow(
+          title: Text(label, style: type.body),
+          value: Text(
+            value,
+            style: type.body.copyWith(color: colors.textMuted),
+          ),
+          trailing: onTap == null
+              ? null
+              : RotatedBox(
+                  quarterTurns: expanded == true ? 3 : 1,
+                  child: Icon(
+                    AppIcons.chevronRight,
+                    size: IconSize.inline,
+                    color: colors.textMuted,
+                  ),
+                ),
+        ),
+      ),
+    );
+    if (onTap == null) return MergeSemantics(child: row);
+    // One node: «Ingresos estimados, Sin precios», a button that opens.
+    return MergeSemantics(
+      child: Semantics(
+        button: true,
+        expanded: expanded,
+        child: InkWell(onTap: onTap, child: row),
       ),
     );
   }
@@ -894,7 +1106,7 @@ class _TypeRow extends StatelessWidget {
     final pay = row.earningsCents;
     final Widget? payText = pay != null
         ? Text(
-            formatEuroCents(context, pay),
+            formatMoneyCents(context, pay),
             key: ValueKey('summary-type-pay-${shift.id}'),
             style: AppTypography.tabular(type.bodyStrong),
           )
@@ -954,10 +1166,19 @@ class _Notes extends StatelessWidget {
   const _Notes({
     required this.summary,
     required this.holidays,
+    required this.tense,
+    this.goal = false,
     this.range = false,
   });
 
   final MonthSummary summary;
+
+  /// Where the period stands against today: the note on worked and planned
+  /// hours shows when there are planned ones.
+  final PeriodTense tense;
+
+  /// There is an hours goal: its note shows.
+  final bool goal;
 
   /// The line of the holiday hours shows, so its note does too.
   final bool holidays;
@@ -977,6 +1198,8 @@ class _Notes extends StatelessWidget {
       if (summary.shiftsWithoutTimes > 0) l10n.summaryNoteNoTimes,
       if (summary.hasExtras) l10n.summaryNoteExtras,
       if (holidays) l10n.summaryNoteHoliday,
+      if (tense != PeriodTense.past) l10n.summaryNoteTense,
+      if (goal) l10n.summaryNoteGoal,
     ];
     return AppCard.tinted(
       key: const ValueKey('summary-notes'),
@@ -993,6 +1216,122 @@ class _Notes extends StatelessWidget {
             Text(note, style: type.meta.copyWith(color: colors.textSecondary)),
           ],
         ],
+      ),
+    );
+  }
+}
+
+/// The net estimate under a gross figure (P9): the net with the withholding
+/// of Ajustes, or, while there is none, a button that sets it.
+class _NetRow extends ConsumerWidget {
+  const _NetRow({
+    required this.idPrefix,
+    required this.grossCents,
+    required this.withholdingPercent,
+  });
+
+  final String idPrefix;
+  final int grossCents;
+  final int withholdingPercent;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    if (withholdingPercent <= 0) {
+      return Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: TextButton.icon(
+          key: ValueKey('$idPrefix-net-setup'),
+          onPressed: () => editWithholding(context, ref),
+          icon: Icon(AbsenceIcons.money, size: IconSize.button),
+          label: Text(l10n.moneyNetSetup),
+        ),
+      );
+    }
+    return SummaryStatRow(
+      id: '$idPrefix-net',
+      label: l10n.moneyNet,
+      value: formatMoneyCents(
+        context,
+        netCentsFrom(grossCents, withholdingPercent),
+      ),
+      detail: l10n.moneyNetNote(withholdingPercent),
+    );
+  }
+}
+
+/// «Llevas ganado» (P9): what the month that is running has paid until now,
+/// gross and net: the days that passed and the part of today already worked.
+class _EarnedSoFarCard extends ConsumerWidget {
+  const _EarnedSoFarCard({required this.month});
+
+  final CivilDate month;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final colors = context.colors;
+    final type = context.type;
+    final earned = ref.watch(earnedSoFarProvider(month));
+    final gross = earned.grossCents;
+    if (gross == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: Sp.card),
+      child: AppCard(
+        key: const ValueKey('summary-earned'),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Semantics(
+              header: true,
+              child: Text(
+                l10n.moneyEarnedTitle.toUpperCase(),
+                style: type.label.copyWith(color: colors.textMuted),
+              ),
+            ),
+            const SizedBox(height: Sp.xs),
+            Semantics(
+              container: true,
+              label:
+                  '${l10n.moneyEarnedTitle}: '
+                  '${formatMoneyCents(context, gross)}. ${l10n.moneyGross}',
+              excludeSemantics: true,
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.end,
+                spacing: Sp.s,
+                children: [
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      formatMoneyCents(context, gross),
+                      key: const ValueKey('summary-earned-gross'),
+                      style: AppTypography.tabular(type.display),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: Sp.xs),
+                    child: Text(
+                      l10n.moneyGross,
+                      style: type.body.copyWith(color: colors.textSecondary),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: Sp.xs),
+            Text(
+              l10n.moneyEarnedNote,
+              style: type.body.copyWith(color: colors.textSecondary),
+            ),
+            if (earned.withholdingPercent > 0)
+              _NetRow(
+                idPrefix: 'summary-earned',
+                grossCents: gross,
+                withholdingPercent: earned.withholdingPercent,
+              ),
+          ],
+        ),
       ),
     );
   }

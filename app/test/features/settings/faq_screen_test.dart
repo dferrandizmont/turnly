@@ -164,6 +164,8 @@ void main() {
       expect(find.text('Ayuda y contacto'), findsOneWidget);
       expect(_key('settings-about'), findsOneWidget);
 
+      await tester.ensureVisible(_key('settings-faq'));
+      await tester.pumpAndSettle();
       await tester.tap(_key('settings-faq'));
       await tester.pumpAndSettle();
       expect(find.byType(FaqScreen), findsOneWidget);

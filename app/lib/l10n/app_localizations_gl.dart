@@ -131,6 +131,43 @@ class AppLocalizationsGl extends AppLocalizations {
   }
 
   @override
+  String get offToday => 'Hoxe tes libre';
+
+  @override
+  String offTodayBack(String date) {
+    return 'Hoxe tes libre; volves o $date';
+  }
+
+  @override
+  String get offTomorrow => 'Mañá tes libre';
+
+  @override
+  String offOn(String date) {
+    return 'Tes libre o $date';
+  }
+
+  @override
+  String offWeekend(String range) {
+    return 'Fin de semana libre: $range';
+  }
+
+  @override
+  String offStreak(int worked) {
+    return 'Levas $worked días seguidos';
+  }
+
+  @override
+  String offStreakLeft(int worked, int left) {
+    String _temp0 = intl.Intl.pluralLogic(
+      left,
+      locale: localeName,
+      other: 'quédanche $left',
+      one: 'quédache 1',
+    );
+    return 'Levas $worked días seguidos; $_temp0';
+  }
+
+  @override
   String durationDaysHours(int days, int hours) {
     return '$days d $hours h';
   }
@@ -307,6 +344,44 @@ class AppLocalizationsGl extends AppLocalizations {
   }
 
   @override
+  String get dayDetailUndo => 'Desfacer o último cambio deste día';
+
+  @override
+  String dayDetailShiftMenu(String name) {
+    return 'Opcións de $name';
+  }
+
+  @override
+  String get dayDetailChange => 'Cambiar';
+
+  @override
+  String dayDetailChangeTitle(String name) {
+    return 'Cambiar $name por…';
+  }
+
+  @override
+  String get dayDetailChangeHint =>
+      'Para cambiar unha quenda por outra, toca o seu menú.';
+
+  @override
+  String get dayDetailMore => 'Máis opcións';
+
+  @override
+  String get dayMoreExtras => 'Horas extra';
+
+  @override
+  String get dayMoreReminder => 'Aviso';
+
+  @override
+  String get dayMoreAlarm => 'Alarma';
+
+  @override
+  String get dayMoreDuplicate => 'Duplicar';
+
+  @override
+  String get dayMoreClear => 'Borrar';
+
+  @override
   String get dayExtrasTitle => 'Horas extra / Saín antes';
 
   @override
@@ -418,6 +493,32 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get shiftTypesDiscardConfirm => 'Descartar';
+
+  @override
+  String get shiftTypesScopeTitle => 'A que días afecta o cambio?';
+
+  @override
+  String get shiftTypesScopeBody =>
+      'Cambiaches as horas ou os cartos desta quenda e xa a tes en días pasados.';
+
+  @override
+  String get shiftTypesScopeAll => 'Corrixir en todos os días';
+
+  @override
+  String get shiftTypesScopeAllHint =>
+      'Era un erro: os días pasados tamén cambian as súas horas e os seus cartos.';
+
+  @override
+  String shiftTypesScopeAllHintSince(String date) {
+    return 'Era un erro: cambian os días desde o $date, cando cambiaches esta quenda por última vez. Os anteriores quedan como están.';
+  }
+
+  @override
+  String get shiftTypesScopeFromToday => 'Só a partir de hoxe';
+
+  @override
+  String get shiftTypesScopeFromTodayHint =>
+      'Cambiou a túa xornada ou o teu prezo: os días pasados quedan como estaban.';
 
   @override
   String get shiftTypesNoTimes => 'Sen horario';
@@ -814,9 +915,6 @@ class AppLocalizationsGl extends AppLocalizations {
   String get shiftTypesFixedPlusHint => 'Sen plus';
 
   @override
-  String get shiftTypesFixedPlusUnit => '€';
-
-  @override
   String get shiftTypesRateLabel => 'Prezo por hora (opcional)';
 
   @override
@@ -824,7 +922,9 @@ class AppLocalizationsGl extends AppLocalizations {
       'Para calcular canto gañas no resumo do mes.';
 
   @override
-  String get shiftTypesRateUnit => '€/h';
+  String shiftTypesRateUnit(String symbol) {
+    return '$symbol/h';
+  }
 
   @override
   String get shiftTypesPreviewLabel => 'Así se verá no mes';
@@ -886,6 +986,64 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get paintToolsLabel => 'Ferramentas para pintar';
+
+  @override
+  String get paintModeReplace => 'Cambiar a quenda';
+
+  @override
+  String get paintModeAdd => 'Engadir outra quenda';
+
+  @override
+  String get paintModeAddSpoken => 'Engadir outra quenda (dobrar)';
+
+  @override
+  String paintHeaderMode(String header, String mode) {
+    return '$header · $mode';
+  }
+
+  @override
+  String get paintPreviewTitle => 'Ao tocar un día';
+
+  @override
+  String get paintPreviewTitleDouble => 'Ao tocar un día (dobrar)';
+
+  @override
+  String get paintPreviewReplace => 'Substitúe a que haxa';
+
+  @override
+  String get paintPreviewAdd => 'Súmase á que xa hai';
+
+  @override
+  String get paintPreviewErase => 'Deixa o día baleiro';
+
+  @override
+  String get paintPreviewEmpty => 'baleiro';
+
+  @override
+  String paintPreviewSpoken(
+    String title,
+    String before,
+    String after,
+    String effect,
+  ) {
+    return '$title: $before pasa a $after. $effect';
+  }
+
+  @override
+  String paintPreviewSpokenTimes(
+    String title,
+    String before,
+    String after,
+    String times,
+    String effect,
+  ) {
+    return '$title: $before pasa a $after, $times. $effect';
+  }
+
+  @override
+  String paintToolSpoken(String name, String times) {
+    return '$name, $times';
+  }
 
   @override
   String get selectionHeader => 'Selección';
@@ -1456,6 +1614,47 @@ class AppLocalizationsGl extends AppLocalizations {
   String get onboardingContinue => 'Continuar';
 
   @override
+  String get onboardingChooseTitle => 'Como comezas o teu cadro de quendas?';
+
+  @override
+  String get onboardingChooseHelp =>
+      'Escolle unha forma. En menos dun minuto terás o mes listo, e despois cámbiao cando queiras.';
+
+  @override
+  String get onboardingPathImport => 'Importar as miñas quendas';
+
+  @override
+  String get onboardingPathImportHint =>
+      'Desde o calendario do móbil, un ficheiro .ics ou CSV, ou unha copia de LRHSoft.';
+
+  @override
+  String get onboardingPathRotation => 'Usar unha rotación';
+
+  @override
+  String get onboardingPathRotationHint =>
+      'Escolle o teu ciclo (mañás, tardes, noites, saínte…) e énchese só, mes tras mes.';
+
+  @override
+  String get onboardingPathRotationTag => 'Se a túa quenda se repite';
+
+  @override
+  String get onboardingPathPaint => 'Pintar a man';
+
+  @override
+  String get onboardingPathPaintHint =>
+      'Escolle unha quenda e arrastra polos días. Para cando cada mes é distinto.';
+
+  @override
+  String get onboardingChooseLater =>
+      'Despois preguntámosche o país para marcar os festivos. Podes omitilo.';
+
+  @override
+  String get onboardingRestore => 'Recuperar unha copia de seguranza';
+
+  @override
+  String get onboardingOptional => 'Opcional';
+
+  @override
   String onboardingProgress(int current, int total) {
     return 'Paso $current de $total';
   }
@@ -1465,7 +1664,7 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get onboardingProfessionHelp =>
-      'Así deixámosche as quendas e as rotacións do teu traballo. Cámbiao cando queiras.';
+      'Só para deixarche os horarios típicos do teu traballo. Cámbiao cando queiras.';
 
   @override
   String get onboardingProfessionNursing => 'Enfermaría, TCAE e celadores';
@@ -1520,11 +1719,53 @@ class AppLocalizationsGl extends AppLocalizations {
   String get onboardingProfessionOtherHint => 'Comezas coas quendas de sempre';
 
   @override
+  String get onboardingProfessionNursingAbroad => 'Enfermaría e sanidade';
+
+  @override
+  String get onboardingProfessionNursingAbroadHint =>
+      'M 08–15, T 15–22 e N 22–08';
+
+  @override
+  String get onboardingProfessionPoliceAbroad => 'Policía';
+
+  @override
+  String get onboardingProfessionSecurityAbroad => 'Seguridade';
+
+  @override
+  String get onboardingProfessionHospitalityAbroad => 'Hostalaría';
+
+  @override
+  String get onboardingProfessionIndustryAbroadHint =>
+      'Quendas rotativas: M 06–14, T 14–22 e N 22–06';
+
+  @override
+  String get onboardingProfessionCommerce => 'Comercio';
+
+  @override
+  String get onboardingProfessionCommerceHint => 'M 09–15 e T 15–21';
+
+  @override
+  String get onboardingProfessionTransport => 'Transporte';
+
+  @override
+  String get onboardingProfessionTransportHint => 'M 06–14, T 14–22 e N 22–06';
+
+  @override
   String get onboardingPlaceTitle => 'Onde traballas?';
 
   @override
   String get onboardingPlaceHelp =>
       'Para marcarche no calendario os festivos da túa comunidade e do teu concello.';
+
+  @override
+  String get onboardingPlaceHelpAbroad =>
+      'Para marcarche no calendario os festivos oficiais do teu país.';
+
+  @override
+  String get onboardingCountryLabel => 'País';
+
+  @override
+  String get onboardingCountrySheetTitle => 'O teu país';
 
   @override
   String get onboardingRegionLabel => 'Comunidade';
@@ -1559,6 +1800,25 @@ class AppLocalizationsGl extends AppLocalizations {
   @override
   String get onboardingLocalHolidaysMissing =>
       'Os festivos locais do teu concello podes engadilos ti en dous toques.';
+
+  @override
+  String onboardingLocalHolidaysMissingYear(String year) {
+    return 'Os festivos locais de $year do teu concello aínda non saíron: engádeos ti en dous toques ou agarda unha actualización.';
+  }
+
+  @override
+  String onboardingCountryNoData(String country) {
+    return 'Aínda non temos os festivos oficiais de $country. Podes engadir os teus en Configuración › Festivos.';
+  }
+
+  @override
+  String get onboardingCountryNone =>
+      'Sen festivos oficiais. Podes engadir os teus en Configuración › Festivos.';
+
+  @override
+  String onboardingCountryIncluded(String country) {
+    return 'Marcaremos no teu calendario os festivos oficiais de $country. Podes engadir os teus en Configuración › Festivos.';
+  }
 
   @override
   String get onboardingRotationTitle => 'Como é a túa rotación?';
@@ -1626,6 +1886,10 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get onboardingReadyByHand => 'Rotación: píntala ti a man';
+
+  @override
+  String get onboardingReadyNoOfficialHolidays =>
+      'Festivos: só os que engadas ti';
 
   @override
   String get onboardingReadyNothing =>
@@ -1794,6 +2058,14 @@ class AppLocalizationsGl extends AppLocalizations {
   String get summaryHoursWorked => 'Horas traballadas';
 
   @override
+  String get summaryHoursPlanned => 'Horas previstas';
+
+  @override
+  String summaryWorkedToDate(String hours) {
+    return '$hours traballadas ata onte';
+  }
+
+  @override
   String get summaryShiftsWorked => 'Quendas traballadas';
 
   @override
@@ -1836,7 +2108,7 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get summaryNoteExtras =>
-      'Horas extra e saídas anticipadas: as que anotas en cada día. As extra suman e as saídas restan das horas traballadas (un día non baixa de 0 h). Valóranse ao prezo por hora da primeira quenda con prezo dese día.';
+      'Horas extra e saídas anticipadas: as que anotas en cada día. As extra suman e as saídas restan das horas traballadas (un día non baixa de 0 h). A saída recorta o final da última quenda do día e as extra van xusto despois: así contan tamén nas nocturnas e en festivo. Valóranse ao prezo por hora da primeira quenda con prezo dese día.';
 
   @override
   String summaryDays(int count) {
@@ -1948,6 +2220,161 @@ class AppLocalizationsGl extends AppLocalizations {
       'Horas en festivo: as que caen nun día festivo da túa comunidade e concello, tamén se a quenda cruza a medianoite.';
 
   @override
+  String get summaryNoteTense =>
+      'Traballadas: os días anteriores a hoxe. Previstas: de hoxe en diante, segundo o teu cadro de quendas.';
+
+  @override
+  String get summaryNoteGoal =>
+      'Obxectivo: nun mes conta a duodécima parte do anual; nun ano, o mensual por 12; nunhas datas, a parte dos seus días. A diferenza suma as traballadas e as previstas.';
+
+  @override
+  String get summaryGoalTitle => 'Obxectivo de horas';
+
+  @override
+  String get summaryGoalAdd => 'Fixar un obxectivo de horas';
+
+  @override
+  String get summaryGoalEdit => 'Cambiar o obxectivo';
+
+  @override
+  String get summaryGoalTarget => 'Obxectivo';
+
+  @override
+  String get summaryGoalDone => 'Traballadas';
+
+  @override
+  String get summaryGoalPlanned => 'Previstas';
+
+  @override
+  String summaryGoalShort(String hours) {
+    return 'Fáltanche $hours';
+  }
+
+  @override
+  String summaryGoalShortPlanned(String hours) {
+    return 'Co previsto, fáltanche $hours';
+  }
+
+  @override
+  String summaryGoalOver(String hours) {
+    return 'Levas $hours de máis';
+  }
+
+  @override
+  String summaryGoalOverPlanned(String hours) {
+    return 'Co previsto, $hours de máis';
+  }
+
+  @override
+  String get summaryGoalMet => 'Xusto o obxectivo';
+
+  @override
+  String get summaryGoalMetPlanned => 'Co previsto, xusto o obxectivo';
+
+  @override
+  String get summaryGoalPerMonth => 'Obxectivo mensual';
+
+  @override
+  String get summaryGoalPerYear => 'Obxectivo anual';
+
+  @override
+  String summaryGoalFromYear(String goal) {
+    return '$goal ao ano, entre 12';
+  }
+
+  @override
+  String summaryGoalFromMonth(String goal) {
+    return '$goal ao mes, por 12';
+  }
+
+  @override
+  String summaryGoalRangeFromYear(String goal, int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days días',
+      one: '1 día',
+    );
+    return '$goal ao ano, a parte de $_temp0';
+  }
+
+  @override
+  String summaryGoalRangeFromMonth(String goal, int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days días',
+      one: '1 día',
+    );
+    return '$goal ao mes por 12, a parte de $_temp0';
+  }
+
+  @override
+  String get summaryGoalChoiceYear => 'Ao ano';
+
+  @override
+  String get summaryGoalChoiceMonth => 'Ao mes';
+
+  @override
+  String get summaryGoalHoursYear => 'Horas ao ano';
+
+  @override
+  String get summaryGoalHoursMonth => 'Horas ao mes';
+
+  @override
+  String get summaryGoalHelpYear =>
+      'Por exemplo, 1.642 h, unha xornada anual habitual. Mira a do teu convenio. En cada mes conta a duodécima parte.';
+
+  @override
+  String get summaryGoalHelpMonth =>
+      'Por exemplo, 140 h. No ano conta 12 veces.';
+
+  @override
+  String get summaryGoalUnit => 'h';
+
+  @override
+  String summaryGoalInvalid(int max) {
+    return 'Escribe entre 1 e $max horas.';
+  }
+
+  @override
+  String get summaryGoalRemove => 'Quitar o obxectivo';
+
+  @override
+  String get summaryGoalSaveFailed => 'Non se puido gardar o obxectivo.';
+
+  @override
+  String get summaryHowTitle => 'Como vou?';
+
+  @override
+  String get summaryHowWorked => 'traballadas';
+
+  @override
+  String get summaryHowWorkedToDate => 'traballadas ata onte';
+
+  @override
+  String get summaryHowPlanned => 'previstas';
+
+  @override
+  String summaryHowPlannedRest(String hours, String date) {
+    return 'e $hours previstas ata o $date';
+  }
+
+  @override
+  String summaryHowBarLabel(String worked, String planned) {
+    return '$worked traballadas, $planned previstas';
+  }
+
+  @override
+  String get summaryBreakdownTitle => 'Detalle';
+
+  @override
+  String get summaryAbsencesNone => 'Ningunha';
+
+  @override
+  String get summaryEstimateNoPrices => 'Sen prezos';
+
+  @override
   String get summaryYearEmpty => 'Este ano non ten quendas.';
 
   @override
@@ -1983,7 +2410,7 @@ class AppLocalizationsGl extends AppLocalizations {
   String get summaryYearRowTitle => 'Horas e estimación';
 
   @override
-  String get summaryYearRowBody => 'Quendas, horas e euros de cada mes';
+  String get summaryYearRowBody => 'Quendas, horas e importes de cada mes';
 
   @override
   String summaryYearMonthSemantics(String month, String shifts, String hours) {
@@ -2008,6 +2435,123 @@ class AppLocalizationsGl extends AppLocalizations {
   String get shareMonthLegendEmpty => 'Este mes non ten quendas.';
 
   @override
+  String get reportShareTooltip => 'Informe en PDF ou CSV';
+
+  @override
+  String get reportSheetTitle => 'Informe de quendas';
+
+  @override
+  String get reportSheetIntro =>
+      'Un PDF limpo para imprimir ou enviar, ou unha folla de cálculo coas túas quendas.';
+
+  @override
+  String get reportFormatPdf => 'PDF para imprimir ou enviar';
+
+  @override
+  String get reportFormatCsv => 'CSV para Excel ou Sheets';
+
+  @override
+  String get reportIncludeTitle => 'Que incluír';
+
+  @override
+  String get reportIncludeNotes => 'Notas dos días';
+
+  @override
+  String get reportIncludeEarnings => 'Importes estimados';
+
+  @override
+  String get reportAbsencesTitle => 'Ausencias';
+
+  @override
+  String get reportAbsencesHidden => 'Non mostralas';
+
+  @override
+  String get reportAbsencesGeneric => 'Só como «Ausencia»';
+
+  @override
+  String get reportAbsencesDetailed => 'Co seu nome e a súa nota';
+
+  @override
+  String get reportAbsencesHint =>
+      'Unha baixa médica non sae co seu nome nin a súa nota a non ser que elixas «Co seu nome e a súa nota».';
+
+  @override
+  String get reportCreate => 'Crear e compartir';
+
+  @override
+  String get reportFailed => 'Non se puido crear o informe';
+
+  @override
+  String reportSubject(String period) {
+    return 'Quendas: $period';
+  }
+
+  @override
+  String get reportUntitled => 'As miñas quendas';
+
+  @override
+  String get reportLegendTitle => 'Lenda';
+
+  @override
+  String get reportTotalsTitle => 'Totais';
+
+  @override
+  String get reportNotesTitle => 'Notas';
+
+  @override
+  String get reportHolidaysTitle => 'Festivos';
+
+  @override
+  String get reportHolidayMark => 'Festivo';
+
+  @override
+  String get reportAbsenceName => 'Ausencia';
+
+  @override
+  String get reportAbsenceCode => 'AUS';
+
+  @override
+  String get reportHoursTotal => 'Horas';
+
+  @override
+  String get reportHoursDone => 'Traballadas ata onte';
+
+  @override
+  String get reportHoursPlannedFrom => 'Previstas desde hoxe';
+
+  @override
+  String get reportFooter => 'Creado con Turnly';
+
+  @override
+  String reportPageOf(int page, int total) {
+    return 'Páxina $page de $total';
+  }
+
+  @override
+  String get reportColDate => 'Data';
+
+  @override
+  String get reportColDay => 'Día';
+
+  @override
+  String get reportColShifts => 'Quenda';
+
+  @override
+  String get reportColCode => 'Código';
+
+  @override
+  String get reportColStart => 'Inicio';
+
+  @override
+  String get reportColEnd => 'Fin';
+
+  @override
+  String get reportColHours => 'Horas';
+
+  @override
+  String get reportColNote => 'Nota';
+
+  @override
   String get saveFailed => 'Non se puido gardar o cambio';
 
   @override
@@ -2017,7 +2561,7 @@ class AppLocalizationsGl extends AppLocalizations {
   String get settingsOpenTooltip => 'Abrir configuración';
 
   @override
-  String get settingsSectionSchedule => 'O teu cadro de quendas';
+  String get settingsSectionSchedule => 'O meu calendario';
 
   @override
   String get settingsShiftsTitle => 'As miñas quendas';
@@ -2045,6 +2589,50 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get settingsThemeDark => 'Escuro';
+
+  @override
+  String get appearanceAccentTitle => 'Cor de acento';
+
+  @override
+  String get appearanceAccentIndigo => 'Índigo';
+
+  @override
+  String get appearanceAccentBlue => 'Azul';
+
+  @override
+  String get appearanceAccentPetrol => 'Petróleo';
+
+  @override
+  String get appearanceAccentRaspberry => 'Framboesa';
+
+  @override
+  String get appearanceAccentGraphite => 'Grafito';
+
+  @override
+  String get appearanceAccentDefault => 'Predeterminada';
+
+  @override
+  String get appearanceAccentNote =>
+      'Cambia ligazóns, interruptores, selección e pestanas. As cores das túas quendas non cambian.';
+
+  @override
+  String get appearanceCellSizeTitle => 'Tamaño da quenda no mes';
+
+  @override
+  String get appearanceCellSizeNormal => 'Normal';
+
+  @override
+  String get appearanceCellSizeLarge => 'Grande';
+
+  @override
+  String get appearanceCellSizeExtraLarge => 'Moi grande';
+
+  @override
+  String get appearanceCellSizeNote =>
+      'O código e a hora de cada día do mes. Se non caben nunha casa, axústanse sós.';
+
+  @override
+  String get appearanceCellSizeSampleCode => 'N';
 
   @override
   String get settingsWeekStartTitle => 'Primeiro día da semana';
@@ -2085,11 +2673,53 @@ class AppLocalizationsGl extends AppLocalizations {
   String get languageNameEn => 'English';
 
   @override
+  String get settingsTimeFormatTitle => 'Formato da hora';
+
+  @override
+  String settingsTimeFormatAuto(String format) {
+    return 'Automático ($format)';
+  }
+
+  @override
+  String get settingsTimeFormat24 => '24 h (22:00)';
+
+  @override
+  String get settingsTimeFormat12 => '12 h (10:00 p. m.)';
+
+  @override
+  String get settingsTimeFormatShort24 => '24 h';
+
+  @override
+  String get settingsTimeFormatShort12 => '12 h';
+
+  @override
+  String get settingsCurrencyTitle => 'Moeda';
+
+  @override
+  String get settingsCurrencyNote =>
+      'Cambiar a moeda non converte os importes. Revisa os prezos por hora e os pluses.';
+
+  @override
+  String get settingsCurrencySearchHint => 'Busca unha moeda ou un código';
+
+  @override
+  String get settingsCurrencyCommon => 'Habituais';
+
+  @override
+  String get settingsCurrencyAll => 'Todas';
+
+  @override
+  String get settingsCurrencyNone => 'Ningunha moeda coincide';
+
+  @override
   String get settingsSaveFailed =>
       'Non se puido gardar o axuste. Proba outra vez.';
 
   @override
-  String get settingsSectionMore => 'Avisos e datos';
+  String get settingsSectionMore => 'Avisos e widget';
+
+  @override
+  String get settingsSectionBackup => 'Copias e cambio de móbil';
 
   @override
   String get settingsHolidaysTitle => 'Festivos';
@@ -2098,7 +2728,17 @@ class AppLocalizationsGl extends AppLocalizations {
   String get settingsAlarmsTitle => 'Alarmas';
 
   @override
+  String settingsAlarmsUntil(String date) {
+    return 'Avisos ata o $date';
+  }
+
+  @override
   String get settingsBackupTitle => 'Copia de seguranza';
+
+  @override
+  String settingsBackupLast(String when) {
+    return 'Última: $when, comprobada';
+  }
 
   @override
   String get settingsPrivacyTitle => 'Política de privacidade';
@@ -2204,7 +2844,7 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get faqDoubleA =>
-      'Dobrar é facer dúas quendas o mesmo día. Toca o día e, no seu detalle, usa «Engadir unha segunda quenda». Se estás pintando, activa «Dobrar» e toca os días. Con varios días escollidos, «Dobrar con…» engade a quenda a todos.\n\nUn día pode levar as quendas que necesites e cada unha suma as súas horas por separado.';
+      'Dobrar é facer dúas quendas o mesmo día. Toca o día e, no seu detalle, usa «Engadir unha segunda quenda». Se estás pintando, escolle o modo «Engadir outra quenda» e toca os días. Con varios días escollidos, «Dobrar con…» engade a quenda a todos.\n\nUn día pode levar as quendas que necesites e cada unha suma as súas horas por separado.';
 
   @override
   String get faqPostNightQ => 'Que é o saínte automático?';
@@ -2265,11 +2905,11 @@ class AppLocalizationsGl extends AppLocalizations {
       'Si. En Configuración › Calendarios creas un para a túa parella, un segundo traballo ou un fillo: cada un ten as súas rotacións e os seus días, e os tipos de quenda son os mesmos. Con dous ou máis, o nome do calendario sobre o mes déixache cambiar dun a outro. O widget e as alarmas seguen o calendario marcado como «Widget e alarmas».\n\nPara ver cando coincidides libres, preme «Comparar calendarios» nesa mesma folla: escolles dous e ves as súas quendas xuntas e os días libres en común do mes.';
 
   @override
-  String get faqSummaryQ => 'Como se calculan as horas e os euros?';
+  String get faqSummaryQ => 'Como se calculan as horas e o diñeiro?';
 
   @override
   String get faqSummaryA =>
-      'A icona de resumo do calendario amosa as quendas, as horas, as nocturnas e as de festivo do mes, dun ano enteiro ou das datas que escollas en «Datas…» (ata 366 días). Unha quenda conta no día en que comeza, aínda que cruce a medianoite.\n\nPara ver euros, pon o prezo por hora e, se o tes, o complemento fixo por tipo de quenda en Configuración › As miñas quendas. A estimación inclúe eses complementos fixos, antes de impostos. Non inclúe complementos por hora nocturna ou festiva nin retencións.\n\nO «Plus por quenda» súmase unha vez por cada quenda traballada dese tipo, tamén se é partida; non depende das horas. Os descansos e as ausencias non o suman.';
+      'A icona de resumo do calendario amosa as quendas, as horas, as nocturnas e as de festivo do mes, dun ano enteiro ou das datas que escollas en «Datas…» (ata 366 días). Unha quenda conta no día en que comeza, aínda que cruce a medianoite.\n\nPara ver importes, pon o prezo por hora e, se o tes, o complemento fixo por tipo de quenda en Configuración › As miñas quendas. A estimación inclúe eses complementos fixos, antes de impostos, na moeda que escollas en Configuración › Aparencia. Non inclúe complementos por hora nocturna ou festiva nin retencións.\n\nO «Plus por quenda» súmase unha vez por cada quenda traballada dese tipo, tamén se é partida; non depende das horas. Os descansos e as ausencias non o suman.';
 
   @override
   String get settingsVersionCopied => 'Versión copiada';
@@ -3093,6 +3733,238 @@ class AppLocalizationsGl extends AppLocalizations {
   String get calExportRangeClamped => 'O máximo é un ano: recortouse o final.';
 
   @override
+  String get calSyncTitle => 'Manter ao día';
+
+  @override
+  String get calSyncHelp =>
+      'Turnly actualiza eses eventos soo, cada vez que cambias o cadro de quendas e ao abrir a app: desde hai unha semana ata os próximos tres meses. Só toca os eventos que creou el. Se o apagas, os que xa están quedan.';
+
+  @override
+  String calSyncLast(String when) {
+    return 'Última actualización: $when';
+  }
+
+  @override
+  String calSyncFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Non se puideron actualizar $count eventos. Tentarase de novo na próxima actualización.',
+      one: 'Non se puido actualizar 1 evento. Tentarase de novo na próxima actualización.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get calSyncLocked =>
+      'Para escoller outro calendario, apaga antes «Manter ao día».';
+
+  @override
+  String get calSyncRunning => 'Actualizando o calendario…';
+
+  @override
+  String get calSyncNoticePermission =>
+      '«Manter ao día» apagouse: Turnly xa non ten permiso para usar o teu calendario.';
+
+  @override
+  String get calSyncNoticeCalendarGone =>
+      '«Manter ao día» apagouse: o calendario do móbil xa non está ou cambiou de nome.';
+
+  @override
+  String get calSyncNoticeSourceGone =>
+      '«Manter ao día» apagouse: o calendario de Turnly que se exportaba xa non existe.';
+
+  @override
+  String get calSyncNoticeDismiss => 'Entendido';
+
+  @override
+  String get calExportIcsTitle => 'Gardar como ficheiro .ics';
+
+  @override
+  String get calExportIcsHelp =>
+      'Un ficheiro que abren Google Calendar, Outlook e Apple Calendar, para envialo ou gardalo onde queiras. Non precisa permiso.';
+
+  @override
+  String calExportIcsRange(String from, String to) {
+    return 'Do $from ao $to';
+  }
+
+  @override
+  String get calExportIcsButton => 'Gardar ficheiro .ics';
+
+  @override
+  String get calExportIcsRunning => 'Preparando o ficheiro…';
+
+  @override
+  String get calExportIcsFailed =>
+      'Non se puido crear o ficheiro. Proba outra vez.';
+
+  @override
+  String get shareLinkRowTitle => 'Compartir por ligazón';
+
+  @override
+  String get shareLinkRowSubtitle =>
+      'A túa familia ve as túas quendas no seu calendario';
+
+  @override
+  String get shareLinkRowPublished => 'Ligazón publicada';
+
+  @override
+  String get shareLinkTitle => 'Compartir por ligazón';
+
+  @override
+  String get shareLinkIntro =>
+      'Publica unha ligazón só de lectura: quen a teña verá as túas quendas no seu calendario (Google, Apple, Outlook) sen instalar nada. Actualízase soa cando cambias o cadro de quendas.';
+
+  @override
+  String get shareLinkUnavailableTitle => 'Aínda non dispoñible';
+
+  @override
+  String get shareLinkUnavailableBody =>
+      'Esta versión aínda non pode publicar ligazóns. Mentres tanto, podes gardar as túas quendas como ficheiro .ics en Exportar quendas.';
+
+  @override
+  String get shareLinkCalendarLabel => 'Calendario';
+
+  @override
+  String get shareLinkOptionsLabel => 'Que se comparte';
+
+  @override
+  String get shareLinkIncludeRest => 'Incluír os días libres';
+
+  @override
+  String get shareLinkIncludeRestHelp =>
+      'Libre e Saínte, como eventos de todo o día.';
+
+  @override
+  String get shareLinkIncludeAbsences => 'Amosar as ausencias como «Ausencia»';
+
+  @override
+  String get shareLinkIncludeAbsencesHelp =>
+      'Sen o motivo: non se sabe se é unha baixa, vacacións ou un día de libre disposición.';
+
+  @override
+  String get shareLinkPrivacyTitle => 'Que sae e que non';
+
+  @override
+  String get shareLinkPrivacyBody =>
+      'Saen o nome, o código e a hora de cada quenda, e o nome do calendario. Nunca saen as túas notas, as baixas nin o motivo de ningunha ausencia. Quen teña a ligazón pode ver as túas quendas: pásaa só a quen queiras e revógaa cando queiras.';
+
+  @override
+  String get shareLinkPublishButton => 'Publicar ligazón';
+
+  @override
+  String get shareLinkPublishConfirmTitle => 'Publicar as túas quendas?';
+
+  @override
+  String get shareLinkPublishConfirmBody =>
+      'As túas quendas subiranse ao servidor de Turnly para que a ligazón funcione. É o único que a app envía fóra do móbil. Bórranse ao revogar a ligazón ou tras seis meses sen actualizarse.';
+
+  @override
+  String get shareLinkPublishConfirm => 'Publicar';
+
+  @override
+  String get shareLinkQrLabel => 'Código QR coa ligazón das túas quendas';
+
+  @override
+  String get shareLinkLinkLabel => 'Ligazón';
+
+  @override
+  String get shareLinkCopy => 'Copiar';
+
+  @override
+  String get shareLinkCopied => 'Ligazón copiada';
+
+  @override
+  String get shareLinkShare => 'Compartir';
+
+  @override
+  String shareLinkShareText(String url) {
+    return 'As miñas quendas en Turnly. Engádeas ao teu calendario con esta ligazón: $url';
+  }
+
+  @override
+  String shareLinkLastPublished(String date) {
+    return 'Última publicación: $date';
+  }
+
+  @override
+  String get shareLinkPublishing => 'Publicando…';
+
+  @override
+  String get shareLinkWaiting => 'Actualizarase nun momento.';
+
+  @override
+  String get shareLinkNotPublished => 'Aínda non se puido publicar.';
+
+  @override
+  String get shareLinkRefresh => 'Actualizar agora';
+
+  @override
+  String shareLinkSharedCalendar(String name) {
+    return 'Compártense as quendas de «$name».';
+  }
+
+  @override
+  String get shareLinkCalendarMissing =>
+      'O calendario que compartías xa non está. Escolle outro para seguir actualizando a ligazón.';
+
+  @override
+  String get shareLinkHowTitle => 'Como subscribirse';
+
+  @override
+  String get shareLinkHowBody =>
+      'En Google Calendar: Outros calendarios › Desde URL, e pega a ligazón. No iPhone: abre a ligazón, ou vai a Configuración › Calendario › Contas › Engadir conta › Outra › Engadir calendario subscrito. Cada calendario decide cada canto mira os cambios: poden tardar unhas horas.';
+
+  @override
+  String get shareLinkRevoke => 'Revogar ligazón';
+
+  @override
+  String get shareLinkRevokeConfirmTitle => 'Revogar a ligazón?';
+
+  @override
+  String get shareLinkRevokeConfirmBody =>
+      'Bórrase do servidor e deixa de funcionar para todos. Se volves publicar, créase unha ligazón nova.';
+
+  @override
+  String get shareLinkRevokeConfirm => 'Revogar';
+
+  @override
+  String get shareLinkRevoking => 'Revogando…';
+
+  @override
+  String get shareLinkRevokePending =>
+      'A revogación está pendente: volverase intentar soa nun momento. Mentres tanto non se publica nada.';
+
+  @override
+  String get shareLinkProblemNetwork =>
+      'Non hai conexión co servidor. Volverase intentar máis tarde.';
+
+  @override
+  String get shareLinkProblemRateLimited =>
+      'Demasiadas actualizacións seguidas. Volverase intentar nun momento.';
+
+  @override
+  String get shareLinkProblemTooLarge =>
+      'O cadro de quendas é demasiado grande para publicalo.';
+
+  @override
+  String get shareLinkProblemRejected =>
+      'O servidor non aceptou a ligazón. Revógaa e publica unha nova.';
+
+  @override
+  String get shareLinkProblemRevoked =>
+      'Esta ligazón revogouse e xa non funciona. Publica unha nova se queres volver compartir as túas quendas.';
+
+  @override
+  String get shareLinkProblemServer =>
+      'Non se puido completar. Proba outra vez.';
+
+  @override
+  String get shareLinkAbsence => 'Ausencia';
+
+  @override
   String get onboardingImportButton => 'Importar agora';
 
   @override
@@ -3113,6 +3985,9 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get backupUiStatusWhere => 'Neste dispositivo';
+
+  @override
+  String get backupUiStatusVerified => 'Comprobada: pódese recuperar enteira';
 
   @override
   String get backupUiStatusRunning => 'Gardando a copia…';
@@ -3179,6 +4054,30 @@ class AppLocalizationsGl extends AppLocalizations {
       'Non se puido facer a copia. Os teus datos seguen como estaban.';
 
   @override
+  String backupWarnRestoreSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'A copia que fixemos antes non inclúe $count adxuntos: os ficheiros non estaban ou non se puideron ler.',
+      one: 'A copia que fixemos antes non inclúe 1 adxunto: o ficheiro non estaba ou non se puido ler.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String backupWarnCopySkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Copia feita, pero sen $count adxuntos: os ficheiros non están ou non se poden ler.',
+      one: 'Copia feita, pero sen 1 adxunto: o ficheiro non está ou non se pode ler.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get backupUiAutoTitle => 'Copias automáticas';
 
   @override
@@ -3187,6 +4086,112 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get backupUiAutoOff => 'Desactivadas: só se copia cando ti o pides.';
+
+  @override
+  String get autoBackupFolderTitle => 'Copia automática nun cartafol';
+
+  @override
+  String get autoBackupFolderIntro =>
+      'Unha copia ao día no cartafol que escollas: Drive, Dropbox, OneDrive ou un do dispositivo. Se perdes o dispositivo, tela alí. Gardamos as 10 últimas.';
+
+  @override
+  String get autoBackupFolderPrivacy =>
+      'A copia leva todo o teu cadro de quendas, ausencias e baixas incluídas, e gárdase onde estea ese cartafol (por exemplo, na túa nube). Non fai falta ningunha conta en Turnly.';
+
+  @override
+  String get autoBackupFolderChoose => 'Escoller cartafol';
+
+  @override
+  String get autoBackupFolderChooseSubtitle =>
+      'Ábrese o selector de cartafoles do sistema';
+
+  @override
+  String get autoBackupFolderFolder => 'Cartafol';
+
+  @override
+  String get autoBackupFolderUnnamed => 'Cartafol escollido';
+
+  @override
+  String get autoBackupFolderChange => 'Toca para escoller outro';
+
+  @override
+  String autoBackupFolderLast(String when) {
+    return 'Última copia no cartafol: $when';
+  }
+
+  @override
+  String get autoBackupFolderNone =>
+      'Aínda non hai ningunha copia no cartafol.';
+
+  @override
+  String get autoBackupFolderSchedule =>
+      'Cópiase unha vez ao día e, coa app aberta, despois dos teus cambios (como moito cada 6 horas).';
+
+  @override
+  String get autoBackupFolderCopyNow => 'Copiar agora no cartafol';
+
+  @override
+  String get autoBackupFolderCopyDone => 'Copia gardada no cartafol';
+
+  @override
+  String get autoBackupFolderVerify => 'Probar a copia do cartafol';
+
+  @override
+  String get autoBackupFolderVerifySubtitle =>
+      'Comproba que a última copia do cartafol se pode recuperar enteira';
+
+  @override
+  String get autoBackupFolderStop => 'Deixar de copiar neste cartafol';
+
+  @override
+  String get autoBackupFolderStopSubtitle =>
+      'As copias que xa están no cartafol non se borran';
+
+  @override
+  String get autoBackupFolderStopped => 'Xa non se fan copias nese cartafol';
+
+  @override
+  String get autoBackupFolderFailedTitle => 'A copia no cartafol non funciona';
+
+  @override
+  String autoBackupFolderFailedWhen(String when) {
+    return 'Último intento: $when.';
+  }
+
+  @override
+  String get autoBackupFolderErrRevoked =>
+      'Turnly xa non ten permiso para usar ese cartafol. Escólleo outra vez.';
+
+  @override
+  String get autoBackupFolderErrMissing =>
+      'Non atopamos o cartafol: pode que se borrase ou se movese. Escolle outro.';
+
+  @override
+  String get autoBackupFolderErrUnwritable =>
+      'Ese cartafol non deixa gardar ficheiros. Escolle outro.';
+
+  @override
+  String get autoBackupFolderErrNoSpace =>
+      'Non queda espazo onde está o cartafol (o dispositivo ou a túa nube). Libera espazo e téntao de novo.';
+
+  @override
+  String get autoBackupFolderErrTooLarge =>
+      'A copia é demasiado grande para gardala.';
+
+  @override
+  String get autoBackupFolderErrFailed =>
+      'Non se puido gardar a copia no cartafol. Volverémolo tentar.';
+
+  @override
+  String get autoBackupFolderErrDamaged =>
+      'Non puidemos ler a configuración da copia no cartafol. Escolle o cartafol outra vez.';
+
+  @override
+  String get autoBackupFolderChooseAgain => 'Escoller o cartafol outra vez';
+
+  @override
+  String get autoBackupFolderPickFailed =>
+      'Non se puido usar ese cartafol. Proba con outro.';
 
   @override
   String get backupUiSectionFile => 'Ficheiro';
@@ -3199,6 +4204,13 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get backupUiExport => 'Exportar ficheiro';
+
+  @override
+  String get backupUiSaveOutside => 'Gardar unha copia fóra de Turnly';
+
+  @override
+  String get backupUiSaveOutsideHelp =>
+      'Na túa nube, noutro dispositivo ou por correo. Se perdes o móbil ou cambias de móbil, recupérala con «Importar ficheiro».';
 
   @override
   String get backupUiExportSubtitle =>
@@ -3526,6 +4538,41 @@ class AppLocalizationsGl extends AppLocalizations {
       'Mantén premida a pantalla de inicio, toca o + de arriba e busca Turnly.';
 
   @override
+  String get widgetNameSmall => 'Pequeno';
+
+  @override
+  String get widgetNameMedium => 'Mediano';
+
+  @override
+  String get widgetNameLarge => 'Grande';
+
+  @override
+  String get widgetNameAgenda => 'Axenda';
+
+  @override
+  String get widgetNameTwoWeeks => 'Dúas semanas';
+
+  @override
+  String get widgetDescSmall => 'Hoxe e mañá';
+
+  @override
+  String get widgetDescMedium => 'Os próximos 7 días';
+
+  @override
+  String get widgetDescLarge => 'O mes enteiro';
+
+  @override
+  String get widgetDescAgenda => 'Próximas quendas';
+
+  @override
+  String get widgetDescTwoWeeks => 'Actual e seguinte';
+
+  @override
+  String widgetAddNamed(String name) {
+    return 'Engadir $name';
+  }
+
+  @override
   String get compareTitle => 'Comparar calendarios';
 
   @override
@@ -3539,16 +4586,10 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get compareIntro =>
-      'Escolle dous calendarios e mira as súas quendas xuntas. Márcanse os días libres dos dous.';
+      'Escolle de dous a seis calendarios e mira as súas quendas xuntas. Márcanse os días libres de todos.';
 
   @override
-  String get compareFirstLabel => 'Primeiro calendario';
-
-  @override
-  String get compareSecondLabel => 'Segundo calendario';
-
-  @override
-  String get comparePickTitle => 'Escolle un calendario';
+  String get comparePickTitle => 'Escolle os calendarios';
 
   @override
   String get compareNeedTwoTitle => 'Necesitas dous calendarios';
@@ -3573,22 +4614,39 @@ class AppLocalizationsGl extends AppLocalizations {
   String get compareFreeListTitle => 'Días libres en común';
 
   @override
-  String get compareLegendFree => 'Libres os dous';
+  String get compareLegendFree => 'Libres en común';
 
   @override
   String get compareNote =>
-      'Conta como libre un día sen quenda de traballo: baleiro, libre ou cunha ausencia (vacacións, baixa…). Cada quenda conta no día en que comeza.';
+      'Conta como libre un día en que ninguén traballa e todos teñen anotado un libre ou unha ausencia (vacacións, baixa…). Un día sen quendas anotadas non conta como libre: márcase como «sen anotar». Cada quenda conta no día en que comeza.';
 
   @override
   String get compareNoShiftMark => '–';
 
   @override
-  String get compareBothFree => 'libres os dous';
+  String get compareBothFree => 'libres en común';
 
   @override
   String compareCellCalendar(String calendar, String shifts) {
     return '$calendar: $shifts';
   }
+
+  @override
+  String get compareLegendUnrecorded => 'Sen anotar en algún';
+
+  @override
+  String compareUnrecordedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count días sen anotar en algún',
+      one: '1 día sen anotar en algún',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get compareUnrecorded => 'sen anotar en algún';
 
   @override
   String get compareLoadFailed => 'Non se puideron ler os calendarios.';
@@ -3782,6 +4840,16 @@ class AppLocalizationsGl extends AppLocalizations {
   String get holidaysSettingsRegionClear => 'Sen comunidade';
 
   @override
+  String get holidaysSettingsCountryTitle => 'País';
+
+  @override
+  String get holidaysSettingsCountryOther =>
+      'Outro país: sen festivos oficiais';
+
+  @override
+  String get holidaysSettingsCountryNone => 'Sen festivos oficiais';
+
+  @override
   String get holidaysSettingsMunicipalityTitle => 'Concello';
 
   @override
@@ -3808,6 +4876,15 @@ class AppLocalizationsGl extends AppLocalizations {
       'Escolle o teu concello para ver os seus festivos locais, ou engádeos ti abaixo.';
 
   @override
+  String holidaysSettingsStatusCountryNoData(String country) {
+    return 'Aínda non temos os festivos oficiais de $country: engade os teus abaixo';
+  }
+
+  @override
+  String get holidaysSettingsStatusNoOfficial =>
+      'Sen festivos oficiais: só saen os que engades ti abaixo';
+
+  @override
   String holidaysSettingsStatusLocalIncluded(String municipality) {
     return 'Festivos locais de $municipality: incluídos';
   }
@@ -3830,8 +4907,35 @@ class AppLocalizationsGl extends AppLocalizations {
   }
 
   @override
-  String get holidaysSettingsStatusLocalPartial =>
-      'Pode que falte algún: compróbaos.';
+  String get holidaysSubdivisionKindState => 'Estado';
+
+  @override
+  String get holidaysSubdivisionKindFederalState => 'Estado federado';
+
+  @override
+  String get holidaysSubdivisionKindProvince => 'Provincia';
+
+  @override
+  String get holidaysSubdivisionKindRegion => 'Rexión';
+
+  @override
+  String get holidaysSubdivisionKindNation => 'Nación';
+
+  @override
+  String get holidaysSubdivisionKindCanton => 'Cantón';
+
+  @override
+  String get holidaysSubdivisionKindCity => 'Cidade';
+
+  @override
+  String get holidaysSubdivisionKindCityOrRegion => 'Cidade ou rexión';
+
+  @override
+  String get holidaysSubdivisionSearch => 'Buscar';
+
+  @override
+  String get holidaysSettingsStatusNoSubdivision =>
+      'Sen escoller só saen os festivos de todo o país. Escolle o teu para ver tamén os da túa zona.';
 
   @override
   String get holidaysSettingsAdd => 'Engadir festivo local';
@@ -4071,6 +5175,19 @@ class AppLocalizationsGl extends AppLocalizations {
   String get alarmsNextOff => 'As alarmas están desactivadas.';
 
   @override
+  String alarmsScheduledUntil(String date) {
+    return 'Avisos programados ata o $date';
+  }
+
+  @override
+  String get alarmsRenewalTitle => 'Avisos de quenda';
+
+  @override
+  String alarmsRenewalBody(String date) {
+    return 'Os teus avisos de quenda chegan ata o $date. Abre Turnly para programar os seguintes.';
+  }
+
+  @override
   String get alarmsSkipDay => 'Sen alarma este día';
 
   @override
@@ -4121,6 +5238,61 @@ class AppLocalizationsGl extends AppLocalizations {
   String agendaSemanticsReminder(String time) {
     return 'aviso ás $time';
   }
+
+  @override
+  String get dndSection => 'Non molestar durante a quenda';
+
+  @override
+  String get dndMasterTitle => 'Silenciar o móbil nas miñas quendas';
+
+  @override
+  String get dndMasterHelp =>
+      'Ponse en «Non molestar» ao comezar e quítase ao rematar.';
+
+  @override
+  String get dndFilterTitle => 'Que deixa pasar';
+
+  @override
+  String get dndFilterSheetTitle => 'Que deixa pasar durante a quenda';
+
+  @override
+  String get dndFilterAll => 'Todo';
+
+  @override
+  String get dndFilterPriority => 'Só o prioritario';
+
+  @override
+  String get dndFilterAlarms => 'Só as alarmas';
+
+  @override
+  String get dndFilterNone => 'Silencio total';
+
+  @override
+  String get dndPermOkTitle => 'Todo listo';
+
+  @override
+  String get dndPermOkBody =>
+      'Turnly pode poñer o móbil en «Non molestar» durante as túas quendas. Prográmase como unha alarma do sistema: o reloxo pode amosar o inicio ou o final da quenda como próxima alarma.';
+
+  @override
+  String get dndPermTitle => 'Falta o acceso a Non molestar';
+
+  @override
+  String get dndPermBody =>
+      'Para silenciar o móbil durante a quenda, permite que Turnly acceda a «Non molestar» na configuración do sistema.';
+
+  @override
+  String get dndPermOpen => 'Abrir a configuración';
+
+  @override
+  String get dndShiftSection => 'Non molestar';
+
+  @override
+  String get dndShiftSwitch => 'Activar Non molestar durante esta quenda';
+
+  @override
+  String get dndShiftHelper =>
+      'O móbil silénciase mentres traballas nesta quenda.';
 
   @override
   String get shiftTypesAlarmSection => 'Alarma';
@@ -4353,6 +5525,24 @@ class AppLocalizationsGl extends AppLocalizations {
   String get monthSelectDays => 'Seleccionar días';
 
   @override
+  String get monthNavMonth => 'Mes';
+
+  @override
+  String get monthNavRotation => 'Rotación';
+
+  @override
+  String get monthNavAgenda => 'Axenda';
+
+  @override
+  String get monthNavSummary => 'Resumo';
+
+  @override
+  String get todayCardCollapse => 'Pregar a tarxeta de hoxe';
+
+  @override
+  String get todayCardExpand => 'Despregar a tarxeta de hoxe';
+
+  @override
   String get monthSelectDay => 'Toca para escoller este día';
 
   @override
@@ -4364,4 +5554,969 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get monthGridSelected => 'Presentación de cuadrícula';
+
+  @override
+  String get absenceRowTitle => 'Vacacións e permisos';
+
+  @override
+  String get absenceRowSubtitle =>
+      'Días permitidos, usados e os que che quedan';
+
+  @override
+  String get absenceTitle => 'Vacacións e permisos';
+
+  @override
+  String get absenceYearPrevious => 'Ano anterior';
+
+  @override
+  String get absenceYearNext => 'Ano seguinte';
+
+  @override
+  String absenceDays(num days) {
+    final intl.NumberFormat daysNumberFormat = intl.NumberFormat.decimalPattern(
+      localeName,
+    );
+    final String daysString = daysNumberFormat.format(days);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$daysString días',
+      one: '1 día',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get absenceEmptyTitle => 'Aínda non hai saldos';
+
+  @override
+  String get absenceEmptyBody =>
+      'Crea un saldo (vacacións, libre disposición…) e a app conta os días a partir do teu cadro de quendas.';
+
+  @override
+  String get absenceAdd => 'Engadir saldo';
+
+  @override
+  String get absenceContinueSeries => 'Continuar unha serie';
+
+  @override
+  String get absenceContinueSeriesHelper =>
+      'Se continúas a serie dun ano anterior, cópianse o nome, os tipos e o tope, e o que che sobrou arrástrase. Ti só enches os días permitidos.';
+
+  @override
+  String get absenceCopyNextYear => 'Copiar ao ano seguinte';
+
+  @override
+  String absenceCopiedNextYear(int year) {
+    return 'Saldo copiado a $year.';
+  }
+
+  @override
+  String absenceLeftCaption(num days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'días que che quedan',
+      one: 'día que che queda',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String absenceLeftSemantics(String name, String days) {
+    return '$name: quédanche $days';
+  }
+
+  @override
+  String get absenceAllowed => 'Permitidos';
+
+  @override
+  String get absenceCarried => 'Arrastrados';
+
+  @override
+  String get absenceAdjustment => 'Axustes';
+
+  @override
+  String get absenceEnjoyed => 'Gozados';
+
+  @override
+  String get absencePlanned => 'Planificados';
+
+  @override
+  String absenceCarriedUntil(String date) {
+    return 'Caducan o $date';
+  }
+
+  @override
+  String get absenceCarriedNoExpiry => 'Sen caducidade';
+
+  @override
+  String absenceCarriedExpired(String date) {
+    return 'Caducaron o $date';
+  }
+
+  @override
+  String absenceWarnExpiring(String days, String date) {
+    return 'Quédanche $days do ano anterior que caducan o $date.';
+  }
+
+  @override
+  String absenceWarnPlanned(String planned, String left) {
+    return 'Planificaches máis dos que tes: $planned planificados e $left dispoñibles.';
+  }
+
+  @override
+  String get absenceNewTitle => 'Novo saldo';
+
+  @override
+  String get absenceEditTitle => 'Editar saldo';
+
+  @override
+  String absenceEditTooltip(String name) {
+    return 'Editar $name';
+  }
+
+  @override
+  String get absenceFieldName => 'Nome';
+
+  @override
+  String get absenceFieldNameHint => 'Vacacións';
+
+  @override
+  String get absenceFieldAllowed => 'Días permitidos';
+
+  @override
+  String get absenceFieldAllowedHelper =>
+      'Os que che corresponden este ano, sen contar os que arrastras.';
+
+  @override
+  String get absenceFieldAdjustment => 'Axuste manual';
+
+  @override
+  String get absenceFieldAdjustmentHelper =>
+      'Suma ou resta días a man: os que xa gastaches antes de usar a app ou un día extra que che deron. Admite negativos.';
+
+  @override
+  String get absenceDaysSuffix => 'días';
+
+  @override
+  String get absenceFieldCarry => 'Arrastrar o que sobre do ano anterior';
+
+  @override
+  String get absenceFieldCarryCap => 'Máximo que se arrastra';
+
+  @override
+  String get absenceFieldCarryCapHelper =>
+      'Déixao baleiro se se arrastra todo.';
+
+  @override
+  String get absenceFieldExpiry => 'Caducan o';
+
+  @override
+  String get absenceFieldExpiryNone => 'Sen caducidade';
+
+  @override
+  String get absenceFieldExpiryClear => 'Quitar a caducidade';
+
+  @override
+  String get absenceFieldTypes => 'Tipos de quenda que contan';
+
+  @override
+  String get absenceFieldTypesHelper =>
+      'Cada día pintado cun destes tipos gasta un día deste saldo.';
+
+  @override
+  String get absenceFieldTypesNone =>
+      'Non tes tipos de quenda de ausencia. Crea un en As miñas quendas coa categoría Ausencia.';
+
+  @override
+  String absenceInvalidName(int max) {
+    return 'Ponlle un nome (máximo $max letras).';
+  }
+
+  @override
+  String get absenceInvalidAllowed =>
+      'Escribe un número de días válido, por exemplo 22.';
+
+  @override
+  String get absenceInvalidAdjustment =>
+      'Escribe días en pasos dun cuarto, por exemplo -1 ou 0,5.';
+
+  @override
+  String get absenceInvalidCap => 'Escribe un máximo válido, por exemplo 5.';
+
+  @override
+  String get absenceRemove => 'Quitar saldo';
+
+  @override
+  String get absenceRemoveTitle => 'Queres quitar este saldo?';
+
+  @override
+  String absenceRemoveBody(String name, int year) {
+    return 'Bórrase o saldo «$name» de $year. As túas quendas non cambian.';
+  }
+
+  @override
+  String get absenceRemoveConfirm => 'Quitar';
+
+  @override
+  String get absenceSaveFailed =>
+      'Non se puido gardar o saldo. Téntao de novo.';
+
+  @override
+  String absenceSummaryLeft(String days, String name) {
+    return 'Quédanche $days de $name';
+  }
+
+  @override
+  String get absenceSummaryOpen => 'Abrir vacacións e permisos';
+
+  @override
+  String get moneyNightPlusLabel => 'Plus nocturno por hora';
+
+  @override
+  String get moneyNightPlusHelper =>
+      'Súmase por cada hora nocturna traballada.';
+
+  @override
+  String get moneyHolidayPlusLabel => 'Plus festivo por hora';
+
+  @override
+  String get moneyHolidayPlusHelper =>
+      'Súmase por cada hora traballada en festivo.';
+
+  @override
+  String get moneyLocationLabel => 'Lugar';
+
+  @override
+  String get moneyLocationHint => 'Hospital, planta 3';
+
+  @override
+  String get moneyLocationHelper =>
+      'Sae nos informes (PDF e CSV) xunto ao nome da quenda.';
+
+  @override
+  String get moneyExtraTitle => 'Importe extra';
+
+  @override
+  String get moneyExtraHelper =>
+      'Dietas, quilometraxe, un bonus… Usa un importe negativo para unha dedución. Súmase á estimación do día.';
+
+  @override
+  String get moneyExtraHint => 'Sen importe';
+
+  @override
+  String get moneyExtraInvalid =>
+      'Escribe un importe válido, por exemplo 25 ou -10,50';
+
+  @override
+  String get moneyExtraClear => 'Quitar o importe extra';
+
+  @override
+  String get moneySectionTitle => 'Horas e diñeiro';
+
+  @override
+  String get moneyWithholdingTitle => 'Retención (%)';
+
+  @override
+  String get moneyWithholdingSubtitle => 'Para calcular o neto estimado';
+
+  @override
+  String moneyWithholdingValue(int percent) {
+    return '$percent %';
+  }
+
+  @override
+  String get moneyWithholdingNone => 'Sen retención';
+
+  @override
+  String get moneyWithholdingHelper =>
+      'A porcentaxe que che reteñen da nómina (IRPF e cotizacións). Con ela calculamos un neto aproximado; non substitúe a túa nómina.';
+
+  @override
+  String get moneyWithholdingField => 'Porcentaxe de retención';
+
+  @override
+  String get moneyWithholdingInvalid =>
+      'Escribe un número enteiro entre 0 e 100.';
+
+  @override
+  String get moneyGross => 'Bruto estimado';
+
+  @override
+  String get moneyNet => 'Neto estimado';
+
+  @override
+  String moneyNetNote(int percent) {
+    return 'Cunha retención do $percent %';
+  }
+
+  @override
+  String get moneyNetSetup => 'Pon a túa retención para ver o neto';
+
+  @override
+  String get moneyEarnedTitle => 'Levas gañado';
+
+  @override
+  String get moneyEarnedNote =>
+      'Os días que pasaron e o traballado hoxe, ata agora.';
+
+  @override
+  String get moneyModeQuarter => 'Trimestre';
+
+  @override
+  String moneyQuarterLabel(int quarter, int year) {
+    return 'T$quarter $year';
+  }
+
+  @override
+  String get moneyQuarterPrevious => 'Trimestre anterior';
+
+  @override
+  String get moneyQuarterNext => 'Trimestre seguinte';
+
+  @override
+  String get moneyBagTitle => 'Bolsa de horas';
+
+  @override
+  String moneyBagFavour(String hours) {
+    return '$hours de máis';
+  }
+
+  @override
+  String moneyBagOwed(String hours) {
+    return 'Fáltanche $hours';
+  }
+
+  @override
+  String get moneyBagEven => 'A cero';
+
+  @override
+  String moneyBagNote(String month) {
+    return 'Horas traballadas menos obxectivo, acumuladas mes a mes ata $month. O saldo de decembro pasa a xaneiro.';
+  }
+
+  @override
+  String get moneyReportExtraColumn => 'Importe extra';
+
+  @override
+  String get moneyReportExtraTotal => 'Importes extra';
+
+  @override
+  String get moneyPlusHint => 'Sen importe';
+
+  @override
+  String get swapRowTitle => 'Libro de cambios';
+
+  @override
+  String get swapRowSubtitle => 'As quendas que che deben e as que lles debes';
+
+  @override
+  String get swapTitle => 'Libro de cambios';
+
+  @override
+  String get swapBalancesTitle => 'Balance';
+
+  @override
+  String swapBalanceTheyOwe(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Débeme $count quendas',
+      one: 'Débeme 1 quenda',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String swapBalanceIOwe(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Débolle $count quendas',
+      one: 'Débolle 1 quenda',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get swapBalanceEven => 'Nada pendente';
+
+  @override
+  String get swapChangesTitle => 'Cambios';
+
+  @override
+  String get swapEmptyTitle => 'Aínda non hai cambios';
+
+  @override
+  String get swapEmptyBody =>
+      'Anota un cambio de quenda cun compañeiro e a app levará a conta de quen che debe que.';
+
+  @override
+  String get swapAdd => 'Engadir cambio';
+
+  @override
+  String get swapNewTitle => 'Cambio novo';
+
+  @override
+  String get swapEditTitle => 'Editar o cambio';
+
+  @override
+  String get swapStagePending => 'Pendente';
+
+  @override
+  String get swapStageReturned => 'Devolto';
+
+  @override
+  String get swapStageSettled => 'Saldado';
+
+  @override
+  String get swapDirectionTheyOwe => 'Débenme';
+
+  @override
+  String get swapDirectionIOwe => 'Débolle';
+
+  @override
+  String get swapFieldService => 'Datos do servizo';
+
+  @override
+  String get swapFieldColleague => 'Con quen';
+
+  @override
+  String get swapFieldColleagueHint => 'Marta';
+
+  @override
+  String get swapInvalidColleague => 'Escribe con quen é o cambio.';
+
+  @override
+  String get swapFieldDirection => 'Quen debe a quenda';
+
+  @override
+  String get swapFieldDirectionHelper =>
+      'Escolle quen queda en deuda co cambio.';
+
+  @override
+  String get swapFieldDate => 'O día que cedes a quenda';
+
+  @override
+  String get swapFieldReturnDate => 'O día que recibes a quenda';
+
+  @override
+  String get swapFieldReturnNone => 'Aínda non a recibiches';
+
+  @override
+  String get swapFieldReturnClear => 'Quitar o día';
+
+  @override
+  String get swapFieldGivenTypes => 'A quenda que cedes';
+
+  @override
+  String get swapFieldReceivedTypes => 'A quenda que recibes';
+
+  @override
+  String get swapFieldTypesHelper =>
+      'Escolle as quendas do cambio para poder aplicalo ao cadro.';
+
+  @override
+  String get swapFieldNote => 'Nota';
+
+  @override
+  String get swapNoteHint => 'Por exemplo: devólvema o luns';
+
+  @override
+  String get swapRemove => 'Quitar o cambio';
+
+  @override
+  String get swapRemoveTitle => 'Queres quitar este cambio?';
+
+  @override
+  String swapRemoveBody(String name, String date) {
+    return 'Bórrase o cambio con $name do $date. As túas quendas non cambian.';
+  }
+
+  @override
+  String get swapRemoveConfirm => 'Quitar';
+
+  @override
+  String get swapSaveFailed => 'Non se puido gardar o cambio. Téntao de novo.';
+
+  @override
+  String get swapRemoved => 'Cambio quitado';
+
+  @override
+  String swapEditTooltip(String name) {
+    return 'Editar o cambio con $name';
+  }
+
+  @override
+  String get swapMarkReturned => 'Marcar como devolto';
+
+  @override
+  String get swapMarkReturnedTitle => 'Que día cha devolven?';
+
+  @override
+  String get swapMarkedReturned => 'Cambio marcado como devolto';
+
+  @override
+  String get swapMarkSettled => 'Marcar como saldado';
+
+  @override
+  String get swapMarkedSettled => 'Cambio saldado';
+
+  @override
+  String get swapReopen => 'Marcar como pendente';
+
+  @override
+  String get swapReopened => 'O cambio volta a estar pendente';
+
+  @override
+  String get swapApplyToCalendar => 'Aplicar ao cadro';
+
+  @override
+  String get swapUndoFromCalendar => 'Quitar do cadro';
+
+  @override
+  String get swapApplied => 'Cambio aplicado ao cadro';
+
+  @override
+  String get swapUnapplied => 'Cambio quitado do cadro';
+
+  @override
+  String get swapNothingToApply => 'Os días xa están como di o cambio';
+
+  @override
+  String get swapNotApplied => 'Este cambio non está aplicado ao cadro';
+
+  @override
+  String get swapDaySection => 'Cambio de quenda';
+
+  @override
+  String get swapDayAdd => 'Anotar un cambio';
+
+  @override
+  String get swapDayEmpty => 'Ese día non ten ningún cambio anotado.';
+
+  @override
+  String get swapMenuTooltip => 'Opcións do cambio';
+
+  @override
+  String get swapGivesLabel => 'Cedes';
+
+  @override
+  String get swapReceivesLabel => 'Recibes';
+
+  @override
+  String get noteAttachmentsSection => 'Adxuntos';
+
+  @override
+  String get noteAttachmentsEmptyTitle => 'Aínda non hai fotos nin ficheiros';
+
+  @override
+  String get noteAttachmentsEmptyBody =>
+      'Podes engadir unha foto, un ficheiro ou un debuxo a este día.';
+
+  @override
+  String get noteAttachmentsAdd => 'Engadir';
+
+  @override
+  String get noteAttachmentsAddPhoto => 'Facer unha foto';
+
+  @override
+  String get noteAttachmentsAddGallery => 'Escoller da galería';
+
+  @override
+  String get noteAttachmentsAddFile => 'Escoller un ficheiro';
+
+  @override
+  String get noteAttachmentsAddSketch => 'Debuxar';
+
+  @override
+  String get noteAttachmentKindPhoto => 'Foto';
+
+  @override
+  String get noteAttachmentKindFile => 'Ficheiro';
+
+  @override
+  String get noteAttachmentKindSketch => 'Debuxo';
+
+  @override
+  String noteAttachmentOpen(String name) {
+    return 'Abrir $name';
+  }
+
+  @override
+  String noteAttachmentRemove(String name) {
+    return 'Quitar $name';
+  }
+
+  @override
+  String noteAttachmentRemoveHint(String name) {
+    return 'Mantén premido para quitar $name';
+  }
+
+  @override
+  String noteAttachmentRemoved(String name) {
+    return 'Quitouse $name';
+  }
+
+  @override
+  String get noteAttachmentsViewerTitle => 'Adxunto';
+
+  @override
+  String get noteAttachmentTooLarge =>
+      'Ese ficheiro é grande de máis (o máximo son 50 MB).';
+
+  @override
+  String get noteAttachmentStoreFull => 'Non queda espazo para máis adxuntos.';
+
+  @override
+  String get noteAttachmentUnreadable => 'Non se puido ler o ficheiro.';
+
+  @override
+  String get noteAttachmentCameraDenied =>
+      'Sen o permiso non podemos abrir a cámara.';
+
+  @override
+  String get noteAttachmentGalleryDenied =>
+      'Sen o permiso non podemos abrir a galería.';
+
+  @override
+  String get noteAttachmentFailed => 'Non se puido gardar o adxunto.';
+
+  @override
+  String get noteAttachmentRemoveFailed => 'Non se puido quitar o adxunto.';
+
+  @override
+  String get noteTasksSection => 'Tarefas';
+
+  @override
+  String get noteTasksEmpty => 'Este día non ten tarefas.';
+
+  @override
+  String get noteTasksAdd => 'Engadir tarefa';
+
+  @override
+  String get noteTasksHint => 'Que hai que facer';
+
+  @override
+  String get noteTasksInvalid => 'Escribe que hai que facer.';
+
+  @override
+  String get noteTasksUndo => 'Desfacer o último cambio das tarefas';
+
+  @override
+  String get noteTaskMenu => 'Opcións da tarefa';
+
+  @override
+  String get noteTaskMoveUp => 'Subir';
+
+  @override
+  String get noteTaskMoveDown => 'Baixar';
+
+  @override
+  String get noteTaskRemove => 'Quitar a tarefa';
+
+  @override
+  String get sketchTitle => 'Debuxo';
+
+  @override
+  String get sketchPen => 'Trazo';
+
+  @override
+  String get sketchEraser => 'Borrador';
+
+  @override
+  String get sketchUndo => 'Desfacer o trazo';
+
+  @override
+  String get sketchRedo => 'Refacer o trazo';
+
+  @override
+  String get sketchClear => 'Borrar o debuxo';
+
+  @override
+  String get sketchSave => 'Gardar';
+
+  @override
+  String get sketchColor => 'Cor do trazo';
+
+  @override
+  String get sketchColorInk => 'Tinta';
+
+  @override
+  String get sketchColorAccent => 'Acento';
+
+  @override
+  String get sketchColorHighlight => 'Ámbar';
+
+  @override
+  String get sketchColorHoliday => 'Vermello';
+
+  @override
+  String get sketchColorSuccess => 'Verde';
+
+  @override
+  String get sketchEmpty => 'Debuxa algo para poder gardalo.';
+
+  @override
+  String get sketchFailed => 'Non se puido gardar o debuxo.';
+
+  @override
+  String get appearanceNoteInMonthTitle => 'Ver a nota no mes';
+
+  @override
+  String get appearanceNoteInMonthSubtitle =>
+      'A primeira liña da nota na casa do día';
+
+  @override
+  String get appearancePaintSoundTitle => 'Son ao pintar';
+
+  @override
+  String get appearancePaintSoundSubtitle =>
+      'Un clic ao pintar un día, agás en silencio';
+
+  @override
+  String get appearancePresetsTitle => 'Paletas preparadas';
+
+  @override
+  String get appearancePresetsNote =>
+      'Cambian dunha vez a cor das quendas que usan as cores de fábrica. As que pintases ao teu gusto quedan igual.';
+
+  @override
+  String get appearancePresetsChoose => 'Escoller';
+
+  @override
+  String get appearancePresetsApplied => 'Paleta aplicada. Podes desfacelo.';
+
+  @override
+  String get appearancePresetSunset => 'Solpor';
+
+  @override
+  String get appearancePresetSea => 'Mar';
+
+  @override
+  String get appearancePresetForest => 'Bosque';
+
+  @override
+  String get appearancePresetCandy => 'Caramelo';
+
+  @override
+  String get appearancePresetNocturnal => 'Noite pechada';
+
+  @override
+  String get appearanceBackgroundTitle => 'Imaxe de fondo do calendario';
+
+  @override
+  String get appearanceBackgroundChoose => 'Escoller';
+
+  @override
+  String get appearanceBackgroundChange => 'Cambiar';
+
+  @override
+  String get appearanceBackgroundPick => 'Escoller da galería';
+
+  @override
+  String get appearanceBackgroundRemove => 'Quitar a imaxe';
+
+  @override
+  String get appearanceBackgroundOnDevice =>
+      'Queda neste móbil: non viaxa na copia de seguranza';
+
+  @override
+  String get appearanceBackgroundNote =>
+      'Escóllese da túa galería e vese detrás do mes, cun veo para que todo se lea ben. As casas das quendas non cambian.';
+
+  @override
+  String get appearanceBackgroundTooLarge =>
+      'Esa imaxe é moi grande. Proba con outra máis pequena.';
+
+  @override
+  String get appearanceBackgroundFailed => 'Non se puido gardar a imaxe.';
+
+  @override
+  String get widgetAddFourWeeks => 'Catro semanas: un mes';
+
+  @override
+  String get widgetNameFourWeeks => 'Catro semanas';
+
+  @override
+  String get widgetDescFourWeeks => 'O mes por semanas';
+
+  @override
+  String get compareSelectorTitle => 'Calendarios comparados';
+
+  @override
+  String get compareSelectorAction => 'Cambiar';
+
+  @override
+  String get compareSheetHint => 'Podes comparar de 2 a 6 calendarios.';
+
+  @override
+  String get compareSheetDone => 'Feito';
+
+  @override
+  String get compareSheetMinWarning =>
+      'Fan falta polo menos 2 calendarios para comparar.';
+
+  @override
+  String get compareSheetMaxWarning => 'Xa comparas 6 calendarios, o máximo.';
+
+  @override
+  String get compareWeekendTitle => 'Fins de semana libres en común';
+
+  @override
+  String compareWeekendCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fins de semana libres en común este mes',
+      one: '1 fin de semana libre en común este mes',
+      zero: 'Ningún fin de semana libre en común este mes',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String compareWeekendDaysCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count días de fin de semana libres en común',
+      one: '1 día de fin de semana libre en común',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String compareWeekendSpoken(String saturday, String sunday) {
+    return '$saturday e $sunday, libres en común';
+  }
+
+  @override
+  String get compareTableNames => 'Calendarios';
+
+  @override
+  String get devEventsRowTitle => 'Citas do móbil';
+
+  @override
+  String get devEventsRowSubtitle =>
+      'As citas do teu calendario xunto ás quendas';
+
+  @override
+  String get devEventsTitle => 'Citas do móbil';
+
+  @override
+  String get devEventsHelp =>
+      'Escolle os calendarios do móbil cuxas citas queres ver xunto ás quendas. Turnly só os le: non escribe nin cambia nada neles.';
+
+  @override
+  String get devEventsPermissionTitle => 'Falta o permiso do calendario';
+
+  @override
+  String get devEventsPermissionBody =>
+      'Para ler as citas do móbil, Turnly necesita permiso para ver os teus calendarios. Non se pide ao abrir a app: só se o aceptas aquí.';
+
+  @override
+  String get devEventsPermissionDeniedTitle =>
+      'O acceso ao calendario está desactivado';
+
+  @override
+  String get devEventsPermissionDeniedBody =>
+      'Actívao na configuración do sistema (Permisos › Calendario) e volve aquí.';
+
+  @override
+  String get devEventsPermissionDeniedBodyIos =>
+      'Actívao na configuración do sistema (Turnly › Calendarios) e volve aquí.';
+
+  @override
+  String get devEventsPermissionRestrictedTitle =>
+      'Este móbil non deixa usar o calendario';
+
+  @override
+  String get devEventsPermissionRestrictedBody =>
+      'Pode ser un control parental ou un perfil de traballo. Sen ese permiso non se poden mostrar as citas.';
+
+  @override
+  String get devEventsPermissionDeclinedBody =>
+      'Non deches o permiso. Sen el non podemos ler os teus calendarios, pero podes permitilo agora.';
+
+  @override
+  String get devEventsPermissionAllow => 'Permitir acceso';
+
+  @override
+  String get devEventsPermissionSettings => 'Abrir a configuración';
+
+  @override
+  String get devEventsPermissionRecheck => 'Comprobar de novo';
+
+  @override
+  String get devEventsCalendarsTitle => 'Calendarios do móbil';
+
+  @override
+  String devEventsChosenCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count calendarios escollidos',
+      one: '1 calendario escollido',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get devEventsEmptyTitle => 'Non hai calendarios';
+
+  @override
+  String get devEventsEmptyBody =>
+      'Este móbil non ten ningún calendario que Turnly poida ler.';
+
+  @override
+  String get devEventsReadFailedTitle =>
+      'Non se puideron ler os teus calendarios';
+
+  @override
+  String get devEventsReadFailedBody =>
+      'O calendario do móbil non respondeu. Compróbao outra vez.';
+
+  @override
+  String get devEventsOffTitle => 'Agora non se amosan citas';
+
+  @override
+  String get devEventsOffBody =>
+      'Non escolleches ningún calendario. Ata que escollas un, o mes e o día non amosan citas.';
+
+  @override
+  String get devEventsSaveFailed => 'Non se puideron gardar os cambios.';
+
+  @override
+  String get devEventsSectionTitle => 'Citas do móbil';
+
+  @override
+  String get devEventsAllDay => 'Todo o día';
+
+  @override
+  String devEventsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count citas',
+      one: '1 cita',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String devEventsEventSemantics(String time, String title) {
+    return '$time, $title';
+  }
+
+  @override
+  String devEventsEventWithCalendarSemantics(
+    String time,
+    String title,
+    String calendar,
+  ) {
+    return '$time, $title, $calendar';
+  }
 }

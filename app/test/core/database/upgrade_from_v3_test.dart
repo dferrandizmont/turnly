@@ -40,11 +40,11 @@ void main() {
   }
 
   test(
-    'real v3 file gets a complete v3 safety copy before reaching v4',
+    'real v3 file gets a complete v3 safety copy before reaching v6',
     () async {
       expect(readUserVersion(file), 3);
       final db = await open();
-      expect(readUserVersion(file), 4);
+      expect(readUserVersion(file), 6);
       expect(await dumpV3Columns(db), before);
       expect(
         (await db.select(db.shiftTypes).get()).every(
@@ -54,7 +54,7 @@ void main() {
       );
       await db.close();
 
-      expect(backupNames(), ['pre-v3-a-v4-20261102-083015.sqlite']);
+      expect(backupNames(), ['pre-v3-a-v6-20261102-083015.sqlite']);
       final copy = File(p.join(backups.path, backupNames().single));
       expect(readUserVersion(copy), 3);
       final asV3 = v3.DatabaseAtV3(NativeDatabase(copy));
@@ -85,8 +85,8 @@ void main() {
       );
       final loaded = await ScheduleRepository(second).load('main');
       expect(loaded.schedule.shiftTypeById('night')!.fixedPlusCents, 3000);
-      expect(backupNames(), ['pre-v3-a-v4-20261102-083015.sqlite']);
-      expect(readUserVersion(file), 4);
+      expect(backupNames(), ['pre-v3-a-v6-20261102-083015.sqlite']);
+      expect(readUserVersion(file), 6);
       await second.close();
     },
   );

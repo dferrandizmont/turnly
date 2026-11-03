@@ -180,7 +180,12 @@ Future<void> _splitShift(QaContext qa) async {
   expect(
     find.descendant(
       of: find.byType(BottomSheet),
-      matching: find.text('09:00–13:00 · 17:00–21:00'),
+      matching: find.byWidgetPredicate(
+        (w) =>
+            w is Text &&
+            w.data?.replaceAll('\u2060', '') ==
+                '09:00–13:00 · 17:00–21:00 · 8 h',
+      ),
     ),
     findsOneWidget,
   );
@@ -189,9 +194,11 @@ Future<void> _splitShift(QaContext qa) async {
   await t.settle();
   expect(find.byType(BottomSheet), findsNothing);
 
-  // The summary counts both segments, not the gap: 160 h + 2 x 8 h.
+  // The summary counts both segments, not the gap: 64 h planned + 2 x 8 h
+  // (the 24th and 25th are after today; 96 h are already worked).
   await t.tapAndSettle(_k('open-summary'), reason: 'Resumen del mes');
-  expect(t.widget<Text>(_k('summary-hours')).data, '176 h');
+  expect(t.widget<Text>(_k('summary-hours')).data, '96 h');
+  expect(t.widget<Text>(_k('summary-legend-planned')).data, '80 h');
   expect(t.widget<Text>(_k('summary-shifts-value')).data, '22');
   await qa.shot('resumen');
   qa.expectNoFlutterErrors('turno partido');

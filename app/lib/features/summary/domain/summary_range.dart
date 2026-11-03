@@ -3,6 +3,40 @@ import '../../schedule/domain/schedule_domain.dart';
 /// Longest period the summary accepts between two dates (a leap year).
 const int maxSummaryRangeDays = 366;
 
+/// The four quarters of a civil year (P9, fila 18 de `docs/paridad-pago.md`):
+/// the shortcut of the summary screen for a quarter instead of typing the
+/// dates of it.
+enum Quarter {
+  /// January to March.
+  first(1),
+
+  /// April to June.
+  second(2),
+
+  /// July to September.
+  third(3),
+
+  /// October to December.
+  fourth(4);
+
+  const Quarter(this.number);
+
+  /// The number of the quarter (1 to 4).
+  final int number;
+
+  /// The first day of the quarter in [year].
+  CivilDate startOf(int year) => CivilDate(year, (number - 1) * 3 + 1, 1);
+
+  /// The last day of the quarter in [year].
+  CivilDate endOf(int year) => CivilDate(year, number * 3, 1).lastDayOfMonth;
+
+  /// The period of the quarter in [year].
+  SummaryRange rangeOf(int year) => SummaryRange(startOf(year), endOf(year));
+
+  @override
+  String toString() => 'Q$number';
+}
+
 /// A free period of the summary: [from] to [to], both included, at most
 /// [maxSummaryRangeDays] days. The summary of it is `summarizeRange` (the same
 /// aggregate as a month). Equal ranges are equal values, so it can key a
@@ -13,6 +47,10 @@ class SummaryRange {
   /// The whole month that contains [anyDay].
   factory SummaryRange.month(CivilDate anyDay) =>
       SummaryRange(anyDay.firstDayOfMonth, anyDay.lastDayOfMonth);
+
+  /// The quarter [quarter] of [year] (T1 to T4).
+  factory SummaryRange.quarter(int year, Quarter quarter) =>
+      quarter.rangeOf(year);
 
   final CivilDate from;
   final CivilDate to;

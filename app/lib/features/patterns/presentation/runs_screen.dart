@@ -11,6 +11,7 @@ import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/buttons.dart';
 import '../../../core/widgets/confirm_dialog.dart';
 import '../../../core/widgets/content_app_bar.dart';
+import '../../../core/widgets/empty_illustration.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/page_body.dart';
 import '../../calendar/application/schedule_controller.dart';
@@ -46,6 +47,10 @@ class RunsScreen extends ConsumerWidget {
         child: runs.isEmpty
             ? EmptyState(
                 icon: SelectionIcons.rotations,
+                illustration: EmptyIllustration(
+                  kind: EmptyIllustrationKind.calendar,
+                  shifts: schedule.shiftTypes,
+                ),
                 title: l10n.selectionRunsEmptyTitle,
                 message: l10n.selectionRunsEmptyMessage,
               )

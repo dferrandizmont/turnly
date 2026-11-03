@@ -26,6 +26,9 @@ void main() {
         (tester) async {
           await pumpCalendar(tester, size: size, textScale: scale);
           final title = find.byKey(const ValueKey('month-title'));
+          // On a small screen with big text the row of the month starts
+          // below the «Hoy» card (B1): bring it into view first.
+          await revealOnMonth(tester, title);
           expect(title, findsOneWidget);
 
           final context = tester.element(title);
@@ -63,7 +66,7 @@ void main() {
     // Another year: the title says the month and the year.
     for (var i = 0; i < 10; i++) {
       final previous = find.byTooltip('Mes anterior');
-      await tester.ensureVisible(previous);
+      await revealOnMonth(tester, previous);
       await tester.pumpAndSettle();
       await tester.tap(previous);
       await tester.pumpAndSettle();
@@ -97,6 +100,7 @@ void main() {
   testWidgets('the title is a button that opens the year', (tester) async {
     await pumpCalendar(tester, size: const Size(320, 640), textScale: 2.0);
     final title = find.byKey(const ValueKey('month-title'));
+    await revealOnMonth(tester, title);
     final context = tester.element(title);
     final scaler = MediaQuery.textScalerOf(context);
     final style = context.type.title;

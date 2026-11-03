@@ -194,7 +194,7 @@ void main() {
 
   group('place', () {
     test('nothing chosen by default', () async {
-      expect(await repo.loadPlace(), HolidayPlace.none);
+      expect(await repo.loadPlace(), HolidayPlace.spain);
     });
 
     test(
@@ -216,7 +216,11 @@ void main() {
             for (final r in rows)
               r.read<String>('key'): r.read<String>('value'),
           },
-          {'holidays.municipality': '"08019"', 'holidays.region': '"ES-CT"'},
+          {
+            'holidays.country': '"ES"',
+            'holidays.municipality': '"08019"',
+            'holidays.region': '"ES-CT"',
+          },
         );
       },
     );
@@ -226,7 +230,7 @@ void main() {
       expect(place.regionCode, 'ES-MD');
 
       await repo.savePlace();
-      expect(await repo.loadPlace(), HolidayPlace.none);
+      expect(await repo.loadPlace(), HolidayPlace.spain);
       expect(
         await db
             .customSelect(
@@ -247,7 +251,7 @@ void main() {
         () => repo.savePlace(regionCode: 'ES-MD', municipalityCode: '08019'),
         throwsArgumentError,
       );
-      expect(await repo.loadPlace(), HolidayPlace.none);
+      expect(await repo.loadPlace(), HolidayPlace.spain);
     });
   });
 
@@ -255,7 +259,7 @@ void main() {
     setUp(() => repo.refreshBundled(loader));
 
     test('no region: only the national file', () async {
-      final entries = await repo.entriesFor(HolidayPlace.none);
+      final entries = await repo.entriesFor(HolidayPlace.spain);
       expect(entries, hasLength(15));
       expect(entries.every((e) => e.scope == HolidayScope.national), isTrue);
       expect(entries.every((e) => e.regionCode == null), isTrue);
@@ -291,7 +295,7 @@ void main() {
       await repo.addUserHoliday(date: day, name: '  Mi patrón ');
 
       for (final place in const [
-        HolidayPlace.none,
+        HolidayPlace.spain,
         HolidayPlace(regionCode: 'ES-CT', municipalityCode: '08019'),
       ]) {
         final snapshot = HolidaySnapshot(
@@ -305,28 +309,28 @@ void main() {
       }
     });
 
-    test(
-      'one per day: adding again replaces; remove brings the official back',
-      () async {
-        await repo.refreshBundled(loader);
-        await repo.addUserHoliday(date: day, name: 'Uno');
-        await repo.addUserHoliday(date: day, name: 'Dos');
-        expect((await repo.userHolidays()).map((e) => e.name), ['Dos']);
+    test('one per day: adding again replaces; remove brings the official back', () async {
+      await repo.refreshBundled(loader);
+      await repo.addUserHoliday(date: day, name: 'Uno');
+      await repo.addUserHoliday(date: day, name: 'Dos');
+      expect((await repo.userHolidays()).map((e) => e.name), ['Dos']);
 
-        await repo.removeUserHoliday(day);
-        expect(await repo.userHolidays(), isEmpty);
-        final back = HolidaySnapshot(
-          place: HolidayPlace.none,
-          entries: await repo.entriesFor(HolidayPlace.none),
-        ).calendar.on(day);
-        expect(back?.name, 'Fiesta Nacional de España');
-        // Removing never deletes official rows.
-        expect(
-          await _count(db, "date = '2026-10-12' AND source = 'bundled'"),
-          1,
-        );
-      },
-    );
+      await repo.removeUserHoliday(day);
+      expect(await repo.userHolidays(), isEmpty);
+      final back = HolidaySnapshot(
+        place: HolidayPlace.spain,
+        entries: await repo.entriesFor(HolidayPlace.spain),
+      ).calendar.on(day);
+      expect(back?.name, 'Fiesta Nacional de España');
+      // Removing never deletes official rows.
+      expect(
+        await _count(
+          db,
+          "date = '2026-10-12' AND source = 'bundled' AND region_code IS NULL",
+        ),
+        1,
+      );
+    });
 
     test('an empty name is refused', () async {
       expect(

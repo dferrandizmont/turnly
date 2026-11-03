@@ -68,7 +68,8 @@ Future<void> main() async {
     },
   );
 
-  test('auxiliary range starts Monday and covers all 60 agenda horizons', () {
+  test('auxiliary range starts Monday and serves the two- and four-week '
+      'horizons', () {
     // Sunday, DST fall-back; even when the month grid starts on Sunday.
     const today = CivilDate(2026, 10, 25);
     final snapshot = _build(today, schedule: Schedule());
@@ -76,8 +77,8 @@ Future<void> main() async {
     expect(snapshot.days, hasLength(60));
     expect(snapshot.firstDate, today.toIso());
     expect(snapshot.displayDays.first.date, '2026-10-19');
-    expect(snapshot.displayDays.last.date, today.addDays(72).toIso());
-    expect(snapshot.displayDays, hasLength(79));
+    expect(snapshot.displayDays.last.date, today.addDays(86).toIso());
+    expect(snapshot.displayDays, hasLength(93));
     for (var i = 0; i < snapshot.displayDays.length; i++) {
       expect(
         snapshot.displayDays[i].date,
@@ -88,8 +89,11 @@ Future<void> main() async {
     for (final day in snapshot.days) {
       final date = CivilDate.parse(day.date);
       final monday = date.addDays(1 - date.weekday);
-      for (var i = 0; i < 14; i++) {
+      // The two-week strip starts on the day; the four-week grid on its Monday.
+      for (var i = 0; i < kWidgetUpcomingDays; i++) {
         expect(dates, contains(date.addDays(i).toIso()));
+      }
+      for (var i = 0; i < kWidgetFourWeeksDays; i++) {
         expect(dates, contains(monday.addDays(i).toIso()));
       }
     }
@@ -108,7 +112,7 @@ Future<void> main() async {
             segment2StartMinute: 17 * 60,
             segment2DurationMinutes: 4 * 60,
           );
-      final last = today.addDays(72);
+      final last = today.addDays(86);
       final snapshot = _build(
         today,
         schedule: Schedule(
@@ -123,11 +127,11 @@ Future<void> main() async {
         ),
       );
       final day = snapshot.displayDays.last;
-      expect(day.date, '2027-03-13');
+      expect(day.date, '2027-03-27');
       expect(day.hasNote, isTrue);
       expect(day.shifts.single.code, shift.code);
-      expect(day.shifts.single.compactTime, shift.compactTimeLabel);
-      expect(day.shifts.single.timeLabel, shift.compactTimeLabel);
+      expect(day.shifts.single.compactTime, shift.compactTimeLabel());
+      expect(day.shifts.single.timeLabel, shift.compactTimeLabel());
       expect(day.toJson().toString(), isNot(contains('Texto privado')));
       final light = ShiftSwatch.forColor(shift.colorValue, Brightness.light);
       expect(day.shifts.single.tintLight, light.tint.toARGB32());
@@ -188,7 +192,7 @@ Future<void> main() async {
   test('v2 round trip includes auxiliary content in the hash', () {
     const today = CivilDate(2026, 10, 25);
     final base = _build(today, schedule: Schedule());
-    final tail = today.addDays(72);
+    final tail = today.addDays(86);
     final edited = _build(
       today,
       schedule: Schedule(

@@ -526,7 +526,19 @@ Future<void> _yearView(QaContext qa) async {
   await t.tapAndSettle(_key('year-next'));
   expect(find.text('2027'), findsOneWidget);
   await t.tapAndSettle(_key('year-month-3'));
-  expect(find.text('Marzo 2027'), findsOneWidget);
+  // The title carries month and year; it is one line when it fits and two
+  // Texts (month, then year) when it does not, so look inside the subtree.
+  final monthTitle = _key('month-title');
+  expect(
+    find.descendant(of: monthTitle, matching: find.textContaining('Marzo')),
+    findsOneWidget,
+    reason: 'el título lleva el mes',
+  );
+  expect(
+    find.descendant(of: monthTitle, matching: find.textContaining('2027')),
+    findsOneWidget,
+    reason: 'el título lleva el año',
+  );
   expect(app.container.read(visibleMonthProvider), const CivilDate(2027, 3, 1));
 }
 

@@ -53,7 +53,7 @@ class YearMonthCards extends StatelessWidget {
         _together(l10n.summaryNightOf(hours(nightMinutes))),
         if (earningsCents != null)
           l10n.summaryYearEstimated(
-            _together(formatEuroCents(context, earningsCents)),
+            _together(formatMoneyCents(context, earningsCents)),
           ),
       ].join(' · '),
     ];

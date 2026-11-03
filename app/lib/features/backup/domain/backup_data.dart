@@ -1,7 +1,11 @@
 import 'package:collection/collection.dart';
 
+import '../../absences/domain/absence_balance.dart';
 import '../../calendars/domain/calendar.dart';
+import '../../notes/domain/day_task.dart';
+import '../../notes/domain/note_attachment.dart';
 import '../../schedule/domain/schedule_domain.dart';
+import '../../swaps/domain/shift_swap.dart';
 import 'backup_errors.dart';
 
 const _deepEq = DeepCollectionEquality();
@@ -113,6 +117,10 @@ class BackupShiftType extends _Value {
     this.segment2StartMinute,
     this.segment2DurationMinutes,
     this.archived = false,
+    this.pastVersions = const [],
+    this.location,
+    this.nightPlusCentsPerHour,
+    this.holidayPlusCentsPerHour,
   });
 
   /// [readHourlyRate] is false for a version 1 file, which has no such field;
@@ -151,6 +159,16 @@ class BackupShiftType extends _Value {
       archived: r.boolean('archived'),
       createdAt: r.integer('createdAt'),
       updatedAt: r.integer('updatedAt'),
+      pastVersions: readV3Fields && json['pastVersions'] != null
+          ? r.objects('pastVersions', BackupShiftTypeVersion.fromJson)
+          : const [],
+      location: readV3Fields ? r.stringOrNull('location') : null,
+      nightPlusCentsPerHour: readV3Fields
+          ? r.integerOrNull('nightPlusCentsPerHour')
+          : null,
+      holidayPlusCentsPerHour: readV3Fields
+          ? r.integerOrNull('holidayPlusCentsPerHour')
+          : null,
     );
   }
 
@@ -179,6 +197,17 @@ class BackupShiftType extends _Value {
   final int sortOrder;
   final bool archived;
 
+  /// Optional format v3 extension (database v5): the terms this type had
+  /// before each change made «only from today on», sorted by `until`. Empty
+  /// for a type that has always had its current terms.
+  final List<BackupShiftTypeVersion> pastVersions;
+
+  /// Optional format v3 extensions (database v6): place and the night and
+  /// holiday pluses per hour. Written only when set.
+  final String? location;
+  final int? nightPlusCentsPerHour;
+  final int? holidayPlusCentsPerHour;
+
   /// Milliseconds since the epoch (UTC).
   final int createdAt;
   final int updatedAt;
@@ -203,6 +232,10 @@ class BackupShiftType extends _Value {
     archived: archived,
     createdAt: createdAt,
     updatedAt: updatedAt,
+    pastVersions: pastVersions,
+    location: location,
+    nightPlusCentsPerHour: nightPlusCentsPerHour,
+    holidayPlusCentsPerHour: holidayPlusCentsPerHour,
   );
 
   ShiftType toShiftType() => ShiftType(
@@ -221,7 +254,15 @@ class BackupShiftType extends _Value {
     alarmSound: alarmSound,
     segment2StartMinute: segment2StartMinute,
     segment2DurationMinutes: segment2DurationMinutes,
+    location: location,
+    nightPlusCentsPerHour: nightPlusCentsPerHour,
+    holidayPlusCentsPerHour: holidayPlusCentsPerHour,
   );
+
+  /// The engine view of [pastVersions].
+  List<ShiftTypeVersion> toVersions() => [
+    for (final v in pastVersions) v.toVersion(),
+  ];
 
   /// The version 3 keys are written **only when they have a value**: a
   /// shift type without them serialises exactly as it did in version 2, so
@@ -247,6 +288,11 @@ class BackupShiftType extends _Value {
     'archived': archived,
     'createdAt': createdAt,
     'updatedAt': updatedAt,
+    if (pastVersions.isNotEmpty)
+      'pastVersions': [for (final v in pastVersions) v.toJson()],
+    'location': ?location,
+    'nightPlusCentsPerHour': ?nightPlusCentsPerHour,
+    'holidayPlusCentsPerHour': ?holidayPlusCentsPerHour,
   };
 
   @override
@@ -270,6 +316,142 @@ class BackupShiftType extends _Value {
     archived,
     createdAt,
     updatedAt,
+    pastVersions,
+    location,
+    nightPlusCentsPerHour,
+    holidayPlusCentsPerHour,
+  ];
+}
+
+/// A `shift_type_versions` row, nested in its shift type
+/// (`shiftTypes[].pastVersions`): the terms the type had up to [until]
+/// (included). Only `until`, `category` and `createdAt` are always written;
+/// the other keys only when they have a value (absent = `null`).
+class BackupShiftTypeVersion extends _Value {
+  const BackupShiftTypeVersion({
+    required this.until,
+    required this.category,
+    required this.createdAt,
+    this.startMinute,
+    this.endMinute,
+    this.paidMinutes,
+    this.nightOverride,
+    this.hourlyRateCents,
+    this.fixedPlusCents,
+    this.segment2StartMinute,
+    this.segment2DurationMinutes,
+    this.nightPlusCentsPerHour,
+    this.holidayPlusCentsPerHour,
+  });
+
+  factory BackupShiftTypeVersion.fromJson(Map<String, Object?> json) {
+    final r = _JsonReader(json, 'shiftTypeVersion');
+    return BackupShiftTypeVersion(
+      until: r.date('until'),
+      category: r.enumValue('category', ShiftCategory.values),
+      startMinute: r.integerOrNull('startMinute'),
+      endMinute: r.integerOrNull('endMinute'),
+      paidMinutes: r.integerOrNull('paidMinutes'),
+      nightOverride: r.boolOrNull('nightOverride'),
+      hourlyRateCents: r.integerOrNull('hourlyRateCents'),
+      fixedPlusCents: r.integerOrNull('fixedPlusCents'),
+      segment2StartMinute: r.integerOrNull('segment2StartMinute'),
+      segment2DurationMinutes: r.integerOrNull('segment2DurationMinutes'),
+      nightPlusCentsPerHour: r.integerOrNull('nightPlusCentsPerHour'),
+      holidayPlusCentsPerHour: r.integerOrNull('holidayPlusCentsPerHour'),
+      createdAt: r.integer('createdAt'),
+    );
+  }
+
+  factory BackupShiftTypeVersion.of(
+    ShiftTypeVersion version, {
+    required int createdAt,
+  }) {
+    final t = version.terms;
+    return BackupShiftTypeVersion(
+      until: version.until,
+      category: t.category,
+      startMinute: t.startMinute,
+      endMinute: t.endMinute,
+      paidMinutes: t.paidMinutes,
+      nightOverride: t.nightOverride,
+      hourlyRateCents: t.hourlyRateCents,
+      fixedPlusCents: t.fixedPlusCents,
+      segment2StartMinute: t.segment2StartMinute,
+      segment2DurationMinutes: t.segment2DurationMinutes,
+      nightPlusCentsPerHour: t.nightPlusCentsPerHour,
+      holidayPlusCentsPerHour: t.holidayPlusCentsPerHour,
+      createdAt: createdAt,
+    );
+  }
+
+  /// Last day (included) these terms applied.
+  final CivilDate until;
+  final ShiftCategory category;
+  final int? startMinute;
+  final int? endMinute;
+  final int? paidMinutes;
+  final bool? nightOverride;
+  final int? hourlyRateCents;
+  final int? fixedPlusCents;
+  final int? segment2StartMinute;
+  final int? segment2DurationMinutes;
+
+  /// Database v6: night and holiday pluses per hour of these terms.
+  final int? nightPlusCentsPerHour;
+  final int? holidayPlusCentsPerHour;
+
+  /// Milliseconds since the epoch (UTC).
+  final int createdAt;
+
+  ShiftTypeVersion toVersion() => ShiftTypeVersion(
+    until: until,
+    terms: ShiftTerms(
+      category: category,
+      startMinute: startMinute,
+      endMinute: endMinute,
+      paidMinutes: paidMinutes,
+      nightOverride: nightOverride,
+      hourlyRateCents: hourlyRateCents,
+      fixedPlusCents: fixedPlusCents,
+      segment2StartMinute: segment2StartMinute,
+      segment2DurationMinutes: segment2DurationMinutes,
+      nightPlusCentsPerHour: nightPlusCentsPerHour,
+      holidayPlusCentsPerHour: holidayPlusCentsPerHour,
+    ),
+  );
+
+  Map<String, Object?> toJson() => {
+    'until': until.toIso(),
+    'category': category.name,
+    'startMinute': ?startMinute,
+    'endMinute': ?endMinute,
+    'paidMinutes': ?paidMinutes,
+    'nightOverride': ?nightOverride,
+    'hourlyRateCents': ?hourlyRateCents,
+    'fixedPlusCents': ?fixedPlusCents,
+    'segment2StartMinute': ?segment2StartMinute,
+    'segment2DurationMinutes': ?segment2DurationMinutes,
+    'nightPlusCentsPerHour': ?nightPlusCentsPerHour,
+    'holidayPlusCentsPerHour': ?holidayPlusCentsPerHour,
+    'createdAt': createdAt,
+  };
+
+  @override
+  List<Object?> get props => [
+    until,
+    category,
+    startMinute,
+    endMinute,
+    paidMinutes,
+    nightOverride,
+    hourlyRateCents,
+    fixedPlusCents,
+    segment2StartMinute,
+    segment2DurationMinutes,
+    nightPlusCentsPerHour,
+    holidayPlusCentsPerHour,
+    createdAt,
   ];
 }
 
@@ -403,6 +585,7 @@ class BackupDayEntry extends _Value {
     this.noteReminderMinute,
     this.overtimeMinutes,
     this.earlyLeaveMinutes,
+    this.extraAmountCents,
   });
 
   /// Reads an exception. A version 1 file has no calendars: its reader
@@ -427,6 +610,9 @@ class BackupDayEntry extends _Value {
       earlyLeaveMinutes: readV3Fields
           ? r.integerOrNull('earlyLeaveMinutes')
           : null,
+      extraAmountCents: readV3Fields
+          ? r.integerOrNull('extraAmountCents')
+          : null,
       updatedAt: r.integer('updatedAt'),
     );
   }
@@ -444,6 +630,9 @@ class BackupDayEntry extends _Value {
   final int? noteReminderMinute;
   final int? overtimeMinutes;
   final int? earlyLeaveMinutes;
+
+  /// Optional format v3 extension (database v6): extra money of the day.
+  final int? extraAmountCents;
   final int updatedAt;
 
   DayEntry toEntry() => DayEntry(
@@ -453,6 +642,7 @@ class BackupDayEntry extends _Value {
     noteReminderMinute: noteReminderMinute,
     overtimeMinutes: overtimeMinutes,
     earlyLeaveMinutes: earlyLeaveMinutes,
+    extraAmountCents: extraAmountCents,
   );
 
   /// The version 3 keys are written only when they have a value (see
@@ -465,6 +655,7 @@ class BackupDayEntry extends _Value {
     'noteReminderMinute': ?noteReminderMinute,
     'overtimeMinutes': ?overtimeMinutes,
     'earlyLeaveMinutes': ?earlyLeaveMinutes,
+    'extraAmountCents': ?extraAmountCents,
     'updatedAt': updatedAt,
   };
 
@@ -477,6 +668,7 @@ class BackupDayEntry extends _Value {
     noteReminderMinute,
     overtimeMinutes,
     earlyLeaveMinutes,
+    extraAmountCents,
     updatedAt,
   ];
 }
@@ -527,35 +719,487 @@ class BackupHoliday extends _Value {
   List<Object?> get props => [date, scope, name, regionCode, municipalityCode];
 }
 
-/// An `absence_balances` row.
+/// An `absence_balances` row. `year`, `type` and `allowedDays` are those of
+/// every format version; the rest are optional extensions of format v3
+/// (database v6), written only when they are not at their default, so a
+/// balance written before v6 serialises as it always did and an older app
+/// still reads the list (it ignores the keys it does not know).
 class BackupAbsenceBalance extends _Value {
   const BackupAbsenceBalance({
     required this.year,
     required this.type,
     required this.allowedDays,
+    this.calendarId,
+    this.name,
+    this.periodStart,
+    this.periodEnd,
+    this.unit = AbsenceUnit.day,
+    this.shiftTypeQuarters = const {},
+    this.carryOver = false,
+    this.carryOverMaxDays,
+    this.adjustmentDays = 0,
+    this.sortOrder = 0,
+    this.createdAt,
+    this.updatedAt,
   });
 
-  factory BackupAbsenceBalance.fromJson(Map<String, Object?> json) {
+  /// [readExtensions] is false for a version 1 or 2 file, which only had the
+  /// first three keys (anything else is ignored).
+  factory BackupAbsenceBalance.fromJson(
+    Map<String, Object?> json, {
+    bool readExtensions = true,
+  }) {
     final r = _JsonReader(json, 'absenceBalance');
-    return BackupAbsenceBalance(
+    final base = (
       year: r.integer('year'),
       type: r.string('type'),
       allowedDays: r.number('allowedDays'),
     );
+    if (!readExtensions) {
+      return BackupAbsenceBalance(
+        year: base.year,
+        type: base.type,
+        allowedDays: base.allowedDays,
+      );
+    }
+    return BackupAbsenceBalance(
+      year: base.year,
+      type: base.type,
+      allowedDays: base.allowedDays,
+      calendarId: r.stringOrNull('calendarId'),
+      name: r.stringOrNull('name'),
+      periodStart: r.dateOrNull('periodStart'),
+      periodEnd: r.dateOrNull('periodEnd'),
+      unit: json['unit'] == null
+          ? AbsenceUnit.day
+          : r.enumValue('unit', AbsenceUnit.values),
+      shiftTypeQuarters: json['shiftTypeQuarters'] == null
+          ? const {}
+          : r.intMap('shiftTypeQuarters'),
+      carryOver: json['carryOver'] == null ? false : r.boolean('carryOver'),
+      carryOverMaxDays: json['carryOverMaxDays'] == null
+          ? null
+          : r.number('carryOverMaxDays'),
+      adjustmentDays: json['adjustmentDays'] == null
+          ? 0
+          : r.number('adjustmentDays'),
+      sortOrder: json['sortOrder'] == null ? 0 : r.integer('sortOrder'),
+      createdAt: r.integerOrNull('createdAt'),
+      updatedAt: r.integerOrNull('updatedAt'),
+    );
   }
+
+  factory BackupAbsenceBalance.of(AbsenceBalance b) => BackupAbsenceBalance(
+    year: b.year,
+    type: b.type,
+    allowedDays: b.allowedDays,
+    calendarId: b.calendarId,
+    name: b.name,
+    periodStart: b.periodStart,
+    periodEnd: b.periodEnd,
+    unit: b.unit,
+    shiftTypeQuarters: b.shiftTypeQuarters,
+    carryOver: b.carryOver,
+    carryOverMaxDays: b.carryOverMaxDays,
+    adjustmentDays: b.adjustmentDays,
+    sortOrder: b.sortOrder,
+    createdAt: b.createdAt,
+    updatedAt: b.updatedAt,
+  );
 
   final int year;
   final String type;
   final double allowedDays;
+  final String? calendarId;
+  final String? name;
+  final CivilDate? periodStart;
+  final CivilDate? periodEnd;
+  final AbsenceUnit unit;
+  final Map<String, int> shiftTypeQuarters;
+  final bool carryOver;
+  final double? carryOverMaxDays;
+  final double adjustmentDays;
+  final int sortOrder;
+  final int? createdAt;
+  final int? updatedAt;
+
+  /// Whether any database v6 field is set (not at its default).
+  bool get hasExtensions =>
+      calendarId != null ||
+      name != null ||
+      periodStart != null ||
+      periodEnd != null ||
+      unit != AbsenceUnit.day ||
+      shiftTypeQuarters.isNotEmpty ||
+      carryOver ||
+      carryOverMaxDays != null ||
+      adjustmentDays != 0 ||
+      sortOrder != 0 ||
+      createdAt != null ||
+      updatedAt != null;
+
+  AbsenceBalance toBalance() => AbsenceBalance(
+    year: year,
+    type: type,
+    allowedDays: allowedDays,
+    calendarId: calendarId,
+    name: name,
+    periodStart: periodStart,
+    periodEnd: periodEnd,
+    unit: unit,
+    shiftTypeQuarters: shiftTypeQuarters,
+    carryOver: carryOver,
+    carryOverMaxDays: carryOverMaxDays,
+    adjustmentDays: adjustmentDays,
+    sortOrder: sortOrder,
+    createdAt: createdAt,
+    updatedAt: updatedAt,
+  );
 
   Map<String, Object?> toJson() => {
     'year': year,
     'type': type,
     'allowedDays': allowedDays,
+    'calendarId': ?calendarId,
+    'name': ?name,
+    'periodStart': ?periodStart?.toIso(),
+    'periodEnd': ?periodEnd?.toIso(),
+    if (unit != AbsenceUnit.day) 'unit': unit.name,
+    if (shiftTypeQuarters.isNotEmpty)
+      'shiftTypeQuarters': {
+        for (final key in shiftTypeQuarters.keys.toList()..sort())
+          key: shiftTypeQuarters[key],
+      },
+    if (carryOver) 'carryOver': true,
+    'carryOverMaxDays': ?carryOverMaxDays,
+    if (adjustmentDays != 0) 'adjustmentDays': adjustmentDays,
+    if (sortOrder != 0) 'sortOrder': sortOrder,
+    'createdAt': ?createdAt,
+    'updatedAt': ?updatedAt,
   };
 
   @override
-  List<Object?> get props => [year, type, allowedDays];
+  List<Object?> get props => [
+    year,
+    type,
+    allowedDays,
+    calendarId,
+    name,
+    periodStart,
+    periodEnd,
+    unit,
+    shiftTypeQuarters,
+    carryOver,
+    carryOverMaxDays,
+    adjustmentDays,
+    sortOrder,
+    createdAt,
+    updatedAt,
+  ];
+}
+
+/// A `note_attachments` row (format v3 extension, database v6): what the
+/// database knows about a file. The bytes travel next to the data in a
+/// backup container (`backup_container.dart`), never inside the JSON.
+class BackupNoteAttachment extends _Value {
+  const BackupNoteAttachment({
+    required this.id,
+    required this.calendarId,
+    required this.date,
+    required this.kind,
+    required this.relativePath,
+    required this.mimeType,
+    required this.sizeBytes,
+    required this.sha256,
+    required this.createdAt,
+    this.displayName,
+    this.sortOrder = 0,
+  });
+
+  factory BackupNoteAttachment.fromJson(Map<String, Object?> json) {
+    final r = _JsonReader(json, 'noteAttachment');
+    return BackupNoteAttachment(
+      id: r.string('id'),
+      calendarId: r.string('calendarId'),
+      date: r.date('date'),
+      kind: r.enumValue('kind', AttachmentKind.values),
+      relativePath: r.string('relativePath'),
+      mimeType: r.string('mimeType'),
+      sizeBytes: r.integer('sizeBytes'),
+      sha256: r.string('sha256'),
+      displayName: r.stringOrNull('displayName'),
+      sortOrder: json['sortOrder'] == null ? 0 : r.integer('sortOrder'),
+      createdAt: r.integer('createdAt'),
+    );
+  }
+
+  factory BackupNoteAttachment.of(NoteAttachment a) => BackupNoteAttachment(
+    id: a.id,
+    calendarId: a.calendarId,
+    date: a.date,
+    kind: a.kind,
+    relativePath: a.relativePath,
+    mimeType: a.mimeType,
+    sizeBytes: a.sizeBytes,
+    sha256: a.sha256,
+    displayName: a.displayName,
+    sortOrder: a.sortOrder,
+    createdAt: a.createdAt,
+  );
+
+  final String id;
+  final String calendarId;
+  final CivilDate date;
+  final AttachmentKind kind;
+  final String relativePath;
+  final String mimeType;
+  final int sizeBytes;
+  final String sha256;
+  final String? displayName;
+  final int sortOrder;
+  final int createdAt;
+
+  NoteAttachment toAttachment() => NoteAttachment(
+    id: id,
+    calendarId: calendarId,
+    date: date,
+    kind: kind,
+    relativePath: relativePath,
+    mimeType: mimeType,
+    sizeBytes: sizeBytes,
+    sha256: sha256,
+    displayName: displayName,
+    sortOrder: sortOrder,
+    createdAt: createdAt,
+  );
+
+  Map<String, Object?> toJson() => {
+    'id': id,
+    'calendarId': calendarId,
+    'date': date.toIso(),
+    'kind': kind.name,
+    'relativePath': relativePath,
+    'mimeType': mimeType,
+    'sizeBytes': sizeBytes,
+    'sha256': sha256,
+    'displayName': ?displayName,
+    'sortOrder': sortOrder,
+    'createdAt': createdAt,
+  };
+
+  @override
+  List<Object?> get props => [
+    id,
+    calendarId,
+    date,
+    kind,
+    relativePath,
+    mimeType,
+    sizeBytes,
+    sha256,
+    displayName,
+    sortOrder,
+    createdAt,
+  ];
+}
+
+/// A `day_tasks` row (format v3 extension, database v6).
+class BackupDayTask extends _Value {
+  const BackupDayTask({
+    required this.id,
+    required this.calendarId,
+    required this.date,
+    required this.title,
+    required this.createdAt,
+    required this.updatedAt,
+    this.done = false,
+    this.sortOrder = 0,
+  });
+
+  factory BackupDayTask.fromJson(Map<String, Object?> json) {
+    final r = _JsonReader(json, 'dayTask');
+    return BackupDayTask(
+      id: r.string('id'),
+      calendarId: r.string('calendarId'),
+      date: r.date('date'),
+      title: r.string('title'),
+      done: r.boolean('done'),
+      sortOrder: json['sortOrder'] == null ? 0 : r.integer('sortOrder'),
+      createdAt: r.integer('createdAt'),
+      updatedAt: r.integer('updatedAt'),
+    );
+  }
+
+  factory BackupDayTask.of(DayTask t) => BackupDayTask(
+    id: t.id,
+    calendarId: t.calendarId,
+    date: t.date,
+    title: t.title,
+    done: t.done,
+    sortOrder: t.sortOrder,
+    createdAt: t.createdAt,
+    updatedAt: t.updatedAt,
+  );
+
+  final String id;
+  final String calendarId;
+  final CivilDate date;
+  final String title;
+  final bool done;
+  final int sortOrder;
+  final int createdAt;
+  final int updatedAt;
+
+  DayTask toTask() => DayTask(
+    id: id,
+    calendarId: calendarId,
+    date: date,
+    title: title,
+    done: done,
+    sortOrder: sortOrder,
+    createdAt: createdAt,
+    updatedAt: updatedAt,
+  );
+
+  Map<String, Object?> toJson() => {
+    'id': id,
+    'calendarId': calendarId,
+    'date': date.toIso(),
+    'title': title,
+    'done': done,
+    'sortOrder': sortOrder,
+    'createdAt': createdAt,
+    'updatedAt': updatedAt,
+  };
+
+  @override
+  List<Object?> get props => [
+    id,
+    calendarId,
+    date,
+    title,
+    done,
+    sortOrder,
+    createdAt,
+    updatedAt,
+  ];
+}
+
+/// A `shift_swaps` row (format v3 extension, database v6).
+class BackupShiftSwap extends _Value {
+  const BackupShiftSwap({
+    required this.id,
+    required this.calendarId,
+    required this.date,
+    required this.colleague,
+    required this.direction,
+    required this.createdAt,
+    required this.updatedAt,
+    this.givenShiftTypeIds,
+    this.receivedShiftTypeIds,
+    this.returnDate,
+    this.status = SwapStatus.pending,
+    this.note,
+    this.closedAt,
+  });
+
+  factory BackupShiftSwap.fromJson(Map<String, Object?> json) {
+    final r = _JsonReader(json, 'shiftSwap');
+    return BackupShiftSwap(
+      id: r.string('id'),
+      calendarId: r.string('calendarId'),
+      date: r.date('date'),
+      colleague: r.string('colleague'),
+      direction: r.enumValue('direction', SwapDirection.values),
+      givenShiftTypeIds: r.stringListOrNull('givenShiftTypeIds'),
+      receivedShiftTypeIds: r.stringListOrNull('receivedShiftTypeIds'),
+      returnDate: r.dateOrNull('returnDate'),
+      status: r.enumValue('status', SwapStatus.values),
+      note: r.stringOrNull('note'),
+      createdAt: r.integer('createdAt'),
+      updatedAt: r.integer('updatedAt'),
+      closedAt: r.integerOrNull('closedAt'),
+    );
+  }
+
+  factory BackupShiftSwap.of(ShiftSwap s) => BackupShiftSwap(
+    id: s.id,
+    calendarId: s.calendarId,
+    date: s.date,
+    colleague: s.colleague,
+    direction: s.direction,
+    givenShiftTypeIds: s.givenShiftTypeIds,
+    receivedShiftTypeIds: s.receivedShiftTypeIds,
+    returnDate: s.returnDate,
+    status: s.status,
+    note: s.note,
+    createdAt: s.createdAt,
+    updatedAt: s.updatedAt,
+    closedAt: s.closedAt,
+  );
+
+  final String id;
+  final String calendarId;
+  final CivilDate date;
+  final String colleague;
+  final SwapDirection direction;
+  final List<String>? givenShiftTypeIds;
+  final List<String>? receivedShiftTypeIds;
+  final CivilDate? returnDate;
+  final SwapStatus status;
+  final String? note;
+  final int createdAt;
+  final int updatedAt;
+  final int? closedAt;
+
+  ShiftSwap toSwap() => ShiftSwap(
+    id: id,
+    calendarId: calendarId,
+    date: date,
+    colleague: colleague,
+    direction: direction,
+    givenShiftTypeIds: givenShiftTypeIds,
+    receivedShiftTypeIds: receivedShiftTypeIds,
+    returnDate: returnDate,
+    status: status,
+    note: note,
+    createdAt: createdAt,
+    updatedAt: updatedAt,
+    closedAt: closedAt,
+  );
+
+  Map<String, Object?> toJson() => {
+    'id': id,
+    'calendarId': calendarId,
+    'date': date.toIso(),
+    'colleague': colleague,
+    'direction': direction.name,
+    'givenShiftTypeIds': ?givenShiftTypeIds,
+    'receivedShiftTypeIds': ?receivedShiftTypeIds,
+    'returnDate': ?returnDate?.toIso(),
+    'status': status.name,
+    'note': ?note,
+    'createdAt': createdAt,
+    'updatedAt': updatedAt,
+    'closedAt': ?closedAt,
+  };
+
+  @override
+  List<Object?> get props => [
+    id,
+    calendarId,
+    date,
+    colleague,
+    direction,
+    givenShiftTypeIds,
+    receivedShiftTypeIds,
+    returnDate,
+    status,
+    note,
+    createdAt,
+    updatedAt,
+    closedAt,
+  ];
 }
 
 const _holidayScopes = {'national', 'regional', 'local'};
@@ -583,6 +1227,9 @@ class BackupData {
     Iterable<BackupHoliday> holidays = const [],
     Iterable<BackupAbsenceBalance> absenceBalances = const [],
     Map<String, String> settings = const {},
+    Iterable<BackupNoteAttachment> noteAttachments = const [],
+    Iterable<BackupDayTask> dayTasks = const [],
+    Iterable<BackupShiftSwap> shiftSwaps = const [],
   }) : calendars = List.unmodifiable(
          (calendars ?? const [BackupCalendar.defaultMain()]).toList()
            ..sort((a, b) => a.id.compareTo(b.id)),
@@ -609,7 +1256,16 @@ class BackupData {
            return byYear != 0 ? byYear : a.type.compareTo(b.type);
          }),
        ),
-       settings = Map.unmodifiable(settings);
+       settings = Map.unmodifiable(settings),
+       noteAttachments = List.unmodifiable(
+         noteAttachments.toList()..sort((a, b) => a.id.compareTo(b.id)),
+       ),
+       dayTasks = List.unmodifiable(
+         dayTasks.toList()..sort((a, b) => a.id.compareTo(b.id)),
+       ),
+       shiftSwaps = List.unmodifiable(
+         shiftSwaps.toList()..sort((a, b) => a.id.compareTo(b.id)),
+       );
 
   /// Parses the `data` object of a **version 1** file (no calendars): every
   /// run and day goes to the calendar `main`, created here with [migratedAt]
@@ -653,7 +1309,7 @@ class BackupData {
       holidays: r.objects('holidays', BackupHoliday.fromJson),
       absenceBalances: r.objects(
         'absenceBalances',
-        BackupAbsenceBalance.fromJson,
+        (o) => BackupAbsenceBalance.fromJson(o, readExtensions: false),
       ),
       settings: r.stringMap('settings'),
     );
@@ -681,7 +1337,7 @@ class BackupData {
       holidays: r.objects('holidays', BackupHoliday.fromJson),
       absenceBalances: r.objects(
         'absenceBalances',
-        BackupAbsenceBalance.fromJson,
+        (o) => BackupAbsenceBalance.fromJson(o, readExtensions: false),
       ),
       settings: r.stringMap('settings'),
     );
@@ -690,9 +1346,19 @@ class BackupData {
   /// Parses the `data` object of a **version 3** file (the current one).
   /// Throws [FormatException] on anything unexpected; the codec turns that
   /// into `CorruptBackup`. Unknown keys are ignored (forward compatibility).
+  /// `noteAttachments`, `dayTasks` and `shiftSwaps` (database v6) are
+  /// optional: absent = none.
   factory BackupData.fromJson(Map<String, Object?> json) {
     final r = _JsonReader(json, 'data');
+    List<T> optional<T>(String key, T Function(Map<String, Object?>) parse) =>
+        json[key] == null ? <T>[] : r.objects(key, parse);
     return BackupData(
+      noteAttachments: optional(
+        'noteAttachments',
+        BackupNoteAttachment.fromJson,
+      ),
+      dayTasks: optional('dayTasks', BackupDayTask.fromJson),
+      shiftSwaps: optional('shiftSwaps', BackupShiftSwap.fromJson),
       calendars: r.objects('calendars', BackupCalendar.fromJson),
       shiftTypes: r.objects('shiftTypes', BackupShiftType.fromJson),
       patterns: r.objects('patterns', BackupPattern.fromJson),
@@ -719,6 +1385,12 @@ class BackupData {
   /// `calendars.primary` among them).
   final Map<String, String> settings;
 
+  /// Database v6, sorted by id. Written only when not empty, so data that
+  /// never used them gives the bytes, checksum and fingerprint it always did.
+  final List<BackupNoteAttachment> noteAttachments;
+  final List<BackupDayTask> dayTasks;
+  final List<BackupShiftSwap> shiftSwaps;
+
   Map<String, Object?> toJson() => {
     'calendars': [for (final c in calendars) c.toJson()],
     'shiftTypes': [for (final t in shiftTypes) t.toJson()],
@@ -728,12 +1400,21 @@ class BackupData {
     'holidays': [for (final h in holidays) h.toJson()],
     'absenceBalances': [for (final b in absenceBalances) b.toJson()],
     'settings': settings,
+    if (noteAttachments.isNotEmpty)
+      'noteAttachments': [for (final a in noteAttachments) a.toJson()],
+    if (dayTasks.isNotEmpty) 'dayTasks': [for (final t in dayTasks) t.toJson()],
+    if (shiftSwaps.isNotEmpty)
+      'shiftSwaps': [for (final s in shiftSwaps) s.toJson()],
   };
 
   /// The engine view of one calendar (what it would show): the shift types
   /// and patterns are common, the runs and days are those of [calendarId].
   Schedule toSchedule([String calendarId = mainCalendarId]) => Schedule(
     shiftTypes: [for (final t in shiftTypes) t.toShiftType()],
+    shiftTypeVersions: {
+      for (final t in shiftTypes)
+        if (t.pastVersions.isNotEmpty) t.id: t.toVersions(),
+    },
     patterns: [for (final p in patterns) p.toPattern()],
     runs: [
       for (final r in patternRuns)
@@ -750,6 +1431,28 @@ class BackupData {
   int get foreignAlarmSoundCount => shiftTypes
       .where((t) => t.alarmSound != null && !isSystemAlarmSound(t.alarmSound!))
       .length;
+
+  /// This data without the attachments whose ids are in [ids] (a copy that
+  /// leaves out the ones whose file is lost). Everything else is the same.
+  BackupData withoutAttachments(Set<String> ids) {
+    if (ids.isEmpty) return this;
+    return BackupData(
+      calendars: calendars,
+      shiftTypes: shiftTypes,
+      patterns: patterns,
+      patternRuns: patternRuns,
+      dayEntries: dayEntries,
+      holidays: holidays,
+      absenceBalances: absenceBalances,
+      settings: settings,
+      noteAttachments: [
+        for (final a in noteAttachments)
+          if (!ids.contains(a.id)) a,
+      ],
+      dayTasks: dayTasks,
+      shiftSwaps: shiftSwaps,
+    );
+  }
 
   /// This data with every alarm sound that is not a system one
   /// ([isSystemAlarmSound]) dropped (`null`: the shift type rings with the
@@ -773,6 +1476,9 @@ class BackupData {
       holidays: holidays,
       absenceBalances: absenceBalances,
       settings: settings,
+      noteAttachments: noteAttachments,
+      dayTasks: dayTasks,
+      shiftSwaps: shiftSwaps,
     );
   }
 
@@ -846,6 +1552,24 @@ class BackupData {
           '(${segment.name})',
         );
       }
+      final versions = checkShiftTypeVersions(t.toVersions());
+      if (versions != null) {
+        fail('Shift type "${t.id}" has an invalid past version ($versions)');
+      }
+      final place = t.location;
+      if (place != null &&
+          (place.trim().isEmpty || place.length > maxShiftLocationLength)) {
+        fail('Shift type "${t.id}" has an invalid place');
+      }
+      for (final hourlyPlus in [
+        t.nightPlusCentsPerHour,
+        t.holidayPlusCentsPerHour,
+      ]) {
+        if (hourlyPlus != null &&
+            (hourlyPlus < 0 || hourlyPlus > maxStoredMoneyCents)) {
+          fail('Shift type "${t.id}" has a plus per hour out of range');
+        }
+      }
     }
 
     final patternIds = <String>{};
@@ -893,6 +1617,11 @@ class BackupData {
           fail('Day ${e.date} has overtime or early leave out of 0-1440');
         }
       }
+      final extra = e.extraAmountCents;
+      if (extra != null &&
+          (extra < -maxStoredMoneyCents || extra > maxStoredMoneyCents)) {
+        fail('Day ${e.date} has an extra amount out of range');
+      }
     }
 
     // One own holiday per day, like `addUserHoliday` (delete-by-date, then
@@ -918,6 +1647,88 @@ class BackupData {
       if (!b.allowedDays.isFinite) {
         fail('Absence balance ${b.year}/${b.type} is not a number');
       }
+      // The database v6 extensions: what the table CHECKs would refuse.
+      final calendar = b.calendarId;
+      if (calendar != null && !calendarIds.contains(calendar)) {
+        fail(
+          'Absence balance ${b.year}/${b.type} points at a missing '
+          'calendar "$calendar"',
+        );
+      }
+      final name = b.name;
+      if (name != null &&
+          (name.trim().isEmpty || name.length > maxAbsenceBalanceNameLength)) {
+        fail('Absence balance ${b.year}/${b.type} has an invalid name');
+      }
+      final start = b.periodStart;
+      final end = b.periodEnd;
+      if ((start == null) != (end == null) ||
+          (start != null && end!.isBefore(start))) {
+        fail('Absence balance ${b.year}/${b.type} has an invalid period');
+      }
+      for (final MapEntry(:key, :value) in b.shiftTypeQuarters.entries) {
+        if (key.isEmpty || value < 1 || value > 4) {
+          fail(
+            'Absence balance ${b.year}/${b.type} counts a shift type '
+            'wrongly',
+          );
+        }
+      }
+      final cap = b.carryOverMaxDays;
+      if (cap != null && (cap < 0 || !isQuarterDays(cap))) {
+        fail('Absence balance ${b.year}/${b.type} has an invalid carry-over');
+      }
+      if (!isQuarterDays(b.adjustmentDays)) {
+        fail('Absence balance ${b.year}/${b.type} has an invalid adjustment');
+      }
+      // A balance written by v6 (it carries one of its fields) is a whole
+      // number of units, never negative (`AbsenceBalance.problem`). One with
+      // only the three keys of every version keeps the old rule (a finite
+      // number): an older file must always restore.
+      if (b.hasExtensions &&
+          (b.allowedDays < 0 || !isWholeUnits(b.allowedDays, b.unit))) {
+        fail(
+          'Absence balance ${b.year}/${b.type} has allowed days that are '
+          'not whole units',
+        );
+      }
+    }
+
+    final attachmentIds = <String>{};
+    final attachmentPaths = <String>{};
+    for (final a in noteAttachments) {
+      if (!attachmentIds.add(a.id)) fail('Duplicate attachment id "${a.id}"');
+      // Lowercase: APFS (iOS) does not tell `a.jpg` from `A.jpg`.
+      if (!attachmentPaths.add(a.relativePath.toLowerCase())) {
+        fail('Two attachments share the file "${a.relativePath}"');
+      }
+      if (!calendarIds.contains(a.calendarId)) {
+        fail('Attachment "${a.id}" points at a missing calendar');
+      }
+      // Ids and paths name files: an unsafe one could reach outside the
+      // attachments folder (docs/copia-de-seguridad.md).
+      final problem = a.toAttachment().problem;
+      if (problem != null) fail('Attachment "${a.id}" is invalid ($problem)');
+    }
+
+    final taskIds = <String>{};
+    for (final t in dayTasks) {
+      if (!taskIds.add(t.id)) fail('Duplicate task id "${t.id}"');
+      if (!calendarIds.contains(t.calendarId)) {
+        fail('Task "${t.id}" points at a missing calendar');
+      }
+      final problem = t.toTask().problem;
+      if (problem != null) fail('Task "${t.id}" is invalid ($problem)');
+    }
+
+    final swapIds = <String>{};
+    for (final s in shiftSwaps) {
+      if (!swapIds.add(s.id)) fail('Duplicate swap id "${s.id}"');
+      if (!calendarIds.contains(s.calendarId)) {
+        fail('Swap "${s.id}" points at a missing calendar');
+      }
+      final problem = s.toSwap().problem;
+      if (problem != null) fail('Swap "${s.id}" is invalid ($problem)');
     }
   }
 
@@ -931,7 +1742,10 @@ class BackupData {
       _deepEq.equals(dayEntries, other.dayEntries) &&
       _deepEq.equals(holidays, other.holidays) &&
       _deepEq.equals(absenceBalances, other.absenceBalances) &&
-      _deepEq.equals(settings, other.settings);
+      _deepEq.equals(settings, other.settings) &&
+      _deepEq.equals(noteAttachments, other.noteAttachments) &&
+      _deepEq.equals(dayTasks, other.dayTasks) &&
+      _deepEq.equals(shiftSwaps, other.shiftSwaps);
 
   @override
   int get hashCode => Object.hash(
@@ -943,6 +1757,9 @@ class BackupData {
     _deepEq.hash(holidays),
     _deepEq.hash(absenceBalances),
     _deepEq.hash(settings),
+    _deepEq.hash(noteAttachments),
+    _deepEq.hash(dayTasks),
+    _deepEq.hash(shiftSwaps),
   );
 }
 
@@ -1030,6 +1847,17 @@ class _JsonReader {
       for (final o in v)
         o is Map<String, Object?> ? parse(o) : _bad(key, 'a list of objects'),
     ];
+  }
+
+  Map<String, int> intMap(String key) {
+    final v = _map[key];
+    if (v is! Map) return _bad(key, 'an object');
+    return Map.unmodifiable({
+      for (final e in v.entries)
+        e.key as String: e.value is int
+            ? e.value! as int
+            : _bad(key, 'integers'),
+    });
   }
 
   Map<String, String> stringMap(String key) {

@@ -1,0 +1,13 @@
+{
+"region":"ES-VC",
+"year":2026,
+"kind":"labour",
+"sources":{
+"s1":{"url":"https://dogv.gva.es/datos/2025/11/14/pdf/2025_46326_es.pdf","ref":"DOGV núm. 10238, 14.11.2025 — Resolución de 12 de noviembre de 2025, de la Conselleria de Educación, Cultura, Universidades y Empleo, por la que se aprueba el calendario de fiestas locales, retribuidas y no recuperables, en el ámbito de la Comunitat Valenciana para el año 2026","published":"2025-11-14","retrieved":"2026-10-31"}
+},
+"municipalities":{
+"03014":{"name":"Alacant/Alicante","days":["2026-04-16","2026-06-23"],"source":"s1"},
+"12040":{"name":"Castelló de la Plana/Castellón de la Plana","days":["2026-03-09","2026-06-29"],"source":"s1"},
+"46250":{"name":"València","days":["2026-01-22","2026-04-13"],"source":"s1"}
+}
+}

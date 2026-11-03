@@ -143,6 +143,62 @@
       }
     }
   },
+  "offToday": "Hoxe tes libre",
+  "@offToday": {
+    "description": "Tarjeta de hoy: hoy es día libre (descanso o ausencia)."
+  },
+  "offTodayBack": "Hoxe tes libre; volves o {date}",
+  "@offTodayBack": {
+    "description": "Tarjeta de hoy: hoy es libre y se sabe cuándo se vuelve, p. ej. «Hoy libras; vuelves el lunes 9».",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "offTomorrow": "Mañá tes libre",
+  "@offTomorrow": {
+    "description": "Tarjeta de hoy: el próximo día libre es mañana."
+  },
+  "offOn": "Tes libre o {date}",
+  "@offOn": {
+    "description": "Tarjeta de hoy y widget: próximo día libre, p. ej. «Libras el jueves 5».",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "offWeekend": "Fin de semana libre: {range}",
+  "@offWeekend": {
+    "description": "Tarjeta de hoy: próximo fin de semana con sábado y domingo libres, p. ej. «Fin de semana libre: 14–15 nov».",
+    "placeholders": {
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "offStreak": "Levas {worked} días seguidos",
+  "@offStreak": {
+    "description": "Tarjeta de hoy: días seguidos trabajando (siempre 3 o más).",
+    "placeholders": {
+      "worked": {
+        "type": "int"
+      }
+    }
+  },
+  "offStreakLeft": "Levas {worked} días seguidos; {left, plural, =1{quédache 1} other{quédanche {left}}}",
+  "@offStreakLeft": {
+    "description": "Tarjeta de hoy: días seguidos trabajando (3 o más) y cuántos de trabajo quedan antes de librar.",
+    "placeholders": {
+      "worked": {
+        "type": "int"
+      },
+      "left": {
+        "type": "int"
+      }
+    }
+  },
   "durationDaysHours": "{days} d {hours} h",
   "@durationDaysHours": {
     "placeholders": {
@@ -345,6 +401,31 @@
       }
     }
   },
+  "dayDetailUndo": "Desfacer o último cambio deste día",
+  "dayDetailShiftMenu": "Opcións de {name}",
+  "@dayDetailShiftMenu": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dayDetailChange": "Cambiar",
+  "dayDetailChangeTitle": "Cambiar {name} por…",
+  "@dayDetailChangeTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dayDetailChangeHint": "Para cambiar unha quenda por outra, toca o seu menú.",
+  "dayDetailMore": "Máis opcións",
+  "dayMoreExtras": "Horas extra",
+  "dayMoreReminder": "Aviso",
+  "dayMoreAlarm": "Alarma",
+  "dayMoreDuplicate": "Duplicar",
+  "dayMoreClear": "Borrar",
   "dayExtrasTitle": "Horas extra / Saín antes",
   "dayExtrasOvertime": "Horas extra",
   "dayExtrasEarlyLeave": "Saín antes",
@@ -430,6 +511,13 @@
   "shiftTypesDiscardBody": "O que cambiaches nesta quenda non se gardará.",
   "shiftTypesDiscardKeep": "Seguir editando",
   "shiftTypesDiscardConfirm": "Descartar",
+  "shiftTypesScopeTitle": "A que días afecta o cambio?",
+  "shiftTypesScopeBody": "Cambiaches as horas ou os cartos desta quenda e xa a tes en días pasados.",
+  "shiftTypesScopeAll": "Corrixir en todos os días",
+  "shiftTypesScopeAllHint": "Era un erro: os días pasados tamén cambian as súas horas e os seus cartos.",
+  "shiftTypesScopeAllHintSince": "Era un erro: cambian os días desde o {date}, cando cambiaches esta quenda por última vez. Os anteriores quedan como están.",
+  "shiftTypesScopeFromToday": "Só a partir de hoxe",
+  "shiftTypesScopeFromTodayHint": "Cambiou a túa xornada ou o teu prezo: os días pasados quedan como estaban.",
   "shiftTypesNoTimes": "Sen horario",
   "shiftTypesRatePerHour": "{rate}/h",
   "shiftTypesFixedPlusPerShift": "+{amount} por quenda",
@@ -636,10 +724,17 @@
   "shiftTypesFixedPlusLabel": "Plus por quenda (opcional)",
   "shiftTypesFixedPlusHelper": "Súmase unha vez por cada quenda traballada.",
   "shiftTypesFixedPlusHint": "Sen plus",
-  "shiftTypesFixedPlusUnit": "€",
   "shiftTypesRateLabel": "Prezo por hora (opcional)",
   "shiftTypesRateHelper": "Para calcular canto gañas no resumo do mes.",
-  "shiftTypesRateUnit": "€/h",
+  "shiftTypesRateUnit": "{symbol}/h",
+  "@shiftTypesRateUnit": {
+    "description": "Sufijo del campo de precio por hora: el símbolo de la moneda elegida y /h, p. ej. «€/h».",
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
   "shiftTypesPreviewLabel": "Así se verá no mes",
   "shiftTypesPreviewLight": "Claro",
   "shiftTypesPreviewDark": "Escuro",
@@ -686,6 +781,19 @@
   "paintDouble": "Dobrar",
   "paintEraser": "Borrar",
   "paintToolsLabel": "Ferramentas para pintar",
+  "paintModeReplace": "Cambiar a quenda",
+  "paintModeAdd": "Engadir outra quenda",
+  "paintModeAddSpoken": "Engadir outra quenda (dobrar)",
+  "paintHeaderMode": "{header} · {mode}",
+  "paintPreviewTitle": "Ao tocar un día",
+  "paintPreviewTitleDouble": "Ao tocar un día (dobrar)",
+  "paintPreviewReplace": "Substitúe a que haxa",
+  "paintPreviewAdd": "Súmase á que xa hai",
+  "paintPreviewErase": "Deixa o día baleiro",
+  "paintPreviewEmpty": "baleiro",
+  "paintPreviewSpoken": "{title}: {before} pasa a {after}. {effect}",
+  "paintPreviewSpokenTimes": "{title}: {before} pasa a {after}, {times}. {effect}",
+  "paintToolSpoken": "{name}, {times}",
   "selectionHeader": "Selección",
   "@selectionHeader": {
     "description": "Etiqueta de la cabecera del modo selección de días (se muestra en mayúsculas)."
@@ -1076,6 +1184,18 @@
   "onboardingSkip": "Omitir",
   "onboardingNext": "Seguinte",
   "onboardingContinue": "Continuar",
+  "onboardingChooseTitle": "Como comezas o teu cadro de quendas?",
+  "onboardingChooseHelp": "Escolle unha forma. En menos dun minuto terás o mes listo, e despois cámbiao cando queiras.",
+  "onboardingPathImport": "Importar as miñas quendas",
+  "onboardingPathImportHint": "Desde o calendario do móbil, un ficheiro .ics ou CSV, ou unha copia de LRHSoft.",
+  "onboardingPathRotation": "Usar unha rotación",
+  "onboardingPathRotationHint": "Escolle o teu ciclo (mañás, tardes, noites, saínte…) e énchese só, mes tras mes.",
+  "onboardingPathRotationTag": "Se a túa quenda se repite",
+  "onboardingPathPaint": "Pintar a man",
+  "onboardingPathPaintHint": "Escolle unha quenda e arrastra polos días. Para cando cada mes é distinto.",
+  "onboardingChooseLater": "Despois preguntámosche o país para marcar os festivos. Podes omitilo.",
+  "onboardingRestore": "Recuperar unha copia de seguranza",
+  "onboardingOptional": "Opcional",
   "onboardingProgress": "Paso {current} de {total}",
   "@onboardingProgress": {
     "placeholders": {
@@ -1088,7 +1208,7 @@
     }
   },
   "onboardingProfessionTitle": "A que te dedicas?",
-  "onboardingProfessionHelp": "Así deixámosche as quendas e as rotacións do teu traballo. Cámbiao cando queiras.",
+  "onboardingProfessionHelp": "Só para deixarche os horarios típicos do teu traballo. Cámbiao cando queiras.",
   "onboardingProfessionNursing": "Enfermaría, TCAE e celadores",
   "onboardingProfessionNursingHint": "M 08–15, T 15–22, N 22–08 e saínte",
   "onboardingProfessionMedicine": "Medicina (gardas)",
@@ -1105,8 +1225,21 @@
   "onboardingProfessionHospitalityHint": "M 08–16 e T 16–00",
   "onboardingProfessionOther": "Outro",
   "onboardingProfessionOtherHint": "Comezas coas quendas de sempre",
+  "onboardingProfessionNursingAbroad": "Enfermaría e sanidade",
+  "onboardingProfessionNursingAbroadHint": "M 08–15, T 15–22 e N 22–08",
+  "onboardingProfessionPoliceAbroad": "Policía",
+  "onboardingProfessionSecurityAbroad": "Seguridade",
+  "onboardingProfessionHospitalityAbroad": "Hostalaría",
+  "onboardingProfessionIndustryAbroadHint": "Quendas rotativas: M 06–14, T 14–22 e N 22–06",
+  "onboardingProfessionCommerce": "Comercio",
+  "onboardingProfessionCommerceHint": "M 09–15 e T 15–21",
+  "onboardingProfessionTransport": "Transporte",
+  "onboardingProfessionTransportHint": "M 06–14, T 14–22 e N 22–06",
   "onboardingPlaceTitle": "Onde traballas?",
   "onboardingPlaceHelp": "Para marcarche no calendario os festivos da túa comunidade e do teu concello.",
+  "onboardingPlaceHelpAbroad": "Para marcarche no calendario os festivos oficiais do teu país.",
+  "onboardingCountryLabel": "País",
+  "onboardingCountrySheetTitle": "O teu país",
   "onboardingRegionLabel": "Comunidade",
   "onboardingRegionPick": "Escoller comunidade",
   "onboardingRegionSheetTitle": "A túa comunidade",
@@ -1118,6 +1251,31 @@
   "onboardingMunicipalityNone": "Ningún concello se chama así",
   "onboardingMunicipalityClear": "Quitar concello",
   "onboardingLocalHolidaysMissing": "Os festivos locais do teu concello podes engadilos ti en dous toques.",
+  "onboardingLocalHolidaysMissingYear": "Os festivos locais de {year} do teu concello aínda non saíron: engádeos ti en dous toques ou agarda unha actualización.",
+  "@onboardingLocalHolidaysMissingYear": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "onboardingCountryNoData": "Aínda non temos os festivos oficiais de {country}. Podes engadir os teus en Configuración › Festivos.",
+  "@onboardingCountryNoData": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
+  "onboardingCountryNone": "Sen festivos oficiais. Podes engadir os teus en Configuración › Festivos.",
+  "onboardingCountryIncluded": "Marcaremos no teu calendario os festivos oficiais de {country}. Podes engadir os teus en Configuración › Festivos.",
+  "@onboardingCountryIncluded": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "onboardingRotationTitle": "Como é a túa rotación?",
   "onboardingRotationHelp": "Escolle a que máis se pareza. Logo dis cando comezas.",
   "onboardingRotationTypical": "O habitual no teu traballo",
@@ -1170,6 +1328,7 @@
     }
   },
   "onboardingReadyByHand": "Rotación: píntala ti a man",
+  "onboardingReadyNoOfficialHolidays": "Festivos: só os que engadas ti",
   "onboardingReadyNothing": "Non escolliches nada, así que comezas co calendario en branco.",
   "onboardingReadySaveFailed": "Non se puido gardar todo. Revisa as túas quendas e festivos en Configuración.",
   "onboardingOpenCalendar": "Ver o meu calendario",
@@ -1180,7 +1339,9 @@
   "paintScrollUp": "Subir polo mes",
   "paintScrollDown": "Baixar polo mes",
   "monthTipPaint": "Escolle unha quenda e arrasta.",
-  "@monthTipPaint": { "description": "Texto do consello compacto da pantalla do mes: unha liña que explica como pintar o mes arrastrando polos dias." },
+  "@monthTipPaint": {
+    "description": "Texto do consello compacto da pantalla do mes: unha liña que explica como pintar o mes arrastrando polos dias."
+  },
   "postNightAutoTitle": "Saínte automático",
   "postNightAutoHelp": "Despois dunha noite, o día seguinte pasa a Saínte se estaba baleiro ou libre.",
   "yearTitle": "Vista anual",
@@ -1259,6 +1420,8 @@
   "summaryEmptyTitle": "Sen quendas este mes",
   "summaryEmptyBody": "Pinta quendas no calendario e aquí verás as horas e a estimación.",
   "summaryHoursWorked": "Horas traballadas",
+  "summaryHoursPlanned": "Horas previstas",
+  "summaryWorkedToDate": "{hours} traballadas ata onte",
   "summaryShiftsWorked": "Quendas traballadas",
   "summaryNightHours": "Horas nocturnas",
   "summaryRestDays": "Días libres",
@@ -1283,7 +1446,7 @@
     }
   },
   "summaryExtrasNoRate": "Hai horas extra ou saídas en días sen quenda con prezo por hora: non están na estimación.",
-  "summaryNoteExtras": "Horas extra e saídas anticipadas: as que anotas en cada día. As extra suman e as saídas restan das horas traballadas (un día non baixa de 0 h). Valóranse ao prezo por hora da primeira quenda con prezo dese día.",
+  "summaryNoteExtras": "Horas extra e saídas anticipadas: as que anotas en cada día. As extra suman e as saídas restan das horas traballadas (un día non baixa de 0 h). A saída recorta o final da última quenda do día e as extra van xusto despois: así contan tamén nas nocturnas e en festivo. Valóranse ao prezo por hora da primeira quenda con prezo dese día.",
   "summaryDays": "{count, plural, =1{1 día} other{{count} días}}",
   "@summaryDays": {
     "placeholders": {
@@ -1315,7 +1478,13 @@
   "summaryEstimateTitle": "Ingresos estimados",
   "summaryFixedPluses": "Complementos",
   "summaryFixedPlusCount": "{count, plural, one{1 quenda} other{{count} quendas}}",
-  "@summaryFixedPlusCount": {"placeholders": {"count": {"type": "int"}}},
+  "@summaryFixedPlusCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "summaryEstimateNote": "Estimación, antes de impostos",
   "summaryEstimateNone": "Pon o prezo por hora ou o complemento por quenda en As miñas quendas para ver a estimación.",
   "summaryEstimateMissing": "Non inclúe o pago por hora de {types}: sen prezo.",
@@ -1360,6 +1529,45 @@
   "summaryNoteDst": "Son horas de reloxo: na noite do cambio de hora non se axusta a 7 ou 9 horas.",
   "summaryNoteNoTimes": "As quendas sen horario contan como quenda, pero non suman horas.",
   "summaryNoteHoliday": "Horas en festivo: as que caen nun día festivo da túa comunidade e concello, tamén se a quenda cruza a medianoite.",
+  "summaryNoteTense": "Traballadas: os días anteriores a hoxe. Previstas: de hoxe en diante, segundo o teu cadro de quendas.",
+  "summaryNoteGoal": "Obxectivo: nun mes conta a duodécima parte do anual; nun ano, o mensual por 12; nunhas datas, a parte dos seus días. A diferenza suma as traballadas e as previstas.",
+  "summaryGoalTitle": "Obxectivo de horas",
+  "summaryGoalAdd": "Fixar un obxectivo de horas",
+  "summaryGoalEdit": "Cambiar o obxectivo",
+  "summaryGoalTarget": "Obxectivo",
+  "summaryGoalDone": "Traballadas",
+  "summaryGoalPlanned": "Previstas",
+  "summaryGoalShort": "Fáltanche {hours}",
+  "summaryGoalShortPlanned": "Co previsto, fáltanche {hours}",
+  "summaryGoalOver": "Levas {hours} de máis",
+  "summaryGoalOverPlanned": "Co previsto, {hours} de máis",
+  "summaryGoalMet": "Xusto o obxectivo",
+  "summaryGoalMetPlanned": "Co previsto, xusto o obxectivo",
+  "summaryGoalPerMonth": "Obxectivo mensual",
+  "summaryGoalPerYear": "Obxectivo anual",
+  "summaryGoalFromYear": "{goal} ao ano, entre 12",
+  "summaryGoalFromMonth": "{goal} ao mes, por 12",
+  "summaryGoalRangeFromYear": "{goal} ao ano, a parte de {days, plural, =1{1 día} other{{days} días}}",
+  "summaryGoalRangeFromMonth": "{goal} ao mes por 12, a parte de {days, plural, =1{1 día} other{{days} días}}",
+  "summaryGoalChoiceYear": "Ao ano",
+  "summaryGoalChoiceMonth": "Ao mes",
+  "summaryGoalHoursYear": "Horas ao ano",
+  "summaryGoalHoursMonth": "Horas ao mes",
+  "summaryGoalHelpYear": "Por exemplo, 1.642 h, unha xornada anual habitual. Mira a do teu convenio. En cada mes conta a duodécima parte.",
+  "summaryGoalHelpMonth": "Por exemplo, 140 h. No ano conta 12 veces.",
+  "summaryGoalUnit": "h",
+  "summaryGoalInvalid": "Escribe entre 1 e {max} horas.",
+  "summaryGoalRemove": "Quitar o obxectivo",
+  "summaryGoalSaveFailed": "Non se puido gardar o obxectivo.",
+  "summaryHowTitle": "Como vou?",
+  "summaryHowWorked": "traballadas",
+  "summaryHowWorkedToDate": "traballadas ata onte",
+  "summaryHowPlanned": "previstas",
+  "summaryHowPlannedRest": "e {hours} previstas ata o {date}",
+  "summaryHowBarLabel": "{worked} traballadas, {planned} previstas",
+  "summaryBreakdownTitle": "Detalle",
+  "summaryAbsencesNone": "Ningunha",
+  "summaryEstimateNoPrices": "Sen prezos",
   "summaryYearEmpty": "Este ano non ten quendas.",
   "summaryYearHint": "Toca un mes para ver o seu detalle.",
   "summaryYearHeaderMonth": "Mes",
@@ -1379,7 +1587,7 @@
   },
   "summaryYearMonthEmpty": "Sen quendas",
   "summaryYearRowTitle": "Horas e estimación",
-  "summaryYearRowBody": "Quendas, horas e euros de cada mes",
+  "summaryYearRowBody": "Quendas, horas e importes de cada mes",
   "summaryYearMonthSemantics": "{month}: {shifts}, {hours}",
   "@summaryYearMonthSemantics": {
     "placeholders": {
@@ -1406,13 +1614,67 @@
   "shareMonthFailed": "Non se puido compartir a imaxe",
   "shareMonthLegendTitle": "Quendas do mes",
   "shareMonthLegendEmpty": "Este mes non ten quendas.",
+  "reportShareTooltip": "Informe en PDF ou CSV",
+  "reportSheetTitle": "Informe de quendas",
+  "reportSheetIntro": "Un PDF limpo para imprimir ou enviar, ou unha folla de cálculo coas túas quendas.",
+  "reportFormatPdf": "PDF para imprimir ou enviar",
+  "reportFormatCsv": "CSV para Excel ou Sheets",
+  "reportIncludeTitle": "Que incluír",
+  "reportIncludeNotes": "Notas dos días",
+  "reportIncludeEarnings": "Importes estimados",
+  "reportAbsencesTitle": "Ausencias",
+  "reportAbsencesHidden": "Non mostralas",
+  "reportAbsencesGeneric": "Só como «Ausencia»",
+  "reportAbsencesDetailed": "Co seu nome e a súa nota",
+  "reportAbsencesHint": "Unha baixa médica non sae co seu nome nin a súa nota a non ser que elixas «Co seu nome e a súa nota».",
+  "reportCreate": "Crear e compartir",
+  "reportFailed": "Non se puido crear o informe",
+  "reportSubject": "Quendas: {period}",
+  "@reportSubject": {
+    "placeholders": {
+      "period": {
+        "type": "String"
+      }
+    }
+  },
+  "reportUntitled": "As miñas quendas",
+  "reportLegendTitle": "Lenda",
+  "reportTotalsTitle": "Totais",
+  "reportNotesTitle": "Notas",
+  "reportHolidaysTitle": "Festivos",
+  "reportHolidayMark": "Festivo",
+  "reportAbsenceName": "Ausencia",
+  "reportAbsenceCode": "AUS",
+  "reportHoursTotal": "Horas",
+  "reportHoursDone": "Traballadas ata onte",
+  "reportHoursPlannedFrom": "Previstas desde hoxe",
+  "reportFooter": "Creado con Turnly",
+  "reportPageOf": "Páxina {page} de {total}",
+  "@reportPageOf": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "reportColDate": "Data",
+  "reportColDay": "Día",
+  "reportColShifts": "Quenda",
+  "reportColCode": "Código",
+  "reportColStart": "Inicio",
+  "reportColEnd": "Fin",
+  "reportColHours": "Horas",
+  "reportColNote": "Nota",
   "saveFailed": "Non se puido gardar o cambio",
   "@saveFailed": {
     "description": "Aviso (SnackBar) cuando falla escribir un cambio en la base de datos; el calendario ya muestra lo que hay guardado."
   },
   "settingsTitle": "Configuración",
   "settingsOpenTooltip": "Abrir configuración",
-  "settingsSectionSchedule": "O teu cadro de quendas",
+  "settingsSectionSchedule": "O meu calendario",
   "settingsShiftsTitle": "As miñas quendas",
   "settingsShiftsSubtitle": "Cores, códigos e horas",
   "settingsCalendarsTitle": "Calendarios",
@@ -1422,6 +1684,20 @@
   "settingsThemeSystemDark": "Sistema (escuro)",
   "settingsThemeLight": "Claro",
   "settingsThemeDark": "Escuro",
+  "appearanceAccentTitle": "Cor de acento",
+  "appearanceAccentIndigo": "Índigo",
+  "appearanceAccentBlue": "Azul",
+  "appearanceAccentPetrol": "Petróleo",
+  "appearanceAccentRaspberry": "Framboesa",
+  "appearanceAccentGraphite": "Grafito",
+  "appearanceAccentDefault": "Predeterminada",
+  "appearanceAccentNote": "Cambia ligazóns, interruptores, selección e pestanas. As cores das túas quendas non cambian.",
+  "appearanceCellSizeTitle": "Tamaño da quenda no mes",
+  "appearanceCellSizeNormal": "Normal",
+  "appearanceCellSizeLarge": "Grande",
+  "appearanceCellSizeExtraLarge": "Moi grande",
+  "appearanceCellSizeNote": "O código e a hora de cada día do mes. Se non caben nunha casa, axústanse sós.",
+  "appearanceCellSizeSampleCode": "N",
   "settingsWeekStartTitle": "Primeiro día da semana",
   "settingsWeekStartMonday": "Luns",
   "settingsWeekStartSunday": "Domingo",
@@ -1457,11 +1733,34 @@
   "@languageNameEn": {
     "description": "Nombre del idioma en su propia lengua: igual en todos los idiomas de la app."
   },
+  "settingsTimeFormatTitle": "Formato da hora",
+  "settingsTimeFormatAuto": "Automático ({format})",
+  "@settingsTimeFormatAuto": {
+    "description": "Opción «seguir el móvil» del formato de hora, con el reloj que da ahora, p. ej. «Automático (24 h)».",
+    "placeholders": {
+      "format": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTimeFormat24": "24 h (22:00)",
+  "settingsTimeFormat12": "12 h (10:00 p. m.)",
+  "settingsTimeFormatShort24": "24 h",
+  "settingsTimeFormatShort12": "12 h",
+  "settingsCurrencyTitle": "Moeda",
+  "settingsCurrencyNote": "Cambiar a moeda non converte os importes. Revisa os prezos por hora e os pluses.",
+  "settingsCurrencySearchHint": "Busca unha moeda ou un código",
+  "settingsCurrencyCommon": "Habituais",
+  "settingsCurrencyAll": "Todas",
+  "settingsCurrencyNone": "Ningunha moeda coincide",
   "settingsSaveFailed": "Non se puido gardar o axuste. Proba outra vez.",
-  "settingsSectionMore": "Avisos e datos",
+  "settingsSectionMore": "Avisos e widget",
+  "settingsSectionBackup": "Copias e cambio de móbil",
   "settingsHolidaysTitle": "Festivos",
   "settingsAlarmsTitle": "Alarmas",
+  "settingsAlarmsUntil": "Avisos ata o {date}",
   "settingsBackupTitle": "Copia de seguranza",
+  "settingsBackupLast": "Última: {when}, comprobada",
   "settingsPrivacyTitle": "Política de privacidade",
   "settingsPrivacySubtitle": "Ábrese no teu navegador",
   "settingsPrivacyOpenFailed": "Non se puido abrir a política de privacidade. Téntao de novo.",
@@ -1491,7 +1790,7 @@
   "faqPatternQ": "Como aplico unha rotación e que é o desfase?",
   "faqPatternA": "No modo pintar preme o botón «Patrón» e segue os pasos: escolle a túa rotación (ou crea a túa), o día en que comezas e ata cando se repite.\n\nO desfase é o punto do ciclo no que estás o día de inicio. Se ese día che toca a noite, no paso «En que día do ciclo estás ese día?» tocas a noite e o resto axústase só. Os días que xa cambiaches a man respéctanse ou substitúense, como prefiras. Para rematar ou quitar unha rotación vai a Configuración › As miñas rotacións.",
   "faqDoubleQ": "Como dobro unha quenda?",
-  "faqDoubleA": "Dobrar é facer dúas quendas o mesmo día. Toca o día e, no seu detalle, usa «Engadir unha segunda quenda». Se estás pintando, activa «Dobrar» e toca os días. Con varios días escollidos, «Dobrar con…» engade a quenda a todos.\n\nUn día pode levar as quendas que necesites e cada unha suma as súas horas por separado.",
+  "faqDoubleA": "Dobrar é facer dúas quendas o mesmo día. Toca o día e, no seu detalle, usa «Engadir unha segunda quenda». Se estás pintando, escolle o modo «Engadir outra quenda» e toca os días. Con varios días escollidos, «Dobrar con…» engade a quenda a todos.\n\nUn día pode levar as quendas que necesites e cada unha suma as súas horas por separado.",
   "faqPostNightQ": "Que é o saínte automático?",
   "faqPostNightA": "É o descanso do día seguinte a unha noite. Se o activas en Configuración › Saínte automático, ao pintar ou aplicar unha noite o día seguinte pasa a Saínte cando estaba baleiro ou libre. Os días que xa tiñan outra quenda non se tocan. Vén desactivado.",
   "faqNotesQ": "Como uso as notas e a axenda?",
@@ -1508,8 +1807,8 @@
   "faqImportA": "Si. En Configuración › Importar quendas podes traer unha copia «.Shifter» de LRHSoft, quendas do calendario do móbil, un ficheiro .ics ou un CSV. En LRHSoft, crea unha copia en Menú › Copia de seguranza › Copia local e escolle o ficheiro de Documents › ShifterBackups. Revisa as datas, os tipos de quenda e a vista previa antes de importar.\n\n«Exportar ao calendario do móbil» copia as túas quendas unha vez a un calendario do teléfono. Se exportas outra vez non se duplican: só se tocan os eventos que creou Turnly.",
   "faqCalendarsQ": "Podo levar varios calendarios e comparalos?",
   "faqCalendarsA": "Si. En Configuración › Calendarios creas un para a túa parella, un segundo traballo ou un fillo: cada un ten as súas rotacións e os seus días, e os tipos de quenda son os mesmos. Con dous ou máis, o nome do calendario sobre o mes déixache cambiar dun a outro. O widget e as alarmas seguen o calendario marcado como «Widget e alarmas».\n\nPara ver cando coincidides libres, preme «Comparar calendarios» nesa mesma folla: escolles dous e ves as súas quendas xuntas e os días libres en común do mes.",
-  "faqSummaryQ": "Como se calculan as horas e os euros?",
-  "faqSummaryA": "A icona de resumo do calendario amosa as quendas, as horas, as nocturnas e as de festivo do mes, dun ano enteiro ou das datas que escollas en «Datas…» (ata 366 días). Unha quenda conta no día en que comeza, aínda que cruce a medianoite.\n\nPara ver euros, pon o prezo por hora e, se o tes, o complemento fixo por tipo de quenda en Configuración › As miñas quendas. A estimación inclúe eses complementos fixos, antes de impostos. Non inclúe complementos por hora nocturna ou festiva nin retencións.\n\nO «Plus por quenda» súmase unha vez por cada quenda traballada dese tipo, tamén se é partida; non depende das horas. Os descansos e as ausencias non o suman.",
+  "faqSummaryQ": "Como se calculan as horas e o diñeiro?",
+  "faqSummaryA": "A icona de resumo do calendario amosa as quendas, as horas, as nocturnas e as de festivo do mes, dun ano enteiro ou das datas que escollas en «Datas…» (ata 366 días). Unha quenda conta no día en que comeza, aínda que cruce a medianoite.\n\nPara ver importes, pon o prezo por hora e, se o tes, o complemento fixo por tipo de quenda en Configuración › As miñas quendas. A estimación inclúe eses complementos fixos, antes de impostos, na moeda que escollas en Configuración › Aparencia. Non inclúe complementos por hora nocturna ou festiva nin retencións.\n\nO «Plus por quenda» súmase unha vez por cada quenda traballada dese tipo, tamén se é partida; non depende das horas. Os descansos e as ausencias non o suman.",
   "settingsVersionCopied": "Versión copiada",
   "settingsEmailCopied": "Correo copiado",
   "settingsAboutTitle": "Acerca de",
@@ -1973,6 +2272,114 @@
   "calExportProblemUnavailable": "Este móbil non ten calendarios dispoñibles.",
   "calExportProblemFailed": "Non se puido exportar. Proba outra vez.",
   "calExportRangeClamped": "O máximo é un ano: recortouse o final.",
+  "calSyncTitle": "Manter ao día",
+  "calSyncHelp": "Turnly actualiza eses eventos soo, cada vez que cambias o cadro de quendas e ao abrir a app: desde hai unha semana ata os próximos tres meses. Só toca os eventos que creou el. Se o apagas, os que xa están quedan.",
+  "calSyncLast": "Última actualización: {when}",
+  "@calSyncLast": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "calSyncFailed": "{count, plural, =1{Non se puido actualizar 1 evento. Tentarase de novo na próxima actualización.} other{Non se puideron actualizar {count} eventos. Tentarase de novo na próxima actualización.}}",
+  "@calSyncFailed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "calSyncLocked": "Para escoller outro calendario, apaga antes «Manter ao día».",
+  "calSyncRunning": "Actualizando o calendario…",
+  "calSyncNoticePermission": "«Manter ao día» apagouse: Turnly xa non ten permiso para usar o teu calendario.",
+  "calSyncNoticeCalendarGone": "«Manter ao día» apagouse: o calendario do móbil xa non está ou cambiou de nome.",
+  "calSyncNoticeSourceGone": "«Manter ao día» apagouse: o calendario de Turnly que se exportaba xa non existe.",
+  "calSyncNoticeDismiss": "Entendido",
+  "calExportIcsTitle": "Gardar como ficheiro .ics",
+  "calExportIcsHelp": "Un ficheiro que abren Google Calendar, Outlook e Apple Calendar, para envialo ou gardalo onde queiras. Non precisa permiso.",
+  "calExportIcsRange": "Do {from} ao {to}",
+  "@calExportIcsRange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "calExportIcsButton": "Gardar ficheiro .ics",
+  "calExportIcsRunning": "Preparando o ficheiro…",
+  "calExportIcsFailed": "Non se puido crear o ficheiro. Proba outra vez.",
+  "shareLinkRowTitle": "Compartir por ligazón",
+  "shareLinkRowSubtitle": "A túa familia ve as túas quendas no seu calendario",
+  "shareLinkRowPublished": "Ligazón publicada",
+  "shareLinkTitle": "Compartir por ligazón",
+  "shareLinkIntro": "Publica unha ligazón só de lectura: quen a teña verá as túas quendas no seu calendario (Google, Apple, Outlook) sen instalar nada. Actualízase soa cando cambias o cadro de quendas.",
+  "shareLinkUnavailableTitle": "Aínda non dispoñible",
+  "shareLinkUnavailableBody": "Esta versión aínda non pode publicar ligazóns. Mentres tanto, podes gardar as túas quendas como ficheiro .ics en Exportar quendas.",
+  "shareLinkCalendarLabel": "Calendario",
+  "shareLinkOptionsLabel": "Que se comparte",
+  "shareLinkIncludeRest": "Incluír os días libres",
+  "shareLinkIncludeRestHelp": "Libre e Saínte, como eventos de todo o día.",
+  "shareLinkIncludeAbsences": "Amosar as ausencias como «Ausencia»",
+  "shareLinkIncludeAbsencesHelp": "Sen o motivo: non se sabe se é unha baixa, vacacións ou un día de libre disposición.",
+  "shareLinkPrivacyTitle": "Que sae e que non",
+  "shareLinkPrivacyBody": "Saen o nome, o código e a hora de cada quenda, e o nome do calendario. Nunca saen as túas notas, as baixas nin o motivo de ningunha ausencia. Quen teña a ligazón pode ver as túas quendas: pásaa só a quen queiras e revógaa cando queiras.",
+  "shareLinkPublishButton": "Publicar ligazón",
+  "shareLinkPublishConfirmTitle": "Publicar as túas quendas?",
+  "shareLinkPublishConfirmBody": "As túas quendas subiranse ao servidor de Turnly para que a ligazón funcione. É o único que a app envía fóra do móbil. Bórranse ao revogar a ligazón ou tras seis meses sen actualizarse.",
+  "shareLinkPublishConfirm": "Publicar",
+  "shareLinkQrLabel": "Código QR coa ligazón das túas quendas",
+  "shareLinkLinkLabel": "Ligazón",
+  "shareLinkCopy": "Copiar",
+  "shareLinkCopied": "Ligazón copiada",
+  "shareLinkShare": "Compartir",
+  "shareLinkShareText": "As miñas quendas en Turnly. Engádeas ao teu calendario con esta ligazón: {url}",
+  "@shareLinkShareText": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
+  "shareLinkLastPublished": "Última publicación: {date}",
+  "@shareLinkLastPublished": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "shareLinkPublishing": "Publicando…",
+  "shareLinkWaiting": "Actualizarase nun momento.",
+  "shareLinkNotPublished": "Aínda non se puido publicar.",
+  "shareLinkRefresh": "Actualizar agora",
+  "shareLinkSharedCalendar": "Compártense as quendas de «{name}».",
+  "@shareLinkSharedCalendar": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "shareLinkCalendarMissing": "O calendario que compartías xa non está. Escolle outro para seguir actualizando a ligazón.",
+  "shareLinkHowTitle": "Como subscribirse",
+  "shareLinkHowBody": "En Google Calendar: Outros calendarios › Desde URL, e pega a ligazón. No iPhone: abre a ligazón, ou vai a Configuración › Calendario › Contas › Engadir conta › Outra › Engadir calendario subscrito. Cada calendario decide cada canto mira os cambios: poden tardar unhas horas.",
+  "shareLinkRevoke": "Revogar ligazón",
+  "shareLinkRevokeConfirmTitle": "Revogar a ligazón?",
+  "shareLinkRevokeConfirmBody": "Bórrase do servidor e deixa de funcionar para todos. Se volves publicar, créase unha ligazón nova.",
+  "shareLinkRevokeConfirm": "Revogar",
+  "shareLinkRevoking": "Revogando…",
+  "shareLinkRevokePending": "A revogación está pendente: volverase intentar soa nun momento. Mentres tanto non se publica nada.",
+  "shareLinkProblemNetwork": "Non hai conexión co servidor. Volverase intentar máis tarde.",
+  "shareLinkProblemRateLimited": "Demasiadas actualizacións seguidas. Volverase intentar nun momento.",
+  "shareLinkProblemTooLarge": "O cadro de quendas é demasiado grande para publicalo.",
+  "shareLinkProblemRejected": "O servidor non aceptou a ligazón. Revógaa e publica unha nova.",
+  "shareLinkProblemRevoked": "Esta ligazón revogouse e xa non funciona. Publica unha nova se queres volver compartir as túas quendas.",
+  "shareLinkProblemServer": "Non se puido completar. Proba outra vez.",
+  "shareLinkAbsence": "Ausencia",
   "onboardingImportButton": "Importar agora",
   "onboardingImportLrhsoftButton": "Importar a copia de LRHSoft",
   "backupUiRowSubtitle": "Automática, exportar e importar",
@@ -1980,6 +2387,7 @@
   "backupUiStatusNoneBody": "Fai unha agora: tarda un segundo. Mentres non a teñas, se perdes o dispositivo ou desinstalas a app pérdese o teu cadro de quendas.",
   "backupUiStatusLast": "Última copia",
   "backupUiStatusWhere": "Neste dispositivo",
+  "backupUiStatusVerified": "Comprobada: pódese recuperar enteira",
   "backupUiStatusRunning": "Gardando a copia…",
   "backupUiStatusPending": "Hai cambios novos: a copia farase nuns segundos.",
   "backupUiStatusPendingAt": "Hai cambios novos: a próxima copia farase arredor das {time}. Se non queres esperar, toca «Facer copia agora».",
@@ -2014,13 +2422,46 @@
   "backupUiBackupNow": "Facer copia agora",
   "backupUiBackupDone": "Copia feita",
   "backupUiBackupFailed": "Non se puido facer a copia. Os teus datos seguen como estaban.",
+  "backupWarnRestoreSkipped": "{count, plural, =1{A copia que fixemos antes non inclúe 1 adxunto: o ficheiro non estaba ou non se puido ler.} other{A copia que fixemos antes non inclúe {count} adxuntos: os ficheiros non estaban ou non se puideron ler.}}",
+  "backupWarnCopySkipped": "{count, plural, =1{Copia feita, pero sen 1 adxunto: o ficheiro non está ou non se pode ler.} other{Copia feita, pero sen {count} adxuntos: os ficheiros non están ou non se poden ler.}}",
   "backupUiAutoTitle": "Copias automáticas",
   "backupUiAutoOn": "Despois de cambiar algo, sen que o notes. Gardamos as 7 últimas e unha por día durante 30 días.",
   "backupUiAutoOff": "Desactivadas: só se copia cando ti o pides.",
+  "autoBackupFolderTitle": "Copia automática nun cartafol",
+  "autoBackupFolderIntro": "Unha copia ao día no cartafol que escollas: Drive, Dropbox, OneDrive ou un do dispositivo. Se perdes o dispositivo, tela alí. Gardamos as 10 últimas.",
+  "autoBackupFolderPrivacy": "A copia leva todo o teu cadro de quendas, ausencias e baixas incluídas, e gárdase onde estea ese cartafol (por exemplo, na túa nube). Non fai falta ningunha conta en Turnly.",
+  "autoBackupFolderChoose": "Escoller cartafol",
+  "autoBackupFolderChooseSubtitle": "Ábrese o selector de cartafoles do sistema",
+  "autoBackupFolderFolder": "Cartafol",
+  "autoBackupFolderUnnamed": "Cartafol escollido",
+  "autoBackupFolderChange": "Toca para escoller outro",
+  "autoBackupFolderLast": "Última copia no cartafol: {when}",
+  "autoBackupFolderNone": "Aínda non hai ningunha copia no cartafol.",
+  "autoBackupFolderSchedule": "Cópiase unha vez ao día e, coa app aberta, despois dos teus cambios (como moito cada 6 horas).",
+  "autoBackupFolderCopyNow": "Copiar agora no cartafol",
+  "autoBackupFolderCopyDone": "Copia gardada no cartafol",
+  "autoBackupFolderVerify": "Probar a copia do cartafol",
+  "autoBackupFolderVerifySubtitle": "Comproba que a última copia do cartafol se pode recuperar enteira",
+  "autoBackupFolderStop": "Deixar de copiar neste cartafol",
+  "autoBackupFolderStopSubtitle": "As copias que xa están no cartafol non se borran",
+  "autoBackupFolderStopped": "Xa non se fan copias nese cartafol",
+  "autoBackupFolderFailedTitle": "A copia no cartafol non funciona",
+  "autoBackupFolderFailedWhen": "Último intento: {when}.",
+  "autoBackupFolderErrRevoked": "Turnly xa non ten permiso para usar ese cartafol. Escólleo outra vez.",
+  "autoBackupFolderErrMissing": "Non atopamos o cartafol: pode que se borrase ou se movese. Escolle outro.",
+  "autoBackupFolderErrUnwritable": "Ese cartafol non deixa gardar ficheiros. Escolle outro.",
+  "autoBackupFolderErrNoSpace": "Non queda espazo onde está o cartafol (o dispositivo ou a túa nube). Libera espazo e téntao de novo.",
+  "autoBackupFolderErrTooLarge": "A copia é demasiado grande para gardala.",
+  "autoBackupFolderErrFailed": "Non se puido gardar a copia no cartafol. Volverémolo tentar.",
+  "autoBackupFolderErrDamaged": "Non puidemos ler a configuración da copia no cartafol. Escolle o cartafol outra vez.",
+  "autoBackupFolderChooseAgain": "Escoller o cartafol outra vez",
+  "autoBackupFolderPickFailed": "Non se puido usar ese cartafol. Proba con outro.",
   "backupUiSectionFile": "Ficheiro",
   "backupUiSectionCheck": "Comprobar",
   "backupUiSectionCopies": "Copias neste dispositivo",
   "backupUiExport": "Exportar ficheiro",
+  "backupUiSaveOutside": "Gardar unha copia fóra de Turnly",
+  "backupUiSaveOutsideHelp": "Na túa nube, noutro dispositivo ou por correo. Se perdes o móbil ou cambias de móbil, recupérala con «Importar ficheiro».",
   "backupUiExportSubtitle": "Para gardalo en Drive ou mandalo por WhatsApp ou correo",
   "backupUiExportFailed": "Non se puido exportar o ficheiro.",
   "backupUiSave": "Gardar no dispositivo",
@@ -2241,14 +2682,23 @@
   "widgetAddTwoWeeks": "Dúas semanas: actual e seguinte",
   "widgetAddManualAndroid": "Mantén premida unha zona baleira da pantalla de inicio, escolle Widgets e busca Turnly.",
   "widgetAddManualIos": "Mantén premida a pantalla de inicio, toca o + de arriba e busca Turnly.",
+  "widgetNameSmall": "Pequeno",
+  "widgetNameMedium": "Mediano",
+  "widgetNameLarge": "Grande",
+  "widgetNameAgenda": "Axenda",
+  "widgetNameTwoWeeks": "Dúas semanas",
+  "widgetDescSmall": "Hoxe e mañá",
+  "widgetDescMedium": "Os próximos 7 días",
+  "widgetDescLarge": "O mes enteiro",
+  "widgetDescAgenda": "Próximas quendas",
+  "widgetDescTwoWeeks": "Actual e seguinte",
+  "widgetAddNamed": "Engadir {name}",
   "compareTitle": "Comparar calendarios",
   "compareOpen": "Comparar calendarios",
   "compareOpenSubtitle": "Mira cando coincidides libres",
   "compareSwap": "Intercambiar",
-  "compareIntro": "Escolle dous calendarios e mira as súas quendas xuntas. Márcanse os días libres dos dous.",
-  "compareFirstLabel": "Primeiro calendario",
-  "compareSecondLabel": "Segundo calendario",
-  "comparePickTitle": "Escolle un calendario",
+  "compareIntro": "Escolle de dous a seis calendarios e mira as súas quendas xuntas. Márcanse os días libres de todos.",
+  "comparePickTitle": "Escolle os calendarios",
   "compareNeedTwoTitle": "Necesitas dous calendarios",
   "compareNeedTwoBody": "Crea outro calendario (a túa parella, un segundo traballo) para ver cando coincidides libres.",
   "compareCount": "{count, plural, =0{Ningún día libre en común este mes} =1{1 día libre en común este mes} other{{count} días libres en común este mes}}",
@@ -2260,10 +2710,10 @@
     }
   },
   "compareFreeListTitle": "Días libres en común",
-  "compareLegendFree": "Libres os dous",
-  "compareNote": "Conta como libre un día sen quenda de traballo: baleiro, libre ou cunha ausencia (vacacións, baixa…). Cada quenda conta no día en que comeza.",
+  "compareLegendFree": "Libres en común",
+  "compareNote": "Conta como libre un día en que ninguén traballa e todos teñen anotado un libre ou unha ausencia (vacacións, baixa…). Un día sen quendas anotadas non conta como libre: márcase como «sen anotar». Cada quenda conta no día en que comeza.",
   "compareNoShiftMark": "–",
-  "compareBothFree": "libres os dous",
+  "compareBothFree": "libres en común",
   "compareCellCalendar": "{calendar}: {shifts}",
   "@compareCellCalendar": {
     "placeholders": {
@@ -2274,6 +2724,20 @@
         "type": "String"
       }
     }
+  },
+  "compareLegendUnrecorded": "Sen anotar en algún",
+  "compareUnrecordedCount": "{count, plural, =1{1 día sen anotar en algún} other{{count} días sen anotar en algún}}",
+  "@compareUnrecordedCount": {
+    "description": "Comparar calendarios: días del mes en que alguno de los calendarios comparados no tiene nada anotado (no cuentan como libres).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "compareUnrecorded": "sen anotar en algún",
+  "@compareUnrecorded": {
+    "description": "Comparar calendarios, lectura en voz alta de un día: alguno de los calendarios comparados no tiene nada anotado."
   },
   "compareLoadFailed": "Non se puideron ler os calendarios.",
   "calendarsTitle": "Calendarios",
@@ -2362,19 +2826,45 @@
   "holidayImportSkipped": "Xa existe · omítese",
   "holidayImportReady": "Engadirase",
   "holidayImportIgnored": "{count, plural, =1{Omítese 1 evento con hora.} other{Omítense {count} eventos con hora.}}",
-  "@holidayImportIgnored": { "placeholders": { "count": { "type": "int" } } },
+  "@holidayImportIgnored": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "holidayImportCapped": "{count, plural, =1{1 evento supera 31 días: recórtase.} other{{count} eventos superan 31 días: recórtanse.}}",
-  "@holidayImportCapped": { "placeholders": { "count": { "type": "int" } } },
+  "@holidayImportCapped": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "holidayImportAdd": "{count, plural, =1{Engadir 1 festivo} other{Engadir {count} festivos}}",
-  "@holidayImportAdd": { "placeholders": { "count": { "type": "int" } } },
+  "@holidayImportAdd": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "holidayImportAdded": "{count, plural, =1{1 festivo engadido} other{{count} festivos engadidos}}",
-  "@holidayImportAdded": { "placeholders": { "count": { "type": "int" } } },
+  "@holidayImportAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "holidayImportEmpty": "Non hai festivos novos.",
   "holidayImportPreviewHelp": "Omítense as datas que xa teñen festivo.",
-
   "holidaysSettingsRegionTitle": "Comunidade autónoma",
   "holidaysSettingsRegionUnset": "Sen escoller",
   "holidaysSettingsRegionClear": "Sen comunidade",
+  "holidaysSettingsCountryTitle": "País",
+  "holidaysSettingsCountryOther": "Outro país: sen festivos oficiais",
+  "holidaysSettingsCountryNone": "Sen festivos oficiais",
   "holidaysSettingsMunicipalityTitle": "Concello",
   "holidaysSettingsMunicipalityNone": "Ningún",
   "holidaysSettingsMunicipalitySearch": "Buscar concello",
@@ -2389,6 +2879,15 @@
   "holidaysSettingsMunicipalityLoadFailed": "Non se puido cargar a lista de concellos.",
   "holidaysSettingsStatusNoRegion": "Sen comunidade só saen os festivos estatais. Escolle a túa para ver os autonómicos.",
   "holidaysSettingsStatusNoMunicipality": "Escolle o teu concello para ver os seus festivos locais, ou engádeos ti abaixo.",
+  "holidaysSettingsStatusCountryNoData": "Aínda non temos os festivos oficiais de {country}: engade os teus abaixo",
+  "@holidaysSettingsStatusCountryNoData": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
+  "holidaysSettingsStatusNoOfficial": "Sen festivos oficiais: só saen os que engades ti abaixo",
   "holidaysSettingsStatusLocalIncluded": "Festivos locais de {municipality}: incluídos",
   "@holidaysSettingsStatusLocalIncluded": {
     "placeholders": {
@@ -2417,7 +2916,16 @@
       }
     }
   },
-  "holidaysSettingsStatusLocalPartial": "Pode que falte algún: compróbaos.",
+  "holidaysSubdivisionKindState": "Estado",
+  "holidaysSubdivisionKindFederalState": "Estado federado",
+  "holidaysSubdivisionKindProvince": "Provincia",
+  "holidaysSubdivisionKindRegion": "Rexión",
+  "holidaysSubdivisionKindNation": "Nación",
+  "holidaysSubdivisionKindCanton": "Cantón",
+  "holidaysSubdivisionKindCity": "Cidade",
+  "holidaysSubdivisionKindCityOrRegion": "Cidade ou rexión",
+  "holidaysSubdivisionSearch": "Buscar",
+  "holidaysSettingsStatusNoSubdivision": "Sen escoller só saen os festivos de todo o país. Escolle o teu para ver tamén os da túa zona.",
   "holidaysSettingsAdd": "Engadir festivo local",
   "holidaysSettingsAddName": "Nome",
   "holidaysSettingsAddDefaultName": "Festa local",
@@ -2624,6 +3132,9 @@
   },
   "alarmsNextNone": "Non hai ningún aviso previsto nos próximos días.",
   "alarmsNextOff": "As alarmas están desactivadas.",
+  "alarmsScheduledUntil": "Avisos programados ata o {date}",
+  "alarmsRenewalTitle": "Avisos de quenda",
+  "alarmsRenewalBody": "Os teus avisos de quenda chegan ata o {date}. Abre Turnly para programar os seguintes.",
   "alarmsSkipDay": "Sen alarma este día",
   "alarmsReminderTitle": "Recordatorio",
   "@alarmsReminderTitle": {
@@ -2671,6 +3182,23 @@
       }
     }
   },
+  "dndSection": "Non molestar durante a quenda",
+  "dndMasterTitle": "Silenciar o móbil nas miñas quendas",
+  "dndMasterHelp": "Ponse en «Non molestar» ao comezar e quítase ao rematar.",
+  "dndFilterTitle": "Que deixa pasar",
+  "dndFilterSheetTitle": "Que deixa pasar durante a quenda",
+  "dndFilterAll": "Todo",
+  "dndFilterPriority": "Só o prioritario",
+  "dndFilterAlarms": "Só as alarmas",
+  "dndFilterNone": "Silencio total",
+  "dndPermOkTitle": "Todo listo",
+  "dndPermOkBody": "Turnly pode poñer o móbil en «Non molestar» durante as túas quendas. Prográmase como unha alarma do sistema: o reloxo pode amosar o inicio ou o final da quenda como próxima alarma.",
+  "dndPermTitle": "Falta o acceso a Non molestar",
+  "dndPermBody": "Para silenciar o móbil durante a quenda, permite que Turnly acceda a «Non molestar» na configuración do sistema.",
+  "dndPermOpen": "Abrir a configuración",
+  "dndShiftSection": "Non molestar",
+  "dndShiftSwitch": "Activar Non molestar durante esta quenda",
+  "dndShiftHelper": "O móbil silénciase mentres traballas nesta quenda.",
   "shiftTypesAlarmSection": "Alarma",
   "@shiftTypesAlarmSection": {
     "description": "Cabecera de la sección de alarma del editor de un tipo de turno."
@@ -2760,8 +3288,369 @@
   "monthPresentationGrid": "Cuadrícula",
   "monthPresentationList": "Lista",
   "monthSelectDays": "Seleccionar días",
+  "monthNavMonth": "Mes",
+  "monthNavRotation": "Rotación",
+  "monthNavAgenda": "Axenda",
+  "monthNavSummary": "Resumo",
+  "todayCardCollapse": "Pregar a tarxeta de hoxe",
+  "todayCardExpand": "Despregar a tarxeta de hoxe",
   "monthSelectDay": "Toca para escoller este día",
   "monthListRecommended": "Lista recomendada para ver os horarios completos e o texto grande.",
   "monthListSelected": "Presentación de lista",
-  "monthGridSelected": "Presentación de cuadrícula"
+  "monthGridSelected": "Presentación de cuadrícula",
+  "absenceRowTitle": "Vacacións e permisos",
+  "absenceRowSubtitle": "Días permitidos, usados e os que che quedan",
+  "absenceTitle": "Vacacións e permisos",
+  "absenceYearPrevious": "Ano anterior",
+  "absenceYearNext": "Ano seguinte",
+  "absenceDays": "{days, plural, =1{1 día} other{{days} días}}",
+  "absenceEmptyTitle": "Aínda non hai saldos",
+  "absenceEmptyBody": "Crea un saldo (vacacións, libre disposición…) e a app conta os días a partir do teu cadro de quendas.",
+  "absenceAdd": "Engadir saldo",
+  "absenceContinueSeries": "Continuar unha serie",
+  "absenceContinueSeriesHelper": "Se continúas a serie dun ano anterior, cópianse o nome, os tipos e o tope, e o que che sobrou arrástrase. Ti só enches os días permitidos.",
+  "absenceCopyNextYear": "Copiar ao ano seguinte",
+  "absenceCopiedNextYear": "Saldo copiado a {year}.",
+  "absenceLeftCaption": "{days, plural, =1{día que che queda} other{días que che quedan}}",
+  "absenceLeftSemantics": "{name}: quédanche {days}",
+  "absenceAllowed": "Permitidos",
+  "absenceCarried": "Arrastrados",
+  "absenceAdjustment": "Axustes",
+  "absenceEnjoyed": "Gozados",
+  "absencePlanned": "Planificados",
+  "absenceCarriedUntil": "Caducan o {date}",
+  "absenceCarriedNoExpiry": "Sen caducidade",
+  "absenceCarriedExpired": "Caducaron o {date}",
+  "absenceWarnExpiring": "Quédanche {days} do ano anterior que caducan o {date}.",
+  "absenceWarnPlanned": "Planificaches máis dos que tes: {planned} planificados e {left} dispoñibles.",
+  "absenceNewTitle": "Novo saldo",
+  "absenceEditTitle": "Editar saldo",
+  "absenceEditTooltip": "Editar {name}",
+  "absenceFieldName": "Nome",
+  "absenceFieldNameHint": "Vacacións",
+  "absenceFieldAllowed": "Días permitidos",
+  "absenceFieldAllowedHelper": "Os que che corresponden este ano, sen contar os que arrastras.",
+  "absenceFieldAdjustment": "Axuste manual",
+  "absenceFieldAdjustmentHelper": "Suma ou resta días a man: os que xa gastaches antes de usar a app ou un día extra que che deron. Admite negativos.",
+  "absenceDaysSuffix": "días",
+  "absenceFieldCarry": "Arrastrar o que sobre do ano anterior",
+  "absenceFieldCarryCap": "Máximo que se arrastra",
+  "absenceFieldCarryCapHelper": "Déixao baleiro se se arrastra todo.",
+  "absenceFieldExpiry": "Caducan o",
+  "absenceFieldExpiryNone": "Sen caducidade",
+  "absenceFieldExpiryClear": "Quitar a caducidade",
+  "absenceFieldTypes": "Tipos de quenda que contan",
+  "absenceFieldTypesHelper": "Cada día pintado cun destes tipos gasta un día deste saldo.",
+  "absenceFieldTypesNone": "Non tes tipos de quenda de ausencia. Crea un en As miñas quendas coa categoría Ausencia.",
+  "absenceInvalidName": "Ponlle un nome (máximo {max} letras).",
+  "absenceInvalidAllowed": "Escribe un número de días válido, por exemplo 22.",
+  "absenceInvalidAdjustment": "Escribe días en pasos dun cuarto, por exemplo -1 ou 0,5.",
+  "absenceInvalidCap": "Escribe un máximo válido, por exemplo 5.",
+  "absenceRemove": "Quitar saldo",
+  "absenceRemoveTitle": "Queres quitar este saldo?",
+  "absenceRemoveBody": "Bórrase o saldo «{name}» de {year}. As túas quendas non cambian.",
+  "absenceRemoveConfirm": "Quitar",
+  "absenceSaveFailed": "Non se puido gardar o saldo. Téntao de novo.",
+  "absenceSummaryLeft": "Quédanche {days} de {name}",
+  "absenceSummaryOpen": "Abrir vacacións e permisos",
+  "moneyNightPlusLabel": "Plus nocturno por hora",
+  "moneyNightPlusHelper": "Súmase por cada hora nocturna traballada.",
+  "moneyHolidayPlusLabel": "Plus festivo por hora",
+  "moneyHolidayPlusHelper": "Súmase por cada hora traballada en festivo.",
+  "moneyLocationLabel": "Lugar",
+  "moneyLocationHint": "Hospital, planta 3",
+  "moneyLocationHelper": "Sae nos informes (PDF e CSV) xunto ao nome da quenda.",
+  "moneyExtraTitle": "Importe extra",
+  "moneyExtraHelper": "Dietas, quilometraxe, un bonus… Usa un importe negativo para unha dedución. Súmase á estimación do día.",
+  "moneyExtraHint": "Sen importe",
+  "moneyExtraInvalid": "Escribe un importe válido, por exemplo 25 ou -10,50",
+  "moneyExtraClear": "Quitar o importe extra",
+  "moneySectionTitle": "Horas e diñeiro",
+  "moneyWithholdingTitle": "Retención (%)",
+  "moneyWithholdingSubtitle": "Para calcular o neto estimado",
+  "moneyWithholdingValue": "{percent} %",
+  "moneyWithholdingNone": "Sen retención",
+  "moneyWithholdingHelper": "A porcentaxe que che reteñen da nómina (IRPF e cotizacións). Con ela calculamos un neto aproximado; non substitúe a túa nómina.",
+  "moneyWithholdingField": "Porcentaxe de retención",
+  "moneyWithholdingInvalid": "Escribe un número enteiro entre 0 e 100.",
+  "moneyGross": "Bruto estimado",
+  "moneyNet": "Neto estimado",
+  "moneyNetNote": "Cunha retención do {percent} %",
+  "moneyNetSetup": "Pon a túa retención para ver o neto",
+  "moneyEarnedTitle": "Levas gañado",
+  "moneyEarnedNote": "Os días que pasaron e o traballado hoxe, ata agora.",
+  "moneyModeQuarter": "Trimestre",
+  "moneyQuarterLabel": "T{quarter} {year}",
+  "moneyQuarterPrevious": "Trimestre anterior",
+  "moneyQuarterNext": "Trimestre seguinte",
+  "moneyBagTitle": "Bolsa de horas",
+  "moneyBagFavour": "{hours} de máis",
+  "moneyBagOwed": "Fáltanche {hours}",
+  "moneyBagEven": "A cero",
+  "moneyBagNote": "Horas traballadas menos obxectivo, acumuladas mes a mes ata {month}. O saldo de decembro pasa a xaneiro.",
+  "moneyReportExtraColumn": "Importe extra",
+  "moneyReportExtraTotal": "Importes extra",
+  "moneyPlusHint": "Sen importe",
+  "swapRowTitle": "Libro de cambios",
+  "swapRowSubtitle": "As quendas que che deben e as que lles debes",
+  "swapTitle": "Libro de cambios",
+  "swapBalancesTitle": "Balance",
+  "swapBalanceTheyOwe": "{count, plural, =1{Débeme 1 quenda} other{Débeme {count} quendas}}",
+  "swapBalanceIOwe": "{count, plural, =1{Débolle 1 quenda} other{Débolle {count} quendas}}",
+  "swapBalanceEven": "Nada pendente",
+  "swapChangesTitle": "Cambios",
+  "swapEmptyTitle": "Aínda non hai cambios",
+  "swapEmptyBody": "Anota un cambio de quenda cun compañeiro e a app levará a conta de quen che debe que.",
+  "swapAdd": "Engadir cambio",
+  "swapNewTitle": "Cambio novo",
+  "swapEditTitle": "Editar o cambio",
+  "swapStagePending": "Pendente",
+  "swapStageReturned": "Devolto",
+  "swapStageSettled": "Saldado",
+  "swapDirectionTheyOwe": "Débenme",
+  "swapDirectionIOwe": "Débolle",
+  "swapFieldService": "Datos do servizo",
+  "swapFieldColleague": "Con quen",
+  "swapFieldColleagueHint": "Marta",
+  "swapInvalidColleague": "Escribe con quen é o cambio.",
+  "swapFieldDirection": "Quen debe a quenda",
+  "swapFieldDirectionHelper": "Escolle quen queda en deuda co cambio.",
+  "swapFieldDate": "O día que cedes a quenda",
+  "swapFieldReturnDate": "O día que recibes a quenda",
+  "swapFieldReturnNone": "Aínda non a recibiches",
+  "swapFieldReturnClear": "Quitar o día",
+  "swapFieldGivenTypes": "A quenda que cedes",
+  "swapFieldReceivedTypes": "A quenda que recibes",
+  "swapFieldTypesHelper": "Escolle as quendas do cambio para poder aplicalo ao cadro.",
+  "swapFieldNote": "Nota",
+  "swapNoteHint": "Por exemplo: devólvema o luns",
+  "swapRemove": "Quitar o cambio",
+  "swapRemoveTitle": "Queres quitar este cambio?",
+  "swapRemoveBody": "Bórrase o cambio con {name} do {date}. As túas quendas non cambian.",
+  "swapRemoveConfirm": "Quitar",
+  "swapSaveFailed": "Non se puido gardar o cambio. Téntao de novo.",
+  "swapRemoved": "Cambio quitado",
+  "swapEditTooltip": "Editar o cambio con {name}",
+  "swapMarkReturned": "Marcar como devolto",
+  "swapMarkReturnedTitle": "Que día cha devolven?",
+  "swapMarkedReturned": "Cambio marcado como devolto",
+  "swapMarkSettled": "Marcar como saldado",
+  "swapMarkedSettled": "Cambio saldado",
+  "swapReopen": "Marcar como pendente",
+  "swapReopened": "O cambio volta a estar pendente",
+  "swapApplyToCalendar": "Aplicar ao cadro",
+  "swapUndoFromCalendar": "Quitar do cadro",
+  "swapApplied": "Cambio aplicado ao cadro",
+  "swapUnapplied": "Cambio quitado do cadro",
+  "swapNothingToApply": "Os días xa están como di o cambio",
+  "swapNotApplied": "Este cambio non está aplicado ao cadro",
+  "swapDaySection": "Cambio de quenda",
+  "swapDayAdd": "Anotar un cambio",
+  "swapDayEmpty": "Ese día non ten ningún cambio anotado.",
+  "swapMenuTooltip": "Opcións do cambio",
+  "swapGivesLabel": "Cedes",
+  "swapReceivesLabel": "Recibes",
+  "noteAttachmentsSection": "Adxuntos",
+  "noteAttachmentsEmptyTitle": "Aínda non hai fotos nin ficheiros",
+  "noteAttachmentsEmptyBody": "Podes engadir unha foto, un ficheiro ou un debuxo a este día.",
+  "noteAttachmentsAdd": "Engadir",
+  "noteAttachmentsAddPhoto": "Facer unha foto",
+  "noteAttachmentsAddGallery": "Escoller da galería",
+  "noteAttachmentsAddFile": "Escoller un ficheiro",
+  "noteAttachmentsAddSketch": "Debuxar",
+  "noteAttachmentKindPhoto": "Foto",
+  "noteAttachmentKindFile": "Ficheiro",
+  "noteAttachmentKindSketch": "Debuxo",
+  "noteAttachmentOpen": "Abrir {name}",
+  "@noteAttachmentOpen": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "noteAttachmentRemove": "Quitar {name}",
+  "@noteAttachmentRemove": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "noteAttachmentRemoveHint": "Mantén premido para quitar {name}",
+  "@noteAttachmentRemoveHint": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "noteAttachmentRemoved": "Quitouse {name}",
+  "@noteAttachmentRemoved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "noteAttachmentsViewerTitle": "Adxunto",
+  "noteAttachmentTooLarge": "Ese ficheiro é grande de máis (o máximo son 50 MB).",
+  "noteAttachmentStoreFull": "Non queda espazo para máis adxuntos.",
+  "noteAttachmentUnreadable": "Non se puido ler o ficheiro.",
+  "noteAttachmentCameraDenied": "Sen o permiso non podemos abrir a cámara.",
+  "noteAttachmentGalleryDenied": "Sen o permiso non podemos abrir a galería.",
+  "noteAttachmentFailed": "Non se puido gardar o adxunto.",
+  "noteAttachmentRemoveFailed": "Non se puido quitar o adxunto.",
+  "noteTasksSection": "Tarefas",
+  "noteTasksEmpty": "Este día non ten tarefas.",
+  "noteTasksAdd": "Engadir tarefa",
+  "noteTasksHint": "Que hai que facer",
+  "noteTasksInvalid": "Escribe que hai que facer.",
+  "noteTasksUndo": "Desfacer o último cambio das tarefas",
+  "noteTaskMenu": "Opcións da tarefa",
+  "noteTaskMoveUp": "Subir",
+  "noteTaskMoveDown": "Baixar",
+  "noteTaskRemove": "Quitar a tarefa",
+  "sketchTitle": "Debuxo",
+  "sketchPen": "Trazo",
+  "sketchEraser": "Borrador",
+  "sketchUndo": "Desfacer o trazo",
+  "sketchRedo": "Refacer o trazo",
+  "sketchClear": "Borrar o debuxo",
+  "sketchSave": "Gardar",
+  "sketchColor": "Cor do trazo",
+  "sketchColorInk": "Tinta",
+  "sketchColorAccent": "Acento",
+  "sketchColorHighlight": "Ámbar",
+  "sketchColorHoliday": "Vermello",
+  "sketchColorSuccess": "Verde",
+  "sketchEmpty": "Debuxa algo para poder gardalo.",
+  "sketchFailed": "Non se puido gardar o debuxo.",
+  "appearanceNoteInMonthTitle": "Ver a nota no mes",
+  "appearanceNoteInMonthSubtitle": "A primeira liña da nota na casa do día",
+  "appearancePaintSoundTitle": "Son ao pintar",
+  "appearancePaintSoundSubtitle": "Un clic ao pintar un día, agás en silencio",
+  "appearancePresetsTitle": "Paletas preparadas",
+  "appearancePresetsNote": "Cambian dunha vez a cor das quendas que usan as cores de fábrica. As que pintases ao teu gusto quedan igual.",
+  "appearancePresetsChoose": "Escoller",
+  "appearancePresetsApplied": "Paleta aplicada. Podes desfacelo.",
+  "appearancePresetSunset": "Solpor",
+  "appearancePresetSea": "Mar",
+  "appearancePresetForest": "Bosque",
+  "appearancePresetCandy": "Caramelo",
+  "appearancePresetNocturnal": "Noite pechada",
+  "appearanceBackgroundTitle": "Imaxe de fondo do calendario",
+  "appearanceBackgroundChoose": "Escoller",
+  "appearanceBackgroundChange": "Cambiar",
+  "appearanceBackgroundPick": "Escoller da galería",
+  "appearanceBackgroundRemove": "Quitar a imaxe",
+  "appearanceBackgroundOnDevice": "Queda neste móbil: non viaxa na copia de seguranza",
+  "appearanceBackgroundNote": "Escóllese da túa galería e vese detrás do mes, cun veo para que todo se lea ben. As casas das quendas non cambian.",
+  "appearanceBackgroundTooLarge": "Esa imaxe é moi grande. Proba con outra máis pequena.",
+  "appearanceBackgroundFailed": "Non se puido gardar a imaxe.",
+  "widgetAddFourWeeks": "Catro semanas: un mes",
+  "widgetNameFourWeeks": "Catro semanas",
+  "widgetDescFourWeeks": "O mes por semanas",
+  "compareSelectorTitle": "Calendarios comparados",
+  "compareSelectorAction": "Cambiar",
+  "compareSheetHint": "Podes comparar de 2 a 6 calendarios.",
+  "compareSheetDone": "Feito",
+  "compareSheetMinWarning": "Fan falta polo menos 2 calendarios para comparar.",
+  "compareSheetMaxWarning": "Xa comparas 6 calendarios, o máximo.",
+  "compareWeekendTitle": "Fins de semana libres en común",
+  "compareWeekendCount": "{count, plural, =0{Ningún fin de semana libre en común este mes} =1{1 fin de semana libre en común este mes} other{{count} fins de semana libres en común este mes}}",
+  "@compareWeekendCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "compareWeekendDaysCount": "{count, plural, =1{1 día de fin de semana libre en común} other{{count} días de fin de semana libres en común}}",
+  "@compareWeekendDaysCount": {
+    "description": "Comparar calendarios: días de fin de semana libres en todos los calendarios comparados que no forman un fin de semana entero.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "compareWeekendSpoken": "{saturday} e {sunday}, libres en común",
+  "@compareWeekendSpoken": {
+    "placeholders": {
+      "saturday": {
+        "type": "String"
+      },
+      "sunday": {
+        "type": "String"
+      }
+    }
+  },
+  "compareTableNames": "Calendarios",
+  "devEventsRowTitle": "Citas do móbil",
+  "devEventsRowSubtitle": "As citas do teu calendario xunto ás quendas",
+  "devEventsTitle": "Citas do móbil",
+  "devEventsHelp": "Escolle os calendarios do móbil cuxas citas queres ver xunto ás quendas. Turnly só os le: non escribe nin cambia nada neles.",
+  "devEventsPermissionTitle": "Falta o permiso do calendario",
+  "devEventsPermissionBody": "Para ler as citas do móbil, Turnly necesita permiso para ver os teus calendarios. Non se pide ao abrir a app: só se o aceptas aquí.",
+  "devEventsPermissionDeniedTitle": "O acceso ao calendario está desactivado",
+  "devEventsPermissionDeniedBody": "Actívao na configuración do sistema (Permisos › Calendario) e volve aquí.",
+  "devEventsPermissionDeniedBodyIos": "Actívao na configuración do sistema (Turnly › Calendarios) e volve aquí.",
+  "devEventsPermissionRestrictedTitle": "Este móbil non deixa usar o calendario",
+  "devEventsPermissionRestrictedBody": "Pode ser un control parental ou un perfil de traballo. Sen ese permiso non se poden mostrar as citas.",
+  "devEventsPermissionDeclinedBody": "Non deches o permiso. Sen el non podemos ler os teus calendarios, pero podes permitilo agora.",
+  "devEventsPermissionAllow": "Permitir acceso",
+  "devEventsPermissionSettings": "Abrir a configuración",
+  "devEventsPermissionRecheck": "Comprobar de novo",
+  "devEventsCalendarsTitle": "Calendarios do móbil",
+  "devEventsChosenCount": "{count, plural, =1{1 calendario escollido} other{{count} calendarios escollidos}}",
+  "@devEventsChosenCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "devEventsEmptyTitle": "Non hai calendarios",
+  "devEventsEmptyBody": "Este móbil non ten ningún calendario que Turnly poida ler.",
+  "devEventsReadFailedTitle": "Non se puideron ler os teus calendarios",
+  "devEventsReadFailedBody": "O calendario do móbil non respondeu. Compróbao outra vez.",
+  "devEventsOffTitle": "Agora non se amosan citas",
+  "devEventsOffBody": "Non escolleches ningún calendario. Ata que escollas un, o mes e o día non amosan citas.",
+  "devEventsSaveFailed": "Non se puideron gardar os cambios.",
+  "devEventsSectionTitle": "Citas do móbil",
+  "devEventsAllDay": "Todo o día",
+  "devEventsCount": "{count, plural, =1{1 cita} other{{count} citas}}",
+  "@devEventsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "devEventsEventSemantics": "{time}, {title}",
+  "@devEventsEventSemantics": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "devEventsEventWithCalendarSemantics": "{time}, {title}, {calendar}",
+  "@devEventsEventWithCalendarSemantics": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      },
+      "calendar": {
+        "type": "String"
+      }
+    }
+  }
 }

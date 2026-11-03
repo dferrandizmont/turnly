@@ -70,8 +70,7 @@ void main() {
     tester,
   ) async {
     final app = await FirstLaunch.open(tester, size: const Size(390, 1200));
-    await app.tap(key('onboarding-profession-nursing'));
-    await app.tap(key('onboarding-next'));
+    await app.toLastStep();
     await app.tap(key('onboarding-region'));
     await app.tap(find.text('Catalunya'));
     await app.tap(key('onboarding-municipality'));
@@ -94,8 +93,7 @@ void main() {
     tester,
   ) async {
     final app = await FirstLaunch.open(tester, size: const Size(390, 1200));
-    await app.tap(key('onboarding-profession-nursing'));
-    await app.tap(key('onboarding-next'));
+    await app.toLastStep();
 
     await app.tap(key('onboarding-region'));
     final communities = find.byType(ChoiceRow);
@@ -144,8 +142,7 @@ void main() {
   testWidgets('H-T10-3: the community sheet is the one of Ajustes › Festivos: '
       'same list in the same order, the chosen one marked', (tester) async {
     final app = await FirstLaunch.open(tester, size: const Size(390, 2600));
-    await app.tap(key('onboarding-profession-nursing'));
-    await app.tap(key('onboarding-next'));
+    await app.toLastStep();
 
     List<String> labels() => [
       for (final row in tester.widgetList<ChoiceRow>(find.byType(ChoiceRow)))

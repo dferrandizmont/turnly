@@ -33,6 +33,12 @@ class BackupActions {
     }
   }
 
+  /// What the newest copy left out (`AttachmentsSkipped`: attachments whose
+  /// file is missing, damaged or could not be read); empty when it was whole.
+  /// Read right after [backupNow] to tell the user.
+  Future<List<BackupWarning>> lastCopyWarnings() async =>
+      (await _tools).service.lastWarnings;
+
   /// "Exportar archivo": the current data as a `.cuadrante`, checked by
   /// reading it back, handed to the share sheet.
   Future<void> exportFile() async {
@@ -75,15 +81,17 @@ class BackupActions {
 
   /// Replaces the current data with [pending] and brings every screen back in
   /// step. Throws a [RestoreFailure]: with `dataReplaced == false` nothing
-  /// changed.
-  Future<void> restore(PendingRestore pending) async {
+  /// changed. Returns what the safety copy made before the restore left out
+  /// (`AttachmentsSkipped`), for the result screen.
+  Future<List<BackupWarning>> restore(PendingRestore pending) async {
     final tools = await _tools;
     final base = RestoreCoordinator.fromRef(_ref, tools.service);
     var replaced = false;
+    var warnings = const <BackupWarning>[];
     final coordinator = RestoreCoordinator(
       runExclusive: base.runExclusive,
       restore: (pending) async {
-        await base.restore(pending);
+        warnings = await tools.service.restore(pending);
         replaced = true;
       },
       reloadSchedule: base.reloadSchedule,
@@ -92,11 +100,13 @@ class BackupActions {
       reloadPostNight: base.reloadPostNight,
       resyncAlarms: base.resyncAlarms,
       resyncWidget: base.resyncWidget,
+      resyncDnd: base.resyncDnd,
       markOnboardingDone: base.markOnboardingDone,
       reloadOnboardingTip: base.reloadOnboardingTip,
     );
     try {
       await coordinator.restoreAndReload(pending);
+      return warnings;
     } catch (error) {
       throw RestoreFailure(dataReplaced: replaced, cause: error);
     } finally {
@@ -130,7 +140,7 @@ class BackupActions {
     origin: BackupImportOrigin.cloudCopy,
     copyDate: entry.modifiedAt,
     load: () async {
-      if (entry.sizeBytes > BackupCodec.maxFileBytes) {
+      if (entry.sizeBytes > BackupCodec.maxImportBytes) {
         return const IncomingFile.problem(IncomingFileProblem.tooLarge);
       }
       try {

@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/day_sheet.dart';
 import '../support/qa_core.dart';
 import '../support/qa_harness.dart';
 
@@ -169,6 +170,7 @@ Future<void> _addReminder(
   await t.pump();
   await t.enterText(_k('day-note'), note);
   await t.pump();
+  await t.openDayMore();
   await t.tapAndSettle(_k('day-reminder-add'), reason: 'Avisarme');
   expect(find.text('Hora del aviso'), findsOneWidget);
   await t.tapAndSettle(
@@ -343,7 +345,13 @@ Future<void> _soundRowBody(QaContext qa) async {
       (p) => p.isNotEmpty,
     );
     expect(pending, isNotEmpty);
-    for (final r in pending) {
+    // The renewal notice (three weeks of Noche over a 14-day horizon) rides
+    // along with the plan and rings on the default channel, no custom sound.
+    final shiftAlarms = pending
+        .where((r) => r.payload!.contains(':${AlarmKind.shift.name}:'))
+        .toList();
+    expect(shiftAlarms, isNotEmpty, reason: 'las noches llevan su alarma');
+    for (final r in shiftAlarms) {
       expect(r.payload, contains('"c":"$_systemSound"'));
     }
     final channels = await _until(

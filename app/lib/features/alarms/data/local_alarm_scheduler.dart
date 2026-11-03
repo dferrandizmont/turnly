@@ -59,7 +59,8 @@ Future<void> alarmNotificationBackgroundHandler(
 /// OnePlus with battery saver the same alarm requested as `exactAllowWhileIdle`
 /// arrived up to 2 minutes late (docs/qa/lanzamiento-android-2026-10-29.md).
 /// The price: the system shows it as the next alarm (status bar icon, lock
-/// screen). Reminders and the evening-before notice stay exact, not clocks.
+/// screen). Reminders, the evening-before notice and the renewal notice (A1)
+/// stay exact, not clocks.
 AndroidScheduleMode androidScheduleModeFor(
   AlarmKind kind, {
   required bool exact,
@@ -92,12 +93,21 @@ class LocalAlarmScheduler implements AlarmScheduler {
   /// (the snooze isolate, tests) trusts every sound. Each question to it is
   /// bounded by [soundTimeout] ([defaultSoundTimeout]): a provider that never
   /// answers must not hold the mutex and stop every later resync.
+  ///
+  /// [manageSoundChannels] false (the background renewal, A1) neither creates
+  /// nor deletes the custom-sound channels: they are the app's, made with
+  /// the sound's title, which the background isolate cannot read (renaming
+  /// them to the bare name would show in the system settings). A sound whose
+  /// channel is not on the phone (the app found it unreadable and deleted
+  /// it) counts as unavailable and its alarms ring on the default channel,
+  /// as the app does; with the channel there, it keeps its sound.
   LocalAlarmScheduler({
     FlutterLocalNotificationsPlugin? plugin,
     Future<String> Function()? localZone,
     this._sounds,
     this._system,
     this.soundTimeout = defaultSoundTimeout,
+    this.manageSoundChannels = true,
   }) : _plugin = plugin ?? FlutterLocalNotificationsPlugin(),
        _localZone = localZone ?? _deviceZone;
 
@@ -113,6 +123,9 @@ class LocalAlarmScheduler implements AlarmScheduler {
   /// How long a sound check may take before it counts as "no answer".
   static const Duration defaultSoundTimeout = Duration(seconds: 3);
   final Duration soundTimeout;
+
+  /// See the constructor.
+  final bool manageSoundChannels;
 
   static Future<String> _deviceZone() async =>
       (await FlutterTimezone.getLocalTimezone()).identifier;
@@ -318,6 +331,18 @@ class LocalAlarmScheduler implements AlarmScheduler {
     }
   }
 
+  /// Ids of the Android channels on the phone. Empty when they cannot be read
+  /// (or off Android): then every custom sound falls back to the default
+  /// channel, which always rings.
+  Future<Set<String>> _existingChannelIds() async {
+    try {
+      final channels = await _android?.getNotificationChannels();
+      return {for (final c in channels ?? const []) c.id};
+    } catch (_) {
+      return const {};
+    }
+  }
+
   /// Whether [sound] can still be played. A failing check counts as playable
   /// only without a sounds service (nothing to ask); with one, the channel
   /// is the default unless the service says yes.
@@ -390,10 +415,10 @@ class LocalAlarmScheduler implements AlarmScheduler {
   /// notification has the two buttons: "Posponer" (Android: handled in the
   /// background, the notification goes away) and "Ya estoy despierto".
   ///
-  /// A reminder ([kind] `reminder`) rings on its own channel with the default
-  /// notification sound and no buttons. Any other alarm rings on the channel
-  /// of its [sound] (null = the default one); [sound] must already be
-  /// resolved (see `effectiveAlarmSound`).
+  /// A reminder or the renewal notice ([isNoticeKind]) rings on the
+  /// reminders' channel with the default notification sound and no buttons.
+  /// Any other alarm rings on the channel of its [sound] (null = the default
+  /// one); [sound] must already be resolved (see `effectiveAlarmSound`).
   NotificationDetails _details({
     String? snoozeLabel,
     String? awakeLabel,
@@ -402,7 +427,7 @@ class LocalAlarmScheduler implements AlarmScheduler {
   }) {
     final strings = _strings;
     final buttons = snoozeLabel != null && awakeLabel != null;
-    final reminder = kind == AlarmKind.reminder;
+    final reminder = isNoticeKind(kind);
     final channelId = alarmChannelIdFor(kind, sound);
     return NotificationDetails(
       android: AndroidNotificationDetails(
@@ -503,11 +528,25 @@ class LocalAlarmScheduler implements AlarmScheduler {
     // back to the default channel instead of ringing on nothing.
     final unavailable = <String>{};
     final inUse = <String>{};
+    // Without managing the channels (background renewal) a sound counts only
+    // if the app left its channel on the phone: the app deletes the channel
+    // of a sound it found unreadable, and a channel recreated from here would
+    // carry a URI that may not play (a silent alarm, or a SecurityException).
+    final existingChannels = manageSoundChannels
+        ? null
+        : await _existingChannelIds();
     for (final alarm in alarms) {
-      final sound = alarm.kind == AlarmKind.reminder ? null : alarm.sound;
+      final sound = isNoticeKind(alarm.kind) ? null : alarm.sound;
       if (sound == null ||
           inUse.contains(sound) ||
           unavailable.contains(sound)) {
+        continue;
+      }
+      if (existingChannels != null) {
+        (existingChannels.contains(alarmSoundChannelId(sound))
+                ? inUse
+                : unavailable)
+            .add(sound);
         continue;
       }
       if (await _playable(sound)) {
@@ -532,7 +571,7 @@ class LocalAlarmScheduler implements AlarmScheduler {
       wanted.add(planned.id);
       // The payload carries the sound it really rings with, so a snooze
       // never brings a missing sound back.
-      final sound = planned.kind == AlarmKind.reminder
+      final sound = isNoticeKind(planned.kind)
           ? null
           : effectiveAlarmSound(planned.sound, unavailable);
       final alarm = sound == planned.sound ? planned : planned.withSound(sound);
@@ -566,7 +605,7 @@ class LocalAlarmScheduler implements AlarmScheduler {
       }
     }
     try {
-      await _deleteStaleSoundChannels(inUse);
+      if (manageSoundChannels) await _deleteStaleSoundChannels(inUse);
     } catch (_) {
       // Only housekeeping: an unused channel does no harm.
     }

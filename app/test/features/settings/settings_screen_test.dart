@@ -27,7 +27,7 @@ void main() {
   setUpAll(initializeLocale);
 
   // Tall enough for the whole screen without scrolling.
-  const tall = Size(390, 2200);
+  const tall = Size(390, 3600);
 
   Future<Preferences> stored(AppUnderTest app) =>
       app.real(() => PreferencesRepository(app.database).load());
@@ -104,12 +104,22 @@ void main() {
 
     expect(find.byType(SettingsScreen), findsOneWidget);
     expect(find.text('Ajustes'), findsOneWidget);
-    for (final heading in [
-      'TU CUADRANTE',
+    // Design 6A: five groups, in this order.
+    final headings = [
+      'MI CALENDARIO',
+      'AVISOS Y WIDGET',
+      'COPIAS Y CAMBIO DE MÓVIL',
       'APARIENCIA',
-      'AVISOS Y DATOS',
       'AYUDA',
-    ]) {
+    ];
+    for (var i = 1; i < headings.length; i++) {
+      expect(
+        tester.getTopLeft(find.text(headings[i])).dy,
+        greaterThan(tester.getTopLeft(find.text(headings[i - 1])).dy),
+        reason: '${headings[i - 1]} before ${headings[i]}',
+      );
+    }
+    for (final heading in headings) {
       expect(find.text(heading), findsOneWidget, reason: heading);
     }
     for (final title in [
@@ -298,6 +308,9 @@ void main() {
       );
       await app.openSettings();
 
+      // Ajustes grows with every package: bring the row into view first.
+      await tester.ensureVisible(find.byKey(const ValueKey('settings-help')));
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('settings-help')));
       await tester.pumpAndSettle();
       expect(
@@ -346,6 +359,9 @@ void main() {
         ],
       );
       await app.openSettings();
+      // Ajustes grows with every package: bring the row into view first.
+      await tester.ensureVisible(find.byKey(const ValueKey('settings-help')));
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('settings-help')));
       await tester.pumpAndSettle();
       expect(find.text('hola@example.test'), findsOneWidget);
@@ -375,6 +391,9 @@ void main() {
         ),
         findsOneWidget,
       );
+      // Ajustes grows with every package: bring the row into view first.
+      await tester.ensureVisible(find.byKey(const ValueKey('settings-about')));
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('settings-about')));
       await tester.pumpAndSettle();
       expect(find.text('Turnly'), findsOneWidget);

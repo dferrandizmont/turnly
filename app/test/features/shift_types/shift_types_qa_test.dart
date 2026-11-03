@@ -443,7 +443,8 @@ void main() {
       expect(find.text('0 min'), findsOneWidget);
       expect(find.text('Sin precio'), findsOneWidget);
       await typeInto(tester, 'shift-rate', '12');
-      expect(find.text('€/h'), findsOneWidget);
+      // The rate and the night and holiday pluses (P9) are all per hour.
+      expect(find.text('€/h'), findsNWidgets(3));
     });
 
     testWidgets('«Dura 8 h» does not touch the «Turno partido» title', (

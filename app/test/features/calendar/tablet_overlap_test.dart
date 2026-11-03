@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/real_font.dart';
+import 'day_sheet_finders.dart';
 import 'harness.dart';
 import 'selection_mode_test.dart' show longPress, tapTool;
 
@@ -161,6 +162,8 @@ void main() {
             prepare: (repository) => repository.saveShiftType(_night12),
           );
           await _openDay(tester);
+          await revealDayControl(tester, 'day-add-night12');
+          await openDayMore(tester);
           final viewport = _key('day-pane-scroll');
           final fab = tester.getRect(_fab);
           expect(tester.getRect(viewport).bottom, lessThanOrEqualTo(fab.top));
@@ -203,7 +206,9 @@ void main() {
           await pumpCalendar(tester, size: size, textScale: scale);
           final fab = tester.getRect(_fab);
           expect(fab.right, closeTo(size.width - Sp.l, 0.01));
-          expect(fab.bottom, closeTo(size.height - Sp.l, 0.01));
+          // Above the bar of destinations (B1), with the usual margin.
+          final bar = tester.getRect(_key('month-nav-bar'));
+          expect(fab.bottom, closeTo(bar.top - Sp.l, 0.01));
           expect(fab.height, Sp.fabHeight);
         });
       }

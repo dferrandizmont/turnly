@@ -32,20 +32,20 @@ bool _wellFormed(String text) {
 }
 
 void main() {
-  group('parseEuroCents', () {
+  group('parseMoneyCents', () {
     test('accepts comma and dot decimals and whole euros', () {
-      expect(parseEuroCents('12,50'), 1250);
-      expect(parseEuroCents('12.50'), 1250);
-      expect(parseEuroCents('12,5'), 1250);
-      expect(parseEuroCents('12'), 1200);
-      expect(parseEuroCents('0,05'), 5);
-      expect(parseEuroCents('  7,25 '), 725);
-      expect(parseEuroCents('9999,99'), 999999);
+      expect(parseMoneyCents('12,50'), 1250);
+      expect(parseMoneyCents('12.50'), 1250);
+      expect(parseMoneyCents('12,5'), 1250);
+      expect(parseMoneyCents('12'), 1200);
+      expect(parseMoneyCents('0,05'), 5);
+      expect(parseMoneyCents('  7,25 '), 725);
+      expect(parseMoneyCents('9999,99'), 999999);
     });
 
     test('a blank text is no rate', () {
-      expect(parseEuroCents(''), isNull);
-      expect(parseEuroCents('   '), isNull);
+      expect(parseMoneyCents(''), isNull);
+      expect(parseMoneyCents('   '), isNull);
     });
 
     test('rejects what is not an amount', () {
@@ -60,23 +60,133 @@ void main() {
         '10000',
         '12 €',
       ]) {
-        expect(() => parseEuroCents(bad), throwsFormatException, reason: bad);
+        expect(() => parseMoneyCents(bad), throwsFormatException, reason: bad);
       }
     });
 
     test('no floating point rounding: 0,29 is 29 cents', () {
-      expect(parseEuroCents('0,29'), 29);
-      expect(parseEuroCents('1,15'), 115);
-      expect(parseEuroCents('4,35'), 435);
+      expect(parseMoneyCents('0,29'), 29);
+      expect(parseMoneyCents('1,15'), 115);
+      expect(parseMoneyCents('4,35'), 435);
     });
   });
 
-  test('formatCentsInput is the inverse of parseEuroCents', () {
+  group('money with the decimals of the currency', () {
+    test('2 decimals is the default', () {
+      expect(parseMoneyCents('12,5', decimals: 2), 1250);
+      expect(
+        () => parseMoneyCents('12,555', decimals: 2),
+        throwsFormatException,
+      );
+    });
+
+    test('0 decimals (yen, won): whole units, no decimal part', () {
+      expect(parseMoneyCents('1500', decimals: 0), 1500);
+      expect(parseMoneyCents(' 999999 ', decimals: 0), 999999);
+      expect(parseMoneyCents('0', decimals: 0), 0);
+      for (final bad in ['15,5', '15.5', '15,', '1000000', '-1', 'x']) {
+        expect(
+          () => parseMoneyCents(bad, decimals: 0),
+          throwsFormatException,
+          reason: bad,
+        );
+      }
+      expect(parseMoneyCents('', decimals: 0), isNull);
+    });
+
+    test('3 decimals (dinar): thousandths', () {
+      expect(parseMoneyCents('12,345', decimals: 3), 12345);
+      expect(parseMoneyCents('12,5', decimals: 3), 12500);
+      expect(parseMoneyCents('12', decimals: 3), 12000);
+      expect(parseMoneyCents('0,001', decimals: 3), 1);
+      expect(parseMoneyCents('999,999', decimals: 3), 999999);
+      expect(
+        () => parseMoneyCents('12,3456', decimals: 3),
+        throwsFormatException,
+      );
+      expect(() => parseMoneyCents('1000', decimals: 3), throwsFormatException);
+    });
+
+    test('formatCentsInput is the inverse for every number of decimals', () {
+      for (final decimals in [0, 2, 3]) {
+        for (final cents in [0, 1, 99, 100, 101, 1250, 12345, 999999]) {
+          expect(
+            parseMoneyCents(
+              formatCentsInput(cents, decimals: decimals),
+              decimals: decimals,
+            ),
+            cents,
+            reason: '$cents with $decimals decimals',
+          );
+        }
+      }
+      expect(formatCentsInput(1500, decimals: 0), '1500');
+      expect(formatCentsInput(12500, decimals: 3), '12,500');
+      expect(formatCentsInput(12000, decimals: 3), '12');
+    });
+
+    test('the draft validates and converts with its decimals', () {
+      const yen = ShiftTypeDraft(
+        code: 'M',
+        name: 'Mañana',
+        rateText: '1500',
+        fixedPlusText: '2000',
+        moneyDecimals: 0,
+      );
+      expect(yen.validate(), isEmpty);
+      final type = yen.toShiftType('m');
+      expect(type.hourlyRateCents, 1500);
+      expect(type.fixedPlusCents, 2000);
+
+      const decimalInYen = ShiftTypeDraft(
+        code: 'M',
+        name: 'Mañana',
+        rateText: '15,5',
+        moneyDecimals: 0,
+      );
+      expect(decimalInYen.validate().keys, contains(ShiftTypeField.rate));
+
+      const dinar = ShiftTypeDraft(
+        code: 'M',
+        name: 'Mañana',
+        rateText: '3,125',
+        moneyDecimals: 3,
+      );
+      expect(dinar.validate(), isEmpty);
+      expect(dinar.toShiftType('m').hourlyRateCents, 3125);
+    });
+
+    test('a stored amount is shown with the decimals of the currency', () {
+      final stored = _morning.copyWith(
+        hourlyRateCents: 1250,
+        fixedPlusCents: 3000,
+      );
+      final euro = ShiftTypeDraft.fromShiftType(stored);
+      expect(euro.rateText, '12,50');
+      expect(euro.fixedPlusText, '30');
+      final yen = ShiftTypeDraft.fromShiftType(stored, moneyDecimals: 0);
+      expect(yen.rateText, '1250');
+      expect(yen.fixedPlusText, '3000');
+      expect(yen.moneyDecimals, 0);
+      // Round trip: nothing changes by opening and saving.
+      expect(yen.toShiftType(stored.id).hourlyRateCents, 1250);
+      expect(euro.toShiftType(stored.id).hourlyRateCents, 1250);
+    });
+
+    test('the decimals take part in the equality of drafts', () {
+      const a = ShiftTypeDraft(rateText: '12');
+      expect(a == a.copyWith(moneyDecimals: 0), isFalse);
+      expect(a.copyWith(moneyDecimals: 0).moneyDecimals, 0);
+      expect(a.copyWith(code: 'X').moneyDecimals, 2);
+    });
+  });
+
+  test('formatCentsInput is the inverse of parseMoneyCents', () {
     expect(formatCentsInput(1250), '12,50');
     expect(formatCentsInput(1200), '12');
     expect(formatCentsInput(5), '0,05');
     for (final cents in [0, 1, 99, 100, 101, 1250, 999999]) {
-      expect(parseEuroCents(formatCentsInput(cents)), cents);
+      expect(parseMoneyCents(formatCentsInput(cents)), cents);
     }
   });
 

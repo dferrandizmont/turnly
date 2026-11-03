@@ -6,6 +6,7 @@ import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'day_sheet_finders.dart';
 import 'harness.dart';
 
 // «Horas extra / Salí antes» in the day detail and the small «+» of the cell
@@ -32,6 +33,8 @@ Future<void> _open(WidgetTester tester, CivilDate date) async {
   await tester.tap(cell(date));
   await tester.pumpAndSettle();
   expect(_sheet, findsOneWidget);
+  // The section is in «Más opciones».
+  await openDayMore(tester);
 }
 
 Future<void> _close(WidgetTester tester) async {

@@ -13,11 +13,12 @@ import '../../../core/widgets/page_body.dart';
 import '../../schedule/domain/civil_date.dart';
 import '../../settings/presentation/settings_widgets.dart';
 import '../application/holidays_provider.dart';
+import '../data/holiday_bundle_format.dart';
 import '../data/holiday_snapshot.dart';
 import '../data/holiday_repository.dart';
 import '../domain/holiday.dart';
-import '../domain/holiday_entry.dart';
 import '../domain/holiday_place.dart';
+import '../domain/holiday_subdivision.dart';
 import '../domain/spanish_regions.dart';
 import '../domain/substituted_holidays.dart';
 import 'add_holiday_sheet.dart';
@@ -28,9 +29,10 @@ import 'holidays_icons.dart';
 import 'holidays_settings_providers.dart';
 import '../../../core/widgets/app_snack_bar.dart';
 
-/// Ajustes › Festivos (`/ajustes/festivos`): the community and municipality
-/// the person works in, a line saying whether the local holidays of that
-/// municipality are included, «Añadir festivo local», and the year's holidays
+/// Ajustes › Festivos (`/ajustes/festivos`): the country and, in Spain, the
+/// community and municipality the person works in, a line saying whether the
+/// local holidays of that municipality are included (or that the country has
+/// no official holidays yet), «Añadir festivo local», and the year's holidays
 /// by month (this year and the next). Every change goes through
 /// [HolidayController], so the month, the day sheet and the year view update
 /// at once.
@@ -73,6 +75,13 @@ class _HolidaysSettingsScreenState
 
   // ---- actions ------------------------------------------------------------
 
+  Future<void> _pickCountry(HolidayPlace place) async {
+    final code = await showCountryPicker(context, selected: place.countryCode);
+    if (code == null || !mounted || code == place.countryCode) return;
+    // Another country drops the community and municipality (Spain only).
+    await saveSetting(context, () => _controller.setPlace(countryCode: code));
+  }
+
   Future<void> _pickRegion(HolidayPlace place) async {
     final pick = await showRegionPicker(
       context,
@@ -84,6 +93,23 @@ class _HolidaysSettingsScreenState
     await saveSetting(
       context,
       () => _controller.setPlace(regionCode: pick.value),
+    );
+  }
+
+  Future<void> _pickSubdivision(HolidayPlace place) async {
+    final pick = await showSubdivisionPicker(
+      context,
+      countryCode: place.countryCode,
+      selected: place.regionCode,
+      clearLabel: context.l10n.holidaysSettingsRegionUnset,
+    );
+    if (pick == null || !mounted || pick.value == place.regionCode) return;
+    await saveSetting(
+      context,
+      () => _controller.setPlace(
+        countryCode: place.countryCode,
+        regionCode: pick.value,
+      ),
     );
   }
 
@@ -222,6 +248,17 @@ class _HolidaysSettingsScreenState
   ) {
     final l10n = context.l10n;
     final place = snapshot.place;
+    if (place.isOtherCountry) {
+      return (text: l10n.holidaysSettingsStatusNoOfficial, good: false);
+    }
+    if (!place.isSpain && !_hasOfficial(snapshot, _year)) {
+      return (
+        text: l10n.holidaysSettingsStatusCountryNoData(
+          holidayCountryLabel(context, place.countryCode),
+        ),
+        good: false,
+      );
+    }
     // Nothing official for this year yet (the app is newer than its data, or
     // the person looks ahead): the place does not matter until it arrives.
     if (snapshot.entries.isNotEmpty && !_hasOfficial(snapshot, _year)) {
@@ -229,6 +266,14 @@ class _HolidaysSettingsScreenState
         text: l10n.holidaysSettingsStatusYearPending('$_year'),
         good: false,
       );
+    }
+    // Another country with data for this year: only its subdivision, when it
+    // has them, is left to choose.
+    if (!place.isSpain) {
+      return countryHasSubdivisions(place.countryCode) &&
+              place.regionCode == null
+          ? (text: l10n.holidaysSettingsStatusNoSubdivision, good: false)
+          : null;
     }
     if (place.regionCode == null) {
       return (text: l10n.holidaysSettingsStatusNoRegion, good: false);
@@ -238,17 +283,10 @@ class _HolidaysSettingsScreenState
       return (text: l10n.holidaysSettingsStatusNoMunicipality, good: false);
     }
     if (municipalityName == null) return null;
-    bool bundledLocal(HolidayEntry e) =>
-        e.scope == HolidayScope.local &&
-        e.source != HolidaySource.user &&
-        e.municipalityCode == code;
-    final local = snapshot.entries.where(bundledLocal);
+    final local = snapshot.entries.where((e) => isBundledLocalOf(e, code));
     if (local.any((e) => e.date.year == _year)) {
-      final partial = place.regionCode == 'ES-MC';
       return (
-        text:
-            l10n.holidaysSettingsStatusLocalIncluded(municipalityName) +
-            (partial ? '. ${l10n.holidaysSettingsStatusLocalPartial}' : ''),
+        text: l10n.holidaysSettingsStatusLocalIncluded(municipalityName),
         good: true,
       );
     }
@@ -307,30 +345,58 @@ class _HolidaysSettingsScreenState
               SettingsSection(
                 children: [
                   SettingsRow(
-                    key: const ValueKey('holidays-region'),
-                    icon: HolidaysIcons.region,
-                    title: l10n.holidaysSettingsRegionTitle,
-                    value: region?.name ?? l10n.holidaysSettingsRegionUnset,
+                    key: const ValueKey('holidays-country'),
+                    icon: HolidaysIcons.country,
+                    title: l10n.holidaysSettingsCountryTitle,
+                    value: holidayCountryLabel(context, place.countryCode),
                     forceStacked: stackPlace,
-                    onTap: () => _pickRegion(place),
+                    onTap: () => _pickCountry(place),
                   ),
-                  SettingsRow(
-                    key: const ValueKey('holidays-municipality'),
-                    icon: HolidaysIcons.municipality,
-                    title: l10n.holidaysSettingsMunicipalityTitle,
-                    forceStacked: stackPlace,
-                    subtitle: region == null
-                        ? l10n.onboardingMunicipalityNeedsRegion
-                        : null,
-                    value: region == null
-                        ? null
-                        : municipalityCode == null
-                        ? l10n.holidaysSettingsMunicipalityNone
-                        : (municipalityName ?? ''),
-                    onTap: region == null
-                        ? null
-                        : () => _pickMunicipality(place),
-                  ),
+                  // Another country with subdivisions in the bundle (states,
+                  // provinces, cantons...).
+                  if (!place.isSpain &&
+                      countryHasSubdivisions(place.countryCode))
+                    SettingsRow(
+                      key: const ValueKey('holidays-subdivision'),
+                      icon: HolidaysIcons.region,
+                      title: holidaySubdivisionTitle(
+                        context,
+                        place.countryCode,
+                      )!,
+                      value:
+                          subdivisionName(place.regionCode) ??
+                          l10n.holidaysSettingsRegionUnset,
+                      forceStacked: stackPlace,
+                      onTap: () => _pickSubdivision(place),
+                    ),
+                  // Communities and municipalities exist only for Spain.
+                  if (place.isSpain) ...[
+                    SettingsRow(
+                      key: const ValueKey('holidays-region'),
+                      icon: HolidaysIcons.region,
+                      title: l10n.holidaysSettingsRegionTitle,
+                      value: region?.name ?? l10n.holidaysSettingsRegionUnset,
+                      forceStacked: stackPlace,
+                      onTap: () => _pickRegion(place),
+                    ),
+                    SettingsRow(
+                      key: const ValueKey('holidays-municipality'),
+                      icon: HolidaysIcons.municipality,
+                      title: l10n.holidaysSettingsMunicipalityTitle,
+                      forceStacked: stackPlace,
+                      subtitle: region == null
+                          ? l10n.onboardingMunicipalityNeedsRegion
+                          : null,
+                      value: region == null
+                          ? null
+                          : municipalityCode == null
+                          ? l10n.holidaysSettingsMunicipalityNone
+                          : (municipalityName ?? ''),
+                      onTap: region == null
+                          ? null
+                          : () => _pickMunicipality(place),
+                    ),
+                  ],
                 ],
               ),
               if (status != null) ...[
@@ -384,7 +450,7 @@ class _HolidaysSettingsScreenState
               else
                 HolidayMonthList(
                   rows: rows,
-                  regionName: region?.name,
+                  regionName: region?.name ?? subdivisionName(place.regionCode),
                   onRemove: _remove,
                 ),
               if (region != null && substituted.isNotEmpty) ...[

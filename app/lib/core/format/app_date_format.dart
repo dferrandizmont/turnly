@@ -1,25 +1,41 @@
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
-/// Date/time formatting of the app in its language: 24 h clock, Monday-first
-/// weeks and the short form of the app ("jue 23 oct"). Needs
-/// `initializeDateFormatting` for [locale] (done in `bootstrapApp` for every
-/// app language; tests call it in `setUpAll`).
+import 'app_formats.dart';
+
+/// Date/time formatting of the app in its language and region: the 24 h or
+/// 12 h clock the person chose ([hour12]) and the short form of the app
+/// ("jue 23 oct"). Needs `initializeDateFormatting` for [locale] (done in
+/// `bootstrapApp` for every app language; tests call it in `setUpAll`).
 ///
 /// The short weekday and month names come from fixed tables
 /// (docs/glosario-idiomas.md §5) rather than from CLDR, which adds dots,
 /// prepositions («de gen.») or four letters («sept»); the long forms come
 /// from `intl`, except the Basque long date, built by hand.
 class AppDateFormat {
-  const AppDateFormat([this.locale = 'es']);
+  const AppDateFormat([this.locale = 'es', this.hour12 = false]);
 
-  factory AppDateFormat.of(BuildContext context) =>
-      AppDateFormat(Localizations.localeOf(context).languageCode);
+  /// The formats in force in [context] (see [AppFormats]); without them the
+  /// locale of `Localizations` and a 24 h clock.
+  factory AppDateFormat.of(BuildContext context) {
+    final formats = AppFormats.maybeOf(context);
+    if (formats != null) {
+      return AppDateFormat(formats.localeName, formats.hour12);
+    }
+    return AppDateFormat(Localizations.localeOf(context).toString());
+  }
 
-  /// Language code ("es", "ca", "gl", "eu", "en").
+  /// Locale name: a language code ("es", "ca", "gl", "eu", "en") or the
+  /// language with the region of the phone ("en_US", "es_MX"). Only the
+  /// language picks the hand-made tables; `intl` takes the region into
+  /// account for the rest.
   final String locale;
 
-  /// First day of the week in the whole app (Monday).
+  /// Whether times read "10:00 PM" (12 h) instead of "22:00" (24 h).
+  final bool hour12;
+
+  /// First day of the week by default (Monday). The week the calendar shows
+  /// starts where `Preferences.weekStart` says.
   static const int firstWeekday = DateTime.monday;
 
   String get _lang => locale.split(RegExp('[-_]')).first;
@@ -85,8 +101,34 @@ class AppDateFormat {
     return _stripDot(DateFormat.E(locale).format(d));
   }
 
-  /// 24 h time "18:30".
-  String time(DateTime d) => DateFormat('HH:mm', locale).format(d);
+  /// "18:30" on the 24 h clock, "6:30 PM" on the 12 h one (the AM/PM marks
+  /// are the ones of the locale: "6:30 p. m." in Spanish).
+  String time(DateTime d) =>
+      DateFormat(hour12 ? 'h:mm a' : 'HH:mm', locale).format(d);
+
+  /// The short form of a time of day for the tight places (the cell of the
+  /// month, the lock-screen line of the widget): the minutes only when they
+  /// are not :00. 24 h: "22", "07:30". 12 h: "10p", "7:30a" (a = AM, p = PM
+  /// in every language, so "10p–6a" reads as 22:00–06:00 and fits where the
+  /// 24 h form does). [minute] is minutes after midnight; 1440 wraps to 0.
+  static String compactClock(int minute, {bool hour12 = false}) {
+    final h = (minute ~/ 60) % 24;
+    final m = minute % 60;
+    if (!hour12) {
+      String two(int n) => n.toString().padLeft(2, '0');
+      return m == 0 ? two(h) : '${two(h)}:${two(m)}';
+    }
+    final shown = h % 12 == 0 ? 12 : h % 12;
+    final mark = h < 12 ? 'a' : 'p';
+    return m == 0
+        ? '$shown$mark'
+        : '$shown:${m.toString().padLeft(2, '0')}$mark';
+  }
+
+  /// Like [compactClock] but without the minutes: "09" or "9a" (for the cell
+  /// that has no room for "09:30").
+  static String compactClockHour(int minute, {bool hour12 = false}) =>
+      compactClock(minute - minute % 60, hour12: hour12);
 
   /// "09:00–16:30" or just "09:00".
   String timeRange(DateTime start, DateTime? end) {

@@ -276,6 +276,8 @@ void main() {
           'night': (23, 7),
         },
         Profession.hospitality: {'morning': (8, 16), 'afternoon': (16, 0)},
+        Profession.commerce: {'morning': (9, 15), 'afternoon': (15, 21)},
+        Profession.transport: <String, (int, int)>{},
         Profession.firefighters: <String, (int, int)>{},
         Profession.industry: <String, (int, int)>{},
         Profession.security: <String, (int, int)>{},
@@ -365,11 +367,10 @@ void main() {
       final before = app.schedule.shiftTypes.length;
       final ids = [for (final t in app.schedule.shiftTypes) t.id];
 
-      await app.tap(key('onboarding-profession-nursing'));
-      await app.tap(key('onboarding-next'));
-      await app.tap(key('onboarding-skip')); // place
+      await app.choosePath('rotation');
       await app.tap(key('onboarding-skip')); // rotation
-      await app.tap(key('onboarding-next')); // import -> writes
+      await app.tap(key('onboarding-profession-nursing'));
+      await app.tap(key('onboarding-next')); // last step -> writes
       await app.flushWrites();
 
       // In memory, the palette of the paint bar and the engine.
@@ -417,9 +418,7 @@ void main() {
       final app = await FirstLaunch.open(tester);
       final start = onboardingToday.addDays(3);
 
-      await app.tap(key('onboarding-profession-nursing'));
-      await app.tap(key('onboarding-next'));
-      await app.tap(key('onboarding-skip'));
+      await app.choosePath('rotation');
       await app.tap(key('onboarding-pattern-correturnos'));
       await app.tap(key('onboarding-next'));
       await tester.tap(key('onboarding-start-date'));
@@ -433,7 +432,8 @@ void main() {
       await tester.pumpAndSettle();
       await app.tap(key('onboarding-offset-6'));
       await app.tap(key('onboarding-next'));
-      await app.tap(key('onboarding-next')); // import -> writes
+      await app.tap(key('onboarding-profession-nursing'));
+      await app.tap(key('onboarding-next')); // last step -> writes
       await app.flushWrites();
 
       // The same request through the engine on the schedule as it was.
@@ -475,12 +475,11 @@ void main() {
       tester,
     ) async {
       final app = await FirstLaunch.open(tester);
-      await app.tap(key('onboarding-profession-firefighters'));
-      await app.tap(key('onboarding-next'));
-      await app.tap(key('onboarding-skip'));
+      await app.choosePath('rotation');
       await app.tap(key('onboarding-pattern-24x72'));
       await app.tap(key('onboarding-next'));
       await app.tap(key('onboarding-next'));
+      await app.tap(key('onboarding-profession-firefighters'));
       await app.tap(key('onboarding-next'));
       await app.tap(key('onboarding-next'));
       expect(find.byType(MonthScreen), findsOneWidget);

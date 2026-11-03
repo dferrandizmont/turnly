@@ -238,6 +238,8 @@ void main() {
             final container = containerOf(tester);
             container.read(preferencesProvider.notifier).setWeekNumbers(weeks);
             await tester.pumpAndSettle();
+            // The row of the month starts below the «Hoy» card (B1).
+            await revealOnMonth(tester, _key('month-presentation-grid'));
             for (final mode in ['grid', 'list']) {
               final control = _key('month-presentation-$mode');
               final rect = tester.getRect(control);
@@ -805,7 +807,6 @@ void main() {
                 const Offset(0, -22),
                 const Offset(0, 22),
               ]) {
-                final point = rect.center + offset;
                 final expected = presentation == 'list'
                     ? MonthPresentation.list
                     : MonthPresentation.grid;
@@ -818,6 +819,10 @@ void main() {
                           : MonthPresentation.list,
                     );
                 await tester.pumpAndSettle();
+                // The switch lives in the pinned row of the month (B1):
+                // a new presentation can move it with the scroll offset.
+                final now = tester.getRect(control);
+                final point = now.center + offset;
                 await tester.tapAt(point);
                 await tester.pumpAndSettle();
                 expect(container.read(monthPresentationProvider), expected);

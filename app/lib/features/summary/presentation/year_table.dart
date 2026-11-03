@@ -8,7 +8,9 @@ import '../../../core/icons/app_icons.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/empty_illustration.dart';
 import '../../../core/widgets/empty_state.dart';
+import '../../calendar/application/schedule_controller.dart';
 import '../../calendar/presentation/shift_format.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../application/summary_providers.dart';
@@ -47,6 +49,12 @@ class YearTable extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(vertical: Sp.x3),
         child: EmptyState(
           icon: AppIcons.summary,
+          illustration: EmptyIllustration(
+            kind: EmptyIllustrationKind.calendar,
+            shifts: ref.watch(
+              scheduleControllerProvider.select((s) => s.palette),
+            ),
+          ),
           title: l10n.summaryYearEmpty,
           message: l10n.summaryEmptyBody,
         ),
@@ -77,7 +85,7 @@ class YearTable extends ConsumerWidget {
                   night: formatHours(l10n, totals.nightMinutes),
                   estimate: totals.earningsCents == null
                       ? '–'
-                      : formatEuroCents(context, totals.earningsCents!),
+                      : formatMoneyCents(context, totals.earningsCents!),
                 ),
               ],
             ),
@@ -169,7 +177,7 @@ class _MonthRow extends StatelessWidget {
       night: empty ? none : formatHours(l10n, summary.nightMinutes),
       estimate: summary.earningsCents == null
           ? none
-          : formatEuroCents(context, summary.earningsCents!),
+          : formatMoneyCents(context, summary.earningsCents!),
     );
     final name = capitalize(
       format.monthName(DateTime(month.year, month.month)),

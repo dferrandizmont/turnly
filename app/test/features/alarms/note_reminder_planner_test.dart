@@ -412,10 +412,12 @@ void main() {
     });
 
     test('nothing beyond the horizon', () {
-      // Now is 12:00; the window ends 14 days later at 12:00 (inclusive).
-      Iterable<int> within(int day, int minute) =>
-          _plan(_schedule([_reminder(_today.addDays(day), minute)]))
-              .map((a) => a.fireMinute);
+      // Now is 12:00; with a 14-day horizon the window ends 14 days later
+      // at 12:00 (inclusive).
+      Iterable<int> within(int day, int minute) => _plan(
+        _schedule([_reminder(_today.addDays(day), minute)]),
+        settings: const AlarmSettings(horizonDays: 14),
+      ).map((a) => a.fireMinute);
       expect(within(14, 11 * 60 + 59), [11 * 60 + 59]);
       expect(within(14, 12 * 60), [12 * 60], reason: 'exactly at the end');
       expect(within(14, 12 * 60 + 1), isEmpty, reason: 'one minute too far');

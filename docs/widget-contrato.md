@@ -37,7 +37,10 @@ caducada, lo cual es correcto (la app nueva traerá también la extensión nueva
 ## 2. Esquema JSON v2 (con lectura de v1)
 
 La v2 conserva sin cambios todas las claves y los 60 días de la v1 y añade `noShift` y `displayDays` en la raíz.
-No añade campos por día a las familias anteriores. La extensión opcional de accesibilidad `descriptions` (26-oct) se comparte por fecha en la raíz; los lectores antiguos la ignoran y los nuevos admiten su ausencia sin subir `v`. Dart y Android leen ambas versiones; una versión desconocida
+No añade campos por día a las familias anteriores. Las extensiones opcionales de la raíz —`descriptions`
+(accesibilidad, 26-oct), `nextOff` (próximo libre, C1) y `notes` (texto de las notas, UW, 2-nov)— se comparten por
+fecha, se añaden sin subir `v` y los lectores antiguos las ignoran, así que un snapshot anterior sigue siendo válido y
+los nuevos admiten su ausencia. Dart y Android leen ambas versiones; una versión desconocida
 da el aviso de caducado. El planificador republica una v1 al abrir la app porque su versión ya no es la actual.
 El futuro lector Swift debe aceptar 1 y 2 y puede ignorar estos dos campos nuevos para sus seis familias.
 Un lector antiguo que solo admita v1 muestra el aviso hasta actualizarse; nunca interpreta la v2 como otro día.
@@ -64,7 +67,7 @@ salida es determinista.
 | `months` | [Month] | Cuadrículas de mes (1 a 3), compartidas por los días de ese mes |
 | `days` | [Day] ×60 | **Exactamente 60 fechas consecutivas** desde `firstDate`. `days[i].date = firstDate + i` |
 | `noShift` | string | Solo v2: texto localizado del día sin turno (`Sin turno`) |
-| `displayDays` | [DisplayDay] | Solo v2: días auxiliares consecutivos desde el lunes de la semana de `firstDate` hasta `lastDate + 13`, ambos incluidos (73–79 días con la línea de tiempo de 60) |
+| `displayDays` | [DisplayDay] | Solo v2: días auxiliares consecutivos desde el lunes de la semana de `firstDate` hasta `lastDate + 27`, ambos incluidos (87–93 días con la línea de tiempo de 60) |
 
 ### Extensión opcional `descriptions` (v2, compatible con snapshots anteriores)
 
@@ -72,15 +75,71 @@ Objeto opcional en la raíz: `{ "today": "hoy", "days": { "2026-10-19": "lunes, 
 
 - `today`: estado localizado que el lector antepone, separado por punto, **solo** al día que ha elegido como hoy al renderizar. No queda fijado al día de generación.
 - `days`: mapa de fecha ISO a descripción completa ya localizada: fecha con día de la semana, día, mes y año; nombres y horas de **todos** los turnos (incluidos ambos tramos); «Sin turno» si está vacío; festivo con nombre y presencia de nota si corresponde. Cubre los 60 días, sus tiras, los 42 días de cada mes y los días auxiliares. La deduplicación evita repetir la frase en las 420 celdas de las tiras.
-- `absences`: descripciones alternativas solo para fechas con ausencias, usadas por agenda/dos semanas. Mantienen la anonimización de `displayDays`: «Ausencia», sin nombre/código personalizado, horas ni nota. No se incluye nunca el contenido de las notas en ninguno de los mapas.
+- `absences`: descripciones alternativas solo para fechas con ausencias, usadas por los widgets de días auxiliares (agenda, dos semanas y cuatro semanas). Mantienen la anonimización de `displayDays`: «Ausencia», sin nombre/código personalizado, horas ni nota. El contenido de las notas no está en estos mapas: viaja aparte, solo para el widget de cuatro semanas, en la extensión `notes` (sección siguiente).
 
 Dart incluye la extensión en `contentHash`; si falta al decodificar, no la añade al recodificar ni al calcular el hash. Android admite v1/v2 sin ella con la lectura anterior y la usa en todas las familias cuando está presente. El texto de «hoy» llega del snapshot, no de los recursos del idioma del dispositivo. `widget_root` se reinicia a descripción nula antes de cada render y cada estado añade la suya cuando corresponde; recuperar datos válidos borra así la descripción obsoleta de caducado.
+
+### Extensión opcional `nextOff` (v2, compatible con snapshots anteriores)
+
+Objeto opcional en la raíz (C1, próximo libre): mapa de fecha ISO a `{ "date": "2026-10-22", "label": "Libras el jueves 22" }`,
+con **una entrada por cada día de la línea de tiempo** para el que se conoce un próximo libre, visto desde ese día
+(así el widget, que cambia de día solo a medianoche, enseña el texto de «hoy» sin recalcular):
+
+```json
+"nextOff": { "2026-10-19": { "date": "2026-10-22", "label": "Libras el jueves 22" },
+             "2026-10-21": { "date": "2026-10-22", "label": "Mañana libras" },
+             "2026-10-22": { "date": "2026-10-22", "label": "Hoy libras; vuelves el lunes 26" } }
+```
+
+- `date`: fecha civil del próximo día libre (hoy incluido) visto desde la clave; `label`: frase ya localizada, la
+  misma de la tarjeta de hoy («Libras el jueves 22», «Mañana libras», «Hoy libras», «Hoy libras; vuelves el lunes 26»).
+- Una fecha sin entrada significa «no se sabe» (calendario vacío o sin nada anotado más allá): el lector no enseña nada.
+  Si ningún día tiene entrada, la clave `nextOff` **no aparece**.
+- Libre = descanso o ausencia anotados; un hueco entre días anotados también cuenta (regla en
+  `docs/motor-de-turnos.md`, «Clasificación de días y días libres»). **No lleva el tipo de ausencia**: una baja se
+  dice «libras» igual que unas vacaciones, para no sacar nada de salud del móvil.
+- Compatibilidad hacia atrás: sin subir `v` (sigue en 2), igual que `descriptions`. Los lectores antiguos ignoran la
+  clave (Android lee con `org.json` por clave; el Swift debe ignorar claves desconocidas) y los nuevos admiten su
+  ausencia. Dart la incluye en `contentHash` cuando existe; si falta al decodificar no la añade al recodificar. No
+  añade claves a los objetos del esquema base (`Day`, `Small`…).
+- Tamaño: unos 70 bytes por día, ≈ 4 KB con los 60 días.
+- Implementación: `WidgetNextOff` y `WidgetSnapshot.nextOff` (`widget_snapshot.dart`), construido en
+  `widget_snapshot_builder.dart` con `computeOffOutlookWith` y los textos de `WidgetStrings.nextOffLabel`. Pendiente
+  del lado nativo (otro encargo): leer `nextOff[hoy]` y enseñar `label` donde quepa (pequeño y agenda).
+
+### Extensión opcional `notes` (v2, compatible con snapshots anteriores)
+
+Objeto opcional en la raíz (UW, 2-nov): mapa de fecha ISO al **texto de la nota** ya compuesto, la primera línea
+recortada, tal como la enseña la celda del mes (`_firstNoteLine` de `calendar/presentation/day_cell.dart`). Lo usa el
+widget de cuatro semanas (`CuadranteFourWeeksWidgetProvider`) para poner esa línea bajo el turno de la celda.
+
+```json
+"notes": { "2026-10-21": "Cambio de turno", "2026-10-28": "Formación" }
+```
+
+- Cubre **todo el rango auxiliar** (`displayDays`): desde el lunes de la semana de `firstDate` hasta `lastDate + 27`.
+- **Nunca viaja el texto de un día de salud:** la fecha de un día con un turno de categoría `absence` no aparece en el
+  mapa aunque tenga nota. El widget tampoco inventa un texto a partir de `hasNote`: si falta, marca la nota con el
+  clip. Es la misma regla que la anonimización de `displayDays` y `descriptions.absences`.
+- Una fecha sin entrada significa «sin nota que enseñar»: el lector no pinta la línea y, en su lugar, el clip cuando
+  el día tiene `hasNote`. Si ninguna fecha tiene nota, la clave `notes` **no aparece**.
+- Compatibilidad hacia atrás: sin subir `v` (sigue en 2), igual que `descriptions` y `nextOff`. Los lectores antiguos
+  ignoran la clave (Android lee con `org.json` por clave; el Swift debe ignorar claves desconocidas) y los nuevos
+  admiten su ausencia. Dart la incluye en `contentHash` cuando existe; si falta al decodificar no la añade al
+  recodificar. **No** añade claves a los objetos del esquema base (`Day`, `DisplayDay`…): el texto de la nota no está
+  dentro del día, vive en este mapa de la raíz.
+- Tamaño: unos 40 bytes por nota; con notas cada 3 días apenas se nota (la medición de la sección 2 lo incluye).
+- Implementación: `WidgetSnapshot.notes` (`widget_snapshot.dart`), construido en `widget_snapshot_builder.dart` con
+  el primer renglón de `day.note` y sin ausencias. Lado nativo: `DisplayDay.note` (`WidgetModel.kt`) se rellena desde
+  este mapa —nunca en una ausencia— y `WidgetRenderer.Painter.fourWeeks` pinta la línea o, si no la hay, el clip
+  `widget_note`.
 
 ### DisplayDay (v2, agenda y dos semanas)
 
 `date`, `weekdayShort`, `dayOfMonth`, `dateLabel`, `isHoliday`, `hasNote` y `shifts` tienen la misma forma que en
 `Day`; cada turno usa `Shift` con sus ocho colores y horas ya formateadas. No hay campos `small`, `medium`, `large`
-ni `lock`, ni texto de notas. Los datos salen de `Schedule`, también antes de hoy y después del último día válido.
+ni `lock`, ni un texto de nota propio: el de la celda de cuatro semanas llega aparte, en el mapa `notes` de la raíz
+(sección anterior). Los datos salen de `Schedule`, también antes de hoy y después del último día válido.
 **Estos días auxiliares no amplían la vigencia:** primero se busca hoy en `days`, igual que en los widgets anteriores.
 No se muestra ningún turno cuando hoy queda fuera de esa lista.
 
@@ -101,7 +160,7 @@ necesario y ningún turno de categoría `absence`; si falta algo muestran el avi
 | `dateLabel` | string | `lun 19` |
 | `isHoliday` | bool | Festivo |
 | `holidayName` | string? | Nombre del festivo, `null` si no lo es |
-| `hasNote` | bool | El día tiene una nota (no vacía). El texto de la nota **no** viaja al widget |
+| `hasNote` | bool | El día tiene una nota (no vacía). El texto **no** viaja dentro del día: para el widget de cuatro semanas va aparte, en la extensión `notes` de la raíz (solo la primera línea y nunca en días de salud) |
 | `shifts` | [Shift] | Turnos del día en orden de visualización; `[]` si no hay turno |
 | `small` | Small | Todo lo del widget pequeño |
 | `medium` | Medium | La tira de 7 días que empieza en este día |
@@ -114,8 +173,8 @@ necesario y ningún turno de categoría `absence`; si falta algo muestran el avi
 |---|---|---|
 | `code` | string | 1–3 caracteres (`N`, `LD`) |
 | `name` | string | `Noche` |
-| `timeLabel` | string? | `22:00–06:00` (24 h, raya `–`), `null` si el turno no tiene horario. **Turno partido (A12):** los dos tramos en la forma compacta, `09–13 · 17–21` (dos rangos completos no caben en la línea del widget) |
-| `compactTime` | string? | `22–06`; con minutos solo si no son `:00` (`07:30–15`), `null` sin horario. Turno partido: `09–13 · 17–21` (los dos tramos unidos por ` · `) |
+| `timeLabel` | string? | `22:00–06:00` (24 h, raya `–`), `null` si el turno no tiene horario. **Reloj de 12 h** (Ajustes › Formato de hora): la forma compacta con letra, `10p–6a`, `7:30a–3:30p` (`a` = AM, `p` = PM; «10:00 PM–6:00 AM» no cabe en la línea del widget). **Turno partido (A12):** los dos tramos en la forma compacta, `09–13 · 17–21` (dos rangos completos no caben en la línea del widget) |
+| `compactTime` | string? | `22–06`; con minutos solo si no son `:00` (`07:30–15`), `null` sin horario. En 12 h: `10p–6a`, `7:30a–3p`. Turno partido: `09–13 · 17–21` (los dos tramos unidos por ` · `) |
 | `category` | string | `work`, `rest` o `absence` |
 | `barLight`, `tintLight`, `inkLight`, `discLight` | int | Colores del turno en modo claro: barra inferior, fondo de la celda (tinte), código y texto en el tono del turno (tinta) y fondo del distintivo (disco) |
 | `barDark`, `tintDark`, `inkDark`, `discDark` | int | Los mismos cuatro en modo oscuro |
@@ -234,9 +293,10 @@ La cuadrícula incluye días anteriores a hoy y posteriores al día 60 con datos
 siete celdas y `days` sesenta días.)
 
 **Tamaño medido** (60 días, JSON compacto, rotación de 4 turnos con los 16 campos de color por estilo y 8 por turno):
-**116.396 bytes (~114 KB)** en v1; 126.403 bytes con un día doble con nota cada 3 días. V2 añade los días auxiliares:
-**145.315 bytes** con la rotación simple y **160.892 bytes** con los días dobles y notas (medido el 25-oct).
-Los días auxiliares están incluidos en la prueba de tamaño y en `contentHash`. Límite del contrato: **200 KB** (`kWidgetSnapshotMaxBytes`,
+**116.396 bytes (~114 KB)** en v1; 126.403 bytes con un día doble con nota cada 3 días. V2 añade los días auxiliares
+(hasta `lastDate + 27`, que dan servicio también al widget de cuatro semanas) y la extensión `notes`: **161.982 bytes**
+con la rotación simple y **178.708 bytes** con los días dobles y notas cada 3 días (medido el 2-nov).
+Los días auxiliares y las notas están incluidos en la prueba de tamaño y en `contentHash`. Límite del contrato: **200 KB** (`kWidgetSnapshotMaxBytes`,
 comprobado con `assert` al codificar y con una prueba).
 
 ## 3. Colores
@@ -303,7 +363,7 @@ horaria publicada no es la actual (`timeZoneChanged`); la versión publicada no 
 
 Publicar = guardar el JSON en la clave del App Group y pedir `WidgetCenter.shared.reloadAllTimelines()`
 (`WidgetPublisher`: `HomeWidgetPublisher` sobre `home_widget`, que en Android guarda en `HomeWidgetPreferences` y
-envía la actualización a los cinco proveedores; `FakeWidgetPublisher` en pruebas y en hosts sin widgets). Quien lo
+envía la actualización a los seis proveedores; `FakeWidgetPublisher` en pruebas y en hosts sin widgets). Quien lo
 dispara en la app es `WidgetHost` (montado en `app.dart`): arranque, vuelta a primer plano, cambios de turnos,
 festivos, preferencias o calendario principal (con la espera de la tabla), medianoche local con la app abierta, y
 cambio de fecha o de zona detectado por una mirada al reloj cada minuto. Siempre se publica el calendario
@@ -364,7 +424,9 @@ cruce de mes y de año; fines de semana de cambio de hora; varios turnos, día v
 (día siguiente, zona, versión, edición); tamaño < 200 KB; y una simulación del protocolo: cada uno de los 60 días
 encuentra su entrada y el día 61 no encuentra ninguna. Turno partido (`widget_snapshot_split_test.dart`): los dos tramos salen
 en `timeLabel`/`compactTime`, en `small.detail`, en la línea de mañana y en la rectangular de bloqueo (`P · 09–13 · 17–21`),
-con minutos solo si no son `:00`, y el `contentHash` cambia si cambia el segundo tramo. **No hay cambio de versión del
+con minutos solo si no son `:00`, y el `contentHash` cambia si cambia el segundo tramo. **Reloj de 12 h** (`widget_snapshot_hour12_test.dart`):
+las horas del snapshot ya vienen escritas en la forma compacta con letra (`timeLabel`, `compactTime`, `small.detail`, la línea de
+mañana, `N · 10p` en la línea de bloqueo); la app vuelve a publicar al cambiar el formato de hora (`docs/formatos.md`). **No hay cambio de versión del
 contrato**: son los mismos campos de texto; el Swift y el Kotlin no calculan horas, solo enseñan el texto (en el Mac,
 comprobar que `09–13 · 17–21` no se corta en el widget pequeño y en el de bloqueo rectangular).
 
@@ -414,8 +476,9 @@ y mismo aviso de caducado. Código en `app/android/app/src/main/kotlin/es/cuadra
 | `CuadranteLargeWidgetProvider` (4×4) | `snapshot.months[day.large.month]`, `weekdayHeaders` y `day.large.todayCell`: título del mes («Octubre 2026»), cabeceras, 6×7 celdas con el número del día, el código de hasta **2 turnos** (lado a lado), el tinte del primer turno, una barra inferior por turno (hasta 2) y hoy con anillo; los días de otros meses con los colores `dim*` del estilo. Redimensionable hasta ~3×3 celdas. |
 | `CuadranteAgendaWidgetProvider` (4×2, redimensionable) | «Próximos días»: hoy y los siguientes, hasta 14 días; filas completas según el espacio y tamaño de texto del lanzador. Fecha, ficha de color, código, horario e indicador de nota; tocar una fila abre ese día. |
 | `CuadranteTwoWeeksWidgetProvider` (4×2) | «Dos semanas»: 2 filas de 7 días desde el lunes de la semana actual, incluso con domingo como inicio del mes en Ajustes. Día, color, código y hora compacta cuando cabe; cada celda abre su día. |
+| `CuadranteFourWeeksWidgetProvider` (4×4) | «Cuatro semanas»: 4 filas de 7 días desde el lunes de la semana actual (28 días, igual de lunes aunque el mes empiece en domingo). Cabecera con el próximo libre de hoy cuando se conoce (extensión `nextOff`), número del día, el código y la barra de cada turno (hasta **2**, con `+N`), y debajo la **primera línea de la nota** o el clip cuando la nota no viaja; hoy con anillo y festivo en rojo. Cada celda abre su día. |
 | `WidgetModelBuilder` | Lee el JSON y devuelve lo que se pinta (o el aviso). Nunca lanza: JSON ausente, roto, versión distinta de 1 y 2 o un día incompleto dan el aviso. |
-| `WidgetRenderer` | `RemoteViews` (los cinco widgets). Colores del JSON; en Android 12+ con `setColorInt(claro, oscuro)`, así que el cambio de tema no necesita redibujar; antes se elige por `uiMode` al dibujar. **Todo dibujo fija la visibilidad del
+| `WidgetRenderer` | `RemoteViews` (los seis widgets). Colores del JSON; en Android 12+ con `setColorInt(claro, oscuro)`, así que el cambio de tema no necesita redibujar; antes se elige por `uiMode` al dibujar. **Todo dibujo fija la visibilidad del
 aviso «Abre Turnly» y del contenido** (`WidgetRenderPlan`): el lanzador reaplica el `RemoteViews` sobre las vistas que ya
 tiene si el layout es el mismo, y lo que dejó el dibujo anterior (aviso visible, contenido oculto) se queda si el nuevo no lo
 cambia (H-T12-2). Fondo y textos neutros de `res/values(-night)/widget_colors.xml` (tokens de `docs/diseno.md`). |
@@ -436,28 +499,45 @@ Los enlaces `cuadrante://` no llevan datos y no disparan acciones: cualquier app
 Los nuevos widgets usan `cuadrante://widget/day/<yyyy-MM-dd>?homeWidget`, y el aviso
 `cuadrante://widget?homeWidget`, por el mismo canal de `home_widget`.
 
-### Agenda y dos semanas (Android, 25-oct)
+### Agenda, dos semanas y cuatro semanas (Android, 25-oct / UW, 2-nov)
 
-Ambos se añaden desde el selector de widgets del lanzador y desde Ajustes › Añadir widget. Tienen descripción y
+Los tres se añaden desde el selector de widgets del lanzador y desde Ajustes › Añadir widget. Tienen descripción y
 vista previa propias y textos en es, ca, gl, eu y en. Usan los mismos fondos, tintes, tipografía e indicadores de hoy
 de los widgets anteriores, con tema claro/oscuro. Las filas y las celdas se añaden con `RemoteViews.addView`, sin
 colecciones ni servicios adicionales. El plan de filas se calcula por instancia al actualizar y redimensionar;
 una instancia más alta puede enseñar más días que otra del mismo proveedor.
-En días con varios turnos, la agenda añade fichas con código y hora y las dos semanas apilan hasta dos bandas.
+En días con varios turnos, la agenda añade fichas con código y hora y las dos semanas y las cuatro semanas apilan
+hasta dos bandas.
 Si el primer día de agenda o una celda no admiten todos los turnos completos, el último código lleva `+N` con el
 número restante; el texto de accesibilidad conserva todos los turnos saneados y sus horas. Las fechas estrechas
 se ajustan al ancho; los rangos de hora de dos semanas se muestran enteros o se ocultan cuando no caben.
 
-Los cinco proveedores están en `WidgetRenderer.providers`: alarma de medianoche, WorkManager, cambios de reloj,
+El de **cuatro semanas** (UW, 2-nov) es un 4×4 con diseño fijo (`widget_four_weeks.xml`: cabecera opcional del próximo
+libre, 7 cabeceras y 4 filas) que el renderizador rellena con 28 celdas `widget_four_weeks_cell`. Cada celda lleva el
+número del día, el turno (código, tinte del primero y una barra por turno, hasta 2 con `+N` como en dos semanas) y, si
+la fecha tiene nota que viaja, su primera línea (una línea, recortada con puntos suspensivos); si la nota no viaja pero
+el día tiene `hasNote`, en su lugar va el clip. La cabecera dice el próximo libre de hoy (extensión `nextOff`); sin
+ninguno, no se enseña. Hoy lleva anillo y el festivo el número en rojo. Es redimensionable hasta unas 3×3 celdas, como
+el del mes: las cuatro filas y las siete columnas se reparten el espacio que dé el lanzador. Cubre los 28 días desde
+el lunes de la semana actual, con un toque por celda que abre su día.
+No hay un interruptor en Ajustes para la nota del widget: se enseña siempre la primera línea (ver la duda en el informe).
+
+Los seis proveedores están en `WidgetRenderer.providers`: alarma de medianoche, WorkManager, cambios de reloj,
 zona, reinicio y republicación Dart actualizan todos juntos. No hay un segundo planificador. El anillo y la agenda
-se desplazan al cambiar hoy; el lunes la cuadrícula de dos semanas avanza siete días. Se mantienen las limitaciones
-de puntualidad de Android sin permiso de alarmas exactas descritas más abajo.
+se desplazan al cambiar hoy; el lunes las cuadrículas de dos y cuatro semanas avanzan siete días. Se mantienen las
+limitaciones de puntualidad de Android sin permiso de alarmas exactas descritas más abajo.
 
 Pruebas Dart: rango auxiliar completo a lo largo de los 60 días, cambio de año, horas partidas, notas sin contenido,
-ausencias neutras, hash, ida y vuelta v2 y lectura/recodificación de `widget_snapshot_v1.json` sin cambios.
+ausencias neutras, hash, ida y vuelta v2 y lectura/recodificación de `widget_snapshot_v1.json` sin cambios. Para el
+widget de cuatro semanas (`widget_four_weeks_test.dart`): 28 días desde el lunes, la extensión `notes` (primera línea,
+fuera en días de salud) y `nextOff`. Los JSON de prueba (`widget_snapshot.json`,
+`widget_snapshot_month_change.json` y `widget_snapshot_four_weeks.json`) los escribe el constructor de Dart y
+`widget_android_fixture_test.dart` falla si dejan de coincidir.
 Pruebas JVM: selección de rangos, lunes incluso con el mes en domingo, medianoche, privacidad, vigencia, filas que
-caben y visibilidad al pasar de caducado a contenido. Quedan para dispositivo: medidas del lanzador, legibilidad,
-redimensionado, toques en frío/caliente y el protocolo de siete días, ahora con los cinco widgets.
+caben y visibilidad al pasar de caducado a contenido; y `WidgetFourWeeksTest` (28 días lunes primero, cabecera del
+próximo libre, primera línea de la nota, ausencias que no filtran el texto, payload manipulado y vigencia).
+Quedan para dispositivo: medidas del lanzador, legibilidad,
+redimensionado, toques en frío/caliente y el protocolo de siete días, ahora con los seis widgets.
 
 Un toque abre la app en ese día: `cuadrante://widget/day/<yyyy-MM-dd>` (la celda de la tira y la del mes llevan su propio
 día; el aviso de caducado abre la app sin día). La cabecera del widget del mes abre ese mes: `cuadrante://widget/month/<yyyy-MM>`
@@ -518,26 +598,28 @@ dice para qué zona se generó.
   elección de mes y de celda de hoy), `WidgetModelBuilderTest`, que lee `src/test/resources/widget_snapshot.json`, y
   `WidgetMonthTest` (widget del mes: 42 celdas, hoy, cambio de mes el día 1, semana en domingo, colores `dim*`, hasta 2
   turnos por celda, aviso, punteros dañados), que añade `widget_snapshot_month_change.json` (cinco días a caballo del 1
-  de noviembre con semana en domingo). Esos JSON los escribe el constructor de Dart y
+  de noviembre con semana en domingo), y `WidgetFourWeeksTest` (cuatro semanas: 28 días lunes primero, cabecera del
+  próximo libre, primera línea de la nota, ausencias que no filtran texto, payload manipulado y vigencia), que añade
+  `widget_snapshot_four_weeks.json` (35 días de línea de tiempo y 62 auxiliares, con dos notas y un próximo libre). Esos JSON los escribe el constructor de Dart y
   `test/features/widget/widget_android_fixture_test.dart` falla si dejan de coincidir
   (`UPDATE_WIDGET_FIXTURE=1 flutter test test/features/widget/widget_android_fixture_test.dart` los regenera).
 - Dart: `widget_publisher_test` (capa `home_widget` simulada), `widget_sync_service_test` y `widget_host_test`
   (arranque, vuelta, cambios con espera, medianoche, fecha cambiada a mano, zona, calendario principal, toques).
-- Emulador: `tool/qa/widget_android.sh` (W01–W05, `docs/qa.md`).
+- Emulador: `tool/qa/widget_android.sh` (W01–W06, `docs/qa.md`).
 
 ### Prueba de 7 días en Android (manual, antes de publicar)
 
 Dispositivos: Android 13, 14, 15 y 16 (al menos uno Samsung y uno Xiaomi o similar, con su ahorro de batería).
 
-1. Instala la build, añade los cinco widgets (Ajustes › Añadir widget), concede «Alarmas y recordatorios» y **sácala de
+1. Instala la build, añade los seis widgets (Ajustes › Añadir widget), concede «Alarmas y recordatorios» y **sácala de
    recientes**. No abras la app en 7 días. Anota antes, de `HomeWidgetPreferences` (build de depuración, `run-as`) o de
    un botón de depuración, la etiqueta esperada de cada fecha.
 2. Cada día: captura a las 00:05 y a las 08:00; deben decir el día de ese momento. Un día a las 00:00:30 también.
 3. Perturbaciones: día 2 reinicio; día 3 ahorro de batería y modo ahorro extremo; día 4 cambio de zona (Madrid →
    Canarias → Madrid); día 5 modo avión a medianoche; día 6 cambio manual de fecha y vuelta; día 7 «optimización de
    batería» de la app activada.
-4. **Caducidad:** adelanta la fecha 61 días (y 60 días y un minuto) respecto de `firstDate`: aviso honesto en los cinco
-   widgets, ningún turno. En el del mes, además, el día 1 de un mes que cae en esos 60 días el título y la cuadrícula
-   cambian solos. Vuelve a la fecha real: reaparecen los días.
-5. Criterio: 7 de 7 días con el día correcto (y el mes correcto en el 4×4) en los cinco widgets en todos los dispositivos. Un widget que tarde más de 1
+4. **Caducidad:** adelanta la fecha 61 días (y 60 días y un minuto) respecto de `firstDate`: aviso honesto en los seis
+   widgets, ningún turno. En los de mes y cuatro semanas, además, el día 1 de un mes que cae en esos 60 días el título y
+   la cuadrícula cambian solos. Vuelve a la fecha real: reaparecen los días.
+5. Criterio: 7 de 7 días con el día correcto (y el mes correcto en los 4×4) en los seis widgets en todos los dispositivos. Un widget que tarde más de 1
    minuto en cambiar sin el permiso de alarmas exactas se anota (límite conocido); con el permiso es un fallo.

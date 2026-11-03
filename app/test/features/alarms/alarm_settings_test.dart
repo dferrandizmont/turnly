@@ -94,9 +94,9 @@ void main() {
         },
       ).withSkipped(_d2, skipped: true).withSkipped(_d1, skipped: true);
       expect(s.toJson(), {
-        'version': 1,
+        'version': 2,
         'enabled': true,
-        'horizonDays': 14,
+        'horizonDays': 30,
         'types': {
           'night': {
             'enabled': true,

@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/app_harness.dart';
+import '../calendar/day_sheet_finders.dart';
 
 // Demo data around Monday 19 Oct 2026, 12:00: Noche 19-23, Libre 24-25,
 // Mañana 26-30.
@@ -54,6 +55,8 @@ void main() {
     await tester.tap(dayCell(date));
     await tester.pumpAndSettle();
     expect(find.byType(BottomSheet), findsOneWidget);
+    // The reminder and «Sin alarma este día» are in «Más opciones».
+    await openDayMore(tester);
   }
 
   Future<void> closeSheet(WidgetTester tester) async {

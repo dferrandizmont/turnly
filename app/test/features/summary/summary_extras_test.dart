@@ -41,7 +41,9 @@ void main() {
   testWidgets('without extras the month has no such lines', (tester) async {
     await pumpCalendar(tester, prepare: _rates);
     await _openSummary(tester);
-    expect(_text(tester, 'summary-hours'), '160 h');
+    // October holds today: 96 h worked before the 19th, 64 h planned.
+    expect(_text(tester, 'summary-hours'), '96 h');
+    expect(_text(tester, 'summary-legend-planned'), '64 h');
     expect(_key('summary-overtime'), findsNothing);
     expect(_key('summary-early-leave'), findsNothing);
     expect(_key('summary-extras-no-rate'), findsNothing);
@@ -63,8 +65,9 @@ void main() {
     await tester.pumpAndSettle();
 
     await _openSummary(tester);
-    // 160 h + 2 h of overtime - 1 h.
-    expect(_text(tester, 'summary-hours'), '161 h');
+    // The extras are on the 19th and later: planned 64 h + 2 h - 1 h.
+    expect(_text(tester, 'summary-hours'), '96 h');
+    expect(_text(tester, 'summary-legend-planned'), '65 h');
     expect(_text(tester, 'summary-overtime-value'), '+2 h');
     expect(_text(tester, 'summary-early-leave-value'), '${_minus}1 h');
     expect(find.text('Horas extra'), findsOneWidget);
@@ -106,7 +109,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(_text(tester, 'summary-period'), '1 oct 2026 – 31 oct 2026');
     expect(_text(tester, 'summary-hours'), monthHours);
-    expect(_text(tester, 'summary-hours'), '161 h');
+    expect(_text(tester, 'summary-legend-planned'), '65 h');
     expect(_text(tester, 'summary-overtime-value'), '+2 h');
     expect(_text(tester, 'summary-early-leave-value'), '${_minus}1 h');
     await tester.ensureVisible(_key('summary-earnings'));

@@ -1,5 +1,6 @@
 import '../../../core/l10n/l10n.dart';
 import '../data/calendar_exporter.dart';
+import '../domain/calendar_sync_settings.dart';
 import '../domain/export_events.dart';
 
 /// One line of the card that says what an export will do, or did.
@@ -69,3 +70,13 @@ List<ExportLine> exportResultLines(AppLocalizations l10n, ExportResult result) {
       ExportLine('failed', l10n.calExportDoneFailed(result.failed)),
   ];
 }
+
+/// Why «Mantener al día» turned itself off, in plain words.
+String calendarSyncNoticeText(
+  AppLocalizations l10n,
+  CalendarSyncNotice notice,
+) => switch (notice) {
+  CalendarSyncNotice.permission => l10n.calSyncNoticePermission,
+  CalendarSyncNotice.calendarGone => l10n.calSyncNoticeCalendarGone,
+  CalendarSyncNotice.sourceGone => l10n.calSyncNoticeSourceGone,
+};

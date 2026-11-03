@@ -17,6 +17,10 @@ class HolidaysIcons {
   static IconData _pick(IconData apple, IconData material) =>
       _apple ? apple : material;
 
+  /// The country.
+  static IconData get country =>
+      _pick(CupertinoIcons.globe, Symbols.public_rounded);
+
   /// The autonomous community.
   static IconData get region => _pick(CupertinoIcons.map, Symbols.map_rounded);
 

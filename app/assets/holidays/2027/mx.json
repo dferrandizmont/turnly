@@ -1,0 +1,14 @@
+{
+"schema":1,
+"year":2027,
+"country":"MX",
+"national":[
+{"date":"2027-01-01","name":"Año Nuevo"},
+{"date":"2027-02-01","name":"Día de la Constitución"},
+{"date":"2027-03-15","name":"Natalicio de Benito Juárez"},
+{"date":"2027-05-01","name":"Día del Trabajo"},
+{"date":"2027-09-16","name":"Día de la Independencia"},
+{"date":"2027-11-15","name":"Día de la Revolución"},
+{"date":"2027-12-25","name":"Navidad"}
+]
+}

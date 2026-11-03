@@ -7,6 +7,7 @@ import '../../../core/widgets/app_sheet.dart';
 import '../../../core/widgets/buttons.dart';
 import '../../../core/widgets/choice_pill.dart';
 import '../../../core/widgets/labeled_field.dart';
+import '../../../core/widgets/minute_picker.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../../shift_types/domain/shift_type_draft.dart';
 import '../../shift_types/presentation/shift_code_formatter.dart';
@@ -72,23 +73,18 @@ class _NewTypeFormState extends State<NewTypeForm> {
     final current = second
         ? (start ? _draft.segment2StartMinute : _draft.segment2EndMinute) ?? 0
         : (start ? _draft.startMinute : _draft.endMinute);
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay(hour: current ~/ 60, minute: current % 60),
-      helpText: second
+    final minute = await showMinutePicker(
+      context,
+      current: current,
+      help: second
           ? (start
                 ? context.l10n.shiftTypesPickSecondStart
                 : context.l10n.shiftTypesPickSecondEnd)
           : (start
                 ? context.l10n.shiftTypesPickStart
                 : context.l10n.shiftTypesPickEnd),
-      builder: (ctx, child) => MediaQuery(
-        data: MediaQuery.of(ctx).copyWith(alwaysUse24HourFormat: true),
-        child: child!,
-      ),
     );
-    if (picked == null || !mounted) return;
-    final minute = picked.hour * 60 + picked.minute;
+    if (minute == null || !mounted) return;
     if (second) {
       _update(
         start

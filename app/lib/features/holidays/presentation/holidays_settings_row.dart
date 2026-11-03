@@ -8,21 +8,25 @@ import '../../../core/router.dart';
 import '../../settings/presentation/settings_widgets.dart';
 import '../application/holidays_provider.dart';
 import '../domain/spanish_regions.dart';
+import 'holiday_pickers.dart';
 
-/// The «Festivos» row of Settings: the chosen community at the right, opens
-/// `/ajustes/festivos`.
+/// The «Festivos» row of Settings: the chosen community at the right (the
+/// country outside Spain), opens `/ajustes/festivos`.
 class HolidaysSettingsRow extends ConsumerWidget {
   const HolidaysSettingsRow({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final region = regionByCode(ref.watch(holidayPlaceProvider).regionCode);
+    final place = ref.watch(holidayPlaceProvider);
+    final region = regionByCode(place.regionCode);
     return SettingsRow(
       key: const ValueKey('settings-holidays'),
       icon: SettingsIcons.holidays,
       title: l10n.settingsHolidaysTitle,
-      value: region?.name ?? l10n.holidaysSettingsRegionUnset,
+      value: !place.isSpain
+          ? holidayCountryLabel(context, place.countryCode)
+          : region?.name ?? l10n.holidaysSettingsRegionUnset,
       onTap: () => context.push(AppRoutes.settingsHolidays),
     );
   }

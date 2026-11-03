@@ -2,8 +2,10 @@
 <resources>
     <string name="widget_agenda_label">Turnly: próximos días</string>
     <string name="widget_two_weeks_label">Turnly: dúas semanas</string>
+    <string name="widget_four_weeks_label">Turnly: catro semanas</string>
     <string name="widget_agenda_description">Hoxe e os próximos días, con quendas e notas. Cambia de día só.</string>
     <string name="widget_two_weeks_description">Esta semana e a seguinte, desde o luns. Cambia de día só.</string>
+    <string name="widget_four_weeks_description">Catro semanas desde o luns, con notas e o próximo libre. Cambia de día só.</string>
     <string name="widget_no_shift">Sen quenda</string>
     <string name="widget_has_note">Ten nota</string>
     <string name="widget_today">hoxe</string>

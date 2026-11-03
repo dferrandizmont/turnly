@@ -15,6 +15,7 @@ import '../../../core/database/database_opener.dart' show backupsDirectoryName;
 import '../../../core/database/database_provider.dart';
 import '../../../core/diagnostics/crash_reporting.dart' show redactError;
 import '../../../core/providers.dart';
+import '../../notes/application/notes_providers.dart';
 import '../data/backup_repository.dart';
 import '../data/backup_settings_repository.dart';
 import '../data/export_cache.dart';
@@ -294,6 +295,10 @@ final backupToolsProvider = FutureProvider<BackupTools>((ref) async {
         db,
         safetyDirectory: directory,
         appVersion: version,
+        // The files of the attachments of the notes: a copy with attachments
+        // is a container, and a restore puts the files back in place. The
+        // folder of the system is asked for only when there are attachments.
+        loadAttachmentStore: () => ref.read(attachmentStoreProvider.future),
         runner: ref.watch(backupTaskRunnerProvider),
         now: clock,
       ),
@@ -384,9 +389,13 @@ final autoBackupRunnerProvider = Provider<AutoBackupRunner>((ref) {
 List<ResultSetImplementation<dynamic, dynamic>> _userTables(AppDatabase db) => [
   db.calendars,
   db.shiftTypes,
+  db.shiftTypeVersions,
   db.patterns,
   db.patternRuns,
   db.dayEntries,
+  db.noteAttachments,
+  db.dayTasks,
+  db.shiftSwaps,
   db.holidays,
   db.absenceBalances,
   db.settings,
@@ -503,9 +512,26 @@ Future<IncomingFile?> pickBackupFile() async {
         ];
   final file = await openFile(acceptedTypeGroups: groups);
   if (file == null) return null;
+  return readPickedBackupFile(file);
+}
+
+/// Reads the file the user picked, within the caps of the import: up to
+/// `BackupCodec.maxImportBytes` for a container (a copy with attachments, a
+/// ZIP) and `BackupCodec.maxFileBytes` for anything else; a bigger one is
+/// [IncomingFileProblem.tooLarge] without reading it all.
+Future<IncomingFile> readPickedBackupFile(XFile file) async {
   try {
-    if (await file.length() > BackupCodec.maxFileBytes) {
+    final length = await file.length();
+    if (length > BackupCodec.maxImportBytes) {
       return const IncomingFile.problem(IncomingFileProblem.tooLarge);
+    }
+    // Only a container (a ZIP: a copy with attachments) may pass the cap of a
+    // plain file: look at its first bytes before reading all of it.
+    if (length > BackupCodec.maxFileBytes) {
+      final head = await file.openRead(0, 4).expand((c) => c).toList();
+      if (!BackupCodec.fitsImportLimit(length, head)) {
+        return const IncomingFile.problem(IncomingFileProblem.tooLarge);
+      }
     }
     return IncomingFile.bytes(await file.readAsBytes());
   } catch (_) {

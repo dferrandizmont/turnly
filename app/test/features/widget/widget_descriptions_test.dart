@@ -24,7 +24,7 @@ void main() {
         today: DayEntry(
           date: today,
           shiftTypeIds: const ['morning', 'night'],
-          note: 'PRIVATE_NOTE',
+          note: 'NOTA_DEL_DIA',
         ),
         tomorrow: DayEntry(
           date: tomorrow,
@@ -70,6 +70,12 @@ void main() {
       expect(redacted, isNot(contains('Vacaciones')));
       expect(redacted, isNot(contains(l10n.daySemanticsNote)));
       final encoded = snapshot.encode();
+      // A normal note's first line travels in the optional `notes` extension
+      // for the four-week widget, but it never enters the spoken descriptions,
+      // and a health-day note leaves the phone in no shape at all.
+      expect(snapshot.notes!['2026-10-19'], 'NOTA_DEL_DIA');
+      expect(label, isNot(contains('NOTA_DEL_DIA')));
+      expect(encoded, isNot(contains('PRIVATE_HEALTH_NOTE')));
       expect(encoded, isNot(contains('PRIVATE_')));
       final decoded = WidgetSnapshot.decode(encoded);
       expect(decoded.descriptions!.toJson(), descriptions.toJson());

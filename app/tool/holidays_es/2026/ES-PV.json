@@ -1,0 +1,15 @@
+{
+"region":"ES-PV",
+"year":2026,
+"kind":"labour",
+"sources":{
+"s1":{"url":"https://egoitza.gipuzkoa.eus/gao-bog/castell/bog/2025/09/04/c2506163.pdf","ref":"BOG de 4.9.2025 (núm. 168, según una fuente secundaria; el PDF no lo imprime) — Resolución de 1 de septiembre de 2025 del delegado territorial de Trabajo y Seguridad Social de Gipuzkoa, por la que se aprueba el calendario de las fiestas locales de Gipuzkoa para el año 2026","published":"2025-09-04","retrieved":"2026-10-31"},
+"s2":{"url":"https://www.euskadi.eus/contenidos/informacion/5907/es_2296/calendario-laboral-BIZKAIA-2026-modificacion-cas.pdf","ref":"BOB núm. 148, 6.8.2025 — Resolución, de 4 de agosto de 2025, de la delegada territorial de Trabajo y Seguridad Social de Bizkaia, por la que se modifica la Resolución de 11 de julio de 2025 por la que se establece el Calendario de Fiestas Locales del Territorio Histórico de Bizkaia para el año 2026 (original: BOB núm. 138, 21.7.2025, https://www.euskadi.eus/contenidos/informacion/5907/es_2296/Calendario-laboral-BIZKAIA-2026-cas.pdf)","published":"2025-08-06","retrieved":"2026-10-31"},
+"s3":{"url":"https://www.araba.eus/BOTHA/Boletines/2025/082/2025_082_02192_C.pdf","ref":"BOTHA núm. 82, 21.7.2025 — Resolución de 14 de julio de 2025 del delegado territorial de Álava del Departamento de Economía, Trabajo y Empleo, que aprueba la determinación de las fiestas locales de Álava para el año 2026","published":"2025-07-21","retrieved":"2026-10-31"}
+},
+"municipalities":{
+"01059":{"name":"Vitoria-Gasteiz","days":["2026-04-28","2026-08-05"],"source":"s3"},
+"20069":{"name":"Donostia/San Sebastián","days":["2026-01-20","2026-07-31"],"source":"s1"},
+"48020":{"name":"Bilbao","days":["2026-07-31","2026-08-28"],"source":"s2"}
+}
+}

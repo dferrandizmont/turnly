@@ -97,23 +97,39 @@ Future<void> _alarms(QaContext qa) async {
 
     final schedule = app.schedule;
     final strings = sync.strings!;
-    final planned = planAlarms(
+    // What the app really schedules is the whole plan, renewal notice
+    // included (A1). With 21 days of Noche and a 14-day horizon the plan is
+    // truncated, so exactly one renewal notice rides along.
+    final plan = planAlarmSchedule(
       schedule: schedule,
       settings: _nightAlarm,
       now: DateTime.now(),
       strings: strings,
     );
+    final planned = plan.toSchedule;
     final pending = await ours();
     qa.metric('alarmas_pendientes', pending.length);
     expect(pending, isNotEmpty);
-    expect(pending.length, lessThanOrEqualTo(maxPendingAlarms));
+    // [maxPendingAlarms] caps the shift alarms; the renewal notice is one more.
+    expect(pending.length, lessThanOrEqualTo(maxPendingAlarms + 1));
     expect(pending.length, planned.length, reason: 'pendientes = plan');
     expect({for (final r in pending) r.id}, {for (final a in planned) a.id});
-    for (final r in pending) {
+    final renewals = pending
+        .where((r) => r.payload!.contains(':${AlarmKind.renewal.name}:'))
+        .toList();
+    expect(
+      renewals,
+      hasLength(plan.renewal == null ? 0 : 1),
+      reason: 'un aviso de renovación si el plan se corta',
+    );
+    if (plan.renewal != null) expect(renewals.single.id, plan.renewal!.id);
+    for (final r in pending.where(
+      (r) => r.payload!.contains(':${AlarmKind.shift.name}:'),
+    )) {
       expect(r.payload, startsWith('${alarmPayloadPrefix}night:'));
     }
     // Every alarm is 90 min before a Noche (22:00 -> 20:30 the same day).
-    for (final alarm in planned) {
+    for (final alarm in planned.where((a) => a.kind == AlarmKind.shift)) {
       expect(schedule.resolve(alarm.shiftDate).shiftIds, contains(_night));
       expect(alarm.shiftTypeId, _night);
       expect(alarm.fireDate, alarm.shiftDate);

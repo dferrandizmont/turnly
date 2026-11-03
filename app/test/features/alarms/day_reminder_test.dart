@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/app_harness.dart';
+import '../calendar/day_sheet_finders.dart';
 
 // «Avisarme» in the day detail (docs/paridad.md, A1). Demo data around Monday
 // 19 Oct 2026, 12:00: the 20th has a note, the 24th (Libre) is empty and the
@@ -42,6 +43,8 @@ void main() {
     await tester.tap(dayCell(date));
     await tester.pumpAndSettle();
     expect(find.byType(BottomSheet), findsOneWidget);
+    // The reminder and «Sin alarma este día» are in «Más opciones».
+    await openDayMore(tester);
   }
 
   Future<void> closeSheet(WidgetTester tester) async {

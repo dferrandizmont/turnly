@@ -20,6 +20,8 @@ Future<AppUnderTest> openExport(
     overrides: importOverrides(phone: phone, picker: FakePicker()),
   );
   await app.openSettings();
+  await tester.ensureVisible(byKey('settings-export-calendar'));
+  await tester.pumpAndSettle();
   await tester.tap(byKey('settings-export-calendar'));
   await tester.pumpAndSettle();
   return app;

@@ -3,6 +3,7 @@ import 'package:cuadrante/features/calendar/application/paint_controller.dart';
 import 'package:cuadrante/features/calendar/application/schedule_controller.dart';
 import 'package:cuadrante/features/schedule/data/demo_schedule.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
+import 'package:cuadrante/features/shift_types/domain/shift_color_presets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -256,6 +257,40 @@ void main() {
       expect(paint().active, isFalse);
       expect(c.strokeActive, isFalse);
       expect(state().canUndo, isTrue);
+    });
+  });
+
+  group('the undo of a colour preset', () {
+    test('puts only the colour back, not a later edit (L2)', () async {
+      final c = controller();
+      // A whole set of colours is applied: it hands back the types as they
+      // were for the «Deshacer» of the snack bar.
+      final previous = c.applyColorPreset(shiftColorPresets.first);
+      expect(previous, isNotNull);
+      expect(previous, isNotEmpty);
+      await c.pendingWrites;
+
+      // The person then edits one of those types: a name (and hours).
+      final edited = previous!.first;
+      final afterPreset = c.state.schedule.shiftTypeById(edited.id)!;
+      c.saveShiftType(
+        afterPreset.copyWith(name: 'Mi turno', startMinute: 1, endMinute: 2),
+      );
+      await c.pendingWrites;
+
+      // «Deshacer»: the colour goes back, the name and the hours stay.
+      c.restoreShiftTypes(previous);
+      await c.pendingWrites;
+
+      final restored = c.state.schedule.shiftTypeById(edited.id)!;
+      expect(restored.name, 'Mi turno', reason: 'the later edit is kept');
+      expect(restored.startMinute, 1);
+      expect(restored.endMinute, 2);
+      expect(
+        restored.colorValue,
+        edited.colorValue,
+        reason: 'the colour is back',
+      );
     });
   });
 }

@@ -1,0 +1,11 @@
+{
+"region":"ES-RI",
+"year":2027,
+"kind":"labour",
+"sources":{
+"s1":{"url":"https://ias1.larioja.org/boletin/Bor_Boletin_visor_Servlet?referencia=41863576-1-PDF-579228","ref":"BOR núm. 160, 21.8.2026, p. 14689 — Consejería de Economía, Innovación, Empresa y Trabajo Autónomo: Calendario laboral de fiestas locales 2027 (Resolución de 18 de agosto de 2026 de la Directora General de Trabajo y Salud Laboral)","published":"2026-08-21","retrieved":"2026-10-31"}
+},
+"municipalities":{
+"26089":{"name":"Logroño","days":["2027-06-11","2027-09-21"],"source":"s1"}
+}
+}

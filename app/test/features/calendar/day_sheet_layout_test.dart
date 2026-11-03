@@ -8,16 +8,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/real_font.dart';
 import '../../support/text_lines.dart';
+import 'day_sheet_finders.dart';
 import 'harness.dart';
 
-/// The day sheet on the widths and text sizes of the QA campaign (T03): a
-/// stable height, a header that closes it when dragged, chips that bleed to
-/// the edges with whole names, arrows that look disabled when they are.
+/// The day sheet on the widths and text sizes of the QA campaign (T03): as
+/// tall as its content (option 4A of 31 Oct) up to a cap, a header that
+/// closes it when dragged, chips with whole names, menu entries that look
+/// disabled when they are.
 Finder get sheet => find.byType(BottomSheet);
 
 void main() {
-  setUpAll(initializeLocale);
+  setUpAll(() async {
+    await initializeLocale();
+    // Heights measured with Roboto: the test font is twice as wide and
+    // wraps every line.
+    expect(await loadRoboto(), isTrue, reason: 'Roboto from the Flutter SDK');
+  });
 
   const oct21 = CivilDate(2026, 10, 21); // Mañana + Tarde
   const oct24 = CivilDate(2026, 10, 24); // Libre
@@ -42,28 +50,36 @@ void main() {
       s.id,
   ];
 
-  group('H-T03-1: disabled arrows look disabled', () {
+  group('H-T03-1: disabled moves look disabled', () {
     for (final brightness in Brightness.values) {
       testWidgets('${brightness.name}: first up and last down are dimmed', (
         tester,
       ) async {
         await pumpCalendar(tester, brightness: brightness);
         await open(tester, oct21);
+        final tokens = tester.element(sheet).colors;
 
         Color? colorOf(String k) {
           final icon = find.descendant(of: key(k), matching: find.byType(Icon));
-          return IconTheme.of(tester.element(icon)).color;
+          return tester.widget<Icon>(icon).color;
         }
 
-        final tokens = tester.element(sheet).colors;
+        bool enabled(String k) =>
+            tester.widget<PopupMenuItem<Object?>>(key(k)).enabled;
+
         // Two shifts: up of the first and down of the last do nothing.
-        expect(tester.widget<IconButton>(key('day-up-0')).onPressed, isNull);
-        expect(tester.widget<IconButton>(key('day-down-1')).onPressed, isNull);
+        await revealDayControl(tester, 'day-up-0');
+        expect(enabled('day-up-0'), isFalse);
+        expect(enabled('day-down-0'), isTrue);
         expect(colorOf('day-up-0'), tokens.disabledContent);
+        expect(colorOf('day-down-0'), tokens.textSecondary);
+        await dismissMenu(tester);
+        await revealDayControl(tester, 'day-down-1');
+        expect(enabled('day-down-1'), isFalse);
+        expect(enabled('day-up-1'), isTrue);
         expect(colorOf('day-down-1'), tokens.disabledContent);
-        expect(colorOf('day-down-0'), tokens.textPrimary);
-        expect(colorOf('day-up-1'), tokens.textPrimary);
-        expect(tokens.disabledContent, isNot(tokens.textPrimary));
+        expect(colorOf('day-up-1'), tokens.textSecondary);
+        expect(tokens.disabledContent, isNot(tokens.textSecondary));
       });
     }
   });
@@ -84,6 +100,8 @@ void main() {
     testWidgets('the body still scrolls without closing it', (tester) async {
       await pumpCalendar(tester, size: const Size(320, 640));
       await open(tester, oct21);
+      // Unfolded, «Más opciones» makes the content taller than the sheet.
+      await openDayMore(tester);
       final scrollable = find.descendant(
         of: sheet,
         matching: find.byType(Scrollable),
@@ -94,7 +112,8 @@ void main() {
       final position = tester
           .state<ScrollableState>(find.byWidget(vertical.widget))
           .position;
-      expect(position.pixels, 0);
+      position.jumpTo(0);
+      await tester.pump();
       // Dragging up on the first shift scrolls the body, down brings it back; the
       // sheet stays open the whole time.
       await tester.drag(key('day-shift-0'), const Offset(0, -150));
@@ -133,10 +152,7 @@ void main() {
       final handle = tester.ensureSemantics();
       await pumpCalendar(tester);
       await open(tester, oct24);
-      await tester.ensureVisible(key('day-holiday-switch'));
-      await tester.pumpAndSettle();
-      await tester.tap(key('day-holiday-switch'));
-      await tester.pumpAndSettle();
+      await tapDayControl(tester, 'day-holiday-switch');
       await Navigator.of(tester.element(sheet)).maybePop();
       await tester.pumpAndSettle();
       expect(
@@ -164,8 +180,7 @@ void main() {
 
           final ids = paletteIds(tester);
           final first = key('day-add-${ids.first}');
-          await tester.ensureVisible(first);
-          await tester.pumpAndSettle();
+          await revealDayControl(tester, 'day-add-${ids.first}');
 
           // The chips wrap (H-T17-3): no sideways scroll, every chip inside
           // the sheet...
@@ -187,9 +202,11 @@ void main() {
           }
           await tester.ensureVisible(first);
           await tester.pumpAndSettle();
-          // ... and its first chip lines up with the text above it.
+          // ... and inside the palette panel, which lines up with the date.
+          final panel = tester.getRect(key('day-palette'));
           final title = tester.getRect(find.text('Miércoles, 21 de octubre'));
-          expect(tester.getRect(first).left + Sp.m, closeTo(title.left, 0.5));
+          expect(panel.left, closeTo(title.left, 0.5));
+          expect(tester.getRect(first).left, greaterThan(panel.left));
 
           // Every name is whole: no ellipsis, no word split.
           for (final id in ids) {
@@ -211,62 +228,93 @@ void main() {
     }
   });
 
-  group('H-T03-7: the height does not move', () {
-    // A tall screen too: there the content used to be shorter than the room,
-    // so the sheet grew and shrank with it.
+  group('4A: the height follows the content', () {
+    double room(WidgetTester tester) =>
+        tester.view.physicalSize.height / tester.view.devicePixelRatio;
+
+    testWidgets('a simple day takes about half the screen and the month '
+        'stays in sight', (tester) async {
+      await pumpCalendar(tester);
+      await open(tester, oct24); // Libre, nothing else
+      final rect = tester.getRect(sheet);
+      expect(rect.height, lessThan(room(tester) * 0.6));
+      // Not the old fixed 88 %.
+      expect(rect.height, lessThan(room(tester) * 0.88 - 1));
+      expect(rect.bottom, closeTo(room(tester), 0.5));
+      // The first weeks of the month are still in sight above the sheet.
+      expect(
+        tester.getRect(cell(const CivilDate(2026, 10, 5))).top,
+        lessThan(rect.top),
+      );
+    });
+
+    testWidgets('it grows with «Más opciones» and shrinks back', (
+      tester,
+    ) async {
+      await pumpCalendar(tester);
+      await open(tester, oct24);
+      final folded = tester.getRect(sheet).height;
+      await openDayMore(tester);
+      final unfolded = tester.getRect(sheet).height;
+      expect(unfolded, greaterThan(folded + 100));
+      await tester.tap(key('day-more'));
+      await tester.pumpAndSettle();
+      expect(tester.getRect(sheet).height, closeTo(folded, 0.5));
+    });
+
     for (final (width, height, scale) in [
       for (final width in widths)
         for (final scale in scales) (width, sizeFor(width).height, scale),
       (412.0, 1600.0, 1.0),
-      (360.0, 1400.0, 1.3),
     ]) {
-      testWidgets('at ${width}x$height dp, text $scale: same sheet '
-          'whatever happens', (tester) async {
+      testWidgets('at ${width}x$height dp, text $scale: never above the cap, '
+          'and what does not fit scrolls', (tester) async {
         await pumpCalendar(tester, size: Size(width, height), textScale: scale);
-        await open(tester, oct24);
-        final start = tester.getRect(sheet);
-
-        void expectStable(String after) {
-          final now = tester.getRect(sheet);
-          expect(now.top, closeTo(start.top, 0.01), reason: after);
-          expect(now.height, closeTo(start.height, 0.01), reason: after);
-        }
-
-        // The own-holiday name field appears (first frame and settled).
-        await tester.ensureVisible(key('day-holiday-switch'));
+        await open(tester, oct21);
+        await revealDayControl(tester, 'day-add-${paletteIds(tester).first}');
+        await openDayMore(tester);
+        final rect = tester.getRect(sheet);
+        expect(rect.height, lessThanOrEqualTo(room(tester) * 0.88 + 0.5));
+        // The last control can be reached.
+        await tester.ensureVisible(key('day-clear'));
         await tester.pumpAndSettle();
-        await tester.tap(key('day-holiday-switch'));
-        await tester.pump();
-        expectStable('holiday switch, first frame');
-        await tester.pumpAndSettle();
-        expectStable('holiday switch');
-
-        // A long note.
-        await tester.ensureVisible(key('day-note'));
-        await tester.pumpAndSettle();
-        await tester.enterText(
-          key('day-note'),
-          'una nota\nmuy larga\nque ocupa\nvarias líneas\ny sigue\ny sigue',
-        );
-        await tester.pump();
-        expectStable('typing');
-
-        // The day goes from one shift to two and to none.
-        final ids = paletteIds(tester);
-        await tester.ensureVisible(key('day-add-${ids.first}'));
-        await tester.pumpAndSettle();
-        await tester.tap(key('day-add-${ids.first}'));
-        await tester.pump();
-        expectStable('shift added, first frame');
-        await tester.pumpAndSettle();
-        expectStable('shift added');
-        await tester.ensureVisible(key('day-remove-0'));
-        await tester.pumpAndSettle();
-        await tester.tap(key('day-remove-0'));
-        await tester.pumpAndSettle();
-        expectStable('shift removed');
+        final clear = tester.getRect(key('day-clear'));
+        expect(clear.bottom, lessThanOrEqualTo(rect.bottom));
+        expect(clear.top, greaterThanOrEqualTo(rect.top));
         expect(tester.takeException(), isNull);
       });
     }
+  });
+
+  group('point 5: the sheet respects the keyboard (viewInsets)', () {
+    testWidgets('with the keyboard up the body ends above it', (tester) async {
+      await pumpCalendar(tester);
+      await open(tester, oct21);
+      await revealDayControl(tester, 'day-note');
+      await tester.tap(key('day-note'));
+      await tester.pumpAndSettle();
+
+      // Without a keyboard the body reaches the bottom of the screen...
+      final room =
+          tester.view.physicalSize.height / tester.view.devicePixelRatio;
+      expect(tester.getRect(key('day-sheet-body')).bottom, closeTo(room, 1));
+
+      // ...and with one up it stops above it (viewInsets, not padding).
+      const keyboard = 340.0;
+      tester.view.viewInsets = FakeViewPadding(
+        bottom: keyboard * tester.view.devicePixelRatio,
+      );
+      addTearDown(() => tester.view.resetViewInsets());
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(key('day-note'));
+      await tester.pumpAndSettle();
+      final body = tester.getRect(key('day-sheet-body'));
+      expect(body.bottom, lessThanOrEqualTo(room - keyboard + 0.5));
+      final note = tester.getRect(key('day-note'));
+      expect(note.bottom, lessThanOrEqualTo(body.bottom + 0.5));
+      expect(note.top, greaterThanOrEqualTo(body.top));
+      expect(tester.takeException(), isNull);
+    });
   });
 }

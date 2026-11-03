@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 
 import 'civil_date.dart';
+import 'shift_type.dart' show maxStoredMoneyCents;
 
 const _listEq = ListEquality<String>();
 const _stepsEq = ListEquality<List<String>>(ListEquality<String>());
@@ -112,13 +113,19 @@ class DayEntry {
     this.noteReminderMinute,
     this.overtimeMinutes,
     this.earlyLeaveMinutes,
+    this.extraAmountCents,
   }) : assert(
          noteReminderMinute == null ||
              (noteReminderMinute >= 0 && noteReminderMinute < 1440),
          'The reminder is a minute of the day (0-1439)',
        ),
        assert(overtimeMinutes == null || overtimeMinutes >= 0),
-       assert(earlyLeaveMinutes == null || earlyLeaveMinutes >= 0);
+       assert(earlyLeaveMinutes == null || earlyLeaveMinutes >= 0),
+       assert(
+         extraAmountCents == null ||
+             (extraAmountCents >= -maxStoredMoneyCents &&
+                 extraAmountCents <= maxStoredMoneyCents),
+       );
 
   final CivilDate date;
 
@@ -138,18 +145,25 @@ class DayEntry {
   /// none.
   final int? earlyLeaveMinutes;
 
+  /// Extra money of this day (allowances, a bonus; negative for a
+  /// deduction), in the minor unit of the currency. `null` = none; 0 is the
+  /// same as none. Schema v6 (the summary adds it from P9).
+  final int? extraAmountCents;
+
   /// Whether [minute] is a valid [noteReminderMinute].
   static bool isReminderMinute(int minute) => minute >= 0 && minute < 1440;
 
-  /// Nothing worth storing: no override, no note, no reminder and no extra
-  /// or missing minutes (0 minutes is the same as none). An entry whose only
-  /// content is a reminder, overtime or early leave is **not** empty.
+  /// Nothing worth storing: no override, no note, no reminder, no extra or
+  /// missing minutes and no extra amount (0 is the same as none). An entry
+  /// whose only content is a reminder, overtime, early leave or an extra
+  /// amount is **not** empty.
   bool get isEmpty =>
       shiftTypeIds == null &&
       (note == null || note!.isEmpty) &&
       noteReminderMinute == null &&
       (overtimeMinutes ?? 0) == 0 &&
-      (earlyLeaveMinutes ?? 0) == 0;
+      (earlyLeaveMinutes ?? 0) == 0 &&
+      (extraAmountCents ?? 0) == 0;
 
   DayEntry copyWith({
     List<String>? shiftTypeIds,
@@ -157,11 +171,13 @@ class DayEntry {
     int? noteReminderMinute,
     int? overtimeMinutes,
     int? earlyLeaveMinutes,
+    int? extraAmountCents,
     bool clearShiftTypeIds = false,
     bool clearNote = false,
     bool clearNoteReminder = false,
     bool clearOvertime = false,
     bool clearEarlyLeave = false,
+    bool clearExtraAmount = false,
   }) => DayEntry(
     date: date,
     shiftTypeIds: clearShiftTypeIds ? null : shiftTypeIds ?? this.shiftTypeIds,
@@ -175,6 +191,9 @@ class DayEntry {
     earlyLeaveMinutes: clearEarlyLeave
         ? null
         : earlyLeaveMinutes ?? this.earlyLeaveMinutes,
+    extraAmountCents: clearExtraAmount
+        ? null
+        : extraAmountCents ?? this.extraAmountCents,
   );
 
   /// The same entry with its shift override replaced by [ids] (`null` = no
@@ -186,6 +205,7 @@ class DayEntry {
     noteReminderMinute: noteReminderMinute,
     overtimeMinutes: overtimeMinutes,
     earlyLeaveMinutes: earlyLeaveMinutes,
+    extraAmountCents: extraAmountCents,
   );
 
   @override
@@ -196,6 +216,7 @@ class DayEntry {
       other.noteReminderMinute == noteReminderMinute &&
       other.overtimeMinutes == overtimeMinutes &&
       other.earlyLeaveMinutes == earlyLeaveMinutes &&
+      other.extraAmountCents == extraAmountCents &&
       (shiftTypeIds == null
           ? other.shiftTypeIds == null
           : other.shiftTypeIds != null &&
@@ -208,6 +229,7 @@ class DayEntry {
     noteReminderMinute,
     overtimeMinutes,
     earlyLeaveMinutes,
+    extraAmountCents,
     shiftTypeIds == null ? null : _listEq.hash(shiftTypeIds),
   );
 
@@ -216,5 +238,6 @@ class DayEntry {
       'DayEntry($date, $shiftTypeIds, $note'
       '${noteReminderMinute == null ? '' : ', reminder $noteReminderMinute'}'
       '${overtimeMinutes == null ? '' : ', overtime $overtimeMinutes'}'
-      '${earlyLeaveMinutes == null ? '' : ', early $earlyLeaveMinutes'})';
+      '${earlyLeaveMinutes == null ? '' : ', early $earlyLeaveMinutes'}'
+      '${extraAmountCents == null ? '' : ', extra $extraAmountCents'})';
 }

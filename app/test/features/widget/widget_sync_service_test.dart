@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cuadrante/core/bootstrap/bootstrap.dart' show initializeLocale;
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
 import 'package:cuadrante/features/widget/application/widget_sync_service.dart';
@@ -157,4 +159,29 @@ Future<void> main() async {
     await flaky.request(WidgetSyncTrigger.appResumed);
     expect(publisher.published, hasLength(1));
   });
+
+  test(
+    'a failed build after disposal never calls the error callback',
+    () async {
+      final started = Completer<void>();
+      final result = Completer<WidgetSnapshot>();
+      final errors = <Object>[];
+      final pending = WidgetSyncService(
+        publisher: publisher,
+        buildSnapshot: (_) {
+          started.complete();
+          return result.future;
+        },
+        onError: (e, _) => errors.add(e),
+      )..strings = WidgetStrings.es;
+      final run = pending.request(WidgetSyncTrigger.appStart);
+      await started.future;
+      pending.dispose();
+      result.completeError(StateError('late build failure'));
+      await run;
+      expect(errors, isEmpty);
+      expect(publisher.published, isEmpty);
+      expect(publisher.reloadCount, 0);
+    },
+  );
 }

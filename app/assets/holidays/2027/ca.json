@@ -1,0 +1,28 @@
+{
+"schema":1,
+"year":2027,
+"country":"CA",
+"national":[
+{"date":"2027-01-01","name":"New Year's Day"},
+{"date":"2027-03-26","name":"Good Friday"},
+{"date":"2027-07-01","name":"Canada Day"},
+{"date":"2027-09-06","name":"Labour Day"},
+{"date":"2027-12-25","name":"Christmas Day"},
+{"date":"2027-12-27","name":"Christmas Day (observed)"}
+],
+"regional":{
+"CA-AB":[{"date":"2027-02-15","name":"Family Day","origin":"regional"},{"date":"2027-05-24","name":"Victoria Day","origin":"regional"},{"date":"2027-10-11","name":"Thanksgiving Day","origin":"regional"},{"date":"2027-11-11","name":"Remembrance Day","origin":"regional"}],
+"CA-BC":[{"date":"2027-02-15","name":"Family Day","origin":"regional"},{"date":"2027-05-24","name":"Victoria Day","origin":"regional"},{"date":"2027-08-02","name":"British Columbia Day","origin":"regional"},{"date":"2027-09-30","name":"National Day for Truth and Reconciliation","origin":"regional"},{"date":"2027-10-11","name":"Thanksgiving Day","origin":"regional"},{"date":"2027-11-11","name":"Remembrance Day","origin":"regional"}],
+"CA-MB":[{"date":"2027-02-15","name":"Louis Riel Day","origin":"regional"},{"date":"2027-05-24","name":"Victoria Day","origin":"regional"},{"date":"2027-09-30","name":"National Day for Truth and Reconciliation","origin":"regional"},{"date":"2027-10-11","name":"Thanksgiving Day","origin":"regional"}],
+"CA-NB":[{"date":"2027-02-15","name":"Family Day","origin":"regional"},{"date":"2027-08-02","name":"New Brunswick Day","origin":"regional"},{"date":"2027-11-11","name":"Remembrance Day","origin":"regional"}],
+"CA-NL":[{"date":"2027-11-11","name":"Remembrance Day","origin":"regional"}],
+"CA-NS":[{"date":"2027-02-15","name":"Heritage Day","origin":"regional"},{"date":"2027-11-11","name":"Remembrance Day","origin":"regional"}],
+"CA-NT":[{"date":"2027-05-24","name":"Victoria Day","origin":"regional"},{"date":"2027-06-21","name":"National Aboriginal Day","origin":"regional"},{"date":"2027-08-02","name":"Civic Holiday","origin":"regional"},{"date":"2027-09-30","name":"National Day for Truth and Reconciliation","origin":"regional"},{"date":"2027-10-11","name":"Thanksgiving Day","origin":"regional"},{"date":"2027-11-11","name":"Remembrance Day","origin":"regional"}],
+"CA-NU":[{"date":"2027-05-24","name":"Victoria Day","origin":"regional"},{"date":"2027-07-09","name":"Nunavut Day","origin":"regional"},{"date":"2027-08-02","name":"Civic Holiday","origin":"regional"},{"date":"2027-09-30","name":"National Day for Truth and Reconciliation","origin":"regional"},{"date":"2027-10-11","name":"Thanksgiving Day","origin":"regional"},{"date":"2027-11-11","name":"Remembrance Day","origin":"regional"}],
+"CA-ON":[{"date":"2027-02-15","name":"Family Day","origin":"regional"},{"date":"2027-05-24","name":"Victoria Day","origin":"regional"},{"date":"2027-10-11","name":"Thanksgiving Day","origin":"regional"},{"date":"2027-12-26","name":"Boxing Day","origin":"regional"},{"date":"2027-12-28","name":"Boxing Day (observed)","origin":"regional"}],
+"CA-PE":[{"date":"2027-02-15","name":"Islander Day","origin":"regional"},{"date":"2027-09-30","name":"National Day for Truth and Reconciliation","origin":"regional"},{"date":"2027-11-11","name":"Remembrance Day","origin":"regional"}],
+"CA-QC":[{"date":"2027-05-24","name":"National Patriots' Day","origin":"regional"},{"date":"2027-06-24","name":"Saint Jean Baptiste Day","origin":"regional"},{"date":"2027-10-11","name":"Thanksgiving Day","origin":"regional"}],
+"CA-SK":[{"date":"2027-02-15","name":"Family Day","origin":"regional"},{"date":"2027-05-24","name":"Victoria Day","origin":"regional"},{"date":"2027-08-02","name":"Saskatchewan Day","origin":"regional"},{"date":"2027-10-11","name":"Thanksgiving Day","origin":"regional"},{"date":"2027-11-11","name":"Remembrance Day","origin":"regional"}],
+"CA-YT":[{"date":"2027-05-24","name":"Victoria Day","origin":"regional"},{"date":"2027-06-21","name":"National Aboriginal Day","origin":"regional"},{"date":"2027-08-16","name":"Discovery Day","origin":"regional"},{"date":"2027-09-30","name":"National Day for Truth and Reconciliation","origin":"regional"},{"date":"2027-10-11","name":"Thanksgiving Day","origin":"regional"},{"date":"2027-11-11","name":"Remembrance Day","origin":"regional"}]
+}
+}

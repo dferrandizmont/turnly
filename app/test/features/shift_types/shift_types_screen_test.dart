@@ -505,6 +505,10 @@ void main() {
       await typeInto(tester, 'shift-rate', '15');
       await tapKey(tester, 'shift-color-${0xFFD6336C.toRadixString(16)}');
       await save(tester);
+      // A new rate on a shift already on days gone: it asks; «Corregir en
+      // todos los días» does what saving always did.
+      expect(_key('shift-scope-from-today'), findsOneWidget);
+      await tapKey(tester, 'shift-scope-every-day');
 
       final state = stateOf(tester);
       final night = state.schedule.shiftTypeById('night')!;

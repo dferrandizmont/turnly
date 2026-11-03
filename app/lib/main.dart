@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,6 +11,7 @@ import 'core/config.dart';
 import 'core/database/database_provider.dart';
 import 'core/diagnostics/crash_reporting.dart';
 import 'core/providers.dart';
+import 'features/alarms/data/alarm_foreground_relay.dart';
 import 'features/holidays/application/holidays_provider.dart';
 import 'features/onboarding/application/onboarding_providers.dart';
 import 'features/schedule/application/schedule_providers.dart';
@@ -23,6 +26,10 @@ Future<void> main() async {
     }
   }
   WidgetsFlutterBinding.ensureInitialized();
+  // Alarms (A1): from the very start, a background renewal running in this
+  // process hands its work to the app (held until AlarmsHost is up) instead
+  // of writing the pending alarms at the same time as the app.
+  if (Platform.isAndroid) appAlarmForegroundRelay.listen();
   // Edge-to-edge: transparent bars, styled per theme in CuadranteApp.
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   final boot = await bootstrapApp();

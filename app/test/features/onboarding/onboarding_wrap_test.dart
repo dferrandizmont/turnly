@@ -1,6 +1,5 @@
 import 'package:cuadrante/core/bootstrap/bootstrap.dart';
 import 'package:cuadrante/core/format/text_wrap.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -61,21 +60,18 @@ void main() {
     for (final scale in [1.0, 1.3, 2.0]) {
       testWidgets('profession hints never break inside a range at $width dp, '
           'text $scale', (tester) async {
-        await FirstLaunch.open(
+        final app = await FirstLaunch.open(
           tester,
           size: Size(width, 800),
           textScale: scale,
         );
+        await app.toLastStep();
         for (final id in ['nursing', 'police', 'industry', 'hospitality']) {
-          final tile = key('onboarding-profession-$id');
-          await tester.ensureVisible(tile);
+          // The hours of the job chosen show under the pills.
+          await app.tap(key('onboarding-profession-$id'));
+          final hint = key('onboarding-profession-hint');
+          await tester.ensureVisible(hint);
           await tester.pumpAndSettle();
-          final hint = find.descendant(
-            of: tile,
-            matching: find.byWidgetPredicate(
-              (w) => w is Text && (w.data ?? '').contains(RegExp(r'\d')),
-            ),
-          );
           final paragraph = tester.renderObject<RenderParagraph>(hint);
           for (final line in linesOf(paragraph)) {
             final shown = line.trim();

@@ -333,6 +333,8 @@ void main() {
       await tapKey(tester, 'shift-row-morning');
       await tapKey(tester, 'shift-split');
       await save(tester);
+      // The morning is already on days gone: fewer hours ask which days.
+      await tapKey(tester, 'shift-scope-every-day');
       expect(
         stateOf(tester).palette
             .firstWhere((t) => t.id == 'morning')

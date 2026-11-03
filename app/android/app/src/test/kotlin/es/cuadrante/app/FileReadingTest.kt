@@ -1,6 +1,7 @@
 package es.cuadrante.app
 
 import java.io.ByteArrayInputStream
+import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.util.concurrent.CountDownLatch
@@ -169,5 +170,81 @@ class DeadlineReaderTest {
         val b = threads.poll(2, TimeUnit.SECONDS)
         assertNotEquals(a, b)
         stuck.close()
+    }
+}
+
+class StreamToDiskTest {
+    private val temp = java.nio.file.Files.createTempDirectory("turnly-test").toFile()
+
+    @After
+    fun tearDown() {
+        temp.deleteRecursively()
+    }
+
+    @Test
+    fun copyToFileWritesEverythingWithoutAByteArrayOfTheWhole() {
+        val data = ByteArray(200_000) { (it % 251).toByte() }
+        val target = File(temp, "a.turnly")
+        CappedRead.copyToFile(ByteArrayInputStream(data), target, maxBytes = 300_000, chunkBytes = 4096)
+        assertArrayEquals(data, target.readBytes())
+    }
+
+    @Test
+    fun copyToFileOverTheCapDeletesTheFile() {
+        val target = File(temp, "b.turnly")
+        try {
+            CappedRead.copyToFile(ByteArrayInputStream(ByteArray(500)), target, maxBytes = 100, chunkBytes = 64)
+            fail("should be too large")
+        } catch (e: TooLargeException) {
+            assertTrue(!target.exists())
+        }
+    }
+
+    @Test
+    fun theReaderSavesToTheFileAndKeepsIt() {
+        val reader = DeadlineReader(5_000)
+        try {
+            val data = ByteArray(10_000) { it.toByte() }
+            val target = File(temp, "c.turnly")
+            val outcomes = LinkedBlockingQueue<ReadOutcome>()
+            reader.start({ ByteArrayInputStream(data) }, 1 shl 20, target) { outcomes.put(it) }
+            val outcome = outcomes.poll(5, TimeUnit.SECONDS)
+            assertTrue(outcome is ReadOutcome.Saved)
+            assertArrayEquals(data, target.readBytes())
+        } finally {
+            reader.shutdown()
+        }
+    }
+
+    @Test
+    fun aFailedOrTooLargeReadLeavesNoFile() {
+        val reader = DeadlineReader(5_000)
+        try {
+            val big = File(temp, "d.turnly")
+            val outcomes = LinkedBlockingQueue<ReadOutcome>()
+            reader.start({ ByteArrayInputStream(ByteArray(500)) }, 100, big) { outcomes.put(it) }
+            assertEquals(ReadOutcome.TooLarge, outcomes.poll(5, TimeUnit.SECONDS))
+            val gone = File(temp, "e.turnly")
+            reader.start({ throw SecurityException("grant gone") }, 100, gone) { outcomes.put(it) }
+            assertEquals(ReadOutcome.Unreadable, outcomes.poll(5, TimeUnit.SECONDS))
+            // The delete happens right after the outcome is reported.
+            Thread.sleep(200)
+            assertTrue(!big.exists())
+            assertTrue(!gone.exists())
+        } finally {
+            reader.shutdown()
+        }
+    }
+
+    @Test
+    fun sweepDeletesOnlyOldFiles() {
+        val dir = File(temp, IncomingFiles.DIR_NAME).apply { mkdirs() }
+        val old = File(dir, "old.turnly").apply { writeText("x") }
+        val fresh = File(dir, "fresh.turnly").apply { writeText("x") }
+        val now = System.currentTimeMillis()
+        old.setLastModified(now - 2 * IncomingFiles.MAX_AGE_MILLIS)
+        IncomingFiles.sweep(temp, now)
+        assertTrue(!old.exists())
+        assertTrue(fresh.exists())
     }
 }

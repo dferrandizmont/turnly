@@ -1,9 +1,11 @@
+import 'package:cuadrante/core/l10n/l10n.dart';
 import 'package:cuadrante/features/calendars/domain/calendar.dart';
 import 'package:cuadrante/features/holidays/application/holidays_provider.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/day_sheet.dart';
 import '../support/qa_core.dart';
 import '../support/qa_harness.dart';
 
@@ -133,7 +135,26 @@ Future<void> _daySheet(QaContext qa) async {
       findsOneWidget,
     );
   }
-  expect(inSheet(find.text('Nota')), findsOneWidget);
+  // The note is an always-visible field with a semantic label, rather
+  // than a separate heading in the layered detail.
+  final note = inSheet(find.byKey(const ValueKey('day-note')));
+  // Disposed here, not in a tear-down: the end-of-test check runs first.
+  final semantics = t.ensureSemantics();
+  try {
+    expect(note, findsOneWidget);
+    await t.ensureVisible(note);
+    await t.pump();
+    expect(note.hitTestable(), findsOneWidget);
+    expect(t.widget<TextField>(note).readOnly, isFalse);
+    expect(
+      inSheet(
+        find.bySemanticsLabel(RegExp(t.element(note).l10n.daySheetNote)),
+      ),
+      findsWidgets,
+    );
+  } finally {
+    semantics.dispose();
+  }
   expect(inSheet(find.text('Revisar cuadrante con Marta')), findsOneWidget);
   await qa.shot('festivo');
   await _dismiss(t);
@@ -147,6 +168,7 @@ Future<void> _daySheet(QaContext qa) async {
   // No holiday line («Festivo: <nombre>») and the «Festivo propio» switch of
   // the editable sheet is off.
   expect(inSheet(find.textContaining('Festivo:')), findsNothing);
+  await t.openDayMore();
   expect(
     t
         .widget<SwitchListTile>(

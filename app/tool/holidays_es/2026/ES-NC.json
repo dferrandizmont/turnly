@@ -1,0 +1,11 @@
+{
+"region":"ES-NC",
+"year":2026,
+"kind":"labour",
+"sources":{
+"s1":{"url":"https://bon.navarra.es/es/anuncio/-/texto/2025/241/12","ref":"BON núm. 241, 2.12.2025 — Resolución 682/2025, de 17 de noviembre, del director general de Economía Social y Trabajo, por la que se determinan las fiestas locales para el año 2026, con carácter retribuido y no recuperable, en el ámbito de la Comunidad Foral de Navarra","published":"2025-12-02","retrieved":"2026-10-31"}
+},
+"municipalities":{
+"31201":{"name":"Pamplona/Iruña","days":["2026-11-30","2026-12-03"],"source":"s1"}
+}
+}

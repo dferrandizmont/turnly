@@ -69,8 +69,10 @@ Tamén podes descargar o APK da [última versión](https://github.com/dferrandiz
 <summary>Máis capturas</summary>
 
 <p>
-  <a href="docs/readme/gl/06-festivos.png"><img src="docs/readme/gl/06-festivos.png" width="19%" alt="Festivos da Comunidade de Madrid e do concello de Madrid"></a>
+  <a href="docs/readme/gl/06-festivos.png"><img src="docs/readme/gl/06-festivos.png" width="19%" alt="Festivos por país, comunidade e concello"></a>
   <a href="docs/readme/gl/07-mes-oscuro.png"><img src="docs/readme/gl/07-mes-oscuro.png" width="19%" alt="O mesmo mes co tema escuro"></a>
+  <a href="docs/readme/gl/08-vacaciones.png"><img src="docs/readme/gl/08-vacaciones.png" width="19%" alt="Saldos de vacacións e permisos, cos días que quedan e os arrastrados"></a>
+  <a href="docs/readme/gl/09-cambios.png"><img src="docs/readme/gl/09-cambios.png" width="19%" alt="Libro de cambios co balance de cada compañeiro e as quendas de cada cambio"></a>
 </p>
 
 </details>
@@ -80,31 +82,49 @@ por [tests de Flutter](app/test/store/), tamén [en castelán](README.es.md#capt
 
 ## Funcións
 
-- **Mes en Cuadrícula ou Lista.** Vista anual, axenda e notas por día. Cada quenda
-  leva cor, código e horario; a Lista permite ler os horarios completos. Exportación
-  puntual ao calendario do móbil e imaxes do mes e do ano.
+- **Mes, rotación, axenda e resumo.** Barra inferior (Mes · Rotación · Axenda ·
+  Resumo) e tarxeta de hoxe pregable coa próxima quenda, o próximo día libre e a
+  racha. Cada quenda leva cor, código e horario, en cuadrícula ou lista, con
+  vista anual e notas por día.
 - **Pintar quendas e rotacións.** Toca ou arrasta para seleccionar varios días,
   dobrar, copiar e pegar, desfacer e refacer; asistente de rotacións con vista
-  previa antes de aplicar: quendas rotativas, 24/72, 4×4, 6×4, 5×2, 2-2-3 e
-  patróns propios. Tipos de quenda, cores, iconas e horarios editables.
-- **Festivos de España.** Nacionais e autonómicos incluídos sen conexión; locais
-  para os municipios dispoñibles e opción de engadir os teus.
-- **Alarmas e widgets.** Alarma por tipo de quenda, recordatorios de notas e widgets
-  de Android para consultar as túas quendas desde a pantalla de inicio. A súa
+  previa: quendas rotativas, 24/72, 4×4, 6×4, 5×2, 2-2-3 e patróns propios.
+  Tipos de quenda, cores, iconas e horarios editables.
+- **Festivos por país.** España coas súas comunidades e municipios, e 21 países
+  máis (Portugal, Brasil, Latinoamérica, Europa, Estados Unidos e Canadá), todo
+  sen conexión, ademais dos que engadas ti.
+- **Alarmas, widgets e non molestar.** Alarma por tipo de quenda, recordatorios
+  de notas e widgets de Android, incluído un de catro semanas. En Android,
+  «Silenciar o móbil nas miñas quendas» silénciao mentres traballas. A
   puntualidade depende dos permisos e das restricións do sistema. O widget de
-  iPhone (WidgetKit) está pendente de desenvolver no Mac.
-- **Copias de seguranza e importación.** Copias de seguranza locais automáticas,
-  exportación a `.turnly` (as copias antigas `.cuadrante` seguen abríndose), vista previa ao restaurar e «Probar restauración».
-  Importar copias `.Shifter` de LRHSoft, ficheiros `.ics` ou CSV e eventos do
-  calendario do móbil, revisando as quendas antes de gardalas.
-- **Resumo de horas.** Traballadas, nocturnas, festivas, extra e saídas anticipadas;
-  estimación de ingresos con prezo por hora e plus fixo por quenda.
+  iPhone está pendente.
+- **Copia, informes e calendario do móbil.** Copias de seguranza locais
+  automáticas e, en Android, unha copia diaria na carpeta que escollas (Drive,
+  Dropbox, OneDrive ou o móbil), con vista previa ao restaurar e «Probar
+  restauración». Informes en PDF e CSV dun mes ou das datas que queiras, «Manter
+  ao día» para seguir as túas quendas no calendario do móbil, e importación
+  desde LRHSoft, `.ics`, CSV e o calendario do móbil.
+- **Horas, diñeiro e permisos.** Horas traballadas, nocturnas e festivas, extras
+  e saídas anticipadas; pluses de noite e de festivo por hora; estimación bruta e
+  neta coa retención que poñas. Saldos de vacacións e permisos por ano e tipo,
+  cos días arrastrados e os que che quedan.
 
 <details>
 <summary>Máis funcións</summary>
 
-- **Varios calendarios.** Sen límite de pagamento, e comparación entre dous cadros
-  de quendas.
+- **Libro de cambios.** Anota unha quenda que cedas ou recibas dun compañeiro,
+  mira o seu balance («Débeme 2 quendas», «Débolle 1 quenda»), o estado e as
+  quendas de cada cambio, e aplícao ao calendario cun só desfacer.
+- **Adxuntos e tarefas.** En «Máis opcións» dun día, «Adxuntos» garda as súas
+  fotos, debuxos e ficheiros, e «Tarefas» é a súa lista de comprobación, cada
+  unha cun desfacer.
+- **Comparar calendarios e citas do móbil.** Ata seis calendarios á vez e as
+  citas do móbil xunto ás túas quendas; Turnly só as le.
+- **Aparencia.** Cores de acento, paletas preparadas, imaxe de fondo do
+  calendario, a primeira liña da nota na casela do mes, un clic ao pintar e o
+  código da quenda máis grande.
+- **Varios calendarios.** Todos os que queiras, cada un coas súas rotacións e os
+  seus días.
 - **Accesibilidade.** Selector de idioma, lector de pantalla, texto ampliable e
   quendas que nunca dependen só da cor.
 

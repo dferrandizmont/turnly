@@ -112,20 +112,37 @@ void main() {
     });
 
     test('is refused by inspect without blocking the UI isolate', () async {
-      // A ticker on the UI isolate: if inspect froze it, ticks would stop.
-      var ticks = 0;
+      // A ticker on the UI isolate: if inspect froze it, the gap between two
+      // ticks would grow. The longest gap is measured, not the number of
+      // ticks: a refusal faster than the timer resolution (or a busy machine
+      // that delays timers) can leave no tick at all without any freeze.
+      final watch = Stopwatch()..start();
+      var last = Duration.zero;
+      var longest = Duration.zero;
+      void beat() {
+        final now = watch.elapsed;
+        if (now - last > longest) longest = now - last;
+        last = now;
+      }
+
       final ticker = Stream<void>.periodic(const Duration(milliseconds: 5))
-          .listen((_) => ticks++);
+          .listen((_) => beat());
       addTearDown(ticker.cancel);
 
-      final watch = Stopwatch()..start();
       await expectLater(
         serviceWith().inspect(bomb),
         throwsA(isA<CorruptBackup>()),
       );
       expect(watch.elapsed, lessThan(const Duration(seconds: 2)));
+      beat(); // the stretch since the last tick counts too
       await ticker.cancel();
-      expect(ticks, greaterThan(0), reason: 'the UI isolate kept running');
+      expect(
+        longest,
+        lessThan(const Duration(milliseconds: 500)),
+        reason:
+            'the UI isolate kept running (longest stall: '
+            '${longest.inMilliseconds} ms)',
+      );
     });
 
     test('a bomb under the old 16 MB cap is refused too', () {

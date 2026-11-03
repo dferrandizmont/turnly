@@ -35,6 +35,14 @@ class SettingsIcons {
   static IconData get weekNumbers =>
       _pick(CupertinoIcons.number, Symbols.tag_rounded);
 
+  /// "Formato de hora".
+  static IconData get timeFormat =>
+      _pick(CupertinoIcons.time, Symbols.schedule_rounded);
+
+  /// "Moneda".
+  static IconData get currency =>
+      _pick(CupertinoIcons.money_dollar_circle, Symbols.payments_rounded);
+
   /// "Idioma".
   static IconData get language =>
       _pick(CupertinoIcons.globe, Symbols.language_rounded);

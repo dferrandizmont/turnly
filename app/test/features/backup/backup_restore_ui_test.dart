@@ -11,6 +11,7 @@ import 'package:cuadrante/features/backup/data/backup_files.dart'
 import 'package:cuadrante/features/backup/data/icloud_backup_store.dart';
 import 'package:cuadrante/features/backup/data/platform_backup_channel.dart';
 import 'package:cuadrante/features/backup/domain/backup_codec.dart';
+import 'package:cuadrante/features/notes/domain/note_attachment.dart';
 import 'package:cuadrante/features/backup/domain/schedule_fingerprint.dart';
 import 'package:cuadrante/features/calendar/application/schedule_controller.dart';
 import 'package:flutter/material.dart';
@@ -615,6 +616,46 @@ void main() {
       expect(key('restore-progress'), findsNothing);
     });
 
+    testWidgets('a restore whose safety copy left attachments out says so', (
+      tester,
+    ) async {
+      final h = BackupUiHarness(tester);
+      await h.open(
+        extraOverrides: [
+          backupActionsProvider.overrideWith(
+            (ref) => _WarningActions(ref, const [
+              BrokenAttachment('a', AttachmentFault.missing),
+              BrokenAttachment('b', AttachmentFault.damaged),
+            ]),
+          ),
+        ],
+      );
+      await importFile(tester, h, golden);
+      await tester.ensureVisible(key('restore-confirm'));
+      await tester.pump();
+      await tester.tap(key('restore-confirm'));
+      await pumpIo(tester, until: key('restore-done'));
+      expect(
+        find.textContaining('no incluye 2 adjuntos'),
+        findsOneWidget,
+      );
+      // The usual text is still there.
+      expect(find.textContaining('Antes de cambiar nada'), findsOneWidget);
+    });
+
+    testWidgets('a restore with nothing left out shows no warning', (
+      tester,
+    ) async {
+      final h = BackupUiHarness(tester);
+      await h.open();
+      await importFile(tester, h, golden);
+      await tester.ensureVisible(key('restore-confirm'));
+      await tester.pump();
+      await tester.tap(key('restore-confirm'));
+      await pumpIo(tester, until: key('restore-done'));
+      expect(find.textContaining('no incluye'), findsNothing);
+    });
+
     testWidgets('a restore that fails says nothing changed', (tester) async {
       final h = BackupUiHarness(tester);
       await h.open(
@@ -673,9 +714,22 @@ class _SlowActions extends BackupActions {
   final Completer<void> gate;
 
   @override
-  Future<void> restore(PendingRestore pending) async {
+  Future<List<BackupWarning>> restore(PendingRestore pending) async {
     await gate.future;
     return super.restore(pending);
+  }
+}
+
+/// A restore that works and whose safety copy left [skipped] out.
+class _WarningActions extends BackupActions {
+  _WarningActions(super.ref, this.skipped);
+
+  final List<BrokenAttachment> skipped;
+
+  @override
+  Future<List<BackupWarning>> restore(PendingRestore pending) async {
+    await super.restore(pending);
+    return [AttachmentsSkipped(skipped)];
   }
 }
 
@@ -686,5 +740,6 @@ class _FailingActions extends BackupActions {
   final RestoreFailure failure;
 
   @override
-  Future<void> restore(PendingRestore pending) async => throw failure;
+  Future<List<BackupWarning>> restore(PendingRestore pending) async =>
+      throw failure;
 }

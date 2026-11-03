@@ -1,0 +1,51 @@
+group 'es.cuadrante.folderaccess'
+version '1.0'
+
+rootProject.allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+apply plugin: 'com.android.library'
+
+// Same Kotlin set-up as the other plugins of the app (see workmanager_android):
+// AGP 9 has built-in Kotlin, but the app sets android.builtInKotlin=false, so
+// this module applies the Kotlin Gradle plugin itself unless built-in Kotlin
+// is active.
+def agpMajor = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')[0] as int
+def builtInKotlin = agpMajor >= 9 &&
+    project.findProperty('android.builtInKotlin')?.toString() != 'false'
+if (!builtInKotlin) {
+    apply plugin: 'kotlin-android'
+}
+
+android {
+    namespace 'es.cuadrante.folderaccess'
+    compileSdk 36
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+    defaultConfig {
+        minSdkVersion 24
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    if (agpMajor < 9) {
+        kotlinOptions {
+            jvmTarget = '17'
+        }
+    }
+}
+
+if (agpMajor >= 9) {
+    kotlin {
+        compilerOptions {
+            jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+        }
+    }
+}

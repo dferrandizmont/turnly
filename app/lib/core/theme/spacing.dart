@@ -141,6 +141,10 @@ class Disc {
   /// Shift puck of the paint tools.
   static const double puck = 54;
 
+  /// Shift puck of the paint sheet: the minimum touch target, so the sheet
+  /// leaves the month its room (decision 28).
+  static const double toolPuck = 48;
+
   /// Round undo / redo buttons of the paint tools.
   static const double round = 48;
 }

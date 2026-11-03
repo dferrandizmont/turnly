@@ -66,10 +66,54 @@ extension ShiftTypeRowMapper on ShiftTypeRow {
       alarmSound: alarmSound == null || alarmSound!.isEmpty ? null : alarmSound,
       segment2StartMinute: segment2Valid ? segment2StartMinute : null,
       segment2DurationMinutes: segment2Valid ? segment2DurationMinutes : null,
+      // A blank place (the CHECK stops it) reads as none.
+      location: location == null || location!.trim().isEmpty
+          ? null
+          : location,
+      nightPlusCentsPerHour: nightPlusCentsPerHour,
+      holidayPlusCentsPerHour: holidayPlusCentsPerHour,
     ),
     sortOrder: sortOrder,
     archived: archived,
   );
+}
+
+extension ShiftTypeVersionRowMapper on ShiftTypeVersionRow {
+  ShiftTypeVersion toVersion() => ShiftTypeVersion(
+    until: untilDate,
+    terms: ShiftTerms(
+      category: category,
+      startMinute: startMinute,
+      endMinute: endMinute,
+      paidMinutes: paidMinutes,
+      nightOverride: nightOverride,
+      hourlyRateCents: hourlyRateCents,
+      fixedPlusCents: fixedPlusCents,
+      segment2StartMinute: segment2StartMinute,
+      segment2DurationMinutes: segment2DurationMinutes,
+      nightPlusCentsPerHour: nightPlusCentsPerHour,
+      holidayPlusCentsPerHour: holidayPlusCentsPerHour,
+    ),
+  );
+}
+
+/// The stored versions of each type, by type id. A version whose terms the
+/// domain refuses (a second segment that does not fit: only through a bug or
+/// a hand-edited file; the CHECKs stop the rest) is left out, so a bad row
+/// never breaks the app: those days fall to the next version.
+Map<String, List<ShiftTypeVersion>> groupShiftTypeVersions(
+  Iterable<ShiftTypeVersionRow> rows,
+) {
+  final byType = <String, List<ShiftTypeVersion>>{};
+  for (final row in rows) {
+    final version = row.toVersion();
+    if (version.terms.problem != null) continue;
+    (byType[row.shiftTypeId] ??= []).add(version);
+  }
+  return {
+    for (final MapEntry(:key, :value) in byType.entries)
+      key: sortedVersions(value),
+  };
 }
 
 extension PatternRowMapper on PatternRow {
@@ -107,6 +151,12 @@ extension DayEntryRowMapper on DayEntryRow {
     earlyLeaveMinutes: earlyLeaveMinutes != null && earlyLeaveMinutes! >= 0
         ? earlyLeaveMinutes!.clamp(0, maxDayExtraMinutes)
         : null,
+    extraAmountCents:
+        extraAmountCents != null &&
+            extraAmountCents! >= -maxStoredMoneyCents &&
+            extraAmountCents! <= maxStoredMoneyCents
+        ? extraAmountCents
+        : null,
   );
 }
 
@@ -133,10 +183,35 @@ extension ShiftTypeRecordMapper on ShiftTypeRecord {
     alarmSound: Value(type.alarmSound),
     segment2StartMinute: Value(type.segment2StartMinute),
     segment2DurationMinutes: Value(type.segment2DurationMinutes),
+    location: Value(type.location),
+    nightPlusCentsPerHour: Value(type.nightPlusCentsPerHour),
+    holidayPlusCentsPerHour: Value(type.holidayPlusCentsPerHour),
     sortOrder: sortOrder,
     archived: Value(archived),
     createdAt: createdAt,
     updatedAt: updatedAt,
+  );
+}
+
+extension ShiftTypeVersionMapper on ShiftTypeVersion {
+  ShiftTypeVersionsCompanion toCompanion({
+    required String shiftTypeId,
+    required int createdAt,
+  }) => ShiftTypeVersionsCompanion.insert(
+    shiftTypeId: shiftTypeId,
+    untilDate: until,
+    category: terms.category,
+    startMinute: Value(terms.startMinute),
+    endMinute: Value(terms.endMinute),
+    paidMinutes: Value(terms.paidMinutes),
+    nightOverride: Value(terms.nightOverride),
+    hourlyRateCents: Value(terms.hourlyRateCents),
+    fixedPlusCents: Value(terms.fixedPlusCents),
+    segment2StartMinute: Value(terms.segment2StartMinute),
+    segment2DurationMinutes: Value(terms.segment2DurationMinutes),
+    nightPlusCentsPerHour: Value(terms.nightPlusCentsPerHour),
+    holidayPlusCentsPerHour: Value(terms.holidayPlusCentsPerHour),
+    createdAt: createdAt,
   );
 }
 
@@ -181,6 +256,7 @@ extension DayEntryMapper on DayEntry {
     noteReminderMinute: Value(noteReminderMinute),
     overtimeMinutes: Value(overtimeMinutes),
     earlyLeaveMinutes: Value(earlyLeaveMinutes),
+    extraAmountCents: Value(extraAmountCents),
     updatedAt: updatedAt,
   );
 }

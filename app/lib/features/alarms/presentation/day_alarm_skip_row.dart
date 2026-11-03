@@ -9,6 +9,29 @@ import '../application/alarm_providers.dart';
 import '../domain/alarm_planner.dart';
 import '../../../core/widgets/app_snack_bar.dart';
 
+/// Whether the «Sin alarma este día» switch of [date] shows (see
+/// [DayAlarmSkipRow]): `null` when it does not, otherwise whether the day is
+/// skipped. «Más opciones» of the day detail names it only when it shows.
+bool? watchDayAlarmSkip(WidgetRef ref, CivilDate date) {
+  final settings = ref.watch(alarmSettingsProvider).value;
+  final primaryId = ref.watch(
+    calendarsControllerProvider.select((c) => c.value?.primaryId),
+  );
+  final viewing = ref.watch(
+    scheduleControllerProvider.select((s) => (s.calendarId, s.schedule)),
+  );
+  if (settings == null || !settings.enabled || primaryId != viewing.$1) {
+    return null;
+  }
+  final skipped = settings.isSkipped(date);
+  final rings = viewing.$2
+      .resolve(date)
+      .shifts
+      .any((s) => canShiftTypeRing(s) && settings.forShiftType(s.id).enabled);
+  if (!rings && !skipped) return null;
+  return skipped;
+}
+
 /// «Sin alarma este día» in the day detail: a switch that stops every alarm
 /// of the shifts starting on [date] (the setting lives in the alarm settings,
 /// `skippedDates`, so it survives repainting the day).
@@ -24,22 +47,8 @@ class DayAlarmSkipRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final settings = ref.watch(alarmSettingsProvider).value;
-    final primaryId = ref.watch(
-      calendarsControllerProvider.select((c) => c.value?.primaryId),
-    );
-    final viewing = ref.watch(
-      scheduleControllerProvider.select((s) => (s.calendarId, s.schedule)),
-    );
-    if (settings == null || !settings.enabled || primaryId != viewing.$1) {
-      return const SizedBox.shrink();
-    }
-    final skipped = settings.isSkipped(date);
-    final rings = viewing.$2
-        .resolve(date)
-        .shifts
-        .any((s) => canShiftTypeRing(s) && settings.forShiftType(s.id).enabled);
-    if (!rings && !skipped) return const SizedBox.shrink();
+    final skipped = watchDayAlarmSkip(ref, date);
+    if (skipped == null) return const SizedBox.shrink();
 
     return SwitchListTile(
       key: const ValueKey('day-alarm-skip-switch'),

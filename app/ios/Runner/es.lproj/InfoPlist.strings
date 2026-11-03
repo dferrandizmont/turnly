@@ -1,0 +1,4 @@
+"CFBundleDisplayName" = "Turnly";
+"NSCalendarsFullAccessUsageDescription" = "Para leer turnos de tu calendario al importar y, si tú lo pides, añadir tus turnos al calendario que elijas. Si ese calendario se sincroniza con una cuenta, esa cuenta también los recibirá.";
+"NSCalendarsUsageDescription" = "Para leer turnos de tu calendario al importar y, si tú lo pides, añadir tus turnos al calendario que elijas. Si ese calendario se sincroniza con una cuenta, esa cuenta también los recibirá.";
+"NSCalendarsWriteOnlyAccessUsageDescription" = "Para añadir tus turnos al calendario que elijas, sin leer lo que ya tienes en él. Si ese calendario se sincroniza con una cuenta, esa cuenta también los recibirá.";

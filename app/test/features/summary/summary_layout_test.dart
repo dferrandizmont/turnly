@@ -96,7 +96,7 @@ void main() {
       final context = tester.element(find.byType(SummaryScreen));
       expect(
         tester.widget<Text>(_key('summary-fixed-plus-value')).data,
-        formatEuroCents(context, 15000),
+        formatMoneyCents(context, 15000),
       );
       expect(
         tester.widget<Text>(_key('summary-fixed-plus-detail')).data,
@@ -104,7 +104,7 @@ void main() {
       );
       expect(
         tester.widget<Text>(_key('summary-earnings')).data,
-        formatEuroCents(context, 139800),
+        formatMoneyCents(context, 139800),
       );
       final rect = tester.getRect(row);
       for (final element

@@ -1,0 +1,11 @@
+{
+"region":"ES-CB",
+"year":2026,
+"kind":"labour",
+"sources":{
+"s1":{"url":"https://boc.cantabria.es/boces/verAnuncioAction.do?idAnuBlob=428192","ref":"BOC núm. 238, 11.12.2025, CVE-2025-10276 — Resolución de 2.12.2025 de la Dirección General de Trabajo, Economía Social y Empleo Autónomo por la que se dispone la publicación del calendario de fiestas nacionales, autonómicas y locales en el ámbito de la Comunidad Autónoma de Cantabria para el año 2026","published":"2025-12-11","retrieved":"2026-10-31"}
+},
+"municipalities":{
+"39075":{"name":"Santander","days":["2026-05-25","2026-07-25"],"source":"s1"}
+}
+}

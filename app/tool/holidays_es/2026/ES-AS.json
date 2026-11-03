@@ -1,0 +1,11 @@
+{
+"region":"ES-AS",
+"year":2026,
+"kind":"labour",
+"sources":{
+"s1":{"url":"https://miprincipado.asturias.es/documents/d/guest/2025-04744","ref":"BOPA núm. 114, 16.6.2025 (Cód. 2025-04744) — Resolución de 3 de junio de 2025, de la Consejería de Ciencia, Industria y Empleo, por la que se aprueba el calendario de fiestas locales para el año 2026 en la Comunidad Autónoma del Principado de Asturias","published":"2025-06-16","retrieved":"2026-10-31"}
+},
+"municipalities":{
+"33044":{"name":"Oviedo","days":["2026-05-26","2026-09-21"],"source":"s1"}
+}
+}

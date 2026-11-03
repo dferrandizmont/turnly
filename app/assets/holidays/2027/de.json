@@ -1,0 +1,34 @@
+{
+"schema":1,
+"year":2027,
+"country":"DE",
+"national":[
+{"date":"2027-01-01","name":"Neujahr"},
+{"date":"2027-03-26","name":"Karfreitag"},
+{"date":"2027-03-29","name":"Ostermontag"},
+{"date":"2027-05-01","name":"Erster Mai"},
+{"date":"2027-05-06","name":"Christi Himmelfahrt"},
+{"date":"2027-05-17","name":"Pfingstmontag"},
+{"date":"2027-10-03","name":"Tag der Deutschen Einheit"},
+{"date":"2027-12-25","name":"Erster Weihnachtstag"},
+{"date":"2027-12-26","name":"Zweiter Weihnachtstag"}
+],
+"regional":{
+"DE-BB":[{"date":"2027-03-28","name":"Ostersonntag","origin":"regional"},{"date":"2027-05-16","name":"Pfingstsonntag","origin":"regional"},{"date":"2027-10-31","name":"Reformationstag","origin":"regional"}],
+"DE-BE":[{"date":"2027-03-08","name":"Frauentag","origin":"regional"}],
+"DE-BW":[{"date":"2027-01-06","name":"Heilige Drei Könige","origin":"regional"},{"date":"2027-05-27","name":"Fronleichnam","origin":"regional"},{"date":"2027-11-01","name":"Allerheiligen","origin":"regional"}],
+"DE-BY":[{"date":"2027-01-06","name":"Heilige Drei Könige","origin":"regional"},{"date":"2027-05-27","name":"Fronleichnam","origin":"regional"},{"date":"2027-11-01","name":"Allerheiligen","origin":"regional"}],
+"DE-HB":[{"date":"2027-10-31","name":"Reformationstag","origin":"regional"}],
+"DE-HE":[{"date":"2027-05-27","name":"Fronleichnam","origin":"regional"}],
+"DE-HH":[{"date":"2027-10-31","name":"Reformationstag","origin":"regional"}],
+"DE-MV":[{"date":"2027-03-08","name":"Frauentag","origin":"regional"},{"date":"2027-10-31","name":"Reformationstag","origin":"regional"}],
+"DE-NI":[{"date":"2027-10-31","name":"Reformationstag","origin":"regional"}],
+"DE-NW":[{"date":"2027-05-27","name":"Fronleichnam","origin":"regional"},{"date":"2027-11-01","name":"Allerheiligen","origin":"regional"}],
+"DE-RP":[{"date":"2027-05-27","name":"Fronleichnam","origin":"regional"},{"date":"2027-11-01","name":"Allerheiligen","origin":"regional"}],
+"DE-SH":[{"date":"2027-10-31","name":"Reformationstag","origin":"regional"}],
+"DE-SL":[{"date":"2027-05-27","name":"Fronleichnam","origin":"regional"},{"date":"2027-08-15","name":"Mariä Himmelfahrt","origin":"regional"},{"date":"2027-11-01","name":"Allerheiligen","origin":"regional"}],
+"DE-SN":[{"date":"2027-10-31","name":"Reformationstag","origin":"regional"},{"date":"2027-11-17","name":"Buß- und Bettag","origin":"regional"}],
+"DE-ST":[{"date":"2027-01-06","name":"Heilige Drei Könige","origin":"regional"},{"date":"2027-10-31","name":"Reformationstag","origin":"regional"}],
+"DE-TH":[{"date":"2027-09-20","name":"Weltkindertag","origin":"regional"},{"date":"2027-10-31","name":"Reformationstag","origin":"regional"}]
+}
+}

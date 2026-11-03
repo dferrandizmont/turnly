@@ -59,9 +59,21 @@ dependencies:
   flutter_timezone: ^5.1.1
   share_plus: ^13.3.1
   file_selector: ^1.1.0
+  # Gallery picker for the calendar background picture (UX · Extras visuales).
+  image_picker: ^1.2.4
   device_calendar_plus: ^0.10.2
   home_widget: ^0.10.0
+  # Photos of a day (P2): the camera and the gallery of the system. The
+  # official plugin of flutter.dev; the files of a day are picked with
+  # `file_selector`, already in the project.
   url_launcher: ^6.3.3
+  workmanager: ^0.10.10
+  pdf: ^3.13.1
+  qr_flutter: ^4.1.0
+  # Android folder access (SAF tree) for the automatic folder copy (P10). A
+  # local plugin so its channel also exists in WorkManager's background engine.
+  turnly_folder_access:
+    path: packages/turnly_folder_access
 
 dev_dependencies:
   flutter_test:
@@ -137,6 +149,8 @@ flutter:
   assets:
     - assets/holidays/
     - assets/holidays/2026/
+    # Roboto for the PDF reports (lib/features/reports, Apache 2.0).
+    - assets/fonts/
     - assets/holidays/2026/municipal/
     - assets/holidays/2027/
     - assets/holidays/2027/municipal/

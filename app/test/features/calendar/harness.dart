@@ -1,5 +1,6 @@
 import 'package:cuadrante/app.dart';
 import 'package:cuadrante/core/providers.dart';
+import 'package:cuadrante/features/calendar/application/month_presentation.dart';
 import 'package:cuadrante/features/calendar/application/paint_controller.dart';
 import 'package:cuadrante/features/calendar/application/schedule_controller.dart';
 import 'package:cuadrante/features/calendar/presentation/month_screen.dart';
@@ -34,9 +35,29 @@ Future<void> pumpCalendar(
   // Runs against the seeded database before the app starts (archive a shift
   // type, store a note...); the app then loads what is stored.
   Future<void> Function(ScheduleRepository repository)? prepare,
+  // The «Hoy» card starts folded when the whole month would not fit with it
+  // open (decision 28). Most tests are about the open card, so by default the
+  // person has chosen to open it; a test of the default passes false.
+  bool openCard = true,
+  // A phone with another density (the Pixel 9 is 2.625) and the status and
+  // navigation bars (in dp) that the system takes from its screen.
+  double pixelRatio = 3,
+  EdgeInsets insets = EdgeInsets.zero,
 }) async {
-  tester.view.physicalSize = size * 3;
-  tester.view.devicePixelRatio = 3;
+  tester.view.physicalSize = size * pixelRatio;
+  tester.view.devicePixelRatio = pixelRatio;
+  if (insets != EdgeInsets.zero) {
+    final padding = FakeViewPadding(
+      top: insets.top * pixelRatio,
+      bottom: insets.bottom * pixelRatio,
+    );
+    tester.view.padding = padding;
+    tester.view.viewPadding = padding;
+    addTearDown(() {
+      tester.view.resetPadding();
+      tester.view.resetViewPadding();
+    });
+  }
   tester.platformDispatcher.textScaleFactorTestValue = textScale;
   tester.platformDispatcher.platformBrightnessTestValue = brightness;
   if (locale == null) {
@@ -70,6 +91,10 @@ Future<void> pumpCalendar(
     ),
   );
   await tester.pumpAndSettle();
+  if (openCard) {
+    containerOf(tester).read(todayCardCollapsedProvider.notifier).set(false);
+    await tester.pumpAndSettle();
+  }
 }
 
 ProviderContainer containerOf(WidgetTester tester) =>

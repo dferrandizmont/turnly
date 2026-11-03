@@ -1,0 +1,11 @@
+{
+"region":"ES-ML",
+"year":2026,
+"kind":"labour",
+"sources":{
+"s1":{"url":"https://bomemelilla.es/bome/descargar/BOME-A-2025-1033.pdf","ref":"BOME núm. 6315, 3.10.2025, art. 1033 — Acuerdo del Consejo de Gobierno, de fecha 19 de septiembre de 2025, relativo a calendario laboral para el año 2026","published":"2025-10-03","retrieved":"2026-10-31"}
+},
+"municipalities":{
+"52001":{"name":"Melilla","days":["2026-09-08","2026-09-17"],"source":"s1"}
+}
+}

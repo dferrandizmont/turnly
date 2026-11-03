@@ -1,0 +1,26 @@
+{
+"schema":1,
+"year":2027,
+"country":"CO",
+"national":[
+{"date":"2027-01-01","name":"Año Nuevo"},
+{"date":"2027-01-11","name":"Día de los Reyes Magos (observado)"},
+{"date":"2027-03-22","name":"Día de San José (observado)"},
+{"date":"2027-03-25","name":"Jueves Santo"},
+{"date":"2027-03-26","name":"Viernes Santo"},
+{"date":"2027-05-01","name":"Día del Trabajo"},
+{"date":"2027-05-10","name":"Ascensión del señor (observado)"},
+{"date":"2027-05-31","name":"Corpus Christi (observado)"},
+{"date":"2027-06-07","name":"Sagrado Corazón (observado)"},
+{"date":"2027-07-05","name":"San Pedro y San Pablo (observado)"},
+{"date":"2027-07-12","name":"Día de Nuestra Señora del Rosario de Chiquinquirá (observado)"},
+{"date":"2027-07-20","name":"Día de la Independencia"},
+{"date":"2027-08-07","name":"Batalla de Boyacá"},
+{"date":"2027-08-16","name":"La Asunción (observado)"},
+{"date":"2027-10-18","name":"Día de la Raza (observado)"},
+{"date":"2027-11-01","name":"Día de Todos los Santos"},
+{"date":"2027-11-15","name":"Independencia de Cartagena (observado)"},
+{"date":"2027-12-08","name":"La Inmaculada Concepción"},
+{"date":"2027-12-25","name":"Navidad"}
+]
+}

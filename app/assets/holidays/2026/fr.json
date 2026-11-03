@@ -1,0 +1,34 @@
+{
+"schema":1,
+"year":2026,
+"country":"FR",
+"national":[
+{"date":"2026-01-01","name":"Jour de l'an"},
+{"date":"2026-04-06","name":"Lundi de Pâques"},
+{"date":"2026-05-01","name":"Fête du Travail"},
+{"date":"2026-05-08","name":"Fête de la Victoire"},
+{"date":"2026-05-14","name":"Ascension"},
+{"date":"2026-05-25","name":"Lundi de Pentecôte"},
+{"date":"2026-07-14","name":"Fête nationale"},
+{"date":"2026-08-15","name":"Assomption"},
+{"date":"2026-11-01","name":"Toussaint"},
+{"date":"2026-11-11","name":"Armistice"},
+{"date":"2026-12-25","name":"Noël"}
+],
+"regional":{
+"FR-57":[{"date":"2026-04-03","name":"Vendredi saint","origin":"regional"},{"date":"2026-12-26","name":"Saint-Étienne","origin":"regional"}],
+"FR-6AE":[{"date":"2026-04-03","name":"Vendredi saint","origin":"regional"},{"date":"2026-12-26","name":"Saint-Étienne","origin":"regional"}],
+"FR-971":[{"date":"2026-03-12","name":"Mi-Carême","origin":"regional"},{"date":"2026-04-03","name":"Vendredi saint","origin":"regional"},{"date":"2026-05-27","name":"Abolition de l'esclavage","origin":"regional"},{"date":"2026-07-21","name":"Fête de Victor Schoelcher","origin":"regional"}],
+"FR-972":[{"date":"2026-04-03","name":"Vendredi saint","origin":"regional"},{"date":"2026-05-22","name":"Abolition de l'esclavage","origin":"regional"},{"date":"2026-07-21","name":"Fête de Victor Schoelcher","origin":"regional"}],
+"FR-973":[{"date":"2026-06-10","name":"Abolition de l'esclavage","origin":"regional"}],
+"FR-974":[{"date":"2026-12-20","name":"Abolition de l'esclavage","origin":"regional"}],
+"FR-976":[{"date":"2026-04-27","name":"Abolition de l'esclavage","origin":"regional"}],
+"FR-BL":[{"date":"2026-10-09","name":"Abolition de l'esclavage","origin":"regional"}],
+"FR-MF":[{"date":"2026-05-28","name":"Abolition de l'esclavage","origin":"regional"},{"date":"2026-07-21","name":"Fête de Victor Schoelcher","origin":"regional"}],
+"FR-NC":[{"date":"2026-09-24","name":"Fête de la Citoyenneté","origin":"regional"}],
+"FR-PF":[{"date":"2026-03-05","name":"Arrivée de l'Évangile","origin":"regional"},{"date":"2026-04-03","name":"Vendredi saint","origin":"regional"},{"date":"2026-11-20","name":"Matāri'i","origin":"regional"}],
+"FR-PM":[],
+"FR-TF":[],
+"FR-WF":[{"date":"2026-04-28","name":"Saint Pierre Chanel","origin":"regional"},{"date":"2026-06-29","name":"Saints Pierre et Paul","origin":"regional"},{"date":"2026-07-29","name":"Fête du Territoire","origin":"regional"}]
+}
+}

@@ -191,7 +191,9 @@ void main() {
       await pumpCalendar(tester, prepare: _rates);
       await _openSummary(tester);
 
-      expect(_text(tester, 'summary-hours'), '160 h');
+      // October holds today: 96 h worked before the 19th, 64 h planned.
+      expect(_text(tester, 'summary-hours'), '96 h');
+      expect(_text(tester, 'summary-legend-planned'), '64 h');
       expect(_text(tester, 'summary-shifts-value'), '20');
       expect(find.text('19 días'), findsOneWidget);
       expect(_text(tester, 'summary-night-value'), '40 h');
@@ -271,6 +273,10 @@ void main() {
       await pumpCalendar(tester);
       await _openSummary(tester);
       expect(_key('summary-earnings'), findsNothing);
+      // B5: folded into one line until it is opened.
+      expect(_key('summary-estimate'), findsNothing);
+      expect(find.text('Sin precios'), findsOneWidget);
+      await _tap(tester, 'summary-estimate-fold');
       expect(
         _text(tester, 'summary-earnings-none'),
         'Pon el precio por hora o el plus por turno en Mis turnos para ver el '
@@ -334,7 +340,9 @@ void main() {
             },
           );
           final container = containerOf(tester);
-          final controller = container.read(scheduleControllerProvider.notifier);
+          final controller = container.read(
+            scheduleControllerProvider.notifier,
+          );
           // June is before the demo rotation: this is its only shift.
           const day = CivilDate(2026, 6, 21);
           controller.setDayShifts(day, const ['plus-only']);
@@ -353,7 +361,10 @@ void main() {
             expect(_text(tester, 'summary-fixed-plus-value'), '30,00$_nbsp€');
             expect(_text(tester, 'summary-fixed-plus-detail'), '1 turno');
             if (earlyLeave) {
-              expect(_text(tester, 'summary-early-leave-value'), '${_minus}8 h');
+              expect(
+                _text(tester, 'summary-early-leave-value'),
+                '${_minus}8 h',
+              );
             }
           }
         },
@@ -388,7 +399,7 @@ void main() {
     testWidgets('painting a day is reflected when coming back', (tester) async {
       await pumpCalendar(tester);
       await _openSummary(tester);
-      expect(_text(tester, 'summary-hours'), '160 h');
+      expect(_text(tester, 'summary-legend-planned'), '64 h');
       final container = ProviderScope.containerOf(
         tester.element(find.byType(SummaryScreen)),
       );
@@ -398,7 +409,7 @@ void main() {
         const ['morning'],
       );
       await tester.pumpAndSettle();
-      expect(_text(tester, 'summary-hours'), '168 h');
+      expect(_text(tester, 'summary-legend-planned'), '72 h');
     });
   });
 
@@ -438,7 +449,7 @@ void main() {
       expect(_text(tester, 'summary-range-days'), startsWith('31 días'));
       expect(_text(tester, 'summary-hours'), monthHours);
       expect(_text(tester, 'summary-earnings'), monthEstimate);
-      expect(_text(tester, 'summary-hours'), '160 h');
+      expect(_text(tester, 'summary-hours'), '96 h');
       // No month-bound actions: the share image is only for months.
       expect(_key('summary-share'), findsNothing);
       // Back to the month.
@@ -588,7 +599,7 @@ void main() {
 
       await _tap(tester, 'summary-year-row-10');
       expect(_text(tester, 'summary-period'), 'Octubre 2026');
-      expect(_text(tester, 'summary-hours'), '160 h');
+      expect(_text(tester, 'summary-hours'), '96 h');
     });
 
     testWidgets('the arrows change the year; an empty year says so', (

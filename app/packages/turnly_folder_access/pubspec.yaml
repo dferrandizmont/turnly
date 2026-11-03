@@ -1,0 +1,25 @@
+name: turnly_folder_access
+description: >-
+  Android folder access for Turnly's automatic folder copies: the system folder
+  picker (ACTION_OPEN_DOCUMENT_TREE) with a persistable permission, and list,
+  write, read and delete of Turnly's own files in that folder. A plugin (not
+  code in MainActivity) so the channel also exists in the background engine
+  that WorkManager starts. No Dart code: the app talks to the channel
+  `app.cuadrante/folder_backup` itself (docs/copia-de-seguridad.md, section 11).
+version: 0.1.0
+publish_to: 'none'
+
+environment:
+  sdk: ^3.13.5
+  flutter: ">=3.47.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: es.cuadrante.folderaccess
+        pluginClass: FolderAccessPlugin

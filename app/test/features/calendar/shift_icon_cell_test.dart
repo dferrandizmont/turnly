@@ -108,6 +108,8 @@ void main() {
         textScale: 1.3,
         prepare: _prepare,
       );
+      // Below the fold since B1 (the «Hoy» card and the bar).
+      await revealCell(tester, _long);
       expect(_icon(_noche), findsNothing);
       expect(_inCell(_noche, find.text('N')), findsOneWidget);
       expect(_icon(_long), findsNothing);
@@ -125,6 +127,7 @@ void main() {
           prepare: _prepare,
         );
         expect(tester.takeException(), isNull);
+        await revealCell(tester, _noche);
         // What is drawn (FittedBox included) is as tall as the code of a
         // shift without icon that has the same kind of time line.
         double drawn(CivilDate date, String code) {

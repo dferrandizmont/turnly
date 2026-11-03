@@ -79,6 +79,10 @@ class PaintController extends Notifier<PaintState> {
   void selectEraser() => state = state.copyWith(clearShiftTypeId: true);
 
   void toggleDoubling() => state = state.copyWith(doubling: !state.doubling);
+
+  /// The mode of the paint bar (B3): «Añadir otro turno» (doblar) when
+  /// [doubling], «Cambiar el turno» otherwise.
+  void setDoubling(bool doubling) => state = state.copyWith(doubling: doubling);
 }
 
 final paintControllerProvider = NotifierProvider<PaintController, PaintState>(

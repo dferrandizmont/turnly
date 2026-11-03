@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart';
 
+import '../domain/holiday_country.dart';
 import '../domain/holiday_entry.dart';
 import 'holiday_bundle_format.dart';
 
@@ -31,7 +32,8 @@ class HolidayBundleLoader {
     return HolidayManifest.fromJson(_decode(bytes, 'manifest.json'));
   }
 
-  /// Every `es.json` and `municipal/*.json` of the bundle as rows.
+  /// Every `es.json`, `municipal/*.json` and country file (`<cc>.json`) of
+  /// the bundle as rows.
   Future<LoadedHolidayBundle> load({HolidayManifest? manifest}) async {
     final m = manifest ?? await readManifest();
     final entries = <HolidayEntry>[];
@@ -41,6 +43,15 @@ class HolidayBundleLoader {
           entries.addAll(parseEsFile(await _readJson(file)));
         case HolidayFileKind.municipal:
           entries.addAll(parseMunicipalFile(await _readJson(file)));
+        case HolidayFileKind.country:
+          final json = await _readJson(file);
+          if (normalizeCountryCode(json['country'] as String?) !=
+              file.country) {
+            throw HolidayBundleException(
+              '${file.path}: country does not match the manifest',
+            );
+          }
+          entries.addAll(parseCountryFile(json));
         case HolidayFileKind.municipalities:
           break;
       }

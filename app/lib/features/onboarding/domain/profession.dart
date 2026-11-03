@@ -1,7 +1,12 @@
+import '../../holidays/domain/holiday_country.dart';
 import '../../schedule/domain/schedule_domain.dart';
 
 /// "¿A qué te dedicas?" (turnos-spec.md section 4, first use). The choice
 /// preloads the shift types and the patterns typical of the job.
+///
+/// Spain gets the list of the Spanish sector (TCAE, Guardia Civil...); any
+/// other country a neutral one ([professionsFor]). The names come from
+/// `ProfessionText` and follow the same country.
 enum Profession {
   nursing,
   medicine,
@@ -10,6 +15,12 @@ enum Profession {
   industry,
   security,
   hospitality,
+
+  /// Only outside Spain (in Spain it is part of «Hostelería y comercio»).
+  commerce,
+
+  /// Only outside Spain.
+  transport,
   other;
 
   /// The value stored in the `onboarding.profile` setting.
@@ -42,10 +53,16 @@ enum Profession {
       ProfessionHours('morning', 8, 16),
       ProfessionHours('afternoon', 16, 0),
     ],
-    // Firefighters (G 24 h), industry (M 06-14, T 14-22, N 22-06), private
-    // security (D / N 12 h) and "other" already match the standard palette.
+    Profession.commerce => const [
+      ProfessionHours('morning', 9, 15),
+      ProfessionHours('afternoon', 15, 21),
+    ],
+    // Firefighters (G 24 h), industry and transport (M 06-14, T 14-22,
+    // N 22-06), private security (D / N 12 h) and "other" already match the
+    // standard palette.
     Profession.firefighters ||
     Profession.industry ||
+    Profession.transport ||
     Profession.security ||
     Profession.other => const [],
   };
@@ -108,6 +125,21 @@ enum Profession {
       'personalDay',
       'vacation',
     ],
+    Profession.commerce => const [
+      'morning',
+      'afternoon',
+      'rest',
+      'vacation',
+      'personalDay',
+    ],
+    Profession.transport => const [
+      'morning',
+      'afternoon',
+      'night',
+      'rest',
+      'vacation',
+      'personalDay',
+    ],
     Profession.other => const [],
   };
 
@@ -126,7 +158,52 @@ enum Profession {
     ],
     Profession.security => const ['2-2-3', '12h', '4x4', '6x4'],
     Profession.hospitality => const ['5x2', '6x4', 'correturnos'],
+    Profession.commerce => const ['5x2', '6x4'],
+    Profession.transport => const ['6x4', '4x4', 'continental', '5x2'],
     Profession.other => const [],
+  };
+}
+
+/// The professions of step 1 in Spain, in order: those of the Spanish sector.
+const List<Profession> spainProfessions = [
+  Profession.nursing,
+  Profession.medicine,
+  Profession.police,
+  Profession.firefighters,
+  Profession.industry,
+  Profession.security,
+  Profession.hospitality,
+  Profession.other,
+];
+
+/// The professions of step 1 anywhere else, in order: neutral names, no
+/// Guardia Civil, TCAE or medicine on its own (it is part of health care).
+const List<Profession> neutralProfessions = [
+  Profession.nursing,
+  Profession.security,
+  Profession.police,
+  Profession.firefighters,
+  Profession.industry,
+  Profession.hospitality,
+  Profession.commerce,
+  Profession.transport,
+  Profession.other,
+];
+
+/// What step 1 offers to someone working in [countryCode].
+List<Profession> professionsFor(String countryCode) =>
+    countryCode == spainCountryCode ? spainProfessions : neutralProfessions;
+
+/// [profession] in the list of [countryCode]: itself when that list has it,
+/// otherwise the closest one there (medicine is health care abroad; commerce
+/// is «Hostelería y comercio» in Spain; transport is «Otro»). Used when the
+/// country changes after step 1.
+Profession professionForCountry(Profession profession, String countryCode) {
+  if (professionsFor(countryCode).contains(profession)) return profession;
+  return switch (profession) {
+    Profession.medicine => Profession.nursing,
+    Profession.commerce => Profession.hospitality,
+    _ => Profession.other,
   };
 }
 

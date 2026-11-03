@@ -426,7 +426,7 @@ void main() {
     });
   });
 
-  test('schema version 4 is what the file records', () async {
+  test('schema version 5 is what the file records', () async {
     final dir = makeTempDir('version');
     final file = File(p.join(dir.path, databaseFileName));
     final onDisk = await openAppDatabase(directory: dir);
@@ -439,7 +439,7 @@ void main() {
       raw.select('PRAGMA user_version').single.values.single,
       AppDatabase.latestSchemaVersion,
     );
-    expect(AppDatabase.latestSchemaVersion, 4);
+    expect(AppDatabase.latestSchemaVersion, 6);
     // A fresh install needs no backup.
     expect(
       Directory(p.join(dir.path, backupsDirectoryName)).existsSync(),

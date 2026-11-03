@@ -1,0 +1,42 @@
+{
+"schema":1,
+"year":2027,
+"country":"PT",
+"national":[
+{"date":"2027-01-01","name":"Ano Novo"},
+{"date":"2027-03-26","name":"Sexta-feira Santa"},
+{"date":"2027-03-28","name":"Páscoa"},
+{"date":"2027-04-25","name":"Dia da Liberdade"},
+{"date":"2027-05-01","name":"Dia do Trabalhador"},
+{"date":"2027-05-27","name":"Corpo de Deus"},
+{"date":"2027-06-10","name":"Dia de Portugal, de Camões e das Comunidades Portuguesas"},
+{"date":"2027-08-15","name":"Assunção de Nossa Senhora"},
+{"date":"2027-10-05","name":"Implantação da República"},
+{"date":"2027-11-01","name":"Dia de Todos os Santos"},
+{"date":"2027-12-01","name":"Restauração da Independência"},
+{"date":"2027-12-08","name":"Imaculada Conceição"},
+{"date":"2027-12-25","name":"Dia de Natal"}
+],
+"regional":{
+"PT-01":[{"date":"2027-05-12","name":"Dia de Santa Joana","origin":"regional"}],
+"PT-02":[{"date":"2027-05-06","name":"Quinta-feira da Ascensão","origin":"regional"}],
+"PT-03":[{"date":"2027-06-24","name":"Dia de São João","origin":"regional"}],
+"PT-04":[{"date":"2027-08-22","name":"Dia de Nossa Senhora das Graças","origin":"regional"}],
+"PT-05":[{"date":"2027-04-13","name":"Dia de Nossa Senhora de Mércoles","origin":"regional"}],
+"PT-06":[{"date":"2027-07-04","name":"Dia de Santa Isabel","origin":"regional"}],
+"PT-07":[{"date":"2027-06-29","name":"Dia de São Pedro","origin":"regional"}],
+"PT-08":[{"date":"2027-09-07","name":"Dia do Município de Faro","origin":"regional"}],
+"PT-09":[{"date":"2027-11-27","name":"Dia do Município da Guarda","origin":"regional"}],
+"PT-10":[{"date":"2027-05-22","name":"Dia do Município de Leiria","origin":"regional"}],
+"PT-11":[{"date":"2027-06-13","name":"Dia de Santo António","origin":"regional"}],
+"PT-12":[{"date":"2027-05-23","name":"Dia do Município de Portalegre","origin":"regional"}],
+"PT-13":[{"date":"2027-06-24","name":"Dia de São João","origin":"regional"}],
+"PT-14":[{"date":"2027-03-19","name":"Dia de São José","origin":"regional"}],
+"PT-15":[{"date":"2027-09-15","name":"Dia de Bocage","origin":"regional"}],
+"PT-16":[{"date":"2027-08-20","name":"Dia de Nossa Senhora da Agonia","origin":"regional"}],
+"PT-17":[{"date":"2027-06-13","name":"Dia de Santo António","origin":"regional"}],
+"PT-18":[{"date":"2027-09-21","name":"Dia de São Mateus","origin":"regional"}],
+"PT-20":[{"date":"2027-05-17","name":"Dia da Região Autónoma dos Açores","origin":"regional"}],
+"PT-30":[{"date":"2027-07-01","name":"Dia da Região Autónoma da Madeira e das Comunidades Madeirenses","origin":"regional"},{"date":"2027-12-26","name":"Primeira Oitava","origin":"regional"}]
+}
+}

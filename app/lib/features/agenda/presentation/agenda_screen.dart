@@ -10,11 +10,15 @@ import '../../../core/providers.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/choice_pill.dart';
 import '../../../core/widgets/content_app_bar.dart';
+import '../../../core/widgets/empty_illustration.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/page_body.dart';
 import '../../calendar/application/schedule_controller.dart';
 import '../../calendar/presentation/day_detail_sheet.dart';
 import '../../calendar/presentation/shift_format.dart';
+import '../../device_events/application/device_events_providers.dart';
+import '../../device_events/domain/device_event_day.dart';
+import '../../device_events/presentation/device_event_row.dart';
 import '../../holidays/application/holidays_provider.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../application/agenda_mode.dart';
@@ -75,6 +79,9 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen> {
         (mode == AgendaMode.shifts
             ? upcomingShiftDays(schedule, holidays, today)
             : upcomingAgenda(schedule, holidays, today));
+    // The appointments of the phone of the days the list shows (P6): they
+    // are read next to the notes, not on their own.
+    final deviceEvents = _deviceEvents(ref, items, today, searching: searching);
 
     Widget body;
     if (items.isEmpty && dateItem == null) {
@@ -87,6 +94,7 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen> {
             )
           : EmptyState(
               icon: AppIcons.note,
+              illustration: EmptyIllustration(shifts: schedule.shiftTypes),
               title: l10n.agendaEmptyTitle,
               message: l10n.agendaEmptyMessage,
             );
@@ -95,6 +103,7 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen> {
         items: items,
         dateItem: dateItem,
         today: today,
+        deviceEvents: deviceEvents,
         // Days off are written out in the shifts list (a day with nothing
         // on it is a day off, not a gap).
         showFree: !searching && mode == AgendaMode.shifts,
@@ -156,6 +165,30 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen> {
   }
 }
 
+/// The appointments of the phone of the days the list shows (P6), by day.
+///
+/// A search looks through all time, so its days are not read here: the
+/// appointments are shown next to the notes of the list, never on their own.
+/// The range is a year at most, because reading more months of the calendar
+/// of the phone than that is not worth it.
+Map<CivilDate, DeviceEventDay> _deviceEvents(
+  WidgetRef ref,
+  List<AgendaItem> items,
+  CivilDate today, {
+  required bool searching,
+}) {
+  if (searching || items.isEmpty) return const {};
+  var last = today;
+  for (final item in items) {
+    if (item.date.isAfter(last)) last = item.date;
+  }
+  final limit = today.addDays(366);
+  if (last.isAfter(limit)) last = limit;
+  final days = ref.watch(deviceEventRangeProvider((today, last))).value;
+  if (days == null) return const {};
+  return {for (final day in days) day.date: day};
+}
+
 /// The two options of the agenda, «Notas» and «Turnos», as two pills (the
 /// chosen one has a check and a bolder label).
 class _ModeToggle extends StatelessWidget {
@@ -180,12 +213,16 @@ class _ModeToggle extends StatelessWidget {
             ChoicePill(
               key: const ValueKey('agenda-mode-notes'),
               label: l10n.agendaModeNotes,
+              // The icon's room is reserved: choosing one pill does not make
+              // the pair jump sideways (the check lands in the same spot).
+              reserveIcon: true,
               selected: mode == AgendaMode.notes,
               onTap: () => onSelected(AgendaMode.notes),
             ),
             ChoicePill(
               key: const ValueKey('agenda-mode-shifts'),
               label: l10n.agendaModeShifts,
+              reserveIcon: true,
               selected: mode == AgendaMode.shifts,
               onTap: () => onSelected(AgendaMode.shifts),
             ),
@@ -248,6 +285,7 @@ class _AgendaList extends StatelessWidget {
     this.header,
     this.footer,
     this.scope,
+    this.deviceEvents = const {},
   });
 
   final List<AgendaItem> items;
@@ -256,6 +294,9 @@ class _AgendaList extends StatelessWidget {
   final AgendaItem? dateItem;
   final CivilDate today;
   final bool alwaysShowYear;
+
+  /// The appointments of the phone of each day (P6).
+  final Map<CivilDate, DeviceEventDay> deviceEvents;
 
   /// Writes «Libre» on the days without shifts.
   final bool showFree;
@@ -331,6 +372,7 @@ class _AgendaList extends StatelessWidget {
             item: item,
             isToday: item.date == today,
             showFree: free || showFree,
+            deviceEvents: deviceEvents[item.date],
           ),
         };
       },
@@ -364,6 +406,7 @@ class _AgendaRow extends StatelessWidget {
     required this.item,
     required this.isToday,
     this.showFree = false,
+    this.deviceEvents,
   });
 
   final AgendaItem item;
@@ -371,6 +414,9 @@ class _AgendaRow extends StatelessWidget {
 
   /// Writes «Libre» when the day has no shifts.
   final bool showFree;
+
+  /// The appointments of the phone of this day (P6), shown next to the note.
+  final DeviceEventDay? deviceEvents;
 
   bool get _free => showFree && item.shifts.isEmpty;
 
@@ -391,6 +437,8 @@ class _AgendaRow extends StatelessWidget {
       if (item.note != null) l10n.agendaSemanticsNote(item.note!),
       if (item.note != null && item.reminderMinute != null)
         l10n.agendaSemanticsReminder(_clock(format, item.reminderMinute!)),
+      if (deviceEvents != null && deviceEvents!.isNotEmpty)
+        l10n.devEventsCount(deviceEvents!.count),
     ].join(', ');
   }
 
@@ -509,6 +557,21 @@ class _AgendaRow extends StatelessWidget {
                               ),
                           ],
                         ),
+                      ),
+                    // The appointments of the phone, next to the note (P6),
+                    // with a wider gap so they do not read as part of it.
+                    if (deviceEvents != null && deviceEvents!.isNotEmpty)
+                      Padding(
+                        padding: EdgeInsets.only(
+                          top:
+                              item.shifts.isEmpty &&
+                                  item.ownHoliday == null &&
+                                  !_free &&
+                                  item.note == null
+                              ? 0
+                              : Sp.s,
+                        ),
+                        child: DeviceEventList(day: deviceEvents!),
                       ),
                   ],
                 ),

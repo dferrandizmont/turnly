@@ -5,12 +5,20 @@ import 'package:drift/native.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
 
 import '../../../core/database/app_database.dart';
+import '../../calendar_export/data/calendar_sync_repository.dart'
+    show calendarSyncKey;
+import '../../device_events/data/device_events_repository.dart'
+    show deviceEventsKey;
+import '../../notes/data/attachment_store.dart';
+import '../../notes/domain/note_attachment.dart' show AttachmentFault;
 import '../../schedule/domain/schedule_domain.dart';
 import '../../settings/domain/preferences.dart' show PreferenceKeys;
 import '../domain/backup_codec.dart';
 import '../domain/backup_data.dart';
 import '../domain/backup_errors.dart';
 import '../domain/backup_task_runner.dart';
+import '../domain/backup_warnings.dart';
+import '../domain/canonical_json.dart';
 import '../domain/restore_summary.dart';
 import '../domain/schedule_fingerprint.dart';
 import 'backup_files.dart';
@@ -27,19 +35,49 @@ const String userHolidaySource = 'user';
 
 /// Settings that describe the life of this device with the app, not the
 /// person's schedule (`onboarding.done`, `onboarding.profile`,
-/// `onboarding.tipPending`), the "Copia en iCloud" switch ([cloudBackupKey])
-/// and the app's language ([PreferenceKeys.language]): they never go into a
-/// backup file, a file that has them (an older version wrote everything, or
+/// `onboarding.tipPending`), the "Copia en iCloud" switch ([cloudBackupKey]),
+/// the app's language ([PreferenceKeys.language]) and the clock
+/// ([PreferenceKeys.timeFormat]): they never go into a backup file, a file that has them (an older version wrote everything, or
 /// somebody crafted it) does not bring them back, and a restore leaves the
 /// device's own untouched. The iCloud switch must be a consent given on this
 /// device, never one that arrives in a file; the language is how this phone
-/// is set up, and restoring a copy made on another one must not change it.
+/// is set up, and restoring a copy made on another one must not change it
+/// (the clock is the same: it follows the phone, not the person's schedule).
+/// The currency, the week start and the other preferences do travel: the
+/// amounts of the copy only make sense in their currency.
 const String deviceSettingPrefix = 'onboarding.';
 
 bool isDeviceSetting(String key) =>
     key.startsWith(deviceSettingPrefix) ||
     key == cloudBackupKey ||
-    key == PreferenceKeys.language;
+    key == calendarSyncKey ||
+    // Which phone calendars are shown next to the shifts: their ids belong to
+    // the phone that handed them out.
+    key == deviceEventsKey ||
+    key == PreferenceKeys.language ||
+    key == PreferenceKeys.timeFormat ||
+    // The picture behind the month is not in the backup (its file does not
+    // travel), so neither is its path: a restored copy must not point at a
+    // picture of another phone (or at nothing).
+    key == PreferenceKeys.calendarBackground ||
+    // The secret of a published link (docs/compartir.md): a backup file
+    // that travels must never let someone else update or delete the feed.
+    key.startsWith('shareLink.');
+
+/// A `.turnly` just encoded from the data of the phone.
+class BackupEncoding {
+  const BackupEncoding(this.bytes, this.data, this.warnings);
+
+  /// The file: a container when [data] has attachments.
+  final Uint8List bytes;
+
+  /// What the file holds: the data read, without the attachments that were
+  /// left out because their file is lost.
+  final BackupData data;
+
+  /// What was left out ([AttachmentsSkipped]); empty for a whole copy.
+  final List<BackupWarning> warnings;
+}
 
 /// Reads the whole user database for a backup, and replaces it from one
 /// (docs/copia-de-seguridad.md).
@@ -49,9 +87,12 @@ class BackupRepository {
     required this.safetyDirectory,
     required this.appVersion,
     this._codec = const BackupCodec(),
+    this.attachmentStore,
+    this.loadAttachmentStore,
     DateTime Function()? now,
     AppDatabase Function()? openScratchDatabase,
     Future<Uint8List> Function(File)? readSafetyCopy,
+    this.readAttachmentFile,
     this._runner = runInBackgroundIsolate,
     this.keepSafetyCopies = safetyCopiesToKeep,
   }) : _now = now ?? DateTime.now,
@@ -64,6 +105,28 @@ class BackupRepository {
   final AppDatabase Function() _openScratchDatabase;
   final Future<Uint8List> Function(File) _readSafetyCopy;
   final BackupTaskRunner _runner;
+
+  /// How an attachment's file is read when it is checked (`null`: a plain
+  /// read). For tests that need a read to fail. It crosses to the background
+  /// isolate with the job, so it must be a top-level function or `null`.
+  final AttachmentBytesReader? readAttachmentFile;
+
+  /// The files of the attachments of the notes (the `attachments` folder of
+  /// `Application Support`), when the store is already built.
+  final AttachmentStore? attachmentStore;
+
+  /// Resolves the store of the files of the attachments when it is needed
+  /// (the app asks the system for its folder then, and not before: a copy of
+  /// a database without attachments never touches the folder).
+  final Future<AttachmentStore> Function()? loadAttachmentStore;
+
+  Future<AttachmentStore?> _store() async {
+    final store = attachmentStore;
+    if (store != null) return store;
+    final loader = loadAttachmentStore;
+    if (loader == null) return null;
+    return loader();
+  }
 
   static Future<Uint8List> _readSafetyFile(File file) => file.readAsBytes();
 
@@ -97,16 +160,233 @@ class BackupRepository {
   /// nothing. Before touching anything it writes the current data to
   /// `pre-restore-<stamp>.turnly` in [safetyDirectory] and keeps the
   /// newest [keepSafetyCopies]; if that copy cannot be written the restore
-  /// does not start.
+  /// does not start. The safety copy skips the attachments whose file is
+  /// already lost (a damaged photo must not stop the user from restoring); the
+  /// returned warnings say which.
   ///
   /// Bundled and remote holidays are left alone (they are derived data of
   /// this device); the holidays feature recalculates them from the restored
   /// settings.
-  Future<void> restore(BackupData data) async {
+  ///
+  /// A backup with attachments (database v6) brings its files in
+  /// [attachmentFiles] (id -> bytes). They are checked against the size and
+  /// the SHA-256 of their rows when the file is read; pass [verified] `true`
+  /// when they come from `BackupCodec.decode` (which did it, in an isolate) so
+  /// they are not hashed again here. Otherwise they are hashed through the
+  /// runner, never on the UI isolate. The files are written in the store
+  /// **before** the rows, so a disk that cannot hold them stops the restore
+  /// before anything changes; if the writing of the files fails half way, or
+  /// the transaction then fails, the files that were written go away again
+  /// and nothing is left behind. The files that no row points at any more
+  /// (the ones of the replaced data) are deleted when the restore ends.
+  Future<List<BackupWarning>> restore(
+    BackupData data, {
+    Map<String, Uint8List> attachmentFiles = const {},
+    bool verified = false,
+  }) async {
     data.validate();
+    final files = await _checkedAttachmentFiles(
+      data,
+      attachmentFiles,
+      verified: verified,
+    );
     final safe = _withoutForeignSounds(data);
-    await _writeSafetyCopy();
-    await _replaceAll(_db, safe);
+    final safety = await _writeSafetyCopy();
+    final written = await _writeAttachmentFiles(safe, files);
+    try {
+      await _replaceAll(_db, safe);
+    } catch (_) {
+      // The rows did not go in: the files that were written for them must not
+      // stay alone.
+      await _deleteFiles(written);
+      rethrow;
+    }
+    // The files the safety copy had to leave out are not swept: the copy is
+    // the way back, and it does not hold them.
+    await _sweepAttachmentFiles(keep: safety.skippedPaths);
+    return safety.warnings;
+  }
+
+  /// The files of the attachments of [data], by id: what a copy carries next
+  /// to the data (the container names the files by id). Read and checked
+  /// against the size and SHA-256 of their rows in the background isolate.
+  ///
+  /// Throws [BrokenAttachments] (a [CorruptBackup]) naming the attachments
+  /// whose file is missing or is not what its row says: a strict copy never
+  /// leaves without its files. The automatic copies use [encodeCurrent]
+  /// instead, which skips them and warns.
+  Future<Map<String, Uint8List>> attachmentBytes(BackupData data) async {
+    if (data.noteAttachments.isEmpty) return const {};
+    final store = await _store();
+    if (store == null) {
+      throw const CorruptBackup('Attachments without a store');
+    }
+    final rootPath = store.root.path;
+    final refs = _refsOf(data);
+    final read = readAttachmentFile;
+    final check = await _runner(
+      () => readVerifiedAttachmentFiles(rootPath, refs, read: read),
+    );
+    if (check.broken.isNotEmpty) throw BrokenAttachments(check.broken);
+    return check.files;
+  }
+
+  static List<AttachmentFileRef> _refsOf(BackupData data) => [
+    for (final a in data.noteAttachments)
+      (
+        id: a.id,
+        relativePath: a.relativePath,
+        sizeBytes: a.sizeBytes,
+        sha256: a.sha256,
+      ),
+  ];
+
+  /// The `.turnly` of [data] (what [readAll] gave) as of [at]: a container
+  /// with the files of its attachments when it has any. The files are read,
+  /// checked and the whole file encoded in the background isolate, in one
+  /// job (the bytes cross isolates once).
+  ///
+  /// With [strict] a missing or damaged file throws [BrokenAttachments] and
+  /// nothing is written. Without it those attachments are **left out** of the
+  /// copy (their rows stay in the database) and come back in
+  /// [BackupEncoding.warnings]: a copy that lacks a photo that is already lost
+  /// is better than no copy at all (the safety copy before a restore and the
+  /// automatic copies must not stop for it).
+  Future<BackupEncoding> encodeCurrent(
+    BackupData data, {
+    required DateTime at,
+    bool strict = false,
+    String? appVersion,
+  }) async {
+    final codec = _codec;
+    final version = appVersion ?? this.appVersion;
+    if (data.noteAttachments.isEmpty) {
+      final bytes = await _runner(
+        () => codec.encode(data, appVersion: version, exportedAt: at),
+      );
+      return BackupEncoding(bytes, data, const []);
+    }
+    final store = await _store();
+    if (store == null) {
+      throw const CorruptBackup('Attachments without a store');
+    }
+    final rootPath = store.root.path;
+    final refs = _refsOf(data);
+    final read = readAttachmentFile;
+    final job = await _runner(() {
+      final check = readVerifiedAttachmentFiles(rootPath, refs, read: read);
+      if (check.broken.isNotEmpty && strict) {
+        return (bytes: null, broken: check.broken);
+      }
+      final kept = data.withoutAttachments({
+        for (final b in check.broken) b.id,
+      });
+      final bytes = codec.encode(
+        kept,
+        appVersion: version,
+        exportedAt: at,
+        attachmentFiles: check.files,
+      );
+      return (bytes: bytes, broken: check.broken);
+    });
+    final bytes = job.bytes;
+    if (bytes == null) throw BrokenAttachments(job.broken);
+    return BackupEncoding(
+      bytes,
+      data.withoutAttachments({for (final b in job.broken) b.id}),
+      warningsFor(job.broken),
+    );
+  }
+
+  /// The files of [data] checked against its rows: every attachment must
+  /// bring its file, of the right size and (unless [verified]) with the right
+  /// SHA-256, which is then checked through the runner.
+  Future<Map<String, Uint8List>> _checkedAttachmentFiles(
+    BackupData data,
+    Map<String, Uint8List> files, {
+    required bool verified,
+  }) async {
+    for (final a in data.noteAttachments) {
+      final bytes = files[a.id];
+      if (bytes == null) {
+        throw CorruptBackup('Attachment "${a.id}" has no file');
+      }
+      if (bytes.length != a.sizeBytes) {
+        throw CorruptBackup('Attachment "${a.id}" does not match its size');
+      }
+    }
+    if (!verified && data.noteAttachments.isNotEmpty) {
+      final expected = {for (final a in data.noteAttachments) a.id: a.sha256};
+      final wrong = await _runner(() {
+        for (final MapEntry(:key, :value) in expected.entries) {
+          if (sha256Hex(files[key]!) != value) return key;
+        }
+        return null;
+      });
+      if (wrong != null) {
+        throw CorruptBackup('Attachment "$wrong" does not match its SHA-256');
+      }
+    }
+    return files;
+  }
+
+  /// Writes the files of the attachments in the store and returns the paths
+  /// that were written (the ones that were already there are left alone).
+  ///
+  /// If a file cannot be written (a store that is full, a file that is not
+  /// what its path says), the files that were written for this restore go
+  /// away again: a restore that fails leaves no trash.
+  Future<List<String>> _writeAttachmentFiles(
+    BackupData data,
+    Map<String, Uint8List> files,
+  ) async {
+    if (data.noteAttachments.isEmpty) return const [];
+    final store = await _store();
+    if (store == null) {
+      throw const CorruptBackup('Attachments without a store');
+    }
+    final written = <String>[];
+    try {
+      for (final a in data.noteAttachments) {
+        final bytes = files[a.id];
+        if (bytes == null) {
+          throw CorruptBackup('Attachment "${a.id}" has no file');
+        }
+        // The bytes are the verified content of the row and its path is
+        // the one of that hash, so a file there that is not them is damaged:
+        // it is replaced (it could not be read back anyway).
+        if (await store.writeAt(a.relativePath, bytes, replaceDamaged: true)) {
+          written.add(a.relativePath);
+        }
+      }
+    } catch (_) {
+      // The files written for the rows that did not go in must not stay
+      // alone: the restore did not happen.
+      await _deleteFiles(written);
+      rethrow;
+    }
+    return written;
+  }
+
+  Future<void> _deleteFiles(List<String> paths) async {
+    final store = await _store();
+    if (store == null) return;
+    for (final path in paths) {
+      try {
+        await store.delete(path);
+      } on AttachmentStoreException {
+        // The file stays; the next sweep removes it.
+      }
+    }
+  }
+
+  /// Deletes the files that no row points at any more, except the paths in
+  /// [keep].
+  Future<void> _sweepAttachmentFiles({Set<String> keep = const {}}) async {
+    final store = await _store();
+    if (store == null) return;
+    final rows = await _db.select(_db.noteAttachments).get();
+    await store.sweep({for (final row in rows) row.relativePath, ...keep});
   }
 
   /// [data] without the alarm sounds that are not the system's
@@ -175,16 +455,45 @@ class BackupRepository {
     }
   }
 
-  Future<void> _writeSafetyCopy() async {
+  /// Makes the safety copy that a restore needs before it changes anything.
+  /// Returns what it left out as warnings and the store paths of those
+  /// attachments, which the restore must not sweep.
+  ///
+  /// The safety copy carries the attachments too: a restore that goes wrong
+  /// must be undoable, files included. The ones whose file is already lost
+  /// ([AttachmentFault.missing]) or does not match its row
+  /// ([AttachmentFault.damaged]) are left out (and reported): they would stop
+  /// every restore otherwise. A file that is there but **could not be read**
+  /// ([AttachmentFault.unreadable]) is different: it may be perfectly good,
+  /// and the replaced data's files are deleted when the restore ends, so
+  /// going on would lose it for good. That restore is refused before anything
+  /// is written or changed ([BrokenAttachments]); trying again once the file
+  /// reads works.
+  Future<({List<BackupWarning> warnings, Set<String> skippedPaths})>
+  _writeSafetyCopy() async {
     final now = _now();
-    final data = await readAll();
+    final current = await readAll();
     final codec = _codec;
-    final version = appVersion;
-    final bytes = await _runner(
-      () => codec.encode(data, appVersion: version, exportedAt: now),
-    );
+    final encoding = await encodeCurrent(current, at: now);
+    final unreadable = [
+      for (final warning in encoding.warnings)
+        if (warning is AttachmentsSkipped)
+          for (final b in warning.attachments)
+            if (b.fault == AttachmentFault.unreadable) b,
+    ];
+    if (unreadable.isNotEmpty) throw BrokenAttachments(unreadable);
+    final skippedIds = {
+      for (final warning in encoding.warnings)
+        if (warning is AttachmentsSkipped)
+          for (final b in warning.attachments) b.id,
+    };
+    final skippedPaths = {
+      for (final a in current.noteAttachments)
+        if (skippedIds.contains(a.id)) a.relativePath,
+    };
+    final data = encoding.data;
     final file = await newBackupFile(safetyDirectory, _safetyPrefix, now);
-    await writeFileAtomically(file, bytes);
+    await writeFileAtomically(file, encoding.bytes);
     // Verify the file actually persisted, not the in-memory buffer. Neither
     // the live database nor older recovery copies may change on failure.
     final persisted = await _readSafetyCopy(file);
@@ -199,6 +508,7 @@ class BackupRepository {
       backupNamePattern(_safetyPrefix),
       keepSafetyCopies,
     );
+    return (warnings: encoding.warnings, skippedPaths: skippedPaths);
   }
 
   static AppDatabase _openMemoryDatabase() {
@@ -240,6 +550,14 @@ class BackupRepository {
         )..where((h) => h.source.equals(userHolidaySource))).get();
         final balances = await db.select(db.absenceBalances).get();
         final settings = await db.select(db.settings).get();
+        final attachments = await db.select(db.noteAttachments).get();
+        final tasks = await db.select(db.dayTasks).get();
+        final swaps = await db.select(db.shiftSwaps).get();
+        final versionRows = await db.select(db.shiftTypeVersions).get();
+        final versionsByType = <String, List<ShiftTypeVersionRow>>{};
+        for (final v in versionRows) {
+          (versionsByType[v.shiftTypeId] ??= []).add(v);
+        }
 
         return BackupData(
           calendars: [
@@ -272,10 +590,33 @@ class BackupRepository {
                 alarmSound: t.alarmSound,
                 segment2StartMinute: t.segment2StartMinute,
                 segment2DurationMinutes: t.segment2DurationMinutes,
+                location: t.location,
+                nightPlusCentsPerHour: t.nightPlusCentsPerHour,
+                holidayPlusCentsPerHour: t.holidayPlusCentsPerHour,
                 sortOrder: t.sortOrder,
                 archived: t.archived,
                 createdAt: t.createdAt,
                 updatedAt: t.updatedAt,
+                pastVersions: [
+                  for (final v in [
+                    ...?versionsByType[t.id],
+                  ]..sort((a, b) => a.untilDate.compareTo(b.untilDate)))
+                    BackupShiftTypeVersion(
+                      until: v.untilDate,
+                      category: v.category,
+                      startMinute: v.startMinute,
+                      endMinute: v.endMinute,
+                      paidMinutes: v.paidMinutes,
+                      nightOverride: v.nightOverride,
+                      hourlyRateCents: v.hourlyRateCents,
+                      fixedPlusCents: v.fixedPlusCents,
+                      segment2StartMinute: v.segment2StartMinute,
+                      segment2DurationMinutes: v.segment2DurationMinutes,
+                      nightPlusCentsPerHour: v.nightPlusCentsPerHour,
+                      holidayPlusCentsPerHour: v.holidayPlusCentsPerHour,
+                      createdAt: v.createdAt,
+                    ),
+                ],
               ),
           ],
           patterns: [
@@ -311,6 +652,7 @@ class BackupRepository {
                 noteReminderMinute: e.noteReminderMinute,
                 overtimeMinutes: e.overtimeMinutes,
                 earlyLeaveMinutes: e.earlyLeaveMinutes,
+                extraAmountCents: e.extraAmountCents,
                 updatedAt: e.updatedAt,
               ),
           ],
@@ -330,12 +672,71 @@ class BackupRepository {
                 year: b.year,
                 type: b.type,
                 allowedDays: b.allowedDays,
+                calendarId: b.calendarId,
+                name: b.name,
+                periodStart: b.periodStart,
+                periodEnd: b.periodEnd,
+                unit: b.unit,
+                shiftTypeQuarters: b.shiftTypeQuarters ?? const {},
+                carryOver: b.carryOver,
+                carryOverMaxDays: b.carryOverMaxDays,
+                adjustmentDays: b.adjustmentDays,
+                sortOrder: b.sortOrder,
+                createdAt: b.createdAt,
+                updatedAt: b.updatedAt,
               ),
           ],
           settings: {
             for (final s in settings)
               if (!isDeviceSetting(s.key)) s.key: s.value,
           },
+          noteAttachments: [
+            for (final a in attachments)
+              BackupNoteAttachment(
+                id: a.id,
+                calendarId: a.calendarId,
+                date: a.date,
+                kind: a.kind,
+                relativePath: a.relativePath,
+                mimeType: a.mimeType,
+                sizeBytes: a.sizeBytes,
+                sha256: a.sha256,
+                displayName: a.displayName,
+                sortOrder: a.sortOrder,
+                createdAt: a.createdAt,
+              ),
+          ],
+          dayTasks: [
+            for (final t in tasks)
+              BackupDayTask(
+                id: t.id,
+                calendarId: t.calendarId,
+                date: t.date,
+                title: t.title,
+                done: t.done,
+                sortOrder: t.sortOrder,
+                createdAt: t.createdAt,
+                updatedAt: t.updatedAt,
+              ),
+          ],
+          shiftSwaps: [
+            for (final s in swaps)
+              BackupShiftSwap(
+                id: s.id,
+                calendarId: s.calendarId,
+                date: s.date,
+                colleague: s.colleague,
+                direction: s.direction,
+                givenShiftTypeIds: s.givenShiftTypeIds,
+                receivedShiftTypeIds: s.receivedShiftTypeIds,
+                returnDate: s.returnDate,
+                status: s.status,
+                note: s.note,
+                createdAt: s.createdAt,
+                updatedAt: s.updatedAt,
+                closedAt: s.closedAt,
+              ),
+          ],
         );
       });
 
@@ -351,13 +752,17 @@ class BackupRepository {
         ];
         await db.delete(db.patternRuns).go();
         await db.delete(db.dayEntries).go();
+        await db.delete(db.noteAttachments).go();
+        await db.delete(db.dayTasks).go();
+        await db.delete(db.shiftSwaps).go();
+        await db.delete(db.absenceBalances).go();
         await db.delete(db.calendars).go();
         await db.delete(db.patterns).go();
+        await db.delete(db.shiftTypeVersions).go();
         await db.delete(db.shiftTypes).go();
         await (db.delete(
           db.holidays,
         )..where((h) => h.source.equals(userHolidaySource))).go();
-        await db.delete(db.absenceBalances).go();
         await db.delete(db.settings).go();
 
         await db.batch((b) {
@@ -391,11 +796,34 @@ class BackupRepository {
                 alarmSound: Value(t.alarmSound),
                 segment2StartMinute: Value(t.segment2StartMinute),
                 segment2DurationMinutes: Value(t.segment2DurationMinutes),
+                location: Value(t.location),
+                nightPlusCentsPerHour: Value(t.nightPlusCentsPerHour),
+                holidayPlusCentsPerHour: Value(t.holidayPlusCentsPerHour),
                 sortOrder: t.sortOrder,
                 archived: Value(t.archived),
                 createdAt: t.createdAt,
                 updatedAt: t.updatedAt,
               ),
+          ]);
+          b.insertAll(db.shiftTypeVersions, [
+            for (final t in data.shiftTypes)
+              for (final v in t.pastVersions)
+                ShiftTypeVersionsCompanion.insert(
+                  shiftTypeId: t.id,
+                  untilDate: v.until,
+                  category: v.category,
+                  startMinute: Value(v.startMinute),
+                  endMinute: Value(v.endMinute),
+                  paidMinutes: Value(v.paidMinutes),
+                  nightOverride: Value(v.nightOverride),
+                  hourlyRateCents: Value(v.hourlyRateCents),
+                  fixedPlusCents: Value(v.fixedPlusCents),
+                  segment2StartMinute: Value(v.segment2StartMinute),
+                  segment2DurationMinutes: Value(v.segment2DurationMinutes),
+                  nightPlusCentsPerHour: Value(v.nightPlusCentsPerHour),
+                  holidayPlusCentsPerHour: Value(v.holidayPlusCentsPerHour),
+                  createdAt: v.createdAt,
+                ),
           ]);
           // In the order given: it is the insertion (rowid) order.
           b.insertAll(db.patterns, [
@@ -431,7 +859,55 @@ class BackupRepository {
                 noteReminderMinute: Value(e.noteReminderMinute),
                 overtimeMinutes: Value(e.overtimeMinutes),
                 earlyLeaveMinutes: Value(e.earlyLeaveMinutes),
+                extraAmountCents: Value(e.extraAmountCents),
                 updatedAt: e.updatedAt,
+              ),
+          ]);
+          b.insertAll(db.noteAttachments, [
+            for (final a in data.noteAttachments)
+              NoteAttachmentsCompanion.insert(
+                id: a.id,
+                calendarId: a.calendarId,
+                date: a.date,
+                kind: a.kind,
+                relativePath: a.relativePath,
+                mimeType: a.mimeType,
+                sizeBytes: a.sizeBytes,
+                sha256: a.sha256,
+                displayName: Value(a.displayName),
+                sortOrder: Value(a.sortOrder),
+                createdAt: a.createdAt,
+              ),
+          ]);
+          b.insertAll(db.dayTasks, [
+            for (final t in data.dayTasks)
+              DayTasksCompanion.insert(
+                id: t.id,
+                calendarId: t.calendarId,
+                date: t.date,
+                title: t.title,
+                done: Value(t.done),
+                sortOrder: Value(t.sortOrder),
+                createdAt: t.createdAt,
+                updatedAt: t.updatedAt,
+              ),
+          ]);
+          b.insertAll(db.shiftSwaps, [
+            for (final s in data.shiftSwaps)
+              ShiftSwapsCompanion.insert(
+                id: s.id,
+                calendarId: s.calendarId,
+                date: s.date,
+                colleague: s.colleague,
+                direction: s.direction,
+                givenShiftTypeIds: Value(s.givenShiftTypeIds),
+                receivedShiftTypeIds: Value(s.receivedShiftTypeIds),
+                returnDate: Value(s.returnDate),
+                status: Value(s.status),
+                note: Value(s.note),
+                createdAt: s.createdAt,
+                updatedAt: s.updatedAt,
+                closedAt: Value(s.closedAt),
               ),
           ]);
           b.insertAll(db.holidays, [
@@ -451,6 +927,20 @@ class BackupRepository {
                 year: a.year,
                 type: a.type,
                 allowedDays: a.allowedDays,
+                calendarId: Value(a.calendarId),
+                name: Value(a.name),
+                periodStart: Value(a.periodStart),
+                periodEnd: Value(a.periodEnd),
+                unit: Value(a.unit),
+                shiftTypeQuarters: Value(
+                  a.shiftTypeQuarters.isEmpty ? null : a.shiftTypeQuarters,
+                ),
+                carryOver: Value(a.carryOver),
+                carryOverMaxDays: Value(a.carryOverMaxDays),
+                adjustmentDays: Value(a.adjustmentDays),
+                sortOrder: Value(a.sortOrder),
+                createdAt: Value(a.createdAt),
+                updatedAt: Value(a.updatedAt),
               ),
           ]);
           b.insertAll(db.settings, [

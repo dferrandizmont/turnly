@@ -98,7 +98,7 @@ Future<BootstrapResult> bootstrapApp({
   );
   final db = database ?? await openAppDatabase();
   final repository = ScheduleRepository(db, now: clock);
-  final preferences = await _loadPreferences(db);
+  var preferences = await _loadPreferences(db);
   // A new database is seeded with the palette and the patterns in the app's
   // language (the stored one, else the phone's); a stored one is never
   // renamed (see `CatalogTexts`).
@@ -115,6 +115,13 @@ Future<BootstrapResult> bootstrapApp({
     demo: config.useDemoData,
     today: CivilDate.fromDateTime(clock()),
   );
+  // A new installation (not the demo one) gets the formats of the phone's
+  // region: first day of the week, currency and a clock that follows the
+  // phone. An existing one has none of these rows and keeps Monday, euros and
+  // the 24 h clock (docs/formatos.md).
+  if (seeded && !config.useDemoData) {
+    preferences = await _seedRegionDefaults(db, preferences);
+  }
   await _repairShiftCodes(repository);
   final calendars = CalendarsRepository(db, now: clock);
   await calendars.ensureMain();
@@ -144,6 +151,24 @@ Future<void> _repairShiftCodes(ScheduleRepository repository) async {
       'Tipos de turno: no se pudieron revisar los códigos',
       error,
     );
+  }
+}
+
+/// Writes the formats of the phone's region into a new database and returns
+/// the preferences with them. Never blocks start-up.
+Future<Preferences> _seedRegionDefaults(
+  AppDatabase db,
+  Preferences current,
+) async {
+  try {
+    final repository = PreferencesRepository(db);
+    await repository.seedRegionDefaults(
+      debugPhoneLocales ?? ui.PlatformDispatcher.instance.locales,
+    );
+    return await repository.load();
+  } catch (error) {
+    debugLogFailure('Ajustes: no se pudieron fijar los formatos', error);
+    return current;
   }
 }
 

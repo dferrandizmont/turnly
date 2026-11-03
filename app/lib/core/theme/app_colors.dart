@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'app_appearance.dart';
+
 /// Background / foreground pair used by icon discs and callouts.
 @immutable
 class TonePair {
@@ -84,7 +86,8 @@ class AppColors extends ThemeExtension<AppColors> {
   /// Weekday headers, small hours, secondary text: >= 4.5:1 on `surface`.
   final Color textMuted;
 
-  /// Links, switches, labels. Indigo, the "night" shift colour.
+  /// Links, switches, labels. Indigo by default, the user's [AppAccent]
+  /// otherwise ([withAccent]).
   final Color accent;
   final Color onAccent;
 
@@ -216,6 +219,47 @@ class AppColors extends ThemeExtension<AppColors> {
     scrim: Color(0x99000000),
     softShadow: Color(0x00000000),
   );
+
+  /// The same tokens with [accent]'s colours for this brightness in
+  /// `accent`, `accentText` and `accentSoft`. Nothing else changes: the
+  /// highlight (amber), the today ring, the buttons and every shift colour
+  /// stay as they are (`docs/diseno.md`, "Acento elegible").
+  AppColors withAccent(AppAccent accent) {
+    final main = isDark ? accent.dark : accent.light;
+    final soft = isDark ? accent.darkSoft : accent.lightSoft;
+    return AppColors(
+      brightness: brightness,
+      background: background,
+      surface: surface,
+      surfaceMuted: surfaceMuted,
+      surfaceRaised: surfaceRaised,
+      border: border,
+      borderStrong: borderStrong,
+      textPrimary: textPrimary,
+      textSecondary: textSecondary,
+      textMuted: textMuted,
+      accent: main,
+      onAccent: onAccent,
+      accentText: main,
+      accentSoft: soft,
+      controlBorder: controlBorder,
+      highlight: highlight,
+      onHighlight: onHighlight,
+      todayRing: todayRing,
+      holiday: holiday,
+      primaryButton: primaryButton,
+      onPrimaryButton: onPrimaryButton,
+      fab: fab,
+      onFab: onFab,
+      fabBorder: fabBorder,
+      danger: danger,
+      dangerContainer: dangerContainer,
+      success: success,
+      successContainer: successContainer,
+      scrim: scrim,
+      softShadow: softShadow,
+    );
+  }
 
   @override
   AppColors copyWith() => this;

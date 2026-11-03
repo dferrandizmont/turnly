@@ -9,6 +9,8 @@ import 'package:cuadrante/features/backup/domain/backup_data.dart';
 import 'package:cuadrante/features/backup/domain/backup_errors.dart';
 import 'package:cuadrante/features/backup/domain/restore_summary.dart';
 import 'package:cuadrante/features/backup/domain/schedule_fingerprint.dart';
+import 'package:cuadrante/features/device_events/data/device_events_repository.dart'
+    show deviceEventsKey;
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
@@ -339,6 +341,106 @@ void main() {
       test('a file cannot set it on a phone that follows the system', () async {
         await seedDatabase(db, smallData());
         await repository.restore(crafted('"en"'));
+        expect((await stored()).containsKey(key), isFalse);
+      });
+    });
+
+    group('the continuous calendar export belongs to the device', () {
+      const key = 'calendarSync';
+      const row = '{"enabled":true,"deviceCalendarId":"3"}';
+
+      Future<Map<String, String>> stored() async => {
+        for (final r in await db.select(db.settings).get()) r.key: r.value,
+      };
+
+      Future<void> setRow(String value) => db
+          .into(db.settings)
+          .insertOnConflictUpdate(
+            SettingsCompanion.insert(key: key, value: value),
+          );
+
+      test('is a device setting', () {
+        expect(isDeviceSetting(key), isTrue);
+      });
+
+      test('is not exported', () async {
+        await seedDatabase(db, smallData());
+        await setRow(row);
+        expect((await repository.readAll()).settings.containsKey(key), isFalse);
+      });
+
+      test('survives a restore of a file that has none', () async {
+        await seedDatabase(db, smallData());
+        await setRow(row);
+        await repository.restore(buildGoldenBackupData());
+        expect((await stored())[key], row);
+      });
+
+      test('a file cannot turn it on', () async {
+        await seedDatabase(db, smallData());
+        final golden = buildGoldenBackupData();
+        await repository.restore(
+          BackupData(
+            calendars: golden.calendars,
+            shiftTypes: golden.shiftTypes,
+            patterns: golden.patterns,
+            patternRuns: golden.patternRuns,
+            dayEntries: golden.dayEntries,
+            holidays: golden.holidays,
+            absenceBalances: golden.absenceBalances,
+            settings: {...golden.settings, key: row},
+          ),
+        );
+        expect((await stored()).containsKey(key), isFalse);
+      });
+    });
+
+    group('the phone calendars next to the shifts belong to the device', () {
+      const key = deviceEventsKey;
+      const row = '{"calendarIds":["cal-1","cal-2"]}';
+
+      Future<Map<String, String>> stored() async => {
+        for (final r in await db.select(db.settings).get()) r.key: r.value,
+      };
+
+      Future<void> setRow(String value) => db
+          .into(db.settings)
+          .insertOnConflictUpdate(
+            SettingsCompanion.insert(key: key, value: value),
+          );
+
+      test('is a device setting', () {
+        expect(isDeviceSetting(key), isTrue);
+      });
+
+      test('is not exported', () async {
+        await seedDatabase(db, smallData());
+        await setRow(row);
+        expect((await repository.readAll()).settings.containsKey(key), isFalse);
+      });
+
+      test('survives a restore of a file that has none', () async {
+        await seedDatabase(db, smallData());
+        await setRow(row);
+        await repository.restore(buildGoldenBackupData());
+        expect((await stored())[key], row);
+      });
+
+      test('a file cannot set it on another phone', () async {
+        await seedDatabase(db, smallData());
+        final golden = buildGoldenBackupData();
+        await repository.restore(
+          BackupData(
+            calendars: golden.calendars,
+            shiftTypes: golden.shiftTypes,
+            patterns: golden.patterns,
+            patternRuns: golden.patternRuns,
+            dayEntries: golden.dayEntries,
+            holidays: golden.holidays,
+            absenceBalances: golden.absenceBalances,
+            settings: {...golden.settings, key: row},
+          ),
+        );
         expect((await stored()).containsKey(key), isFalse);
       });
     });

@@ -1,0 +1,14 @@
+{
+"schema":1,
+"year":2026,
+"country":"MX",
+"national":[
+{"date":"2026-01-01","name":"Año Nuevo"},
+{"date":"2026-02-02","name":"Día de la Constitución"},
+{"date":"2026-03-16","name":"Natalicio de Benito Juárez"},
+{"date":"2026-05-01","name":"Día del Trabajo"},
+{"date":"2026-09-16","name":"Día de la Independencia"},
+{"date":"2026-11-16","name":"Día de la Revolución"},
+{"date":"2026-12-25","name":"Navidad"}
+]
+}

@@ -1,0 +1,25 @@
+{
+"region":"ES-CL",
+"year":2027,
+"kind":"labour",
+"sources":{
+"s1":{"url":"https://www.diputaciondepalencia.es/system/files/bop/2026/20260713-bop-83-Ordinario.pdf","ref":"BOP de Palencia núm. 83, 13.7.2026 — Acuerdo de determinación de las Fiestas Locales, a efectos laborales, en los municipios de la provincia de Palencia (año 2027), Oficina Territorial de Trabajo, 7.7.2026","published":"2026-07-13","retrieved":"2026-10-31"},
+"s2":{"url":"https://sede.diputaciondesalamanca.gob.es/documentacion/bop/2026/20260708/BOP-SA-20260708-001.pdf","ref":"BOP de Salamanca núm. 129, 8.7.2026, CVE BOP-SA-20260708-001 — Acuerdo de 1 de julio de 2026 de la Oficina Territorial de Trabajo de Salamanca para la determinación de las fiestas locales, a efectos laborales, en los municipios de esta provincia para el año 2027","published":"2026-07-08","retrieved":"2026-10-31"},
+"s3":{"url":"https://www.dipsegovia.es/documents/39512/56aab79e-edee-6aff-6ffd-544ebb560401","ref":"BOP de Segovia núm. 80, 6.7.2026 (RC-9105) — Fiestas locales 2027, Oficina Territorial de Trabajo (resolución de 30.6.2026)","published":"2026-07-06","retrieved":"2026-10-31"},
+"s4":{"url":"http://bop.dipsoria.es/index.php/mod.documentos/mem.descargar/fichero.documentos_1390_b8116e16%232E%23pdf","ref":"BOP de Soria núm. 81, 15.7.2026 (BOPSO-81-15072026) — Acuerdo de 7 de julio de 2026 de la Oficina Territorial de Trabajo por el que se determinan las fiestas laborales (año 2027)","published":"2026-07-15","retrieved":"2026-10-31"},
+"s5":{"url":"https://www.diputaciondezamora.es/opencms/export/sites/dipu-zamora/servicios/BOP/.Archivos/documentos/BOP/anuncios/2026/87/202601859.pdf","ref":"BOP de Zamora núm. 87, 27.7.2026 (anuncio 202601859) — Calendario de fiestas locales para el año 2027, Oficina Territorial de Trabajo (acuerdo de 22.7.2026)","published":"2026-07-27","retrieved":"2026-10-31"},
+"s6":{"url":"https://www.diputacionavila.es/bops/2026/08-07-2026/08-07-2026_144826.pdf","ref":"BOP de Ávila núm. 129, 8.7.2026 — Anuncio núm. 1448/26 de la Oficina Territorial de Trabajo, Calendario de fiestas de carácter local año 2027 (firmado 2.7.2026)","published":"2026-07-08","retrieved":"2026-10-31"},
+"s7":{"url":"https://bop.sede.diputaciondevalladolid.es/boletines/2026/octubre/23/BOPVA-A-2026-03085.pdf","ref":"BOP de Valladolid núm. 2026/204, 23.10.2026, BOPVA-A-2026-03085 — Resolución de 16 de octubre de 2026 de la Oficina Territorial de Trabajo de Valladolid para la determinación de las fiestas locales, a efectos laborales, en los municipios de la provincia de Valladolid (amplía la resolución de 6.7.2026, BOP 2026/129 de 9.7.2026, donde la capital figuraba como no comunicada)","published":"2026-10-23","retrieved":"2026-10-31"},
+"s8":{"url":"http://bopbur.diputaciondeburgos.es/sites/default/files/private/publicado/bopbur-2026-202/bopbur-2026-202-anuncio-202604503.pdf","ref":"BOP de Burgos núm. 202, 23.10.2026, CVE BOPBUR-2026-04503 (anuncio 202604503) — Resolución de 13 de octubre de 2026 de la Oficina Territorial de Trabajo de Burgos sobre calendario de fiestas locales, retribuidas y no recuperables, para el año 2027 (resolución complementaria de la publicada en el BOP de 4.8.2026, núm. 145)","published":"2026-10-23","retrieved":"2026-10-31"}
+},
+"municipalities":{
+"05019":{"name":"Ávila","days":["2027-05-03","2027-10-15"],"source":"s6"},
+"09059":{"name":"Burgos","days":["2027-06-04","2027-06-29"],"source":"s8"},
+"34120":{"name":"Palencia","days":["2027-02-02","2027-09-02"],"source":"s1"},
+"37274":{"name":"Salamanca","days":["2027-06-12","2027-09-08"],"source":"s2"},
+"40194":{"name":"Segovia","days":["2027-06-29","2027-10-25"],"source":"s3"},
+"42173":{"name":"Soria","days":["2027-06-24","2027-10-02"],"source":"s4"},
+"47186":{"name":"Valladolid","days":["2027-05-13","2027-09-08"],"source":"s7"},
+"49275":{"name":"Zamora","days":["2027-05-17","2027-06-29"],"source":"s5"}
+}
+}

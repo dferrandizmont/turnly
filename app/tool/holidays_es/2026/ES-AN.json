@@ -1,0 +1,18 @@
+{
+"region":"ES-AN",
+"year":2026,
+"kind":"labour",
+"sources":{
+"s1":{"url":"https://www.juntadeandalucia.es/boja/2025/197/28","ref":"BOJA núm. 197, 14.10.2025 — Resolución de 6 de octubre de 2025, de la Dirección General de Trabajo, Seguridad y Salud Laboral, por la que se publica la relación de fiestas locales de los municipios de la Comunidad Autónoma de Andalucía para el año 2026","published":"2025-10-14","retrieved":"2026-10-31"}
+},
+"municipalities":{
+"04013":{"name":"Almería","days":["2026-06-24","2026-08-29"],"source":"s1"},
+"11012":{"name":"Cádiz","days":["2026-02-16","2026-10-07"],"source":"s1"},
+"14021":{"name":"Córdoba","days":["2026-09-08","2026-10-24"],"source":"s1"},
+"18087":{"name":"Granada","days":["2026-01-02","2026-06-04"],"source":"s1"},
+"21041":{"name":"Huelva","days":["2026-08-03","2026-09-08"],"source":"s1"},
+"23050":{"name":"Jaén","days":["2026-06-11","2026-11-25"],"source":"s1"},
+"29067":{"name":"Málaga","days":["2026-08-19","2026-09-08"],"source":"s1"},
+"41091":{"name":"Sevilla","days":["2026-04-22","2026-06-04"],"source":"s1"}
+}
+}

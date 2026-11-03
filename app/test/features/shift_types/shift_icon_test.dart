@@ -179,6 +179,9 @@ void main() {
       // Editing something else does not lose it.
       await typeInto(tester, 'shift-rate', '14');
       await save(tester);
+      // The night is already on days gone: a new rate asks which days.
+      await tester.tap(_key('shift-scope-every-day'));
+      await tester.pumpAndSettle();
       expect(
         stateOf(tester).schedule.shiftTypeById('night')!.icon,
         ShiftIcon.moon,

@@ -34,7 +34,7 @@ Desde la raíz del repositorio, en Git Bash (Windows):
 tool/qa/run_android.sh                    # la batería completa
 QA_ONLY=Q02,Q03 tool/qa/run_android.sh    # solo esos escenarios
 QA_SKIP=Q13 tool/qa/run_android.sh        # todos menos esos
-tool/qa/upgrade_android.sh                # solo U02 (actualización real desde la 0.2.0; necesita red)
+tool/qa/upgrade_android.sh                # solo U02 (actualización real desde la 0.6.13; necesita red)
 tool/qa/release_check.sh                  # lo de antes de publicar: batería + U02
 ```
 
@@ -69,7 +69,7 @@ tocas algo de `tool/qa/*.sh`. `build/qa/` se ignora en git (el script crea
 | `QA_TIMEOUT=2400` | Segundos máximos de `flutter test`. |
 | `QA_FLUTTER_ARGS=...` | Argumentos extra para `flutter test`. |
 | `QA_UPGRADE=1` | Después de la batería, ejecuta U02 (necesita red, 5–10 min más). |
-| `QA_OLD_TAG=v0.2.0` | La release desde la que se actualiza en U02. |
+| `QA_OLD_TAG=v0.6.13` | La release desde la que se actualiza en U02. |
 | `QA_CURRENT_APK=ruta.apk` | U02 usa ese APK en lugar de compilar el de release actual. |
 
 **Reglas de seguridad del script.** Nunca toca un emulador que no ha arrancado él: si otra sesión usa
@@ -123,9 +123,10 @@ propósito, 27–28 Vacaciones.
 | Q08 Detalle del día | La hoja de un festivo muestra el nombre del festivo, los turnos (nombre y código) y la nota; un día con nota sin festivo; un día doblado; un día vacío. |
 | Q09 Tema oscuro y texto grande | Tema oscuro con texto ×1,3 y ×2,0: mes, modo pintar (con un trazo) y hoja del día sin ningún `FlutterError`; capturas de cada uno. |
 | Q10 Festivos por comunidad | Solo nacionales: el 26 dic no es festivo; con `ES-CT` sí («San Esteban»); se guarda en `settings`, sobrevive a cerrar la app y se quita al borrar la comunidad. |
-| Q11 Alarmas | Con la alarma de Noche 90 min antes, el plugin real de notificaciones lista las pendientes con nuestro prefijo de payload (≤ 60, las del plan, todas a las 20:30 locales de un día de Noche); al desactivar no queda ninguna. Con el reloj fijo, la primera es el 19 oct a las 20:30. El plugin no expone la hora de disparo: la hora se comprueba en el plan. |
+| Q11 Alarmas | Con la alarma de Noche 90 min antes, el plugin real de notificaciones lista las pendientes con nuestro prefijo de payload (las del plan completo, aviso de renovación incluido cuando el plan se corta por el horizonte; ≤ 61, todas las de turno a las 20:30 locales de un día de Noche); al desactivar no queda ninguna. Con el reloj fijo, la primera es el 19 oct a las 20:30. El plugin no expone la hora de disparo: la hora se comprueba en el plan. |
 | Q12 Copia de seguridad | Exportar con `BackupService` → alterar y vaciar los datos → restaurar: la huella (`scheduleFingerprint`, 730 días) coincide con la original y queda la copia previa `pre-restore`; archivos dañados (byte cambiado, truncado, no es una copia `.turnly`) se rechazan sin tocar los datos. |
 | Q13 Rendimiento | Arranque en frío (abrir el archivo, `bootstrapApp`, primer fotograma con las 42 celdas) con 2 años de turnos en la BD: objetivo < 1 s, **falla por encima de 2 s**. Se miden tres arranques seguidos; el primero es el que cuenta. La cifra sale del build de depuración en el emulador (JIT), así que es una cota alta del rendimiento real. Medido el 19-oct-2026 en `Mochila_Phone` (API 36, 417 días guardados): 237 / 228 / 237 ms. |
+| Q14 Libro de cambios | Ajustes › Libro de cambios: la lista vacía («Todavía no hay cambios»); se anota un cambio (Marta, «Me lo deben», cedes la Noche) y sale en la lista («Pendiente») y en el balance («Me debe 1 turno»), con su fila en `shift_swaps` (`theyOwe`, `["night"]`); «Aplicar al cuadrante» deja el 19 de octubre sin turno (excepción `[]`) y «Deshacer» lo devuelve con **un** solo paso (la fila del día desaparece); «Marcar como devuelto» (21 de octubre) deja el balance a cero («Nada pendiente») y «Marcar como saldado» cierra el cambio (`status = returned`); el detalle del día tiene la sección «Cambio de turno» con el cambio. (`scenarios/swaps.dart`) |
 | Q20 Mis turnos: orden | Ajustes › Mis turnos lista la paleta en su orden; arrastrar el asa de un turno cambia el orden, la BD guarda `sort_order` en ese orden, la barra de pintar lo sigue y sobrevive a reiniciar. (`scenarios/shift_types.dart`) |
 | Q21 Mis turnos: crear | Formulario vacío → mensajes en español y nada guardado; el código se sugiere desde el nombre y uno repetido se rechaza; color de la cuadrícula, 07:30–15:30, descanso de 30 min («Se pagan 7 h 30 min») y 12,50 €/h: la BD guarda `paid_minutes` 450 y `hourly_rate_cents` 1250; se pinta de inmediato y sobrevive a reiniciar. |
 | Q22 Mis turnos: editar | La vista previa (celda real en claro y en oscuro) imprime un contraste ≥ 4,5:1 con los 24 colores de la cuadrícula; capturas en ambos temas; 08:00–08:00 se explica como 24 h y 22:00–06:00 como «termina al día siguiente»; los días que usan el turno cambian al guardar. |
@@ -148,10 +149,10 @@ propósito, 27–28 Vacaciones.
 | Q39 Compartir el año | «Compartir como imagen» entrega un PNG válido (`cuadrante-2026.png`) a la hoja de compartir (sustituida por una función de prueba). |
 | Q50 Enfermería, primer uso en < 60 s | Primer arranque (`scenarios/onboarding.dart`, `onboardingScenarios`): Enfermería → Madrid → 12 horas, día 2 del ciclo → Continuar → Ver mi calendario: **11 toques**; mide `primer_uso_ms` y `primer_uso_toques` y **falla por encima de 60 s o de 12 toques**. Tipos con las horas de enfermería, sin duplicados, `onboarding.profile` guardado y el mes pintado. |
 | Q51 Saltar cada paso | «Saltar» en los cuatro pasos (y «atrás» en medio): calendario en blanco, nada guardado salvo `onboarding.done`; al reiniciar no vuelve. |
-| Q52 Comunidad y municipio | Sevilla avisa de que los locales se añaden a mano; cambiar de comunidad olvida el municipio; Madrid capital marca el 9 nov en el mes y la elección sobrevive a reiniciar. |
+| Q52 Comunidad y municipio | Algeciras avisa de que los locales se añaden a mano; cambiar de comunidad olvida el municipio; Madrid capital marca el 9 nov en el mes y la elección sobrevive a reiniciar. |
 | Q53 Quien actualiza no lo ve | Base con rotación y días (como la que deja la 0.3.0): abre en el mes, `onboarding.done` queda a `true` y borrar todos los datos después no lo hace volver. |
-| Q54 Consejo del mes | Aparece tras el primer uso, sigue tras reiniciar si no se cierra, y «Entendido» lo quita para siempre (`onboarding.tipPending`). |
-| Q60 Alarmas: activar desde la pantalla | Ajustes › Alarmas: interruptor general y Noche (90 min) desde la interfaz → el plugin real lista las pendientes con el prefijo de payload (= plan, ≤ 60, todas a las 20:30) y la línea «Próximo aviso» acaba en «20:30 · Noche». Reloj del dispositivo. (`scenarios/alarms_settings.dart`) |
+| Q54 Consejo de Pintar | Aparece, tras el primer uso, dentro de la hoja la primera vez que se entra en Pintar (ya no en el mes), sigue tras reiniciar si no se cierra, y la cruz lo quita para siempre (`onboarding.tipPending`). |
+| Q60 Alarmas: activar desde la pantalla | Ajustes › Alarmas: interruptor general y Noche (90 min) desde la interfaz → el plugin real lista las pendientes con el prefijo de payload (= plan completo, aviso de renovación incluido; todas las de turno a las 20:30) y la línea «Próximo aviso» acaba en «20:30 · Noche». Reloj del dispositivo. (`scenarios/alarms_settings.dart`) |
 | Q61 Alarmas: día anterior | Activar «Aviso el día anterior» añade exactamente un aviso por noche con la víspera por delante (a las 20:00 del día anterior) y deja intactas las alarmas de antes del turno; apagarlo devuelve el conjunto inicial. |
 | Q62 Alarmas: saltar un día | «Sin alarma este día» en el detalle de una noche quita **exactamente** la alarma de ese día (las demás siguen, mismos ids); quitar el interruptor la devuelve. |
 | Q63 Alarmas: probar aviso | «Probar aviso» deja una notificación pendiente (payload de prueba) y a los 10 s aparece entre las activas con el título «Aviso de prueba». Sin alarmas exactas concedidas puede tardar minutos (se anota). |
@@ -197,8 +198,8 @@ temporal, nunca a la de la app.
 | Id | Qué demuestra |
 |---|---|
 | Q85 Crear más de diez calendarios | Con 9 calendarios extra se crean el décimo, el undécimo y el siguiente: **ya no hay tope** (con la gratuidad total del 26-oct-2026 se retiró el límite de 10 y su mensaje). Archivar uno lo deja guardado y recuperarlo vuelve a dejarlo activo. |
-| Q86 Comparar: días libres en común | Ajustes › Calendarios › «Comparar calendarios» con «Mi cuadrante» y «Pareja»: cada día enseña los turnos de los dos (N / V, M+T / –), los días libres en los dos (Libre, vacío, vacaciones) llevan marca con check, el contador dice «12 días libres en común este mes» y la lista trae sus fechas. (`scenarios/parity_compare.dart`) |
-| Q87 Comparar: elegir y cambiar de mes | Desde la etiqueta del calendario del mes: elegir «Hijo» como segundo, elegir el que ya está en el otro hueco los intercambia, flechas y deslizar cambian de mes, y la BD queda idéntica (solo lectura, el calendario activo no cambia). |
+| Q86 Comparar: días libres en común | Ajustes › Calendarios › «Comparar calendarios» con «Mi cuadrante» y «Pareja»: la rejilla tiene una fila por calendario y una columna por día, y cada día enseña los turnos de los dos (N / V, M+T / –), los días libres en los dos llevan marca con check, el contador dice «12 días libres en común este mes» y la lista trae sus fechas. El resumen añade los fines de semana libres en común («4 fines de semana libres en común este mes» y el sábado 31, cuyo domingo es del mes siguiente, como día suelto). El fixture convierte el 22 en Libre y da a «Pareja» un libre en los 12 días que «Mi cuadrante» no trabaja (un día sin anotar no es libre). (`scenarios/parity_compare.dart`) |
+| Q87 Comparar: elegir y cambiar de mes | Desde la etiqueta del calendario del mes: la hoja de «Cambiar» mete a «Hijo» (también con libres en los mismos días) en la comparación y lo saca otra vez; las flechas cambian de mes (los días de la rejilla se desplazan de lado, así que un deslizar ya no cambia el mes), y la BD queda idéntica (solo lectura, el calendario activo no cambia). |
 | Q88 Resumen por fechas | En el resumen, «Fechas…» arranca con el mes en pantalla y las mismas cifras (160 h); Desde 19 y Hasta 25 de octubre dan 5 turnos, 40 h y 24 h nocturnas (como calcula el motor); las flechas mueven el periodo su propia longitud; en un rango no hay botón de compartir imagen. (`scenarios/parity_summary.dart`) |
 | Q89 Color libre | Mis turnos › Nuevo › «Más colores…»: la hoja enseña la casilla en claro y en oscuro con el contraste; un hex mueve los deslizadores y un deslizador reescribe el hex; un hex incompleto bloquea «Usar este color»; el color se guarda en la BD y el turno lo lleva en la paleta. (`scenarios/parity_color.dart`) |
 | Q90 Cortar una semana | Seleccionar una semana y «Cortar»: los 7 días quedan vacíos en pantalla y en la BD, el aviso dice «7 días cortados» y un solo deshacer lo devuelve todo; el portapapeles conserva los días. Cortar mueve también nota, aviso y horas extra de la copia (prueba de controlador `range_edit_annotations_controller_test.dart`). (`scenarios/parity_cut.dart`) |
@@ -233,12 +234,55 @@ temporal, nunca a la de la app.
 |---|---|
 | Q99 Turno partido | Mis turnos › Nuevo turno «Partido» 09:00–13:00; con «Turno partido» y el segundo tramo empezando a las 13:00 el formulario dice que sería un solo tramo y no guarda; con 17:00–21:00 enseña «Trabajas 4 h y 4 h: 8 h en total» y guarda las cuatro columnas (`start/end_minute`, `segment2_start_minute`, `segment2_duration_minutes`). Pintado en los dos días libres del 24 y el 25, la casilla muestra el código, el detalle del día los dos horarios («09:00–13:00 · 17:00–21:00») y el resumen del mes pasa de 160 h a 176 h (el descanso no se trabaja) con 22 turnos. |
 
+### Notas del día: adjuntos, dibujo y tareas (Q100)
+
+`integration_test/scenarios/notes_attachments.dart` (`notesScenarios`).
+
+| Id | Qué demuestra |
+|---|---|
+| Q103 Detalle: dibujo y tareas | En el detalle del 24 de octubre, «Más opciones» trae las secciones «Adjuntos» y «Tareas». Un trazo en el lienzo y «Guardar» lo dejan como adjunto del día: una fila en `note_attachments` (`kind = sketch`, `image/png`) y el archivo en el almacén (`<Application Support>/attachments/`). Una pulsación larga en la miniatura lo quita (la fila y el archivo) y el «Deshacer» de la sección lo devuelve. Las tareas del día se escriben en `day_tasks`, se marcan, se reordenan (el «Deshacer» de la sección vuelve a ponerlas en su orden) y se borran. La foto y el archivo salen a la galería y al explorador del sistema: eso lo prueba una persona, no la batería. |
+
+### No molestar durante el turno (Q101)
+
+`integration_test/scenarios/dnd.dart` (`dndScenarios`). Solo Android: en iOS Focus no es programable por las apps.
+
+| Id | Qué demuestra |
+|---|---|
+| Q104 No molestar por turno y estado global | En Mis turnos › Noche, el interruptor «Activar No molestar durante este turno» está apagado y al activarlo y guardar queda en los ajustes de silencio (`settings.dnd`, clave `dnd`, con `byShiftType.night.enabled = true`), no en la fila del tipo de turno; con el interruptor general apagado todavía no silencia nada (`isEnabledFor('night')` es falso). En Ajustes › Alarmas, el interruptor general se enciende y ya silencia la Noche, la fila del filtro aparece («Solo lo prioritario» por defecto) y elegir «Solo las alarmas» lo guarda (`filter = alarms`). La tarjeta del permiso refleja el estado real de «Acceso a No molestar»: verde si está concedido, o la explicación con el botón a los ajustes del sistema si no (el escenario no da por hecho que esté concedido). Tras cerrar y abrir la app, los dos interruptores y el filtro siguen como estaban. Capturas: `editor_activo`, `alarmas_activo`, `filtro_alarmas`, `tras_reiniciar` (y `permiso_denegado` si falta el acceso). |
+### Ola 3: comparar varios calendarios (Q100)
+
+`integration_test/scenarios/compare_many.dart` (`compareManyScenarios`, en el registro).
+
+| Id | Qué demuestra |
+|---|---|
+| Q100 Comparar varios calendarios | «Comparar calendarios» con «Mi cuadrante», «Pareja», «Hijo» y «Turno»: la hoja de «Cambiar» mete los que falten (hasta seis) y avisa cuando no caben más; la rejilla tiene una fila por calendario y una columna por día, los días se desplazan de lado y **la columna de los nombres no se mueve**; «Turno» trabaja el fin de semana del 24, así que ese día no lleva el check de libres en común; el resumen dice «9 días libres en común este mes», «3 fines de semana libres en común este mes» y el sábado 31 como día suelto. Nada se escribe: el calendario activo sigue siendo el de la pantalla. |
+
+### Ola 3: citas del móvil (Q101)
+
+`integration_test/scenarios/device_events.dart` (`deviceEventsScenarios`, en el registro). El calendario del móvil es el
+de verdad del emulador, por el plugin: el escenario crea un calendario local («QA citas») con una cita el 20 de octubre
+y lo borra al terminar.
+
+| Id | Qué demuestra |
+|---|---|
+| Q101 Citas del móvil | Ajustes › «Citas del móvil» lista los calendarios del móvil y el permiso ya está concedido (nunca se pide al arrancar): al elegir uno el contador dice «1 calendario elegido» y la elección queda guardada (`settings`, clave `deviceEvents`); en el mes, el día 20 lleva un punto discreto (y el 21 no); en el detalle del día, la cita con su hora («09:00–10:00»); y en la agenda, la cita junto a las notas. |
+
+### Ola 3: extras visuales (Q102)
+
+`integration_test/scenarios/ux_extras.dart` (`uxExtrasScenarios`, en el registro). La galería es simulada (el selector
+del sistema no se puede manejar desde la batería, como el de sonido de Q94) y los archivos de fondo van a una carpeta
+temporal, igual que en las pruebas de widget.
+
+| Id | Qué demuestra |
+|---|---|
+| Q102 Extras visuales | Ajustes › Apariencia: «Ver la nota en el mes» y «Sonido al pintar» arrancan apagados y se guardan al tocarlos; con el sonido activado, pintar un día guarda el turno (el clic del sistema nunca rompe el trazo); «Paletas preparadas» enseña los cinco juegos, aplicar uno repinta los tipos de turno de una vez con su aviso y «Deshacer» lo devuelve; «Imagen de fondo del calendario» elige una imagen (galería simulada), la guarda en la carpeta de la app y muestra su miniatura en la fila, y «Quitar» la borra. La primera línea de la nota se escribe en la casilla cuando el número la deja caber (pantallas anchas); en el móvil se mantiene el clip de siempre. |
+
 ### Actualización (U01 y U02)
 
 | Id | Qué demuestra |
 |---|---|
-| U01 Migración v1 → v4 en el dispositivo | Un archivo v1 real con datos se migra a v4 (pasando por v2 y v3) con el SQLite de Android: todo en `main`, huella de 730 días idéntica, copia previa legible, sin segunda copia al reabrir y el mes muestra los turnos. Corre dentro de la batería. |
-| U02 Actualización real desde la 0.2.0 | Con los APK de release: se pinta una semana en la 0.2.0, se instala la versión actual encima y siguen los mismos días en «Tarde»; sin crash. Script aparte (`upgrade_android.sh`), con red. |
+| U01 Migración v1 → v6 en el dispositivo | Un archivo v1 real con datos se migra al esquema actual (v6, pasando por v2…v5) con el SQLite de Android: todo en `main`, huella de 730 días idéntica, copia previa legible, sin segunda copia al reabrir y el mes muestra los turnos. Corre dentro de la batería. |
+| U02 Actualización real desde la 0.6.13 | Con los APK de release: se pinta una semana en la 0.6.13, se instala la versión actual encima y los mismos días siguen en «Tarde» con el resto del mes intacto (se comparan los días que ambos volcados comparten, uno a uno); sin crash. Script aparte (`upgrade_android.sh`), con red. |
 
 Detalle en «Escenarios de actualización».
 
@@ -294,7 +338,7 @@ Lo que la batería de arriba no puede hacer por sí sola: probar que una app **y
 entera cuando llega la versión nueva. Cada release los pasa; lo que más duele perder es el cuadrante de la gente.
 Se prueban de dos formas complementarias.
 
-### U01 — Migración v1 → v4 en el dispositivo (`scenarios/upgrade.dart`)
+### U01 — Migración v1 → v6 en el dispositivo (`scenarios/upgrade.dart`)
 
 Va en la batería normal (`QA_ONLY=U01 tool/qa/run_android.sh` para correrlo solo). Qué hace, con el SQLite de
 Android de verdad:
@@ -304,10 +348,10 @@ Android de verdad:
    anfitrión (`test/support/v1_database.dart`): tipos de turno (con uno archivado), patrones, 3 rotaciones (una
    cortada), días con varios turnos, con `[]` a propósito, solo nota y nota con emojis, festivo propio, saldos de
    ausencias y ajustes. Calcula la **huella de 730 días** con esos datos v1.
-2. Lo abre con `openAppDatabase` (el camino real de la app) y comprueba: esquema 4, un solo calendario `main`,
+2. Lo abre con `openAppDatabase` (el camino real de la app) y comprueba: el esquema actual (v6), un solo calendario `main`,
    **todas** las filas de `pattern_runs` y `day_entries` en `main`, cada columna de v1 idéntica y la huella de
    `main` idéntica a la de v1.
-3. La copia previa `backups/pre-v1-a-v4-*.sqlite` existe, es v1, se abre con el esquema v1 con los mismos datos y
+3. La copia previa `backups/pre-v1-a-v6-*.sqlite` existe, es v1, se abre con el esquema v1 con los mismos datos y
    abrirla no cambia un byte.
 4. Arranca la app sobre ella: el mes muestra los turnos migrados (por el texto de las celdas: M + N el 19, vacío el
    20, V el 22; la hoja del día trae «Viaje a Cádiz» y «Cambio con Marta») y los festivos propios y los ajustes
@@ -315,26 +359,27 @@ Android de verdad:
 5. Cierra y abre otra vez: **no hay una segunda copia**, la copia no cambia y el volcado de todas las tablas es
    idéntico (sin filas duplicadas).
 
-### U02 — Actualización real desde la 0.2.0 (`tool/qa/upgrade_android.sh`)
+### U02 — Actualización real desde la 0.6.13 (`tool/qa/upgrade_android.sh`)
 
 Es lo único que usa los **APK de release de verdad**, firmados como los que se instalan en el móvil, sin
 `run-as` (no son depurables): la app se maneja desde fuera, como una persona, con `adb input`, y se lee con
 `adb shell uiautomator dump`. Los botones y los días se buscan por su etiqueta de accesibilidad («Pintar»,
 «Tarde», «jueves 22 de octubre, …»), nunca por píxeles.
 
-1. `gh release download v0.2.0 -p '*.apk'` → `build/qa/cuadrante-0.2.0.apk` (se conserva entre ejecuciones).
+1. `gh release download v0.6.13 -p '*.apk'` → `build/qa/cuadrante-0.6.13.apk` (se conserva entre ejecuciones).
 2. Compila el APK de release actual (`flutter build apk --release --dart-define=USE_DEMO_DATA=false`, firma de
    desarrollo de esta máquina, número de compilación = nº de commits, para que sea una actualización y no una
    bajada de versión).
-3. Desinstala, instala la 0.2.0, la abre, entra en modo pintar, elige «Tarde» y pinta **una semana con un solo
+3. Desinstala, instala la 0.6.13, la abre, entra en modo pintar, elige «Tarde» y pinta **una semana con un solo
    arrastre**; sale del modo pintar. Las builds de release no traen datos de demostración: el calendario empieza
    vacío y lo pintado es lo único que hay.
 4. Cierra la app a la fuerza, la abre y guarda las etiquetas de todos los días del mes (las pintadas llevan el
-   nombre y la hora de «Tarde»). Captura `U02_antes_0.2.0.png`.
+   nombre y la hora de «Tarde»). Captura `U02_antes_0.6.13.png`.
 5. `adb install -r` del APK actual **sin desinstalar**; comprueba que `firstInstallTime` no cambia (se actualizó,
-   no se reinstaló), abre la app y vuelve a leer la pantalla: los mismos 7 días siguen en «Tarde» y **todo el mes
-   es idéntico**. Captura `U02_despues_actual.png`. Sin `FATAL EXCEPTION` ni señal fatal en `logcat` y con la app
-   en marcha.
+   no se reinstaló), abre la app y vuelve a leer la pantalla: los mismos 7 días siguen en «Tarde» y cada día que
+   los dos volcados comparten dice lo mismo (el rediseño del mes cambió el alto de la cabecera, así que una fila
+   puede quedar recortada en un volcado y no en el otro; se comparan solo los días presentes en ambos). Captura
+   `U02_despues_actual.png`. Sin `FATAL EXCEPTION` ni señal fatal en `logcat` y con la app en marcha.
 6. Elige un día vacío **del mes visible** (las casillas grises no se pintan), pinta con la versión nueva y
    comprueba que ya dice «Mañana» **antes** de cerrar. Cierra y abre: sigue ahí y los siete días de Tarde
    siguen intactos (la base migrada admite escrituras). Un toque fallido se distingue de un fallo de persistencia.
@@ -369,7 +414,7 @@ mira `adb shell dumpsys activity activities`: **una** sola `ActivityRecord` de `
 El script lo escribió y revisó quien hizo el cambio **sin ejecutarlo** (no hay emulador en esa sesión): la primera
 vez que se use, comprueba que cuenta dos antes del cambio (`git stash` del manifest) y una después.
 
-## Widgets de Android (W01–W05)
+## Widgets de Android (W01–W06)
 
 `tool/qa/widget_android.sh` prueba los widgets de pantalla de inicio (`docs/widget-contrato.md`, «Android») en un
 emulador de verdad, sin abrir la app cuando lo que se comprueba es el cambio de día. Aparte de la batería: no usa
@@ -394,10 +439,11 @@ zona y ahorro de batería de vuelta a lo normal, emulador apagado solo si lo arr
 | W02 Cambio de día sin la app | Con la app cerrada (proceso matado) y el ahorro de batería activo, la hora pasa a las 23:58:30; el widget enseña hoy, y tras medianoche, mañana: la alarma exacta llega a las 00:00:02 (falla si tarda más de 10 s; con `QA_WIDGET_EXACT=0` solo se anota la hora). Después, cambio de zona a Pacific/Honolulu (el widget sigue el reloj de allí) y vuelta. |
 | W03 Aviso honesto | Último día publicado a las 23:58:30 y su medianoche: pasa a «Abre Turnly para seguir al día» sin ningún turno; 40 días después y con el reloj antes del primer día, lo mismo; de vuelta dentro del rango reaparece el día correcto. |
 | W05 Widget del mes (4×4) | Desde Ajustes › Añadir widget › «Grande: el mes entero» se fija el widget 4×4: muestra el título del mes de hoy (de la instantánea, p. ej. «Octubre 2026») y una celda con descripción «<día> … hoy». Con la app matada y el ahorro de batería activo, la hora pasa a las 23:58:30 de la víspera del primer día del segundo mes de la instantánea; tras la medianoche (alarma) el título cambia al mes nuevo, desaparece el anterior y la celda «1 … hoy» es la de hoy. Tocar la cabecera abre la app (`cuadrante://widget/month/<aaaa-mm>`). Lo que **no** mira el script (a ojo, con las capturas `W05_*.png`): el anillo de hoy, las barras de color, los días atenuados de otros meses y que con 3×3 celdas se lea (ver el protocolo manual). Va antes de W04 porque necesita el widget colocado. |
+| W06 Widget de cuatro semanas (4×4) | Desde Ajustes › Añadir widget › «Cuatro semanas: un mes» se fija el 4×4: muestra 28 días desde el lunes de la semana actual (la cuadrícula llega al lunes + 27, con la descripción de ese día leída de la instantánea), la celda de hoy marcada «hoy», la cabecera con el próximo libre de hoy cuando la instantánea lo trae (extensión `nextOff`) y, en su celda, la primera línea de la nota (la del día con nota; el demo pone una en mañana). Tocar una celda abre la app. Con la app matada y el ahorro de batería activo, la hora pasa a las 23:58:30 y, tras la medianoche (alarma), la celda «hoy» es la del día siguiente y ya no la de ayer. Lo que **no** mira el script (a ojo, con las capturas `W06_*.png`): el anillo, las barras de color, el clip cuando la nota no viaja (día de salud) y que la nota larga se recorte con puntos suspensivos. Va después de W05 y antes de W04 porque necesita el widget colocado. |
 | W04 Reinicio | Tras reiniciar el emulador llega `BOOT_COMPLETED`, la alarma de medianoche vuelve a estar armada (`dumpsys alarm`) y la siguiente medianoche dispara el refresco. Va la última: el launcher de esta imagen olvida los widgets colocados al reiniciar, así que no se mira la pantalla después. |
 
 Deja `build/qa/widget/widget.log` (líneas `QA_*`), `shots/W0*_*.png`, `ui_*.xml`, `logcat.txt` y `build.log`. Código
-de salida 0 solo si W01–W05 pasan; la última línea dice `RESULT: PASSED/FAILED`. No cambia el resultado de la batería
+de salida 0 solo si W01–W06 pasan; la última línea dice `RESULT: PASSED/FAILED`. No cambia el resultado de la batería
 ni de `release_check.sh`; es parte de la comprobación de los widgets antes de publicar (`docs/widget-contrato.md`,
 «Prueba de 7 días en Android»).
 

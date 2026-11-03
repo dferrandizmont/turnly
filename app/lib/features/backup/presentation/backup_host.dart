@@ -5,8 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/router.dart';
+import '../../notes/application/notes_providers.dart';
 import '../application/backup_models.dart';
 import '../application/backup_providers.dart';
+import '../application/folder_backup_providers.dart';
 import '../data/platform_backup_channel.dart';
 
 /// Keeps the automatic copies running for the whole life of the app and opens
@@ -44,6 +46,8 @@ class _BackupHostState extends ConsumerState<BackupHost> {
     _channel.onIncomingFile(_openIncoming);
     // Exports left in the cache by an earlier session are removed.
     ref.read(exportCacheSweepProvider);
+    // Files of the notes that no day uses any more are removed too.
+    ref.read(attachmentSweepProvider);
     // The file the app was started with, once the router is on screen.
     WidgetsBinding.instance.addPostFrameCallback((_) => _openIncoming());
   }
@@ -129,6 +133,7 @@ class _BackupHostState extends ConsumerState<BackupHost> {
   Widget build(BuildContext context) {
     // Watching the runner is what starts it (and keeps it alive).
     ref.listen(autoBackupRunnerProvider, (previous, next) {});
+    ref.listen(folderBackupRunnerProvider, (previous, next) {});
     return widget.child;
   }
 }

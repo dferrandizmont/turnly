@@ -346,17 +346,17 @@ void main() {
     });
 
     testWidgets(
-      'Sevilla (41091) has none in the bundle: the screen says to add them',
+      'Dos Hermanas (41038) has none in the bundle: the screen says to add them',
       (tester) async {
         final app = await AppUnderTest.pump(tester, size: tall);
         await openHolidays(tester, app);
         await warmIndex(tester, app);
         await chooseRegion(tester, 'ES-AN');
 
-        await chooseMunicipality(tester, 'sevilla', '41091');
+        await chooseMunicipality(tester, 'dos hermanas', '41038');
 
         expect(
-          inRow('holidays-municipality', find.text('Sevilla')),
+          inRow('holidays-municipality', find.text('Dos Hermanas')),
           findsOneWidget,
         );
         expect(

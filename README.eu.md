@@ -70,8 +70,10 @@ Ahal baduzu, egon proban gutxienez 14 egunez eta erabili noizean behin (adibidez
 <summary>Pantaila-argazki gehiago</summary>
 
 <p>
-  <a href="docs/readme/eu/06-festivos.png"><img src="docs/readme/eu/06-festivos.png" width="19%" alt="Madrilgo Erkidegoko eta Madril udalerriko jaiegunak"></a>
+  <a href="docs/readme/eu/06-festivos.png"><img src="docs/readme/eu/06-festivos.png" width="19%" alt="Jaiegunak herrialdeka, erkidegoka eta udalerrika"></a>
   <a href="docs/readme/eu/07-mes-oscuro.png"><img src="docs/readme/eu/07-mes-oscuro.png" width="19%" alt="Hilabete bera gai ilunarekin"></a>
+  <a href="docs/readme/eu/08-vacaciones.png"><img src="docs/readme/eu/08-vacaciones.png" width="19%" alt="Oporren eta baimenen saldoak, gelditzen diren egunekin eta eramandakoekin"></a>
+  <a href="docs/readme/eu/09-cambios.png"><img src="docs/readme/eu/09-cambios.png" width="19%" alt="Trukeen liburua, lankide bakoitzaren balantzearekin eta truke bakoitzeko txandekin"></a>
 </p>
 
 </details>
@@ -81,34 +83,54 @@ Sakatu pantaila-argazki bat handitzeko. Benetako pantailak dira, datu asmatuekin
 
 ## Funtzioak
 
-- **Hilabetea Sareta edo Zerrenda gisa.** Urteko ikuspegia, agenda eta eguneko
-  oharrak. Txanda bakoitzak kolorea, kodea eta ordutegia ditu; Zerrendan ordutegi
-  osoak irakur daitezke. Noizbehinka esportatzea mugikorreko egutegira, eta
-  hilabetearen eta urtearen irudiak.
-- **Txandak margotzea eta txandaketak.** Ukituz edo arrastatuz, hainbat egun
+- **Hilabetea, txandaketa, agenda eta laburpena.** Beheko barra (Hilabetea ·
+  Txandaketa · Agenda · Laburpena) eta gaurko txartel tolesgarria, hurrengo
+  txandarekin, hurrengo egun librearekin eta lan-boladarekin. Txanda bakoitzak
+  kolorea, kodea eta ordutegia ditu, saretan edo zerrendan, urteko ikuspegiarekin
+  eta eguneko oharrekin.
+- **Txandak eta txandaketak margotzea.** Ukituz edo arrastatuz, hainbat egun
   hautatu, bikoiztu, kopiatu eta itsatsi, desegin eta berregin; txandaketen
   laguntzailea aurrebistarekin: txanda birakariak, 24/72, 4×4, 6×4, 5×2, 2-2-3
   eta eredu propioak. Txanda motak, koloreak, ikonoak eta ordutegiak editagarriak
   dira.
-- **Espainiako jaiegunak.** Estatukoak eta erkidegokoak konexiorik gabe datoz; tokikoak,
-  eskuragarri dauden udalerrietarako, eta zureak gehitzeko aukera.
-- **Alarmak eta widgetak.** Alarmak txanda motaren arabera, oharren gogorarazpenak
-  eta Androiderako widgetak zure txandak hasierako pantailatik ikusteko.
-  Puntualtasuna sistemaren baimenen eta murrizketen araberakoa da. iPhoneko
-  widgeta (WidgetKit) Mac-ean garatzeko dago oraindik.
-- **Babeskopia lokala eta inportatzea.** Tokiko babeskopia automatikoak,
-  `.turnly` fitxategira esportatzea (`.cuadrante` kopia zaharrak ere irekitzen dira), leheneratu aurreko aurrebista eta «Probatu
-  leheneratzea». LRHSoft-en `.Shifter` kopiak, `.ics` edo CSV fitxategiak eta
-  mugikorreko egutegiko gertaerak inportatzea, txandak gorde aurretik berrikusita.
-- **Orduen laburpena.** Lan egindako orduak, gaueko orduak, jaiegunetako orduak,
-  aparteko orduak eta irteera aurreratuak; diru-sarreren estimazioa, orduko
-  prezioarekin eta txandako osagarri finkoarekin.
+- **Jaiegunak herrialdeka.** Espainia, bere erkidego eta udalerriekin, eta beste 21
+  herrialde (Portugal, Brasil, Latinoamerika, Europa, Ameriketako Estatu Batuak eta
+  Kanada), dena konexiorik gabe, zuk gehitzen dituzunez gain.
+- **Alarmak, widgetak eta ez molestatu.** Alarmak txanda motaren arabera, oharren
+  gogorarazpenak eta Androiderako widgetak, lau astekoa barne. Androiden, «Isildu
+  mugikorra nire txandetan» aukerak mugikorra isilarazten du lanean ari zaren
+  bitartean. Puntualtasuna sistemaren baimenen eta murrizketen araberakoa da.
+  iPhoneko widgeta egiteke dago.
+- **Babeskopia, txostenak eta mugikorreko egutegia.** Tokiko babeskopia automatikoak
+  eta, Androiden, eguneroko kopia bat zuk aukeratutako karpetan (Drive, Dropbox,
+  OneDrive edo mugikorra), leheneratu aurreko aurrebistarekin eta «Probatu
+  leheneratzea». Hilabete baten edo nahi dituzun daten PDF eta CSV txostenak,
+  «Eguneratuta mantendu» zure txandak mugikorreko egutegian jarraitzeko, eta
+  LRHSoft-etik, `.ics` eta CSV fitxategietatik eta mugikorreko egutegitik
+  inportatzea.
+- **Orduak, dirua eta baimenak.** Lan egindako, gaueko eta jaiegunetako orduak,
+  aparteko orduak eta irteera aurreratuak; orduko gaueko eta jaiegunetako
+  osagarriak; eta soldata gordinaren eta garbiaren estimazioa, zuk jarritako
+  atxikipenarekin. Oporren eta baimenen saldoak urte eta motaren arabera,
+  eramandako egunekin eta gelditzen zaizkizunekin.
 
 <details>
 <summary>Funtzio gehiago</summary>
 
-- **Hainbat egutegi.** Ordaindu beharreko mugarik gabe, eta bi egutegi alderatzeko
-  aukera.
+- **Trukeen liburua.** Idatzi lankide bati eman edo lankide batengandik jaso duzun
+  txanda bat, ikusi haren balantzea («2 txanda zor dizkit», «Txanda bat zor
+  diot»), truke bakoitzaren egoera eta txandak, eta aplikatu egutegira desegite
+  bakarrarekin.
+- **Eranskinak eta zereginak.** Egun bateko «Aukera gehiago» atalean, «Eranskinak»
+  atalak egun horretako argazkiak, marrazkiak eta fitxategiak gordetzen ditu, eta
+  «Zereginak» egun horretako egiaztapen-zerrenda da, bakoitza desegite batekin.
+- **Egutegiak eta mugikorreko hitzorduak alderatzea.** Gehienez sei egutegi aldi
+  berean, eta mugikorreko hitzorduak zure txandekin batera; Turnly-k irakurri
+  bakarrik egiten ditu.
+- **Itxura.** Azentu-koloreak, prestatutako paletak, egutegiko atzeko irudia,
+  oharraren lehen lerroa hilabeteko laukian, klik bat margotzean eta txandaren
+  kode handiagoa.
+- **Hainbat egutegi.** Nahi adina, bakoitza bere txandaketekin eta egunekin.
 - **Irisgarritasuna.** Hizkuntza-hautatzailea, pantaila-irakurgailua eta testu
   handigarria; txandak ez daude inoiz kolorearen mende bakarrik.
 

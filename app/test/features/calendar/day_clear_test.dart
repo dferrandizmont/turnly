@@ -14,6 +14,7 @@ import 'day_detail_test.dart'
         openDay,
         schedule,
         tapInSheet;
+import 'day_sheet_finders.dart';
 import 'harness.dart';
 
 // QA campaign, T09 (H-T09-2): «Borrar día» was off on a day that only had a
@@ -39,6 +40,8 @@ void main() {
     expect(schedule(tester).resolve(oct22).shifts, isEmpty);
 
     await openDay(tester, oct22);
+
+    await openDayMore(tester);
     expect(_clearEnabled(tester), isTrue);
     await tapInSheet(tester, 'day-clear');
     expect(schedule(tester).entries[oct22]?.note, isNull);
@@ -56,6 +59,7 @@ void main() {
   ) async {
     await pumpCalendar(tester);
     await openDay(tester, oct22);
+    await openDayMore(tester);
     expect(_clearEnabled(tester), isFalse);
     await enterNote(tester, 'Algo');
     expect(_clearEnabled(tester), isTrue);
@@ -70,6 +74,7 @@ void main() {
     _controller(tester).setDayExtras(oct22, overtimeMinutes: 30);
     await tester.pumpAndSettle();
     await openDay(tester, oct22);
+    await openDayMore(tester);
     expect(_clearEnabled(tester), isTrue);
     await tapInSheet(tester, 'day-clear');
     expect(schedule(tester).entries[oct22]?.overtimeMinutes, isNull);
@@ -95,6 +100,8 @@ void main() {
     expect(before?.noteReminderMinute, 8 * 60);
 
     await openDay(tester, oct26);
+
+    await openDayMore(tester);
     await tapInSheet(tester, 'day-clear');
     final cleared = schedule(tester);
     expect(cleared.resolve(oct26).shifts, isEmpty);
@@ -126,6 +133,8 @@ void main() {
     await tester.pumpAndSettle();
 
     await openDay(tester, oct22);
+
+    await openDayMore(tester);
     expect(_clearEnabled(tester), isTrue);
     await tapInSheet(tester, 'day-clear');
     await tester.pumpAndSettle();
@@ -143,6 +152,7 @@ void main() {
   testWidgets('a day with nothing at all keeps it off', (tester) async {
     await pumpCalendar(tester);
     await openDay(tester, oct22);
+    await openDayMore(tester);
     expect(_clearEnabled(tester), isFalse);
     await closeDay(tester);
   });

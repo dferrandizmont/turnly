@@ -12,7 +12,7 @@ import '../../support/app_harness.dart';
 void main() {
   setUpAll(initializeLocale);
 
-  const tall = Size(390, 2200);
+  const tall = Size(390, 3600);
 
   Future<Preferences> stored(AppUnderTest app) =>
       app.real(() => PreferencesRepository(app.database).load());

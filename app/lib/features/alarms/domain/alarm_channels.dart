@@ -29,12 +29,18 @@ String alarmSoundChannelId(String? sound) => sound == null
 String? effectiveAlarmSound(String? sound, Set<String> unavailable) =>
     sound == null || unavailable.contains(sound) ? null : sound;
 
-/// The channel an alarm of [kind] rings on. Reminders have their own channel
-/// (notification volume, default tone); the alarms before a shift and the
-/// evening-before ones use the channel of their [sound] (already resolved
-/// with [effectiveAlarmSound]).
+/// Whether an alarm of [kind] is a plain notification (notification volume,
+/// default tone, no custom sound) rather than an alarm: the reminder of a
+/// note and the renewal notice (A1), which reuses the reminders' channel.
+bool isNoticeKind(AlarmKind kind) =>
+    kind == AlarmKind.reminder || kind == AlarmKind.renewal;
+
+/// The channel an alarm of [kind] rings on. Reminders and the renewal notice
+/// share their own channel (notification volume, default tone); the alarms
+/// before a shift and the evening-before ones use the channel of their
+/// [sound] (already resolved with [effectiveAlarmSound]).
 String alarmChannelIdFor(AlarmKind kind, String? sound) =>
-    kind == AlarmKind.reminder ? reminderChannelId : alarmSoundChannelId(sound);
+    isNoticeKind(kind) ? reminderChannelId : alarmSoundChannelId(sound);
 
 /// The channels of [existing] that carry a custom sound and that none of the
 /// [inUseSounds] needs any more: the ones to delete. Channels of the default

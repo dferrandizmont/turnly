@@ -343,6 +343,13 @@ Future<void> _edit(QaContext qa) async {
   await _type(t, 'shift-name', 'Noche larga');
   await _tap(t, 'shift-save');
 
+  // Changing the hours of a type used in the past now asks for a scope.
+  // This scenario corrects every day, keeping its original assertions.
+  await t.waitFor(_k('shift-scope-every-day'));
+  expect(_k('shift-scope-from-today'), findsOneWidget);
+  await _tap(t, 'shift-scope-every-day');
+  expect(_k('shift-list'), findsOneWidget);
+
   await _flush(t);
   final row = (await _storedTypes(app, where: "id = 'night'")).single;
   expect(row['name'], 'Noche larga');

@@ -25,6 +25,12 @@ enum AlarmKind {
   /// not to a shift: `shiftTypeId` is empty and `shiftDate` is the day of
   /// the note. No buttons, so it cannot be snoozed.
   reminder,
+
+  /// The renewal notice (A1): the evening before the last planned shift
+  /// alarm, when the plan was cut by the horizon or by the cap, it asks to
+  /// open the app so the next alarms get scheduled. `shiftTypeId` is empty
+  /// and `shiftDate` is the day of that last alarm. No buttons.
+  renewal,
 }
 
 /// What travels inside a notification, so that a notification action can act

@@ -16,9 +16,11 @@ import 'calendars_providers.dart';
 /// today, the widget when its sync gets wired) reads it through here.
 Future<Schedule> readPrimarySchedule(Ref ref) async {
   final primaryId = await ref.read(calendarsRepositoryProvider).primaryId();
+  if (!ref.mounted) throw StateError('Primary schedule reader disposed');
   final current = ref.read(scheduleControllerProvider);
   if (current.calendarId == primaryId) return current.schedule;
   await ref.read(scheduleControllerProvider.notifier).pendingWrites;
+  if (!ref.mounted) throw StateError('Primary schedule reader disposed');
   final stored = await ref.read(scheduleRepositoryProvider).load(primaryId);
   return stored.schedule;
 }

@@ -13,7 +13,7 @@ import '../support/qa_harness.dart';
 final List<QaScenario> holidaysScenarios = [
   qaHolidaysRegion, // Q55
   qaHolidaysBarcelona, // Q56
-  qaHolidaysSevilla, // Q57
+  qaHolidaysNoLocal, // Q57
   qaHolidaysOwn, // Q58
   qaHolidaysNextYear, // Q59
 ];
@@ -198,13 +198,13 @@ Future<void> _barcelona(QaContext qa) async {
 // ---- Q57 -------------------------------------------------------------------
 
 /// Q57.
-const qaHolidaysSevilla = QaScenario(
+const qaHolidaysNoLocal = QaScenario(
   'Q57',
-  'Festivos: municipio sin locales (Sevilla) y búsqueda sin acentos',
-  _sevilla,
+  'Festivos: municipio sin locales (Algeciras) y búsqueda sin acentos',
+  _noLocal,
 );
 
-Future<void> _sevilla(QaContext qa) async {
+Future<void> _noLocal(QaContext qa) async {
   final t = qa.tester;
   final app = await QaApp.open(qa);
 
@@ -224,18 +224,18 @@ Future<void> _sevilla(QaContext qa) async {
     findsOneWidget,
   );
 
-  // Sevilla has none in the bundle: the guidance line and no local rows.
+  // Algeciras (Cádiz) has none in the bundle: the guidance line, no locals.
   await _chooseRegion(t, 'ES-AN');
-  await _chooseMunicipality(t, 'sevilla', '41091');
-  qa.expectNoFlutterErrors('tras elegir Sevilla');
+  await _chooseMunicipality(t, 'algeciras', '11004');
+  qa.expectNoFlutterErrors('tras elegir Algeciras');
   expect(
     find.text('Todavía no tenemos los de tu municipio: añádelos tú abajo'),
     findsOneWidget,
   );
   expect(find.text('Fiesta local'), findsNothing);
   expect(find.text('Día de Andalucía'), findsOneWidget);
-  expect(app.container.read(holidayPlaceProvider).municipalityCode, '41091');
-  await qa.shot('sevilla');
+  expect(app.container.read(holidayPlaceProvider).municipalityCode, '11004');
+  await qa.shot('algeciras');
 }
 
 // ---- Q58 -------------------------------------------------------------------

@@ -1,0 +1,11 @@
+{
+"region":"ES-AS",
+"year":2027,
+"kind":"labour",
+"sources":{
+"s1":{"url":"https://www.asturias.es/bopa/2026/06/10/2026-04656.pdf","ref":"BOPA núm. 110, 10.6.2026 (Cód. 2026-04656) — Resolución de 22 de mayo de 2026, de la Consejería de Ciencia, Industria y Empleo, por la que se aprueba el calendario de fiestas locales para el año 2027 en la Comunidad Autónoma del Principado de Asturias","published":"2026-06-10","retrieved":"2026-10-31"}
+},
+"municipalities":{
+"33044":{"name":"Oviedo","days":["2027-05-18","2027-09-21"],"source":"s1"}
+}
+}

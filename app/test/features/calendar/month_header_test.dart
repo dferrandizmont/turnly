@@ -54,12 +54,13 @@ void main() {
               closeTo(width - Sp.l, 1),
             );
 
-            // Share, agenda and settings sit side by side, in that order.
+            // Share, report and settings sit side by side, in that order (the
+            // agenda moved to the bar of destinations, B1).
             final share = glyphRight(tester, 'Compartir el mes como imagen');
-            final agenda = glyphRight(tester, 'Agenda de notas');
+            final report = glyphRight(tester, 'Informe en PDF o CSV');
             final settings = glyphRight(tester, 'Abrir ajustes');
-            expect(settings - agenda, closeTo(48, 1));
-            expect(agenda - share, closeTo(48, 1));
+            expect(report - share, closeTo(48, 1));
+            expect(settings - report, closeTo(48, 1));
 
             // The date is still on the left, under no one's feet.
             final date = tester.getRect(

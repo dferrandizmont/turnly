@@ -1,0 +1,15 @@
+{
+"islands":{
+"GC":{"name":"Gran Canaria","municipalities":["35001","35002","35005","35006","35008","35009","35011","35012","35013","35016","35019","35020","35021","35022","35023","35025","35026","35027","35031","35032","35033"]},
+"LZ":{"name":"Lanzarote y La Graciosa","municipalities":["35004","35010","35018","35024","35028","35029","35034"]},
+"FV":{"name":"Fuerteventura","municipalities":["35003","35007","35014","35015","35017","35030"]},
+"TF":{"name":"Tenerife","municipalities":["38001","38004","38005","38006","38010","38011","38012","38015","38017","38018","38019","38020","38022","38023","38025","38026","38028","38031","38032","38034","38035","38038","38039","38040","38041","38042","38043","38044","38046","38051","38052"]},
+"LP":{"name":"La Palma","municipalities":["38007","38008","38009","38014","38016","38024","38027","38029","38030","38033","38037","38045","38047","38053"]},
+"GO":{"name":"La Gomera","municipalities":["38002","38003","38021","38036","38049","38050"]},
+"EH":{"name":"El Hierro","municipalities":["38013","38048","38901"]}
+},
+"years":{
+"2026":{"source":{"url":"https://www.gobiernodecanarias.org/boc/2025/088/1659.html","ref":"BOC núm. 88, 5.5.2025 — Decreto 61/2025, de 28 de abril, por el que se determina el calendario de fiestas laborales de la Comunidad Autónoma de Canarias para el año 2026 (anexo, fiestas insulares)","published":"2025-05-05","retrieved":"2026-10-31"},"days":{"GC":{"date":"2026-09-08","name":"Nuestra Señora del Pino"},"LZ":{"date":"2026-09-15","name":"Nuestra Señora de los Volcanes"},"FV":{"date":"2026-09-18","name":"Nuestra Señora de la Peña"},"TF":{"date":"2026-02-02","name":"Virgen de la Candelaria"},"LP":{"date":"2026-08-05","name":"Nuestra Señora de las Nieves"},"GO":{"date":"2026-10-05","name":"Nuestra Señora de Guadalupe"},"EH":{"date":"2026-09-24","name":"Nuestra Señora de los Reyes"}}},
+"2027":{"source":{"url":"https://www.gobiernodecanarias.org/boc/2026/133/2334.html","ref":"BOC núm. 133, 3.7.2026 — Decreto 115/2026, de 29 de junio, por el que se determina el calendario de fiestas laborales de la Comunidad Autónoma de Canarias para el año 2027 (anexo, fiestas insulares)","published":"2026-07-03","retrieved":"2026-10-31"},"days":{"GC":{"date":"2027-09-08","name":"Nuestra Señora del Pino"},"LZ":{"date":"2027-09-15","name":"Nuestra Señora de los Volcanes"},"FV":{"date":"2027-09-17","name":"Nuestra Señora de la Peña"},"TF":{"date":"2027-02-02","name":"Virgen de la Candelaria"},"LP":{"date":"2027-08-05","name":"Nuestra Señora de las Nieves"},"GO":{"date":"2027-10-04","name":"Nuestra Señora de Guadalupe"},"EH":{"date":"2027-09-24","name":"Nuestra Señora de los Reyes"}}}
+}
+}

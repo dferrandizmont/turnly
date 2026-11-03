@@ -517,7 +517,7 @@ void main() {
   });
 
   group('size caps before reading (M1)', () {
-    const big = BackupCodec.maxFileBytes + 1;
+    const big = BackupCodec.maxImportBytes + 1;
     const name = 'cuadrante-20261019-090000.cuadrante';
 
     test('a listed entry over the cap is refused without asking native '
@@ -544,6 +544,29 @@ void main() {
       final s = store();
       final entry = (await s.list()).single;
       expect((await s.read(entry)).length, BackupCodec.maxFileBytes);
+    });
+
+    test('a container of 9 MiB (a copy with photos) is read; the same size '
+        'that is not a ZIP is refused after the read', () async {
+      final container = Uint8List(9 * 1024 * 1024)
+        ..setRange(0, 4, const [0x50, 0x4b, 0x03, 0x04]);
+      native.files[name] = container;
+      final s = store();
+      final entry = (await s.list()).single;
+      expect((await s.read(entry)).length, container.length);
+
+      native.files[name] = Uint8List(9 * 1024 * 1024);
+      final plain = (await s.list()).single;
+      await expectLater(
+        s.read(plain),
+        throwsA(
+          isA<ICloudFailed>().having(
+            (e) => e.message,
+            'message',
+            'read: too large',
+          ),
+        ),
+      );
     });
 
     test('the too_large code of the contract is a typed failure', () async {

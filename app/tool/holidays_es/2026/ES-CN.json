@@ -1,0 +1,12 @@
+{
+"region":"ES-CN",
+"year":2026,
+"kind":"labour",
+"sources":{
+"s1":{"url":"https://www.gobiernodecanarias.org/boc/2025/165/3029.html","ref":"BOC núm. 165, 21.8.2025 — ORDEN de 6 de agosto de 2025, por la que se determinan las fiestas locales propias de cada municipio de la Comunidad Autónoma de Canarias para el año 2026 (BOC-A-2025-165-3029)","published":"2025-08-21","retrieved":"2026-10-31"}
+},
+"municipalities":{
+"35016":{"name":"Las Palmas de Gran Canaria","days":["2026-02-17","2026-06-24"],"source":"s1"},
+"38038":{"name":"Santa Cruz de Tenerife","days":["2026-02-17","2026-05-04"],"source":"s1"}
+}
+}

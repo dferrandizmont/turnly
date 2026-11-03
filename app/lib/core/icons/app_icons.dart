@@ -47,11 +47,27 @@ class AppIcons {
       _pick(CupertinoIcons.paperclip, Symbols.attach_file_rounded);
   static IconData get add => _pick(CupertinoIcons.add, Symbols.add_rounded);
 
+  /// The camera of the system (a photo of the day, P2).
+  static IconData get camera =>
+      _pick(CupertinoIcons.camera, Symbols.photo_camera_rounded);
+
+  /// The gallery of the system (a photo already taken, P2).
+  static IconData get gallery =>
+      _pick(CupertinoIcons.photo_on_rectangle, Symbols.photo_library_rounded);
+
+  /// Any file (an attachment that is not a photo, P2).
+  static IconData get file =>
+      _pick(CupertinoIcons.doc, Symbols.description_rounded);
+
   /// Clear a day (eraser).
   static IconData get erase =>
       _pick(CupertinoIcons.delete_left, Symbols.ink_eraser_rounded);
   static IconData get check =>
       _pick(CupertinoIcons.checkmark, Symbols.check_rounded);
+
+  /// «Seleccionar días»: pick several days at once.
+  static IconData get selectDays =>
+      _pick(CupertinoIcons.checkmark_square, Symbols.select_check_box_rounded);
   static IconData get more =>
       _pick(CupertinoIcons.ellipsis, Symbols.more_horiz_rounded);
   static IconData get back =>
@@ -95,6 +111,10 @@ class AppIcons {
   /// The month as a list of days (the presentation switch).
   static IconData get listView =>
       _pick(CupertinoIcons.list_bullet, Symbols.view_agenda_rounded);
+
+  /// The appointments of the phone, shown next to the shifts (P6).
+  static IconData get deviceEvents =>
+      _pick(CupertinoIcons.calendar_badge_plus, Symbols.event_rounded);
 
   /// The monthly summary (hours and estimated pay).
   static IconData get summary =>
@@ -187,4 +207,8 @@ class AppIcons {
   /// The sound of an alarm (speaker).
   static IconData get sound =>
       _pick(CupertinoIcons.speaker_2, Symbols.volume_up_rounded);
+
+  /// «No molestar» durante el turno (P13): the phone silenced while working.
+  static IconData get silence =>
+      _pick(CupertinoIcons.moon_zzz, Symbols.do_not_disturb_on_rounded);
 }

@@ -100,63 +100,75 @@ class AppTypography extends ThemeExtension<AppTypography> {
     fontFeatures: tabularFigures ? const [FontFeature.tabularFigures()] : null,
   );
 
-  factory AppTypography.from(AppColors c) => AppTypography(
-    display: _style(
-      36,
-      40,
-      FontWeight.w800,
-      c.textPrimary,
-      letterSpacing: -0.6,
-    ),
-    title: _style(21, 28, FontWeight.w800, c.textPrimary),
-    headline: _style(24, 30, FontWeight.w800, c.textPrimary),
-    body: _style(15, 22, FontWeight.w400, c.textPrimary),
-    bodyStrong: _style(
-      19,
-      24,
-      FontWeight.w600,
-      c.textPrimary,
-      tabularFigures: true,
-    ),
-    label: _style(13, 18, FontWeight.w700, c.textPrimary, letterSpacing: 0.6),
-    button: _style(
-      16,
-      22,
-      FontWeight.w700,
-      c.textPrimary,
-      tabularFigures: true,
-    ),
-    meta: _style(13, 18, FontWeight.w400, c.textMuted),
-    caption: _style(12, 16, FontWeight.w600, c.textMuted),
-    cellDay: _style(
-      11,
-      14,
-      FontWeight.w700,
-      c.textSecondary,
-      tabularFigures: true,
-    ),
-    cellCode: _style(
-      20,
-      22,
-      FontWeight.w800,
-      c.textPrimary,
-      tabularFigures: true,
-    ),
-    cellCodeMulti: _style(
-      14,
-      16,
-      FontWeight.w800,
-      c.textPrimary,
-      tabularFigures: true,
-    ),
-    cellTime: _style(
-      10,
-      12,
-      FontWeight.w600,
-      c.textMuted,
-      tabularFigures: true,
-    ),
-  );
+  /// The styles of [c]. [cellScale] is the user's «Tamaño del turno en el
+  /// mes» (`CellTextSize.factor`): it multiplies the starting size (and the
+  /// line) of [cellCode], [cellCodeMulti] and [cellTime], and nothing else.
+  /// The cell still shrinks them to what fits (`cellCodeSize`,
+  /// `cellTimeInCell`) and never below [cellCodeMinSize] / [cellTimeMinSize].
+  factory AppTypography.from(AppColors c, {double cellScale = 1}) =>
+      AppTypography(
+        display: _style(
+          36,
+          40,
+          FontWeight.w800,
+          c.textPrimary,
+          letterSpacing: -0.6,
+        ),
+        title: _style(21, 28, FontWeight.w800, c.textPrimary),
+        headline: _style(24, 30, FontWeight.w800, c.textPrimary),
+        body: _style(15, 22, FontWeight.w400, c.textPrimary),
+        bodyStrong: _style(
+          19,
+          24,
+          FontWeight.w600,
+          c.textPrimary,
+          tabularFigures: true,
+        ),
+        label: _style(
+          13,
+          18,
+          FontWeight.w700,
+          c.textPrimary,
+          letterSpacing: 0.6,
+        ),
+        button: _style(
+          16,
+          22,
+          FontWeight.w700,
+          c.textPrimary,
+          tabularFigures: true,
+        ),
+        meta: _style(13, 18, FontWeight.w400, c.textMuted),
+        caption: _style(12, 16, FontWeight.w600, c.textMuted),
+        cellDay: _style(
+          11,
+          14,
+          FontWeight.w700,
+          c.textSecondary,
+          tabularFigures: true,
+        ),
+        cellCode: _style(
+          20 * cellScale,
+          22 * cellScale,
+          FontWeight.w800,
+          c.textPrimary,
+          tabularFigures: true,
+        ),
+        cellCodeMulti: _style(
+          14 * cellScale,
+          16 * cellScale,
+          FontWeight.w800,
+          c.textPrimary,
+          tabularFigures: true,
+        ),
+        cellTime: _style(
+          10 * cellScale,
+          12 * cellScale,
+          FontWeight.w600,
+          c.textMuted,
+          tabularFigures: true,
+        ),
+      );
 
   /// Tabular figures on any style (times, amounts, counters).
   static TextStyle tabular(TextStyle style) =>

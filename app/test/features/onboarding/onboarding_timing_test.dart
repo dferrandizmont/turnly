@@ -23,17 +23,16 @@ void main() {
     final appTime = Stopwatch()..start();
     final fakeStart = tester.binding.clock.now();
 
-    await app.tap(key('onboarding-profession-nursing')); // 1
-    await app.tap(key('onboarding-next')); // 2
-    await app.tap(key('onboarding-region')); // 3
-    await app.tap(find.text('Comunidad de Madrid')); // 4
+    await app.choosePath('rotation'); // 1
+    await app.tap(key('onboarding-pattern-12h')); // 2
+    await app.tap(key('onboarding-next')); // 3
+    await app.tap(key('onboarding-offset-1')); // 4: the night of the cycle
     await app.tap(key('onboarding-next')); // 5
-    await app.tap(key('onboarding-pattern-12h')); // 6
-    await app.tap(key('onboarding-next')); // 7
-    await app.tap(key('onboarding-offset-1')); // 8: the night of the cycle
-    await app.tap(key('onboarding-next')); // 9
-    await app.tap(key('onboarding-next')); // 10: "Continuar" (writes)
-    await app.tap(key('onboarding-next')); // 11: "Ver mi calendario"
+    await app.tap(key('onboarding-profession-nursing')); // 6
+    await app.tap(key('onboarding-region')); // 7
+    await app.tap(find.text('Comunidad de Madrid')); // 8
+    await app.tap(key('onboarding-next')); // 9: "Continuar" (writes)
+    await app.tap(key('onboarding-next')); // 10: "Ver mi calendario"
 
     expect(find.byType(MonthScreen), findsOneWidget);
     await app.flushWrites();
@@ -58,8 +57,11 @@ void main() {
       textScale: 1.8,
     );
     // Any overflow or build error fails the test by itself.
-    await app.tap(key('onboarding-profession-hospitality'));
+    await app.choosePath('rotation');
+    await app.tap(key('onboarding-pattern-5x2'));
     await app.tap(key('onboarding-next'));
+    await app.tap(key('onboarding-next'));
+    await app.tap(key('onboarding-profession-hospitality'));
     await app.tap(key('onboarding-region'));
     await app.tap(find.text('Illes Balears'));
     await app.tap(key('onboarding-municipality'));
@@ -67,10 +69,6 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.textContaining('Palma').first);
     await tester.pumpAndSettle();
-    await app.tap(key('onboarding-next'));
-    await app.tap(key('onboarding-pattern-5x2'));
-    await app.tap(key('onboarding-next'));
-    await app.tap(key('onboarding-next'));
     await app.tap(key('onboarding-next'));
     expect(app.title, 'Listo');
     await app.tap(key('onboarding-next'));

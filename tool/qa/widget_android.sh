@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# W01-W05: the Android home-screen widgets on a real emulator (docs/qa.md,
+# W01-W06: the Android home-screen widgets on a real emulator (docs/qa.md,
 # docs/widget-contrato.md "Android"). Run it from the repo root, in Git Bash:
 #
 #   tool/qa/widget_android.sh                       # boots Cuadrante_QA on port 5580
@@ -25,12 +25,18 @@
 # W03 Honest message: the last published day ends (clock to 23:58:30 of the day
 #     60, then past it): the widgets show the "open the app" text and no shift;
 #     back in range they show the day again.
+# W06 Four-week widget (4x4): pinned from Ajustes > Anadir widget > Cuatro
+#     semanas; it shows 28 Monday-first days (today marked, the grid reaching
+#     Monday + 27), the optional next-day-off label of today and, on the cell
+#     of a day with a note, its first line; a tap on a cell opens the app; at
+#     midnight, with the app killed and the battery saver on, the "today" ring
+#     moves to the next day drawn by the midnight alarm.
 #
 # The clock is set with `service call alarm 2` (the shell may do it on the
 # google_apis_playstore image, which cannot be rooted: `cmd time_detector` is
 # refused). The app is a debug build, so `run-as` can read the snapshot that
 # is the oracle of the expected labels. Output in build/qa/widget/: widget.log
-# (QA_* lines), shots/W0*.png, ui_*.xml, logcat. Exit code 0 only if W01-W05
+# (QA_* lines), shots/W0*.png, ui_*.xml, logcat. Exit code 0 only if W01-W06
 # pass. Always at the end: restores the clock and battery saver, stops the
 # emulator ONLY if this run started it, and builds without a Gradle daemon.
 set -u
@@ -101,6 +107,18 @@ w_tap_wait() {
 w_screen_has() {
   w_ui_dump now
   sed 's/>/>\n/g' "$WQ_OUT/ui_now.xml" | grep -qE "(text|content-desc)=\"[^\"]*($1)"
+}
+
+# Like w_screen_has, but also looks on the neighbouring home pages: the
+# launcher may pin the widgets on its second page and jump back to the first
+# one after a time-zone or clock change (seen on 1-nov-2026).
+w_seek() {
+  w_screen_has "$1" && return 0
+  qa_adb shell input swipe 900 1200 180 1200 250; sleep 1.5
+  w_screen_has "$1" && return 0
+  qa_adb shell input swipe 180 1200 900 1200 250; sleep 1
+  qa_adb shell input swipe 180 1200 900 1200 250; sleep 1.5
+  w_screen_has "$1"
 }
 
 w_home() { qa_adb shell input keyevent KEYCODE_WAKEUP; qa_adb shell input keyevent 82; qa_adb shell input keyevent KEYCODE_HOME; sleep 2; }
@@ -240,16 +258,50 @@ w_install() {
 
 # ---- W01 ---------------------------------------------------------------------
 
+# Taps $1 only once its node sits fully inside the visible screen, scrolling
+# the list up until it does: a node half under the navigation bar reports
+# clamped bounds and the tap lands on the row above (seen on a OnePlus 8T).
+w_tap_visible() {
+  local i b h
+  h="$(qa_adb shell wm size | tr -d '\r' | sed -n 's/.*x\([0-9]*\)$/\1/p' | tail -n1)"
+  [ -n "$h" ] || h=2400
+  for i in 1 2 3 4 5 6; do
+    w_ui_dump tap
+    b="$(sed 's/>/>\n/g' "$WQ_OUT/ui_tap.xml" | grep -E "(text|content-desc)=\"[^\"]*($1)" | head -n1 \
+      | sed -n 's/.*bounds="\[\([0-9]*\),\([0-9]*\)\]\[\([0-9]*\),\([0-9]*\)\]".*/\1 \2 \3 \4/p')"
+    if [ -n "$b" ]; then
+      set -- $b
+      if [ "$2" -ge 150 ] && [ "$4" -le $((h * 82 / 100)) ] && [ "$4" -gt "$2" ]; then
+        qa_adb shell input tap $((($1 + $3) / 2)) $((($2 + $4) / 2))
+        return 0
+      fi
+    fi
+    # Slow drag (no fling) and a pause: a tap while the list still glides
+    # lands on the neighbouring row (seen: «Importar turnos» on a OnePlus 8T).
+    qa_adb shell input swipe 540 $((h * 75 / 100)) 540 $((h * 45 / 100)) 1200
+    sleep 2
+  done
+  return 1
+}
+
 w_pin() {   # w_pin <button regex of the sheet>
   qa_adb shell am kill "$QA_PACKAGE"
   qa_adb shell am start -n "$QA_PACKAGE/.MainActivity" >/dev/null
   sleep 3
   w_tap_wait "Abrir ajustes" 15 || { w_fail "no está el botón de Ajustes"; return 1; }
   sleep 2
-  w_tap "A.{1,2}adir widget" || { qa_adb shell input swipe 540 1800 540 700 300; sleep 1; w_tap "A.{1,2}adir widget"; } \
-    || { w_fail "no está la fila «Añadir widget»"; return 1; }
+  w_tap_visible "A.{1,2}adir widget" || { w_fail "no está la fila «Añadir widget»"; return 1; }
   sleep 2
-  w_tap_wait "$1" 5 || { w_fail "la hoja no ofrece «$1» (¿el launcher no permite fijar?)"; return 1; }
+  # The gallery (wave 2): tap the size card, then its «Añadir <size>» button.
+  # A card below the fold needs the sheet scrolled first.
+  local i
+  for i in 1 2 3 4; do
+    w_tap "$1" && sleep 1 && w_screen_has "A.{1,2}adir $1" && break
+    qa_adb shell input swipe 540 1500 540 800 300
+    sleep 1
+  done
+  w_screen_has "A.{1,2}adir $1" || { w_fail "la galería no ofrece «$1»"; return 1; }
+  w_tap_wait "A.{1,2}adir $1" 5 || { w_fail "no se pudo pulsar «Añadir $1»"; return 1; }
   w_tap_wait "Add to home screen|A.{1,2}adir a la pantalla|A.{1,2}adir autom" 10 || { w_fail "el launcher no mostró su diálogo de fijar widget"; return 1; }
   sleep 3
 }
@@ -299,7 +351,7 @@ w02() {
   qa_adb logcat -c
   w_set_clock "$(w_local_epoch "$d0 23:58:30")" || { w_fail "no se pudo cambiar la hora (service call alarm 2)"; return 1; }
   sleep 3
-  w_screen_has "$l0" || { w_fail "antes de medianoche debería verse «$l0»"; return 1; }
+  w_seek "$l0" || { w_fail "antes de medianoche debería verse «$l0»"; return 1; }
   w_shot before_midnight
   midnight_prefix="$(date -u -d "$d1" +%m-%d) 00:0"
   w_wait_midnight "$midnight_prefix" || { w_fail "la alarma de medianoche no llegó"; return 1; }
@@ -307,7 +359,7 @@ w02() {
   t="$(w_alarm_lateness "$midnight_prefix")"
   w_note "alarma de medianoche recibida a las 00:00:$(printf %02d "$t") (batería: ahorro activado, app cerrada)"
   if [ "$WQ_EXACT" = 1 ] && [ "$t" -gt 10 ]; then w_fail "con alarma exacta llegó $t s tarde"; return 1; fi
-  w_screen_has "$l1" || { w_fail "tras medianoche debería verse «$l1»"; return 1; }
+  w_seek "$l1" || { w_fail "tras medianoche debería verse «$l1»"; return 1; }
   w_screen_has "$l0" && { w_fail "sigue viéndose «$l0» (ayer)"; return 1; }
   w_shot after_midnight
   qa_adb shell settings put global low_power 0
@@ -317,11 +369,11 @@ w02() {
   local back_date
   w_set_zone Pacific/Honolulu
   back_date="$(qa_adb shell date +%Y-%m-%d | tr -d '\r')"
-  w_screen_has "$(w_label "$back_date")" || { w_fail "al cambiar de zona (hoy allí: $back_date) no se redibujó"; return 1; }
+  w_seek "$(w_label "$back_date")" || { w_fail "al cambiar de zona (hoy allí: $back_date) no se redibujó"; return 1; }
   w_shot zone_honolulu
   w_note "zona Pacific/Honolulu: el widget sigue el reloj local ($back_date)"
   w_set_zone "$WQ_ZONE"
-  w_screen_has "$l1" || { w_fail "al volver a $WQ_ZONE debería verse «$l1»"; return 1; }
+  w_seek "$l1" || { w_fail "al volver a $WQ_ZONE debería verse «$l1»"; return 1; }
   w_note "de vuelta a $WQ_ZONE: «$l1»"
 }
 
@@ -339,11 +391,11 @@ w03() {
   qa_adb logcat -c
   w_set_clock "$(w_local_epoch "$last 23:58:30")" || { w_fail "no se pudo cambiar la hora"; return 1; }
   sleep 3
-  w_screen_has "$(w_label "$last")" || { w_fail "el último día ($last) debería verse"; return 1; }
+  w_seek "$(w_label "$last")" || { w_fail "el último día ($last) debería verse"; return 1; }
   w_shot last_day
   w_wait_midnight "$(date -u -d "$after" +%m-%d) 00:0" || { w_fail "la alarma de medianoche no llegó"; return 1; }
   sleep 3
-  w_screen_has "$stale_body" || { w_fail "pasado el día 60 debería verse «$stale_body»"; return 1; }
+  w_seek "$stale_body" || { w_fail "pasado el día 60 debería verse «$stale_body»"; return 1; }
   w_screen_has "$(w_label "$last")" && { w_fail "sigue viéndose el último día"; return 1; }
   w_shot stale_after_midnight
   w_note "pasada la medianoche del día 60: «$stale_body», ningún turno"
@@ -351,10 +403,10 @@ w03() {
   # Far past the end, and before the start (clock gone back).
   w_set_clock "$(w_local_epoch "$(w_add_days "$last" 40) 12:00:00")" || return 1
   sleep 4
-  w_screen_has "$stale_body" || { w_fail "40 días después debería verse el aviso"; return 1; }
+  w_seek "$stale_body" || { w_fail "40 días después debería verse el aviso"; return 1; }
   w_set_clock "$(w_local_epoch "$(w_add_days "$first" -3) 12:00:00")" || return 1
   sleep 4
-  w_screen_has "$stale_body" || { w_fail "con el reloj antes del primer día debería verse el aviso"; return 1; }
+  w_seek "$stale_body" || { w_fail "con el reloj antes del primer día debería verse el aviso"; return 1; }
   w_shot stale_before_first
   w_note "reloj fuera del rango (antes y después): siempre el aviso, nunca un día equivocado"
 
@@ -437,6 +489,106 @@ w05() {
   w_note "tocar la cabecera abre la app"
 }
 
+# ---- W06 ---------------------------------------------------------------------
+
+# The `notes` object of the snapshot (UW) and the note text of date $1 (yyyy-mm-dd).
+w_notes() { w_snapshot | sed -n 's/.*"notes":\({[^}]*}\).*/\1/p' | head -n1; }
+w_note_of() { w_notes | grep -o "\"$1\":\"[^\"]*\"" | head -n1 | sed 's/^"[^"]*":"\(.*\)"$/\1/'; }
+
+# The day descriptions of the snapshot (`descriptions.days` and `.absences`) and the one of date $1.
+# Auxiliary widgets speak the redacted label of a health day, so that one wins when it exists.
+w_descriptions() { w_snapshot | sed -n 's/.*"days":\({[^}]*}\).*/\1/p' | head -n1; }
+w_absences() { w_snapshot | sed -n 's/.*"absences":\({[^}]*}\).*/\1/p' | head -n1; }
+w_description_of() {
+  local text
+  text="$(w_absences | grep -o "\"$1\":\"[^\"]*\"" | head -n1 | sed 's/^"[^"]*":"\(.*\)"$/\1/')"
+  [ -n "$text" ] || text="$(w_descriptions | grep -o "\"$1\":\"[^\"]*\"" | head -n1 | sed 's/^"[^"]*":"\(.*\)"$/\1/')"
+  echo "$text"
+}
+
+# The label of the next day off seen from $1 (yyyy-mm-dd), or nothing when unknown.
+w_next_off_of() {
+  w_snapshot | sed -n "s/.*\"nextOff\":{\"$1\":{\"date\":\"[^\"]*\",\"label\":\"\([^\"]*\)\".*/\1/p" | head -n1
+}
+
+w06() {
+  # Real time again (W05 moved the clock to the eve of the next month), so the app republishes from today.
+  w_set_clock "$(date -u +%s)" || { w_fail "no se pudo restaurar la hora"; return 1; }
+  qa_adb shell settings put global low_power 0
+  w_pin "Cuatro semanas" || return 1
+  w_home
+  qa_adb shell am kill "$QA_PACKAGE"; sleep 2
+  w_home
+
+  local today monday last day lastdesc lastdate note_date note_txt nextoff t
+  today="$(w_device_date)"
+  monday="$(date -u -d "$today - $(( $(date -u -d "$today" +%u) - 1 )) day" +%F)"
+  last="$(w_add_days "$monday" 27)"
+  day="$(echo "$today" | sed 's/^[0-9]*-[0-9]*-0*//')"
+  # Four Monday-first weeks (28 days): today marks a cell and the grid reaches $monday + 27.
+  w_today_cell_is "$day" || { w_fail "la celda de hoy ($day) no está marcada «hoy»"; return 1; }
+  lastdesc="$(w_description_of "$last")"
+  [ -n "$lastdesc" ] || { w_fail "no se pudo leer la descripción de $last de la instantánea"; return 1; }
+  lastdate="$(echo "$lastdesc" | sed 's/^[^,]*, //; s/\. .*//')"
+  w_seek "$lastdate" || { w_fail "la cuadrícula no llega a $last («$lastdate»): no son cuatro semanas"; return 1; }
+  w_shot four_weeks_today
+  w_note "cuatro semanas: 28 días del lunes $monday al $last, hoy = celda $day"
+
+  # The optional header with the next day off of today, when the snapshot knows one.
+  nextoff="$(w_next_off_of "$today")"
+  if [ -n "$nextoff" ]; then
+    w_seek "$nextoff" || { w_fail "la cabecera no muestra el próximo libre «$nextoff»"; return 1; }
+    w_note "próximo libre en la cabecera: «$nextoff»"
+  else
+    w_note "la instantánea no trae próximo libre para hoy: la cabecera va oculta"
+  fi
+
+  # The first line of the note travels to its cell (the demo seeds one note on tomorrow). An optional
+  # check: the seed may change, so a snapshot without a note in the grid is only noted.
+  note_date="$(w_notes | grep -o '"[0-9][0-9-]*":' | sed 's/[":]//g' | head -n1)"
+  if [ -n "$note_date" ] && [[ "$note_date" > "$monday" || "$note_date" = "$monday" ]] \
+    && [[ "$note_date" < "$last" || "$note_date" = "$last" ]]; then
+    note_txt="$(w_note_of "$note_date")"
+    if [ -n "$note_txt" ]; then
+      w_seek "${note_txt:0:10}" || { w_fail "la nota de $note_date («$note_txt») no se ve en su celda"; return 1; }
+      w_note "nota de $note_date en su celda: «$note_txt»"
+    fi
+  else
+    w_note "sin notas dentro de la cuadrícula: no hay nota que comprobar"
+  fi
+
+  # A tap on a cell opens the app.
+  w_seek "$lastdate"
+  w_tap "hoy\." || { w_fail "no se pudo tocar la celda de hoy"; return 1; }
+  sleep 4
+  qa_adb shell dumpsys window | tr -d '\r' | grep -i "mCurrentFocus" | grep -q "$QA_PACKAGE" \
+    || { w_fail "tocar la celda no abrió la app"; return 1; }
+  w_note "tocar una celda del día abre la app"
+  qa_adb shell am kill "$QA_PACKAGE"
+
+  # Midnight: the ring moves to the next day without opening the app.
+  local d0 d1 nextday
+  d0="$(w_device_date)"; d1="$(w_add_days "$d0" 1)"
+  nextday="$(echo "$d1" | sed 's/^[0-9]*-[0-9]*-0*//')"
+  qa_adb shell settings put global low_power 1
+  w_home
+  qa_adb logcat -c
+  w_set_clock "$(w_local_epoch "$d0 23:58:30")" || { w_fail "no se pudo cambiar la hora"; return 1; }
+  sleep 3
+  w_seek "$lastdate" || { w_fail "antes de medianoche debería verse la cuadrícula"; return 1; }
+  w_shot four_weeks_before_midnight
+  w_wait_midnight "$(date -u -d "$d1" +%m-%d) 00:0" || { w_fail "la alarma de medianoche no llegó"; return 1; }
+  sleep 3
+  t="$(w_alarm_lateness "$(date -u -d "$d1" +%m-%d) 00:0")"
+  w_note "alarma de medianoche recibida a las 00:00:$(printf %02d "$t") (batería: ahorro activado, app cerrada)"
+  if [ "$WQ_EXACT" = 1 ] && [ "$t" -gt 10 ]; then w_fail "con alarma exacta llegó $t s tarde"; return 1; fi
+  w_today_cell_is "$nextday" || { w_fail "tras medianoche la celda de hoy debería ser el día $nextday"; return 1; }
+  w_today_cell_is "$day" && { w_fail "sigue marcada como hoy la celda del día $day (ayer)"; return 1; }
+  w_shot four_weeks_after_midnight
+  qa_adb shell settings put global low_power 0
+  w_note "tras la medianoche el anillo pasó al día $nextday sin abrir la app"
+}
+
 # ---- W04 ---------------------------------------------------------------------
 
 # Last on purpose: the launcher of this image forgets the placed widgets after a
@@ -475,8 +627,9 @@ if [ "$WQ_FAILED_ANY" = 0 ]; then
   scenario W02 "El día cambia sin abrir la app (medianoche, zona, reinicio)" w02
   scenario W03 "Aviso honesto fuera de los 60 días" w03
   scenario W05 "Widget del mes (4x4): cambia de mes solo a medianoche" w05
+  scenario W06 "Widget de cuatro semanas (4x4): 4 semanas, notas y proximo libre" w06
   scenario W04 "Reinicio: la alarma vuelve a armarse" w04
 else
-  qa_log "W01 failed: W02, W03, W05 and W04 need the widgets and were skipped"
+  qa_log "W01 failed: W02, W03, W05, W06 and W04 need the widgets and were skipped"
 fi
 exit "$WQ_FAILED_ANY"

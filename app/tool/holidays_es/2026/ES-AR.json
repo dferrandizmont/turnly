@@ -1,0 +1,13 @@
+{
+"region":"ES-AR",
+"year":2026,
+"kind":"labour",
+"sources":{
+"s1":{"url":"https://www.boa.aragon.es/cgi-bin/EBOA/BRSCGI?CMD=VEROBJ&MLKOB=1421874360606","ref":"BOA núm. 225, 20.11.2025 — Resolución de 4 de noviembre de 2025, del Director General de Trabajo, por la que se determinan las fiestas laborales, de carácter retribuido, no recuperables e inhábiles, para el año 2026, en los municipios de las provincias de Huesca, Teruel y Zaragoza","published":"2025-11-20","retrieved":"2026-10-31"}
+},
+"municipalities":{
+"22125":{"name":"Huesca","days":["2026-01-22","2026-08-10"],"source":"s1"},
+"44216":{"name":"Teruel","days":["2026-04-07","2026-07-13"],"source":"s1"},
+"50297":{"name":"Zaragoza","days":["2026-01-29","2026-03-05"],"source":"s1"}
+}
+}

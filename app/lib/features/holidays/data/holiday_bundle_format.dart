@@ -7,10 +7,13 @@
 //   municipalities.json            INE code -> name, per region (the picker)
 //   {year}/es.json                 national + the 19 regions
 //   {year}/municipal/ES-XX.json    local holidays per municipality (INE code)
+//   {year}/<cc>.json               another country (scope `country`), same
+//                                  shape as es.json plus `country`
 
 import '../../../core/format/text_fold.dart';
 import '../../schedule/domain/civil_date.dart';
 import '../domain/holiday.dart';
+import '../domain/holiday_country.dart';
 import '../domain/holiday_entry.dart';
 import '../domain/spanish_regions.dart';
 
@@ -19,6 +22,24 @@ const int holidayBundleSchema = 1;
 
 /// Name of a local holiday that has no own name.
 const String defaultLocalHolidayName = 'Fiesta local';
+
+/// Start of the name of a Canary island holiday («Fiesta insular (Virgen de
+/// la Candelaria)»). The bundle ships it as a local day of every municipality
+/// of the island, but it is not one of the municipality's two own days.
+const String islandHolidayPrefix = 'Fiesta insular';
+
+/// Whether [name] is that of an island holiday ([islandHolidayPrefix]).
+bool isIslandHolidayName(String name) =>
+    name.startsWith('$islandHolidayPrefix ');
+
+/// Whether [e] is one of the bundled local days of the municipality [code],
+/// what tells that the bundle has that municipality's locals for a year.
+/// Island holidays and the person's own holidays do not count.
+bool isBundledLocalOf(HolidayEntry e, String code) =>
+    e.scope == HolidayScope.local &&
+    e.source != HolidaySource.user &&
+    e.municipalityCode == code &&
+    !isIslandHolidayName(e.name);
 
 /// Raised when a bundle (or a piece of it) is damaged or not understood.
 class HolidayBundleException implements Exception {
@@ -39,6 +60,10 @@ enum HolidayFileKind {
 
   /// `municipalities.json`: INE code -> name (the picker).
   municipalities,
+
+  /// `{year}/<cc>.json`: the national (and, optionally, subdivision)
+  /// holidays of one country other than Spain; `country` says which.
+  country,
 }
 
 /// One line of `manifest.json -> files`.
@@ -50,6 +75,7 @@ class HolidayManifestFile {
     required this.bytes,
     this.year,
     this.region,
+    this.country,
     this.source,
   });
 
@@ -60,11 +86,19 @@ class HolidayManifestFile {
       throw HolidayBundleException('manifest: unknown scope "$scope"');
     }
     final source = json['source'];
+    final country = normalizeCountryCode(json['country'] as String?);
+    if (kind.first == HolidayFileKind.country &&
+        (country == null || country == otherCountryCode)) {
+      throw HolidayBundleException(
+        'manifest: bad country "${json['country']}"',
+      );
+    }
     return HolidayManifestFile(
       path: _string(json, 'path'),
       kind: kind.first,
       year: json['year'] as int?,
       region: json['region'] as String?,
+      country: country,
       sha256: _string(json, 'sha256'),
       bytes: json['bytes'] as int? ?? -1,
       source: source is Map<String, Object?> ? source : null,
@@ -76,6 +110,9 @@ class HolidayManifestFile {
   final HolidayFileKind kind;
   final int? year;
   final String? region;
+
+  /// Country of a [HolidayFileKind.country] file (`MX`); null otherwise.
+  final String? country;
 
   /// Lower-case hex SHA-256 of the file bytes.
   final String sha256;
@@ -89,6 +126,7 @@ class HolidayManifestFile {
     'year': year,
     'scope': kind.name,
     if (region != null) 'region': region,
+    if (country != null) 'country': country,
     'sha256': sha256,
     'bytes': bytes,
     if (source != null) 'source': source,
@@ -132,6 +170,16 @@ class HolidayManifest {
     for (final f in files)
       if (f.kind == HolidayFileKind.es && f.year != null) f.year!,
   ]..sort());
+
+  /// Countries with official holidays in this bundle (`ES` for `es.json`),
+  /// sorted.
+  List<String> get countries => ({
+    for (final f in files)
+      if (f.kind == HolidayFileKind.es)
+        spainCountryCode
+      else if (f.kind == HolidayFileKind.country && f.country != null)
+        f.country!,
+  }.toList()..sort());
 }
 
 /// Rows of `{year}/es.json`.
@@ -182,6 +230,77 @@ List<HolidayEntry> parseEsFile(
               : HolidayScope.national,
           name: _string(h, 'name'),
           regionCode: region,
+          source: source,
+        ),
+      );
+    }
+  }
+  return out;
+}
+
+/// Rows of `{year}/<cc>.json`, the package of a country other than Spain
+/// (manifest scope `country`). Same shape as `es.json` plus `country`;
+/// `regional` is optional and its keys are ISO 3166-2 codes of that country:
+///
+/// ```json
+/// {"schema":1,"year":2027,"country":"MX",
+///  "national":[{"date":"2027-09-16","name":"Día de la Independencia"}],
+///  "regional":{"MX-CMX":[{"date":"2027-…","name":"…","origin":"regional"}]}}
+/// ```
+/// National rows are stored with the country code as their region (`MX`), so
+/// `HolidayCalendar` can tell them apart from Spain's without a new column.
+/// A file that says `ES` is read exactly like `es.json`.
+List<HolidayEntry> parseCountryFile(
+  Map<String, Object?> json, {
+  HolidaySource source = HolidaySource.bundled,
+}) {
+  final country = normalizeCountryCode(json['country'] as String?);
+  if (country == null || country == otherCountryCode) {
+    throw HolidayBundleException(
+      'country file: bad country ${json['country']}',
+    );
+  }
+  if (country == spainCountryCode) {
+    return parseEsFile({
+      'regional': const <String, Object?>{},
+      ...json,
+    }, source: source);
+  }
+  _checkSchema(json, 'country file');
+  final year = json['year'] as int;
+  final out = <HolidayEntry>[
+    for (final h in _list(json, 'national'))
+      HolidayEntry(
+        date: _date(h, year),
+        scope: HolidayScope.national,
+        name: _string(h, 'name'),
+        regionCode: country,
+        source: source,
+      ),
+  ];
+  final regional = json['regional'];
+  if (regional == null) return out;
+  if (regional is! Map) {
+    throw const HolidayBundleException('country file: bad regional');
+  }
+  final subdivision = RegExp('^$country-[A-Z0-9]{1,3}\$');
+  for (final MapEntry(key: code, value: rows) in regional.entries) {
+    if (code is! String || !subdivision.hasMatch(code)) {
+      throw HolidayBundleException('country file: unknown region $code');
+    }
+    for (final h in (rows as List).cast<Map<String, Object?>>()) {
+      final origin = h['origin'];
+      if (origin != 'regional' && origin != 'national-optional') {
+        throw HolidayBundleException('country file: unknown origin $origin');
+      }
+      out.add(
+        HolidayEntry(
+          date: _date(h, year),
+          scope: origin == 'regional'
+              ? HolidayScope.regional
+              : HolidayScope.national,
+          name: _string(h, 'name'),
+          regionCode: code,
           source: source,
         ),
       );

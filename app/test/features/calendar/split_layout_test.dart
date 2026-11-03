@@ -11,6 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/real_font.dart';
 import '../onboarding/onboarding_support.dart' show FirstLaunch;
+import 'day_sheet_finders.dart';
 import 'harness.dart';
 
 /// The two-pane month of wide screens (`docs/diseno.md`, «Pantallas anchas»):
@@ -279,6 +280,8 @@ void main() {
       expect(find.text('Miércoles, 21 de octubre'), findsOneWidget);
       expect(key('day-shift-0'), findsOneWidget);
       expect(key('day-note'), findsOneWidget);
+      expect(key('day-undo'), findsOneWidget);
+      await openDayMore(tester);
       expect(key('day-duplicate'), findsOneWidget);
       expect(focused(tester, oct21), isTrue);
       expect(focused(tester, oct22), isFalse);
@@ -317,9 +320,7 @@ void main() {
       await pumpCalendar(tester, size: tabletLandscape);
       await tapDay(tester, oct24);
       expect(idsOn(scheduleOf(tester), oct24), 'rest');
-      await tester.ensureVisible(key('day-add-morning'));
-      await tester.tap(key('day-add-morning'));
-      await tester.pumpAndSettle();
+      await tapDayControl(tester, 'day-add-morning');
 
       expect(idsOn(scheduleOf(tester), oct24), 'rest+morning');
       expect(inCell(oct24, find.text('M')), findsOneWidget);
@@ -358,9 +359,7 @@ void main() {
     ) async {
       await pumpCalendar(tester, size: tabletLandscape);
       await tapDay(tester, oct21);
-      await tester.ensureVisible(key('day-clear'));
-      await tester.tap(key('day-clear'));
-      await tester.pumpAndSettle();
+      await tapDayControl(tester, 'day-clear');
       expect(idsOn(scheduleOf(tester), oct21), '');
       expect(paneDetail, findsNothing);
       expect(paneToday, findsOneWidget);
@@ -606,17 +605,22 @@ void main() {
           size: phoneLandscape,
           textScale: scale,
         );
+        // The first question has no «Siguiente»: a card per way to start.
+        await app.choosePath('rotation');
+        await app.tap(find.byKey(const ValueKey('onboarding-pattern-12h')));
         final next = find.byKey(const ValueKey('onboarding-next'));
-        for (var step = 0; step < 2; step++) {
+        // Rotation, start day and the last step (place and job).
+        for (var step = 0; step < 3; step++) {
           expect(tester.getRect(next).bottom, lessThanOrEqualTo(412.5));
           expect(tester.getRect(next).top, greaterThan(0));
-          if (step == 0) {
+          if (step == 2) {
             await app.tap(
               find.byKey(const ValueKey('onboarding-profession-nursing')),
             );
           }
           await app.tap(next);
         }
+        expect(app.title, 'Listo');
         expect(tester.takeException(), isNull);
       });
     }

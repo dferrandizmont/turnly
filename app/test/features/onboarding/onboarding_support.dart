@@ -40,11 +40,13 @@ class FirstLaunch {
     OnboardingStatus status = const OnboardingStatus(needed: true),
     Size size = const Size(390, 844),
     double textScale = 1.0,
+    Brightness brightness = Brightness.light,
     List<Override> overrides = const [],
   }) async {
     tester.view.physicalSize = size * 3;
     tester.view.devicePixelRatio = 3;
     tester.platformDispatcher.textScaleFactorTestValue = textScale;
+    tester.platformDispatcher.platformBrightnessTestValue = brightness;
     useSpanishPhone(tester);
     addTearDown(() {
       tester.view.resetPhysicalSize();
@@ -88,6 +90,13 @@ class FirstLaunch {
     await tester.tap(finder);
     await tester.pumpAndSettle();
   }
+
+  /// Taps the card of a way to start on the first question: `import`,
+  /// `rotation` or `paint`.
+  Future<void> choosePath(String path) => tap(key('onboarding-path-$path'));
+
+  /// The last step (optional) with nothing chosen before: «Pintar a mano».
+  Future<void> toLastStep() => choosePath('paint');
 
   /// The title of the step on screen.
   String get title => (tester.widget(

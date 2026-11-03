@@ -1,4 +1,5 @@
 import 'package:cuadrante/core/providers.dart';
+import 'package:cuadrante/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -94,7 +95,10 @@ Future<void> _faq(QaContext qa) async {
   final version = config.appVersion.isEmpty
       ? 'Versión de desarrollo'
       : 'Versión ${config.appVersion}';
-  expect(find.text('Cuadrante · $version'), findsOneWidget);
+  // The header shows the localized app name (Turnly since the rename), not a
+  // hard-coded one.
+  final appName = lookupAppLocalizations(const Locale('es', 'ES')).appName;
+  expect(find.text('$appName · $version'), findsOneWidget);
   expect(_k('help-copy-version'), findsOneWidget);
   expect(
     _k('help-no-email'),
