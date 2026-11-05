@@ -70,9 +70,13 @@ String backupWhen(
   return l10n.backupUiWhenDate(date, time);
 }
 
-/// Restore is a complete localized sentence: relative days and calendar
-/// dates need different articles/contractions (de hoy, del 3 de noviembre).
-String backupRestoreLabel(
+/// The pieces of a copy's moment for the sentences that need different
+/// articles/contractions per kind of day (de hoy, del 3 de noviembre): the
+/// kind of day (`today`, `yesterday` or `date`, the `select` key of the
+/// message), the time and the calendar date.
+typedef BackupWhenParts = ({String day, String time, String date});
+
+BackupWhenParts backupWhenParts(
   AppLocalizations l10n,
   DateTime at,
   DateTime now, {
@@ -81,18 +85,31 @@ String backupRestoreLabel(
   final local = at.toLocal();
   final day = CivilDate.fromDateTime(local);
   final today = CivilDate.fromDateTime(now);
-  return l10n.backupUiCopyRestoreLabel(
-    day == today
+  return (
+    day: day == today
         ? 'today'
         : day == today.addDays(-1)
         ? 'yesterday'
         : 'date',
-    AppDateFormat(l10n.localeName, hour12).time(local),
-    (local.year == now.year
-            ? DateFormat.MMMMd(l10n.localeName)
-            : DateFormat.yMMMMd(l10n.localeName))
-        .format(local),
+    time: AppDateFormat(l10n.localeName, hour12).time(local),
+    date:
+        (local.year == now.year
+                ? DateFormat.MMMMd(l10n.localeName)
+                : DateFormat.yMMMMd(l10n.localeName))
+            .format(local),
   );
+}
+
+/// Restore is a complete localized sentence: relative days and calendar
+/// dates need different articles/contractions (de hoy, del 3 de noviembre).
+String backupRestoreLabel(
+  AppLocalizations l10n,
+  DateTime at,
+  DateTime now, {
+  bool hour12 = false,
+}) {
+  final parts = backupWhenParts(l10n, at, now, hour12: hour12);
+  return l10n.backupUiCopyRestoreLabel(parts.day, parts.time, parts.date);
 }
 
 /// What the status card says while changes wait for their copy, and it must

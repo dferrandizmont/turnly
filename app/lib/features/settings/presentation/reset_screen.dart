@@ -3,17 +3,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/format/app_date_format.dart';
+import '../../../core/icons/app_icons.dart';
+import '../../../core/icons/reset_icons.dart';
+import '../../../core/icons/settings_icons.dart';
 import '../../../core/l10n/l10n.dart';
+import '../../../core/providers.dart';
 import '../../../core/router.dart';
 import '../../../core/theme/theme_context.dart';
+import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/buttons.dart';
 import '../../../core/widgets/confirm_dialog.dart';
 import '../../../core/widgets/content_app_bar.dart';
 import '../../../core/widgets/page_body.dart';
 import '../../backup/domain/backup_store.dart';
+import '../../backup/presentation/backup_format.dart';
 import '../application/reset_providers.dart';
 import '../application/reset_everything.dart';
 import '../application/reset_notice.dart';
+import 'settings_widgets.dart';
 
 class ResetScreen extends ConsumerStatefulWidget {
   const ResetScreen({super.key});
@@ -49,11 +56,14 @@ class _ResetScreenState extends ConsumerState<ResetScreen> {
     }
   }
 
-  String _date(BackupEntry copy) {
-    final format = AppDateFormat.of(context);
-    final date = copy.modifiedAt.toLocal();
-    return '${format.dayMonthYear(date)} · ${format.time(date)}';
-  }
+  /// The copy's moment as the pieces the sentences need (de hoy, del 3 de
+  /// noviembre), in the clock and the 12/24 h format of the app.
+  BackupWhenParts _when(BackupEntry copy) => backupWhenParts(
+    context.l10n,
+    copy.modifiedAt,
+    ref.read(clockProvider)(),
+    hour12: AppDateFormat.of(context).hour12,
+  );
 
   Future<void> _share() async {
     if (_busy) return;
@@ -68,6 +78,11 @@ class _ResetScreenState extends ConsumerState<ResetScreen> {
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  String _confirmBody(BackupEntry copy) {
+    final parts = _when(copy);
+    return context.l10n.resetConfirmBody(parts.day, parts.time, parts.date);
   }
 
   Future<void> _reset() async {
@@ -93,7 +108,7 @@ class _ResetScreenState extends ConsumerState<ResetScreen> {
           return showConfirmDialog(
             context,
             title: context.l10n.resetConfirmTitle,
-            body: context.l10n.resetConfirmBody(_date(copy)),
+            body: _confirmBody(copy),
             confirmLabel: context.l10n.resetDelete,
             destructive: true,
             scrollable: true,
@@ -131,19 +146,31 @@ class _ResetScreenState extends ConsumerState<ResetScreen> {
     final colors = context.colors;
     final copy = _copy;
     final items = [
-      l10n.resetCalendars,
-      l10n.resetNotes,
-      l10n.resetAbsences,
-      l10n.resetHolidays,
-      l10n.resetSwaps,
-      l10n.resetAlarms,
-      l10n.resetWidget,
-      l10n.resetDnd,
-      l10n.resetCalendarEvents,
-      l10n.resetShareLink,
-      l10n.resetFolderBackup,
-      l10n.resetPreferences,
+      (AppIcons.calendar, l10n.resetCalendars),
+      (AppIcons.note, l10n.resetNotes),
+      (ResetIcons.absences, l10n.resetAbsences),
+      (SettingsIcons.holidays, l10n.resetHolidays),
+      (ResetIcons.swaps, l10n.resetSwaps),
+      (SettingsIcons.alarms, l10n.resetAlarms),
+      (SettingsIcons.widget, l10n.resetWidget),
+      (AppIcons.silence, l10n.resetDnd),
+      (AppIcons.deviceEvents, l10n.resetCalendarEvents),
+      (ResetIcons.shareLink, l10n.resetShareLink),
+      (ResetIcons.folder, l10n.resetFolderBackup),
+      (ResetIcons.preferences, l10n.resetPreferences),
     ];
+    final String? status;
+    if (_deleting) {
+      status = l10n.resetDeleting;
+    } else if (_savingCopy) {
+      status = l10n.resetBackupPreparing;
+    } else if (copy != null) {
+      ref.watch(clockProvider);
+      final parts = _when(copy);
+      status = l10n.resetBackupSavedAt(parts.day, parts.time, parts.date);
+    } else {
+      status = null;
+    }
     return PopScope(
       canPop: !_deleting,
       child: AbsorbPointer(
@@ -157,26 +184,29 @@ class _ResetScreenState extends ConsumerState<ResetScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(l10n.resetIntro, style: context.type.bodyStrong),
+                  SettingsSection(
+                    key: const ValueKey('reset-items'),
+                    title: l10n.resetListTitle,
+                    children: [
+                      for (final (icon, text) in items)
+                        _ResetItemRow(icon: icon, text: text),
+                    ],
+                  ),
                   const SizedBox(height: Sp.m),
-                  for (final item in items)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: Sp.s),
-                      child: Text('• $item', style: context.type.body),
-                    ),
+                  _KeepNote(text: l10n.resetKeepLanguage),
                   const SizedBox(height: Sp.m),
-                  Text(l10n.resetKeepLanguage, style: context.type.bodyStrong),
-                  const SizedBox(height: Sp.section),
-                  if (_savingCopy || _deleting || copy != null)
+                  if (status != null)
                     Text(
-                      _deleting
-                          ? l10n.resetDeleting
-                          : _savingCopy
-                          ? l10n.resetBackupPreparing
-                          : l10n.resetBackupSaved(copy!.id),
-                      style: context.type.body,
+                      status,
+                      key: const ValueKey('reset-status'),
+                      style: context.type.body.copyWith(
+                        color: colors.textSecondary,
+                      ),
                     ),
-                  if (_busy) const Center(child: ButtonSpinner()),
+                  if (_busy) ...[
+                    const SizedBox(height: Sp.m),
+                    const Center(child: ButtonSpinner()),
+                  ],
                   if (_error != null) ...[
                     const SizedBox(height: Sp.m),
                     Text(
@@ -220,6 +250,99 @@ class _ResetScreenState extends ConsumerState<ResetScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// One thing the reset deletes: a neutral icon disc and its sentence on the
+/// `surface` card of [SettingsSection] (the hairline indent matches the disc).
+/// The icon is quiet on purpose: what warns is the button.
+class _ResetItemRow extends StatelessWidget {
+  const _ResetItemRow({required this.icon, required this.text});
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: Sp.l, vertical: Sp.m),
+      child: Row(
+        children: [
+          ExcludeSemantics(
+            child: Container(
+              width: Disc.m,
+              height: Disc.m,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: colors.surfaceMuted,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: IconSize.button,
+                color: colors.textSecondary,
+              ),
+            ),
+          ),
+          const SizedBox(width: Sp.m),
+          Expanded(child: Text(text, style: context.type.body)),
+        ],
+      ),
+    );
+  }
+}
+
+/// What stays after the reset: a tinted note with the accent disc of
+/// [AppCallout] (a shield) and no heading, so it reads as a note, not a title.
+class _KeepNote extends StatelessWidget {
+  const _KeepNote({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final tone = colors.accentTone;
+    final disc = ExcludeSemantics(
+      child: Container(
+        width: Disc.m,
+        height: Disc.m,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(color: tone.bg, shape: BoxShape.circle),
+        child: Icon(
+          SettingsIcons.backup,
+          size: IconSize.button,
+          fill: 1,
+          color: tone.fg,
+        ),
+      ),
+    );
+    final message = Text(
+      text,
+      key: const ValueKey('reset-keep-note'),
+      style: context.type.body.copyWith(color: colors.textSecondary),
+    );
+    return AppCard.tinted(
+      child: context.largeText
+          // The text gets the card's whole width at large text sizes.
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                disc,
+                const SizedBox(height: Sp.m),
+                message,
+              ],
+            )
+          : Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                disc,
+                const SizedBox(width: Sp.m),
+                Expanded(child: message),
+              ],
+            ),
     );
   }
 }

@@ -3731,7 +3731,7 @@
     }
   },
   "resetTitle": "Dena ezabatu eta hutsetik hasi",
-  "resetIntro": "Hau guztia ezabatuko da Turnly aplikaziotik:",
+  "resetListTitle": "Zer ezabatzen da",
   "resetCalendars": "Egutegi guztiak eta haien txandak, txandakatzeak eta salbuespenak.",
   "resetNotes": "Oharrak, eranskinak (argazkiak, marrazkiak eta fitxategiak) eta zereginak.",
   "resetAbsences": "Oporrak, baimenak eta absentziak.",
@@ -3743,23 +3743,35 @@
   "resetPreferences": "Ezarpen guztiak.",
   "resetKeepLanguage": "Aplikazioaren hizkuntza bakarrik gordeko dugu. Babeskopia mugikorrean geratuko da, eta lehen erabileran leheneratu ahal izango duzu.",
   "resetBackupPreparing": "Kopia gordetzen…",
-  "resetBackupSaved": "Ezabatu aurretik kopia bat gordeko dugu: {file}",
+  "resetBackupSavedAt": "{day, select, today{Ezabatu aurretik gaurko kopia bat gorde dugu ({time}).} yesterday{Ezabatu aurretik atzoko kopia bat gorde dugu ({time}).} other{Ezabatu aurretik kopia bat gorde dugu ({date}, {time}).}}",
   "resetShare": "Gorde kopia beste leku batean",
   "resetDelete": "Ezabatu dena",
   "resetConfirmTitle": "Dena ezabatu?",
-  "resetConfirmBody": "Ezin da desegin, baina data honetako kopia duzu: {date}.",
+  "resetConfirmBody": "{day, select, today{Ezin da desegin, baina gaurko kopia duzu ({time}).} yesterday{Ezin da desegin, baina atzoko kopia duzu ({time}).} other{Ezin da desegin, baina kopia hau duzu ({date}, {time}).}}",
   "resetBackupFailed": "Ezin izan da babeskopia gorde eta egiaztatu. Ez da ezer ezabatu. Begiratu mugikorreko espazioa eta saiatu berriro.",
   "resetShareFailed": "Ezin izan da kopia partekatu. Kopia lokala mugikorrean gordeta dago oraindik.",
   "resetFailed": "Ezin izan da ezabatzea amaitu. Babeskopia mugikorrean gordeta dago oraindik. Saiatu berriro.",
-  "@resetBackupSaved": {
+  "@resetBackupSavedAt": {
     "placeholders": {
-      "file": {
+      "day": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "date": {
         "type": "String"
       }
     }
   },
   "@resetConfirmBody": {
     "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
       "date": {
         "type": "String"
       }

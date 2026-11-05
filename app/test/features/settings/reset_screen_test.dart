@@ -2,6 +2,8 @@ import 'dart:io';
 import 'dart:async';
 
 import 'package:cuadrante/core/bootstrap/bootstrap.dart';
+import 'package:cuadrante/core/theme/spacing.dart' show Sp;
+import 'package:cuadrante/core/widgets/app_card.dart';
 import 'package:cuadrante/core/providers.dart';
 import 'package:cuadrante/core/diagnostics/crash_reporting.dart';
 import 'package:cuadrante/features/calendar/application/schedule_controller.dart';
@@ -13,6 +15,7 @@ import 'package:cuadrante/features/backup/application/folder_backup_providers.da
 import 'package:cuadrante/features/backup/data/folder_backup_state_store.dart';
 import 'package:cuadrante/features/backup/domain/folder_backup.dart';
 import 'package:cuadrante/features/backup/domain/backup_store.dart';
+import 'package:cuadrante/features/backup/presentation/backup_format.dart';
 import 'package:cuadrante/features/share_link/application/share_link_controller.dart';
 import 'package:cuadrante/features/share_link/data/share_link_api.dart';
 import 'package:cuadrante/features/share_link/domain/share_token.dart';
@@ -57,10 +60,15 @@ void main() {
     BackupUiHarness h, {
     List<Override> extra = const [],
     CalendarBackgroundStore? backgroundStore,
+    Size size = const Size(390, 2200),
+    Brightness brightness = Brightness.light,
+    DateTime Function()? clock,
   }) async {
     final app = await AppUnderTest.pump(
       tester,
-      size: const Size(390, 2200),
+      size: size,
+      platformBrightness: brightness,
+      clock: clock,
       overrides: [
         ...h.overrides,
         resetTemporaryDirectoryProvider.overrideWithValue(() async => h.root),
@@ -145,15 +153,41 @@ void main() {
       l10n.resetPreferences,
     ];
     for (final item in expected) {
-      expect(find.text('• $item'), findsOneWidget);
+      expect(find.text(item), findsOneWidget);
+      expect(
+        find.descendant(of: key('reset-items'), matching: find.text(item)),
+        findsOneWidget,
+      );
     }
+    // One icon per item, in the card, and no bullet lists left.
+    expect(
+      find.descendant(of: key('reset-items'), matching: find.byType(Icon)),
+      findsNWidgets(expected.length),
+    );
     expect(
       tester
           .widgetList<Text>(find.byType(Text))
           .where((t) => t.data?.startsWith('• ') ?? false),
-      hasLength(expected.length),
+      isEmpty,
     );
-    expect(find.textContaining('Solo conservamos el idioma'), findsOneWidget);
+    expect(find.text(l10n.resetListTitle.toUpperCase()), findsOneWidget);
+    // What stays is a note in a tinted card, not a heading.
+    expect(find.text(l10n.resetKeepLanguage), findsOneWidget);
+    expect(
+      find.ancestor(
+        of: key('reset-keep-note'),
+        matching: find.byWidgetPredicate((w) => w is AppCard && w.tinted),
+      ),
+      findsOneWidget,
+    );
+    // The copy is dated in words, never by its file name.
+    expect(key('reset-status'), findsOneWidget);
+    expect(
+      find.text('Antes de borrar guardamos una copia de hoy a las 12:00.'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('pre-reset-'), findsNothing);
+    expect(find.textContaining('.turnly'), findsNothing);
     expect(h.files, hasLength(1));
     await tapIo(tester, key('reset-share'));
     expect(h.shared, hasLength(1));
@@ -161,6 +195,68 @@ void main() {
     expect(data.dayEntries, isNotEmpty);
     expect(h.shared.single.fileName, h.files.single);
   });
+
+  test('the saved copy is dated in words for today, yesterday and older', () {
+    final l10n = lookupAppLocalizations(const Locale('es'));
+    final now = DateTime(2026, 11, 5, 9);
+    String say(DateTime at) {
+      final p = backupWhenParts(l10n, at, now);
+      return l10n.resetBackupSavedAt(p.day, p.time, p.date);
+    }
+
+    expect(
+      say(DateTime(2026, 11, 5, 8, 13)),
+      'Antes de borrar guardamos una copia de hoy a las 08:13.',
+    );
+    expect(
+      say(DateTime(2026, 11, 4, 23, 5)),
+      'Antes de borrar guardamos una copia de ayer a las 23:05.',
+    );
+    expect(
+      say(DateTime(2026, 11, 3, 14, 52)),
+      'Antes de borrar guardamos una copia del 3 de noviembre a las 14:52.',
+    );
+    final old = backupWhenParts(l10n, DateTime(2026, 11, 3, 14, 52), now);
+    expect(
+      l10n.resetConfirmBody(old.day, old.time, old.date),
+      'No se puede deshacer, pero tienes la copia del 3 de noviembre a las 14:52.',
+    );
+    final yesterday = backupWhenParts(l10n, DateTime(2026, 11, 4, 23, 5), now);
+    expect(
+      l10n.resetConfirmBody(yesterday.day, yesterday.time, yesterday.date),
+      'No se puede deshacer, pero tienes la copia de ayer a las 23:05.',
+    );
+  });
+
+  for (final (name, size, scale, brightness) in [
+    ('phone x1.3 light', const Size(360, 3000), 1.3, Brightness.light),
+    ('phone x2 dark', const Size(320, 4200), 2.0, Brightness.dark),
+    ('tablet x1.3 light', const Size(900, 1600), 1.3, Brightness.light),
+  ]) {
+    testWidgets('lays out without overflow: $name', (tester) async {
+      tester.platformDispatcher.textScaleFactorTestValue = scale;
+      final h = BackupUiHarness(tester);
+      await open(tester, h, size: size, brightness: brightness);
+      final l10n = lookupAppLocalizations(const Locale('es'));
+      expect(tester.takeException(), isNull);
+      for (final item in [
+        l10n.resetCalendars,
+        l10n.resetCalendarEvents,
+        l10n.resetFolderBackup,
+        l10n.resetPreferences,
+      ]) {
+        expect(find.text(item), findsOneWidget);
+      }
+      expect(find.text(l10n.resetKeepLanguage), findsOneWidget);
+      expect(find.text(l10n.resetShare), findsOneWidget);
+      expect(find.text(l10n.resetDelete), findsOneWidget);
+      expect(
+        tester.getSize(key('reset-items')).width,
+        lessThanOrEqualTo(Sp.maxContentWidth),
+      );
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   testWidgets(
     'confirmation can be cancelled; confirming reaches first use with copy intact',
@@ -183,7 +279,9 @@ void main() {
       await tapIo(tester, key('reset-delete'), until: find.byType(AlertDialog));
       expect(find.text('¿Borrar todo?'), findsOneWidget);
       expect(
-        find.textContaining('No se puede deshacer, pero tienes la copia del'),
+        find.text(
+          'No se puede deshacer, pero tienes la copia de hoy a las 12:00.',
+        ),
         findsOneWidget,
       );
       await tester.tap(key('confirm-cancel'));

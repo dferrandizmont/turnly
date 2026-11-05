@@ -10490,11 +10490,11 @@ abstract class AppLocalizations {
   /// **'Borrar todo y empezar de cero'**
   String get resetTitle;
 
-  /// No description provided for @resetIntro.
+  /// No description provided for @resetListTitle.
   ///
   /// In es, this message translates to:
-  /// **'Se borrará todo esto de Turnly:'**
-  String get resetIntro;
+  /// **'Qué se borra'**
+  String get resetListTitle;
 
   /// No description provided for @resetCalendars.
   ///
@@ -10562,11 +10562,11 @@ abstract class AppLocalizations {
   /// **'Guardando la copia…'**
   String get resetBackupPreparing;
 
-  /// No description provided for @resetBackupSaved.
+  /// No description provided for @resetBackupSavedAt.
   ///
   /// In es, this message translates to:
-  /// **'Antes de borrar guardamos una copia: {file}'**
-  String resetBackupSaved(String file);
+  /// **'{day, select, today{Antes de borrar guardamos una copia de hoy a las {time}.} yesterday{Antes de borrar guardamos una copia de ayer a las {time}.} other{Antes de borrar guardamos una copia del {date} a las {time}.}}'**
+  String resetBackupSavedAt(String day, String time, String date);
 
   /// No description provided for @resetShare.
   ///
@@ -10589,8 +10589,8 @@ abstract class AppLocalizations {
   /// No description provided for @resetConfirmBody.
   ///
   /// In es, this message translates to:
-  /// **'No se puede deshacer, pero tienes la copia del {date}.'**
-  String resetConfirmBody(String date);
+  /// **'{day, select, today{No se puede deshacer, pero tienes la copia de hoy a las {time}.} yesterday{No se puede deshacer, pero tienes la copia de ayer a las {time}.} other{No se puede deshacer, pero tienes la copia del {date} a las {time}.}}'**
+  String resetConfirmBody(String day, String time, String date);
 
   /// No description provided for @resetBackupFailed.
   ///

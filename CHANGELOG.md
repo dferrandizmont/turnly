@@ -12,6 +12,12 @@ at once, so they can skip numbers.
 
 ## Unreleased
 
+## 0.8.7 · 2026-11-05
+
+A clearer screen to delete everything and start over.
+
+- Settings: the “Borrar todo y empezar de cero” screen is clearer, with an icon per item, a note on what stays and the backup's date.
+
 ## 0.8.6 · 2026-11-05
 
 The Google backup of Android only takes Turnly end-to-end encrypted. Release for Google Play, GitHub and the web.

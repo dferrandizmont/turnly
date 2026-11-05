@@ -1456,3 +1456,4 @@ app/test/features/settings/reset_backup_test.dart
 app/test/features/settings/reset_everything_test.dart
 app/test/features/settings/reset_screen_test.dart
 tool/qa/backup_android.sh
+app/lib/core/icons/reset_icons.dart

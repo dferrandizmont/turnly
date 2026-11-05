@@ -6584,7 +6584,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get resetTitle => 'Borrar todo y empezar de cero';
 
   @override
-  String get resetIntro => 'Se borrará todo esto de Turnly:';
+  String get resetListTitle => 'Qué se borra';
 
   @override
   String get resetCalendars =>
@@ -6624,8 +6624,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get resetBackupPreparing => 'Guardando la copia…';
 
   @override
-  String resetBackupSaved(String file) {
-    return 'Antes de borrar guardamos una copia: $file';
+  String resetBackupSavedAt(String day, String time, String date) {
+    String _temp0 = intl.Intl.selectLogic(day, {
+      'today': 'Antes de borrar guardamos una copia de hoy a las $time.',
+      'yesterday': 'Antes de borrar guardamos una copia de ayer a las $time.',
+      'other': 'Antes de borrar guardamos una copia del $date a las $time.',
+    });
+    return '$_temp0';
   }
 
   @override
@@ -6638,8 +6643,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get resetConfirmTitle => '¿Borrar todo?';
 
   @override
-  String resetConfirmBody(String date) {
-    return 'No se puede deshacer, pero tienes la copia del $date.';
+  String resetConfirmBody(String day, String time, String date) {
+    String _temp0 = intl.Intl.selectLogic(day, {
+      'today': 'No se puede deshacer, pero tienes la copia de hoy a las $time.',
+      'yesterday':
+          'No se puede deshacer, pero tienes la copia de ayer a las $time.',
+      'other':
+          'No se puede deshacer, pero tienes la copia del $date a las $time.',
+    });
+    return '$_temp0';
   }
 
   @override

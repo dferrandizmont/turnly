@@ -6590,7 +6590,7 @@ class AppLocalizationsEu extends AppLocalizations {
   String get resetTitle => 'Dena ezabatu eta hutsetik hasi';
 
   @override
-  String get resetIntro => 'Hau guztia ezabatuko da Turnly aplikaziotik:';
+  String get resetListTitle => 'Zer ezabatzen da';
 
   @override
   String get resetCalendars =>
@@ -6630,8 +6630,13 @@ class AppLocalizationsEu extends AppLocalizations {
   String get resetBackupPreparing => 'Kopia gordetzen…';
 
   @override
-  String resetBackupSaved(String file) {
-    return 'Ezabatu aurretik kopia bat gordeko dugu: $file';
+  String resetBackupSavedAt(String day, String time, String date) {
+    String _temp0 = intl.Intl.selectLogic(day, {
+      'today': 'Ezabatu aurretik gaurko kopia bat gorde dugu ($time).',
+      'yesterday': 'Ezabatu aurretik atzoko kopia bat gorde dugu ($time).',
+      'other': 'Ezabatu aurretik kopia bat gorde dugu ($date, $time).',
+    });
+    return '$_temp0';
   }
 
   @override
@@ -6644,8 +6649,13 @@ class AppLocalizationsEu extends AppLocalizations {
   String get resetConfirmTitle => 'Dena ezabatu?';
 
   @override
-  String resetConfirmBody(String date) {
-    return 'Ezin da desegin, baina data honetako kopia duzu: $date.';
+  String resetConfirmBody(String day, String time, String date) {
+    String _temp0 = intl.Intl.selectLogic(day, {
+      'today': 'Ezin da desegin, baina gaurko kopia duzu ($time).',
+      'yesterday': 'Ezin da desegin, baina atzoko kopia duzu ($time).',
+      'other': 'Ezin da desegin, baina kopia hau duzu ($date, $time).',
+    });
+    return '$_temp0';
   }
 
   @override

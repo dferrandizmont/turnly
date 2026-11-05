@@ -6557,7 +6557,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get resetTitle => 'Delete everything and start over';
 
   @override
-  String get resetIntro => 'All of this will be deleted from Turnly:';
+  String get resetListTitle => 'What gets deleted';
 
   @override
   String get resetCalendars =>
@@ -6597,8 +6597,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get resetBackupPreparing => 'Saving the backup…';
 
   @override
-  String resetBackupSaved(String file) {
-    return 'Before deleting we save a backup: $file';
+  String resetBackupSavedAt(String day, String time, String date) {
+    String _temp0 = intl.Intl.selectLogic(day, {
+      'today': 'Before deleting we saved a backup from today at $time.',
+      'yesterday': 'Before deleting we saved a backup from yesterday at $time.',
+      'other': 'Before deleting we saved a backup from $date at $time.',
+    });
+    return '$_temp0';
   }
 
   @override
@@ -6611,8 +6616,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get resetConfirmTitle => 'Delete everything?';
 
   @override
-  String resetConfirmBody(String date) {
-    return 'This cannot be undone, but you have the backup from $date.';
+  String resetConfirmBody(String day, String time, String date) {
+    String _temp0 = intl.Intl.selectLogic(day, {
+      'today':
+          'This cannot be undone, but you have the backup from today at $time.',
+      'yesterday':
+          'This cannot be undone, but you have the backup from yesterday at $time.',
+      'other':
+          'This cannot be undone, but you have the backup from $date at $time.',
+    });
+    return '$_temp0';
   }
 
   @override

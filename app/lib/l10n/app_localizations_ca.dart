@@ -6574,7 +6574,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get resetTitle => 'Esborra-ho tot i comença de zero';
 
   @override
-  String get resetIntro => 'S’esborrarà tot això de Turnly:';
+  String get resetListTitle => 'Què s’esborra';
 
   @override
   String get resetCalendars =>
@@ -6614,8 +6614,13 @@ class AppLocalizationsCa extends AppLocalizations {
   String get resetBackupPreparing => 'Desant la còpia…';
 
   @override
-  String resetBackupSaved(String file) {
-    return 'Abans d’esborrar desem una còpia: $file';
+  String resetBackupSavedAt(String day, String time, String date) {
+    String _temp0 = intl.Intl.selectLogic(day, {
+      'today': 'Abans d’esborrar desem una còpia d’avui a les $time.',
+      'yesterday': 'Abans d’esborrar desem una còpia d’ahir a les $time.',
+      'other': 'Abans d’esborrar desem una còpia del $date a les $time.',
+    });
+    return '$_temp0';
   }
 
   @override
@@ -6628,8 +6633,13 @@ class AppLocalizationsCa extends AppLocalizations {
   String get resetConfirmTitle => 'Vols esborrar-ho tot?';
 
   @override
-  String resetConfirmBody(String date) {
-    return 'No es pot desfer, però tens la còpia del $date.';
+  String resetConfirmBody(String day, String time, String date) {
+    String _temp0 = intl.Intl.selectLogic(day, {
+      'today': 'No es pot desfer, però tens la còpia d’avui a les $time.',
+      'yesterday': 'No es pot desfer, però tens la còpia d’ahir a les $time.',
+      'other': 'No es pot desfer, però tens la còpia del $date a les $time.',
+    });
+    return '$_temp0';
   }
 
   @override

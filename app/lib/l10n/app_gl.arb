@@ -3731,7 +3731,7 @@
     }
   },
   "resetTitle": "Borrar todo e comezar de cero",
-  "resetIntro": "Borrarase todo isto de Turnly:",
+  "resetListTitle": "Que se borra",
   "resetCalendars": "Todos os calendarios e as súas quendas, rotacións e excepcións.",
   "resetNotes": "Notas, anexos (fotos, debuxos e ficheiros) e tarefas.",
   "resetAbsences": "Vacacións, permisos e ausencias.",
@@ -3743,23 +3743,35 @@
   "resetPreferences": "Todos os axustes.",
   "resetKeepLanguage": "Só conservamos o idioma da app. A copia de seguranza queda no móbil e poderás restaurala no primeiro uso.",
   "resetBackupPreparing": "Gardando a copia…",
-  "resetBackupSaved": "Antes de borrar gardamos unha copia: {file}",
+  "resetBackupSavedAt": "{day, select, today{Antes de borrar gardamos unha copia de hoxe ás {time}.} yesterday{Antes de borrar gardamos unha copia de onte ás {time}.} other{Antes de borrar gardamos unha copia do {date} ás {time}.}}",
   "resetShare": "Gardar a copia noutro sitio",
   "resetDelete": "Borrar todo",
   "resetConfirmTitle": "Borrar todo?",
-  "resetConfirmBody": "Non se pode desfacer, pero tes a copia do {date}.",
+  "resetConfirmBody": "{day, select, today{Non se pode desfacer, pero tes a copia de hoxe ás {time}.} yesterday{Non se pode desfacer, pero tes a copia de onte ás {time}.} other{Non se pode desfacer, pero tes a copia do {date} ás {time}.}}",
   "resetBackupFailed": "Non se puido gardar e comprobar a copia de seguranza. Non se borrou nada. Revisa o espazo do móbil e volve tentalo.",
   "resetShareFailed": "Non se puido compartir a copia. A copia local segue gardada no móbil.",
   "resetFailed": "Non se puido completar o borrado. A túa copia de seguranza segue gardada no móbil. Volve tentalo.",
-  "@resetBackupSaved": {
+  "@resetBackupSavedAt": {
     "placeholders": {
-      "file": {
+      "day": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "date": {
         "type": "String"
       }
     }
   },
   "@resetConfirmBody": {
     "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
       "date": {
         "type": "String"
       }
