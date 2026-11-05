@@ -912,6 +912,8 @@ docs/readme/ca/06-festivos.png
 docs/readme/ca/07-mes-oscuro.png
 docs/readme/ca/08-vacaciones.png
 docs/readme/ca/09-cambios.png
+docs/readme/ca/10-primer-uso.png
+docs/readme/ca/11-widgets.png
 docs/readme/ca/header.png
 docs/readme/ca/icon-512.png
 docs/readme/en/01-mes.png
@@ -923,6 +925,8 @@ docs/readme/en/06-festivos.png
 docs/readme/en/07-mes-oscuro.png
 docs/readme/en/08-vacaciones.png
 docs/readme/en/09-cambios.png
+docs/readme/en/10-primer-uso.png
+docs/readme/en/11-widgets.png
 docs/readme/en/header.png
 docs/readme/en/icon-512.png
 docs/readme/es/01-mes.png
@@ -934,6 +938,8 @@ docs/readme/es/06-festivos.png
 docs/readme/es/07-mes-oscuro.png
 docs/readme/es/08-vacaciones.png
 docs/readme/es/09-cambios.png
+docs/readme/es/10-primer-uso.png
+docs/readme/es/11-widgets.png
 docs/readme/es/header.png
 docs/readme/es/icon-512.png
 docs/readme/eu/01-mes.png
@@ -945,6 +951,8 @@ docs/readme/eu/06-festivos.png
 docs/readme/eu/07-mes-oscuro.png
 docs/readme/eu/08-vacaciones.png
 docs/readme/eu/09-cambios.png
+docs/readme/eu/10-primer-uso.png
+docs/readme/eu/11-widgets.png
 docs/readme/eu/header.png
 docs/readme/eu/icon-512.png
 docs/readme/gl/01-mes.png
@@ -956,6 +964,8 @@ docs/readme/gl/06-festivos.png
 docs/readme/gl/07-mes-oscuro.png
 docs/readme/gl/08-vacaciones.png
 docs/readme/gl/09-cambios.png
+docs/readme/gl/10-primer-uso.png
+docs/readme/gl/11-widgets.png
 docs/readme/gl/header.png
 docs/readme/gl/icon-512.png
 docs/tienda/app-store.md
@@ -1457,3 +1467,5 @@ app/test/features/settings/reset_everything_test.dart
 app/test/features/settings/reset_screen_test.dart
 tool/qa/backup_android.sh
 app/lib/core/icons/reset_icons.dart
+web/assets/theme.js
+web/templates/icons.html.j2

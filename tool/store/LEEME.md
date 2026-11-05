@@ -28,7 +28,7 @@ En Windows se usa la zona del sistema: no definas `TZ=Europe/Madrid`, porque
 su runtime no interpreta ese identificador IANA como Linux.
 
 Salidas versionadas en **`docs/readme/<idioma>/`** para los cinco idiomas de la app
-(`es`, `ca`, `gl`, `eu`, `en`), once por idioma. Las capturas son **pantallas en bruto
+(`es`, `ca`, `gl`, `eu`, `en`), trece por idioma. Las capturas son **pantallas en bruto
 del móvil, como las de Ink Lab**: 1080 × 2400 (412 dp de ancho a 1080/412), tema claro,
 con barra de estado de Android (10:00, wifi, 3G, cobertura y batería llenas) y píldora
 del gesto abajo, **sin titular, sin marco y sin tinte de fondo**. Una sola va en oscuro
@@ -41,12 +41,14 @@ del gesto abajo, **sin titular, sin marco y sin tinte de fondo**. Una sola va en
 | `01-mes.png` | 1080 × 2400 | Cuadrícula del mes, tema claro |
 | `02-lista.png` | 1080 × 2400 | Lista del mismo mes |
 | `03-pintar.png` | 1080 × 2400 | Pintar con la paleta |
-| `04-rotaciones.png` | 1080 × 2400 | Asistente y vista previa de la rotación |
+| `04-rotaciones.png` | 1080 × 2400 | Asistente: paso del día de inicio y del ciclo (0.8.4) |
 | `05-horas.png` | 1080 × 2400 | Resumen de horas |
 | `06-festivos.png` | 1080 × 2400 | Festivos: país, comunidad y municipio |
 | `07-mes-oscuro.png` | 1080 × 2400 | Cuadrícula del mes, tema oscuro |
 | `08-vacaciones.png` | 1080 × 2400 | Vacaciones y permisos: saldos del año |
 | `09-cambios.png` | 1080 × 2400 | Libro de cambios: balance con los compañeros |
+| `10-primer-uso.png` | 1080 × 2400 | Primer uso: los tres caminos (importar, rotación, pintar) |
+| `11-widgets.png` | 1080 × 2400 | Galería «Añadir widget» con los turnos de la muestra |
 
 En las pantallas largas (`05-horas`, `06-festivos`) el test desplaza la lista lo mínimo
 para que ningún texto quede bajo la píldora del gesto. PNG RGB de 8 bits, opacos y sin metadatos. El escritor comprueba las dimensiones

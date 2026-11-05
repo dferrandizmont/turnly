@@ -105,6 +105,12 @@ const githubPhysical = Size(1080, 2400);
 const githubWidthDp = 412.0;
 const githubPixelRatio = 1080 / githubWidthDp;
 
+/// Android tablet in portrait for the Google Play tablet screenshots (Redmi Pad
+/// 2 Pro class): 800 dp wide, rendered at 1600x2560.
+const tabletPhysical = Size(1600, 2560);
+const tabletWidthDp = 800.0;
+const tabletPixelRatio = 1600 / tabletWidthDp;
+
 /// Status bar height and gesture bar inset of the fake phone, in dp.
 const githubStatusBarDp = 40.0;
 const githubGestureDp = 24.0;
@@ -118,8 +124,9 @@ void paintAndroidChrome(
   required Size size,
   required Color ink,
   required TextStyle textStyle,
+  double widthDp = githubWidthDp,
 }) {
-  final dp = size.width / githubWidthDp;
+  final dp = size.width / widthDp;
   final ys = githubStatusBarDp * dp;
   final cy = ys / 2;
 

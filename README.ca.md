@@ -61,7 +61,7 @@ També pots baixar l’APK de la [darrera versió](https://github.com/dferrandiz
   <a href="docs/readme/ca/01-mes.png"><img src="docs/readme/ca/01-mes.png" width="19%" alt="Mes pintat i targeta del proper torn"></a>
   <a href="docs/readme/ca/02-lista.png"><img src="docs/readme/ca/02-lista.png" width="19%" alt="El mateix mes en vista Llista, amb codis i horaris complets"></a>
   <a href="docs/readme/ca/03-pintar.png"><img src="docs/readme/ca/03-pintar.png" width="19%" alt="Mode pintar amb la paleta de torns"></a>
-  <a href="docs/readme/ca/04-rotaciones.png"><img src="docs/readme/ca/04-rotaciones.png" width="19%" alt="Assistent de rotacions amb vista prèvia abans d’aplicar"></a>
+  <a href="docs/readme/ca/04-rotaciones.png"><img src="docs/readme/ca/04-rotaciones.png" width="19%" alt="Assistent de rotacions: el dia del cicle en què comences, abans d'aplicar"></a>
   <a href="docs/readme/ca/05-horas.png"><img src="docs/readme/ca/05-horas.png" width="19%" alt="Resum mensual d’hores treballades, nocturnes i festives"></a>
 </p>
 
@@ -73,6 +73,8 @@ També pots baixar l’APK de la [darrera versió](https://github.com/dferrandiz
   <a href="docs/readme/ca/07-mes-oscuro.png"><img src="docs/readme/ca/07-mes-oscuro.png" width="19%" alt="El mateix mes amb el tema fosc"></a>
   <a href="docs/readme/ca/08-vacaciones.png"><img src="docs/readme/ca/08-vacaciones.png" width="19%" alt="Saldos de vacances i permisos, amb els dies que queden i els arrossegats"></a>
   <a href="docs/readme/ca/09-cambios.png"><img src="docs/readme/ca/09-cambios.png" width="19%" alt="Llibre de canvis amb el balanç de cada company i els torns de cada canvi"></a>
+  <a href="docs/readme/ca/10-primer-uso.png"><img src="docs/readme/ca/10-primer-uso.png" width="19%" alt="Primera pantalla del primer ús, amb tres camins: importar, usar una rotació o pintar a mà"></a>
+  <a href="docs/readme/ca/11-widgets.png"><img src="docs/readme/ca/11-widgets.png" width="19%" alt="Galeria «Afegeix un widget» amb els teus torns reals: petit, agenda, mitjà i més"></a>
 </p>
 
 </details>

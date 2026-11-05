@@ -16,7 +16,7 @@ Future<bool> loadRoboto() async {
   final dir = _materialFonts();
   if (dir == null) return false;
   Future<ByteData> bytes(String name) async {
-    final data = await File('${dir.path}/$name').readAsBytes();
+    final data = await _file(dir, name)!.readAsBytes();
     return ByteData.sublistView(data);
   }
 
@@ -47,7 +47,21 @@ Directory? _materialFonts() {
   }
   for (final path in candidates) {
     final found = Directory(path);
-    if (File('${found.path}/roboto-regular.ttf').existsSync()) return found;
+    if (_file(found, 'roboto-regular.ttf') != null) return found;
+  }
+  return null;
+}
+
+/// [name] in [dir], whatever its case: the SDK for Windows has
+/// `roboto-regular.ttf` and the one for Linux and macOS `Roboto-Regular.ttf`
+/// (Windows does not tell them apart; the CI on Linux does).
+File? _file(Directory dir, String name) {
+  if (!dir.existsSync()) return null;
+  final wanted = name.toLowerCase();
+  for (final entry in dir.listSync()) {
+    if (entry is File && entry.uri.pathSegments.last.toLowerCase() == wanted) {
+      return entry;
+    }
   }
   return null;
 }

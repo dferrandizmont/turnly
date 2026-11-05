@@ -2,20 +2,20 @@
   "name": "Turnly",
   "title": "Turnly · As túas quendas, dunha ollada",
   "description": "Calendario de quendas gratuíto e de código aberto para quen traballa a quendas en España. Sen anuncios, sen conta e sen conexión.",
-  "intro": "Calendario de quendas para quen traballa a quendas en España: sanidade, policía, bombeiros, industria, hostalaría ou calquera outro sector. Organiza mañás, tardes, noites, gardas e días libres, e consulta a túa próxima quenda dunha ollada.",
+  "intro": "Calendario de quendas para quen traballa a quendas en España: sanidade, policía, bombeiros, industria, hostalaría ou calquera outro sector. Organiza mañás, tardes, noites, gardas, saíntes e días libres, e consulta a túa próxima quenda dunha ollada.",
   "key_facts": "Gratis · Sen anuncios · Sen conta · Funciona sen conexión · Código aberto · Cinco idiomas",
   "features": [
-    "Barra inferior (Mes · Rotación · Axenda · Resumo) e tarxeta de hoxe pregable coa próxima quenda, o próximo día libre e a racha. Cuadrícula ou lista, vista anual e notas por día con adxuntos e tarefas. Compara ata seis calendarios á vez.",
-    "Toca ou arrasta para seleccionar varios días, dobrar, copiar e pegar, desfacer e refacer. Asistente de rotacións con vista previa: quendas rotativas, 24/72, 4×4, 6×4, 5×2, 2-2-3 e patróns propios.",
-    "España coas súas comunidades e municipios, e 21 países máis (Portugal, Brasil, Latinoamérica, Europa, Estados Unidos e Canadá), todo sen conexión, ademais dos que engadas ti.",
-    "Alarma por tipo de quenda que non se esgota, recordatorios de notas e widgets de Android, incluído un de catro semanas. En Android, «Silenciar o móbil nas miñas quendas» silénciao mentres traballas.",
-    "Copias de seguranza locais automáticas e, en Android, unha copia diaria na carpeta que escollas (Drive, Dropbox, OneDrive ou o móbil), con vista previa ao restaurar. Importa copias de Shifter de LRHSoft, ficheiros .ics ou CSV e o calendario do móbil.",
-    "Horas traballadas, nocturnas e festivas, extras e saídas anticipadas; pluses de noite e de festivo por hora; estimación bruta e neta coa retención que poñas. Informes en PDF e CSV dun mes ou das datas que queiras.",
-    "Saldos de vacacións e permisos por ano e tipo, cos días arrastrados e os que che quedan. Libro de cambios: anota unha quenda que cedas ou recibas dun compañeiro e mira o seu balance."
+    "Tarxeta de hoxe coa próxima quenda, o próximo día libre e a racha. O mes en cuadrícula ou lista, a axenda e o ano, coas citas do calendario do móbil xunto ás túas quendas. Notas por día con fotos, ficheiros e tarefas. Compara ata seis calendarios e mira que días tedes libres á vez.",
+    "Toca ou arrastra para pintar varios días e, con «Engadir outra quenda», pon máis dunha no mesmo día. Copia, pega, desfai e refai. Asistente de rotacións con vista previa: quendas rotativas, 24/72, 4×4, 6×4, 5×2, 2-2-3 ou o teu propio patrón, desde o día do ciclo que che toque.",
+    "Un aviso por tipo de quenda que soa como un espertador e prográmase cun mes de marxe, e recordatorios de notas. En Android, seis widgets (hoxe, semana, mes, axenda, dúas e catro semanas) e «Silenciar o móbil nas miñas quendas», que lle devolve o son ao remataren.",
+    "Copias automáticas que comprobas con «Probar restauración» e, en Android, unha ao día no cartafol que escollas (Drive, Dropbox, OneDrive…). Importa copias de Shifter de LRHSoft, .ics, CSV ou o calendario do móbil. Con «Manter ao día», as túas quendas pasan ao calendario do móbil; tamén podes gardalas nun .ics.",
+    "Horas traballadas, nocturnas e festivas, extras e saídas anticipadas por mes, trimestre, ano ou as datas que queiras, co teu obxectivo e a bolsa de horas. Prezo por hora e pluses fixos, de noite e de festivo: soldo bruto estimado e neto coa túa retención. Informes en PDF e CSV.",
+    "Saldos de vacacións, días de libre disposición e permisos por ano, cos días arrastrados e cando caducan. No libro de cambios apuntas as quendas que cambias cos compañeiros, ves quen lle debe a quen e aplícalas ao calendario.",
+    "Festivos de España, coas comunidades e moitos municipios, e de 21 países máis, sen conexión e cos que engadas ti. Ao teu gusto: formato de hora e de data, moeda, cinco cores de acento, paletas preparadas para as túas quendas e imaxe de fondo do calendario."
   ],
   "privacy_summary": [
     "As túas quendas, notas e ausencias gárdanse só no teu móbil: non hai conta, nin servidor propio, nin analítica.",
-    "A app non envía datos nin informes de erros a ninguén. Só saen do móbil as copias da túa conta de Google ou de Apple e o que ti decidas exportar."
+    "A app non envía datos nin informes de erros a ninguén. Só sae do móbil o que ti decidas exportar ou pasar ao calendario do móbil e a copia do sistema: en Android, a da túa conta de Google, cifrada de extremo a extremo co bloqueo de pantalla (sen bloqueo, Turnly non entra nela); no iPhone, a de iCloud ou a do ordenador."
   ],
   "faq": [
     {
@@ -36,7 +36,11 @@
     },
     {
       "question": "Como paso as miñas quendas a outro móbil?",
-      "answer": "Exporta unha copia desde Configuración › Copia de seguranza e ábrea no móbil novo. Non se restaura nada sen que o confirmes."
+      "answer": "Leva un ficheiro .turnly: expórtao en Configuración › Copia de seguranza e ábreo no móbil novo (ou, en Android, usa a copia automática nun cartafol). As copias que quedan dentro da app pérdense ao desinstalala. En Android tamén funciona o paso directo do móbil vello ao novo. Non se restaura nada sen que o confirmes."
+    },
+    {
+      "question": "E se quero comezar de cero?",
+      "answer": "En Configuración, «Borrar todo e comezar de cero» borra os teus calendarios, notas, ausencias e axustes (só conserva o idioma) e lévate ao primeiro uso. Antes garda unha copia de seguranza que podes restaurar ou levar a outro sitio."
     }
   ],
   "licence_text": "Código MIT · Contido CC BY-SA 4.0",
@@ -44,18 +48,21 @@
     "01-mes": "Mes pintado e tarxeta da próxima quenda",
     "02-lista": "O mesmo mes en vista Lista, con códigos e horarios completos",
     "03-pintar": "Modo pintar coa paleta de quendas",
-    "04-rotaciones": "Asistente de rotacións con vista previa antes de aplicar",
+    "04-rotaciones": "Asistente de rotacións: o día do ciclo no que comezas, antes de aplicar",
     "05-horas": "Resumo mensual de horas traballadas, nocturnas e festivas",
     "06-festivos": "Festivos por país, comunidade e concello",
     "07-mes-oscuro": "O mesmo mes co tema escuro",
     "08-vacaciones": "Saldos de vacacións e permisos, cos días que quedan e os arrastrados",
-    "09-cambios": "Libro de cambios co balance de cada compañeiro e as quendas de cada cambio"
+    "09-cambios": "Libro de cambios co balance de cada compañeiro e as quendas de cada cambio",
+    "10-primer-uso": "Primeira pantalla do primeiro uso, con tres camiños: importar, usar unha rotación ou pintar a man",
+    "11-widgets": "Galería «Engadir widget» coas túas quendas reais: pequeno, axenda, mediano e máis"
   },
-  "privacy_date": "2026-10-30",
+  "privacy_date": "2026-11-04",
   "kicker": "Calendario de quendas",
   "tagline": "As túas quendas, dunha ollada.",
   "chip": "Gratis, sen anuncios e sen conexión.",
   "nav_label": "Seccións",
+  "theme_dark": "Tema escuro",
   "download_title": "Android en probas; iPhone, proximamente.",
   "download_intro": "Modo claro e escuro. Gratis e sen conta.",
   "download_notes": {
@@ -86,13 +93,13 @@
   "features_title": "Todo aberto, sen Pro nin compras",
   "features_intro": "Cada quenda leva cor, código e horario, e nunca depende só da cor.",
   "feature_titles": [
-    "Mes, rotación, axenda e resumo",
+    "Mes, axenda e ano",
     "Pintar quendas e rotacións",
-    "Festivos por país",
-    "Alarmas, widgets e non molestar",
-    "Copias de seguranza e importación",
+    "Alarmas, seis widgets e non molestar",
+    "Copias de seguranza, importar e exportar",
     "Horas e diñeiro",
-    "Vacacións, permisos e libro de cambios"
+    "Vacacións, permisos e libro de cambios",
+    "Festivos e ao teu gusto"
   ],
   "privacy_title": "As túas quendas quedan no teu móbil.",
   "support_intro": "Tes outra dúbida? Escríbeme:",

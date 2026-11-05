@@ -61,7 +61,7 @@ Tamén podes descargar o APK da [última versión](https://github.com/dferrandiz
   <a href="docs/readme/gl/01-mes.png"><img src="docs/readme/gl/01-mes.png" width="19%" alt="Mes pintado e tarxeta da próxima quenda"></a>
   <a href="docs/readme/gl/02-lista.png"><img src="docs/readme/gl/02-lista.png" width="19%" alt="O mesmo mes en vista Lista, con códigos e horarios completos"></a>
   <a href="docs/readme/gl/03-pintar.png"><img src="docs/readme/gl/03-pintar.png" width="19%" alt="Modo pintar coa paleta de quendas"></a>
-  <a href="docs/readme/gl/04-rotaciones.png"><img src="docs/readme/gl/04-rotaciones.png" width="19%" alt="Asistente de rotacións con vista previa antes de aplicar"></a>
+  <a href="docs/readme/gl/04-rotaciones.png"><img src="docs/readme/gl/04-rotaciones.png" width="19%" alt="Asistente de rotacións: o día do ciclo no que comezas, antes de aplicar"></a>
   <a href="docs/readme/gl/05-horas.png"><img src="docs/readme/gl/05-horas.png" width="19%" alt="Resumo mensual de horas traballadas, nocturnas e festivas"></a>
 </p>
 
@@ -73,6 +73,8 @@ Tamén podes descargar o APK da [última versión](https://github.com/dferrandiz
   <a href="docs/readme/gl/07-mes-oscuro.png"><img src="docs/readme/gl/07-mes-oscuro.png" width="19%" alt="O mesmo mes co tema escuro"></a>
   <a href="docs/readme/gl/08-vacaciones.png"><img src="docs/readme/gl/08-vacaciones.png" width="19%" alt="Saldos de vacacións e permisos, cos días que quedan e os arrastrados"></a>
   <a href="docs/readme/gl/09-cambios.png"><img src="docs/readme/gl/09-cambios.png" width="19%" alt="Libro de cambios co balance de cada compañeiro e as quendas de cada cambio"></a>
+  <a href="docs/readme/gl/10-primer-uso.png"><img src="docs/readme/gl/10-primer-uso.png" width="19%" alt="Primeira pantalla do primeiro uso, con tres camiños: importar, usar unha rotación ou pintar a man"></a>
+  <a href="docs/readme/gl/11-widgets.png"><img src="docs/readme/gl/11-widgets.png" width="19%" alt="Galería «Engadir widget» coas túas quendas reais: pequeno, axenda, mediano e máis"></a>
 </p>
 
 </details>

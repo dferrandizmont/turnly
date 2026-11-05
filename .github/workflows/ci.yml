@@ -1,10 +1,25 @@
 name: ci
 
+# The same file goes to the private repository (Actions minutes are paid) and
+# to the public one (free). In the private one a push to main does not run the
+# job (see `if:` below): only the release tags (v*, one per prerelease), pull
+# requests and a manual run do. Commits that only touch docs or the web never
+# start it.
 on:
   push:
     branches: [main]
+    tags: ['v*']
+    # Tag pushes ignore path filters: a release always runs.
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - 'web/**'
   pull_request:
     branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - 'web/**'
   workflow_dispatch:
 
 permissions:
@@ -16,6 +31,11 @@ concurrency:
 
 jobs:
   app:
+    # Private repository: no run for a plain push to main (paid minutes).
+    if: >-
+      github.repository != 'dferrandizmont/turnly-flutter' ||
+      github.event_name != 'push' ||
+      startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:

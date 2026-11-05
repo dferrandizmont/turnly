@@ -1,0 +1,16 @@
+{#- Line icons (24×24, stroke = currentColor), drawn in the app's SF Symbols / Material rounded style. Decorative. -#}
+{% macro icon(name, cls='i') -%}
+<svg class="{{ cls }}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+{%- if name == 'cal' %}<rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M8 3v4M16 3v4M4 10h16M8 14h2M12 14h2M8 17h2M12 17h2"></path>
+{%- elif name == 'brush' %}<path d="M14 5l5 5-7.5 7.5-5-5z"></path><path d="M6.5 12.5L4 20l7.5-2.5"></path>
+{%- elif name == 'flag' %}<path d="M6 21V4"></path><path d="M6 4h11l-2.5 4.5L17 13H6"></path>
+{%- elif name == 'bell' %}<path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"></path><path d="M10 21h4"></path>
+{%- elif name == 'backup' %}<path d="M12 15V4M8 8l4-4 4 4"></path><path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"></path>
+{%- elif name == 'clock' %}<circle cx="12" cy="12" r="8"></circle><path d="M12 8v4l3 2"></path>
+{%- elif name == 'swap' %}<path d="M5 8h13l-3.5-3.5"></path><path d="M19 16H6l3.5 3.5"></path>
+{%- elif name == 'mail' %}<rect x="3.5" y="5.5" width="17" height="13" rx="2"></rect><path d="M4 7l8 6 8-6"></path>
+{%- elif name == 'lock' %}<rect x="5" y="10.5" width="14" height="10" rx="2"></rect><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"></path>
+{%- elif name == 'sun' %}<circle cx="12" cy="12" r="4"></circle><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"></path>
+{%- elif name == 'moon' %}<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"></path>
+{%- endif %}</svg>
+{%- endmacro %}

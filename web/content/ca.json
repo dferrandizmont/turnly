@@ -2,20 +2,20 @@
   "name": "Turnly",
   "title": "Turnly · Els teus torns, d’un cop d’ull",
   "description": "Calendari de torns gratuït i de codi obert per a qui treballa a torns a Espanya. Sense anuncis, sense compte i sense connexió.",
-  "intro": "Calendari de torns per a qui treballa a torns a Espanya: sanitat, policia, bombers, indústria, hostaleria o qualsevol altre sector. Organitza matins, tardes, nits, guàrdies i dies lliures, i consulta el teu proper torn d’un cop d’ull.",
+  "intro": "Calendari de torns per a qui treballa a torns a Espanya: sanitat, policia, bombers, indústria, hostaleria o qualsevol altre sector. Organitza matins, tardes, nits, guàrdies, sortints i dies lliures, i consulta el teu proper torn d’un cop d’ull.",
   "key_facts": "Gratis · Sense anuncis · Sense compte · Funciona sense connexió · Codi obert · Cinc idiomes",
   "features": [
-    "Barra inferior (Mes · Rotació · Agenda · Resum) i targeta d’avui plegable amb el proper torn, el proper dia lliure i la ratxa. Quadrícula o llista, vista anual i notes per dia amb adjunts i tasques. Compara fins a sis calendaris alhora.",
-    "Toca o arrossega per seleccionar diversos dies, doblar, copiar i enganxar, desfer i refer. Assistent de rotacions amb vista prèvia: torns rotatius, 24/72, 4×4, 6×4, 5×2, 2-2-3 i patrons propis.",
-    "Espanya amb les seves comunitats i municipis, i 21 països més (Portugal, Brasil, Llatinoamèrica, Europa, Estats Units i Canadà), tot sense connexió, a més dels que hi afegeixis tu.",
-    "Alarma per tipus de torn que no s’esgota, recordatoris de notes i widgets d’Android, inclòs un de quatre setmanes. A Android, «Silencia el mòbil durant els meus torns» el silencia mentre treballes.",
-    "Còpies de seguretat locals automàtiques i, a Android, una còpia diària a la carpeta que triïs (Drive, Dropbox, OneDrive o el mòbil), amb vista prèvia en restaurar. Importa còpies de Shifter de LRHSoft, fitxers .ics o CSV i el calendari del mòbil.",
-    "Hores treballades, nocturnes i festives, extres i sortides anticipades; plusos de nit i de festiu per hora; estimació bruta i neta amb la retenció que posis. Informes en PDF i CSV d’un mes o de les dates que vulguis.",
-    "Saldos de vacances i permisos per any i tipus, amb els dies arrossegats i els que et queden. Llibre de canvis: anota un torn que cedeixis o rebis d’un company i mira el seu balanç."
+    "Targeta d’avui amb el proper torn, el proper dia lliure i la ratxa. El mes en quadrícula o llista, l’agenda i l’any, amb les cites del calendari del mòbil al costat dels teus torns. Notes per dia amb fotos, fitxers i tasques. Compara fins a sis calendaris i mira quins dies teniu lliures alhora.",
+    "Toca o arrossega per pintar diversos dies i, amb «Afegeix un altre torn», posa’n més d’un al mateix dia. Copia, enganxa, desfés i refés. Assistent de rotacions amb vista prèvia: torns rotatius, 24/72, 4×4, 6×4, 5×2, 2-2-3 o el teu propi patró, des del dia del cicle que et toqui.",
+    "Un avís per tipus de torn que sona com un despertador i es programa amb un mes de marge, i recordatoris de notes. A Android, sis widgets (avui, setmana, mes, agenda, dues i quatre setmanes) i «Silencia el mòbil durant els meus torns», que li torna el so quan acabes.",
+    "Còpies automàtiques que comproves amb «Prova la restauració» i, a Android, una cada dia a la carpeta que triïs (Drive, Dropbox, OneDrive…). Importa còpies de Shifter de LRHSoft, .ics, CSV o el calendari del mòbil. Amb «Mantenir al dia», els teus torns passen al calendari del mòbil; també els pots desar en un .ics.",
+    "Hores treballades, nocturnes i festives, extres i sortides anticipades per mes, trimestre, any o les dates que vulguis, amb el teu objectiu i la borsa d’hores. Preu per hora i plusos fixos, de nit i de festiu: sou brut estimat i net amb la teva retenció. Informes en PDF i CSV.",
+    "Saldos de vacances, dies de lliure disposició i permisos per any, amb els dies arrossegats i quan caduquen. Al llibre de canvis apuntes els torns que canvies amb els companys, veus qui deu què a qui i els apliques al calendari.",
+    "Festius d’Espanya, amb les comunitats i molts municipis, i de 21 països més, sense connexió i amb els que hi afegeixis tu. Al teu gust: format d’hora i de data, moneda, cinc colors d’accent, paletes preparades per als teus torns i imatge de fons del calendari."
   ],
   "privacy_summary": [
     "Els teus torns, notes i absències es desen només al teu mòbil: no hi ha compte, ni servidor propi, ni analítica.",
-    "L’app no envia dades ni informes d’errors a ningú. Només surten del mòbil les còpies del teu compte de Google o d’Apple i el que tu decideixis exportar."
+    "L’app no envia dades ni informes d’errors a ningú. Només surt del mòbil el que tu decideixis exportar o passar al calendari del mòbil i la còpia del sistema: a Android, la del teu compte de Google, xifrada d’extrem a extrem amb el bloqueig de pantalla (sense bloqueig, Turnly no hi entra); a l’iPhone, la d’iCloud o la de l’ordinador."
   ],
   "faq": [
     {
@@ -36,7 +36,11 @@
     },
     {
       "question": "Com passo els meus torns a un altre mòbil?",
-      "answer": "Exporta una còpia des de Configuració › Còpia de seguretat i obre-la al mòbil nou. No es restaura res sense que ho confirmis."
+      "answer": "Porta-hi un fitxer .turnly: exporta’l a Configuració › Còpia de seguretat i obre’l al mòbil nou (o, a Android, fes servir la còpia automàtica en una carpeta). Les còpies que queden dins de l’app es perden en desinstal·lar-la. A Android també funciona el pas directe del mòbil vell al nou. No es restaura res sense que ho confirmis."
+    },
+    {
+      "question": "I si vull començar de zero?",
+      "answer": "A Configuració, «Esborra-ho tot i comença de zero» esborra els teus calendaris, notes, absències i ajustos (només conserva l’idioma) i et torna al primer ús. Abans desa una còpia de seguretat que pots restaurar o guardar en un altre lloc."
     }
   ],
   "licence_text": "Codi MIT · Contingut CC BY-SA 4.0",
@@ -44,18 +48,21 @@
     "01-mes": "Mes pintat i targeta del proper torn",
     "02-lista": "El mateix mes en vista Llista, amb codis i horaris complets",
     "03-pintar": "Mode pintar amb la paleta de torns",
-    "04-rotaciones": "Assistent de rotacions amb vista prèvia abans d’aplicar",
+    "04-rotaciones": "Assistent de rotacions: el dia del cicle en què comences, abans d'aplicar",
     "05-horas": "Resum mensual d’hores treballades, nocturnes i festives",
     "06-festivos": "Festius per país, comunitat i municipi",
     "07-mes-oscuro": "El mateix mes amb el tema fosc",
     "08-vacaciones": "Saldos de vacances i permisos, amb els dies que queden i els arrossegats",
-    "09-cambios": "Llibre de canvis amb el balanç de cada company i els torns de cada canvi"
+    "09-cambios": "Llibre de canvis amb el balanç de cada company i els torns de cada canvi",
+    "10-primer-uso": "Primera pantalla del primer ús, amb tres camins: importar, usar una rotació o pintar a mà",
+    "11-widgets": "Galeria «Afegeix un widget» amb els teus torns reals: petit, agenda, mitjà i més"
   },
-  "privacy_date": "2026-10-30",
+  "privacy_date": "2026-11-04",
   "kicker": "Calendari de torns",
   "tagline": "Els teus torns, d’un cop d’ull.",
   "chip": "Gratis, sense anuncis i sense connexió.",
   "nav_label": "Seccions",
+  "theme_dark": "Tema fosc",
   "download_title": "Android en proves; iPhone, aviat.",
   "download_intro": "Mode clar i fosc. Gratis i sense compte.",
   "download_notes": {
@@ -86,13 +93,13 @@
   "features_title": "Tot obert, sense Pro ni compres",
   "features_intro": "Cada torn porta color, codi i horari, i mai no depèn només del color.",
   "feature_titles": [
-    "Mes, rotació, agenda i resum",
+    "Mes, agenda i any",
     "Pintar torns i rotacions",
-    "Festius per país",
-    "Alarmes, widgets i no molestar",
-    "Còpies de seguretat i importació",
+    "Alarmes, sis widgets i no molestar",
+    "Còpies de seguretat, importar i exportar",
     "Hores i diners",
-    "Vacances, permisos i llibre de canvis"
+    "Vacances, permisos i llibre de canvis",
+    "Festius i al teu gust"
   ],
   "privacy_title": "Els teus torns es queden al teu mòbil.",
   "support_intro": "Tens algun altre dubte? Escriu-me:",

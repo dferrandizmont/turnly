@@ -62,7 +62,7 @@ Ahal baduzu, egon proban gutxienez 14 egunez eta erabili noizean behin (adibidez
   <a href="docs/readme/eu/01-mes.png"><img src="docs/readme/eu/01-mes.png" width="19%" alt="Margotutako hilabetea eta hurrengo txandaren txartela"></a>
   <a href="docs/readme/eu/02-lista.png"><img src="docs/readme/eu/02-lista.png" width="19%" alt="Hilabete bera Zerrenda ikuspegian, kode eta ordutegi osoekin"></a>
   <a href="docs/readme/eu/03-pintar.png"><img src="docs/readme/eu/03-pintar.png" width="19%" alt="Margotze modua, txanden paletarekin"></a>
-  <a href="docs/readme/eu/04-rotaciones.png"><img src="docs/readme/eu/04-rotaciones.png" width="19%" alt="Txandaketen laguntzailea, aplikatu aurreko aurrebistarekin"></a>
+  <a href="docs/readme/eu/04-rotaciones.png"><img src="docs/readme/eu/04-rotaciones.png" width="19%" alt="Txandaketen laguntzailea: zikloko zein egunetan hasten zaren, aplikatu aurretik"></a>
   <a href="docs/readme/eu/05-horas.png"><img src="docs/readme/eu/05-horas.png" width="19%" alt="Lan egindako orduen, gaueko orduen eta jaiegunetako orduen hileko laburpena"></a>
 </p>
 
@@ -74,6 +74,8 @@ Ahal baduzu, egon proban gutxienez 14 egunez eta erabili noizean behin (adibidez
   <a href="docs/readme/eu/07-mes-oscuro.png"><img src="docs/readme/eu/07-mes-oscuro.png" width="19%" alt="Hilabete bera gai ilunarekin"></a>
   <a href="docs/readme/eu/08-vacaciones.png"><img src="docs/readme/eu/08-vacaciones.png" width="19%" alt="Oporren eta baimenen saldoak, gelditzen diren egunekin eta eramandakoekin"></a>
   <a href="docs/readme/eu/09-cambios.png"><img src="docs/readme/eu/09-cambios.png" width="19%" alt="Trukeen liburua, lankide bakoitzaren balantzearekin eta truke bakoitzeko txandekin"></a>
+  <a href="docs/readme/eu/10-primer-uso.png"><img src="docs/readme/eu/10-primer-uso.png" width="19%" alt="Lehen erabileraren lehen pantaila, hiru bidekin: inportatu, txandaketa bat erabili edo eskuz margotu"></a>
+  <a href="docs/readme/eu/11-widgets.png"><img src="docs/readme/eu/11-widgets.png" width="19%" alt="«Gehitu widgeta» galeria zure benetako txandekin: txikia, agenda, ertaina eta gehiago"></a>
 </p>
 
 </details>

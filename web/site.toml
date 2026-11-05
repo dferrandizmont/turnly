@@ -7,7 +7,7 @@ open_source = true
 free = true
 repo_url = "https://github.com/dferrandizmont/turnly"
 contact_email = "turnly@mainshai.com"
-screenshots = ["01-mes", "02-lista", "03-pintar", "04-rotaciones", "05-horas", "06-festivos", "07-mes-oscuro", "08-vacaciones", "09-cambios"]
+screenshots = ["01-mes", "02-lista", "03-pintar", "04-rotaciones", "05-horas", "06-festivos", "07-mes-oscuro", "08-vacaciones", "09-cambios", "10-primer-uso", "11-widgets"]
 privacy = { es = "docs/legal/politica-privacidad.md", en = "docs/legal/politica-privacidad.en.md" }
 privacy_fallback = { ca = "es", gl = "es", eu = "es" }
 downloads = [

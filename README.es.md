@@ -62,7 +62,7 @@ También puedes descargar el APK de la [última versión](https://github.com/dfe
   <a href="docs/readme/es/01-mes.png"><img src="docs/readme/es/01-mes.png" width="19%" alt="Mes pintado y tarjeta del próximo turno"></a>
   <a href="docs/readme/es/02-lista.png"><img src="docs/readme/es/02-lista.png" width="19%" alt="El mismo mes en vista Lista, con códigos y horarios completos"></a>
   <a href="docs/readme/es/03-pintar.png"><img src="docs/readme/es/03-pintar.png" width="19%" alt="Modo pintar con la paleta de turnos"></a>
-  <a href="docs/readme/es/04-rotaciones.png"><img src="docs/readme/es/04-rotaciones.png" width="19%" alt="Asistente de rotaciones con vista previa antes de aplicar"></a>
+  <a href="docs/readme/es/04-rotaciones.png"><img src="docs/readme/es/04-rotaciones.png" width="19%" alt="Asistente de rotaciones: el día del ciclo en el que empiezas, antes de aplicar"></a>
   <a href="docs/readme/es/05-horas.png"><img src="docs/readme/es/05-horas.png" width="19%" alt="Resumen mensual de horas trabajadas, nocturnas y festivas"></a>
 </p>
 
@@ -74,6 +74,8 @@ También puedes descargar el APK de la [última versión](https://github.com/dfe
   <a href="docs/readme/es/07-mes-oscuro.png"><img src="docs/readme/es/07-mes-oscuro.png" width="19%" alt="El mismo mes con el tema oscuro"></a>
   <a href="docs/readme/es/08-vacaciones.png"><img src="docs/readme/es/08-vacaciones.png" width="19%" alt="Saldos de vacaciones y permisos, con los días que quedan y los arrastrados"></a>
   <a href="docs/readme/es/09-cambios.png"><img src="docs/readme/es/09-cambios.png" width="19%" alt="Libro de cambios con el balance de cada compañero y los turnos de cada cambio"></a>
+  <a href="docs/readme/es/10-primer-uso.png"><img src="docs/readme/es/10-primer-uso.png" width="19%" alt="Primera pantalla del primer uso, con tres caminos: importar, usar una rotación o pintar a mano"></a>
+  <a href="docs/readme/es/11-widgets.png"><img src="docs/readme/es/11-widgets.png" width="19%" alt="Galería «Añadir widget» con tus turnos reales: pequeño, agenda, mediano y más"></a>
 </p>
 
 </details>

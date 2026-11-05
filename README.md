@@ -61,7 +61,7 @@ Or download the APK of the [latest release](https://github.com/dferrandizmont/tu
   <a href="docs/readme/en/01-mes.png"><img src="docs/readme/en/01-mes.png" width="19%" alt="Painted month and next shift card"></a>
   <a href="docs/readme/en/02-lista.png"><img src="docs/readme/en/02-lista.png" width="19%" alt="The same month in List view, with shift codes and full times"></a>
   <a href="docs/readme/en/03-pintar.png"><img src="docs/readme/en/03-pintar.png" width="19%" alt="Paint mode with the shift palette"></a>
-  <a href="docs/readme/en/04-rotaciones.png"><img src="docs/readme/en/04-rotaciones.png" width="19%" alt="Rotation wizard with a preview before applying"></a>
+  <a href="docs/readme/en/04-rotaciones.png"><img src="docs/readme/en/04-rotaciones.png" width="19%" alt="Rotation wizard: the day of the cycle you start on, before applying"></a>
   <a href="docs/readme/en/05-horas.png"><img src="docs/readme/en/05-horas.png" width="19%" alt="Monthly summary of worked, night and public holiday hours"></a>
 </p>
 
@@ -73,6 +73,8 @@ Or download the APK of the [latest release](https://github.com/dferrandizmont/tu
   <a href="docs/readme/en/07-mes-oscuro.png"><img src="docs/readme/en/07-mes-oscuro.png" width="19%" alt="The same month in the dark theme"></a>
   <a href="docs/readme/en/08-vacaciones.png"><img src="docs/readme/en/08-vacaciones.png" width="19%" alt="Vacation and leave balances, with the days left and the ones carried over"></a>
   <a href="docs/readme/en/09-cambios.png"><img src="docs/readme/en/09-cambios.png" width="19%" alt="Swap book with each colleague's balance and the shifts of every change"></a>
+  <a href="docs/readme/en/10-primer-uso.png"><img src="docs/readme/en/10-primer-uso.png" width="19%" alt="First screen of the first run, with three ways in: import, use a rotation or paint by hand"></a>
+  <a href="docs/readme/en/11-widgets.png"><img src="docs/readme/en/11-widgets.png" width="19%" alt="The «Add widget» gallery with your real shifts: small, agenda, medium and more"></a>
 </p>
 
 </details>

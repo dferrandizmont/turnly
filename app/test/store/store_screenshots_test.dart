@@ -1,6 +1,7 @@
 @Tags(['store'])
 library;
 
+import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
@@ -21,7 +22,12 @@ import 'package:cuadrante/features/calendars/domain/calendar.dart';
 import 'package:cuadrante/features/holidays/application/holidays_provider.dart';
 import 'package:cuadrante/features/holidays/data/holiday_repository.dart';
 import 'package:cuadrante/features/holidays/presentation/holidays_settings_providers.dart';
+import 'package:cuadrante/features/onboarding/application/onboarding_providers.dart'
+    show initialOnboardingProvider;
+import 'package:cuadrante/features/onboarding/data/onboarding_repository.dart';
 import 'package:cuadrante/features/patterns/application/pattern_wizard.dart';
+import 'package:cuadrante/features/widget/data/widget_publisher.dart';
+import 'package:cuadrante/features/widget/presentation/add_widget_row.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
 import 'package:cuadrante/features/schedule/application/schedule_providers.dart';
 import 'package:cuadrante/features/settings/application/preferences_controller.dart';
@@ -46,10 +52,18 @@ const _targetName = String.fromEnvironment(
   'STORE_TARGET',
   defaultValue: 'github',
 );
-const _github = _targetName == 'github';
+// Raw screens, no caption or frame: the README phone and the Play tablet.
+const _raw = _targetName == 'github' || _targetName == 'tablet';
+const _tablet = _targetName == 'tablet';
+const _rawPhysical = _tablet ? tabletPhysical : githubPhysical;
+const _rawRatio = _tablet ? tabletPixelRatio : githubPixelRatio;
+const _rawWidthDp = _tablet ? tabletWidthDp : githubWidthDp;
 const _targets = {
   // Raw phone screenshots for the README: no caption, no frame.
   'github': githubPhysical,
+  // Raw Android tablet screens in portrait, framed later by store_shots.py
+  // (docs/store/shots.json, play-tablet10).
+  'tablet': tabletPhysical,
   'play': Size(1080, 1920),
   'ios69': Size(1320, 2868),
   'ios65': Size(1242, 2688),
@@ -69,6 +83,8 @@ const _shots = [
   ('07-mes-oscuro', 0, true, false),
   ('08-vacaciones', 6, false, true),
   ('09-cambios', 7, false, true),
+  ('10-primer-uso', 8, false, true),
+  ('11-widgets', 9, false, true),
 ];
 // One caption per shot, in the order of [_shots]. Vocabulary from
 // docs/glosario-idiomas.md; ca, gl and eu are pending native review.
@@ -146,8 +162,8 @@ void main() {
     for (final (shot, index, darkShot, readmeOnly) in _shots) {
       // The dark month shot and the two settings scenes only exist for the
       // README.
-      if ((darkShot || readmeOnly) && !_github) continue;
-      final dark = _github ? darkShot : index == 0 || index == 2;
+      if ((darkShot || readmeOnly) && !_raw) continue;
+      final dark = _raw ? darkShot : index == 0 || index == 2;
       testWidgets(
         '$language/$shot ($_targetName)',
         (tester) async {
@@ -161,14 +177,14 @@ void main() {
               ? TargetPlatform.iOS
               : TargetPlatform.android;
           addTearDown(() => debugDefaultTargetPlatformOverride = null);
-          if (_github) {
-            tester.view.physicalSize = githubPhysical;
-            tester.view.devicePixelRatio = githubPixelRatio;
+          if (_raw) {
+            tester.view.physicalSize = _rawPhysical;
+            tester.view.devicePixelRatio = _rawRatio;
             // The fake phone has a status bar and a gesture bar: the app
             // keeps clear of them through its own SafeAreas.
             final inset = FakeViewPadding(
-              top: githubStatusBarDp * githubPixelRatio,
-              bottom: githubGestureDp * githubPixelRatio,
+              top: githubStatusBarDp * _rawRatio,
+              bottom: githubGestureDp * _rawRatio,
             );
             tester.view.padding = inset;
             tester.view.viewPadding = inset;
@@ -376,6 +392,10 @@ void main() {
                   appDatabaseProvider.overrideWithValue(storage.database),
                   initialScheduleProvider.overrideWithValue(initial),
                   clockProvider.overrideWithValue(() => _now),
+                  if (index == 8)
+                    initialOnboardingProvider.overrideWithValue(
+                      const OnboardingStatus(needed: true),
+                    ),
                   initialHolidaysProvider.overrideWithValue(holidays),
                   initialPreferencesProvider.overrideWithValue(
                     Preferences(
@@ -419,11 +439,10 @@ void main() {
                 );
                 wizard.selectPreset('continental');
                 wizard.next();
-                wizard.next();
+                // Step 2: the start day and which day of the cycle it is
+                // (0.8.4), here day 2.
+                wizard.setStepOffset(1);
                 await tester.pumpAndSettle();
-                await tester.ensureVisible(
-                  find.byKey(const ValueKey('pattern-preview')),
-                );
               case 4:
                 router.push(AppRoutes.summaryFor(_month));
               case 5:
@@ -449,9 +468,18 @@ void main() {
                 await tester.runAsync(
                   () => container.read(swapLedgerProvider.future),
                 );
+              case 9:
+                // The «Add widget» gallery over the real month.
+                unawaited(
+                  showAddWidgetSheet(
+                    tester.element(find.byType(Scaffold).first),
+                    FakeWidgetPublisher()..pinSupported = true,
+                  ),
+                );
+                await tester.pumpAndSettle();
             }
             await tester.pumpAndSettle();
-            if (_github && (index == 4 || index == 5)) {
+            if (_raw && (index == 4 || index == 5)) {
               // Long scrolling screens: nudge the scroll so that no text ends
               // up behind the gesture pill (a line struck through by it).
               await _clearGesturePill(tester);
@@ -462,10 +490,10 @@ void main() {
                     as RenderRepaintBoundary;
             await tester.runAsync(() async {
               final screen = await boundary.toImage(
-                pixelRatio: _github ? githubPixelRatio : 3,
+                pixelRatio: _raw ? _rawRatio : 3,
               );
               try {
-                final image = _github
+                final image = _raw
                     ? await _composeGithub(screen, target!, dark)
                     : await _compose(
                         screen,
@@ -474,7 +502,9 @@ void main() {
                         index,
                       );
                 try {
-                  final path = _github
+                  final path = _tablet
+                      ? '../docs/store/tablet/$language/$shot.png'
+                      : _raw
                       ? '../docs/readme/$language/$shot.png'
                       : 'build/store/$_targetName/$language/$shot.png';
                   await writeStorePng(image, path);
@@ -501,12 +531,12 @@ void main() {
 /// Scrolls the biggest vertical list by the smallest amount (up to 160 dp)
 /// that leaves every text and icon clear of the gesture pill.
 Future<void> _clearGesturePill(WidgetTester tester) async {
-  final height = githubPhysical.height / githubPixelRatio;
+  final height = _rawPhysical.height / _rawRatio;
   const pillHalfWidth = 54 + 8.0;
   final pill = Rect.fromLTRB(
-    githubWidthDp / 2 - pillHalfWidth,
+    _rawWidthDp / 2 - pillHalfWidth,
     height - 12 - 2 - 6,
-    githubWidthDp / 2 + pillHalfWidth,
+    _rawWidthDp / 2 + pillHalfWidth,
     height - 12 + 2 + 6,
   );
   ScrollableState? list;
@@ -555,6 +585,7 @@ Future<ui.Image> _composeGithub(ui.Image screen, Size target, bool dark) async {
     size: target,
     ink: colors.textPrimary,
     textStyle: AppTypography.from(colors).body,
+    widthDp: _rawWidthDp,
   );
   final picture = recorder.endRecording();
   try {

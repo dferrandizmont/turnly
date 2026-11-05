@@ -1,9 +1,13 @@
+{% from 'icons.html.j2' import icon -%}
 <!doctype html>
 <html lang="{{ lang }}">
-<head>{% include 'base/head.html.j2' %}</head>
+<head>{% include 'base/head.html.j2' %}
+{#- No defer: it sets the saved theme on <html> before the first paint. -#}
+<script src="{{ 'theme.js' | asset }}"></script></head>
 <body>
 {% include 'base/skip_link.html.j2' %}
-{% block header %}{% set home = route(lang) %}<header class="top">
+{% set home = route(lang) %}
+{% block header %}<header class="top">
 <div class="wrap top-in">
 <a class="brand" href="{{ home }}"><img src="{{ 'icon.png' | asset }}" alt="" width="36" height="36"><span>{{ c.name }}</span></a>
 <nav class="nav" aria-label="{{ c.nav_label }}">
@@ -13,10 +17,25 @@
 <a href="{{ '' if page_kind == 'home' else home }}#privacy">{{ t.privacy }}</a>
 <a href="{{ '' if page_kind == 'home' else home }}#support">{{ t.support }}</a>
 </nav>
+{#- Hidden without JS (it would do nothing); assets/theme.js shows it and keeps aria-pressed in step. -#}
+<button class="theme-btn" type="button" aria-pressed="false" title="{{ c.theme_dark }}" data-theme-toggle hidden>{{ icon('sun', 'i i-sun') }}{{ icon('moon', 'i i-moon') }}<span class="vh">{{ c.theme_dark }}</span></button>
 {% include 'base/lang_switcher.html.j2' %}
 </div>
 </header>{% endblock %}
 <main id="content">{% block content %}{% endblock %}</main>
-{% block footer %}{% include 'base/required_footer.html.j2' %}{% endblock %}
+{#- Same required content as the shared base/required_footer.html.j2 (author, code and licence, Ko-fi, mail,
+    no tracking), laid out as direction B: brand on the left, links on the right. -#}
+{% block footer %}{% set author_parts = t.author.split('DanielMF') %}<footer class="foot">
+<div class="wrap foot-in">
+<a class="brand" href="{{ home }}"><img src="{{ 'icon.png' | asset }}" alt="" width="36" height="36"><span>{{ c.name }}</span></a>
+<ul class="foot-links">
+<li><span>{{ author_parts[0].format(app=c.name) }}<a href="https://mainshai.com">DanielMF</a>{{ author_parts[1] }}</span></li>
+{% if site.open_source %}<li><span><a href="{{ site.repo_url }}">{{ t.code }}</a> · {{ c.licence_text }}</span></li>{% endif %}
+{% if site.free %}<li><a href="https://ko-fi.com/danielmfdev">{{ t.coffee }}</a></li>{% endif %}
+<li><a href="mailto:{{ contact_email }}">{{ t.contact }}</a></li>
+<li><span class="no-track">{{ icon('lock', 'i i-s') }}{{ t.no_tracking }}</span></li>
+</ul>
+</div>
+</footer>{% endblock %}
 </body>
 </html>
