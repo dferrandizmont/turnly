@@ -273,9 +273,7 @@ app/lib/core/database/migration_v3_to_v4.dart
 app/lib/core/database/tables.dart
 app/lib/core/diagnostics/crash_reporting.dart
 app/lib/core/diagnostics/debug_log.dart
-app/lib/core/diagnostics/timing.dart
 app/lib/core/format/app_date_format.dart
-app/lib/core/format/iso.dart
 app/lib/core/format/money.dart
 app/lib/core/format/text_fold.dart
 app/lib/core/format/text_measure.dart
@@ -395,7 +393,6 @@ app/lib/features/calendar/presentation/month_grid.dart
 app/lib/features/calendar/presentation/month_list.dart
 app/lib/features/calendar/presentation/month_presentation_control.dart
 app/lib/features/calendar/presentation/month_screen.dart
-app/lib/features/calendar/presentation/month_tip.dart
 app/lib/features/calendar/presentation/paint_bar.dart
 app/lib/features/calendar/presentation/puck_label.dart
 app/lib/features/calendar/presentation/selection_bar.dart
@@ -522,8 +519,6 @@ app/lib/features/settings/domain/preferences.dart
 app/lib/features/settings/presentation/faq_screen.dart
 app/lib/features/settings/presentation/sections/appearance_section.dart
 app/lib/features/settings/presentation/sections/help_section.dart
-app/lib/features/settings/presentation/sections/import_export_section.dart
-app/lib/features/settings/presentation/sections/more_section.dart
 app/lib/features/settings/presentation/sections/schedule_section.dart
 app/lib/features/settings/presentation/settings_screen.dart
 app/lib/features/settings/presentation/settings_widgets.dart
@@ -1469,3 +1464,4 @@ tool/qa/backup_android.sh
 app/lib/core/icons/reset_icons.dart
 web/assets/theme.js
 web/templates/icons.html.j2
+web/assets/lang.js

@@ -62,7 +62,11 @@
   "tagline": "Zure txandak, begi-kolpe batean.",
   "chip": "Doan, iragarkirik gabe eta konexiorik gabe.",
   "nav_label": "Atalak",
-  "theme_dark": "Gai iluna",
+  "theme_label": "Gaia",
+  "theme_system": "Sistema",
+  "theme_light": "Argia",
+  "theme_dark": "Iluna",
+  "theme_hint": "Aldatu gaia",
   "download_title": "Android probetan; iPhone, laster.",
   "download_intro": "Modu argia eta iluna. Doan eta konturik gabe.",
   "download_notes": {

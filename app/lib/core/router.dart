@@ -8,6 +8,8 @@ import '../features/alarms/presentation/alarms_settings_screen.dart';
 import '../features/backup/application/backup_models.dart';
 import '../features/backup/presentation/backup_screen.dart';
 import '../features/backup/presentation/restore_preview_screen.dart';
+import '../features/calendar/presentation/month_destinations.dart'
+    show DestinationRailShell, MonthDestination;
 import '../features/calendar/presentation/month_screen.dart';
 import '../features/calendar_export/presentation/export_screen.dart';
 import '../features/calendars/presentation/calendars_screen.dart';
@@ -252,19 +254,33 @@ GoRouter buildRouter({
         ),
       ),
       GoRoute(path: AppRoutes.year, builder: (c, s) => const YearScreen()),
-      GoRoute(path: AppRoutes.agenda, builder: (c, s) => const AgendaScreen()),
+      // «Rotación», «Agenda» and «Resumen» carry the rail of destinations
+      // beside them when there are two panes, like the month.
+      GoRoute(
+        path: AppRoutes.agenda,
+        builder: (c, s) => const DestinationRailShell(
+          current: MonthDestination.agenda,
+          child: AgendaScreen(),
+        ),
+      ),
       GoRoute(
         path: AppRoutes.settingsRuns,
-        builder: (c, s) => const RunsScreen(),
+        builder: (c, s) => const DestinationRailShell(
+          current: MonthDestination.rotation,
+          child: RunsScreen(),
+        ),
       ),
       GoRoute(
         path: AppRoutes.summary,
-        builder: (c, s) => SummaryScreen(
-          // A new link to the same screen starts over.
-          key: ValueKey(s.uri.toString()),
-          // /resumen?mes=2026-10&vista=ano
-          month: _parseMonth(s.uri.queryParameters['mes'], now()),
-          yearView: s.uri.queryParameters['vista'] == 'ano',
+        builder: (c, s) => DestinationRailShell(
+          current: MonthDestination.summary,
+          child: SummaryScreen(
+            // A new link to the same screen starts over.
+            key: ValueKey(s.uri.toString()),
+            // /resumen?mes=2026-10&vista=ano
+            month: _parseMonth(s.uri.queryParameters['mes'], now()),
+            yearView: s.uri.queryParameters['vista'] == 'ano',
+          ),
         ),
       ),
       GoRoute(

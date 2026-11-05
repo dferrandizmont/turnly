@@ -121,7 +121,7 @@ img { max-width: 100%; }
 .s-v { --bar: var(--v-bar); --ink: var(--v-ink); --disc: var(--v-disc); }
 
 /* Cabecera */
-.top-in { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; min-height: 84px; }
+.top-in { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; min-height: 84px; }
 .brand {
   display: flex; align-items: center; gap: 10px; min-height: 44px; border-radius: var(--r-ctl);
   color: var(--text); text-decoration: none; font-weight: 800; font-size: 21px; letter-spacing: -0.02em;
@@ -144,22 +144,20 @@ img { max-width: 100%; }
 }
 .langs a:hover { color: var(--text); }
 .langs a[aria-current="page"] { color: var(--on-accent); background: var(--accent); font-weight: 800; }
-/* Theme toggle: same box as the language switcher. Hidden in the HTML; assets/theme.js shows it. It shows the
-   theme in use (sun in light, moon in dark) and is a toggle button for «Dark theme» (aria-pressed). */
+/* Theme toggle: same height as the language switcher. Hidden in the HTML; assets/theme.js shows it. It cycles
+   system -> light -> dark -> system. Its visible text names the theme in use (it is also its accessible name) and
+   the icon follows data-theme on <html>: monitor with no choice, sun for light, moon for dark. */
 .theme-btn {
-  display: flex; align-items: center; justify-content: center; flex: none; width: 52px; height: 52px; padding: 0;
-  background: var(--surface); color: var(--text); border: 1px solid var(--control-border); border-radius: var(--r-ctl);
-  font: inherit; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px; flex: none; min-width: 52px; height: 52px;
+  padding: 0 14px; background: var(--surface); color: var(--text); border: 1px solid var(--control-border);
+  border-radius: var(--r-ctl); font: inherit; font-weight: 700; font-size: 15px; line-height: 1.2; cursor: pointer;
 }
 .theme-btn[hidden] { display: none; }
 .theme-btn:hover { background: var(--raised); }
-.theme-btn .i-moon { display: none; }
-:root[data-theme="dark"] .theme-btn .i-sun { display: none; }
+.theme-btn .i-sun, .theme-btn .i-moon { display: none; }
+:root[data-theme="light"] .theme-btn .i-sun { display: block; }
 :root[data-theme="dark"] .theme-btn .i-moon { display: block; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .theme-btn .i-sun { display: none; }
-  :root:not([data-theme="light"]) .theme-btn .i-moon { display: block; }
-}
+:root[data-theme] .theme-btn .i-auto { display: none; }
 
 /* Botones */
 .btn {
@@ -367,6 +365,15 @@ a.btn:hover { background: var(--text); color: var(--bg); }
   .btn-off { border-color: GrayText; }
 }
 
+/* Not enough room for brand, five links, theme toggle and languages in one row (Basque needs about 1180 px): the
+   links take their own row so the header never breaks in the middle of the switcher. */
+@media (max-width: 1180px) {
+  .nav { order: 3; width: 100%; margin-left: 0; }
+  .theme-btn { margin-left: auto; }
+  .theme-btn:not([hidden]) + .langs-nav { margin-left: 0; }
+  .langs-nav { margin-left: auto; }
+}
+
 @media (max-width: 1000px) {
   .row { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); }
   .row .btn { grid-column: 1 / -1; }
@@ -383,9 +390,10 @@ a.btn:hover { background: var(--text); color: var(--bg); }
   .theme-btn:not([hidden]) + .langs-nav { margin-left: 0; }
   .langs { gap: 0; }
   .langs a { font-size: 13px; }
+  /* The section links wrap onto a second row when a language needs it (Basque is the longest): never a sideways scroll. */
   .nav {
     order: 3; width: calc(100% + 32px); margin: 4px -16px 0; padding: 0 8px 6px;
-    overflow-x: auto; flex-wrap: nowrap; scrollbar-width: thin; border-bottom: 1px solid var(--border);
+    flex-wrap: wrap; border-bottom: 1px solid var(--border);
   }
   .nav a { padding: 0 10px; }
   .nav a:focus-visible { outline-offset: -3px; }

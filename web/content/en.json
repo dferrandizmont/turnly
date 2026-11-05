@@ -62,7 +62,11 @@
   "tagline": "Your shifts at a glance.",
   "chip": "Free, no ads and works offline.",
   "nav_label": "Sections",
-  "theme_dark": "Dark theme",
+  "theme_label": "Theme",
+  "theme_system": "System",
+  "theme_light": "Light",
+  "theme_dark": "Dark",
+  "theme_hint": "Change theme",
   "download_title": "Android is in testing; iPhone is coming soon.",
   "download_intro": "Light and dark themes. Free, with no account.",
   "download_notes": {

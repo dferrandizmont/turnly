@@ -210,7 +210,9 @@ class _MonthGridState extends ConsumerState<MonthGrid> {
     // finger lifts, even when painting changes a week's required height.
     _strokeGeometry = _geometry;
     _strokeController = _schedule;
-    _strokeController!.beginStroke(ref.read(paintControllerProvider).tool);
+    _strokeController!.beginStroke(
+      ref.read(paintControllerProvider.notifier).tool,
+    );
     _lastPoint = details.localPosition;
     final index = _geometry.cellAt(details.localPosition);
     if (index != null) _paintCell(index);

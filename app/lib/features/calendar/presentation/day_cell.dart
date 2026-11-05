@@ -238,6 +238,8 @@ class _DayCellState extends State<DayCell> {
         : day.shifts.length;
     final hiddenShifts = day.shifts.length - visibleShifts;
     final bands = visibleShifts + (hiddenShifts > 0 ? 1 : 0);
+    // Each band takes the share of the cell it needs (see [_bandHeights]).
+    final bandFlex = _bandFlex(context, day.shifts);
     final lead = swatches.isEmpty
         ? ShiftSwatch.none(brightness, outOfMonth: !inMonth)
         : swatches.first;
@@ -305,6 +307,7 @@ class _DayCellState extends State<DayCell> {
               children: [
                 for (var i = 0; i < visibleShifts; i++)
                   Expanded(
+                    flex: bandFlex[i],
                     child: _ShiftBand(
                       shift: day.shifts[i],
                       swatch: swatches[i],
@@ -317,6 +320,7 @@ class _DayCellState extends State<DayCell> {
                   ),
                 if (hiddenShifts > 0)
                   Expanded(
+                    flex: bandFlex[visibleShifts],
                     child: _OverflowBand(
                       date: day.date,
                       count: hiddenShifts,
@@ -478,33 +482,52 @@ double dayCellHeightWithTime(BuildContext context, {double? limit}) {
   return height.clamp(0, max);
 }
 
-/// Equal-height bands each keep their own code and time. The first also
-/// reserves the day number, the last the bar, so the tallest band determines
-/// the common height (including when a timed shift follows an untimed one).
+/// The room each band of a cell needs, top to bottom: its code and time
+/// lines, plus the row of the day number for the first band and the bar for
+/// the last one. The «+N» band that closes a day of four shifts or more has
+/// no time.
 ///
 /// A cell never draws more than [_maxCellBands] bands: with four or more
-/// shifts the third one is the neutral «+N» of [_OverflowBand]. The height is
-/// measured with that same cap, so a day with six shifts takes exactly the
-/// room of a day with three.
-double dayCellHeightForShifts(BuildContext context, List<ShiftType> shifts) {
-  if (shifts.length < 2) return dayCellHeightWithTime(context);
+/// shifts the third one is the neutral «+N» of [_OverflowBand]. A day with six
+/// shifts therefore takes exactly the room of a day with four.
+List<double> _bandHeights(BuildContext context, List<ShiftType> shifts) {
   final type = context.type;
   final scaler = MediaQuery.textScalerOf(context);
   final number = textHeight(type.cellDay, scaler) + Sp.xs + Sp.hair;
-  final bands = math.min(shifts.length, _maxCellBands);
-  var bandHeight = 0.0;
-  for (var i = 0; i < bands; i++) {
-    final height =
-        textHeight(type.cellCodeMulti, scaler) +
-        (shifts[i].hasTimes ? textHeight(type.cellTime, scaler) : 0) +
-        (i == 0 ? number : 0) +
-        (i == bands - 1 ? Sp.bar : 0);
-    bandHeight = math.max(bandHeight, height);
-  }
-  return math.max(
-    dayCellHeightWithTime(context),
-    bandHeight * bands + Sp.cellGap,
-  );
+  final codeLine = textHeight(type.cellCodeMulti, scaler);
+  final timeLine = textHeight(type.cellTime, scaler);
+  final overflow = shifts.length > _maxCellBands;
+  final visible = overflow ? _maxCellBands - 1 : shifts.length;
+  final bands = visible + (overflow ? 1 : 0);
+  return [
+    for (var i = 0; i < bands; i++)
+      codeLine +
+          (i < visible && shifts[i].hasTimes ? timeLine : 0) +
+          (i == 0 ? number : 0) +
+          (i == bands - 1 ? Sp.bar : 0),
+  ];
+}
+
+/// The bands share the height of the cell in proportion to what each one
+/// needs ([_bandHeights]), so a cell that is exactly as tall as the sum gives
+/// every band its room and one that is taller (a row stretched by another day
+/// of the week) gives them all a bit more.
+List<int> _bandFlex(BuildContext context, List<ShiftType> shifts) {
+  if (shifts.length < 2) return const [1];
+  return [
+    for (final height in _bandHeights(context, shifts))
+      math.max(1, (height * 100).round()),
+  ];
+}
+
+/// The height a cell needs for the bands of [shifts]: the sum of what each
+/// band needs (see [_bandHeights]) plus the gap between cells, never less
+/// than a cell with a single shift. The tallest band does not set the pace:
+/// the bands share the cell in proportion to their own needs.
+double dayCellHeightForShifts(BuildContext context, List<ShiftType> shifts) {
+  if (shifts.length < 2) return dayCellHeightWithTime(context);
+  final sum = _bandHeights(context, shifts).fold<double>(0, (a, b) => a + b);
+  return math.max(dayCellHeightWithTime(context), sum + Sp.cellGap);
 }
 
 /// The marks of a day, in one row at the top right (opposite the day number):

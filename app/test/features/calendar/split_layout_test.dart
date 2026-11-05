@@ -322,10 +322,10 @@ void main() {
       expect(idsOn(scheduleOf(tester), oct24), 'rest');
       await tapDayControl(tester, 'day-add-morning');
 
-      expect(idsOn(scheduleOf(tester), oct24), 'rest+morning');
+      expect(idsOn(scheduleOf(tester), oct24), 'morning');
       expect(inCell(oct24, find.text('M')), findsOneWidget);
       // The pane follows the change too.
-      expect(key('day-shift-1'), findsOneWidget);
+      expect(key('day-shift-0'), findsOneWidget);
 
       containerOf(tester).read(scheduleControllerProvider.notifier).undo();
       await tester.pumpAndSettle();

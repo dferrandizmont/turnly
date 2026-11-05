@@ -98,9 +98,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('six shifts say «+4» and grow no more than three bands', (
-    tester,
-  ) async {
+  testWidgets('six shifts say «+4» and take the room of four', (tester) async {
     await pumpCalendar(tester, prepare: prepare);
     await revealCell(tester, sixShifts);
 
@@ -108,16 +106,84 @@ void main() {
     expect(inCell(sixShifts, find.text('T')), findsOneWidget);
     expect(inCell(sixShifts, find.text('+4')), findsOneWidget);
 
-    // The height of six shifts is exactly the height of three: the row of the
-    // week never grows with the shifts that do not fit.
+    // The height of six shifts is exactly the height of four (two bands and
+    // the «+N», which has no time line): the row of the week never grows
+    // with the shifts that do not fit, and it is no taller than three bands.
     final context = tester.element(cell(sixShifts));
     final schedule = scheduleOf(tester);
+    final six = dayCellHeightForShifts(
+      context,
+      schedule.resolve(sixShifts).shifts,
+    );
     expect(
-      dayCellHeightForShifts(context, schedule.resolve(sixShifts).shifts),
-      dayCellHeightForShifts(context, schedule.resolve(threeShifts).shifts),
+      six,
+      dayCellHeightForShifts(context, schedule.resolve(fourShifts).shifts),
+    );
+    expect(
+      six,
+      lessThanOrEqualTo(
+        dayCellHeightForShifts(context, schedule.resolve(threeShifts).shifts),
+      ),
     );
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('the row of a busy day takes what its bands need, no more', (
+    tester,
+  ) async {
+    await pumpCalendar(tester, prepare: prepare);
+    await revealCell(tester, one);
+    await revealCell(tester, fourShifts);
+    final context = tester.element(cell(fourShifts));
+    final schedule = scheduleOf(tester);
+    final single = dayCellHeightForShifts(
+      context,
+      schedule.resolve(one).shifts,
+    );
+    final busy = dayCellHeightForShifts(
+      context,
+      schedule.resolve(fourShifts).shifts,
+    );
+    // Three bands (two shifts and «+2») do not make a row 2.3 times taller
+    // than the others: the number of the day and the bar are in the sum
+    // once, not once per band.
+    expect(busy, greaterThan(single));
+    expect(busy, lessThan(single * 1.9));
+    // The rendered row is as tall as measured (plus nothing stretched).
+    final row = tester.getSize(cell(fourShifts)).height;
+    expect(row, closeTo(busy, 0.6));
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final scale in [1.0, 1.3, 2.0]) {
+    testWidgets('text x$scale: the bands of four shifts never overlap or '
+        'leave the cell', (tester) async {
+      await pumpCalendar(
+        tester,
+        size: const Size(360, 800),
+        textScale: scale,
+        prepare: prepare,
+      );
+      await revealCell(tester, fourShifts);
+      final box = tester.getRect(cell(fourShifts));
+      final marks = [
+        for (final text in ['M', 'T', '+2'])
+          tester.getRect(inCell(fourShifts, find.text(text))),
+      ];
+      for (final mark in marks) {
+        expect(mark.top, greaterThanOrEqualTo(box.top - 0.5));
+        expect(mark.bottom, lessThanOrEqualTo(box.bottom + 0.5));
+      }
+      for (var i = 0; i < marks.length - 1; i++) {
+        expect(
+          marks[i].bottom,
+          lessThanOrEqualTo(marks[i + 1].top + 0.5),
+          reason: 'band $i overlaps band ${i + 1}',
+        );
+      }
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   testWidgets('the label still names every shift of the day', (tester) async {
     final handle = tester.ensureSemantics();

@@ -178,7 +178,7 @@ del número del día y delante del clip de la nota y del punto de festivo (esa f
 hora; en una casilla muy estrecha la fila encoge hasta el 60 % en vez de salirse); el texto leído de la casilla dice «horas extra: 1 h 30 min» / «salida anticipada: 30 min».
 En el distintivo de 44 px (lista de turnos, detalle del día), en las fichas redondas de pintar y en la leyenda el
 icono va encima del código (12-14 dp) o delante del nombre; el código no desaparece nunca.
-**Cuatro turnos o más en un día:** como mucho 3 bandas. Se ven los 2 primeros turnos y una tercera banda neutra «+N» (`surfaceMuted`, borde superior `borderStrong` de `Sp.hair`, texto `textMuted` en `cellCodeMulti`), nunca en color de turno; la altura de la fila se mide con ese tope y el lector de pantalla nombra todos los turnos.**Forma de las fichas:** `ChoicePill` es una píldora por defecto; las fichas de etiqueta larga o de varias líneas (profesión, turno y tanda del día del ciclo) usan `Rad.inputRadius`.
+**Cuatro turnos o más en un día:** como mucho 3 bandas. Se ven los 2 primeros turnos y una tercera banda neutra «+N» (`surfaceMuted`, borde superior `borderStrong` de `Sp.hair`, texto `textMuted` en `cellCodeMulti`), nunca en color de turno; la altura de la fila se mide con ese tope y el lector de pantalla nombra todos los turnos. Las bandas se reparten la altura de la casilla en proporción a lo que necesita cada una (su código y su hora; la primera, además, la fila del número; la última, la barra), y la fila mide la suma de esas alturas, no la banda más alta por el número de bandas.**Forma de las fichas:** `ChoicePill` es una píldora por defecto; las fichas de etiqueta larga o de varias líneas (profesión, turno y tanda del día del ciclo) usan `Rad.inputRadius`.
 
 **Modo pintar** (B3, opción 3A del lienzo del 31-oct; una línea y hoja que mide lo que sobra, decisión 28): cabecera
 **de una línea** «PINTANDO · CAMBIAR EL TURNO» (`label`: «PINTANDO» en `ink` del turno elegido y el modo en `textMuted`;
@@ -425,7 +425,7 @@ oculta en Pintar y Selección (su hoja de herramientas ocupa ese sitio) y con el
 un nombre no cabe en su cuarto de ancho, los destinos quedan solo con el icono y el nombre como tooltip y texto leído,
 como las demás barras con nombre. Con dos paneles los mismos destinos van en un **raíl** de 80 dp a la izquierda del mes
 (`NavigationRail`, nombres debajo; solo iconos con la misma regla), porque una barra inferior se comería el alto que le
-falta al mes en un móvil horizontal.
+falta al mes en un móvil horizontal. Ese raíl lo llevan también Rotación, Agenda y Resumen (`DestinationRailShell`, puesto en la ruta) cuando hay dos paneles: el mismo punto de corte (`Adaptive.useSplit`), con su destino marcado; tocar otro destino sustituye la pantalla (el atrás sigue yendo al mes) y «Mes» vuelve al mes de hoy. Con una columna (móvil, tableta en vertical) no cambia nada.
 
 Qué abre cada uno (los tres últimos se abren encima, con su botón atrás, como antes):
 - **Mes**: esta pantalla; tocarlo vuelve al mes de hoy (y cierra el día abierto en el panel).

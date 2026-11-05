@@ -25,7 +25,7 @@ void activateMonthDay(BuildContext context, WidgetRef ref, CivilDate date) {
     final month = ref.read(visibleMonthProvider);
     if (date.year != month.year || date.month != month.month) return;
     final controller = ref.read(scheduleControllerProvider.notifier);
-    controller.beginStroke(ref.read(paintControllerProvider).tool);
+    controller.beginStroke(ref.read(paintControllerProvider.notifier).tool);
     if (controller.paintDay(date)) {
       unawaited(HapticFeedback.selectionClick().catchError((Object _) {}));
       playPaintSound(ref);

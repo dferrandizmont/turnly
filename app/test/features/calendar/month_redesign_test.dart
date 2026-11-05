@@ -166,11 +166,90 @@ void main() {
       await pumpCalendar(tester, size: const Size(1280, 800));
       expect(key('month-nav-bar'), findsNothing);
       expect(key('month-nav-rail'), findsOneWidget);
-      await tester.tap(key('open-agenda'));
-      await tester.pumpAndSettle();
-      expect(key('month-nav-rail'), findsNothing);
+      expect(
+        tester.widget<NavigationRail>(key('month-nav-rail')).selectedIndex,
+        0,
+      );
       expect(tester.takeException(), isNull);
     });
+
+    Future<void> openFromRail(WidgetTester tester, String destination) async {
+      await tester.tap(key(destination));
+      await tester.pumpAndSettle();
+    }
+
+    int railSelected(WidgetTester tester) =>
+        tester.widget<NavigationRail>(key('month-nav-rail')).selectedIndex!;
+
+    testWidgets('two panes: Rotación, Agenda and Resumen keep the rail', (
+      tester,
+    ) async {
+      await pumpCalendar(tester, size: const Size(1280, 800));
+
+      await openFromRail(tester, 'open-agenda');
+      expect(find.text('Agenda'), findsWidgets);
+      expect(key('month-nav-rail'), findsOneWidget);
+      expect(railSelected(tester), 2);
+
+      // From one screen to another: no stack of pages, one back to the month.
+      await openFromRail(tester, 'open-summary');
+      expect(key('month-nav-rail'), findsOneWidget);
+      expect(railSelected(tester), 3);
+
+      await openFromRail(tester, 'open-rotation');
+      expect(find.text('Mis rotaciones'), findsOneWidget);
+      expect(key('month-nav-rail'), findsOneWidget);
+      expect(railSelected(tester), 1);
+
+      // Tapping the screen on screen does nothing.
+      await openFromRail(tester, 'open-rotation');
+      expect(find.text('Mis rotaciones'), findsOneWidget);
+
+      rootNavigatorKey.currentState!.pop();
+      await tester.pumpAndSettle();
+      expect(find.byType(NavigationRail), findsOneWidget);
+      expect(railSelected(tester), 0);
+      expect(find.text('Mis rotaciones'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('two panes: Mes in the rail goes back to the month', (
+      tester,
+    ) async {
+      await pumpCalendar(tester, size: const Size(1280, 800));
+      await openFromRail(tester, 'open-agenda');
+      await openFromRail(tester, 'open-summary');
+      await openFromRail(tester, 'nav-month');
+      expect(railSelected(tester), 0);
+      expect(find.byType(NavigationRail), findsOneWidget);
+      expect(key('pane-divider'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('two panes: the screens fit beside the rail', (tester) async {
+      await pumpCalendar(tester, size: const Size(1280, 800));
+      await openFromRail(tester, 'open-summary');
+      final rail = tester.getRect(key('month-nav-rail'));
+      final scaffold = tester.getRect(find.byType(Scaffold).last);
+      expect(scaffold.left, greaterThanOrEqualTo(rail.right - 0.5));
+      // The app bar sees the width left beside the rail.
+      final media = MediaQuery.of(tester.element(find.byType(Scaffold).last));
+      expect(media.size.width, closeTo(scaffold.width, 0.5));
+      expect(tester.takeException(), isNull);
+    });
+
+    for (final size in const [Size(390, 844), Size(800, 1280)]) {
+      testWidgets('one column ${size.width.toInt()}x${size.height.toInt()}: '
+          'the screens open without a rail', (tester) async {
+        await pumpCalendar(tester, size: size);
+        await tester.tap(key('open-agenda'));
+        await tester.pumpAndSettle();
+        expect(find.byType(NavigationRail), findsNothing);
+        expect(key('month-nav-bar'), findsNothing);
+        expect(find.byType(BackButton), findsWidgets);
+        expect(tester.takeException(), isNull);
+      });
+    }
   });
 
   group('foldable «Hoy» card', () {

@@ -62,7 +62,11 @@
   "tagline": "Els teus torns, d’un cop d’ull.",
   "chip": "Gratis, sense anuncis i sense connexió.",
   "nav_label": "Seccions",
-  "theme_dark": "Tema fosc",
+  "theme_label": "Tema",
+  "theme_system": "Sistema",
+  "theme_light": "Clar",
+  "theme_dark": "Fosc",
+  "theme_hint": "Canvia el tema",
   "download_title": "Android en proves; iPhone, aviat.",
   "download_intro": "Mode clar i fosc. Gratis i sense compte.",
   "download_notes": {

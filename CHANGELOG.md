@@ -10,6 +10,14 @@ at once, so they can skip numbers.
 
 ## Unreleased
 
+## 0.8.9 · 2026-11-05
+
+Tablets and busy days, from testing on a real phone and tablet. Release for Google Play, GitHub and the web.
+
+- Tablets in landscape: Rotación, Agenda and Resumen now keep the side navigation bar of the month, so you can move between the four screens without going back.
+- Month: the week of a day with four shifts or more is no longer more than twice as tall as the others; the row takes just the room its bands need, also with large text.
+- Adding a work shift to a day that only has “Libre” (“Añadir otro turno” while painting, or “Añadir turno” in the day's detail) now replaces “Libre” instead of stacking it. Days with several shifts, and absences, are left as they were.
+
 ## 0.8.8 · 2026-11-05
 
 A first-run fix found in testing on a real phone and tablet. Release for Google Play, GitHub and the web.

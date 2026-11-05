@@ -269,11 +269,22 @@ class DayDetailBodyState extends ConsumerState<DayDetailBody>
   /// A puck of the palette: added to the day, or in place of the shift being
   /// changed. The palette closes; the new row says what happened.
   void _pick(List<String> ids, String id, int? changing) {
-    final next = [...ids];
+    final List<String> next;
     if (changing != null) {
+      next = [...ids];
       next[changing] = id;
     } else {
-      next.add(id);
+      // «Añadir turno»: a work shift takes the place of a lone «Libre».
+      final added = ref
+          .read(scheduleControllerProvider)
+          .palette
+          .where((t) => t.id == id)
+          .firstOrNull;
+      next = addShiftToDay(
+        ids,
+        id,
+        replaceRest: added?.category == ShiftCategory.work,
+      );
     }
     setState(() {
       _paletteOpen = null;

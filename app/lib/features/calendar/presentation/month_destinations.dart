@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +9,7 @@ import '../../../core/icons/selection_icons.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/router.dart';
 import '../../../core/theme/theme_context.dart';
+import '../../../core/widgets/adaptive.dart';
 import '../../patterns/application/pattern_start_pick.dart';
 import '../application/open_day.dart';
 import '../application/schedule_controller.dart';
@@ -35,24 +38,32 @@ const _destinationKeys = {
   MonthDestination.summary: ValueKey('open-summary'),
 };
 
+/// Opens [destination]. From the month ([from] is [MonthDestination.month])
+/// the three screens open on top of it; from one of them (the rail shows on
+/// all four when there are two panes) they take its place, so the back button
+/// still goes to the month, and «Mes» goes back to today's month.
 void openMonthDestination(
   BuildContext context,
   WidgetRef ref,
-  MonthDestination destination,
-) {
+  MonthDestination destination, {
+  MonthDestination from = MonthDestination.month,
+}) {
+  if (destination == from && destination != MonthDestination.month) return;
+  final onTop = from != MonthDestination.month;
+  void open(String location) =>
+      onTop ? context.pushReplacement(location) : context.push(location);
   switch (destination) {
     case MonthDestination.month:
       ref.read(openDayProvider.notifier).close();
       ref.read(visibleMonthProvider.notifier).today();
+      if (onTop) context.go(AppRoutes.home);
     case MonthDestination.rotation:
       final runs = ref.read(scheduleControllerProvider).schedule.runs;
-      context.push(
-        runs.isEmpty ? patternWizardLocation() : AppRoutes.settingsRuns,
-      );
+      open(runs.isEmpty ? patternWizardLocation() : AppRoutes.settingsRuns);
     case MonthDestination.agenda:
-      context.push(AppRoutes.agenda);
+      open(AppRoutes.agenda);
     case MonthDestination.summary:
-      context.push(AppRoutes.summaryFor(ref.read(visibleMonthProvider)));
+      open(AppRoutes.summaryFor(ref.read(visibleMonthProvider)));
   }
 }
 
@@ -151,9 +162,13 @@ class MonthNavigationBar extends ConsumerWidget {
   }
 }
 
-/// The same destinations as a rail at the start of the two-pane month.
+/// The same destinations as a rail at the start of the two-pane month, and of
+/// the three screens that open from it ([DestinationRailShell]). [current] is
+/// the destination on screen.
 class MonthNavigationRail extends ConsumerWidget {
-  const MonthNavigationRail({super.key});
+  const MonthNavigationRail({super.key, this.current = MonthDestination.month});
+
+  final MonthDestination current;
 
   /// The width of the rail (Material's).
   static const double width = 80;
@@ -167,12 +182,16 @@ class MonthNavigationRail extends ConsumerWidget {
       backgroundColor: colors.background,
       minWidth: width,
       groupAlignment: -1,
-      selectedIndex: MonthDestination.month.index,
+      selectedIndex: current.index,
       labelType: names
           ? NavigationRailLabelType.all
           : NavigationRailLabelType.none,
-      onDestinationSelected: (index) =>
-          openMonthDestination(context, ref, MonthDestination.values[index]),
+      onDestinationSelected: (index) => openMonthDestination(
+        context,
+        ref,
+        MonthDestination.values[index],
+        from: current,
+      ),
       destinations: [
         for (final destination in MonthDestination.values)
           NavigationRailDestination(
@@ -183,6 +202,68 @@ class MonthNavigationRail extends ConsumerWidget {
             label: Text(_describe(context, destination).label),
           ),
       ],
+    );
+  }
+}
+
+/// Puts the rail of destinations beside [child], a whole screen with its own
+/// app bar (Rotación, Agenda, Resumen), when the window has two panes
+/// ([Adaptive.useSplit], the same cut-off as the month). With one column
+/// (a phone, a tablet in portrait) it is [child] alone, as before.
+class DestinationRailShell extends StatelessWidget {
+  const DestinationRailShell({
+    super.key,
+    required this.current,
+    required this.child,
+  });
+
+  /// The destination the child is.
+  final MonthDestination current;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!Adaptive.useSplit(MediaQuery.sizeOf(context))) return child;
+    final colors = context.colors;
+    return ColoredBox(
+      color: colors.background,
+      child: LayoutBuilder(
+        builder: (context, box) => Align(
+          alignment: Alignment.topCenter,
+          child: SizedBox(
+            width: math.min(box.maxWidth, Adaptive.splitMaxWidth),
+            child: Row(
+              children: [
+                SizedBox(
+                  height: box.maxHeight,
+                  // The rail needs a Material to paint its ink on.
+                  child: Material(
+                    color: colors.background,
+                    child: MonthNavigationRail(current: current),
+                  ),
+                ),
+                Expanded(
+                  // The screen sees the window it really has beside the rail
+                  // (its app bar lines up with its page column from that
+                  // width), and the rail already keeps clear of the cut-out.
+                  child: LayoutBuilder(
+                    builder: (context, area) => MediaQuery.removePadding(
+                      context: context,
+                      removeLeft: true,
+                      child: MediaQuery(
+                        data: MediaQuery.of(
+                          context,
+                        ).copyWith(size: Size(area.maxWidth, area.maxHeight)),
+                        child: child,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

@@ -22,12 +22,18 @@ class PaintState {
 
   bool get erasing => shiftTypeId == null;
 
-  /// The brush the current selection paints with.
-  PaintTool get tool => erasing
-      ? const PaintTool.erase()
-      : doubling
-      ? PaintTool.add(shiftTypeId!)
-      : PaintTool.replace(shiftTypeId!);
+  /// The brush the current selection paints with. [palette] tells whether the
+  /// chosen shift is a work shift: «Añadir otro turno» (doblar) puts a work
+  /// shift in place of a lone «Libre» instead of beside it.
+  PaintTool toolFor(List<ShiftType> palette) {
+    if (erasing) return const PaintTool.erase();
+    if (!doubling) return PaintTool.replace(shiftTypeId!);
+    final chosen = palette.where((t) => t.id == shiftTypeId).firstOrNull;
+    return PaintTool.add(
+      shiftTypeId!,
+      replaceRest: chosen?.category == ShiftCategory.work,
+    );
+  }
 
   PaintState copyWith({
     bool? active,
@@ -72,6 +78,10 @@ class PaintController extends Notifier<PaintState> {
     ref.read(scheduleControllerProvider.notifier).endStroke();
     state = state.copyWith(active: false);
   }
+
+  /// The brush to paint with now (see [PaintState.toolFor]).
+  PaintTool get tool =>
+      state.toolFor(ref.read(scheduleControllerProvider).palette);
 
   void selectShift(String shiftTypeId) =>
       state = state.copyWith(shiftTypeId: shiftTypeId);

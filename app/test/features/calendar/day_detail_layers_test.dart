@@ -190,7 +190,8 @@ void main() {
       expect(_undoEnabled(tester), isFalse);
 
       await tapDayControl(tester, 'day-add-guard24');
-      expect(_ids(tester, _oct24), ['rest', 'guard24']);
+      // A work shift takes the place of a lone «Libre».
+      expect(_ids(tester, _oct24), ['guard24']);
       expect(_undoEnabled(tester), isTrue);
 
       await _undo(tester);
@@ -459,7 +460,8 @@ void main() {
       expect(_key('day-more-content'), findsNothing);
 
       await tapDayControl(tester, 'day-add-morning');
-      expect(_ids(tester, _oct24), ['rest', 'morning']);
+      // A work shift takes the place of a lone «Libre».
+      expect(_ids(tester, _oct24), ['morning']);
       expect(_undoEnabled(tester), isTrue);
       await _undo(tester);
       expect(_ids(tester, _oct24), ['rest']);

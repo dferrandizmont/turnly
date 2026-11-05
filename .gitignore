@@ -23,3 +23,6 @@ build/
 
 # QA evidence (screenshots, logs)
 qa/*/evidence/
+
+# Browser automation output
+.playwright-mcp/

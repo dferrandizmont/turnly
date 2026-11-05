@@ -169,6 +169,23 @@ void main() {
       expect(ids(schedule(), today), 'night');
     });
 
+    test('add over a lone «Libre» replaces it; over several it does not', () {
+      final c = controller();
+      expect(ids(schedule(), d1), 'rest');
+      c.beginStroke(const PaintTool.add('morning', replaceRest: true));
+      c.paintDay(d1); // «Libre» by rotation
+      c.endStroke();
+      expect(ids(schedule(), d1), 'morning');
+      c.undo();
+      expect(ids(schedule(), d1), 'rest');
+
+      c.setDayShifts(d1, ['rest', 'night']);
+      c.beginStroke(const PaintTool.add('morning', replaceRest: true));
+      c.paintDay(d1);
+      c.endStroke();
+      expect(ids(schedule(), d1), 'rest+night+morning');
+    });
+
     test('replace overwrites the shifts of the day', () {
       final c = controller();
       c.beginStroke(const PaintTool.replace('vacation'));
@@ -226,32 +243,43 @@ void main() {
       expect(paint().active, isFalse);
       expect(paint().shiftTypeId, 'morning');
       expect(paint().doubling, isFalse);
-      expect(paint().tool, const PaintTool.replace('morning'));
+      expect(p().tool, const PaintTool.replace('morning'));
     });
 
     test('"Doblar" switches replace and add', () {
       p().selectShift('night');
-      expect(paint().tool, const PaintTool.replace('night'));
+      expect(p().tool, const PaintTool.replace('night'));
       p().toggleDoubling();
-      expect(paint().tool, const PaintTool.add('night'));
+      expect(p().tool, const PaintTool.add('night', replaceRest: true));
       p().toggleDoubling();
-      expect(paint().tool, const PaintTool.replace('night'));
+      expect(p().tool, const PaintTool.replace('night'));
     });
+
+    test(
+      'doubling with an absence keeps «Libre»; with work it replaces it',
+      () {
+        p().toggleDoubling();
+        p().selectShift('vacation');
+        expect(p().tool, const PaintTool.add('vacation'));
+        p().selectShift('guard24');
+        expect(p().tool, const PaintTool.add('guard24', replaceRest: true));
+      },
+    );
 
     test('the eraser overrides doubling', () {
       p().toggleDoubling();
       p().selectEraser();
       expect(paint().erasing, isTrue);
-      expect(paint().tool, const PaintTool.erase());
+      expect(p().tool, const PaintTool.erase());
       p().selectShift('morning');
-      expect(paint().tool, const PaintTool.add('morning'));
+      expect(p().tool, const PaintTool.add('morning', replaceRest: true));
     });
 
     test('toggle enters and leaves; leaving closes the open stroke', () {
       p().toggle();
       expect(paint().active, isTrue);
       final c = controller();
-      c.beginStroke(paint().tool);
+      c.beginStroke(p().tool);
       c.paintDay(today.addDays(5));
       p().toggle();
       expect(paint().active, isFalse);

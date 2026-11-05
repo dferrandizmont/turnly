@@ -3,7 +3,8 @@
 <html lang="{{ lang }}">
 <head>{% include 'base/head.html.j2' %}
 {#- No defer: it sets the saved theme on <html> before the first paint. -#}
-<script src="{{ 'theme.js' | asset }}"></script></head>
+<script src="{{ 'theme.js' | asset }}"></script>
+<script src="{{ 'lang.js' | asset }}" defer></script></head>
 <body>
 {% include 'base/skip_link.html.j2' %}
 {% set home = route(lang) %}
@@ -17,8 +18,10 @@
 <a href="{{ '' if page_kind == 'home' else home }}#privacy">{{ t.privacy }}</a>
 <a href="{{ '' if page_kind == 'home' else home }}#support">{{ t.support }}</a>
 </nav>
-{#- Hidden without JS (it would do nothing); assets/theme.js shows it and keeps aria-pressed in step. -#}
-<button class="theme-btn" type="button" aria-pressed="false" title="{{ c.theme_dark }}" data-theme-toggle hidden>{{ icon('sun', 'i i-sun') }}{{ icon('moon', 'i i-moon') }}<span class="vh">{{ c.theme_dark }}</span></button>
+{#- Hidden without JS (it would do nothing). assets/theme.js shows it and cycles system -> light -> dark -> system,
+    changing the visible word to the theme now in use (the accessible name is «Tema: Claro»: a hidden label plus
+    that word, so the visible text is always part of the name); the three words travel in data-text-*. The icon of the state in use is picked by CSS from data-theme on <html>. -#}
+<button class="theme-btn" type="button" title="{{ c.theme_hint }}" data-theme-toggle data-text-system="{{ c.theme_system }}" data-text-light="{{ c.theme_light }}" data-text-dark="{{ c.theme_dark }}" hidden>{{ icon('auto', 'i i-auto') }}{{ icon('sun', 'i i-sun') }}{{ icon('moon', 'i i-moon') }}<span class="vh">{{ c.theme_label }}: </span><span class="theme-text" data-theme-text>{{ c.theme_system }}</span></button>
 {% include 'base/lang_switcher.html.j2' %}
 </div>
 </header>{% endblock %}

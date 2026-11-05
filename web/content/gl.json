@@ -62,7 +62,11 @@
   "tagline": "As túas quendas, dunha ollada.",
   "chip": "Gratis, sen anuncios e sen conexión.",
   "nav_label": "Seccións",
-  "theme_dark": "Tema escuro",
+  "theme_label": "Tema",
+  "theme_system": "Sistema",
+  "theme_light": "Claro",
+  "theme_dark": "Escuro",
+  "theme_hint": "Cambiar o tema",
   "download_title": "Android en probas; iPhone, proximamente.",
   "download_intro": "Modo claro e escuro. Gratis e sen conta.",
   "download_notes": {

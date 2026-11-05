@@ -529,7 +529,9 @@ void main() {
 }
 
 /// Scrolls the biggest vertical list by the smallest amount (up to 160 dp)
-/// that leaves every text and icon clear of the gesture pill.
+/// that leaves every text and icon clear of the gesture pill, without
+/// pushing any row that is fully visible above the top edge of the list
+/// (the app bar's bottom). If no amount does both, the list stays where it is.
 Future<void> _clearGesturePill(WidgetTester tester) async {
   final height = _rawPhysical.height / _rawRatio;
   const pillHalfWidth = 54 + 8.0;
@@ -540,25 +542,34 @@ Future<void> _clearGesturePill(WidgetTester tester) async {
     height - 12 + 2 + 6,
   );
   ScrollableState? list;
+  RenderBox? listBox;
   var listHeight = 0.0;
   for (final element in find.byType(Scrollable).evaluate()) {
     final state = (element as StatefulElement).state as ScrollableState;
     if (axisDirectionToAxis(state.axisDirection) != Axis.vertical) continue;
-    final height = (element.renderObject! as RenderBox).size.height;
-    if (list == null || height > listHeight) {
+    final box = element.renderObject! as RenderBox;
+    if (list == null || box.size.height > listHeight) {
       list = state;
-      listHeight = height;
+      listBox = box;
+      listHeight = box.size.height;
     }
   }
-  if (list == null) return;
+  if (list == null || listBox == null) return;
+  final listTop = listBox.localToGlobal(Offset.zero).dy;
   final rects = <Rect>[
     for (final finder in [find.byType(Text), find.byType(Icon)])
       for (final element in finder.evaluate())
         if (element.renderObject case final RenderBox box when box.attached)
           box.localToGlobal(Offset.zero) & box.size,
   ];
+  bool clearsPill(double d) =>
+      rects.every((r) => !r.shift(Offset(0, -d)).overlaps(pill));
+  // Rows that start inside the list must stay inside it, so the first row
+  // of a screen is never cut by the app bar.
+  bool keepsTop(double d) =>
+      rects.every((r) => r.top < listTop || r.top - d >= listTop);
   for (var d = 0; d <= 160; d++) {
-    if (rects.every((r) => !r.shift(Offset(0, -d.toDouble())).overlaps(pill))) {
+    if (clearsPill(d.toDouble()) && keepsTop(d.toDouble())) {
       if (d > 0) {
         list.position.jumpTo(list.position.pixels + d);
         await tester.pumpAndSettle();

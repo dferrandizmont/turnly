@@ -27,7 +27,7 @@
 <p class="label doc-kicker">{{ t.privacy }}</p>
 {% if policy_lang != lang %}<aside class="notice">
 <p class="label">{{ c.fallback_label }}</p>
-<p><strong class="privacy-fallback">{{ t.privacy_fallback.format(language=t.languages[policy_lang]) }}</strong> {{ c.fallback_text }}</p>
+<p><strong class="privacy-fallback">{{ t.privacy_fallback.format(language=t.languages_inline[policy_lang]) }}</strong> {{ c.fallback_text }}</p>
 </aside>{% endif %}
 {% if toc %}<details class="idx-m">
 <summary>{{ c.toc_label }} · {{ c.toc_count.format(count=toc | length) }}</summary>

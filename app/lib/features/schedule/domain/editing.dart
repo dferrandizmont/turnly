@@ -8,27 +8,59 @@ const _idsEq = ListEquality<String>();
 
 enum PaintMode { replace, add, erase }
 
+/// Id of the «Libre» shift type of the catalog.
+const restShiftTypeId = 'rest';
+
+/// The shifts of a day after «Añadir otro turno» adds [id] to [current].
+///
+/// A shift the day already has changes nothing. With [replaceRest] (the shift
+/// being added is a work shift) a day whose only shift is «Libre» gets [id] in
+/// its place; a day with several shifts, «Libre» among them, keeps them all.
+List<String> addShiftToDay(
+  List<String> current,
+  String id, {
+  bool replaceRest = false,
+}) {
+  if (current.contains(id)) return current;
+  if (replaceRest && current.length == 1 && current.first == restShiftTypeId) {
+    return [id];
+  }
+  return [...current, id];
+}
+
 /// Brush of paint mode.
 class PaintTool {
   /// The day becomes `[id]`.
   const PaintTool.replace(String id)
     : mode = PaintMode.replace,
-      shiftTypeId = id;
+      shiftTypeId = id,
+      replaceRest = false;
 
   /// "Double up": adds [id] after the day's effective shifts if not present.
-  const PaintTool.add(String id) : mode = PaintMode.add, shiftTypeId = id;
+  /// With [replaceRest] a day that only has «Libre» gets [id] instead (see
+  /// [addShiftToDay]); the caller sets it for work shifts.
+  const PaintTool.add(String id, {this.replaceRest = false})
+    : mode = PaintMode.add,
+      shiftTypeId = id;
 
   /// The day becomes empty.
-  const PaintTool.erase() : mode = PaintMode.erase, shiftTypeId = null;
+  const PaintTool.erase()
+    : mode = PaintMode.erase,
+      shiftTypeId = null,
+      replaceRest = false;
 
   final PaintMode mode;
   final String? shiftTypeId;
+  final bool replaceRest;
 
   /// Resulting shift ids given the day's current effective ids.
   List<String> apply(List<String> current) => switch (mode) {
     PaintMode.replace => [shiftTypeId!],
-    PaintMode.add =>
-      current.contains(shiftTypeId) ? current : [...current, shiftTypeId!],
+    PaintMode.add => addShiftToDay(
+      current,
+      shiftTypeId!,
+      replaceRest: replaceRest,
+    ),
     PaintMode.erase => const [],
   };
 
@@ -36,10 +68,11 @@ class PaintTool {
   bool operator ==(Object other) =>
       other is PaintTool &&
       other.mode == mode &&
-      other.shiftTypeId == shiftTypeId;
+      other.shiftTypeId == shiftTypeId &&
+      other.replaceRest == replaceRest;
 
   @override
-  int get hashCode => Object.hash(mode, shiftTypeId);
+  int get hashCode => Object.hash(mode, shiftTypeId, replaceRest);
 }
 
 /// Before/after of one day's entry; `null` = no entry stored.

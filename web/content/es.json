@@ -62,7 +62,11 @@
   "tagline": "Tus turnos, de un vistazo.",
   "chip": "Gratis, sin anuncios y sin conexión.",
   "nav_label": "Secciones",
-  "theme_dark": "Tema oscuro",
+  "theme_label": "Tema",
+  "theme_system": "Sistema",
+  "theme_light": "Claro",
+  "theme_dark": "Oscuro",
+  "theme_hint": "Cambiar tema",
   "download_title": "Android en pruebas; iPhone, próximamente.",
   "download_intro": "Modo claro y oscuro. Gratis y sin cuenta.",
   "download_notes": {

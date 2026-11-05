@@ -156,14 +156,21 @@ void main() {
         findsOneWidget,
       );
 
+      // oct24 only has «Libre»: a work shift takes its place.
       await tapInSheet(tester, 'day-add-guard24');
-      expect(schedule(tester).resolve(oct24).shiftIds, ['rest', 'guard24']);
-      expect(_key('day-shift-1'), findsOneWidget);
+      expect(schedule(tester).resolve(oct24).shiftIds, ['guard24']);
+      expect(_key('day-shift-1'), findsNothing);
       // The palette closes: the new row says what happened.
       expect(_key('day-palette'), findsNothing);
+      // With a shift that is not «Libre», the next one is added to it.
+      await tapInSheet(tester, 'day-add-open');
+      await tapInSheet(tester, 'day-add-night');
+      expect(schedule(tester).resolve(oct24).shiftIds, ['guard24', 'night']);
+      expect(_key('day-shift-1'), findsOneWidget);
       // The one already in the day cannot be added again.
+      await tapInSheet(tester, 'day-add-open');
       await tapInSheet(tester, 'day-add-guard24');
-      expect(schedule(tester).resolve(oct24).shiftIds, ['rest', 'guard24']);
+      expect(schedule(tester).resolve(oct24).shiftIds, ['guard24', 'night']);
       await expectStoredIsShown(tester);
 
       await closeDay(tester);
@@ -172,8 +179,29 @@ void main() {
         findsOneWidget,
       );
       await undoFromMonth(tester);
+      expect(schedule(tester).resolve(oct24).shiftIds, ['guard24']);
+      await undoFromMonth(tester);
       expect(schedule(tester).resolve(oct24).shiftIds, ['rest']);
       await expectStoredIsShown(tester);
+    });
+
+    testWidgets('«Libre» with another shift stays when one more is added', (
+      tester,
+    ) async {
+      await pumpCalendar(tester);
+      await openDay(tester, oct24);
+      await tapInSheet(tester, 'day-add-open');
+      await tapInSheet(tester, 'day-add-vacation');
+      // An absence is not a work shift: «Libre» stays beside it.
+      expect(schedule(tester).resolve(oct24).shiftIds, ['rest', 'vacation']);
+      await tapInSheet(tester, 'day-add-open');
+      await tapInSheet(tester, 'day-add-guard24');
+      // Several shifts: nothing is replaced.
+      expect(schedule(tester).resolve(oct24).shiftIds, [
+        'rest',
+        'vacation',
+        'guard24',
+      ]);
     });
 
     testWidgets('an empty day offers "Añadir turno"', (tester) async {
@@ -496,7 +524,7 @@ void main() {
       await enterNote(tester, 'antes de doblar');
       await tapInSheet(tester, 'day-add-guard24');
       expect(schedule(tester).resolve(oct24).note, 'antes de doblar');
-      expect(schedule(tester).resolve(oct24).shiftIds, ['rest', 'guard24']);
+      expect(schedule(tester).resolve(oct24).shiftIds, ['guard24']);
     });
   });
 
@@ -739,12 +767,14 @@ void main() {
       final before = schedule(tester).entries;
 
       await openDay(tester, oct24);
-      await tapInSheet(tester, 'day-add-guard24');
+      await tapInSheet(tester, 'day-add-guard24'); // takes the place of «Libre»
+      await tapInSheet(tester, 'day-add-open');
+      await tapInSheet(tester, 'day-add-night');
       await tapInSheet(tester, 'day-remove-0');
       await enterNote(tester, 'nota');
       await closeDay(tester);
       await tester.pump();
-      expect(schedule(tester).resolve(oct24).shiftIds, ['guard24']);
+      expect(schedule(tester).resolve(oct24).shiftIds, ['night']);
       expect(schedule(tester).resolve(oct24).note, 'nota');
 
       await enterPaintMode(tester);
@@ -755,10 +785,12 @@ void main() {
 
       await undo(); // the note
       expect(schedule(tester).resolve(oct24).note, isNull);
-      expect(schedule(tester).resolve(oct24).shiftIds, ['guard24']);
+      expect(schedule(tester).resolve(oct24).shiftIds, ['night']);
       await undo(); // the removal
-      expect(schedule(tester).resolve(oct24).shiftIds, ['rest', 'guard24']);
-      await undo(); // the addition
+      expect(schedule(tester).resolve(oct24).shiftIds, ['guard24', 'night']);
+      await undo(); // the second addition
+      expect(schedule(tester).resolve(oct24).shiftIds, ['guard24']);
+      await undo(); // the first addition
       expect(schedule(tester).resolve(oct24).shiftIds, ['rest']);
       expect(schedule(tester).entries, before);
       expect(stateOf(tester).canUndo, isFalse);
@@ -767,7 +799,7 @@ void main() {
       // And redo brings them back.
       await tester.tap(find.byKey(const ValueKey('redo')));
       await tester.pumpAndSettle();
-      expect(schedule(tester).resolve(oct24).shiftIds, ['rest', 'guard24']);
+      expect(schedule(tester).resolve(oct24).shiftIds, ['guard24']);
     });
   });
 

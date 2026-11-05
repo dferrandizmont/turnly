@@ -34,6 +34,55 @@ void main() {
       expect(const PaintTool.add('a').apply([]), ['a']);
       expect(const PaintTool.erase().apply(['x']), isEmpty);
     });
+
+    group('«Libre» and «Añadir otro turno»', () {
+      const work = PaintTool.add('morning', replaceRest: true);
+
+      test('a work shift takes the place of a lone «Libre»', () {
+        expect(work.apply(['rest']), ['morning']);
+        expect(addShiftToDay(['rest'], 'morning', replaceRest: true), [
+          'morning',
+        ]);
+      });
+
+      test('a day with several shifts is left alone', () {
+        expect(work.apply(['rest', 'night']), ['rest', 'night', 'morning']);
+        expect(work.apply(['night', 'rest']), ['night', 'rest', 'morning']);
+        expect(work.apply(['afternoon']), ['afternoon', 'morning']);
+        expect(work.apply([]), ['morning']);
+      });
+
+      test('without the flag (absences, «Saliente»…) «Libre» stays', () {
+        expect(const PaintTool.add('vacation').apply(['rest']), [
+          'rest',
+          'vacation',
+        ]);
+        expect(addShiftToDay(['rest'], 'postNight'), ['rest', 'postNight']);
+      });
+
+      test('only «Libre» is replaced, not other rest shifts', () {
+        expect(work.apply(['postNight']), ['postNight', 'morning']);
+      });
+
+      test('the shift already there changes nothing', () {
+        expect(const PaintTool.add('rest', replaceRest: true).apply(['rest']), [
+          'rest',
+        ]);
+      });
+
+      test('the flag is part of the brush', () {
+        expect(work, isNot(const PaintTool.add('morning')));
+        expect(work.hashCode, isNot(const PaintTool.add('morning').hashCode));
+      });
+
+      test('painting a «Libre» day of the rotation stores the work shift', () {
+        final s = _base();
+        expect(s.resolve(_day(2)).shiftIds, ['rest']);
+        final patch = s.paint(work, [_day(2)]);
+        final result = s.apply(ScheduleChange(patch: patch)).resolve(_day(2));
+        expect(result.shiftIds, ['morning']);
+      });
+    });
   });
 
   group('paint', () {
