@@ -20,3 +20,6 @@ build/
 
 # Entorno virtual del generador de festivos (app/tool/export_country_holidays.py)
 .venv/
+
+# QA evidence (screenshots, logs)
+qa/*/evidence/

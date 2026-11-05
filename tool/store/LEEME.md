@@ -90,6 +90,7 @@ TZ=Europe/Madrid flutter test --dart-define=GENERATE_STORE=true --dart-define=ST
 | `ios69` | 1320 × 2868 | `app/build/store/ios69/{es,ca,gl,eu,en}/` |
 | `ios65` | 1242 × 2688 | `app/build/store/ios65/{es,ca,gl,eu,en}/` |
 | `ios63` | 1206 × 2622 | `app/build/store/ios63/{es,ca,gl,eu,en}/` (**obligatorio** en App Store Connect: «iPhone with Dynamic Island, medium display», comprobado el 28-oct-2026) |
+| `tablet` | 1600 × 2560 | `docs/store/tablet/{es,ca,gl,eu,en}/`: pantallas en bruto de una tablet Android en vertical (800 dp, clase Redmi Pad 2 Pro). `store_shots.py docs/store/shots.json` las enmarca en `docs/store/<idioma>/play-tablet7/` (1350 × 2400) y `play-tablet10/` (1800 × 3200) para Play |
 
 El target iOS selecciona controles Flutter de iOS; estos renders **no sustituyen
 la validación del build de iPhone** ni las capturas de widgets nativos. Comprueba

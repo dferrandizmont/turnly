@@ -198,10 +198,17 @@ class _ImportArt extends StatelessWidget {
 /// Shift types of the drawings, as the calendar shows them: colour and code
 /// (never colour alone, even in a drawing). Missing ones are left out. Talks
 /// the app's language while the first-use flow is open (see
-/// [shiftTypeForFirstUse]).
-List<ShiftType> _artShifts(Schedule schedule, List<String> ids) => [
-  for (final id in ids) ?shiftTypeForFirstUse(schedule, id),
-];
+/// [shiftTypeForFirstUse]). The factory texts live outside the widget tree,
+/// so the drawing depends on the locale itself: a language change on this
+/// screen redraws the badges with the new codes.
+List<ShiftType> _artShifts(
+  BuildContext context,
+  Schedule schedule,
+  List<String> ids,
+) {
+  Localizations.localeOf(context);
+  return [for (final id in ids) ?shiftTypeForFirstUse(schedule, id)];
+}
 
 /// The badges of a small grid inside a [Disc.badge] square.
 const double _artGap = Sp.hair;
@@ -217,7 +224,7 @@ class _RotationArt extends ConsumerWidget {
     final schedule = ref.watch(
       scheduleControllerProvider.select((s) => s.schedule),
     );
-    final shifts = _artShifts(schedule, const [
+    final shifts = _artShifts(context, schedule, const [
       'morning',
       'afternoon',
       'night',
@@ -252,7 +259,7 @@ class _PaintArt extends ConsumerWidget {
     final schedule = ref.watch(
       scheduleControllerProvider.select((s) => s.schedule),
     );
-    final shifts = _artShifts(schedule, const [
+    final shifts = _artShifts(context, schedule, const [
       'morning',
       'morning',
       'rest',

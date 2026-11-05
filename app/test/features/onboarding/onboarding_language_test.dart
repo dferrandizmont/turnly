@@ -351,4 +351,42 @@ void main() {
       },
     );
   }
+
+  testWidgets('the path drawings follow a language change at once', (
+    tester,
+  ) async {
+    final app = await FirstLaunch.open(tester);
+    final card = key('onboarding-path-rotation');
+    final es = lookupAppLocalizations(const Locale('es'));
+    expect(
+      find.descendant(
+        of: card,
+        matching: find.text(es.catalogShiftAfternoonCode),
+      ),
+      findsOneWidget,
+    );
+    await app.tap(key('onboarding-language'));
+    await app.tap(
+      find.descendant(
+        of: find.byType(BottomSheet),
+        matching: find.text('English'),
+      ),
+    );
+    final en = lookupAppLocalizations(const Locale('en'));
+    expect(
+      find.descendant(
+        of: card,
+        matching: find.text(en.catalogShiftAfternoonCode),
+      ),
+      findsOneWidget,
+      reason: 'the badges of «Use a rotation» redraw in the new language',
+    );
+    expect(
+      find.descendant(
+        of: card,
+        matching: find.text(es.catalogShiftAfternoonCode),
+      ),
+      findsNothing,
+    );
+  });
 }

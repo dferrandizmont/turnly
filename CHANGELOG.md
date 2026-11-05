@@ -1,8 +1,6 @@
 # Changelog
 
 What changes in each version of Turnly (called Cuadrante until 0.6.14), newest first. The "Unreleased" section fills up as changes land and becomes
-
-- Keep pre-reset safety backups outside automatic retention, finish reset despite cleanup failures, and explain remaining system cleanup on first use.
 the next version on the day it ships.
 
 Numbering: the last number goes up with fixes (0.6.12 → 0.6.13), the middle one with new features (→ 0.7.0), and 1.0.0
@@ -11,6 +9,12 @@ will be the production launch in the stores. Every version ships on
 at once, so they can skip numbers.
 
 ## Unreleased
+
+## 0.8.8 · 2026-11-05
+
+A first-run fix found in testing on a real phone and tablet. Release for Google Play, GitHub and the web.
+
+- First run: after changing the language on the first screen, the little drawings of the three ways to start show the shift codes of the new language straight away.
 
 ## 0.8.7 · 2026-11-05
 
@@ -29,7 +33,7 @@ The Google backup of Android only takes Turnly end-to-end encrypted. Release for
 A way to delete everything and start again, with a backup first.
 
 - Backups: fix the restore label's date wording, including “de hoy” in Spanish.
-- Settings: “Borrar todo y empezar de cero” deletes everything and takes you back to the first run, after saving a backup you can keep somewhere else.
+- Settings: “Borrar todo y empezar de cero” deletes everything and takes you back to the first run, after saving a backup you can keep somewhere else. That backup is kept apart from the automatic ones, so it is never rotated out.
 
 ## 0.8.4 · 2026-11-04
 
