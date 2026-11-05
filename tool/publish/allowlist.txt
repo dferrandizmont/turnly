@@ -1432,3 +1432,27 @@ app/tool/holidays_es/2027/ES-MC.json
 app/tool/holidays_es/2027/ES-PV.json
 app/tool/holidays_es/2027/ES-RI.json
 app/tool/holidays_es/canarias-islands.json
+# Added on 5-nov-2026 (0.8.4–0.8.6), reviewed one by one: app code, tests and the QA backup script.
+app/android/app/src/main/kotlin/es/cuadrante/app/ResetCalendarChannel.kt
+app/android/app/src/main/res/values-v28/backup.xml
+app/android/app/src/main/res/values/backup.xml
+app/lib/features/calendar_export/data/reset_calendar_events.dart
+app/lib/features/patterns/application/shift_run_options.dart
+app/lib/features/patterns/presentation/cycle_start_picker.dart
+app/lib/features/settings/application/reset_everything.dart
+app/lib/features/settings/application/reset_notice.dart
+app/lib/features/settings/application/reset_providers.dart
+app/lib/features/settings/data/reset_repository.dart
+app/lib/features/settings/presentation/reset_screen.dart
+app/lib/features/settings/presentation/sections/reset_section.dart
+app/test/features/backup/auto_backup_readiness_test.dart
+app/test/features/calendar/day_cell_overflow_test.dart
+app/test/features/calendar_export/reset_calendar_events_test.dart
+app/test/features/onboarding/onboarding_region_defaults_test.dart
+app/test/features/patterns/cycle_start_picker_test.dart
+app/test/features/patterns/factory_texts_test.dart
+app/test/features/patterns/shift_run_options_test.dart
+app/test/features/settings/reset_backup_test.dart
+app/test/features/settings/reset_everything_test.dart
+app/test/features/settings/reset_screen_test.dart
+tool/qa/backup_android.sh

@@ -33,6 +33,35 @@ ShiftType? shiftTypeForDisplay(Schedule schedule, String id) {
   return null;
 }
 
+/// [type] with its name and code in the app's language when [type] is one of
+/// the factory templates, and untouched otherwise. Everything else (hours,
+/// colour, the job's adjustments) is kept.
+///
+/// While the first-use flow is open the seeded catalogue has not been
+/// finalized yet: it was written when the database was created, possibly in
+/// the phone's language, while the person may have chosen another on the very
+/// first screen. Showing a factory type through here talks the app's language
+/// without touching the stored data.
+///
+/// The criterion is the id alone: any type whose id is a template key is
+/// shown with the factory texts, and a type with any other id (one the person
+/// made or imported) is left alone. This is only the name used to draw it: the
+/// stored rows are never touched here, and the real rename at the end of the
+/// flow (`finalizeFactoryCatalog`) skips a catalogue the person has edited.
+ShiftType factoryTextsShiftType(ShiftType type) {
+  final texts = catalogTexts.templates[type.id];
+  return texts == null
+      ? type
+      : type.copyWith(name: texts.name, code: texts.code);
+}
+
+/// [shiftTypeForDisplay], with a factory type talking the app's language
+/// during the first-use flow (see [factoryTextsShiftType]).
+ShiftType? shiftTypeForFirstUse(Schedule schedule, String id) {
+  final type = shiftTypeForDisplay(schedule, id);
+  return type == null ? null : factoryTextsShiftType(type);
+}
+
 /// Whether the first day of [steps] includes shift type [shiftTypeId].
 bool startsWithShift(List<List<String>> steps, String shiftTypeId) =>
     steps.isNotEmpty && steps.first.contains(shiftTypeId);

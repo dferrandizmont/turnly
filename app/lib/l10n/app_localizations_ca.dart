@@ -267,6 +267,11 @@ class AppLocalizationsCa extends AppLocalizations {
   }
 
   @override
+  String dayCellMoreShifts(int count) {
+    return '+$count';
+  }
+
+  @override
   String daySheetHoliday(String name) {
     return 'Festiu: $name';
   }
@@ -1537,6 +1542,49 @@ class AppLocalizationsCa extends AppLocalizations {
   @override
   String patternOffsetHelp(String date) {
     return 'Toca el dia del patró que et toca el $date.';
+  }
+
+  @override
+  String get patternStartShiftTitle => 'Quin torn et toca aquell dia?';
+
+  @override
+  String patternStartShiftHelp(String date) {
+    return 'El $date. Tria el torn; si es repeteix al cicle, després tries quin.';
+  }
+
+  @override
+  String patternStartOccurrenceTitle(String shift) {
+    return '$shift es repeteix: quin dia et toca?';
+  }
+
+  @override
+  String get patternStartOccurrenceHelp =>
+      'Compta des del primer dels dies seguits.';
+
+  @override
+  String get patternShowCycle => 'Mostra el cicle complet';
+
+  @override
+  String get patternHideCycle => 'Amaga el cicle complet';
+
+  @override
+  String patternOccurrenceInRun(int position, int count) {
+    return 'Dia $position de $count';
+  }
+
+  @override
+  String patternOccurrenceInRunAfter(int position, int count, String previous) {
+    return 'Dia $position de $count, després de $previous';
+  }
+
+  @override
+  String patternOccurrenceAfter(String previous) {
+    return 'Després de $previous';
+  }
+
+  @override
+  String patternOccurrenceRun(int run, String label) {
+    return 'Tanda $run · $label';
   }
 
   @override
@@ -4316,8 +4364,13 @@ class AppLocalizationsCa extends AppLocalizations {
   String get backupUiCopyRestore => 'Restaura aquesta';
 
   @override
-  String backupUiCopyRestoreLabel(String when) {
-    return 'Restaura la còpia de: $when';
+  String backupUiCopyRestoreLabel(String day, String time, String date) {
+    String _temp0 = intl.Intl.selectLogic(day, {
+      'today': 'Restaura la còpia d’avui a les $time',
+      'yesterday': 'Restaura la còpia d’ahir a les $time',
+      'other': 'Restaura la còpia del $date a les $time',
+    });
+    return '$_temp0';
   }
 
   @override
@@ -6516,4 +6569,106 @@ class AppLocalizationsCa extends AppLocalizations {
   ) {
     return '$time, $title, $calendar';
   }
+
+  @override
+  String get resetTitle => 'Esborra-ho tot i comença de zero';
+
+  @override
+  String get resetIntro => 'S’esborrarà tot això de Turnly:';
+
+  @override
+  String get resetCalendars =>
+      'Tots els calendaris i els seus torns, rotacions i excepcions.';
+
+  @override
+  String get resetNotes =>
+      'Notes, adjunts (fotos, dibuixos i fitxers) i tasques.';
+
+  @override
+  String get resetAbsences => 'Vacances, permisos i absències.';
+
+  @override
+  String get resetSwaps => 'El llibre de canvis.';
+
+  @override
+  String get resetAlarms => 'Alarmes i avisos programats.';
+
+  @override
+  String get resetWidget => 'El contingut del widget.';
+
+  @override
+  String get resetDnd => 'Les regles i franges de No molestis.';
+
+  @override
+  String get resetCalendarEvents =>
+      'Els esdeveniments que Mantenir al dia ha escrit al calendari del mòbil.';
+
+  @override
+  String get resetPreferences => 'Tots els ajustos.';
+
+  @override
+  String get resetKeepLanguage =>
+      'Només conservem l’idioma de l’app. La còpia de seguretat es queda al mòbil i la podràs restaurar en el primer ús.';
+
+  @override
+  String get resetBackupPreparing => 'Desant la còpia…';
+
+  @override
+  String resetBackupSaved(String file) {
+    return 'Abans d’esborrar desem una còpia: $file';
+  }
+
+  @override
+  String get resetShare => 'Desa la còpia en un altre lloc';
+
+  @override
+  String get resetDelete => 'Esborra-ho tot';
+
+  @override
+  String get resetConfirmTitle => 'Vols esborrar-ho tot?';
+
+  @override
+  String resetConfirmBody(String date) {
+    return 'No es pot desfer, però tens la còpia del $date.';
+  }
+
+  @override
+  String get resetBackupFailed =>
+      'No s’ha pogut desar i comprovar la còpia de seguretat. No s’ha esborrat res. Revisa l’espai del mòbil i torna-ho a provar.';
+
+  @override
+  String get resetShareFailed =>
+      'No s’ha pogut compartir la còpia. La còpia local continua desada al mòbil.';
+
+  @override
+  String get resetFailed =>
+      'No s’ha pogut completar l’esborrament. La teva còpia de seguretat continua desada al mòbil. Torna-ho a provar.';
+
+  @override
+  String get resetHolidays => 'Els festius que vas afegir a mà.';
+
+  @override
+  String get resetShareLink => 'L’enllaç que vas compartir.';
+
+  @override
+  String get resetFolderBackup =>
+      'La còpia diària a la teva carpeta (els arxius que ja hi ha es queden on són).';
+
+  @override
+  String get resetDeleting => 'Esborrant…';
+
+  @override
+  String get resetCleanupWarning =>
+      'Algunes dades del sistema no s’han pogut netejar.';
+
+  @override
+  String get resetCalendarCleanupWarning =>
+      'Alguns esdeveniments del calendari del mòbil no s’han pogut treure.';
+
+  @override
+  String get backupUiCopyPreReset => 'Abans de començar de zero';
+
+  @override
+  String get backupUiOriginPreReset =>
+      'Còpia de just abans de començar de zero';
 }

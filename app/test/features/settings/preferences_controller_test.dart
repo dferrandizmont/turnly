@@ -75,6 +75,27 @@ void main() {
     );
   });
 
+  test(
+    're-choosing the value you already have still marks it as yours',
+    () async {
+      final repository = PreferencesRepository(db);
+      final c = container();
+      final controller = c.read(preferencesProvider.notifier);
+
+      // The defaults already are Monday and EUR: choosing them by hand writes
+      // the explicit markers all the same.
+      await controller.setWeekStart(WeekStart.monday);
+      await controller.setCurrency('EUR');
+
+      // A later country change must leave those hand-made choices alone.
+      await controller.applyRegionDefaults('US');
+
+      final stored = await repository.load();
+      expect(stored.weekStart, WeekStart.monday);
+      expect(stored.currency, 'EUR');
+    },
+  );
+
   test('a change made before the first read wins over it', () async {
     await PreferencesRepository(db).setThemeMode(ThemeMode.dark);
     final c = container();

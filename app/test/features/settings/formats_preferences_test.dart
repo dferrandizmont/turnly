@@ -151,6 +151,62 @@ void main() {
     });
   });
 
+  group('applyRegionDefaults (picking a country)', () {
+    test('a seeded installation follows the country it picks', () async {
+      await repository.seedRegionDefaults(const [Locale('en', 'US')]);
+      expect((await repository.load()).currency, 'USD');
+
+      final picked = await repository.applyRegionDefaults('ES');
+      expect(picked.weekStart, WeekStart.monday);
+      expect(picked.currency, 'EUR');
+    });
+
+    test('never overwrites a currency or week start chosen by hand', () async {
+      await repository.seedRegionDefaults(const [Locale('en', 'US')]);
+      await repository.setWeekStart(WeekStart.monday);
+      await repository.setCurrency('GBP');
+
+      final picked = await repository.applyRegionDefaults('US');
+      expect(picked.weekStart, WeekStart.monday);
+      expect(picked.currency, 'GBP');
+      expect(await stored(PreferenceKeys.currencyExplicit), 'true');
+      expect(await stored(PreferenceKeys.weekStartExplicit), 'true');
+    });
+
+    test('a stored value with no marker (an old installation) is kept', () async {
+      // Rows from a version that predates the explicit markers.
+      await store(PreferenceKeys.currency, '"GBP"');
+      await store(PreferenceKeys.weekStart, '7');
+
+      final picked = await repository.applyRegionDefaults('ES');
+      expect(picked.weekStart, WeekStart.sunday);
+      expect(picked.currency, 'GBP');
+    });
+
+    test('an installation with nothing stored takes the country', () async {
+      final picked = await repository.applyRegionDefaults('US');
+      expect(picked.weekStart, WeekStart.sunday);
+      expect(picked.currency, 'USD');
+      // The markers are written as `false`: the value can still follow a
+      // later country.
+      expect(await stored(PreferenceKeys.currencyExplicit), 'false');
+      expect(await stored(PreferenceKeys.weekStartExplicit), 'false');
+    });
+
+    test('a second country change still applies', () async {
+      final first = await repository.applyRegionDefaults('US');
+      expect(first.weekStart, WeekStart.sunday);
+      expect(first.currency, 'USD');
+
+      // The first choice left the markers at `false`, so the formats follow
+      // the second country too (the bug was that they did not).
+      final second = await repository.applyRegionDefaults('ES');
+      expect(second.weekStart, WeekStart.monday);
+      expect(second.currency, 'EUR');
+      expect(await stored(PreferenceKeys.currencyExplicit), 'false');
+    });
+  });
+
   group('bootstrap', () {
     // A new database is seeded; the phone's languages are fixed by
     // `debugPhoneLocales` (the test config puts Spanish Spain).

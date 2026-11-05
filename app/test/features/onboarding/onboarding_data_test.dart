@@ -430,7 +430,7 @@ void main() {
         find.descendant(of: dialog, matching: find.byType(TextButton)).last,
       );
       await tester.pumpAndSettle();
-      await app.tap(key('onboarding-offset-6'));
+      await app.selectCycleDay(6);
       await app.tap(key('onboarding-next'));
       await app.tap(key('onboarding-profession-nursing'));
       await app.tap(key('onboarding-next')); // last step -> writes

@@ -10,6 +10,8 @@ import '../../../core/widgets/buttons.dart';
 import '../../../core/widgets/page_body.dart';
 import '../../calendar/application/paint_controller.dart';
 import '../application/onboarding_controller.dart';
+import '../../settings/application/reset_everything.dart';
+import '../../settings/application/reset_notice.dart';
 import 'choose_step.dart';
 import 'import_ready_steps.dart';
 import 'place_step.dart';
@@ -34,6 +36,7 @@ class OnboardingScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
+    final cleanupFailures = ref.watch(resetCleanupNoticeProvider);
     final state = ref.watch(onboardingControllerProvider);
     final controller = ref.read(onboardingControllerProvider.notifier);
     final stage = state.stage;
@@ -107,10 +110,34 @@ class OnboardingScreen extends ConsumerWidget {
       },
       child: Scaffold(
         body: SafeArea(
-          child: PageBody(
-            child: compact
-                ? _compactBody(header, step, next, stage, nextInside: bigText)
-                : _fixedBody(header, step, next, stage),
+          child: Column(
+            children: [
+              if (cleanupFailures.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(Sp.m),
+                  child: Text(
+                    cleanupFailures.length == 1 &&
+                            cleanupFailures.contains(ResetCleanupStep.calendar)
+                        ? l10n.resetCalendarCleanupWarning
+                        : l10n.resetCleanupWarning,
+                    key: const ValueKey('reset-cleanup-warning'),
+                    style: context.type.body,
+                  ),
+                ),
+              Expanded(
+                child: PageBody(
+                  child: compact
+                      ? _compactBody(
+                          header,
+                          step,
+                          next,
+                          stage,
+                          nextInside: bigText,
+                        )
+                      : _fixedBody(header, step, next, stage),
+                ),
+              ),
+            ],
           ),
         ),
       ),

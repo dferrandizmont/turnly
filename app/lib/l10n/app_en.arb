@@ -339,6 +339,7 @@
       }
     }
   },
+  "dayCellMoreShifts": "+{count}",
   "daySheetHoliday": "Public holiday: {name}",
   "@daySheetHoliday": {
     "placeholders": {
@@ -1137,6 +1138,76 @@
   "@patternOffsetHelp": {
     "placeholders": {
       "date": {
+        "type": "String"
+      }
+    }
+  },
+  "patternStartShiftTitle": "Which shift are you on that day?",
+  "patternStartShiftHelp": "On {date}. Pick the shift; if it repeats in the cycle, you’ll choose which one next.",
+  "@patternStartShiftHelp": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "patternStartOccurrenceTitle": "{shift} repeats: which day is yours?",
+  "patternStartOccurrenceHelp": "Count from the first of the days in a row.",
+  "patternShowCycle": "Show the full cycle",
+  "patternHideCycle": "Hide the full cycle",
+  "patternOccurrenceInRun": "Day {position} of {count}",
+  "@patternOccurrenceInRun": {
+    "description": "Day of a run of several days: «2nd of 5 · Morning».",
+    "placeholders": {
+      "ordinal": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "shift": {
+        "type": "String"
+      }
+    }
+  },
+  "patternOccurrenceInRunAfter": "Day {position} of {count}, after {previous}",
+  "@patternOccurrenceInRunAfter": {
+    "description": "Day of a run, saying which run: «1st of 2 · Off, after Night».",
+    "placeholders": {
+      "ordinal": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "shift": {
+        "type": "String"
+      },
+      "previous": {
+        "type": "String"
+      }
+    }
+  },
+  "patternOccurrenceAfter": "After {previous}",
+  "@patternOccurrenceAfter": {
+    "description": "A one-day run: «Off, after Afternoon».",
+    "placeholders": {
+      "shift": {
+        "type": "String"
+      },
+      "previous": {
+        "type": "String"
+      }
+    }
+  },
+  "patternOccurrenceRun": "Run {run} · {label}",
+  "@patternOccurrenceRun": {
+    "description": "Numbers the run when the shift has several: «Run 2 · 1st of 2 · Morning, after Off».",
+    "placeholders": {
+      "run": {
+        "type": "int"
+      },
+      "label": {
         "type": "String"
       }
     }
@@ -2525,10 +2596,16 @@
   },
   "backupUiCopyMetaVersion": "{kind} · {version} · {size}",
   "backupUiCopyRestore": "Restore this one",
-  "backupUiCopyRestoreLabel": "Restore the backup from {when}",
+  "backupUiCopyRestoreLabel": "{day, select, today{Restore the backup from today at {time}} yesterday{Restore the backup from yesterday at {time}} other{Restore the backup from {date} at {time}}}",
   "@backupUiCopyRestoreLabel": {
     "placeholders": {
-      "when": {
+      "day": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "date": {
         "type": "String"
       }
     }
@@ -3652,5 +3729,48 @@
         "type": "String"
       }
     }
-  }
+  },
+  "resetTitle": "Delete everything and start over",
+  "resetIntro": "All of this will be deleted from Turnly:",
+  "resetCalendars": "All calendars and their shifts, rotations and exceptions.",
+  "resetNotes": "Notes, attachments (photos, drawings and files) and tasks.",
+  "resetAbsences": "Vacation, leave and absences.",
+  "resetSwaps": "The shift swap ledger.",
+  "resetAlarms": "Alarms and scheduled notifications.",
+  "resetWidget": "The widget’s content.",
+  "resetDnd": "Do Not Disturb rules and scheduled windows.",
+  "resetCalendarEvents": "The events Keep up to date wrote to your phone’s calendar.",
+  "resetPreferences": "All settings.",
+  "resetKeepLanguage": "Only the app language is kept. The backup stays on your phone and you can restore it during the first run.",
+  "resetBackupPreparing": "Saving the backup…",
+  "resetBackupSaved": "Before deleting we save a backup: {file}",
+  "resetShare": "Save the backup somewhere else",
+  "resetDelete": "Delete everything",
+  "resetConfirmTitle": "Delete everything?",
+  "resetConfirmBody": "This cannot be undone, but you have the backup from {date}.",
+  "resetBackupFailed": "Could not save and verify the backup. Nothing has been deleted. Check your phone’s storage and try again.",
+  "resetShareFailed": "Could not share the backup. The local backup is still saved on your phone.",
+  "resetFailed": "Could not complete the reset. Your backup is still saved on your phone. Try again.",
+  "@resetBackupSaved": {
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "@resetConfirmBody": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "resetHolidays": "The public holidays you added by hand.",
+  "resetShareLink": "The link you shared.",
+  "resetFolderBackup": "The daily backup in your folder (existing files stay where they are).",
+  "resetDeleting": "Deleting…",
+  "resetCleanupWarning": "Some system data could not be cleaned up.",
+  "resetCalendarCleanupWarning": "Some events could not be removed from the phone’s calendar.",
+  "backupUiCopyPreReset": "Before starting over",
+  "backupUiOriginPreReset": "Backup from just before starting over"
 }

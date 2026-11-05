@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:cuadrante/core/bootstrap/bootstrap.dart';
 import 'package:cuadrante/l10n/app_localizations_es.dart';
+import 'package:cuadrante/l10n/app_localizations.dart';
+import 'package:flutter/widgets.dart';
 import 'package:cuadrante/features/backup/application/auto_backup_runner.dart';
 import 'package:cuadrante/features/backup/application/backup_models.dart';
 import 'package:cuadrante/features/backup/data/platform_backup_channel.dart';
@@ -115,6 +117,82 @@ void main() {
     test('a sentence can start with it', () {
       expect(sentenceCase('hoy a las 09:05'), 'Hoy a las 09:05');
       expect(sentenceCase(''), '');
+    });
+  });
+
+  group('restore label grammar', () {
+    final now = DateTime(2026, 11, 5, 15);
+    for (final (language, today, yesterday, date) in [
+      (
+        'es',
+        'Restaurar la copia de hoy a las 14:52',
+        'Restaurar la copia de ayer a las 14:52',
+        'Restaurar la copia del 3 de noviembre a las 14:52',
+      ),
+      (
+        'ca',
+        'Restaura la còpia d’avui a les 14:52',
+        'Restaura la còpia d’ahir a les 14:52',
+        'Restaura la còpia del 3 de novembre a les 14:52',
+      ),
+      (
+        'gl',
+        'Restaurar a copia de hoxe ás 14:52',
+        'Restaurar a copia de onte ás 14:52',
+        'Restaurar a copia do 3 de novembro ás 14:52',
+      ),
+      (
+        'eu',
+        'Leheneratu gaurko kopia (14:52)',
+        'Leheneratu atzoko kopia (14:52)',
+        'Leheneratu kopia (azaroaren 3(a), 14:52)',
+      ),
+      (
+        'en',
+        'Restore the backup from today at 14:52',
+        'Restore the backup from yesterday at 14:52',
+        'Restore the backup from November 3 at 14:52',
+      ),
+    ]) {
+      test('$language: relative days and calendar date', () {
+        final strings = lookupAppLocalizations(Locale(language));
+        expect(
+          backupRestoreLabel(strings, DateTime(2026, 11, 5, 14, 52), now),
+          today,
+        );
+        expect(
+          backupRestoreLabel(strings, DateTime(2026, 11, 4, 14, 52), now),
+          yesterday,
+        );
+        expect(
+          backupRestoreLabel(strings, DateTime(2026, 11, 3, 14, 52), now),
+          date,
+        );
+        expect(
+          backupRestoreLabel(strings, DateTime(2025, 11, 3, 14, 52), now),
+          contains('2025'),
+        );
+      });
+    }
+    test('respects the 12-hour clock and civil days across summer time', () {
+      final strings = lookupAppLocalizations(const Locale('en'));
+      expect(
+        backupRestoreLabel(
+          strings,
+          DateTime(2026, 11, 5, 14, 52),
+          now,
+          hour12: true,
+        ),
+        'Restore the backup from today at 2:52 PM',
+      );
+      expect(
+        backupRestoreLabel(
+          l10n,
+          DateTime(2026, 3, 28, 23, 50),
+          DateTime(2026, 3, 30, 0, 10),
+        ),
+        'Restaurar la copia del 28 de marzo a las 23:50',
+      );
     });
   });
 

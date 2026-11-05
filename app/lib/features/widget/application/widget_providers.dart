@@ -11,6 +11,7 @@ import '../../calendars/application/primary_schedule.dart';
 import '../../holidays/application/holidays_provider.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../../settings/application/preferences_controller.dart';
+import '../../onboarding/application/onboarding_providers.dart';
 import '../data/widget_publisher.dart';
 import '../domain/widget_snapshot_builder.dart';
 import 'widget_sync_service.dart';
@@ -38,6 +39,10 @@ final widgetSyncProvider = Provider<WidgetSyncService>((ref) {
   final clock = ref.watch(clockProvider);
   final service = WidgetSyncService(
     publisher: ref.watch(widgetPublisherProvider),
+    canPublish: () async {
+      final firstRun = ref.read(onboardingRepositoryProvider);
+      return !await firstRun.isResetPending() || await firstRun.isDone();
+    },
     buildSnapshot: (strings) async {
       final schedule = await readPrimarySchedule(ref);
       if (!ref.mounted) throw StateError('Widget snapshot builder disposed');

@@ -6,8 +6,8 @@ enum BackupCopyKind {
   /// Made by the app (automatically or with "Hacer copia ahora").
   local,
 
-  /// The copy `restore` writes of the current data right before replacing it,
-  /// so a restore can be undone.
+  /// A pre-restore or pre-reset copy of the current data before replacing it,
+  /// so it can be recovered afterwards.
   safety,
 }
 
@@ -26,6 +26,9 @@ class BackupCopy {
 
   /// A key that is stable for the file (tests, list items).
   String get id => entry.id;
+
+  bool get isPreReset =>
+      kind == BackupCopyKind.safety && id.startsWith('pre-reset-');
 }
 
 /// Where the file being previewed came from, for the wording of the preview.
@@ -41,6 +44,9 @@ enum BackupImportOrigin {
 
   /// The copy made before a restore ([BackupCopyKind.safety]).
   safetyCopy,
+
+  /// The safety copy made before starting over.
+  preResetCopy,
 
   /// A copy in the iCloud folder. An **external** file for all purposes: the
   /// folder is visible in Files on every device of the Apple ID and anybody

@@ -55,10 +55,12 @@ final RegExp _sharedImageName = RegExp(r'^cuadrante-\d{4}(-\d{2})?\.png$');
 /// Deletes the images this app shared (`cuadrante-2026.png`,
 /// `cuadrante-2026-10.png`) that are older than [maxAge] from [dir]. The
 /// share sheet has long finished with them; they would only pile up in the
-/// cache. Nothing else in [dir] is touched, and a failure is ignored.
+/// cache. With [all], reset deletes even recent shared images and reports
+/// failures to its caller. Nothing else in [dir] is touched.
 Future<void> deleteStaleSharedImages(
   Directory dir, {
   DateTime? now,
+  bool all = false,
   Duration maxAge = const Duration(days: 1),
 }) async {
   try {
@@ -67,14 +69,16 @@ Future<void> deleteStaleSharedImages(
       if (entity is! File) continue;
       if (!_sharedImageName.hasMatch(p.basename(entity.path))) continue;
       try {
-        if ((await entity.lastModified()).isBefore(limit)) {
+        if (all || (await entity.lastModified()).isBefore(limit)) {
           await entity.delete();
         }
       } catch (_) {
+        if (all) rethrow;
         // Already gone, or in use: leave it.
       }
     }
   } catch (_) {
+    if (all) rethrow;
     // The cache folder could not be listed.
   }
 }

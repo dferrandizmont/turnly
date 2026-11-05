@@ -159,12 +159,19 @@ class SequenceChips extends StatelessWidget {
     super.key,
     required this.steps,
     required this.schedule,
+    this.shiftOf,
     this.size = Disc.s,
     this.keyPrefix,
   });
 
   final List<List<String>> steps;
   final Schedule schedule;
+
+  /// Resolves a shift id to the type to draw. The first-use flow passes
+  /// [shiftTypeForFirstUse] so a factory type talks the app's language from
+  /// the first frame; left `null`, the stored type is used
+  /// ([shiftTypeForDisplay]).
+  final ShiftType? Function(String id)? shiftOf;
   final double size;
 
   /// Gives each chip the key `<prefix>-<index>`.
@@ -172,6 +179,7 @@ class SequenceChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final resolve = shiftOf ?? (id) => shiftTypeForDisplay(schedule, id);
     return Wrap(
       spacing: Sp.xs,
       runSpacing: Sp.xs,
@@ -180,7 +188,7 @@ class SequenceChips extends StatelessWidget {
           StepChip(
             key: keyPrefix == null ? null : ValueKey('$keyPrefix-$i'),
             size: size,
-            shifts: [for (final id in step) ?shiftTypeForDisplay(schedule, id)],
+            shifts: [for (final id in step) ?resolve(id)],
           ),
       ],
     );

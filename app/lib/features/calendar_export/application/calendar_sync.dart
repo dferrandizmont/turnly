@@ -78,6 +78,17 @@ class CalendarSync {
   Future<CalendarSyncOutcome>? _loop;
   bool _dirty = false;
   bool _disposed = false;
+  bool _paused = false;
+
+  /// Stops triggers and drains an in-flight pass before destructive cleanup.
+  Future<void> pause() async {
+    _paused = true;
+    _timer?.cancel();
+    _timer = null;
+    await _loop;
+  }
+
+  void resume() => _paused = false;
   CalendarSyncOutcome _last = CalendarSyncOutcome.off;
 
   /// Passes that got as far as reading the settings (tests, diagnostics).
@@ -85,7 +96,7 @@ class CalendarSync {
 
   /// Debounced: a pass runs [debounce] after the last call.
   void requestSync() {
-    if (_disposed) return;
+    if (_disposed || _paused) return;
     _timer?.cancel();
     _timer = Timer(debounce, () {
       _timer = null;
@@ -96,7 +107,7 @@ class CalendarSync {
   /// Runs a pass now (waiting for one in flight, and once more if asked
   /// meanwhile). Completes with how the last one ended.
   Future<CalendarSyncOutcome> sync() {
-    if (_disposed) return Future.value(CalendarSyncOutcome.off);
+    if (_disposed || _paused) return Future.value(CalendarSyncOutcome.off);
     _timer?.cancel();
     _timer = null;
     _dirty = true;
@@ -113,7 +124,7 @@ class CalendarSync {
   Future<CalendarSyncOutcome> _run() async {
     await null; // never complete synchronously (see `_loop = null` below)
     try {
-      while (_dirty && !_disposed) {
+      while (_dirty && !_disposed && !_paused) {
         _dirty = false;
         try {
           _last = await lock.run(_once);

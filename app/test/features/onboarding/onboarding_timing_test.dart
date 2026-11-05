@@ -26,7 +26,7 @@ void main() {
     await app.choosePath('rotation'); // 1
     await app.tap(key('onboarding-pattern-12h')); // 2
     await app.tap(key('onboarding-next')); // 3
-    await app.tap(key('onboarding-offset-1')); // 4: the night of the cycle
+    await app.tap(key('onboarding-shift-night12')); // 4: the night of the cycle
     await app.tap(key('onboarding-next')); // 5
     await app.tap(key('onboarding-profession-nursing')); // 6
     await app.tap(key('onboarding-region')); // 7

@@ -99,6 +99,9 @@ abstract interface class AlarmScheduler {
   /// a background isolate where only the plugin is available.
   Future<void> scheduleOneOff(OneOffAlarm alarm);
 
+  /// Cancels all app notifications, including reminders, renewals and tests.
+  Future<void> cancelAll();
+
   /// Cancels every pending snoozed alarm (the alarms were turned off).
   Future<void> cancelSnoozes();
 }
@@ -172,6 +175,15 @@ class FakeAlarmScheduler implements AlarmScheduler {
     oneOffs
       ..removeWhere((o) => o.id == alarm.id)
       ..add(alarm);
+  }
+
+  int cancelAllCalls = 0;
+
+  @override
+  Future<void> cancelAll() async {
+    cancelAllCalls++;
+    scheduled = const [];
+    oneOffs.clear();
   }
 
   @override

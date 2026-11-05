@@ -12,12 +12,16 @@ class _FakePlugin implements FlutterLocalNotificationsPlugin {
 
   int failInitCalls;
   int initCalls = 0;
+  int cancelAllCalls = 0;
   final scheduled = <tz.TZDateTime>[];
   final details = <NotificationDetails?>[];
 
   @override
   dynamic noSuchMethod(Invocation invocation) {
     switch (invocation.memberName) {
+      case #cancelAll:
+        cancelAllCalls++;
+        return Future<void>.value();
       case #initialize:
         initCalls++;
         if (failInitCalls > 0) {
@@ -54,6 +58,16 @@ const _alarm = PlannedAlarm(
 );
 
 void main() {
+  test('reset cancels all plugin notifications, including one-offs', () async {
+    final plugin = _FakePlugin();
+    final scheduler = LocalAlarmScheduler(
+      plugin: plugin,
+      localZone: () async => 'Europe/Madrid',
+    );
+    await scheduler.cancelAll();
+    expect(plugin.initCalls, 1);
+    expect(plugin.cancelAllCalls, 1);
+  });
   test('every replaceAll reads the device zone again', () async {
     var zone = 'Europe/Madrid';
     final plugin = _FakePlugin();

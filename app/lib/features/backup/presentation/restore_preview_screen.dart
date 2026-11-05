@@ -359,6 +359,7 @@ class _Preview extends ConsumerWidget {
       BackupImportOrigin.sharedFile => l10n.backupUiOriginShared,
       BackupImportOrigin.localCopy => l10n.backupUiOriginLocal,
       BackupImportOrigin.safetyCopy => l10n.backupUiOriginSafety,
+      BackupImportOrigin.preResetCopy => l10n.backupUiOriginPreReset,
       BackupImportOrigin.cloudCopy => l10n.backupUiOriginCloud,
     };
     final String range;

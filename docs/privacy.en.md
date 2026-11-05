@@ -73,11 +73,18 @@ system picker (`file_selector`) and shared with the system share sheet (`share_p
   per the user's 26 Oct 2026 response to decision 13.
 
 ## System backups
-- **Android (Auto Backup):** `allowBackup="true"` with explicit rules (`res/xml/backup_rules.xml`,
-  `data_extraction_rules.xml`): `files/` (the database and `backups/`) goes in, nothing else. The system uploads it
-  to the user's Google account and transfers it phone to phone; end-to-end encrypted with the screen lock on Android
-  9 or later **if the user has a lock**. We never see it, but the data **does leave the phone** that way, absences
-  included. Do not say "never leaves the phone".
+- **Android (Auto Backup):** `allowBackup="@bool/allow_system_backup"` (off on Android 7–8, on from 9) with
+  explicit rules (`res/xml/backup_rules.xml`, `data_extraction_rules.xml`, checked on 4 Nov 2026):
+  `<include domain="file" path="."/>` with `<exclude domain="file" path="folder_backup/"/>`. All of `files/` goes in:
+  the `cuadrante.sqlite` database, `backups/` and **`attachments/`** (photos, drawings and files of the notes);
+  `folder_backup/` stays out (the record of the folder backup, because the folder permission does not travel).
+  Shared preferences, the cache and `no_backup/` never go in. **Since 4 Nov 2026 (question 30)** the cloud backup only
+  happens **end-to-end encrypted** with the screen lock (`disableIfNoEncryptionCapabilities="true"` on Android 12+,
+  `requireFlags="clientSideEncryption"` on Android 9–11): without a screen lock, Turnly is left out of the Google
+  backup. The direct phone-to-phone transfer (`<device-transfer>`, `deviceToDeviceTransfer`) is unchanged. Android
+  7–8 has no system backup. We never see it and Google cannot read it either, but the data **does leave the phone**
+  that way, encrypted, absences and attachments included. Do not say "never leaves the phone". Test:
+  `tool/qa/backup_android.sh`.
 - **iOS:** the database is part of the iPhone backup (iCloud or computer), managed by the user with their Apple ID.
 
 ## Import and export (`docs/importar.md`)
@@ -109,9 +116,11 @@ overridden with `--dart-define`. Other languages use the authoritative Spanish p
 
 ## Store declarations
 - App Store, App Privacy: **no data collected**, no tracking, no in-app purchases (`docs/tienda/app-store.md`).
-- Google Play, Data safety: **no data collected or shared** by the app; no ads or purchases. Reading the calendar or
-  saving notes on the phone is not collection (`docs/tienda/google-play.md`, "Seguridad de los datos"). Declare the
-  calendar and exact-alarm permissions with their justification.
+- Google Play, Data safety: the app shares nothing automatically and has no ads, analytics or purchases. Reading the
+  calendar or saving notes on the phone is not collection. The Google backup only carries the data end-to-end
+  encrypted (question 30, 4 Nov 2026), which Play does not count as collected: **no data collected**
+  (`docs/tienda/google-play.md`, "Seguridad de los datos"). Declare the exact-alarm, Do Not Disturb and calendar
+  permissions with their justification (same section, "Permisos de Android").
 - No accounts to delete; data is removed by uninstalling the app or clearing its data from the system (and, where
   relevant, from the user's Google or iCloud backups).
 - Review the forms against the final AAB/IPA and publish a policy URL consistent with these facts.

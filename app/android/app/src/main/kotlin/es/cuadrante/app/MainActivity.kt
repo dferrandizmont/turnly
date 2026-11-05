@@ -60,6 +60,7 @@ class MainActivity : FlutterActivity() {
     private var sounds: AlarmSoundChannel? = null
     private var alarmSystem: AlarmSystemChannel? = null
     private var dnd: DndChannel? = null
+    private var resetCalendar: ResetCalendarChannel? = null
     private val saver = DocumentSaver(this)
     private var pendingUri: Uri? = null
     private var pendingSender: String? = null
@@ -111,6 +112,8 @@ class MainActivity : FlutterActivity() {
         // registers it.
         dnd?.shutdown()
         dnd = DndChannel(this, flutterEngine.dartExecutor.binaryMessenger)
+        resetCalendar?.shutdown()
+        resetCalendar = ResetCalendarChannel(this, flutterEngine.dartExecutor.binaryMessenger)
         // The intent the app was started with; Dart asks for it once it is up.
         // Not when Android hands the same one back (recreated, or reopened from
         // the recents list): that file was dealt with the first time.
@@ -149,6 +152,7 @@ class MainActivity : FlutterActivity() {
         sounds?.shutdown()
         alarmSystem?.stop()
         dnd?.shutdown()
+        resetCalendar?.shutdown()
         reader.shutdown()
         saver.shutdown()
         super.onDestroy()

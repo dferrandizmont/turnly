@@ -70,6 +70,31 @@ String backupWhen(
   return l10n.backupUiWhenDate(date, time);
 }
 
+/// Restore is a complete localized sentence: relative days and calendar
+/// dates need different articles/contractions (de hoy, del 3 de noviembre).
+String backupRestoreLabel(
+  AppLocalizations l10n,
+  DateTime at,
+  DateTime now, {
+  bool hour12 = false,
+}) {
+  final local = at.toLocal();
+  final day = CivilDate.fromDateTime(local);
+  final today = CivilDate.fromDateTime(now);
+  return l10n.backupUiCopyRestoreLabel(
+    day == today
+        ? 'today'
+        : day == today.addDays(-1)
+        ? 'yesterday'
+        : 'date',
+    AppDateFormat(l10n.localeName, hour12).time(local),
+    (local.year == now.year
+            ? DateFormat.MMMMd(l10n.localeName)
+            : DateFormat.yMMMMd(l10n.localeName))
+        .format(local),
+  );
+}
+
 /// What the status card says while changes wait for their copy, and it must
 /// be true: the automatic copy comes 10 s after the last change but never
 /// sooner than 15 min after the previous one (`AutoBackupPolicy`), so the

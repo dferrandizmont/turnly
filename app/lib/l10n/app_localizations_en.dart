@@ -267,6 +267,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String dayCellMoreShifts(int count) {
+    return '+$count';
+  }
+
+  @override
   String daySheetHoliday(String name) {
     return 'Public holiday: $name';
   }
@@ -1537,6 +1542,49 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String patternOffsetHelp(String date) {
     return 'Tap the day of the pattern you’re on on $date.';
+  }
+
+  @override
+  String get patternStartShiftTitle => 'Which shift are you on that day?';
+
+  @override
+  String patternStartShiftHelp(String date) {
+    return 'On $date. Pick the shift; if it repeats in the cycle, you’ll choose which one next.';
+  }
+
+  @override
+  String patternStartOccurrenceTitle(String shift) {
+    return '$shift repeats: which day is yours?';
+  }
+
+  @override
+  String get patternStartOccurrenceHelp =>
+      'Count from the first of the days in a row.';
+
+  @override
+  String get patternShowCycle => 'Show the full cycle';
+
+  @override
+  String get patternHideCycle => 'Hide the full cycle';
+
+  @override
+  String patternOccurrenceInRun(int position, int count) {
+    return 'Day $position of $count';
+  }
+
+  @override
+  String patternOccurrenceInRunAfter(int position, int count, String previous) {
+    return 'Day $position of $count, after $previous';
+  }
+
+  @override
+  String patternOccurrenceAfter(String previous) {
+    return 'After $previous';
+  }
+
+  @override
+  String patternOccurrenceRun(int run, String label) {
+    return 'Run $run · $label';
   }
 
   @override
@@ -4303,8 +4351,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backupUiCopyRestore => 'Restore this one';
 
   @override
-  String backupUiCopyRestoreLabel(String when) {
-    return 'Restore the backup from $when';
+  String backupUiCopyRestoreLabel(String day, String time, String date) {
+    String _temp0 = intl.Intl.selectLogic(day, {
+      'today': 'Restore the backup from today at $time',
+      'yesterday': 'Restore the backup from yesterday at $time',
+      'other': 'Restore the backup from $date at $time',
+    });
+    return '$_temp0';
   }
 
   @override
@@ -6499,4 +6552,104 @@ class AppLocalizationsEn extends AppLocalizations {
   ) {
     return '$time, $title, $calendar';
   }
+
+  @override
+  String get resetTitle => 'Delete everything and start over';
+
+  @override
+  String get resetIntro => 'All of this will be deleted from Turnly:';
+
+  @override
+  String get resetCalendars =>
+      'All calendars and their shifts, rotations and exceptions.';
+
+  @override
+  String get resetNotes =>
+      'Notes, attachments (photos, drawings and files) and tasks.';
+
+  @override
+  String get resetAbsences => 'Vacation, leave and absences.';
+
+  @override
+  String get resetSwaps => 'The shift swap ledger.';
+
+  @override
+  String get resetAlarms => 'Alarms and scheduled notifications.';
+
+  @override
+  String get resetWidget => 'The widget’s content.';
+
+  @override
+  String get resetDnd => 'Do Not Disturb rules and scheduled windows.';
+
+  @override
+  String get resetCalendarEvents =>
+      'The events Keep up to date wrote to your phone’s calendar.';
+
+  @override
+  String get resetPreferences => 'All settings.';
+
+  @override
+  String get resetKeepLanguage =>
+      'Only the app language is kept. The backup stays on your phone and you can restore it during the first run.';
+
+  @override
+  String get resetBackupPreparing => 'Saving the backup…';
+
+  @override
+  String resetBackupSaved(String file) {
+    return 'Before deleting we save a backup: $file';
+  }
+
+  @override
+  String get resetShare => 'Save the backup somewhere else';
+
+  @override
+  String get resetDelete => 'Delete everything';
+
+  @override
+  String get resetConfirmTitle => 'Delete everything?';
+
+  @override
+  String resetConfirmBody(String date) {
+    return 'This cannot be undone, but you have the backup from $date.';
+  }
+
+  @override
+  String get resetBackupFailed =>
+      'Could not save and verify the backup. Nothing has been deleted. Check your phone’s storage and try again.';
+
+  @override
+  String get resetShareFailed =>
+      'Could not share the backup. The local backup is still saved on your phone.';
+
+  @override
+  String get resetFailed =>
+      'Could not complete the reset. Your backup is still saved on your phone. Try again.';
+
+  @override
+  String get resetHolidays => 'The public holidays you added by hand.';
+
+  @override
+  String get resetShareLink => 'The link you shared.';
+
+  @override
+  String get resetFolderBackup =>
+      'The daily backup in your folder (existing files stay where they are).';
+
+  @override
+  String get resetDeleting => 'Deleting…';
+
+  @override
+  String get resetCleanupWarning => 'Some system data could not be cleaned up.';
+
+  @override
+  String get resetCalendarCleanupWarning =>
+      'Some events could not be removed from the phone’s calendar.';
+
+  @override
+  String get backupUiCopyPreReset => 'Before starting over';
+
+  @override
+  String get backupUiOriginPreReset => 'Backup from just before starting over';
 }

@@ -16,6 +16,8 @@ import '../../../core/database/database_provider.dart';
 import '../../../core/diagnostics/crash_reporting.dart' show redactError;
 import '../../../core/providers.dart';
 import '../../notes/application/notes_providers.dart';
+import '../../onboarding/application/onboarding_providers.dart';
+import '../../onboarding/data/onboarding_repository.dart';
 import '../data/backup_repository.dart';
 import '../data/backup_settings_repository.dart';
 import '../data/export_cache.dart';
@@ -64,7 +66,12 @@ class BackupTools {
     this.cloudStore,
     this.cloudEnabled = _cloudOff,
     this.codec = const BackupCodec(),
-  });
+  }) : preResetStore = LocalFileBackupStore(
+         directory,
+         prefix: 'pre-reset',
+         keep: 2,
+         pruneOnSave: false,
+       );
 
   static Future<bool> _cloudOff() async => false;
 
@@ -79,6 +86,10 @@ class BackupTools {
   /// `pre-restore-<stamp>.turnly`: written by `BackupRepository.restore`.
   /// Local only, never in iCloud.
   final LocalFileBackupStore safetyStore;
+
+  /// Two verified pre-reset copies, independent of automatic retention.
+  /// Pruned only after verification, so a broken new copy costs no good one.
+  final LocalFileBackupStore preResetStore;
 
   /// The second place of the app's copies: the iCloud container, on iOS only
   /// and only with the user's opt-in (`null` otherwise). Each good local copy
@@ -113,6 +124,7 @@ class BackupTools {
   Future<List<BackupCopy>> copies() async {
     final local = await autoStore.list();
     final safety = await safetyStore.list();
+    final preReset = await preResetStore.list();
     return [
       for (final e in local)
         BackupCopy(
@@ -125,6 +137,12 @@ class BackupTools {
           BackupCopyKind.safety,
           e,
           appVersion: await _versionOf(safetyStore, 'safety', e),
+        ),
+      for (final e in preReset)
+        BackupCopy(
+          BackupCopyKind.safety,
+          e,
+          appVersion: await _versionOf(preResetStore, 'pre-reset', e),
         ),
     ]..sort((a, b) => b.entry.modifiedAt.compareTo(a.entry.modifiedAt));
   }
@@ -154,7 +172,10 @@ class BackupTools {
 
   Future<Uint8List> read(BackupCopy copy) => switch (copy.kind) {
     BackupCopyKind.local => autoStore.read(copy.entry),
-    BackupCopyKind.safety => safetyStore.read(copy.entry),
+    BackupCopyKind.safety =>
+      copy.entry.id.startsWith('pre-reset-')
+          ? preResetStore.read(copy.entry)
+          : safetyStore.read(copy.entry),
   };
 
   /// Takes a copy and reads it back from disk: a file that cannot be decoded
@@ -353,12 +374,70 @@ final autoBackupStatusProvider =
       AutoBackupStatusNotifier.new,
     );
 
+/// A pending first use must never replace the latest copy with empty data.
+/// Bootstrap supplies the initial status; demos/previews may omit the flow.
+/// Persisted resetPending always wins, also after restarting the app.
+///
+/// Read changes asynchronously: Drift's `select(...).watch()` starts another
+/// read synchronously on table updates. In widget tests that read can hold the
+/// executor's lock in fake time while a multi-write action in `runAsync` waits
+/// for it. Defer update reads to the next event turn so a committing
+/// transaction can release that lock before a read enters the listener's zone.
+final autoBackupReadyProvider = StreamProvider<bool>((ref) {
+  final db = ref.watch(appDatabaseProvider);
+  final initiallyNeeded = ref.watch(initialOnboardingProvider)?.needed ?? false;
+  var disposed = false;
+  Timer? deferredRead;
+  Completer<void>? pendingTurn;
+  ref.onDispose(() {
+    disposed = true;
+    deferredRead?.cancel();
+    final turn = pendingTurn;
+    if (turn != null && !turn.isCompleted) turn.complete();
+  });
+
+  Future<bool> read() async {
+    final rows =
+        await (db.select(db.settings)..where(
+              (s) => s.key.isIn([
+                OnboardingSettings.done,
+                OnboardingSettings.resetPending,
+              ]),
+            ))
+            .get();
+    final flags = {for (final row in rows) row.key: row.value == 'true'};
+    return flags[OnboardingSettings.resetPending] != true &&
+        (flags[OnboardingSettings.done] == true || !initiallyNeeded);
+  }
+
+  return (() async* {
+    if (disposed) return;
+    yield await read();
+    if (disposed) return;
+    final changes = db.tableUpdates(
+      TableUpdateQuery.onAllTables([db.settings]),
+    );
+    await for (final _ in changes) {
+      if (disposed) return;
+      final turn = Completer<void>();
+      pendingTurn = turn;
+      deferredRead = Timer(Duration.zero, turn.complete);
+      await turn.future;
+      deferredRead = null;
+      pendingTurn = null;
+      if (disposed) return;
+      yield await read();
+    }
+  })();
+});
+
 /// Watches the user's tables and takes a copy after changes. The host keeps it
 /// alive for the whole life of the app; it needs nothing from the UI.
 final autoBackupRunnerProvider = Provider<AutoBackupRunner>((ref) {
   final db = ref.watch(appDatabaseProvider);
   final reporter = ref.watch(crashReporterProvider);
   final runner = AutoBackupRunner(
+    enabled: false,
     policy: ref.watch(autoBackupPolicyProvider),
     now: ref.watch(clockProvider),
     perform: () async =>
@@ -374,10 +453,27 @@ final autoBackupRunnerProvider = Provider<AutoBackupRunner>((ref) {
   final changes = db
       .tableUpdates(TableUpdateQuery.onAllTables(_userTables(db)))
       .listen((_) => runner.noteChange());
-  ref.listen<AsyncValue<bool>>(autoBackupEnabledProvider, (_, next) {
-    runner.enabled = next.value ?? true;
-  }, fireImmediately: true);
+  void updateEnabled() {
+    runner.enabled =
+        (ref.read(autoBackupEnabledProvider).value ?? true) &&
+        (ref.read(autoBackupReadyProvider).value ?? false) &&
+        !ref.read(restoreInProgressProvider);
+  }
+
+  ref.listen(autoBackupEnabledProvider, (_, _) => updateEnabled());
+  ref.listen(autoBackupReadyProvider, (_, _) => updateEnabled());
+  ref.listen(restoreInProgressProvider, (_, _) => updateEnabled());
+  // The first update waits until this provider is built: turning the runner
+  // on publishes its status to `autoBackupStatusProvider`, and Riverpod does
+  // not allow a provider to modify another one while it is being built (a
+  // `fireImmediately` here broke the month tests whenever the readiness had
+  // already resolved).
+  var disposed = false;
+  scheduleMicrotask(() {
+    if (!disposed) updateEnabled();
+  });
   ref.onDispose(() {
+    disposed = true;
     unawaited(changes.cancel());
     runner.dispose();
   });

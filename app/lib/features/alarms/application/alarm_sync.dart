@@ -62,13 +62,24 @@ class AlarmSync {
   Future<void>? _loop;
   bool _dirty = false;
   bool _disposed = false;
+  bool _paused = false;
+
+  /// Stops triggers and drains an in-flight pass before destructive cleanup.
+  Future<void> pause() async {
+    _paused = true;
+    _timer?.cancel();
+    _timer = null;
+    await _loop;
+  }
+
+  void resume() => _paused = false;
 
   /// Number of runs that reached the scheduler (for tests and diagnostics).
   int runs = 0;
 
   /// Debounced: the plan is recomputed [debounce] after the last call.
   void requestResync() {
-    if (_disposed) return;
+    if (_disposed || _paused) return;
     _timer?.cancel();
     _timer = Timer(debounce, () {
       _timer = null;
@@ -78,7 +89,7 @@ class AlarmSync {
 
   /// Completes when the (possibly coalesced) schedule is up to date.
   Future<void> resync() {
-    if (_disposed) return Future.value();
+    if (_disposed || _paused) return Future.value();
     _timer?.cancel();
     _timer = null;
     _dirty = true;
@@ -95,7 +106,7 @@ class AlarmSync {
   Future<void> _run() async {
     await null; // never complete synchronously (see `_loop = null` below)
     try {
-      while (_dirty && !_disposed) {
+      while (_dirty && !_disposed && !_paused) {
         _dirty = false;
         try {
           await _once();
@@ -114,7 +125,7 @@ class AlarmSync {
     final texts = strings;
     if (texts == null) return;
     final settings = await loadSettings();
-    if (_disposed) return;
+    if (_disposed || _paused) return;
 
     // Texts first: the iOS notification actions take their labels from them
     // when the plugin is initialized.
@@ -132,7 +143,7 @@ class AlarmSync {
             location: await scheduler.planningZone(),
           )
         : AlarmPlan.empty;
-    if (_disposed) return;
+    if (_disposed || _paused) return;
     runs++;
     await scheduler.replaceAll(plan.toSchedule);
     _lastPlan = plan;
@@ -143,7 +154,7 @@ class AlarmSync {
     // The background renewal follows the switches, not the permission: a
     // run without it does nothing, and the permission may come back.
     final registrar = renewal;
-    if (registrar != null && !_disposed) {
+    if (registrar != null && !_disposed && !_paused) {
       try {
         await registrar.setEnabled(settings.anyActive);
       } catch (error, stack) {

@@ -26,6 +26,7 @@ import '../features/patterns/presentation/runs_screen.dart';
 import '../features/schedule/domain/civil_date.dart';
 import '../features/settings/presentation/faq_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
+import '../features/settings/presentation/reset_screen.dart';
 import '../features/share_link/presentation/share_link_screen.dart';
 import '../features/shift_types/presentation/shift_type_form_screen.dart';
 import '../features/shift_types/presentation/shift_types_screen.dart';
@@ -44,6 +45,7 @@ class AppRoutes {
   static const settingsHolidays = '/ajustes/festivos';
   static const settingsAlarms = '/ajustes/alarmas';
   static const settingsBackup = '/ajustes/copia';
+  static const settingsReset = '/ajustes/borrar-todo';
 
   /// «Vacaciones y permisos»: the balances of days of leave of a year (P3).
   static const settingsAbsences = '/ajustes/ausencias';
@@ -66,6 +68,7 @@ class AppRoutes {
   /// The full screen of the attachment [id].
   static String attachmentOf(String id) =>
       '$dayAttachment?id=${Uri.encodeComponent(id)}';
+
   /// «Citas del móvil»: the calendars of the phone whose appointments are
   /// shown next to the shifts (P6).
   static const settingsDeviceEvents = '/ajustes/citas';
@@ -166,10 +169,7 @@ GoRouter buildRouter({
         path: AppRoutes.settingsAbsences,
         builder: (c, s) => const AbsencesScreen(),
       ),
-      GoRoute(
-        path: AppRoutes.swaps,
-        builder: (c, s) => const SwapsScreen(),
-      ),
+      GoRoute(path: AppRoutes.swaps, builder: (c, s) => const SwapsScreen()),
       GoRoute(
         path: AppRoutes.settingsDeviceEvents,
         builder: (c, s) => const DeviceEventsScreen(),
@@ -181,6 +181,10 @@ GoRouter buildRouter({
       GoRoute(
         path: AppRoutes.settingsBackup,
         builder: (c, s) => const BackupScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.settingsReset,
+        builder: (c, s) => const ResetScreen(),
       ),
       GoRoute(
         path: AppRoutes.compare,
@@ -271,8 +275,7 @@ GoRouter buildRouter({
         path: AppRoutes.daySketch,
         builder: (c, s) => SketchScreen(
           date: _parseDate(s.uri.queryParameters['fecha']) ?? now(),
-          calendarId:
-              s.uri.queryParameters['calendario'] ?? mainCalendarId,
+          calendarId: s.uri.queryParameters['calendario'] ?? mainCalendarId,
         ),
       ),
       GoRoute(

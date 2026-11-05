@@ -11,6 +11,7 @@ import '../../../core/widgets/choice_pill.dart';
 import '../../../core/widgets/content_app_bar.dart';
 import '../../../core/widgets/page_body.dart';
 import '../../schedule/domain/civil_date.dart';
+import '../../settings/application/preferences_controller.dart';
 import '../../settings/presentation/settings_widgets.dart';
 import '../application/holidays_provider.dart';
 import '../data/holiday_bundle_format.dart';
@@ -78,8 +79,14 @@ class _HolidaysSettingsScreenState
   Future<void> _pickCountry(HolidayPlace place) async {
     final code = await showCountryPicker(context, selected: place.countryCode);
     if (code == null || !mounted || code == place.countryCode) return;
-    // Another country drops the community and municipality (Spain only).
-    await saveSetting(context, () => _controller.setPlace(countryCode: code));
+    // Another country drops the community and municipality (Spain only), and
+    // sets its formats (first day of the week, currency) for whoever has not
+    // picked them by hand.
+    final preferences = ref.read(preferencesProvider.notifier);
+    await saveSetting(context, () async {
+      await _controller.setPlace(countryCode: code);
+      await preferences.applyRegionDefaults(code);
+    });
   }
 
   Future<void> _pickRegion(HolidayPlace place) async {

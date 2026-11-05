@@ -1,5 +1,6 @@
 import 'package:cuadrante/core/bootstrap/bootstrap.dart';
 import 'package:cuadrante/core/config.dart';
+import 'package:cuadrante/core/format/text_wrap.dart';
 import 'package:cuadrante/features/calendar/presentation/month_screen.dart';
 import 'package:cuadrante/features/calendars/domain/calendar.dart';
 import 'package:cuadrante/features/onboarding/domain/profession.dart';
@@ -72,13 +73,23 @@ void main() {
     await app.tap(key('onboarding-next'));
     expect(app.title, '¿Cuándo empiezas?');
     // No job yet: the hours as they are.
-    expect(find.text('Ese día te toca: Mañana 06:00–14:00'), findsOneWidget);
+    expect(
+      find.text(
+        keepTimeRangesTogether('Ese día te toca: Mañana 06:00–14:00'),
+      ),
+      findsOneWidget,
+    );
     // The job is chosen in the last step; back on the start day it shows.
     await app.tap(key('onboarding-next'));
     await app.tap(key('onboarding-profession-nursing'));
     await app.tap(key('onboarding-back'));
     // Day 1 of the cycle is a Mañana: 08:00-15:00 for a nurse, not 06:00-14:00.
-    expect(find.text('Ese día te toca: Mañana 08:00–15:00'), findsOneWidget);
+    expect(
+      find.text(
+        keepTimeRangesTogether('Ese día te toca: Mañana 08:00–15:00'),
+      ),
+      findsOneWidget,
+    );
 
     await app.tap(key('onboarding-next'));
     await app.tap(key('onboarding-next'));

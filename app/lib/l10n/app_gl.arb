@@ -339,6 +339,7 @@
       }
     }
   },
+  "dayCellMoreShifts": "+{count}",
   "daySheetHoliday": "Festivo: {name}",
   "@daySheetHoliday": {
     "placeholders": {
@@ -1137,6 +1138,76 @@
   "@patternOffsetHelp": {
     "placeholders": {
       "date": {
+        "type": "String"
+      }
+    }
+  },
+  "patternStartShiftTitle": "Que quenda che toca ese día?",
+  "patternStartShiftHelp": "O {date}. Escolle a quenda; se se repite no ciclo, despois escolles cal.",
+  "@patternStartShiftHelp": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "patternStartOccurrenceTitle": "{shift} repítese: que día che toca?",
+  "patternStartOccurrenceHelp": "Conta desde o primeiro dos días seguidos.",
+  "patternShowCycle": "Ver o ciclo completo",
+  "patternHideCycle": "Ocultar o ciclo completo",
+  "patternOccurrenceInRun": "Día {position} de {count}",
+  "@patternOccurrenceInRun": {
+    "description": "Día dunha tanda de varios días: «2.º de 5 · Mañá».",
+    "placeholders": {
+      "ordinal": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "shift": {
+        "type": "String"
+      }
+    }
+  },
+  "patternOccurrenceInRunAfter": "Día {position} de {count}, despois de {previous}",
+  "@patternOccurrenceInRunAfter": {
+    "description": "Día dunha tanda, dicindo cal: «1.º de 2 · Libre, despois de Noite».",
+    "placeholders": {
+      "ordinal": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "shift": {
+        "type": "String"
+      },
+      "previous": {
+        "type": "String"
+      }
+    }
+  },
+  "patternOccurrenceAfter": "Despois de {previous}",
+  "@patternOccurrenceAfter": {
+    "description": "Tanda dun só día: «Libre, despois de Tarde».",
+    "placeholders": {
+      "shift": {
+        "type": "String"
+      },
+      "previous": {
+        "type": "String"
+      }
+    }
+  },
+  "patternOccurrenceRun": "Tanda {run} · {label}",
+  "@patternOccurrenceRun": {
+    "description": "Numera a tanda cando a quenda ten varias: «Tanda 2 · 1.º de 2 · Mañá, despois de Libre».",
+    "placeholders": {
+      "run": {
+        "type": "int"
+      },
+      "label": {
         "type": "String"
       }
     }
@@ -2525,10 +2596,16 @@
   },
   "backupUiCopyMetaVersion": "{kind} · {version} · {size}",
   "backupUiCopyRestore": "Restaurar esta",
-  "backupUiCopyRestoreLabel": "Restaurar a copia do {when}",
+  "backupUiCopyRestoreLabel": "{day, select, today{Restaurar a copia de hoxe ás {time}} yesterday{Restaurar a copia de onte ás {time}} other{Restaurar a copia do {date} ás {time}}}",
   "@backupUiCopyRestoreLabel": {
     "placeholders": {
-      "when": {
+      "day": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "date": {
         "type": "String"
       }
     }
@@ -3652,5 +3729,48 @@
         "type": "String"
       }
     }
-  }
+  },
+  "resetTitle": "Borrar todo e comezar de cero",
+  "resetIntro": "Borrarase todo isto de Turnly:",
+  "resetCalendars": "Todos os calendarios e as súas quendas, rotacións e excepcións.",
+  "resetNotes": "Notas, anexos (fotos, debuxos e ficheiros) e tarefas.",
+  "resetAbsences": "Vacacións, permisos e ausencias.",
+  "resetSwaps": "O libro de cambios.",
+  "resetAlarms": "Alarmas e avisos programados.",
+  "resetWidget": "O contido do widget.",
+  "resetDnd": "As regras e franxas de Non molestar.",
+  "resetCalendarEvents": "Os eventos que Manter ao día escribiu no calendario do móbil.",
+  "resetPreferences": "Todos os axustes.",
+  "resetKeepLanguage": "Só conservamos o idioma da app. A copia de seguranza queda no móbil e poderás restaurala no primeiro uso.",
+  "resetBackupPreparing": "Gardando a copia…",
+  "resetBackupSaved": "Antes de borrar gardamos unha copia: {file}",
+  "resetShare": "Gardar a copia noutro sitio",
+  "resetDelete": "Borrar todo",
+  "resetConfirmTitle": "Borrar todo?",
+  "resetConfirmBody": "Non se pode desfacer, pero tes a copia do {date}.",
+  "resetBackupFailed": "Non se puido gardar e comprobar a copia de seguranza. Non se borrou nada. Revisa o espazo do móbil e volve tentalo.",
+  "resetShareFailed": "Non se puido compartir a copia. A copia local segue gardada no móbil.",
+  "resetFailed": "Non se puido completar o borrado. A túa copia de seguranza segue gardada no móbil. Volve tentalo.",
+  "@resetBackupSaved": {
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "@resetConfirmBody": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "resetHolidays": "Os festivos que engadiches á man.",
+  "resetShareLink": "A ligazón que compartiches.",
+  "resetFolderBackup": "A copia diaria no teu cartafol (os ficheiros que xa hai quedan onde están).",
+  "resetDeleting": "Borrando…",
+  "resetCleanupWarning": "Non se puideron limpar algúns datos do sistema.",
+  "resetCalendarCleanupWarning": "Non se puideron quitar algúns eventos do calendario do móbil.",
+  "backupUiCopyPreReset": "Antes de empezar de cero",
+  "backupUiOriginPreReset": "Copia de xusto antes de empezar de cero"
 }

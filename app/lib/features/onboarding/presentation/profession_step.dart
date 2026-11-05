@@ -65,6 +65,7 @@ class ProfessionSection extends ConsumerWidget {
                 key: ValueKey('onboarding-profession-${profession.name}'),
                 label: profession.label(l10n, spain: spain),
                 selected: selected == profession,
+                radius: Rad.inputRadius,
                 onTap: () => controller.selectProfession(profession),
               ),
           ],

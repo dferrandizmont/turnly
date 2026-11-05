@@ -131,4 +131,27 @@ void main() {
   test('no folder yet means no copies', () async {
     expect(await tools(LocalFileBackupStore(dir)).copies(), isEmpty);
   });
+  test('pre-reset safety copy survives weeks of automatic rotation and is readable', () async {
+    final t = tools(LocalFileBackupStore(dir, keep: 7));
+    final copy = await t.preResetStore.save(Uint8List.fromList([42]), at: at);
+    for (var day = 1; day <= 40; day++) {
+      await t.autoStore.save(
+        Uint8List.fromList([day]),
+        at: at.add(Duration(days: day)),
+      );
+    }
+    final listed = (await t.copies()).singleWhere((c) => c.id == copy.id);
+    expect(listed.kind, BackupCopyKind.safety);
+    expect(await t.read(listed), Uint8List.fromList([42]));
+    expect(await t.autoStore.list(), hasLength(7));
+    for (var n = 1; n <= 3; n++) {
+      await t.preResetStore.save(
+        Uint8List.fromList([n]),
+        at: at.add(Duration(days: n)),
+      );
+      await t.preResetStore.prune();
+    }
+    expect(await t.preResetStore.list(), hasLength(2));
+    expect(await t.autoStore.list(), hasLength(7));
+  });
 }

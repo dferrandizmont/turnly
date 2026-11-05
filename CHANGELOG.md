@@ -1,6 +1,8 @@
 # Changelog
 
 What changes in each version of Turnly (called Cuadrante until 0.6.14), newest first. The "Unreleased" section fills up as changes land and becomes
+
+- Keep pre-reset safety backups outside automatic retention, finish reset despite cleanup failures, and explain remaining system cleanup on first use.
 the next version on the day it ships.
 
 Numbering: the last number goes up with fixes (0.6.12 → 0.6.13), the middle one with new features (→ 0.7.0), and 1.0.0
@@ -9,6 +11,29 @@ will be the production launch in the stores. Every version ships on
 at once, so they can skip numbers.
 
 ## Unreleased
+
+## 0.8.6 · 2026-11-05
+
+The Google backup of Android only takes Turnly end-to-end encrypted. Release for Google Play, GitHub and the web.
+
+- Android: Turnly only goes into the Google backup end-to-end encrypted with your screen lock, so neither Google nor anyone else can read your shifts, notes, absences (sick leave included) or attachments. Without a screen lock, Turnly is left out of the Google backup (use the automatic backup to a folder or a .turnly file); moving straight from your old phone to a new one works as before. On Android 7 and 8, Turnly no longer uses the system backup.
+
+## 0.8.5 · 2026-11-04
+
+A way to delete everything and start again, with a backup first.
+
+- Backups: fix the restore label's date wording, including “de hoy” in Spanish.
+- Settings: “Borrar todo y empezar de cero” deletes everything and takes you back to the first run, after saving a backup you can keep somewhere else.
+
+## 0.8.4 · 2026-11-04
+
+First-run fixes found on a real phone, and a cap on very busy days in the month view.
+
+- First run: picking your country now sets the first day of the week and the currency of that country on a new installation, and changing the country later updates them, unless you had already chosen them yourself in Settings.
+- First run: the rotation you are setting up shows each shift's name and code in the language you picked on the first screen, even before the roster is finished.
+- First run and «Aplicar patrón» now ask for the day of the cycle in one shared, clearer way: choose the shift that day has (with its colour, code and hours), and if that shift repeats in the cycle the question names it («Tarde se repite: ¿qué día te toca?») and you pick «Día 2 de 5». When the shift has several runs, each option says which one («Tanda 2 · Día 1 de 2, después de Libre»), so there is nothing to count. The numbered whole-cycle grid stays one tap away under «Ver el ciclo completo», and a live month preview, in the app language, shows the result before you apply it.
+- The job pills of the last step of the first use now have the same rounded shape as the rest of the choices.
+- Month view: a day with four or more shifts shows two of them and “+N”, so its week row no longer grows without limit.
 
 ## 0.8.3 · 2026-11-03
 

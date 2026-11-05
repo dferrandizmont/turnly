@@ -94,6 +94,12 @@ class _BackupHostState extends ConsumerState<BackupHost> {
   /// dropped. Repeated intents therefore cannot stack screens.
   Future<void> _openIncoming() async {
     if (!mounted || !await _channel.hasIncomingFile() || !mounted) return;
+    // Incoming files cannot interrupt the reset.
+    final matches = _router.routerDelegate.currentConfiguration;
+    if (matches.isNotEmpty &&
+        matches.last.matchedLocation == AppRoutes.settingsReset) {
+      return;
+    }
     // Not over the first-use flow: restoring there would be overwritten by
     // the choices the person goes on to make. The file stays pending and
     // opens once the flow has ended.

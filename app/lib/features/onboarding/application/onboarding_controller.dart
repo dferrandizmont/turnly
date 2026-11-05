@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/diagnostics/crash_reporting.dart';
@@ -7,9 +9,11 @@ import '../../calendar/application/schedule_controller.dart';
 import '../../calendar/application/visible_month.dart';
 import '../../holidays/application/holidays_provider.dart';
 import '../../holidays/domain/holiday_country.dart';
+import '../../patterns/application/post_night_provider.dart';
 import '../../patterns/domain/pattern_application.dart';
 import '../../patterns/domain/pattern_catalog.dart';
 import '../../schedule/domain/schedule_domain.dart';
+import '../../settings/application/preferences_controller.dart';
 import '../domain/profession.dart';
 import 'onboarding_providers.dart';
 
@@ -233,6 +237,28 @@ class OnboardingController extends Notifier<OnboardingState> {
           ? null
           : professionForCountry(profession, code),
     );
+    // Choosing a country sets its formats (first day of the week, currency)
+    // for whoever has not picked them by hand. It is not awaited here (the
+    // country must show at once) and a failure is reported like the rest of
+    // the flow, never left uncaught.
+    unawaited(_applyRegionDefaults(code));
+  }
+
+  /// [applyRegionDefaults] with its failure reported through the crash
+  /// reporter (the same diagnostics as `finish`): a country whose formats
+  /// cannot be written must not fail silently.
+  Future<void> _applyRegionDefaults(String code) async {
+    try {
+      await ref.read(preferencesProvider.notifier).applyRegionDefaults(code);
+    } catch (error, stack) {
+      try {
+        await ref
+            .read(crashReporterProvider)
+            .record(redactError(error), stack, fatal: false);
+      } catch (_) {
+        // A reporter that fails must not break the flow.
+      }
+    }
   }
 
   void selectRegion(String? regionCode) {
@@ -494,3 +520,44 @@ final onboardingControllerProvider =
     NotifierProvider.autoDispose<OnboardingController, OnboardingState>(
       OnboardingController.new,
     );
+
+/// What applying the rotation chosen in the first-use flow would look like,
+/// for the live preview of «¿Cuándo empiezas?»: the same planner as the
+/// wizard (`patternPreviewProvider`), on the schedule with the chosen job's
+/// hours, so what is shown is what `finish` writes. `null` without a rotation.
+final onboardingPreviewProvider = Provider.autoDispose<PatternApplication?>((
+  ref,
+) {
+  final state = ref.watch(onboardingControllerProvider);
+  if (!state.hasRotation) return null;
+  final schedule = ref.watch(
+    scheduleControllerProvider.select((s) => s.schedule),
+  );
+  final palette = ref.watch(
+    scheduleControllerProvider.select((s) => s.palette),
+  );
+  final auto = ref.watch(postNightAutoProvider);
+  final request = ref
+      .read(onboardingControllerProvider.notifier)
+      .request(scheduleWithProfession(schedule, state.profession));
+  if (request == null) return null;
+  final plan = planPatternApplication(
+    schedule,
+    request,
+    seq: schedule.runs.fold(0, (m, r) => r.seq > m ? r.seq : m) + 1,
+    postNightAuto: auto,
+    palette: palette,
+  );
+  // The factory types are stored in the phone's language until the end of
+  // the flow (`finalizeFactoryCatalog`): the preview draws them in the app's
+  // language, like the shift chips above it (`shiftTypeForFirstUse`).
+  return PatternApplication(
+    schedule: plan.schedule.copyWith(
+      shiftTypes: plan.schedule.shiftTypes.map(factoryTextsShiftType),
+    ),
+    change: plan.change,
+    newTypes: plan.newTypes,
+    newPattern: plan.newPattern,
+    postNightDays: plan.postNightDays,
+  );
+});

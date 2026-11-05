@@ -26,6 +26,11 @@ import 'shift_icon_glyph.dart';
 /// content of a cell never moves under the finger.
 const double cellContentInset = Sp.selectedBorder;
 
+/// Most shift bands a cell draws. A day with four or more shifts shows the
+/// first two and a neutral «+N» band for the rest, so its week row no longer
+/// grows with every shift of the day.
+const int _maxCellBands = 3;
+
 /// Spoken description of a day: "lunes 12 de octubre, hoy, Noche de 22:00 a
 /// 06:00, festivo: Fiesta Nacional de España, con nota".
 String daySemanticsLabel(
@@ -226,6 +231,13 @@ class _DayCellState extends State<DayCell> {
       for (final s in day.shifts) s.swatch(brightness, outOfMonth: !inMonth),
     ];
     final multi = swatches.length > 1;
+    // At most three bands: the first two shifts and, from the fourth shift on,
+    // a neutral «+N» band for the ones the cell does not show.
+    final visibleShifts = day.shifts.length > _maxCellBands
+        ? _maxCellBands - 1
+        : day.shifts.length;
+    final hiddenShifts = day.shifts.length - visibleShifts;
+    final bands = visibleShifts + (hiddenShifts > 0 ? 1 : 0);
     final lead = swatches.isEmpty
         ? ShiftSwatch.none(brightness, outOfMonth: !inMonth)
         : swatches.first;
@@ -291,7 +303,7 @@ class _DayCellState extends State<DayCell> {
           else
             Column(
               children: [
-                for (var i = 0; i < swatches.length; i++)
+                for (var i = 0; i < visibleShifts; i++)
                   Expanded(
                     child: _ShiftBand(
                       shift: day.shifts[i],
@@ -300,7 +312,15 @@ class _DayCellState extends State<DayCell> {
                       selected: selected && inMonth,
                       compact: multi,
                       topReserve: i == 0 ? numberReserve : 0,
-                      bottomReserve: i == swatches.length - 1 ? Sp.bar : 0,
+                      bottomReserve: i == bands - 1 ? Sp.bar : 0,
+                    ),
+                  ),
+                if (hiddenShifts > 0)
+                  Expanded(
+                    child: _OverflowBand(
+                      date: day.date,
+                      count: hiddenShifts,
+                      bottomReserve: Sp.bar,
                     ),
                   ),
               ],
@@ -461,23 +481,29 @@ double dayCellHeightWithTime(BuildContext context, {double? limit}) {
 /// Equal-height bands each keep their own code and time. The first also
 /// reserves the day number, the last the bar, so the tallest band determines
 /// the common height (including when a timed shift follows an untimed one).
+///
+/// A cell never draws more than [_maxCellBands] bands: with four or more
+/// shifts the third one is the neutral «+N» of [_OverflowBand]. The height is
+/// measured with that same cap, so a day with six shifts takes exactly the
+/// room of a day with three.
 double dayCellHeightForShifts(BuildContext context, List<ShiftType> shifts) {
   if (shifts.length < 2) return dayCellHeightWithTime(context);
   final type = context.type;
   final scaler = MediaQuery.textScalerOf(context);
   final number = textHeight(type.cellDay, scaler) + Sp.xs + Sp.hair;
+  final bands = math.min(shifts.length, _maxCellBands);
   var bandHeight = 0.0;
-  for (var i = 0; i < shifts.length; i++) {
+  for (var i = 0; i < bands; i++) {
     final height =
         textHeight(type.cellCodeMulti, scaler) +
         (shifts[i].hasTimes ? textHeight(type.cellTime, scaler) : 0) +
         (i == 0 ? number : 0) +
-        (i == shifts.length - 1 ? Sp.bar : 0);
+        (i == bands - 1 ? Sp.bar : 0);
     bandHeight = math.max(bandHeight, height);
   }
   return math.max(
     dayCellHeightWithTime(context),
-    bandHeight * shifts.length + Sp.cellGap,
+    bandHeight * bands + Sp.cellGap,
   );
 }
 
@@ -693,6 +719,58 @@ class _DayMarks extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// The band that says how many shifts of the day the cell does not show
+/// («+N»). It is the third band of a day with four or more shifts: neutral
+/// on purpose (`surfaceMuted` and its border, `textMuted`), never in the
+/// colour of a shift, so it can not be taken for one more shift. The spoken
+/// label of the cell still names every shift of the day.
+class _OverflowBand extends StatelessWidget {
+  const _OverflowBand({
+    required this.date,
+    required this.count,
+    required this.bottomReserve,
+  });
+
+  final CivilDate date;
+  final int count;
+
+  /// Space kept free at the bottom for the colour bar.
+  final double bottomReserve;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colors.surfaceMuted,
+        border: Border(
+          top: BorderSide(color: colors.borderStrong, width: Sp.hair),
+        ),
+      ),
+      child: Padding(
+        padding: EdgeInsets.only(bottom: bottomReserve),
+        child: Center(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: cellContentInset),
+              child: Text(
+                context.l10n.dayCellMoreShifts(count),
+                key: ValueKey('cell-overflow-${date.toIso()}'),
+                maxLines: 1,
+                softWrap: false,
+                style: context.type.cellCodeMulti.copyWith(
+                  color: colors.textMuted,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

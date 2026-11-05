@@ -15,6 +15,12 @@ abstract final class PreferenceKeys {
   /// `1` (Monday) or `7` (Sunday), like [DateTime.weekday].
   static const weekStart = 'calendar.weekStart';
 
+  /// `true` once the person picked the first day of the week by hand (Ajustes
+  /// › Apariencia). A missing marker next to a stored [weekStart] means it was
+  /// chosen before this marker existed, so it is treated as a manual choice:
+  /// picking a country never overwrites it.
+  static const weekStartExplicit = 'calendar.weekStartExplicit';
+
   /// `true` shows the ISO week number at the left of every row of the month.
   static const weekNumbers = 'calendar.weekNumbers';
 
@@ -28,6 +34,12 @@ abstract final class PreferenceKeys {
   /// An ISO 4217 code ("EUR", "USD"). Travels in the backup with the amounts
   /// it describes.
   static const currency = 'appearance.currency';
+
+  /// `true` once the person picked the currency by hand (Ajustes ›
+  /// Apariencia). A missing marker next to a stored [currency] means it was
+  /// chosen before this marker existed, so it is treated as a manual choice:
+  /// picking a country never overwrites it.
+  static const currencyExplicit = 'appearance.currencyExplicit';
 
   /// An [AppAccent.stored] (`"indigo"`, `"blue"`...). Travels in the backup,
   /// like the theme.

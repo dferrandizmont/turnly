@@ -1,6 +1,6 @@
 # Política de privacidad de Turnly
 
-Última actualización: 30 de octubre de 2026
+Última actualización: 4 de noviembre de 2026
 
 Turnly es una app de calendario de turnos para quien trabaja a turnos en España. Es una app independiente: no
 está creada, revisada ni respaldada por ninguna empresa, administración ni sindicato.
@@ -40,9 +40,11 @@ controlas tú: la app solo lo entrega a la app que elijas en la hoja de comparti
 después (subirlo a tu nube, mandarlo por WhatsApp o por correo...) queda fuera de la app. Al abrir un `.turnly` o un `.cuadrante`,
 nada se restaura sin que lo confirmes.
 
-**Copia del sistema.** En Android, si tienes activada la copia de seguridad de Google, el sistema sube
-periódicamente la base de datos y las copias de la app a tu cuenta de Google y las pasa a tu móvil nuevo; en Android
-9 o superior va cifrada de extremo a extremo con tu bloqueo de pantalla, si tienes uno. En iPhone, la base de datos
+**Copia del sistema.** En Android 9 o superior, si tienes activada la copia de seguridad de Google y tu móvil tiene
+bloqueo de pantalla, el sistema sube periódicamente la base de datos, las copias y los adjuntos de la app a tu cuenta
+de Google, cifrados de extremo a extremo con ese bloqueo (ni Google ni nosotros podemos leerlos). Sin bloqueo de
+pantalla, Turnly no entra en esa copia. Al estrenar móvil, el sistema también puede pasar los datos directamente del
+móvil viejo al nuevo. En Android 7 y 8, Turnly no usa la copia del sistema. En iPhone, la base de datos
 entra en la copia del dispositivo (iCloud o la del ordenador). Esas copias las gestionas tú con tu cuenta de Google o
 de Apple y puedes desactivarlas en los ajustes del sistema; la app no envía nada por su cuenta y no hace ninguna
 copia propia en iCloud.
@@ -130,8 +132,8 @@ menores: los turnos y los ajustes se mantienen en el dispositivo.
 
 ## 9. Seguridad
 No hay servidor ni transmisión de datos desde la app. Las copias automáticas se guardan en la carpeta privada de la
-app. Tú controlas los archivos exportados y las copias de tu cuenta de Google o de Apple; si tu móvil tiene bloqueo
-de pantalla, la copia de Google va cifrada con él. El código es público y cualquiera puede comprobar lo que hace.
+app. Tú controlas los archivos exportados y las copias de tu cuenta de Google o de Apple; la copia de Google de
+Turnly solo se hace cifrada con tu bloqueo de pantalla. El código es público y cualquiera puede comprobar lo que hace.
 
 ## 10. Cambios en esta política
 

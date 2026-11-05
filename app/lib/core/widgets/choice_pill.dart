@@ -16,6 +16,7 @@ class ChoicePill extends StatelessWidget {
     this.icon,
     this.leading,
     this.reserveIcon = false,
+    this.radius,
   });
 
   final String label;
@@ -35,15 +36,23 @@ class ChoicePill extends StatelessWidget {
   /// other.
   final bool reserveIcon;
 
+  /// Corner radius, or `null` for the fully rounded pill ([StadiumBorder]).
+  /// A choice of longer labels (the jobs of «¿A qué te dedicas?») reads
+  /// better as a rounded rectangle, like the other selection chips.
+  final BorderRadiusGeometry? radius;
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final shape = StadiumBorder(
-      side: BorderSide(
-        color: selected ? colors.todayRing : colors.borderStrong,
-        width: selected ? Sp.ring : 1,
-      ),
-    );
+    final shape = (radius == null
+            ? const StadiumBorder()
+            : RoundedRectangleBorder(borderRadius: radius!))
+        .copyWith(
+          side: BorderSide(
+            color: selected ? colors.todayRing : colors.borderStrong,
+            width: selected ? Sp.ring : 1,
+          ),
+        );
     final glyph = selected ? AppIcons.check : icon;
     final showIconSlot = glyph != null || reserveIcon;
     return Semantics(

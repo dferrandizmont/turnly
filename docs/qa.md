@@ -467,3 +467,30 @@ Q30–Q39 están en `scenarios/patterns.dart`, que exporta `patternScenarios` (`
 `app.container`, `app.schedule`, `app.paint` y `app.flushWrites()` siguen funcionando (el contenedor se busca
 desde `CuadranteApp`, no desde el `MonthScreen`). Un `SnackBar` con acción flota sobre Deshacer/Rehacer del modo
 pintar unos segundos (`pump(5 s)` antes de deshacer).
+
+## Copia del sistema de Android (B01–B03)
+
+`tool/qa/backup_android.sh` comprueba qué saca del móvil el Auto Backup desde la pregunta 30 (4-nov-2026): la copia
+de Google solo con cifrado de extremo a extremo real, y nada en Android 7–8. Detalle y límites en
+`docs/copia-de-seguridad.md` §10.
+
+```bash
+tool/qa/backup_android.sh                          # compila, B03, y B01 y B02 cada uno en su arranque de Cuadrante_QA
+QA_BACKUP_APK=ruta.apk tool/qa/backup_android.sh   # sin compilar
+QA_BACKUP_CASE=B01 tool/qa/backup_android.sh       # un solo caso
+```
+
+Solo corre en emuladores (`emulator-*`): desinstala Turnly y borra su copia del sistema. Con un móvil real hay que
+pedirlo a propósito con `QA_BACKUP_ALLOW_DEVICE=1` y `QA_DEVICE=<serial>`, sabiendo que pierde sus datos.
+
+| Id | Qué demuestra |
+|---|---|
+| B01 Sin cifrado | Con el transporte local de AOSP, `bmgr backupnow`, desinstalar e instalar: la restauración no trae ni `cuadrante.sqlite` ni un adjunto. |
+| B02 Cifrado falso | Igual con `fake_encryption_flag=true` (bandera de prueba, no la real): tampoco sale nada. |
+| B03 Android 7–8 | En el APK, `allow_system_backup` es `false` de serie y `true` desde la v28. |
+
+Desinstala la app del emulador. Cambia el transporte de copia y lo devuelve al de Google al acabar. En un mismo
+arranque solo funciona la primera restauración, por eso cada caso arranca su propio emulador. Con las reglas anteriores
+(4-nov-2026), B01 y B02 fallaban: el control está hecho. No prueba que, con bloqueo de pantalla, la copia de Google sí
+lleve Turnly: eso se mira a mano en un móvil real (§10 de `docs/copia-de-seguridad.md`; hecho el 4-nov-2026 en la
+Redmi Pad 2 Pro).

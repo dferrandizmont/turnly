@@ -178,6 +178,7 @@ del número del día y delante del clip de la nota y del punto de festivo (esa f
 hora; en una casilla muy estrecha la fila encoge hasta el 60 % en vez de salirse); el texto leído de la casilla dice «horas extra: 1 h 30 min» / «salida anticipada: 30 min».
 En el distintivo de 44 px (lista de turnos, detalle del día), en las fichas redondas de pintar y en la leyenda el
 icono va encima del código (12-14 dp) o delante del nombre; el código no desaparece nunca.
+**Cuatro turnos o más en un día:** como mucho 3 bandas. Se ven los 2 primeros turnos y una tercera banda neutra «+N» (`surfaceMuted`, borde superior `borderStrong` de `Sp.hair`, texto `textMuted` en `cellCodeMulti`), nunca en color de turno; la altura de la fila se mide con ese tope y el lector de pantalla nombra todos los turnos.**Forma de las fichas:** `ChoicePill` es una píldora por defecto; las fichas de etiqueta larga o de varias líneas (profesión, turno y tanda del día del ciclo) usan `Rad.inputRadius`.
 
 **Modo pintar** (B3, opción 3A del lienzo del 31-oct; una línea y hoja que mide lo que sobra, decisión 28): cabecera
 **de una línea** «PINTANDO · CAMBIAR EL TURNO» (`label`: «PINTANDO» en `ink` del turno elegido y el modo en `textMuted`;
@@ -306,13 +307,18 @@ comparación con el periodo anterior y las líneas de turnos, extras, nocturnas,
 estimado si hay precios, los turnos por grupo y, al final, **lo que no tiene datos plegado** en una tarjeta de líneas:
 «Ausencias · Ninguna» y «Ingresos estimados · Sin precios», que se abre (chevron que gira) para enseñar qué hacer.
 
-**Ajustes** (diseño 6A, B6): cinco grupos en este orden, cada fila con su icono y **el estado a la derecha o en la
+**Ajustes** (diseño 6A, B6): grupos en este orden, cada fila con su icono y **el estado a la derecha o en la
 segunda línea**: **Mi calendario** (Mis turnos con cuántos hay, Calendarios con el de pantalla, Mis rotaciones,
 Saliente automático, Importar turnos) · **Avisos y widget** (Alarmas con «Activadas» y «Avisos hasta el mar 17 nov»,
 Añadir widget, Exportar turnos al calendario del móvil, Compartir por enlace) · **Copias y cambio de móvil** (Copia de seguridad: «Última:
 ayer a las 22:14, comprobada», «Todavía no hay ninguna copia» o el fallo de la última copia automática) ·
 **Apariencia** (Tema, Idioma, Formato de hora, Primer día de la semana, número de semana, Moneda, Festivos con el país o
-la comunidad) · **Ayuda**. Una fila nueva de otra función es su propio widget y una línea en el grupo (el «Color de
+la comunidad) · **Ayuda** · **Borrar todo y empezar de cero** (grupo propio al final, fila destructiva).
+El borrado conserva solo el idioma y dos copias de seguridad previas, separadas de la rotación automática.
+La pantalla enumera también los festivos propios, el enlace compartido y la copia diaria en carpeta (sus archivos se
+conservan). Mientras guarda la copia se puede volver atrás; tras confirmar, «Borrando…» bloquea la interacción y
+atrás. Primero se vacía la base; la limpieza de sistema continúa aunque falle un paso. Siempre lleva al primer uso,
+con una línea de aviso si quedó algo sin limpiar. Una fila nueva de otra función es su propio widget y una línea en el grupo (el «Color de
 acento» va justo debajo de Tema).
 
 **Copia de seguridad** (B9): la acción principal es **«Guardar una copia fuera de Turnly»** (botón relleno: comparte
@@ -508,8 +514,8 @@ calendario útil en menos de 60 s sin responder nada que no haga falta.
   y su `bar`, y el pincel). Debajo, en `meta` centrado, «Después te preguntamos el país…» y el botón de texto
   **Recuperar una copia de seguridad** (abre Ajustes › Copia; si se restaura, el flujo termina en el mes).
 - **Cada camino lleva a lo suyo:** importar → «¿Vienes de otra app?» (importar ahora o la copia de LRHSoft) →
-  último paso; rotación → catálogo → día de inicio y día del ciclo → último paso; a mano → último paso, y el mes se
-  abre ya en modo pintar. «Lo pinto a mano» sigue en el catálogo y hace lo mismo sin salir del camino.
+  último paso; rotación → catálogo → día de inicio y **turno y día del ciclo** → último paso; a mano → último paso, y
+  el mes se abre ya en modo pintar. «Lo pinto a mano» sigue en el catálogo y hace lo mismo sin salir del camino.
 - **Último paso, opcional** (`PlaceStep`): «Paso N de M · Opcional» en `meta` seminegrita, «¿Dónde trabajas?» (país,
   comunidad y municipio como antes) y, debajo, «¿A qué te dedicas? Opcional» en `title` con las profesiones del país
   en `ChoicePill` (la elegida con borde `todayRing` y check; tocarla otra vez la quita) y sus horas habituales en una
@@ -530,9 +536,18 @@ posterior), en 200 ms; la cabecera y la fila del mes no se mueven. Con «reducir
 ## Asistente de patrón y vista anual
 - **Asistente de patrón** (`/patron`, tres pasos con una barra de tres segmentos y «Paso 1 de 3»): tarjetas `surface`
   de radio `Rad.row` con el nombre, el ciclo («28 días») y la secuencia como **fichas pequeñas** (`Disc.s`, `disc` +
-  `ink` del turno, el código siempre visible). La elegida lleva el borde `todayRing` y un check, no solo color. Las
-  fichas del selector de día del ciclo son `Disc.m`, con el número del día debajo. La vista previa son dos meses
-  con la misma `DayCell` de la pantalla del mes.
+  `ink` del turno, el código siempre visible). La elegida lleva el borde `todayRing` y un check, no solo color.
+- **Selector de turno y día del ciclo** (mismo componente en el paso 2 del asistente y en «¿Cuándo empiezas?» del
+  primer uso, `CycleStartPicker`): la pregunta es **qué turno** tiene ese día, con una píldora `ChoicePill` por turno
+  distinto del ciclo (radio `Rad.inputRadius`, el mismo de las fichas de profesión; color y código en un `ShiftBadge`,
+  nunca solo color; los del catálogo hablan el idioma de la app). Si ese turno aparece varias veces en el ciclo, debajo
+  sale **una píldora por día del turno**, rotulada por su tanda («2.º de 5 · Mañana»; «Tanda 2 · 1.º de 2 · Libre,
+  después de Noche» cuando el turno tiene varias tandas separadas, nombradas por el turno del día anterior). Una tanda
+  sólo se rotula «después de X» cuando el día inmediatamente anterior tiene otro turno; si está vacío, se cae esa parte.
+  La cuadrícula numerada de todo el ciclo sigue detrás de «Ver el ciclo completo» (fichas `Disc.m`, con el número del
+  día debajo) para quien la prefiera. Bajo el selector, **«Así quedará»**: dos meses con la misma `DayCell` de la
+  pantalla del mes que se actualizan en vivo; el primer uso lo enseña con este mismo componente y el asistente lo deja
+  para su paso 3, para no pintarlo dos veces. El texto bajo el selector resume «Ese día te toca: …».
 - **Vista anual** (`/ano`): cada día es un cuadrado con la `bar` del turno (varios turnos: franjas verticales),
   `surfaceMuted` si no hay turno, un punto `holiday` en los festivos y un anillo `todayRing` en hoy; 3 columnas en
   móvil (4 desde 600 dp). Cada mes se lee en voz alta como sus recuentos («Octubre 2026: 8 Noche, 5 Libre»). La

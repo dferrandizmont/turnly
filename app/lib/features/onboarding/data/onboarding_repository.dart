@@ -18,6 +18,9 @@ abstract final class OnboardingSettings {
   /// `true` from the end of the flow until the user closes the tip about
   /// painting on the month screen.
   static const tipPending = 'onboarding.tipPending';
+
+  /// A reset keeps home widgets empty until first use is finished again.
+  static const resetPending = 'onboarding.resetPending';
 }
 
 /// Whether the first-use flow has to be shown, and whether its tip is
@@ -132,6 +135,7 @@ class OnboardingRepository {
         return OnboardingStatus(tipPending: tip);
       }
       if (force) return OnboardingStatus(needed: true, tipPending: tip);
+      if (await isResetPending()) return OnboardingStatus(needed: true);
       if (demo) return OnboardingStatus(tipPending: tip);
       if (await hasUserData()) {
         await markDone();
@@ -182,14 +186,18 @@ class OnboardingRepository {
 
   Future<bool> isDone() => _readBool(OnboardingSettings.done);
 
+  Future<bool> isResetPending() => _readBool(OnboardingSettings.resetPending);
+
   Future<bool> isTipPending() => _readBool(OnboardingSettings.tipPending);
 
   /// Marks the flow as finished; with [tip] the month screen shows its tip.
   Future<void> markDone({bool tip = false}) => _db.transaction(() async {
     await _write(OnboardingSettings.done, true);
-    await (_db.delete(
-      _db.settings,
-    )..where((s) => s.key.equals(_factoryCatalogKey))).go();
+    await (_db.delete(_db.settings)..where(
+          (s) =>
+              s.key.isIn([_factoryCatalogKey, OnboardingSettings.resetPending]),
+        ))
+        .go();
     if (tip) await _write(OnboardingSettings.tipPending, true);
   });
 

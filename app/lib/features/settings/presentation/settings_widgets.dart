@@ -72,9 +72,11 @@ class SettingsRow extends StatelessWidget {
     this.onTap,
     this.trailing,
     this.forceStacked = false,
+    this.destructive = false,
   });
 
   final IconData icon;
+  final bool destructive;
   final String title;
   final String? subtitle;
 
@@ -104,7 +106,9 @@ class SettingsRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final type = context.type;
-    final tone = colors.accentTone;
+    final tone = destructive
+        ? TonePair(colors.dangerContainer, colors.danger)
+        : colors.accentTone;
 
     final content = ConstrainedBox(
       constraints: const BoxConstraints(minHeight: minHeight),
@@ -130,7 +134,12 @@ class SettingsRow extends StatelessWidget {
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: titleStyle(context)),
+              Text(
+                title,
+                style: destructive
+                    ? titleStyle(context).copyWith(color: colors.danger)
+                    : titleStyle(context),
+              ),
               if (subtitle != null)
                 Text(subtitle!, style: subtitleStyle(context)),
             ],

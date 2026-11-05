@@ -44,7 +44,9 @@ class BackupCopyList extends StatelessWidget {
   /// wrote it (when the file says), and the size.
   static String metaOf(AppLocalizations l10n, BackupCopy copy) {
     final kind = copy.kind == BackupCopyKind.safety
-        ? l10n.backupUiCopySafety
+        ? (copy.isPreReset
+              ? l10n.backupUiCopyPreReset
+              : l10n.backupUiCopySafety)
         : l10n.backupUiCopyLocal;
     final size = backupSize(copy.entry.sizeBytes, l10n.localeName);
     final version = copy.appVersion;
@@ -107,13 +109,11 @@ class BackupCopyList extends StatelessWidget {
                   hour12: AppDateFormat.of(context).hour12,
                 ),
                 meta: metaOf(l10n, copy),
-                restoreLabel: l10n.backupUiCopyRestoreLabel(
-                  backupWhen(
-                    l10n,
-                    copy.entry.modifiedAt,
-                    now,
-                    hour12: AppDateFormat.of(context).hour12,
-                  ),
+                restoreLabel: backupRestoreLabel(
+                  l10n,
+                  copy.entry.modifiedAt,
+                  now,
+                  hour12: AppDateFormat.of(context).hour12,
                 ),
                 inline: inline,
                 onRestore: () => onRestore(copy),

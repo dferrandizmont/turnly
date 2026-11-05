@@ -339,6 +339,7 @@
       }
     }
   },
+  "dayCellMoreShifts": "+{count}",
   "daySheetHoliday": "Festiu: {name}",
   "@daySheetHoliday": {
     "placeholders": {
@@ -1137,6 +1138,76 @@
   "@patternOffsetHelp": {
     "placeholders": {
       "date": {
+        "type": "String"
+      }
+    }
+  },
+  "patternStartShiftTitle": "Quin torn et toca aquell dia?",
+  "patternStartShiftHelp": "El {date}. Tria el torn; si es repeteix al cicle, després tries quin.",
+  "@patternStartShiftHelp": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "patternStartOccurrenceTitle": "{shift} es repeteix: quin dia et toca?",
+  "patternStartOccurrenceHelp": "Compta des del primer dels dies seguits.",
+  "patternShowCycle": "Mostra el cicle complet",
+  "patternHideCycle": "Amaga el cicle complet",
+  "patternOccurrenceInRun": "Dia {position} de {count}",
+  "@patternOccurrenceInRun": {
+    "description": "Dia d'una tanda de diversos dies: «2n de 5 · Matí».",
+    "placeholders": {
+      "ordinal": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "shift": {
+        "type": "String"
+      }
+    }
+  },
+  "patternOccurrenceInRunAfter": "Dia {position} de {count}, després de {previous}",
+  "@patternOccurrenceInRunAfter": {
+    "description": "Dia d'una tanda, dient quina tanda: «1r de 2 · Lliure, després de Nit».",
+    "placeholders": {
+      "ordinal": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "shift": {
+        "type": "String"
+      },
+      "previous": {
+        "type": "String"
+      }
+    }
+  },
+  "patternOccurrenceAfter": "Després de {previous}",
+  "@patternOccurrenceAfter": {
+    "description": "Tanda d'un sol dia: «Lliure, després de Tarda».",
+    "placeholders": {
+      "shift": {
+        "type": "String"
+      },
+      "previous": {
+        "type": "String"
+      }
+    }
+  },
+  "patternOccurrenceRun": "Tanda {run} · {label}",
+  "@patternOccurrenceRun": {
+    "description": "Numera la tanda quan el torn en té diverses: «Tanda 2 · 1r de 2 · Matí, després de Lliure».",
+    "placeholders": {
+      "run": {
+        "type": "int"
+      },
+      "label": {
         "type": "String"
       }
     }
@@ -2525,10 +2596,16 @@
   },
   "backupUiCopyMetaVersion": "{kind} · {version} · {size}",
   "backupUiCopyRestore": "Restaura aquesta",
-  "backupUiCopyRestoreLabel": "Restaura la còpia de: {when}",
+  "backupUiCopyRestoreLabel": "{day, select, today{Restaura la còpia d’avui a les {time}} yesterday{Restaura la còpia d’ahir a les {time}} other{Restaura la còpia del {date} a les {time}}}",
   "@backupUiCopyRestoreLabel": {
     "placeholders": {
-      "when": {
+      "day": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "date": {
         "type": "String"
       }
     }
@@ -3652,5 +3729,48 @@
         "type": "String"
       }
     }
-  }
+  },
+  "resetTitle": "Esborra-ho tot i comença de zero",
+  "resetIntro": "S’esborrarà tot això de Turnly:",
+  "resetCalendars": "Tots els calendaris i els seus torns, rotacions i excepcions.",
+  "resetNotes": "Notes, adjunts (fotos, dibuixos i fitxers) i tasques.",
+  "resetAbsences": "Vacances, permisos i absències.",
+  "resetSwaps": "El llibre de canvis.",
+  "resetAlarms": "Alarmes i avisos programats.",
+  "resetWidget": "El contingut del widget.",
+  "resetDnd": "Les regles i franges de No molestis.",
+  "resetCalendarEvents": "Els esdeveniments que Mantenir al dia ha escrit al calendari del mòbil.",
+  "resetPreferences": "Tots els ajustos.",
+  "resetKeepLanguage": "Només conservem l’idioma de l’app. La còpia de seguretat es queda al mòbil i la podràs restaurar en el primer ús.",
+  "resetBackupPreparing": "Desant la còpia…",
+  "resetBackupSaved": "Abans d’esborrar desem una còpia: {file}",
+  "resetShare": "Desa la còpia en un altre lloc",
+  "resetDelete": "Esborra-ho tot",
+  "resetConfirmTitle": "Vols esborrar-ho tot?",
+  "resetConfirmBody": "No es pot desfer, però tens la còpia del {date}.",
+  "resetBackupFailed": "No s’ha pogut desar i comprovar la còpia de seguretat. No s’ha esborrat res. Revisa l’espai del mòbil i torna-ho a provar.",
+  "resetShareFailed": "No s’ha pogut compartir la còpia. La còpia local continua desada al mòbil.",
+  "resetFailed": "No s’ha pogut completar l’esborrament. La teva còpia de seguretat continua desada al mòbil. Torna-ho a provar.",
+  "@resetBackupSaved": {
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "@resetConfirmBody": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "resetHolidays": "Els festius que vas afegir a mà.",
+  "resetShareLink": "L’enllaç que vas compartir.",
+  "resetFolderBackup": "La còpia diària a la teva carpeta (els arxius que ja hi ha es queden on són).",
+  "resetDeleting": "Esborrant…",
+  "resetCleanupWarning": "Algunes dades del sistema no s’han pogut netejar.",
+  "resetCalendarCleanupWarning": "Alguns esdeveniments del calendari del mòbil no s’han pogut treure.",
+  "backupUiCopyPreReset": "Abans de començar de zero",
+  "backupUiOriginPreReset": "Còpia de just abans de començar de zero"
 }

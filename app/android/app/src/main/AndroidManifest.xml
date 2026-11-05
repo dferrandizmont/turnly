@@ -39,17 +39,18 @@
          of a one-off export. Nothing is read or written in the background. -->
     <uses-permission android:name="android.permission.READ_CALENDAR"/>
     <uses-permission android:name="android.permission.WRITE_CALENDAR"/>
-    <!-- Backup (docs/copia-de-seguridad.md, "Copia del sistema de Android"):
-         Auto Backup is on and the rules say exactly what goes into the Google
-         backup (android:fullBackupContent, Android 11 and below) and into the
-         cloud backup and the device-to-device transfer (android:dataExtractionRules,
-         Android 12+): the database and the .turnly and legacy .cuadrante copies in files/, and
-         nothing else. -->
+    <!-- Backup (docs/copia-de-seguridad.md, "Copia del sistema de Android";
+         question 30 of docs/preguntas.md): Auto Backup is on from Android 9
+         (allow_system_backup, res/values*/backup.xml; off on 7 and 8) and the
+         rules say exactly what goes out: files/ (the database, the .turnly
+         copies and the notes' attachments), to the Google backup ONLY when it is
+         end-to-end encrypted with the screen lock, or straight to a new phone
+         (android:fullBackupContent on 9-11, android:dataExtractionRules on 12+). -->
     <application
         android:label="@string/app_name"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:allowBackup="true"
+        android:allowBackup="@bool/allow_system_backup"
         android:fullBackupContent="@xml/backup_rules"
         android:dataExtractionRules="@xml/data_extraction_rules">
         <activity

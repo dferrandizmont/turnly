@@ -1,6 +1,6 @@
 # Turnly privacy policy
 
-Last updated: 30 October 2026
+Last updated: 4 November 2026
 
 Courtesy translation. The Spanish version ([politica-privacidad.md](politica-privacidad.md)) is the one that
 applies.
@@ -42,9 +42,11 @@ shifts, notes and absences, carries no identifier and is not encrypted; you keep
 it to the app you pick in the system share sheet. What you do with it afterwards (upload it to your cloud, send it by
 WhatsApp or email...) is outside the app. When you open a `.turnly` or `.cuadrante` file, nothing is restored until you confirm.
 
-**System backup.** On Android, if Google backup is on, the system periodically uploads the app's database and
-backups to your Google account and moves them to your new phone; on Android 9 or later it is end-to-end encrypted
-with your screen lock, if you have one. On iPhone, the database is part of the device backup (iCloud or computer).
+**System backup.** On Android 9 or later, if Google backup is on and your phone has a screen lock, the system
+periodically uploads the app's database, backups and attachments to your Google account, end-to-end encrypted with
+that lock (neither Google nor we can read them). Without a screen lock, Turnly is left out of that backup. When you
+set up a new phone, the system can also move the data straight from the old phone to the new one. On Android 7 and 8,
+Turnly does not use the system backup. On iPhone, the database is part of the device backup (iCloud or computer).
 You manage those backups with your Google or Apple account and can turn them off in the system settings; the app
 sends nothing on its own and keeps no backup of its own in iCloud.
 
@@ -129,8 +131,8 @@ shifts and settings stay on the device.
 
 ## 9. Security
 There is no server and no data transmission from the app. Automatic backups are kept in the app's private folder.
-You control exported files and the backups of your Google or Apple account; if your phone has a screen lock, the
-Google backup is encrypted with it. The code is public and anyone can check what it does.
+You control exported files and the backups of your Google or Apple account; Turnly's Google backup only happens
+encrypted with your screen lock. The code is public and anyone can check what it does.
 
 ## 10. Changes to this policy
 

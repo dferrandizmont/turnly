@@ -1,6 +1,7 @@
 import 'package:cuadrante/core/bootstrap/bootstrap.dart';
 import 'package:cuadrante/core/format/text_wrap.dart';
 import 'package:cuadrante/core/icons/app_icons.dart';
+import 'package:cuadrante/core/widgets/choice_pill.dart';
 import 'package:cuadrante/features/backup/presentation/backup_screen.dart';
 import 'package:cuadrante/features/calendar/application/paint_controller.dart';
 import 'package:cuadrante/features/calendar/presentation/month_screen.dart';
@@ -142,18 +143,147 @@ void main() {
         expect(app.title, '¿Cuándo empiezas?');
         expect(find.text('Lunes 19 de octubre 2026'), findsOneWidget);
         expect(
-          find.text('Ese día te toca: Día 12 h 08:00–20:00'),
+          find.text(
+            keepTimeRangesTogether('Ese día te toca: Día 12 h 08:00–20:00'),
+          ),
           findsOneWidget,
         );
-        await app.tap(key('onboarding-offset-1'));
+        await app.tap(key('onboarding-shift-night12'));
         expect(
-          find.text('Ese día te toca: Noche 12 h 20:00–08:00'),
+          find.text(
+            keepTimeRangesTogether('Ese día te toca: Noche 12 h 20:00–08:00'),
+          ),
           findsOneWidget,
         );
         await _next(app);
         expect(app.title, '¿Dónde trabajas?');
       },
     );
+
+    testWidgets('a shift that repeats asks which of its days', (tester) async {
+      final app = await FirstLaunch.open(tester);
+      await app.choosePath('rotation');
+      await app.tap(key('onboarding-pattern-continental'));
+      await _next(app);
+      expect(app.title, '¿Cuándo empiezas?');
+
+      // «Mañana» appears several times in the 28-day cycle: after picking it
+      // the picker asks which of its days, one option per day of the run,
+      // labelled by its run (no counting). Its three runs are all after
+      // Libre, so the run number is what tells them apart.
+      await app.tap(key('onboarding-shift-morning'));
+      expect(key('onboarding-occurrence-0'), findsOneWidget);
+      expect(key('onboarding-offset-0'), findsNothing, reason: 'grid hidden');
+      expect(
+        find.text('Tanda 1 · Día 1 de 2, después de Libre'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('Tanda 2 · Día 1 de 2, después de Libre'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('Tanda 3 · Día 1 de 3, después de Libre'),
+        findsOneWidget,
+      );
+      // Every option of the shift has a label of its own: no two pills read
+      // the same.
+      final labels = [
+        for (final pill in tester.widgetList<ChoicePill>(find.byType(ChoicePill)))
+          if (pill.key is ValueKey<String> &&
+              (pill.key! as ValueKey<String>).value.startsWith(
+                'onboarding-occurrence-',
+              ))
+            pill.label,
+      ];
+      expect(labels.toSet(), hasLength(labels.length));
+      await app.tap(key('onboarding-occurrence-9'));
+      await _next(app);
+      await app.tap(key('onboarding-profession-nursing'));
+      await _next(app);
+
+      expect(app.title, 'Listo');
+      // The 10th day of the cycle is a morning (M2 T2 N3 L2 M2...).
+      expect(
+        find.textContaining('Empiezas en el día 10 del ciclo (Mañana)'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('tapping the shift already chosen keeps the cycle day', (
+      tester,
+    ) async {
+      final app = await FirstLaunch.open(tester);
+      await app.choosePath('rotation');
+      await app.tap(key('onboarding-pattern-continental'));
+      await _next(app);
+
+      // Choose the first day of the second morning run (day 10 of the cycle,
+      // offset 9)…
+      await app.tap(key('onboarding-shift-morning'));
+      await app.tap(key('onboarding-occurrence-9'));
+      expect(app.container.read(onboardingControllerProvider).stepOffset, 9);
+      // …and tapping the same shift again must not jump back to its first
+      // day (offset 0).
+      await app.tap(key('onboarding-shift-morning'));
+      expect(app.container.read(onboardingControllerProvider).stepOffset, 9);
+    });
+
+    testWidgets('the catalogue cards talk the app language, not the phone\'s', (
+      tester,
+    ) async {
+      // The database is seeded in the phone's language (English); the app
+      // follows the phone but the person may have another one. Here the
+      // phone is English and the app shows Spanish.
+      debugPhoneLocales = const [Locale('en', 'US')];
+      addTearDown(() => debugPhoneLocales = const [Locale('es', 'ES')]);
+      final app = await FirstLaunch.open(tester);
+      await app.choosePath('rotation');
+
+      // The chips of a card with afternoon and off: Spanish T/L, not the
+      // stored English A/O.
+      final card = key('onboarding-pattern-correturnos');
+      expect(
+        find.descendant(of: card, matching: find.text('T')),
+        findsWidgets,
+        reason: 'Tarde, in the app language',
+      );
+      expect(find.descendant(of: card, matching: find.text('L')), findsWidgets);
+      expect(
+        find.descendant(of: card, matching: find.text('A')),
+        findsNothing,
+        reason: 'the phone\'s English code must not show',
+      );
+      expect(find.descendant(of: card, matching: find.text('O')), findsNothing);
+    });
+
+    testWidgets('the «Así quedará» preview talks the app language too', (
+      tester,
+    ) async {
+      // Found on a real phone (0.8.4): the chips said «Tarde» but the month
+      // preview drew the stored English «A» (Afternoon).
+      debugPhoneLocales = const [Locale('en', 'US')];
+      addTearDown(() => debugPhoneLocales = const [Locale('es', 'ES')]);
+      final app = await FirstLaunch.open(tester);
+      await app.choosePath('rotation');
+      await app.tap(key('onboarding-pattern-correturnos'));
+      await _next(app);
+      await app.tap(key('onboarding-shift-afternoon'));
+
+      final preview = key('onboarding-pattern-preview');
+      await tester.ensureVisible(preview);
+      await tester.pumpAndSettle();
+      expect(
+        find.descendant(of: preview, matching: find.text('T')),
+        findsWidgets,
+        reason: 'Tarde, in the app language',
+      );
+      expect(
+        find.descendant(of: preview, matching: find.text('A')),
+        findsNothing,
+        reason: 'the phone\'s English code must not show',
+      );
+    });
 
     testWidgets('the job chosen at the end orders the catalogue on the way '
         'back, and keeps the rotation', (tester) async {
@@ -521,7 +651,7 @@ void main() {
     testWidgets('back keeps what was chosen, screen by screen', (tester) async {
       final app = await FirstLaunch.open(tester);
       await _toStart(app, preset: 'continental');
-      await app.tap(key('onboarding-offset-3'));
+      await app.selectCycleDay(3);
       await _next(app);
       await _nurseInMadrid(app);
       expect(app.title, '¿Dónde trabajas?');
@@ -540,7 +670,10 @@ void main() {
       expect(app.title, '¿Cuándo empiezas?');
       // Continental, day 4 of the cycle (M M T T N N N ...): a Tarde, with
       // the nurse's hours (the job chosen at the end is already shown).
-      expect(find.text('Ese día te toca: Tarde 15:00–22:00'), findsOneWidget);
+      expect(
+        find.text(keepTimeRangesTogether('Ese día te toca: Tarde 15:00–22:00')),
+        findsOneWidget,
+      );
       await _next(app);
       expect(find.text('Comunidad de Madrid'), findsOneWidget);
     });
@@ -610,7 +743,7 @@ void main() {
     ) async {
       final app = await FirstLaunch.open(tester);
       await _toStart(app);
-      await app.tap(key('onboarding-offset-1'));
+      await app.tap(key('onboarding-shift-night12'));
       await _next(app);
       await app.tap(key('onboarding-profession-nursing'));
       await app.tap(key('onboarding-region'));

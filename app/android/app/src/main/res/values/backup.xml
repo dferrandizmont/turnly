@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  android:allowBackup (AndroidManifest.xml). Android 7 and 8 (API 24-27) cannot
+  require client-side encryption for the Google backup (requireFlags exists from
+  Android 9), so the system backup stays off there: the shifts, notes, absences
+  (sick leave included) and attachments would go to Google unencrypted.
+  values-v28 switches it on for Android 9 and later, where backup_rules.xml and
+  data_extraction_rules.xml only let them out end-to-end encrypted.
+  Question 30 of docs/preguntas.md (4-nov-2026).
+-->
+<resources>
+    <bool name="allow_system_backup">false</bool>
+</resources>

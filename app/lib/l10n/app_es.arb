@@ -347,6 +347,15 @@
       }
     }
   },
+  "dayCellMoreShifts": "+{count}",
+  "@dayCellMoreShifts": {
+    "description": "Turnos del día que no caben en la celda del mes: se ven los dos primeros y «+N» dice cuántos más hay.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "daySheetHoliday": "Festivo: {name}",
   "@daySheetHoliday": {
     "placeholders": {
@@ -1277,6 +1286,75 @@
   "@patternOffsetHelp": {
     "placeholders": {
       "date": {
+        "type": "String"
+      }
+    }
+  },
+  "patternStartShiftTitle": "¿Qué turno te toca ese día?",
+  "patternStartShiftHelp": "El {date}. Elige el turno; si se repite en el ciclo, después eliges cuál.",
+  "@patternStartShiftHelp": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "patternStartOccurrenceTitle": "{shift} se repite: ¿qué día te toca?",
+  "@patternStartOccurrenceTitle": {
+    "description": "Pregunta cuando el turno elegido sale varios días en el ciclo: «Tarde se repite: ¿qué día te toca?».",
+    "placeholders": {
+      "shift": {
+        "type": "String"
+      }
+    }
+  },
+  "patternStartOccurrenceHelp": "Cuenta desde el primero de los días seguidos.",
+  "patternShowCycle": "Ver el ciclo completo",
+  "patternHideCycle": "Ocultar el ciclo completo",
+  "patternOccurrenceInRun": "Día {position} de {count}",
+  "@patternOccurrenceInRun": {
+    "description": "Opción: un día de una racha de días seguidos del mismo turno, «Día 2 de 5». Sin el nombre del turno (va en la pregunta) y sin ordinal con género (el nombre lo pone el usuario).",
+    "placeholders": {
+      "position": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "patternOccurrenceInRunAfter": "Día {position} de {count}, después de {previous}",
+  "@patternOccurrenceInRunAfter": {
+    "description": "Como patternOccurrenceInRun, cuando el turno tiene varias rachas: «Día 1 de 2, después de Libre».",
+    "placeholders": {
+      "position": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "previous": {
+        "type": "String"
+      }
+    }
+  },
+  "patternOccurrenceAfter": "Después de {previous}",
+  "@patternOccurrenceAfter": {
+    "description": "Racha de un solo día cuando el turno tiene varias: «Después de Noche».",
+    "placeholders": {
+      "previous": {
+        "type": "String"
+      }
+    }
+  },
+  "patternOccurrenceRun": "Tanda {run} · {label}",
+  "@patternOccurrenceRun": {
+    "description": "Numera la tanda cuando el turno tiene varias: «Tanda 2 · 1.º de 2 · Mañana, después de Libre».",
+    "placeholders": {
+      "run": {
+        "type": "int"
+      },
+      "label": {
         "type": "String"
       }
     }
@@ -2885,10 +2963,16 @@
     }
   },
   "backupUiCopyRestore": "Restaurar esta",
-  "backupUiCopyRestoreLabel": "Restaurar la copia del {when}",
+  "backupUiCopyRestoreLabel": "{day, select, today{Restaurar la copia de hoy a las {time}} yesterday{Restaurar la copia de ayer a las {time}} other{Restaurar la copia del {date} a las {time}}}",
   "@backupUiCopyRestoreLabel": {
     "placeholders": {
-      "when": {
+      "day": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "date": {
         "type": "String"
       }
     }
@@ -4245,5 +4329,48 @@
         "type": "String"
       }
     }
-  }
+  },
+  "resetTitle": "Borrar todo y empezar de cero",
+  "resetIntro": "Se borrará todo esto de Turnly:",
+  "resetCalendars": "Todos los calendarios y sus turnos, rotaciones y excepciones.",
+  "resetNotes": "Notas, adjuntos (fotos, dibujos y archivos) y tareas.",
+  "resetAbsences": "Vacaciones, permisos y ausencias.",
+  "resetSwaps": "El libro de cambios.",
+  "resetAlarms": "Alarmas y avisos programados.",
+  "resetWidget": "El contenido del widget.",
+  "resetDnd": "Las reglas y ventanas de No molestar.",
+  "resetCalendarEvents": "Los eventos que Mantener al día escribió en el calendario del móvil.",
+  "resetPreferences": "Todos los ajustes.",
+  "resetKeepLanguage": "Solo conservamos el idioma de la app. La copia de seguridad se queda en el móvil y podrás restaurarla en el primer uso.",
+  "resetBackupPreparing": "Guardando la copia…",
+  "resetBackupSaved": "Antes de borrar guardamos una copia: {file}",
+  "resetShare": "Guardar la copia en otro sitio",
+  "resetDelete": "Borrar todo",
+  "resetConfirmTitle": "¿Borrar todo?",
+  "resetConfirmBody": "No se puede deshacer, pero tienes la copia del {date}.",
+  "resetBackupFailed": "No se ha podido guardar y comprobar la copia de seguridad. No se ha borrado nada. Revisa el espacio del móvil y vuelve a intentarlo.",
+  "resetShareFailed": "No se ha podido compartir la copia. La copia local sigue guardada en el móvil.",
+  "resetFailed": "No se ha podido completar el borrado. Tu copia de seguridad sigue guardada en el móvil. Vuelve a intentarlo.",
+  "@resetBackupSaved": {
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "@resetConfirmBody": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "resetHolidays": "Los festivos que añadiste a mano.",
+  "resetShareLink": "El enlace que compartiste.",
+  "resetFolderBackup": "La copia diaria en tu carpeta (los archivos que ya hay se quedan donde están).",
+  "resetDeleting": "Borrando…",
+  "resetCleanupWarning": "Algunos datos del sistema no se han podido limpiar.",
+  "resetCalendarCleanupWarning": "Algunos eventos del calendario del móvil no se han podido quitar.",
+  "backupUiCopyPreReset": "Antes de empezar de cero",
+  "backupUiOriginPreReset": "Copia de justo antes de empezar de cero"
 }

@@ -147,6 +147,16 @@ class AutoBackupRunner {
     return _attempt();
   }
 
+  /// Drain before reset; no new automatic copies while rows are replaced.
+  Future<void> pause() async {
+    enabled = false;
+    try {
+      await _running;
+    } catch (_) {
+      // Reset takes its own strict copy and reports that attempt separately.
+    }
+  }
+
   void dispose() {
     _disposed = true;
     _timer?.cancel();

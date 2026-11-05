@@ -10,6 +10,7 @@ import 'sections/backup_section.dart';
 import 'sections/help_section.dart';
 import 'sections/money_section.dart';
 import 'sections/schedule_section.dart';
+import 'sections/reset_section.dart';
 
 /// Settings (`/ajustes`): grouped sections of rows, each with its state at
 /// the right (`docs/diseno.md`, design 6A). Each
@@ -19,7 +20,7 @@ class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   /// Design 6A: Mi calendario · Horas y dinero (P9) · Avisos y widget · Copias y cambio de móvil
-  /// · Apariencia · Ayuda.
+  /// · Apariencia · Ayuda · Borrar todo (grupo destructivo final).
   static const List<Widget> _sections = [
     ScheduleSection(),
     MoneySection(),
@@ -27,6 +28,7 @@ class SettingsScreen extends StatelessWidget {
     BackupSection(),
     AppearanceSection(),
     HelpSection(),
+    ResetSection(),
   ];
 
   @override

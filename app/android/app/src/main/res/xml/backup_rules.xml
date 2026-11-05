@@ -1,21 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Auto Backup rules for Android 11 and below (android:fullBackupContent).
+  Auto Backup rules for Android 9 to 11 (android:fullBackupContent).
   Android 12+ uses data_extraction_rules.xml instead; keep the two in step.
-  See docs/copia-de-seguridad.md, "Copia del sistema de Android".
+  Android 7 and 8 have no system backup at all (values/backup.xml).
+  See docs/copia-de-seguridad.md, "Copia del sistema de Android", and
+  question 30 of docs/preguntas.md.
 
   Application Support on Android is the app's files/ directory, which is the
-  "file" domain: cuadrante.sqlite (the database) and backups/ (the .cuadrante
-  copies, the copies made before a restore and before a migration).
+  "file" domain: cuadrante.sqlite (the database: shifts, notes, amounts,
+  absences, sick leave included), backups/ (the .turnly copies) and
+  attachments/ (the photos, drawings and files of the notes).
+
+  They only leave the phone in two ways:
+  - clientSideEncryption: the Google backup, only when it is end-to-end
+    encrypted with the user's screen lock (no lock, no backup), so Google
+    cannot read it and Play's Data safety does not count it as collected;
+  - deviceToDeviceTransfer: straight from the old phone to the new one.
 
   As soon as there is an <include>, only what is included is backed up, so the
   shared preferences (the scheduled alarms of flutter_local_notifications, which
   are derived from the data and planned again at start-up), the cache, the
-  code cache and no_backup/ stay out. Caches and temporary exports (the .cuadrante
+  code cache and no_backup/ stay out. Caches and temporary exports (the .turnly
   handed to the share sheet) live in cache/, which is never backed up.
 -->
 <full-backup-content>
-    <include domain="file" path="."/>
+    <include domain="file" path="." requireFlags="clientSideEncryption"/>
+    <include domain="file" path="." requireFlags="deviceToDeviceTransfer"/>
     <!-- The folder copy's record (state, lock, temporary files): the folder's
          permission does not travel to another phone, so neither does this. -->
     <exclude domain="file" path="folder_backup/"/>

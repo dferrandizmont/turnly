@@ -7,11 +7,10 @@ import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../calendar/application/schedule_controller.dart';
-import '../../calendar/presentation/shift_format.dart';
 import '../../patterns/domain/pattern_catalog.dart';
+import '../../patterns/presentation/cycle_start_picker.dart';
 import '../../patterns/presentation/pattern_wizard_screen.dart'
     show PatternCard, PatternDateTile, patternFullDate, pickPatternDate;
-import '../../patterns/presentation/step_chips.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../application/onboarding_controller.dart';
 import '../domain/profession.dart';
@@ -48,6 +47,9 @@ class RotationStep extends ConsumerWidget {
         description: p.description,
         steps: p.steps,
         schedule: schedule,
+        // The factory catalogue talks the app's language from the first
+        // frame, not the phone's (the seeded type may be in another one).
+        shiftOf: (id) => shiftTypeForFirstUse(schedule, id),
         selected: state.presetId == p.id,
         onTap: () => controller.selectPreset(p.id),
       ),
@@ -118,7 +120,6 @@ class StartStep extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final type = context.type;
-    final colors = context.colors;
     final format = AppDateFormat.of(context);
     final state = ref.watch(onboardingControllerProvider);
     final controller = ref.read(onboardingControllerProvider.notifier);
@@ -132,12 +133,7 @@ class StartStep extends ConsumerWidget {
     if (id == null) return const SizedBox.shrink();
     final preset = patternPresetById(id);
     final pattern = presetPattern(schedule, preset);
-    final offset = state.stepOffset % pattern.lengthDays;
     final start = state.start;
-
-    List<ShiftType> shiftsOf(List<String> ids) => [
-      for (final shiftId in ids) ?shiftTypeForDisplay(schedule, shiftId),
-    ];
 
     final suggested = preset.suggestedStart;
     final weekdays = {
@@ -176,46 +172,16 @@ class StartStep extends ConsumerWidget {
             ),
           ),
         const SizedBox(height: Sp.section),
-        Semantics(
-          header: true,
-          child: Text(l10n.patternOffsetTitle, style: type.bodyStrong),
-        ),
-        const SizedBox(height: Sp.xs),
-        Text(
-          l10n.patternOffsetHelp(
-            format.weekdayDayMonth(
-              DateTime(start.year, start.month, start.day),
-            ),
-          ),
-          style: type.meta,
-        ),
-        const SizedBox(height: Sp.m),
-        Wrap(
-          // The cells are 48 dp wide to the touch: their own margin is the gap.
-          runSpacing: Sp.xs,
-          children: [
-            for (final (i, step) in pattern.steps.indexed)
-              StepChip(
-                key: ValueKey('onboarding-offset-$i'),
-                size: Disc.m,
-                shifts: shiftsOf(step),
-                selected: i == offset,
-                caption: '${i + 1}',
-                semanticsLabel: l10n.patternChipDay(
-                  i + 1,
-                  shiftsLine(l10n, format, shiftsOf(step)),
-                ),
-                onTap: () => controller.setStepOffset(i),
-              ),
-          ],
-        ),
-        const SizedBox(height: Sp.m),
-        Text(
-          l10n.patternOffsetThatDay(
-            shiftsLine(l10n, format, shiftsOf(pattern.steps[offset])),
-          ),
-          key: const ValueKey('onboarding-offset-result'),
-          style: type.body.copyWith(color: colors.textSecondary),
+        // The same picker and live preview as the pattern wizard: the factory
+        // catalogue talks the app's language from the first frame.
+        CycleStartPicker(
+          keyPrefix: 'onboarding-',
+          steps: pattern.steps,
+          shiftOf: (id) => shiftTypeForFirstUse(schedule, id),
+          offset: state.stepOffset,
+          onOffsetChanged: controller.setStepOffset,
+          start: start,
+          plan: ref.watch(onboardingPreviewProvider),
         ),
       ],
     );

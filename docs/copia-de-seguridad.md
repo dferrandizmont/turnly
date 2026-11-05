@@ -731,6 +731,8 @@ las tablas del usuario (`AppDatabase.tableUpdates`: lo que escriba cualquier pan
 pasado el tiempo que marca `AutoBackupPolicy`, hace una copia con `BackupService.backupNow` en la carpeta
 `<Application Support>/backups`. La lectura de la base sigue en su conexión; la serialización, suma de control,
 compresión y validación de los bytes persistidos pasan por `BackupTaskRunner` (`Isolate.run` en la app).
+Las copias automáticas esperan a que termine el primer uso: `onboarding.resetPending` las bloquea también después
+de reiniciar la app. Al terminar el primer uso vuelven a activarse según el interruptor de copias automáticas.
 Exportar, guardar en el móvil y crear/verificar la copia previa a restaurar usan el mismo aislamiento.
 Solo se envían datos planos al isolate, nunca la base de datos ni los providers. La prueba
 `backup_processing_isolate_test.dart` comprueba los puertos de control de las tres codificaciones y las dos
@@ -878,26 +880,28 @@ Archivos), con la app cerrada y abierta.
 
 ## 10. Copia del sistema de Android (Auto Backup)
 
-> **Importante: la copia del sistema SÍ sube los datos a la cuenta de Google del usuario.** Con Auto Backup activado,
-> Android sube periódicamente `files/` (la base de datos y las copias `.turnly`) a la cuenta de Google del usuario.
-> Va **cifrada de extremo a extremo con el bloqueo de pantalla** (PIN, patrón o contraseña) en Android 9 o superior
-> **si el usuario tiene un bloqueo puesto**; sin bloqueo de pantalla, esa clave del usuario no existe. Nosotros no la
-> vemos, pero los datos **sí salen del móvil**: no es cierto que «nunca salgan» de él. Esto incluye las ausencias de
-> salud (baja médica) cuando existan; la **decisión pendiente** sobre cómo tratarlas está en `docs/preguntas.md`
-> (pregunta 13).
+> **Desde el 4-nov-2026 (pregunta 30 de `docs/preguntas.md`), la copia de Google de Turnly solo se hace cifrada de
+> extremo a extremo.** Con Auto Backup activado, Android sube `files/` (la base de datos, con las ausencias y la baja
+> médica, las copias `.turnly` y los adjuntos de las notas) a la cuenta de Google del usuario **solo si el móvil tiene
+> bloqueo de pantalla** (PIN, patrón o contraseña), porque entonces va cifrada con él y Google no la puede leer. Sin
+> bloqueo, Turnly no entra en la copia de Google. El paso directo de un móvil a otro (cable o wifi, al estrenar móvil)
+> no cambia. En Android 7 y 8, que no saben exigir el cifrado, la copia del sistema está apagada. Los datos siguen
+> saliendo del móvil por esa vía, cifrados: no decir que «nunca salen» de él.
 
 Application Support en Android es `files/` (`getFilesDir()`, dominio `file` de Auto Backup): ahí están
-`cuadrante.sqlite` (la base de datos), `backups/` (copias `.turnly`, copias previas a restaurar y a migrar). La caché
+`cuadrante.sqlite` (la base de datos), `backups/` (copias `.turnly`, copias previas a restaurar y a migrar) y
+`attachments/` (los adjuntos de las notas); `folder_backup/` (el registro de la copia en carpeta) se excluye. La caché
 (`getTemporaryDirectory()`: los archivos que se entregan a la hoja de compartir) no se copia nunca.
 
-`AndroidManifest.xml`: `android:allowBackup="true"` explícito, y reglas explícitas para los dos mecanismos:
+`AndroidManifest.xml`: `android:allowBackup="@bool/allow_system_backup"` (`false` en `values/backup.xml`, Android 7–8;
+`true` en `values-v28/backup.xml`), y reglas explícitas para los dos mecanismos:
 
 | Atributo | Fichero | Android | Cubre |
 |---|---|---|---|
-| `android:fullBackupContent` | `res/xml/backup_rules.xml` | ≤ 11 | copia en la nube de Google |
-| `android:dataExtractionRules` | `res/xml/data_extraction_rules.xml` | 12+ | `<cloud-backup>` y `<device-transfer>` (móvil a móvil) |
+| `android:fullBackupContent` | `res/xml/backup_rules.xml` | 9–11 | copia en la nube (`requireFlags="clientSideEncryption"`) y móvil a móvil (`requireFlags="deviceToDeviceTransfer"`) |
+| `android:dataExtractionRules` | `res/xml/data_extraction_rules.xml` | 12+ | `<cloud-backup disableIfNoEncryptionCapabilities="true">` y `<device-transfer>` (móvil a móvil) |
 
-Las tres reglas hacen lo mismo: `<include domain="file" path="."/>`. En cuanto hay un `<include>`, solo entra lo
+Todas incluyen lo mismo: `<include domain="file" path="."/>` menos `folder_backup/`; solo cambia la condición. En cuanto hay un `<include>`, solo entra lo
 incluido: **se excluyen** las preferencias compartidas (las alarmas programadas de `flutter_local_notifications`, que se
 vuelven a calcular de los datos al arrancar, no deben viajar a otro móvil), la caché, `code_cache` y `no_backup/`. Se
 incluyen a propósito también las copias `.turnly` de `backups/`: si la base de datos se copiara a medio escribir, la
@@ -915,6 +919,24 @@ sistema `backup_enabled`, que no es API pública: si el teléfono no lo da (Sams
 es `unknown` y la pantalla lo dice tal cual en vez de adivinar. Un `unknown` no es un error.
 
 ### Cómo probarlo (filas A de la matriz)
+
+**Prueba automática (4-nov-2026):** `tool/qa/backup_android.sh` (agente de QA), en el emulador de la API 36 con el
+transporte local de AOSP. B01: sin cifrado, tras `bmgr backupnow`, desinstalar e instalar, no vuelve ni la base de datos
+ni un adjunto. B02: igual con `fake_encryption_flag=true`, que pone a propósito una bandera de prueba **falsa**
+(`FLAG_FAKE_CLIENT_SIDE_ENCRYPTION_ENABLED`), no la real, así que tampoco sale nada. B03: `allow_system_backup` es
+`false` de serie y `true` desde la v28 en el APK. Control: con las reglas anteriores, B01 y B02 sí traían los datos de
+vuelta. Cada caso arranca su emulador: en un mismo arranque solo la primera restauración funciona, sean cuales sean las
+reglas.
+
+**Lo que el emulador no puede probar:** que con bloqueo de pantalla la copia de Google **sí** lleve Turnly (solo el
+transporte de Google da la bandera real de cifrado, y hace falta una cuenta). Comprobación manual en un móvil con
+cuenta de Google, copia activada y bloqueo de pantalla: `adb shell bmgr backupnow es.cuadrante.app` debe acabar en
+`Success` para el paquete; quitando el bloqueo, debe salir rechazado o sin datos. **Hecho el 4-nov-2026** en la
+Redmi Pad 2 Pro (Android 16, API 36, bloqueo con credencial, copia de Google activada) con
+`turnly-0.8.4-copia-cifrada.apk` (versionCode 775, commit `7053074`, instalado encima de la 0.8.4 sin borrar datos):
+`bmgr backupnow` subió los 507 392 bytes de Turnly con `Success`. La parte sin bloqueo no se probó en el móvil real
+(habría que quitar el bloqueo del usuario); la cubre el emulador (B01 y B02). Lo de Android 9–11 (`requireFlags`) y
+7–8 tampoco se prueba aquí (solo hay AVD de la API 36): se apoya en la documentación de Android y en B03.
 
 Con un móvil o emulador con servicios de Google y la copia activada (Ajustes › Sistema › Copia de seguridad):
 
@@ -1166,3 +1188,14 @@ error, sin plugin, validaciones de ida y vuelta), `folder_backup_task_test.dart`
 WorkManager, pasada en segundo plano con base real solo lectura) y `folder_backup_section_test.dart` (el bloque entero
 dentro de la pantalla de copia). El Kotlin se prueba en un móvil real (matriz: carpeta local, tarjeta, Drive, Dropbox,
 revocar en Ajustes de Android, borrar la carpeta, llenar el almacenamiento).
+
+### Copia de seguridad antes de empezar de cero
+
+«Borrar todo y empezar de cero» guarda y vuelve a leer una copia `pre-reset-*.turnly` antes de vaciar la base.
+La copia se crea al abrir la pantalla y se reutiliza al confirmar si sigue en disco y se decodifica; si no,
+se exige una nueva copia verificada antes de confirmar el borrado.
+Comparte la carpeta local `backups/` con las demás copias, pero tiene una tienda propia: conserva las dos últimas
+copias verificadas y no participa en la rotación de las automáticas ni en iCloud. Una copia que no se puede
+verificar se elimina antes de fallar y nunca sustituye una copia buena. Se muestra como copia de seguridad en
+Recuperar, también desde el primer uso. La copia diaria en una carpeta se desactiva y olvida su permiso; los
+archivos que ya había en esa carpeta se conservan.

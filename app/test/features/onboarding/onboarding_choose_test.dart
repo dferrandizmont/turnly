@@ -60,7 +60,7 @@ void main() {
       await app.choosePath('rotation');
       await app.tap(key('onboarding-pattern-12h'));
       await app.tap(key('onboarding-next'));
-      await app.tap(key('onboarding-offset-1'));
+      await app.selectCycleDay(1);
       await app.tap(key('onboarding-next'));
       await app.tap(key('onboarding-profession-nursing'));
       await app.tap(key('onboarding-region'));

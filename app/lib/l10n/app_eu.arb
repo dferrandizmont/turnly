@@ -339,6 +339,7 @@
       }
     }
   },
+  "dayCellMoreShifts": "+{count}",
   "daySheetHoliday": "Jaieguna: {name}",
   "@daySheetHoliday": {
     "placeholders": {
@@ -1137,6 +1138,76 @@
   "@patternOffsetHelp": {
     "placeholders": {
       "date": {
+        "type": "String"
+      }
+    }
+  },
+  "patternStartShiftTitle": "Zein txanda dagokizu egun horretan?",
+  "patternStartShiftHelp": "Data: {date}. Aukeratu txanda; zikloan errepikatzen bada, gero zein den aukeratuko duzu.",
+  "@patternStartShiftHelp": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "patternStartOccurrenceTitle": "{shift} errepikatu egiten da: zein egun dagokizu?",
+  "patternStartOccurrenceHelp": "Jarraian dauden egunetatik lehenengotik hasita zenbatu.",
+  "patternShowCycle": "Ikusi ziklo osoa",
+  "patternHideCycle": "Ezkutatu ziklo osoa",
+  "patternOccurrenceInRun": "{position}. eguna, guztira {count}",
+  "@patternOccurrenceInRun": {
+    "description": "Hainbat eguneko sortaren eguna: «5 egunetan, 2. eguna · Goiza».",
+    "placeholders": {
+      "ordinal": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "shift": {
+        "type": "String"
+      }
+    }
+  },
+  "patternOccurrenceInRunAfter": "{position}. eguna, guztira {count} · Aurrekoa: {previous}",
+  "@patternOccurrenceInRunAfter": {
+    "description": "Sortaren eguna, zein sortatakoa den esanda: «2 egunetan, 1. eguna · Libre · Aurrekoa: Gaua».",
+    "placeholders": {
+      "ordinal": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "shift": {
+        "type": "String"
+      },
+      "previous": {
+        "type": "String"
+      }
+    }
+  },
+  "patternOccurrenceAfter": "Aurrekoa: {previous}",
+  "@patternOccurrenceAfter": {
+    "description": "Egun bakarreko sorta: «Libre · Aurrekoa: Arratsaldea».",
+    "placeholders": {
+      "shift": {
+        "type": "String"
+      },
+      "previous": {
+        "type": "String"
+      }
+    }
+  },
+  "patternOccurrenceRun": "{run}. sorta · {label}",
+  "@patternOccurrenceRun": {
+    "description": "Sorta zenbatzen du txandak hainbat sorta dituenean: «2. sorta · 2 egunetan, 1. eguna · Goiza · Aurrekoa: Libre».",
+    "placeholders": {
+      "run": {
+        "type": "int"
+      },
+      "label": {
         "type": "String"
       }
     }
@@ -2525,10 +2596,16 @@
   },
   "backupUiCopyMetaVersion": "{kind} · {version} · {size}",
   "backupUiCopyRestore": "Leheneratu hau",
-  "backupUiCopyRestoreLabel": "Leheneratu kopia ({when})",
+  "backupUiCopyRestoreLabel": "{day, select, today{Leheneratu gaurko kopia ({time})} yesterday{Leheneratu atzoko kopia ({time})} other{Leheneratu kopia ({date}, {time})}}",
   "@backupUiCopyRestoreLabel": {
     "placeholders": {
-      "when": {
+      "day": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "date": {
         "type": "String"
       }
     }
@@ -3652,5 +3729,48 @@
         "type": "String"
       }
     }
-  }
+  },
+  "resetTitle": "Dena ezabatu eta hutsetik hasi",
+  "resetIntro": "Hau guztia ezabatuko da Turnly aplikaziotik:",
+  "resetCalendars": "Egutegi guztiak eta haien txandak, txandakatzeak eta salbuespenak.",
+  "resetNotes": "Oharrak, eranskinak (argazkiak, marrazkiak eta fitxategiak) eta zereginak.",
+  "resetAbsences": "Oporrak, baimenak eta absentziak.",
+  "resetSwaps": "Aldaketen liburua.",
+  "resetAlarms": "Alarmak eta programatutako abisuak.",
+  "resetWidget": "Widgetaren edukia.",
+  "resetDnd": "Ez molestatu moduaren arauak eta denbora-tarteak.",
+  "resetCalendarEvents": "Eguneratuta mantendu aukerak mugikorreko egutegian idatzitako gertaerak.",
+  "resetPreferences": "Ezarpen guztiak.",
+  "resetKeepLanguage": "Aplikazioaren hizkuntza bakarrik gordeko dugu. Babeskopia mugikorrean geratuko da, eta lehen erabileran leheneratu ahal izango duzu.",
+  "resetBackupPreparing": "Kopia gordetzen…",
+  "resetBackupSaved": "Ezabatu aurretik kopia bat gordeko dugu: {file}",
+  "resetShare": "Gorde kopia beste leku batean",
+  "resetDelete": "Ezabatu dena",
+  "resetConfirmTitle": "Dena ezabatu?",
+  "resetConfirmBody": "Ezin da desegin, baina data honetako kopia duzu: {date}.",
+  "resetBackupFailed": "Ezin izan da babeskopia gorde eta egiaztatu. Ez da ezer ezabatu. Begiratu mugikorreko espazioa eta saiatu berriro.",
+  "resetShareFailed": "Ezin izan da kopia partekatu. Kopia lokala mugikorrean gordeta dago oraindik.",
+  "resetFailed": "Ezin izan da ezabatzea amaitu. Babeskopia mugikorrean gordeta dago oraindik. Saiatu berriro.",
+  "@resetBackupSaved": {
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "@resetConfirmBody": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "resetHolidays": "Eskuz gehitu dituzun jaiegunak.",
+  "resetShareLink": "Partekatu duzun esteka.",
+  "resetFolderBackup": "Zure karpetako eguneroko kopia (lehendik dauden fitxategiak bertan geratuko dira).",
+  "resetDeleting": "Ezabatzen…",
+  "resetCleanupWarning": "Sistemako datu batzuk garbitu gabe geratu dira.",
+  "resetCalendarCleanupWarning": "Mugikorreko egutegiko gertaera batzuk kendu gabe geratu dira.",
+  "backupUiCopyPreReset": "Berriro hasi aurretik",
+  "backupUiOriginPreReset": "Berriro hasi aurretik egindako kopia"
 }

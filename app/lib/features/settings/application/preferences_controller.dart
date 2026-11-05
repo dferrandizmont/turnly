@@ -52,11 +52,32 @@ class PreferencesController extends Notifier<Preferences> {
     (repository) => repository.setThemeMode(mode),
   );
 
-  /// [weekStart] is [WeekStart.monday] or [WeekStart.sunday].
+  /// [weekStart] is [WeekStart.monday] or [WeekStart.sunday]. Choosing the
+  /// value you already have still writes the explicit marker ([force]): a
+  /// country picked later must not change a hand-made choice.
   Future<void> setWeekStart(int weekStart) => _change(
     state.copyWith(weekStart: weekStart),
     (repository) => repository.setWeekStart(weekStart),
+    force: true,
   );
+
+  /// Picking a country applies the formats of that country (its first day of
+  /// the week and its currency) to whatever the person has not chosen by hand
+  /// ([region] is an ISO 3166 alpha-2 code, or `null` when unknown). Called
+  /// from the first use and from Ajustes › Festivos.
+  Future<void> applyRegionDefaults(String? region) async {
+    final previous = state;
+    _touched = true;
+    try {
+      final next = await ref
+          .read(preferencesRepositoryProvider)
+          .applyRegionDefaults(region);
+      if (ref.mounted) state = next;
+    } catch (_) {
+      if (ref.mounted) state = previous;
+      rethrow;
+    }
+  }
 
   Future<void> setWeekNumbers(bool show) => _change(
     state.copyWith(weekNumbers: show),
@@ -76,10 +97,12 @@ class PreferencesController extends Notifier<Preferences> {
   );
 
   /// Ajustes › Apariencia › Moneda ([currency] is an ISO 4217 code). The
-  /// amounts already stored are not converted (`money.dart`).
+  /// amounts already stored are not converted (`money.dart`). Choosing the
+  /// value you already have still writes the explicit marker ([force]).
   Future<void> setCurrency(String currency) => _change(
     state.copyWith(currency: currency),
     (repository) => repository.setCurrency(currency),
+    force: true,
   );
 
   /// Ajustes › Apariencia › Color de acento; the whole app repaints at once
@@ -124,12 +147,16 @@ class PreferencesController extends Notifier<Preferences> {
     (repository) => repository.setCalendarBackground(relativePath),
   );
 
+  /// [force] writes even when [next] equals the current state: a few choices
+  /// (the week start and the currency) also store a marker, so re-choosing the
+  /// same value by hand still has to be written.
   Future<void> _change(
     Preferences next,
-    Future<void> Function(PreferencesRepository repository) write,
-  ) async {
+    Future<void> Function(PreferencesRepository repository) write, {
+    bool force = false,
+  }) async {
     final previous = state;
-    if (next == previous) return;
+    if (!force && next == previous) return;
     _touched = true;
     state = next;
     try {

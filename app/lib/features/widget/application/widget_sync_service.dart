@@ -17,10 +17,12 @@ class WidgetSyncService {
   WidgetSyncService({
     required this.publisher,
     required this.buildSnapshot,
+    this.canPublish,
     this.onError,
   });
 
   final WidgetPublisher publisher;
+  final Future<bool> Function()? canPublish;
 
   /// Builds the snapshot for the current state (primary calendar, holidays,
   /// clock, time zone) with the given texts.
@@ -35,6 +37,17 @@ class WidgetSyncService {
   Timer? _timer;
   Future<void>? _loop;
   bool _disposed = false;
+  bool _paused = false;
+
+  /// Stops triggers and drains an in-flight pass before destructive cleanup.
+  Future<void> pause() async {
+    _paused = true;
+    _timer?.cancel();
+    _timer = null;
+    await _loop;
+  }
+
+  void resume() => _paused = false;
 
   /// Runs that built a snapshot (for tests and diagnostics).
   int runs = 0;
@@ -55,7 +68,7 @@ class WidgetSyncService {
   /// Raises [trigger]. Returns when the run that handles it has finished (a
   /// debounced trigger returns at once).
   Future<void> request(WidgetSyncTrigger trigger) {
-    if (_disposed) return Future.value();
+    if (_disposed || _paused) return Future.value();
     _pending.add(trigger);
     if (trigger.debounce == Duration.zero) {
       _timer?.cancel();
@@ -85,7 +98,10 @@ class WidgetSyncService {
   Future<void> _run() async {
     await null; // never complete synchronously (see `_loop = null` below)
     try {
-      while (_pending.isNotEmpty && !_disposed && _strings != null) {
+      while (_pending.isNotEmpty &&
+          !_disposed &&
+          !_paused &&
+          _strings != null) {
         final batch = List.of(_pending);
         _pending.clear();
         try {
@@ -110,8 +126,12 @@ class WidgetSyncService {
       );
 
   Future<void> _once(WidgetSyncTrigger trigger, WidgetStrings strings) async {
+    if (canPublish != null && !await canPublish!()) {
+      if (!_disposed && !_paused) await publisher.clear();
+      return;
+    }
     final snapshot = await buildSnapshot(strings);
-    if (_disposed) return;
+    if (_disposed || _paused) return;
     runs++;
     lastPlan = await syncWidget(
       publisher: publisher,

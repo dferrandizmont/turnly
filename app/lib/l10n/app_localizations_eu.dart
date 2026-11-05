@@ -267,6 +267,11 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
+  String dayCellMoreShifts(int count) {
+    return '+$count';
+  }
+
+  @override
   String daySheetHoliday(String name) {
     return 'Jaieguna: $name';
   }
@@ -1540,6 +1545,49 @@ class AppLocalizationsEu extends AppLocalizations {
   @override
   String patternOffsetHelp(String date) {
     return 'Ukitu data honetan dagokizun ereduaren eguna: $date.';
+  }
+
+  @override
+  String get patternStartShiftTitle => 'Zein txanda dagokizu egun horretan?';
+
+  @override
+  String patternStartShiftHelp(String date) {
+    return 'Data: $date. Aukeratu txanda; zikloan errepikatzen bada, gero zein den aukeratuko duzu.';
+  }
+
+  @override
+  String patternStartOccurrenceTitle(String shift) {
+    return '$shift errepikatu egiten da: zein egun dagokizu?';
+  }
+
+  @override
+  String get patternStartOccurrenceHelp =>
+      'Jarraian dauden egunetatik lehenengotik hasita zenbatu.';
+
+  @override
+  String get patternShowCycle => 'Ikusi ziklo osoa';
+
+  @override
+  String get patternHideCycle => 'Ezkutatu ziklo osoa';
+
+  @override
+  String patternOccurrenceInRun(int position, int count) {
+    return '$position. eguna, guztira $count';
+  }
+
+  @override
+  String patternOccurrenceInRunAfter(int position, int count, String previous) {
+    return '$position. eguna, guztira $count · Aurrekoa: $previous';
+  }
+
+  @override
+  String patternOccurrenceAfter(String previous) {
+    return 'Aurrekoa: $previous';
+  }
+
+  @override
+  String patternOccurrenceRun(int run, String label) {
+    return '$run. sorta · $label';
   }
 
   @override
@@ -4320,8 +4368,13 @@ class AppLocalizationsEu extends AppLocalizations {
   String get backupUiCopyRestore => 'Leheneratu hau';
 
   @override
-  String backupUiCopyRestoreLabel(String when) {
-    return 'Leheneratu kopia ($when)';
+  String backupUiCopyRestoreLabel(String day, String time, String date) {
+    String _temp0 = intl.Intl.selectLogic(day, {
+      'today': 'Leheneratu gaurko kopia ($time)',
+      'yesterday': 'Leheneratu atzoko kopia ($time)',
+      'other': 'Leheneratu kopia ($date, $time)',
+    });
+    return '$_temp0';
   }
 
   @override
@@ -6532,4 +6585,105 @@ class AppLocalizationsEu extends AppLocalizations {
   ) {
     return '$time, $title, $calendar';
   }
+
+  @override
+  String get resetTitle => 'Dena ezabatu eta hutsetik hasi';
+
+  @override
+  String get resetIntro => 'Hau guztia ezabatuko da Turnly aplikaziotik:';
+
+  @override
+  String get resetCalendars =>
+      'Egutegi guztiak eta haien txandak, txandakatzeak eta salbuespenak.';
+
+  @override
+  String get resetNotes =>
+      'Oharrak, eranskinak (argazkiak, marrazkiak eta fitxategiak) eta zereginak.';
+
+  @override
+  String get resetAbsences => 'Oporrak, baimenak eta absentziak.';
+
+  @override
+  String get resetSwaps => 'Aldaketen liburua.';
+
+  @override
+  String get resetAlarms => 'Alarmak eta programatutako abisuak.';
+
+  @override
+  String get resetWidget => 'Widgetaren edukia.';
+
+  @override
+  String get resetDnd => 'Ez molestatu moduaren arauak eta denbora-tarteak.';
+
+  @override
+  String get resetCalendarEvents =>
+      'Eguneratuta mantendu aukerak mugikorreko egutegian idatzitako gertaerak.';
+
+  @override
+  String get resetPreferences => 'Ezarpen guztiak.';
+
+  @override
+  String get resetKeepLanguage =>
+      'Aplikazioaren hizkuntza bakarrik gordeko dugu. Babeskopia mugikorrean geratuko da, eta lehen erabileran leheneratu ahal izango duzu.';
+
+  @override
+  String get resetBackupPreparing => 'Kopia gordetzen…';
+
+  @override
+  String resetBackupSaved(String file) {
+    return 'Ezabatu aurretik kopia bat gordeko dugu: $file';
+  }
+
+  @override
+  String get resetShare => 'Gorde kopia beste leku batean';
+
+  @override
+  String get resetDelete => 'Ezabatu dena';
+
+  @override
+  String get resetConfirmTitle => 'Dena ezabatu?';
+
+  @override
+  String resetConfirmBody(String date) {
+    return 'Ezin da desegin, baina data honetako kopia duzu: $date.';
+  }
+
+  @override
+  String get resetBackupFailed =>
+      'Ezin izan da babeskopia gorde eta egiaztatu. Ez da ezer ezabatu. Begiratu mugikorreko espazioa eta saiatu berriro.';
+
+  @override
+  String get resetShareFailed =>
+      'Ezin izan da kopia partekatu. Kopia lokala mugikorrean gordeta dago oraindik.';
+
+  @override
+  String get resetFailed =>
+      'Ezin izan da ezabatzea amaitu. Babeskopia mugikorrean gordeta dago oraindik. Saiatu berriro.';
+
+  @override
+  String get resetHolidays => 'Eskuz gehitu dituzun jaiegunak.';
+
+  @override
+  String get resetShareLink => 'Partekatu duzun esteka.';
+
+  @override
+  String get resetFolderBackup =>
+      'Zure karpetako eguneroko kopia (lehendik dauden fitxategiak bertan geratuko dira).';
+
+  @override
+  String get resetDeleting => 'Ezabatzen…';
+
+  @override
+  String get resetCleanupWarning =>
+      'Sistemako datu batzuk garbitu gabe geratu dira.';
+
+  @override
+  String get resetCalendarCleanupWarning =>
+      'Mugikorreko egutegiko gertaera batzuk kendu gabe geratu dira.';
+
+  @override
+  String get backupUiCopyPreReset => 'Berriro hasi aurretik';
+
+  @override
+  String get backupUiOriginPreReset => 'Berriro hasi aurretik egindako kopia';
 }

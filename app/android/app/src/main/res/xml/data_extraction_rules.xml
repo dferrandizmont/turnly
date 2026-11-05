@@ -2,18 +2,26 @@
 <!--
   Data extraction rules for Android 12+ (android:dataExtractionRules): what goes
   into the cloud backup (Google) and into a device-to-device transfer.
-  Android 11 and below use backup_rules.xml; keep the two in step.
-  See docs/copia-de-seguridad.md, "Copia del sistema de Android".
+  Android 9 to 11 use backup_rules.xml; keep the two in step. Android 7 and 8
+  have no system backup at all (values/backup.xml).
+  See docs/copia-de-seguridad.md, "Copia del sistema de Android", and
+  question 30 of docs/preguntas.md.
 
-  Both get the same: the "file" domain, which is files/ (cuadrante.sqlite and
-  backups/). Nothing else: not the shared preferences (the scheduled alarms are
-  derived from the data and planned again at start-up), not the cache, not
+  Both get the "file" domain, which is files/ (cuadrante.sqlite, backups/ and
+  attachments/: shifts, notes, amounts, absences with sick leave, and the
+  notes' photos and files). disableIfNoEncryptionCapabilities: the Google
+  backup only happens when it is end-to-end encrypted with the user's screen
+  lock; without a lock there is no cloud backup of Turnly. The transfer from
+  one phone to another goes straight between the two and is not limited.
+
+  Nothing else: not the shared preferences (the scheduled alarms are derived
+  from the data and planned again at start-up), not the cache, not
   no_backup/. An <include> limits the backup to what it names. folder_backup/
   (the record of the automatic folder copy) is excluded: the folder's
   permission does not travel, so neither does the record of it.
 -->
 <data-extraction-rules>
-    <cloud-backup>
+    <cloud-backup disableIfNoEncryptionCapabilities="true">
         <include domain="file" path="."/>
         <exclude domain="file" path="folder_backup/"/>
     </cloud-backup>

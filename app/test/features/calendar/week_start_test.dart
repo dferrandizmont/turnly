@@ -430,11 +430,14 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(card);
       await tester.pumpAndSettle();
+      // The month preview is on the last step: walk the wizard to it.
       final next = find.byKey(const ValueKey('pattern-next'));
-      await tester.ensureVisible(next);
-      await tester.pumpAndSettle();
-      await tester.tap(next);
-      await tester.pumpAndSettle();
+      while (next.evaluate().isNotEmpty) {
+        await tester.ensureVisible(next);
+        await tester.pumpAndSettle();
+        await tester.tap(next);
+        await tester.pumpAndSettle();
+      }
       await tester.scrollUntilVisible(
         find.byKey(ValueKey('preview-${oct4.toIso()}')),
         300,

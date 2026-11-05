@@ -124,7 +124,9 @@ class BackupActions {
 
   /// A request to preview a stored copy.
   BackupImportRequest requestFor(BackupCopy copy) => BackupImportRequest(
-    origin: copy.kind == BackupCopyKind.safety
+    origin: copy.isPreReset
+        ? BackupImportOrigin.preResetCopy
+        : copy.kind == BackupCopyKind.safety
         ? BackupImportOrigin.safetyCopy
         : BackupImportOrigin.localCopy,
     copyDate: copy.entry.modifiedAt,

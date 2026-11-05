@@ -196,9 +196,11 @@ class _ImportArt extends StatelessWidget {
 }
 
 /// Shift types of the drawings, as the calendar shows them: colour and code
-/// (never colour alone, even in a drawing). Missing ones are left out.
+/// (never colour alone, even in a drawing). Missing ones are left out. Talks
+/// the app's language while the first-use flow is open (see
+/// [shiftTypeForFirstUse]).
 List<ShiftType> _artShifts(Schedule schedule, List<String> ids) => [
-  for (final id in ids) ?shiftTypeForDisplay(schedule, id),
+  for (final id in ids) ?shiftTypeForFirstUse(schedule, id),
 ];
 
 /// The badges of a small grid inside a [Disc.badge] square.

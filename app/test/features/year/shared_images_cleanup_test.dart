@@ -51,4 +51,16 @@ void main() {
   test('a folder that is missing is not an error', () async {
     await deleteStaleSharedImages(Directory(p.join(dir.path, 'nada')));
   });
+  test(
+    'reset removes recent year and month images, preserves unrelated files',
+    () async {
+      final year = make('cuadrante-2026.png', age: Duration.zero);
+      final month = make('cuadrante-2026-11.png', age: Duration.zero);
+      final other = make('photo.png', age: Duration.zero);
+      await deleteStaleSharedImages(dir, now: now, all: true);
+      expect(year.existsSync(), isFalse);
+      expect(month.existsSync(), isFalse);
+      expect(other.existsSync(), isTrue);
+    },
+  );
 }

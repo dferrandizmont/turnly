@@ -508,6 +508,12 @@ class LocalAlarmScheduler implements AlarmScheduler {
   }
 
   @override
+  Future<void> cancelAll() => _mutex.run(() async {
+    await initialize();
+    await _plugin.cancelAll();
+  });
+
+  @override
   Future<void> cancelSnoozes() async {
     await initialize();
     final pending = await _plugin.pendingNotificationRequests();

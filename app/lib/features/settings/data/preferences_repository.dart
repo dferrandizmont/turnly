@@ -67,12 +67,20 @@ class PreferencesRepository {
   /// preference already stored (a restored backup, an earlier run) is never
   /// touched. Existing installations never call this: without a row they
   /// keep Monday, euros and the 24 h clock.
+  ///
+  /// The week start and the currency also get an explicit marker set to
+  /// `false`: they follow the phone's region for now and picking a country in
+  /// the first use (or in Ajustes › Festivos) may change them, until the
+  /// person chooses one by hand ([setWeekStart], [setCurrency]), which flips
+  /// the marker to `true`.
   Future<void> seedRegionDefaults(Iterable<Locale> phone) async {
     final region = regionOfPhone(phone);
     final rows = {
       PreferenceKeys.weekStart: weekStartForRegion(region),
+      PreferenceKeys.weekStartExplicit: false,
       PreferenceKeys.timeFormat: TimeFormatPreference.auto.stored,
       PreferenceKeys.currency: currencyForRegion(region),
+      PreferenceKeys.currencyExplicit: false,
     };
     await _db.batch((b) {
       for (final row in rows.entries) {
@@ -85,15 +93,73 @@ class PreferencesRepository {
     });
   }
 
+  /// Applies the formats of a country ([region]) to the two preferences the
+  /// person has not chosen by hand: the first day of the week and the
+  /// currency. A preference with its explicit marker set to `true` (chosen in
+  /// Ajustes) keeps its value. A **stored** value without a marker (an earlier
+  /// version wrote it) is treated as a hand-made choice too, so picking a
+  /// country never changes it behind the person's back; an installation with
+  /// nothing stored — the usual case before the markers existed — has no
+  /// choice to keep and follows the country like a new one. Returns the
+  /// preferences as they are left.
+  ///
+  /// When a preference is applied, its marker is written as `false` as well:
+  /// a value that came from a country must keep following later country
+  /// changes (a value with no marker would look like a hand-made choice from
+  /// then on, and the second change would be ignored).
+  Future<Preferences> applyRegionDefaults(String? region) =>
+      _db.transaction(() async {
+        if (!await _isExplicit(
+          PreferenceKeys.weekStartExplicit,
+          PreferenceKeys.weekStart,
+        )) {
+          final next = weekStartForRegion(region);
+          final current = await _readValue(PreferenceKeys.weekStart);
+          if (current != next) {
+            await _write(PreferenceKeys.weekStart, next);
+          }
+          await _write(PreferenceKeys.weekStartExplicit, false);
+        }
+        if (!await _isExplicit(
+          PreferenceKeys.currencyExplicit,
+          PreferenceKeys.currency,
+        )) {
+          final next = currencyForRegion(region);
+          final current = await _readValue(PreferenceKeys.currency);
+          if (current != next) await _write(PreferenceKeys.currency, next);
+          await _write(PreferenceKeys.currencyExplicit, false);
+        }
+        return load();
+      });
+
+  /// Whether the preference whose marker is [markerKey] was chosen by hand:
+  /// the marker when it is stored, or (a value from before the marker existed)
+  /// the presence of [valueKey] itself.
+  Future<bool> _isExplicit(String markerKey, String valueKey) async {
+    final marker = await _readValue(markerKey);
+    if (marker is bool) return marker;
+    return await _readValue(valueKey) != null;
+  }
+
+  Future<Object?> _readValue(String key) async {
+    final row = await (_db.select(
+      _db.settings,
+    )..where((s) => s.key.equals(key))).getSingleOrNull();
+    return row == null ? null : _decode(row.value);
+  }
+
   Future<void> setThemeMode(ThemeMode mode) =>
       _write(PreferenceKeys.themeMode, themeModeToStored(mode));
 
   /// Throws [ArgumentError] unless [weekStart] is Monday (1) or Sunday (7).
+  /// A choice made here is kept: the marker ([PreferenceKeys.weekStartExplicit])
+  /// stops a later country change from overwriting it.
   Future<void> setWeekStart(int weekStart) async {
     if (!WeekStart.isValid(weekStart)) {
       throw ArgumentError.value(weekStart, 'weekStart', 'must be 1 or 7');
     }
     await _write(PreferenceKeys.weekStart, weekStart);
+    await _write(PreferenceKeys.weekStartExplicit, true);
   }
 
   Future<void> setWeekNumbers(bool show) =>
@@ -105,7 +171,9 @@ class PreferencesRepository {
   Future<void> setTimeFormat(TimeFormatPreference timeFormat) =>
       _write(PreferenceKeys.timeFormat, timeFormat.stored);
 
-  /// Throws [ArgumentError] unless [currency] is an ISO 4217 code.
+  /// Throws [ArgumentError] unless [currency] is an ISO 4217 code. A choice
+  /// made here is kept: the marker ([PreferenceKeys.currencyExplicit]) stops a
+  /// later country change from overwriting it.
   Future<void> setCurrency(String currency) async {
     if (!isCurrencyCode(currency)) {
       throw ArgumentError.value(
@@ -115,6 +183,7 @@ class PreferencesRepository {
       );
     }
     await _write(PreferenceKeys.currency, currency);
+    await _write(PreferenceKeys.currencyExplicit, true);
   }
 
   Future<void> setAccent(AppAccent accent) =>

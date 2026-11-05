@@ -160,11 +160,20 @@ void main() {
 
         // Today is the second day of the cycle (a Libre).
         expect(
-          find.text(keepTimeRangesTogether('Ese día te toca: Guardia 24 h 08:00–08:00')),
+          find.text(
+            keepTimeRangesTogether('Ese día te toca: Guardia 24 h 08:00–08:00'),
+          ),
           findsOneWidget,
         );
+        await _tap(tester, _key('cycle-toggle'));
         await _tap(tester, _key('offset-1'));
         expect(find.text('Ese día te toca: Libre'), findsOneWidget);
+        // The picker never doubles the preview: it belongs to the last step.
+        expect(_key('pattern-preview'), findsNothing);
+
+        // 3: no end, respect my days (the defaults), apply.
+        await _tap(tester, _key('pattern-next'));
+        expect(find.text('Paso 3 de 3'), findsOneWidget);
 
         // The preview is the engine's result for exactly these choices.
         final request = PatternRequest(
@@ -197,9 +206,6 @@ void main() {
         // Nothing has changed yet.
         expect(_schedule(tester).runs, before);
 
-        // 3: no end, respect my days (the defaults), apply.
-        await _tap(tester, _key('pattern-next'));
-        expect(find.text('Paso 3 de 3'), findsOneWidget);
         await _tap(tester, _key('pattern-apply'));
 
         // Back on the month screen, still painting, with an undo offer.
@@ -293,7 +299,10 @@ void main() {
       // Respect is on by default: the preview keeps the double shift.
       expect(_previewCodes(tester, wed21), containsAll(['M', 'T']));
       await _tap(tester, _key('pattern-replace-overrides'));
-      expect(_previewCodes(tester, wed21), unorderedEquals(['21', 'M', '06–14']));
+      expect(
+        _previewCodes(tester, wed21),
+        unorderedEquals(['21', 'M', '06–14']),
+      );
 
       await _tap(tester, _key('pattern-apply'));
       final s = _schedule(tester);
@@ -309,14 +318,38 @@ void main() {
       await _openWizard(tester);
       await _tap(tester, _key('pattern-card-4x4'));
       await _tap(tester, _key('pattern-next'));
+      await _tap(tester, _key('cycle-toggle'));
       await _tap(tester, _key('offset-3'));
       await _tap(tester, _key('pattern-back'));
       expect(find.text('Paso 1 de 3'), findsOneWidget);
       await _tap(tester, _key('pattern-next'));
       expect(
-        find.text(keepTimeRangesTogether('Ese día te toca: Día 12 h 08:00–20:00')),
+        find.text(
+          keepTimeRangesTogether('Ese día te toca: Día 12 h 08:00–20:00'),
+        ),
         findsOneWidget,
       );
+    });
+
+    testWidgets('a shift that repeats labels each day by its run', (
+      tester,
+    ) async {
+      await _openWizard(tester);
+      // 4 x 4: Día 12 h is one run of four days (day 1 is a Día 12 h).
+      await _tap(tester, _key('pattern-card-4x4'));
+      await _tap(tester, _key('pattern-next'));
+      expect(find.text('Día 2 de 4'), findsOneWidget);
+      // The whole numbered grid stays behind «Ver el ciclo completo».
+      expect(_key('offset-3'), findsNothing);
+      await _tap(tester, _key('occurrence-3'));
+      expect(
+        find.text(
+          keepTimeRangesTogether('Ese día te toca: Día 12 h 08:00–20:00'),
+        ),
+        findsOneWidget,
+      );
+      await _tap(tester, _key('cycle-toggle'));
+      expect(_key('offset-3'), findsOneWidget);
     });
 
     testWidgets('a pattern that needs a missing type creates it on apply', (
@@ -399,6 +432,7 @@ void main() {
 
       await _tap(tester, _key('pattern-next'));
       // Step 2 offers this sequence's days.
+      await _tap(tester, _key('cycle-toggle'));
       expect(_key('offset-0'), findsOneWidget);
       expect(_key('offset-2'), findsOneWidget);
       expect(_key('offset-3'), findsNothing);

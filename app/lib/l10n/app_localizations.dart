@@ -488,6 +488,12 @@ abstract class AppLocalizations {
   /// **'salida anticipada: {duration}'**
   String daySemanticsEarlyLeave(String duration);
 
+  /// Turnos del día que no caben en la celda del mes: se ven los dos primeros y «+N» dice cuántos más hay.
+  ///
+  /// In es, this message translates to:
+  /// **'+{count}'**
+  String dayCellMoreShifts(int count);
+
   /// No description provided for @daySheetHoliday.
   ///
   /// In es, this message translates to:
@@ -2562,6 +2568,66 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Toca el día del patrón que te toca el {date}.'**
   String patternOffsetHelp(String date);
+
+  /// No description provided for @patternStartShiftTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Qué turno te toca ese día?'**
+  String get patternStartShiftTitle;
+
+  /// No description provided for @patternStartShiftHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'El {date}. Elige el turno; si se repite en el ciclo, después eliges cuál.'**
+  String patternStartShiftHelp(String date);
+
+  /// Pregunta cuando el turno elegido sale varios días en el ciclo: «Tarde se repite: ¿qué día te toca?».
+  ///
+  /// In es, this message translates to:
+  /// **'{shift} se repite: ¿qué día te toca?'**
+  String patternStartOccurrenceTitle(String shift);
+
+  /// No description provided for @patternStartOccurrenceHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuenta desde el primero de los días seguidos.'**
+  String get patternStartOccurrenceHelp;
+
+  /// No description provided for @patternShowCycle.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver el ciclo completo'**
+  String get patternShowCycle;
+
+  /// No description provided for @patternHideCycle.
+  ///
+  /// In es, this message translates to:
+  /// **'Ocultar el ciclo completo'**
+  String get patternHideCycle;
+
+  /// Opción: un día de una racha de días seguidos del mismo turno, «Día 2 de 5». Sin el nombre del turno (va en la pregunta) y sin ordinal con género (el nombre lo pone el usuario).
+  ///
+  /// In es, this message translates to:
+  /// **'Día {position} de {count}'**
+  String patternOccurrenceInRun(int position, int count);
+
+  /// Como patternOccurrenceInRun, cuando el turno tiene varias rachas: «Día 1 de 2, después de Libre».
+  ///
+  /// In es, this message translates to:
+  /// **'Día {position} de {count}, después de {previous}'**
+  String patternOccurrenceInRunAfter(int position, int count, String previous);
+
+  /// Racha de un solo día cuando el turno tiene varias: «Después de Noche».
+  ///
+  /// In es, this message translates to:
+  /// **'Después de {previous}'**
+  String patternOccurrenceAfter(String previous);
+
+  /// Numera la tanda cuando el turno tiene varias: «Tanda 2 · 1.º de 2 · Mañana, después de Libre».
+  ///
+  /// In es, this message translates to:
+  /// **'Tanda {run} · {label}'**
+  String patternOccurrenceRun(int run, String label);
 
   /// No description provided for @patternOffsetThatDay.
   ///
@@ -6730,8 +6796,8 @@ abstract class AppLocalizations {
   /// No description provided for @backupUiCopyRestoreLabel.
   ///
   /// In es, this message translates to:
-  /// **'Restaurar la copia del {when}'**
-  String backupUiCopyRestoreLabel(String when);
+  /// **'{day, select, today{Restaurar la copia de hoy a las {time}} yesterday{Restaurar la copia de ayer a las {time}} other{Restaurar la copia del {date} a las {time}}}'**
+  String backupUiCopyRestoreLabel(String day, String time, String date);
 
   /// No description provided for @backupUiWhenToday.
   ///
@@ -10417,6 +10483,180 @@ abstract class AppLocalizations {
     String title,
     String calendar,
   );
+
+  /// No description provided for @resetTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Borrar todo y empezar de cero'**
+  String get resetTitle;
+
+  /// No description provided for @resetIntro.
+  ///
+  /// In es, this message translates to:
+  /// **'Se borrará todo esto de Turnly:'**
+  String get resetIntro;
+
+  /// No description provided for @resetCalendars.
+  ///
+  /// In es, this message translates to:
+  /// **'Todos los calendarios y sus turnos, rotaciones y excepciones.'**
+  String get resetCalendars;
+
+  /// No description provided for @resetNotes.
+  ///
+  /// In es, this message translates to:
+  /// **'Notas, adjuntos (fotos, dibujos y archivos) y tareas.'**
+  String get resetNotes;
+
+  /// No description provided for @resetAbsences.
+  ///
+  /// In es, this message translates to:
+  /// **'Vacaciones, permisos y ausencias.'**
+  String get resetAbsences;
+
+  /// No description provided for @resetSwaps.
+  ///
+  /// In es, this message translates to:
+  /// **'El libro de cambios.'**
+  String get resetSwaps;
+
+  /// No description provided for @resetAlarms.
+  ///
+  /// In es, this message translates to:
+  /// **'Alarmas y avisos programados.'**
+  String get resetAlarms;
+
+  /// No description provided for @resetWidget.
+  ///
+  /// In es, this message translates to:
+  /// **'El contenido del widget.'**
+  String get resetWidget;
+
+  /// No description provided for @resetDnd.
+  ///
+  /// In es, this message translates to:
+  /// **'Las reglas y ventanas de No molestar.'**
+  String get resetDnd;
+
+  /// No description provided for @resetCalendarEvents.
+  ///
+  /// In es, this message translates to:
+  /// **'Los eventos que Mantener al día escribió en el calendario del móvil.'**
+  String get resetCalendarEvents;
+
+  /// No description provided for @resetPreferences.
+  ///
+  /// In es, this message translates to:
+  /// **'Todos los ajustes.'**
+  String get resetPreferences;
+
+  /// No description provided for @resetKeepLanguage.
+  ///
+  /// In es, this message translates to:
+  /// **'Solo conservamos el idioma de la app. La copia de seguridad se queda en el móvil y podrás restaurarla en el primer uso.'**
+  String get resetKeepLanguage;
+
+  /// No description provided for @resetBackupPreparing.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardando la copia…'**
+  String get resetBackupPreparing;
+
+  /// No description provided for @resetBackupSaved.
+  ///
+  /// In es, this message translates to:
+  /// **'Antes de borrar guardamos una copia: {file}'**
+  String resetBackupSaved(String file);
+
+  /// No description provided for @resetShare.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar la copia en otro sitio'**
+  String get resetShare;
+
+  /// No description provided for @resetDelete.
+  ///
+  /// In es, this message translates to:
+  /// **'Borrar todo'**
+  String get resetDelete;
+
+  /// No description provided for @resetConfirmTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Borrar todo?'**
+  String get resetConfirmTitle;
+
+  /// No description provided for @resetConfirmBody.
+  ///
+  /// In es, this message translates to:
+  /// **'No se puede deshacer, pero tienes la copia del {date}.'**
+  String resetConfirmBody(String date);
+
+  /// No description provided for @resetBackupFailed.
+  ///
+  /// In es, this message translates to:
+  /// **'No se ha podido guardar y comprobar la copia de seguridad. No se ha borrado nada. Revisa el espacio del móvil y vuelve a intentarlo.'**
+  String get resetBackupFailed;
+
+  /// No description provided for @resetShareFailed.
+  ///
+  /// In es, this message translates to:
+  /// **'No se ha podido compartir la copia. La copia local sigue guardada en el móvil.'**
+  String get resetShareFailed;
+
+  /// No description provided for @resetFailed.
+  ///
+  /// In es, this message translates to:
+  /// **'No se ha podido completar el borrado. Tu copia de seguridad sigue guardada en el móvil. Vuelve a intentarlo.'**
+  String get resetFailed;
+
+  /// No description provided for @resetHolidays.
+  ///
+  /// In es, this message translates to:
+  /// **'Los festivos que añadiste a mano.'**
+  String get resetHolidays;
+
+  /// No description provided for @resetShareLink.
+  ///
+  /// In es, this message translates to:
+  /// **'El enlace que compartiste.'**
+  String get resetShareLink;
+
+  /// No description provided for @resetFolderBackup.
+  ///
+  /// In es, this message translates to:
+  /// **'La copia diaria en tu carpeta (los archivos que ya hay se quedan donde están).'**
+  String get resetFolderBackup;
+
+  /// No description provided for @resetDeleting.
+  ///
+  /// In es, this message translates to:
+  /// **'Borrando…'**
+  String get resetDeleting;
+
+  /// No description provided for @resetCleanupWarning.
+  ///
+  /// In es, this message translates to:
+  /// **'Algunos datos del sistema no se han podido limpiar.'**
+  String get resetCleanupWarning;
+
+  /// No description provided for @resetCalendarCleanupWarning.
+  ///
+  /// In es, this message translates to:
+  /// **'Algunos eventos del calendario del móvil no se han podido quitar.'**
+  String get resetCalendarCleanupWarning;
+
+  /// No description provided for @backupUiCopyPreReset.
+  ///
+  /// In es, this message translates to:
+  /// **'Antes de empezar de cero'**
+  String get backupUiCopyPreReset;
+
+  /// No description provided for @backupUiOriginPreReset.
+  ///
+  /// In es, this message translates to:
+  /// **'Copia de justo antes de empezar de cero'**
+  String get backupUiOriginPreReset;
 }
 
 class _AppLocalizationsDelegate

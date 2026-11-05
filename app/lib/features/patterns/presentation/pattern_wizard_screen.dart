@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/format/app_date_format.dart';
-import '../../../core/format/text_wrap.dart';
 import '../../../core/icons/app_icons.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme_context.dart';
@@ -19,7 +18,7 @@ import '../../calendar/presentation/shift_format.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../application/pattern_wizard.dart';
 import '../domain/pattern_catalog.dart';
-import 'mini_month.dart';
+import 'cycle_start_picker.dart';
 import 'pattern_builder.dart';
 import 'step_chips.dart';
 import '../../../core/widgets/app_snack_bar.dart';
@@ -408,6 +407,7 @@ class PatternCard extends StatelessWidget {
     required this.schedule,
     required this.selected,
     required this.onTap,
+    this.shiftOf,
   });
 
   final String name;
@@ -416,6 +416,11 @@ class PatternCard extends StatelessWidget {
   final Schedule schedule;
   final bool selected;
   final VoidCallback onTap;
+
+  /// Resolves a shift id to the type to draw for the chips; the first-use
+  /// flow passes [shiftTypeForFirstUse] so a factory type talks the app's
+  /// language. `null`: the stored type ([shiftTypeForDisplay]).
+  final ShiftType? Function(String id)? shiftOf;
 
   @override
   Widget build(BuildContext context) {
@@ -445,7 +450,7 @@ class PatternCard extends StatelessWidget {
             Text(description!, style: type.meta),
           ],
           const SizedBox(height: Sp.m),
-          SequenceChips(steps: steps, schedule: schedule),
+          SequenceChips(steps: steps, schedule: schedule, shiftOf: shiftOf),
         ],
       ),
     );
@@ -521,7 +526,6 @@ class _StartStep extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final colors = context.colors;
     final type = context.type;
     final format = AppDateFormat.of(context);
     final provider = patternWizardProvider(args);
@@ -538,11 +542,6 @@ class _StartStep extends ConsumerWidget {
     final preset = wizard.presetId == null
         ? null
         : patternPresetById(wizard.presetId!);
-    final offset = wizard.stepOffset % pattern.lengthDays;
-    final shiftsThatDay = [
-      for (final id in pattern.steps[offset])
-        ?shiftTypeForDisplay(schedule, id),
-    ];
 
     final suggested = preset?.suggestedStart;
     final weekdays = {
@@ -576,57 +575,18 @@ class _StartStep extends ConsumerWidget {
             ),
           ),
         const SizedBox(height: Sp.section),
-        Semantics(
-          header: true,
-          child: Text(l10n.patternOffsetTitle, style: type.bodyStrong),
+        // Same "which day of the cycle" picker as the first-use flow. The
+        // preview is left to the last step, which shows it once with the same
+        // plan: showing it here too would paint the same two months twice.
+        CycleStartPicker(
+          steps: pattern.steps,
+          shiftOf: (id) => shiftTypeForDisplay(schedule, id),
+          offset: wizard.stepOffset,
+          onOffsetChanged: controller.setStepOffset,
+          start: wizard.start,
+          plan: ref.watch(patternPreviewProvider(args)),
+          showPreview: false,
         ),
-        const SizedBox(height: Sp.xs),
-        Text(
-          l10n.patternOffsetHelp(
-            format.weekdayDayMonth(
-              DateTime(wizard.start.year, wizard.start.month, wizard.start.day),
-            ),
-          ),
-          style: type.meta,
-        ),
-        const SizedBox(height: Sp.m),
-        Wrap(
-          // The cells are 48 dp wide to the touch: their own margin is the gap.
-          runSpacing: Sp.xs,
-          children: [
-            for (final (i, step) in pattern.steps.indexed)
-              Builder(
-                builder: (context) {
-                  final shifts = [
-                    for (final id in step) ?shiftTypeForDisplay(schedule, id),
-                  ];
-                  return StepChip(
-                    key: ValueKey('offset-$i'),
-                    size: Disc.m,
-                    shifts: shifts,
-                    selected: i == offset,
-                    caption: '${i + 1}',
-                    semanticsLabel: l10n.patternChipDay(
-                      i + 1,
-                      shiftsLine(l10n, format, shifts),
-                    ),
-                    onTap: () => controller.setStepOffset(i),
-                  );
-                },
-              ),
-          ],
-        ),
-        const SizedBox(height: Sp.m),
-        Text(
-          // «Mañana 06:00–14:00» wrapped between the hours at the dash.
-          keepTimeRangesTogether(
-            l10n.patternOffsetThatDay(shiftsLine(l10n, format, shiftsThatDay)),
-          ),
-          key: const ValueKey('pattern-offset-result'),
-          style: type.body.copyWith(color: colors.textSecondary),
-        ),
-        const SizedBox(height: Sp.section),
-        _Preview(args: args),
       ],
     );
   }
@@ -707,7 +667,11 @@ class _EndStep extends ConsumerWidget {
           onTap: () => controller.setClearOverrides(true),
         ),
         const SizedBox(height: Sp.section),
-        _Preview(args: args),
+        PatternMonthPreview(
+          key: const ValueKey('pattern-preview'),
+          start: wizard.start,
+          plan: ref.watch(patternPreviewProvider(args)),
+        ),
       ],
     );
   }
@@ -758,57 +722,6 @@ class _OptionTile extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-// ---- preview ----------------------------------------------------------------
-
-/// The result before applying: the start month and the next one.
-class _Preview extends ConsumerWidget {
-  const _Preview({required this.args});
-
-  final PatternWizardArgs args;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = context.l10n;
-    final type = context.type;
-    final colors = context.colors;
-    final wizard = ref.watch(patternWizardProvider(args));
-    final plan = ref.watch(patternPreviewProvider(args));
-    final first = wizard.start.firstDayOfMonth;
-    final second = first.addDays(first.daysInMonth);
-
-    return Column(
-      key: const ValueKey('pattern-preview'),
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Semantics(
-          header: true,
-          child: Text(l10n.patternPreviewTitle, style: type.bodyStrong),
-        ),
-        const SizedBox(height: Sp.s),
-        if (plan == null)
-          Text(
-            l10n.patternPreviewNone,
-            style: type.body.copyWith(color: colors.textMuted),
-          )
-        else ...[
-          if (plan.postNightDays.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(bottom: Sp.s),
-              child: Text(
-                l10n.patternPreviewPostNight(plan.postNightDays.length),
-                key: const ValueKey('pattern-preview-post-night'),
-                style: type.meta,
-              ),
-            ),
-          MiniMonth(month: first, schedule: plan.schedule),
-          const SizedBox(height: Sp.l),
-          MiniMonth(month: second, schedule: plan.schedule),
-        ],
-      ],
     );
   }
 }

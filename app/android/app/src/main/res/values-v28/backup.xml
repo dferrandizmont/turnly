@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 9+: the system backup is on, but the rules only let the data out
+     end-to-end encrypted or straight to another phone (values/backup.xml). -->
+<resources>
+    <bool name="allow_system_backup">true</bool>
+</resources>

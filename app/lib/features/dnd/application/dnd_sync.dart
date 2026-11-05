@@ -63,10 +63,21 @@ class DndSync {
   Future<void>? _loop;
   bool _dirty = false;
   bool _disposed = false;
+  bool _paused = false;
+
+  /// Stops triggers and drains an in-flight pass before destructive cleanup.
+  Future<void> pause() async {
+    _paused = true;
+    _timer?.cancel();
+    _timer = null;
+    await _loop;
+  }
+
+  void resume() => _paused = false;
 
   /// Debounced: the plan is recomputed [debounce] after the last call.
   void requestResync() {
-    if (_disposed) return;
+    if (_disposed || _paused) return;
     _timer?.cancel();
     _timer = Timer(debounce, () {
       _timer = null;
@@ -76,7 +87,7 @@ class DndSync {
 
   /// Completes when the (possibly coalesced) plan is up to date.
   Future<void> resync() {
-    if (_disposed) return Future.value();
+    if (_disposed || _paused) return Future.value();
     _timer?.cancel();
     _timer = null;
     _dirty = true;
@@ -92,7 +103,7 @@ class DndSync {
   Future<void> _run() async {
     await null; // never complete synchronously (see `_loop = null` below)
     try {
-      while (_dirty && !_disposed) {
+      while (_dirty && !_disposed && !_paused) {
         _dirty = false;
         try {
           await _once();
@@ -108,7 +119,7 @@ class DndSync {
 
   Future<void> _once() async {
     final settings = await loadSettings();
-    if (_disposed) return;
+    if (_disposed || _paused) return;
 
     // The silence off: whatever was armed is cancelled and the phone freed.
     if (!settings.anyActive) {
@@ -121,7 +132,7 @@ class DndSync {
     // Without the permission the phone cannot be silenced: nothing is armed
     // (and what was, if the permission was taken away, is cancelled).
     final permission = await channel.permissionStatus();
-    if (_disposed) return;
+    if (_disposed || _paused) return;
     if (permission != DndPermission.granted) {
       await channel.cancelAll();
       _lastWindows = const [];
@@ -130,14 +141,14 @@ class DndSync {
     }
 
     final days = await (horizonDays?.call() ?? Future.value(dndHorizonDays));
-    if (_disposed) return;
+    if (_disposed || _paused) return;
     final windows = planDndWindows(
       schedule: await readSchedule(),
       settings: settings,
       now: now(),
       horizonDays: days,
     );
-    if (_disposed) return;
+    if (_disposed || _paused) return;
     runs++;
     await channel.replaceWindows(windows);
     _lastWindows = windows;

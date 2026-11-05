@@ -206,6 +206,7 @@ class _WidgetHostState extends ConsumerState<WidgetHost> {
     // Nor is the restore preview, or a restore that is replacing the data:
     // leaving them could drop the confirmation the user is about to give.
     if (here == AppRoutes.settingsBackupImport ||
+        here == AppRoutes.settingsReset ||
         ref.read(restoreInProgressProvider)) {
       return;
     }
