@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,6 +24,9 @@ import '../../alarms/application/alarm_providers.dart';
 import '../../settings/application/preferences_controller.dart';
 import '../../settings/presentation/settings_widgets.dart' show saveSetting;
 import '../../alarms/data/alarm_sounds.dart' show AlarmSoundChoice;
+import '../../alarms/domain/alarm_planner.dart' show canShiftTypeRing;
+import '../../alarms/domain/alarm_settings.dart' show PauseAlertSettings;
+import '../../alarms/presentation/alarm_pickers.dart' show pickPauseTiming;
 import '../../calendar/application/schedule_controller.dart';
 import '../../calendar/presentation/shift_format.dart';
 import '../../dnd/application/dnd_providers.dart';
@@ -33,6 +38,7 @@ import 'shift_code_formatter.dart';
 import 'shift_color_grid.dart';
 import 'shift_color_picker.dart';
 import 'shift_icon_picker.dart';
+import 'shift_pause_section.dart';
 import 'shift_type_preview.dart';
 import 'shift_type_scope_dialog.dart';
 import 'shift_type_times_section.dart';
@@ -129,6 +135,7 @@ class _ShiftTypeFormScreenState extends ConsumerState<ShiftTypeFormScreen> {
     _location.text = _draft.location ?? '';
     _loadSoundInfo();
     _loadDnd();
+    _loadPause();
   }
 
   /// Reads the stored «No molestar» choice (P13) once the settings arrive and
@@ -152,6 +159,29 @@ class _ShiftTypeFormScreenState extends ConsumerState<ShiftTypeFormScreen> {
     setState(() {
       _draft = _draft.copyWith(dndEnabled: stored);
       _initial = _initial.copyWith(dndEnabled: stored);
+    });
+  }
+
+  /// Reads the stored pause notice of the shift (it lives with the alarm
+  /// settings) and adopts it unless the user already touched it: the draft is
+  /// seeded before the settings arrive, so without this an already-on notice
+  /// would show as off and a plain save would turn it off.
+  Future<void> _loadPause() async {
+    if (_editing == null) return;
+    final PauseAlertSettings stored;
+    try {
+      stored = (await ref.read(alarmSettingsProvider.future))
+          .forShiftType(_editing.id)
+          .pause;
+    } catch (_) {
+      // The provider reports the failure; the switch just stays off.
+      return;
+    }
+    if (!mounted || _draft.pause == stored) return;
+    if (_draft.pause != _initial.pause) return;
+    setState(() {
+      _draft = _draft.copyWith(pause: stored);
+      _initial = _initial.copyWith(pause: stored);
     });
   }
 
@@ -198,6 +228,31 @@ class _ShiftTypeFormScreenState extends ConsumerState<ShiftTypeFormScreen> {
           ? _draft.copyWith(clearAlarmSound: true)
           : _draft.copyWith(alarmSound: picked.uri);
     });
+  }
+
+  /// The switch of the pause notice. Turning it on with the alarms on also
+  /// makes sure the phone lets the app post notifications (never at launch).
+  void _setPause(bool on) {
+    _update(_draft.copyWith(pause: _draft.pause.copyWith(enabled: on)));
+    if (on) unawaited(_ensurePauseNotifications());
+  }
+
+  Future<void> _ensurePauseNotifications() async {
+    try {
+      final alarms = await ref.read(alarmSettingsProvider.future);
+      if (!alarms.enabled) return;
+      await ref
+          .read(alarmSettingsProvider.notifier)
+          .ensureNotificationPermission();
+    } catch (_) {
+      // Only a courtesy: the alarms screen shows the permission state.
+    }
+  }
+
+  Future<void> _pickPauseTiming() async {
+    final picked = await pickPauseTiming(context, current: _draft.pause);
+    if (picked == null || !mounted) return;
+    _update(_draft.copyWith(pause: picked));
   }
 
   void _resetSound() => setState(() {
@@ -446,6 +501,8 @@ class _ShiftTypeFormScreenState extends ConsumerState<ShiftTypeFormScreen> {
     controller.saveShiftType(type, onlyFrom: onlyFrom);
     await _saveDnd(id, type);
     if (!mounted) return;
+    await _savePause(id, type);
+    if (!mounted) return;
     // Saved: nothing left to lose (and `pop` does not go through PopScope).
     _leave();
   }
@@ -464,6 +521,23 @@ class _ShiftTypeFormScreenState extends ConsumerState<ShiftTypeFormScreen> {
       () => ref
           .read(dndSettingsProvider.notifier)
           .setShiftType(id, DndTypeSettings(enabled: _draft.dndEnabled)),
+    );
+  }
+
+  /// Stores the pause notice. It lives with the alarm settings, not in the
+  /// shift type row, so it is written separately and only when it changed.
+  /// A shift no alarm can ring for (an absence, no times) keeps whatever it
+  /// had.
+  Future<void> _savePause(String id, ShiftType type) async {
+    if (!canShiftTypeRing(type)) return;
+    final current = await ref.read(alarmSettingsProvider.future);
+    final stored = current.forShiftType(id);
+    if (!mounted || stored.pause == _draft.pause) return;
+    await saveSetting(
+      context,
+      () => ref
+          .read(alarmSettingsProvider.notifier)
+          .setShiftType(id, stored.copyWith(pause: _draft.pause)),
     );
   }
 
@@ -873,6 +947,20 @@ class _ShiftTypeFormScreenState extends ConsumerState<ShiftTypeFormScreen> {
                   missing: _soundMissing,
                   onPick: _pickingSound ? null : _pickSound,
                   onReset: _resetSound,
+                ),
+              ],
+              if (_draft.pauseSectionApplies) ...[
+                const SizedBox(height: Sp.section),
+                ShiftPauseSection(
+                  pause: _draft.pause,
+                  onChanged: _setPause,
+                  onPickTiming: _pickPauseTiming,
+                  suggested: _draft.suggestsPause,
+                  duration: _draft.scheduledMinutes,
+                  split: _draft.segment2Fits,
+                  outside: _draft.pauseOutsideShift,
+                  alarmsOff:
+                      ref.watch(alarmSettingsProvider).value?.enabled == false,
                 ),
               ],
               const SizedBox(height: Sp.section),

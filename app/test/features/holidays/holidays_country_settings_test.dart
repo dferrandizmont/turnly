@@ -14,7 +14,7 @@ import '../../support/app_harness.dart';
 void main() {
   setUpAll(initializeLocale);
 
-  const tall = Size(390, 2900);
+  const tall = Size(390, 3400);
 
   Finder key(String value) => find.byKey(ValueKey(value));
 
@@ -85,18 +85,18 @@ void main() {
       await tester.tap(key('region-option-ES-CT'));
       await tester.pumpAndSettle();
 
-      await chooseCountry(tester, 'PL');
+      await chooseCountry(tester, 'MA');
 
       expect(
         app.container.read(holidayPlaceProvider),
-        const HolidayPlace(countryCode: 'PL'),
+        const HolidayPlace(countryCode: 'MA'),
       );
-      expect(inRow('holidays-country', find.text('Polonia')), findsOneWidget);
+      expect(inRow('holidays-country', find.text('Marruecos')), findsOneWidget);
       expect(key('holidays-region'), findsNothing);
       expect(key('holidays-municipality'), findsNothing);
       expect(
         find.text(
-          'Todavía no tenemos los festivos oficiales de Polonia: añade los '
+          'Todavía no tenemos los festivos oficiales de Marruecos: añade los '
           'tuyos abajo',
         ),
         findsOneWidget,
@@ -113,7 +113,10 @@ void main() {
 
       // Settings shows the country instead of «Sin elegir».
       await app.back();
-      expect(inRow('settings-holidays', find.text('Polonia')), findsOneWidget);
+      expect(
+        inRow('settings-holidays', find.text('Marruecos')),
+        findsOneWidget,
+      );
       expect(tester.takeException(), isNull);
     },
   );
@@ -158,7 +161,7 @@ void main() {
   ) async {
     final app = await AppUnderTest.pump(tester, size: tall);
     await openHolidays(tester, app);
-    await chooseCountry(tester, 'PL');
+    await chooseCountry(tester, 'MA');
     expect(find.text('Año Nuevo'), findsNothing);
     await chooseCountry(tester, 'ES');
     expect(app.container.read(holidayPlaceProvider), HolidayPlace.spain);

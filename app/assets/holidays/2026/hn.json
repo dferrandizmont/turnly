@@ -1,0 +1,18 @@
+{
+"schema":1,
+"year":2026,
+"country":"HN",
+"national":[
+{"date":"2026-01-01","name":"Año Nuevo"},
+{"date":"2026-04-02","name":"Jueves Santo"},
+{"date":"2026-04-03","name":"Viernes Santo"},
+{"date":"2026-04-04","name":"Sábado de Gloria"},
+{"date":"2026-04-14","name":"Día de las Américas"},
+{"date":"2026-05-01","name":"Día del Trabajo"},
+{"date":"2026-09-15","name":"Día de la Independencia"},
+{"date":"2026-10-07","name":"Semana Morazánica"},
+{"date":"2026-10-08","name":"Semana Morazánica"},
+{"date":"2026-10-09","name":"Semana Morazánica"},
+{"date":"2026-12-25","name":"Navidad"}
+]
+}

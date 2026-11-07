@@ -122,7 +122,8 @@ bool _hasWorkedMinutes(Schedule schedule, CivilDate date) {
 /// [fromMonth] (the carry-over of the previous year).
 ///
 /// [holidays] are the holiday dates of the user's place and [window] is the
-/// night window, as in [summarizeMonth].
+/// night window, as in [summarizeMonth]. With a [closingDay] each month is
+/// its payroll month.
 HoursBalance hoursBalance(
   Schedule schedule,
   HoursGoal goal, {
@@ -131,6 +132,7 @@ HoursBalance hoursBalance(
   int carryInMinutes = 0,
   Set<CivilDate> holidays = const {},
   NightWindow window = const NightWindow(),
+  int? closingDay,
 }) {
   var worked = 0;
   var target = 0;
@@ -142,6 +144,7 @@ HoursBalance hoursBalance(
       month,
       holidays: holidays,
       window: window,
+      closingDay: closingDay,
     ).workedMinutes;
     target += goalMinutesForMonthOf(goal, month);
     month = month.addDays(month.daysInMonth);

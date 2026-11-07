@@ -12,7 +12,9 @@ import 'absence_status.dart';
 ///   counted here from the days of the period that carry one of the types of
 ///   the balance (`shift_type_quarters`), and only the types of the
 ///   **absence** category count (a work or rest type mapped by mistake does
-///   not consume the balance).
+///   not consume the balance). A balance counted in working days
+///   ([AbsenceBalance.workingDaysOnly]) only counts the days that are Monday
+///   to Friday and not one of [AbsenceBalanceCalculator.holidays].
 /// * **Carried** are the days left of the same series in the year before
 ///   (the row says whether they are carried and with what cap); the chain is
 ///   followed year by year (what was left in 2026 and carried into 2027 can
@@ -30,6 +32,7 @@ class AbsenceBalanceCalculator {
     required this.primaryCalendarId,
     required this.today,
     this.carryOverExpiry = const {},
+    this.holidays = const {},
   }) : _balances = List.unmodifiable(balances) {
     for (final balance in _balances) {
       _byKey[_keyOf(balance)] = balance;
@@ -49,6 +52,10 @@ class AbsenceBalanceCalculator {
 
   /// The day the carried days expire, by key ([absenceCarryOverExpiryKey]).
   final Map<String, CivilDate> carryOverExpiry;
+
+  /// The holidays of the place: a balance counted in working days does not
+  /// spend a day on them.
+  final Set<CivilDate> holidays;
 
   /// The balances by year, series and calendar.
   final Map<(int, String, String), AbsenceBalance> _byKey = {};
@@ -139,6 +146,9 @@ class AbsenceBalanceCalculator {
     var planned = 0.0;
     for (final day in schedule.resolveRange(balance.start, balance.end)) {
       if (until != null && day.date.isAfter(until)) continue;
+      if (balance.workingDaysOnly && !isWorkingDay(day.date, holidays)) {
+        continue;
+      }
       var dayQuarters = 0;
       for (final shift in day.shifts) {
         // Only the types of the absence category count.

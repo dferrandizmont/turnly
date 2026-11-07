@@ -193,6 +193,12 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
+  String get durationWheelHours => 'h';
+
+  @override
+  String get durationWheelMinutes => 'min';
+
+  @override
   String get calendarNoShift => 'Txandarik ez';
 
   @override
@@ -2215,6 +2221,12 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
+  String get summaryNightPlus => 'Gaueko plusa';
+
+  @override
+  String get summaryHolidayPlus => 'Jaiegun-plusa';
+
+  @override
   String get summaryEstimateNote => 'Estimazioa, zergen aurretik';
 
   @override
@@ -2274,6 +2286,11 @@ class AppLocalizationsEu extends AppLocalizations {
   @override
   String get summaryNoteGoal =>
       'Helburua: hilabete batean urtekoaren hamabirena hartzen da; urte batean, hilekoa bider 12; data batzuetan, egun horiei dagokien zatia. Aldeak lan egindakoak eta aurreikusitakoak batzen ditu.';
+
+  @override
+  String summaryNoteClosingDay(int day) {
+    return 'Nomina-hilabetea: itxiera-eguna $day izanik, hilabete bakoitza aurreko hilabeteko $day egunaren biharamunetik hilabete honetako $day egunera arte doa (edo azken egunera arte, hilabetea laburragoa bada). Orduak, dirua, helburua eta aparteko orduen muga horrela kontatzen dira.';
+  }
 
   @override
   String get summaryGoalTitle => 'Ordu-helburua';
@@ -2659,11 +2676,33 @@ class AppLocalizationsEu extends AppLocalizations {
   String get appearanceAccentGraphite => 'Grafitoa';
 
   @override
+  String get appearanceAccentViolet => 'Morea';
+
+  @override
+  String get appearanceAccentPlum => 'Aran-kolorea';
+
+  @override
+  String get appearanceAccentEmerald => 'Esmeralda';
+
+  @override
+  String get appearanceAccentOlive => 'Oliba-kolorea';
+
+  @override
+  String get appearanceAccentTerracotta => 'Terrakota';
+
+  @override
   String get appearanceAccentDefault => 'Lehenetsia';
 
   @override
   String get appearanceAccentNote =>
       'Estekak, etengailuak, hautapena eta fitxak aldatzen ditu. Zure txanden koloreak ez dira aldatzen.';
+
+  @override
+  String get appearancePureBlackTitle => 'Atzealde beltza';
+
+  @override
+  String get appearancePureBlackSubtitle =>
+      'Atzealde beltz hutsa gai ilunean, OLED mugikorretarako pentsatua.';
 
   @override
   String get appearanceCellSizeTitle => 'Txandaren tamaina hilabetean';
@@ -2963,7 +3002,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get faqSummaryA =>
-      'Egutegiko laburpen-ikonoak txandak, orduak, gaueko orduak eta jaiegunetakoak erakusten ditu, hilabetekoak, urte osokoak edo «Datak…» atalean aukeratzen dituzun datetakoak (366 egun arte). Txanda bat hasten den egunean kontatzen da, gauerdia gainditzen badu ere.\n\nZenbatekoak ikusteko, jarri txanden orduko prezioa eta, baduzu, txanda motaren osagarri finkoa Ezarpenak › Nire txandak atalean. Estimazioak osagarri finko horiek barne hartzen ditu, zergen aurretik, Ezarpenak › Itxura atalean aukeratzen duzun monetan. Ez ditu gaueko edo jaiegunetako orduen osagarriak ez atxikipenak barne hartzen.\n\n«Txandako osagarria» behin gehitzen da mota horretako txanda landu bakoitzeko, baita zatitutakoa bada ere; ez da ordu kopuruaren araberakoa. Atsedenek eta absentziek ez dute gehitzen.';
+      'Egutegiko laburpen-ikonoak txandak, orduak, gaueko orduak eta jaiegunetakoak erakusten ditu, hilabetekoak, urte osokoak edo «Datak…» atalean aukeratzen dituzun datetakoak (366 egun arte). Txanda bat hasten den egunean kontatzen da, gauerdia gainditzen badu ere.\n\nZenbatekoak ikusteko, jarri txanden orduko prezioa eta, baduzu, txanda motaren osagarri finkoa Ezarpenak › Nire txandak atalean. Estimazioak osagarri finko horiek barne hartzen ditu, zergen aurretik, Ezarpenak › Itxura atalean aukeratzen duzun monetan. Txanda bakoitzean jartzen dituzun gaueko eta jaiegunetako orduko plusak ere batzen ditu; atxikipenak garbia bakarrik aldatzen du. Ezarpenak › Orduak eta dirua atalean sektorekako osagarrien txantiloiak, nomina-hilabeteko itxiera-eguna eta aparteko orduen muga dituzu.\n\n«Txandako osagarria» behin gehitzen da mota horretako txanda landu bakoitzeko, baita zatitutakoa bada ere; ez da ordu kopuruaren araberakoa. Atsedenek eta absentziek ez dute gehitzen.';
 
   @override
   String get settingsVersionCopied => 'Bertsioa kopiatu da';
@@ -4995,6 +5034,9 @@ class AppLocalizationsEu extends AppLocalizations {
   String get holidaysSubdivisionKindCityOrRegion => 'Hiria edo eskualdea';
 
   @override
+  String get holidaysSubdivisionKindDepartment => 'Departamendua';
+
+  @override
   String get holidaysSubdivisionSearch => 'Bilatu';
 
   @override
@@ -5191,6 +5233,11 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
+  String alarmsTypePauseLine(String timing) {
+    return 'Etenaldia: $timing';
+  }
+
+  @override
   String get alarmsDayBeforeTimeTitle => 'Abisuaren ordua';
 
   @override
@@ -5268,6 +5315,16 @@ class AppLocalizationsEu extends AppLocalizations {
   @override
   String get alarmsReminderChannelDescription =>
       'Egun bateko oharrean aukeratzen duzun orduan abisatzen dizu.';
+
+  @override
+  String get alarmsPauseTitle => 'Etenaldia egiteko ordua';
+
+  @override
+  String get alarmsPauseChannelName => 'Etenaldi abisuak';
+
+  @override
+  String get alarmsPauseChannelDescription =>
+      'Txandaren erdian abisatzen dizu etenaldi bat egin dezazun.';
 
   @override
   String get dayReminderAdd => 'Abisatu';
@@ -5384,6 +5441,54 @@ class AppLocalizationsEu extends AppLocalizations {
   String get shiftTypesSoundReset => 'Erabili lehenetsia';
 
   @override
+  String get shiftTypesPauseSection => 'Etenaldi abisua';
+
+  @override
+  String get shiftTypesPauseSwitch => 'Abisatu etenaldia egiteko';
+
+  @override
+  String shiftTypesPauseHelperLong(String duration) {
+    return 'Txanda honek $duration irauten du: ondo etortzen da erdian pixka bat gelditzea.';
+  }
+
+  @override
+  String get shiftTypesPauseHelperShort =>
+      'Txandaren erdian abisu bat, gelditzeaz gogoratzeko.';
+
+  @override
+  String get shiftTypesPauseWhen => 'Noiz';
+
+  @override
+  String get shiftTypesPauseMid => 'Txandaren erdian';
+
+  @override
+  String shiftTypesPauseAfter(String duration) {
+    return 'Hasi eta $duration geroago';
+  }
+
+  @override
+  String get shiftTypesPauseSheetTitle => 'Noiz abisatu';
+
+  @override
+  String get shiftTypesPauseCustomTitle => 'Hasieratik igarotako denbora';
+
+  @override
+  String get shiftTypesPauseCustomHelp =>
+      'Txanda hasi eta zenbat ordu eta minutu geroago.';
+
+  @override
+  String get shiftTypesPauseSplitNote =>
+      'Txanda zatitu batean, abisua zati luzeenean doa.';
+
+  @override
+  String get shiftTypesPauseOutside =>
+      'Denbora hori txanda baino luzeagoa da: ez du joko.';
+
+  @override
+  String get shiftTypesPauseAlarmsOff =>
+      'Alarmak desaktibatuta daude. Aktibatu itzazu Ezarpenak › Alarmak atalean abisua jo dezan.';
+
+  @override
   String get catalogShiftMorningName => 'Goiza';
 
   @override
@@ -5461,7 +5566,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get catalogPattern24x72Description =>
-      '24 orduko guardia eta 72 ordu libre';
+      '24 orduko guardia eta 72 ordu libre (1-3 ere bai)';
 
   @override
   String get catalogPattern12hName => '12 ordu';
@@ -5509,6 +5614,20 @@ class AppLocalizationsEu extends AppLocalizations {
   @override
   String get catalogPatternDupontDescription =>
       '28 eguneko zikloa 12 orduko txandetan: 4 gau, 3 libre, 3 egun, libre 1, 3 gau, 3 libre, 4 egun eta 7 libre';
+
+  @override
+  String get catalogPatternPn2226Name => 'Polizia Nazionala 2-2-2-6';
+
+  @override
+  String get catalogPatternPn2226Description =>
+      '2 goiz, 2 arratsalde, 2 gau, gau-ondokoa eta 5 libre (Polizia Nazionalaren 6x6a)';
+
+  @override
+  String get catalogPatternGuard14Name => 'Guardia 1-4';
+
+  @override
+  String get catalogPatternGuard14Description =>
+      '24 orduko guardia eta 4 egun libre (guardia 1 eta libre 4)';
 
   @override
   String get holidayNameNewYear => 'Urteberri eguna';
@@ -5700,6 +5819,9 @@ class AppLocalizationsEu extends AppLocalizations {
   String get absenceAllowed => 'Baimenduak';
 
   @override
+  String get absenceWorkingDaysNote => 'Egun baliodunetan';
+
+  @override
   String get absenceCarried => 'Ekarritakoak';
 
   @override
@@ -5770,6 +5892,13 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get absenceFieldCarry => 'Ekarri aurreko urteko soberakina';
+
+  @override
+  String get absenceFieldWorkingDays => 'Kontatu egun baliodunak bakarrik';
+
+  @override
+  String get absenceFieldWorkingDaysHelper =>
+      'Astelehenetik ostiralera, zure egutegiko jaiegunak kenduta: asteburuan edo jaiegunean margotutako egun batek ez du saldorik gastatzen.';
 
   @override
   String get absenceFieldCarryCap => 'Ekar daitekeen gehienezkoa';
@@ -5905,6 +6034,177 @@ class AppLocalizationsEu extends AppLocalizations {
   @override
   String get moneyWithholdingInvalid =>
       'Idatzi 0 eta 100 arteko zenbaki oso bat.';
+
+  @override
+  String get closingDayTitle => 'Itxiera-eguna';
+
+  @override
+  String get closingDaySubtitle => 'Zure nomina-hilabeteko azken eguna';
+
+  @override
+  String get closingDayNone => 'Hilabete-amaiera';
+
+  @override
+  String closingDayValue(int day) {
+    return 'Eguna: $day';
+  }
+
+  @override
+  String get closingDayField => 'Itxiera-eguna';
+
+  @override
+  String get closingDayHelper =>
+      '21etik 20ra kobratzen baduzu, idatzi 20: azaroko laburpena urriaren 21etik azaroaren 20ra joango da. Utzi hutsik hilabete naturala kontatzeko.';
+
+  @override
+  String get closingDayInvalid =>
+      'Idatzi 1etik 30erako egun bat, edo utzi hutsik hilabete naturalerako.';
+
+  @override
+  String get overtimeCapTitle => 'Aparteko orduen muga';
+
+  @override
+  String get overtimeCapSubtitle => 'Laburpenean abisatzen dizu hurbiltzean';
+
+  @override
+  String get overtimeCapNone => 'Mugarik gabe';
+
+  @override
+  String overtimeCapValueYear(int hours) {
+    return '$hours h urtean';
+  }
+
+  @override
+  String overtimeCapValueMonth(int hours) {
+    return '$hours h hilean';
+  }
+
+  @override
+  String get overtimeCapIntro =>
+      'Egun bakoitzean idazten dituzun aparteko orduak kontatzen ditu. Langileen Estatutuak gehienez 80 jartzen ditu urtean; zure hitzarmenak beste bat ezar dezake.';
+
+  @override
+  String get overtimeCapPerYear => 'Urtean';
+
+  @override
+  String get overtimeCapPerMonth => 'Hilean';
+
+  @override
+  String get overtimeCapField => 'Gehienezko aparteko orduak';
+
+  @override
+  String get overtimeCapHoursSuffix => 'h';
+
+  @override
+  String overtimeCapInvalid(int max) {
+    return 'Idatzi ordu kopuru oso bat, 1 eta $max artean.';
+  }
+
+  @override
+  String get overtimeCapRemove => 'Kendu muga';
+
+  @override
+  String get overtimeCapUsedYear => 'Urteko aparteko orduak';
+
+  @override
+  String get overtimeCapUsedMonth => 'Hilabeteko aparteko orduak';
+
+  @override
+  String overtimeCapOf(String used, String cap) {
+    return '$used / $cap';
+  }
+
+  @override
+  String overtimeCapLeft(String left) {
+    return 'Geratzen zaizkizu: $left';
+  }
+
+  @override
+  String overtimeCapNear(String left) {
+    return 'Mugara hurbiltzen ari zara. Geratzen zaizkizu: $left.';
+  }
+
+  @override
+  String get overtimeCapReached => 'Aparteko orduen mugara iritsi zara.';
+
+  @override
+  String overtimeCapOver(String excess) {
+    return 'Aparteko orduen muga gainditu duzu. Gehiegizkoa: $excess.';
+  }
+
+  @override
+  String get payTemplateTitle => 'Osagarrien txantiloia';
+
+  @override
+  String get payTemplateSubtitle =>
+      'Osasun publikoa, suhiltzaileak edo zaindariak';
+
+  @override
+  String get payTemplateIntro =>
+      'Bete aldi berean zure lan-txanden osagarriak. Txantiloiak ez dakar zenbatekorik, hitzarmen eta urte bakoitzarekin aldatzen direlako: 0tik hasten dira eta zure nominakoak idazten dituzu.';
+
+  @override
+  String get payTemplatePublicHealth => 'Osasun publikoa';
+
+  @override
+  String get payTemplateFirefighters => 'Suhiltzaileak';
+
+  @override
+  String get payTemplatePrivateSecurity => 'Segurtasun-zaindariak';
+
+  @override
+  String get payTemplateGuardPlus => 'Guardiako osagarria';
+
+  @override
+  String payTemplateGuardHelper(int hours) {
+    return 'Guardia bakoitzeko behin gehitzen da: $hours h edo gehiagoko txandak.';
+  }
+
+  @override
+  String get payTemplateHolidayHelper =>
+      'Jaiegunean lan egindako ordu bakoitzeko gehitzen da. Guardia bat jaiegun batera igarotzen bada, egun horretako orduak bakarrik kontatzen dira.';
+
+  @override
+  String get payTemplateAnnualHours => 'Urteko lanaldia (aukerakoa)';
+
+  @override
+  String get payTemplateAnnualHoursHelper =>
+      'Urteko ordu-helburu gisa gordetzen da. Utzi hutsik ez aldatzeko.';
+
+  @override
+  String payTemplateAnnualHoursSource(int hours) {
+    return 'Segurtasun-enpresen estatuko hitzarmenak $hours h lan eraginkor ezartzen ditu urtean. Urteko ordu-helburu gisa gordetzen da; aldatu edo ezabatu zurea beste bat bada.';
+  }
+
+  @override
+  String get payTemplateAnnualHoursNone => 'Aldaketarik gabe';
+
+  @override
+  String payTemplateAnnualHoursInvalid(int max) {
+    return 'Idatzi ordu kopuru oso bat, 1 eta $max artean.';
+  }
+
+  @override
+  String get payTemplateTypes => 'Zein txanda motari aplikatzen zaion';
+
+  @override
+  String get payTemplateTypesNone =>
+      'Ez duzu ordutegia duen lan-txanda motarik txantiloi honetarako. Sortu itzazu Nire txandak atalean.';
+
+  @override
+  String get payTemplateApply => 'Aplikatu';
+
+  @override
+  String payTemplateApplied(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Txantiloia aplikatu da. Aldatutako txanda motak: $count.',
+      one: 'Txantiloia txanda mota bati aplikatu zaio.',
+      zero: 'Txantiloia aplikatu da: ez da txanda motarik aldatzen.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get moneyGross => 'Zenbatetsitako gordina';

@@ -267,7 +267,7 @@ final patternPresets = <PatternPreset>[
   PatternPreset(
     id: '24x72',
     name: '24 x 72',
-    description: 'Guardia de 24 h y 72 h libres',
+    description: 'Guardia de 24 h y 72 h libres (también 1-3)',
     steps: _seq('G L3'),
   ),
   PatternPreset(
@@ -328,6 +328,27 @@ final patternPresets = <PatternPreset>[
         'Ciclo de 28 días en turnos de 12 h: 4 noches, 3 libres, 3 días, '
         '1 libre, 3 noches, 3 libres, 4 días y 7 libres',
     steps: _seq('E4 L3 D3 L1 E3 L3 D4 L7'),
+  ),
+  // Policía Nacional "6x6", the 2-2-2-6: two mornings (07-15), two afternoons
+  // (15-23) and two nights (23-07), then the saliente and five more days off
+  // (six days of rest in all). 12-day cycle. Sources: Campus Training,
+  // "Turnos de la Policía Nacional"; JUCIL (in force since March 2020).
+  PatternPreset(
+    id: 'pn-2-2-2-6',
+    name: 'Policía Nacional 2-2-2-6',
+    description:
+        '2 mañanas, 2 tardes, 2 noches, saliente y 5 libres (el 6x6 de la '
+        'Policía Nacional)',
+    steps: _seq('M2 T2 N2 S L5'),
+  ),
+  // Firefighters' guard "1-4": one 24 h guard and four days off (the
+  // libranza varies by service: 1-3, 1-4 or 1-5; 1-3 is the 24 x 72).
+  // Source: Campus Training, "Horario de trabajo de bomberos".
+  PatternPreset(
+    id: 'guard-1-4',
+    name: 'Guardia 1-4',
+    description: 'Guardia de 24 h y 4 días libres (1 guardia y 4 libres)',
+    steps: _seq('G L4'),
   ),
 ];
 

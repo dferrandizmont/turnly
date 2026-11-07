@@ -253,6 +253,14 @@
       }
     }
   },
+  "durationWheelHours": "h",
+  "@durationWheelHours": {
+    "description": "Etiqueta corta junto a la rueda de horas de un selector de duración."
+  },
+  "durationWheelMinutes": "min",
+  "@durationWheelMinutes": {
+    "description": "Etiqueta corta junto a la rueda de minutos de un selector de duración."
+  },
   "calendarNoShift": "Sin turno",
   "calendarShiftWithTimes": "{name} {times}",
   "@calendarShiftWithTimes": {
@@ -1710,6 +1718,8 @@
       }
     }
   },
+  "summaryNightPlus": "Plus nocturno",
+  "summaryHolidayPlus": "Plus festivo",
   "summaryEstimateNote": "Estimado, antes de impuestos",
   "summaryEstimateNone": "Pon el precio por hora o el plus por turno en Mis turnos para ver el estimado.",
   "summaryEstimateMissing": "No incluye el pago por hora de {types}: sin precio.",
@@ -1756,6 +1766,14 @@
   "summaryNoteHoliday": "Horas en festivo: las que caen en un día festivo de tu comunidad y municipio, también si el turno cruza la medianoche.",
   "summaryNoteTense": "Trabajadas: los días anteriores a hoy. Previstas: de hoy en adelante, según tu cuadrante.",
   "summaryNoteGoal": "Objetivo: en un mes cuenta la doceava parte del anual; en un año, el mensual por 12; en unas fechas, la parte de sus días. La diferencia suma las trabajadas y las previstas.",
+  "summaryNoteClosingDay": "Mes de nómina: con el día de cierre en el {day}, cada mes va del día siguiente al {day} del mes anterior hasta el {day} (o hasta el último día, si el mes es más corto). Las horas, el dinero, el objetivo y el tope de horas extra se cuentan así.",
+  "@summaryNoteClosingDay": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
   "summaryGoalTitle": "Objetivo de horas",
   "summaryGoalAdd": "Fijar un objetivo de horas",
   "summaryGoalEdit": "Cambiar objetivo",
@@ -2006,8 +2024,15 @@
   "appearanceAccentPetrol": "Petróleo",
   "appearanceAccentRaspberry": "Frambuesa",
   "appearanceAccentGraphite": "Grafito",
+  "appearanceAccentViolet": "Violeta",
+  "appearanceAccentPlum": "Ciruela",
+  "appearanceAccentEmerald": "Esmeralda",
+  "appearanceAccentOlive": "Oliva",
+  "appearanceAccentTerracotta": "Terracota",
   "appearanceAccentDefault": "Por defecto",
   "appearanceAccentNote": "Cambia enlaces, interruptores, selección y pestañas. Los colores de tus turnos no cambian.",
+  "appearancePureBlackTitle": "Fondo negro",
+  "appearancePureBlackSubtitle": "Negro puro detrás de las pantallas en el tema oscuro, pensado para móviles OLED.",
   "appearanceCellSizeTitle": "Tamaño del turno en el mes",
   "appearanceCellSizeNormal": "Normal",
   "appearanceCellSizeLarge": "Grande",
@@ -2140,7 +2165,7 @@
   "faqCalendarsQ": "¿Puedo llevar varios calendarios y compararlos?",
   "faqCalendarsA": "Sí. En Ajustes › Calendarios creas uno para tu pareja, un segundo trabajo o un hijo: cada uno tiene sus rotaciones y sus días, y los tipos de turno son los mismos. Con dos o más, el nombre del calendario sobre el mes te deja cambiar de uno a otro. El widget y las alarmas siguen el calendario marcado como «Widget y alarmas».\n\nPara ver cuándo coincidís libres, pulsa «Comparar calendarios» en esa misma hoja: eliges dos y ves sus turnos juntos y los días libres en común del mes.",
   "faqSummaryQ": "¿Cómo se calculan las horas y el dinero?",
-  "faqSummaryA": "El icono de resumen del calendario enseña los turnos, las horas, las nocturnas y las de festivo del mes, de un año entero o de las fechas que elijas en «Fechas…» (hasta 366 días). Un turno cuenta en el día en que empieza, aunque cruce la medianoche.\n\nPara ver importes, pon el precio por hora y, si lo tienes, el plus fijo por tipo de turno en Ajustes › Mis turnos. La estimación incluye esos pluses fijos, antes de impuestos, en la moneda que elijas en Ajustes › Apariencia. No incluye pluses por hora nocturna o festiva ni retenciones.\n\nEl «Plus por turno» se suma una vez por cada turno trabajado de ese tipo, también si es partido; no depende de las horas. Los descansos y las ausencias no lo suman.",
+  "faqSummaryA": "El icono de resumen del calendario enseña los turnos, las horas, las nocturnas y las de festivo del mes, de un año entero o de las fechas que elijas en «Fechas…» (hasta 366 días). Un turno cuenta en el día en que empieza, aunque cruce la medianoche.\n\nPara ver importes, pon el precio por hora y, si lo tienes, el plus fijo por tipo de turno en Ajustes › Mis turnos. La estimación incluye esos pluses fijos, antes de impuestos, en la moneda que elijas en Ajustes › Apariencia. También suma los pluses por hora nocturna y festiva que pongas en cada turno; la retención solo cambia el neto. En Ajustes › Horas y dinero tienes plantillas de pluses por sector, el día de cierre de tu mes de nómina y un tope de horas extra.\n\nEl «Plus por turno» se suma una vez por cada turno trabajado de ese tipo, también si es partido; no depende de las horas. Los descansos y las ausencias no lo suman.",
   "settingsVersionCopied": "Versión copiada",
   "settingsEmailCopied": "Correo copiado",
   "settingsAboutTitle": "Acerca de",
@@ -3376,6 +3401,7 @@
   "holidaysSubdivisionKindCanton": "Cantón",
   "holidaysSubdivisionKindCity": "Ciudad",
   "holidaysSubdivisionKindCityOrRegion": "Ciudad o región",
+  "holidaysSubdivisionKindDepartment": "Departamento",
   "holidaysSubdivisionSearch": "Buscar",
   "holidaysSettingsStatusNoSubdivision": "Sin elegir solo salen los festivos de todo el país. Elige el tuyo para ver también los de tu zona.",
   "holidaysSettingsAdd": "Añadir festivo local",
@@ -3533,6 +3559,15 @@
       }
     }
   },
+  "alarmsTypePauseLine": "Pausa: {timing}",
+  "@alarmsTypePauseLine": {
+    "description": "Segunda línea de un tipo en Ajustes › Alarmas cuando tiene aviso de pausa: «Pausa: A mitad del turno».",
+    "placeholders": {
+      "timing": {
+        "type": "String"
+      }
+    }
+  },
   "alarmsDayBeforeTimeTitle": "Hora del aviso",
   "alarmsLabelTitle": "Texto del aviso",
   "alarmsLabelDefault": "El de siempre",
@@ -3623,6 +3658,18 @@
   "@alarmsReminderChannelDescription": {
     "description": "Descripción del canal de Android de los recordatorios de notas."
   },
+  "alarmsPauseTitle": "Toca pausa",
+  "@alarmsPauseTitle": {
+    "description": "Título de la notificación del aviso de pausa a mitad de turno."
+  },
+  "alarmsPauseChannelName": "Avisos de pausa",
+  "@alarmsPauseChannelName": {
+    "description": "Nombre del canal de notificaciones de Android para los avisos de pausa."
+  },
+  "alarmsPauseChannelDescription": "Te avisa a mitad del turno para que hagas una pausa.",
+  "@alarmsPauseChannelDescription": {
+    "description": "Descripción del canal de Android de los avisos de pausa."
+  },
   "dayReminderAdd": "Avisarme",
   "@dayReminderAdd": {
     "description": "Botón del detalle del día, bajo la nota: pide una hora y programa un aviso."
@@ -3683,6 +3730,44 @@
   },
   "shiftTypesSoundMissing": "No disponible: suena el predeterminado",
   "shiftTypesSoundReset": "Usar el predeterminado",
+  "shiftTypesPauseSection": "Aviso de pausa",
+  "@shiftTypesPauseSection": {
+    "description": "Cabecera de la sección del aviso de pausa en el editor de un tipo de turno."
+  },
+  "shiftTypesPauseSwitch": "Avisarme para hacer una pausa",
+  "shiftTypesPauseHelperLong": "Este turno dura {duration}: suele venir bien parar un rato a mitad.",
+  "@shiftTypesPauseHelperLong": {
+    "description": "Ayuda bajo el interruptor cuando el turno dura 8 horas o más. {duration}: duración del turno, p. ej. «12 h».",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "shiftTypesPauseHelperShort": "Un aviso a mitad del turno para acordarte de parar.",
+  "shiftTypesPauseWhen": "Cuándo",
+  "shiftTypesPauseMid": "A mitad del turno",
+  "shiftTypesPauseAfter": "{duration} después de empezar",
+  "@shiftTypesPauseAfter": {
+    "description": "Cuándo suena el aviso de pausa. {duration}: «2 h», «1 h 30 min».",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "shiftTypesPauseSheetTitle": "Cuándo te avisamos",
+  "shiftTypesPauseCustomTitle": "Tiempo desde el inicio",
+  "shiftTypesPauseCustomHelp": "Horas y minutos después de que empiece el turno.",
+  "shiftTypesPauseSplitNote": "En un turno partido, el aviso va en el tramo más largo.",
+  "@shiftTypesPauseSplitNote": {
+    "description": "Nota del aviso de pausa en un turno partido."
+  },
+  "shiftTypesPauseOutside": "Ese tiempo es mayor que el turno: no sonará.",
+  "@shiftTypesPauseOutside": {
+    "description": "Aviso de que el tiempo elegido no cabe dentro del turno."
+  },
+  "shiftTypesPauseAlarmsOff": "Las alarmas están desactivadas. Actívalas en Ajustes › Alarmas para que suene el aviso.",
   "catalogShiftMorningName": "Mañana",
   "@catalogShiftMorningName": {
     "description": "Plantillas de tipo de turno: nombre y código (1 a 3 caracteres, sin espacios, distinto en cada plantilla). Solo se usan al crear el tipo (instalación nueva, saliente automático…); los tipos ya guardados no se renombran."
@@ -3717,7 +3802,7 @@
   },
   "catalogPatternCorreturnosDescription": "5 mañanas, 2 libres, 5 tardes, 2 libres, 5 noches, 2 libres",
   "catalogPattern24x72Name": "24 x 72",
-  "catalogPattern24x72Description": "Guardia de 24 h y 72 h libres",
+  "catalogPattern24x72Description": "Guardia de 24 h y 72 h libres (también 1-3)",
   "catalogPattern12hName": "12 horas",
   "catalogPattern12hDescription": "Día 12 h, noche 12 h, saliente y libre",
   "catalogPattern6x4Name": "6 x 4",
@@ -3732,6 +3817,10 @@
   "catalogPatternContinentalDescription": "Turno continuo de 28 días con 4 equipos: bloques de 2 y 3 mañanas, tardes y noches, y 7 libres",
   "catalogPatternDupontName": "DuPont",
   "catalogPatternDupontDescription": "Ciclo de 28 días en turnos de 12 h: 4 noches, 3 libres, 3 días, 1 libre, 3 noches, 3 libres, 4 días y 7 libres",
+  "catalogPatternPn2226Name": "Policía Nacional 2-2-2-6",
+  "catalogPatternPn2226Description": "2 mañanas, 2 tardes, 2 noches, saliente y 5 libres (el 6x6 de la Policía Nacional)",
+  "catalogPatternGuard14Name": "Guardia 1-4",
+  "catalogPatternGuard14Description": "Guardia de 24 h y 4 días libres (1 guardia y 4 libres)",
   "holidayNameNewYear": "Año Nuevo",
   "holidayNameEpiphany": "Epifanía del Señor",
   "holidayNameMaundyThursday": "Jueves Santo",
@@ -3847,6 +3936,7 @@
     }
   },
   "absenceAllowed": "Permitidos",
+  "absenceWorkingDaysNote": "En días hábiles",
   "absenceCarried": "Arrastrados",
   "absenceAdjustment": "Ajustes",
   "absenceEnjoyed": "Disfrutados",
@@ -3908,6 +3998,8 @@
   "absenceFieldAdjustmentHelper": "Suma o resta días a mano: los que ya gastaste antes de usar la app o un día extra que te han dado. Admite negativos.",
   "absenceDaysSuffix": "días",
   "absenceFieldCarry": "Arrastrar lo que sobre del año anterior",
+  "absenceFieldWorkingDays": "Contar solo días hábiles",
+  "absenceFieldWorkingDaysHelper": "De lunes a viernes, sin los festivos de tu calendario: un día pintado en fin de semana o en festivo no gasta saldo.",
   "absenceFieldCarryCap": "Máximo que se arrastra",
   "absenceFieldCarryCapHelper": "Déjalo vacío si se arrastra todo.",
   "absenceFieldExpiry": "Caducan el",
@@ -3981,6 +4073,137 @@
   "moneyWithholdingHelper": "El porcentaje que te retienen de la nómina (IRPF y cotizaciones). Con él calculamos un neto aproximado; no sustituye a tu nómina.",
   "moneyWithholdingField": "Porcentaje de retención",
   "moneyWithholdingInvalid": "Escribe un número entero entre 0 y 100.",
+  "closingDayTitle": "Día de cierre",
+  "closingDaySubtitle": "El último día de tu mes de nómina",
+  "closingDayNone": "Fin de mes",
+  "closingDayValue": "Día {day}",
+  "@closingDayValue": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "closingDayField": "Día de cierre",
+  "closingDayHelper": "Si cobras del 21 al 20, escribe 20: el resumen de noviembre irá del 21 de octubre al 20 de noviembre. Déjalo vacío para contar el mes natural.",
+  "closingDayInvalid": "Escribe un día del 1 al 30, o déjalo vacío para el mes natural.",
+  "overtimeCapTitle": "Tope de horas extra",
+  "overtimeCapSubtitle": "Te avisa en el resumen al acercarte",
+  "overtimeCapNone": "Sin tope",
+  "overtimeCapValueYear": "{hours} h al año",
+  "@overtimeCapValueYear": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "overtimeCapValueMonth": "{hours} h al mes",
+  "@overtimeCapValueMonth": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "overtimeCapIntro": "Cuenta las horas extra que anotas en cada día. El Estatuto de los Trabajadores pone un máximo de 80 al año; tu convenio puede fijar otro.",
+  "overtimeCapPerYear": "Al año",
+  "overtimeCapPerMonth": "Al mes",
+  "overtimeCapField": "Horas extra como máximo",
+  "overtimeCapHoursSuffix": "h",
+  "overtimeCapInvalid": "Escribe un número entero de horas entre 1 y {max}.",
+  "@overtimeCapInvalid": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "overtimeCapRemove": "Quitar el tope",
+  "overtimeCapUsedYear": "Horas extra del año",
+  "overtimeCapUsedMonth": "Horas extra del mes",
+  "overtimeCapOf": "{used} de {cap}",
+  "@overtimeCapOf": {
+    "placeholders": {
+      "used": {
+        "type": "String"
+      },
+      "cap": {
+        "type": "String"
+      }
+    }
+  },
+  "overtimeCapLeft": "Te quedan {left}",
+  "@overtimeCapLeft": {
+    "placeholders": {
+      "left": {
+        "type": "String"
+      }
+    }
+  },
+  "overtimeCapNear": "Te acercas al tope: te quedan {left}.",
+  "@overtimeCapNear": {
+    "placeholders": {
+      "left": {
+        "type": "String"
+      }
+    }
+  },
+  "overtimeCapReached": "Has llegado al tope de horas extra.",
+  "overtimeCapOver": "Has pasado el tope de horas extra en {excess}.",
+  "@overtimeCapOver": {
+    "placeholders": {
+      "excess": {
+        "type": "String"
+      }
+    }
+  },
+  "payTemplateTitle": "Plantilla de pluses",
+  "payTemplateSubtitle": "Sanidad pública, bomberos o vigilantes",
+  "payTemplateIntro": "Rellena de una vez los pluses de tus turnos de trabajo. La plantilla no trae importes, porque cambian con cada convenio y cada año: empiezan en 0 y escribes los de tu nómina.",
+  "payTemplatePublicHealth": "Sanidad pública",
+  "payTemplateFirefighters": "Bomberos",
+  "payTemplatePrivateSecurity": "Vigilantes de seguridad",
+  "payTemplateGuardPlus": "Plus por guardia",
+  "payTemplateGuardHelper": "Se suma una vez por cada guardia: los turnos de {hours} h o más.",
+  "@payTemplateGuardHelper": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "payTemplateHolidayHelper": "Se suma por cada hora trabajada en festivo. Si una guardia cruza a un festivo, solo cuentan sus horas de ese día.",
+  "payTemplateAnnualHours": "Jornada anual (opcional)",
+  "payTemplateAnnualHoursHelper": "Se guarda como tu objetivo de horas al año. Déjalo vacío para no cambiarlo.",
+  "payTemplateAnnualHoursSource": "El convenio estatal de empresas de seguridad fija {hours} h de trabajo efectivo al año. Se guarda como tu objetivo de horas al año; cámbialo o bórralo si el tuyo es otro.",
+  "@payTemplateAnnualHoursSource": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "payTemplateAnnualHoursNone": "Sin cambios",
+  "payTemplateAnnualHoursInvalid": "Escribe un número entero de horas entre 1 y {max}.",
+  "@payTemplateAnnualHoursInvalid": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "payTemplateTypes": "Tipos de turno a los que se aplica",
+  "payTemplateTypesNone": "No tienes tipos de turno de trabajo con horario para esta plantilla. Créalos en Mis turnos.",
+  "payTemplateApply": "Aplicar",
+  "payTemplateApplied": "{count, plural, =0{Plantilla aplicada: ningún tipo de turno cambia.} =1{Plantilla aplicada a 1 tipo de turno.} other{Plantilla aplicada a {count} tipos de turno.}}",
+  "@payTemplateApplied": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "moneyGross": "Bruto estimado",
   "moneyNet": "Neto estimado",
   "moneyNetNote": "Con una retención del {percent} %",

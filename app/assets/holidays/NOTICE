@@ -2,7 +2,7 @@ Holidays of other countries (assets/holidays/<year>/<cc>.json)
 ===============================================================
 
 Generated at development time by app/tool/export_country_holidays.py from
-python-holidays 0.107 (data snapshot 2026-10-31).
+python-holidays 0.107 (data snapshot 2026-11-06).
 Nothing is downloaded or computed on the phone.
 
   python-holidays

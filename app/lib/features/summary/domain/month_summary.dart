@@ -1,4 +1,5 @@
 import '../../schedule/domain/schedule_domain.dart';
+import 'pay_period.dart';
 
 /// Free monthly summary (docs/roadmap.md, "Ingresos estimados"): shifts per
 /// type, hours, night hours, estimated pay, rest days, absences and holiday
@@ -497,7 +498,8 @@ _Piece? _pieceOf(ShiftOccurrence occurrence, int? cutMinute) {
 /// the same definitions as a month: it is the one aggregate behind the month
 /// summary ([summarizeMonth]) and the free date range of the summary screen,
 /// so `summarizeRange(first of month, last of month)` equals the month.
-/// [MonthSummary.month] is [first]. Shifts count on the day they START: a
+/// [MonthSummary.month] is [first] unless [month] names it (the payroll month
+/// of a closing day, [summarizeMonth]). Shifts count on the day they START: a
 /// night shift of [last] belongs to the range in full.
 ///
 /// [holidays] are the holiday dates of the user's place (the neighbouring
@@ -518,6 +520,7 @@ MonthSummary summarizeRange(
   Set<CivilDate> holidays = const {},
   NightWindow window = const NightWindow(),
   ClockCutoff? cutoff,
+  CivilDate? month,
 }) {
   final days = schedule.resolveRange(first, last);
 
@@ -726,7 +729,7 @@ MonthSummary summarizeRange(
   if (extraAmountCents != 0) earnings = (earnings ?? 0) + extraAmountCents;
 
   return MonthSummary(
-    month: first,
+    month: month ?? first,
     types: types,
     shiftsWorked: shiftsWorked,
     workedDays: workedDays,
@@ -753,21 +756,29 @@ MonthSummary summarizeRange(
 
 /// Summarizes the month that contains [anyDay] for [schedule]
 /// ([summarizeRange] over its first to its last day).
+///
+/// With a [closingDay] («día de cierre», `pay_period.dart`) it is the payroll
+/// month named after that month instead: with 20, «noviembre» is 21 October
+/// to 20 November. [MonthSummary.month] is the first day of the month it is
+/// named after either way.
 MonthSummary summarizeMonth(
   Schedule schedule,
   CivilDate anyDay, {
   Set<CivilDate> holidays = const {},
   NightWindow window = const NightWindow(),
   ClockCutoff? cutoff,
+  int? closingDay,
 }) {
   final first = anyDay.firstDayOfMonth;
+  final period = payPeriodOf(first, closingDay);
   return summarizeRange(
     schedule,
-    first,
-    first.lastDayOfMonth,
+    period.from,
+    period.to,
     holidays: holidays,
     window: window,
     cutoff: cutoff,
+    month: first,
   );
 }
 
@@ -817,12 +828,14 @@ class YearTotals {
       months.fold(0, (sum, m) => sum + pick(m));
 }
 
-/// The twelve [summarizeMonth]s of [year].
+/// The twelve [summarizeMonth]s of [year] (the payroll months with a
+/// [closingDay]).
 YearTotals summarizeYearTotals(
   Schedule schedule,
   int year, {
   Set<CivilDate> holidays = const {},
   NightWindow window = const NightWindow(),
+  int? closingDay,
 }) => YearTotals(
   year: year,
   months: [
@@ -832,6 +845,7 @@ YearTotals summarizeYearTotals(
         CivilDate(year, m, 1),
         holidays: holidays,
         window: window,
+        closingDay: closingDay,
       ),
   ],
 );

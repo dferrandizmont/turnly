@@ -443,6 +443,18 @@ class _TypeTile extends StatelessWidget {
                                 type.meta.copyWith(color: colors.textMuted),
                               ),
                             ),
+                          // The break alert is set in the shift editor and
+                          // independent of the switch: show it here too.
+                          if (settings.pause.enabled)
+                            Text(
+                              l10n.alarmsTypePauseLine(
+                                pauseTimingText(l10n, settings.pause),
+                              ),
+                              key: ValueKey('alarms-type-pause-${shift.id}'),
+                              style: type.meta.copyWith(
+                                color: colors.textMuted,
+                              ),
+                            ),
                         ],
                       ),
                     ),

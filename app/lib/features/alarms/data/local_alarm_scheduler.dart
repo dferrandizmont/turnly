@@ -59,8 +59,8 @@ Future<void> alarmNotificationBackgroundHandler(
 /// OnePlus with battery saver the same alarm requested as `exactAllowWhileIdle`
 /// arrived up to 2 minutes late (docs/qa/lanzamiento-android-2026-10-29.md).
 /// The price: the system shows it as the next alarm (status bar icon, lock
-/// screen). Reminders, the evening-before notice and the renewal notice (A1)
-/// stay exact, not clocks.
+/// screen). Reminders, the evening-before notice, the renewal notice (A1) and
+/// the pause notice stay exact, not clocks.
 AndroidScheduleMode androidScheduleModeFor(
   AlarmKind kind, {
   required bool exact,
@@ -275,6 +275,21 @@ class LocalAlarmScheduler implements AlarmScheduler {
         enableVibration: true,
       ),
     );
+    // Pause notices («Toca pausa»): same volume and tone as a notification,
+    // on their own channel so the user can silence them in the system.
+    final pauseName = strings.pauseChannelName;
+    if (pauseName != null) {
+      await android.createNotificationChannel(
+        AndroidNotificationChannel(
+          pauseChannelId,
+          pauseName,
+          description: strings.pauseChannelDescription,
+          importance: Importance.high,
+          playSound: true,
+          enableVibration: true,
+        ),
+      );
+    }
   });
 
   /// Creates the channel of the custom sound [sound] (an Android channel has
@@ -416,7 +431,8 @@ class LocalAlarmScheduler implements AlarmScheduler {
   /// background, the notification goes away) and "Ya estoy despierto".
   ///
   /// A reminder or the renewal notice ([isNoticeKind]) rings on the
-  /// reminders' channel with the default notification sound and no buttons.
+  /// reminders' channel, a pause notice on its own, with the default
+  /// notification sound and no buttons.
   /// Any other alarm rings on the channel of its [sound] (null = the default
   /// one); [sound] must already be resolved (see `effectiveAlarmSound`).
   NotificationDetails _details({
@@ -428,6 +444,7 @@ class LocalAlarmScheduler implements AlarmScheduler {
     final strings = _strings;
     final buttons = snoozeLabel != null && awakeLabel != null;
     final reminder = isNoticeKind(kind);
+    final pause = kind == AlarmKind.pause;
     final channelId = alarmChannelIdFor(kind, sound);
     return NotificationDetails(
       android: AndroidNotificationDetails(
@@ -435,9 +452,15 @@ class LocalAlarmScheduler implements AlarmScheduler {
         // The channel already exists (configure created it with the
         // localized name); this is only read when it does not. No localized
         // copy is available in the snooze isolate.
-        (reminder ? strings?.reminderChannelName : strings?.channelName) ??
+        (pause
+                ? strings?.pauseChannelName
+                : reminder
+                ? strings?.reminderChannelName
+                : strings?.channelName) ??
             channelId,
-        channelDescription: reminder
+        channelDescription: pause
+            ? strings?.pauseChannelDescription
+            : reminder
             ? strings?.reminderChannelDescription
             : strings?.channelDescription,
         icon: _androidSmallIcon,

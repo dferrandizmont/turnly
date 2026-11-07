@@ -29,7 +29,7 @@ void main() {
     final h = BackupUiHarness(tester);
     final app = await AppUnderTest.pump(
       tester,
-      size: const Size(390, 1800),
+      size: const Size(390, 2600),
       overrides: h.overrides,
     );
     await app.openSettings();

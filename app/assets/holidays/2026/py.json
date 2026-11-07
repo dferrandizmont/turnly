@@ -1,0 +1,21 @@
+{
+"schema":1,
+"year":2026,
+"country":"PY",
+"national":[
+{"date":"2026-01-01","name":"Año Nuevo"},
+{"date":"2026-03-01","name":"Día de los Héroes de la Patria"},
+{"date":"2026-04-02","name":"Jueves Santo"},
+{"date":"2026-04-03","name":"Viernes Santo"},
+{"date":"2026-04-05","name":"Domingo de Resurrección"},
+{"date":"2026-05-01","name":"Día de los Trabajadores"},
+{"date":"2026-05-14","name":"Feriado Nacional"},
+{"date":"2026-05-15","name":"Día de la Independencia Nacional"},
+{"date":"2026-06-12","name":"Día de la Paz del Chaco"},
+{"date":"2026-06-22","name":"Día de la Jura de la Constitución Nacional"},
+{"date":"2026-08-15","name":"Día de la Fundación de Asunción"},
+{"date":"2026-09-29","name":"Día de la Batalla de Boquerón"},
+{"date":"2026-12-08","name":"Día de la Virgen de Caacupé"},
+{"date":"2026-12-25","name":"Día de la Navidad"}
+]
+}

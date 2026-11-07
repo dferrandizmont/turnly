@@ -1,0 +1,18 @@
+{
+"schema":1,
+"year":2026,
+"country":"LU",
+"national":[
+{"date":"2026-01-01","name":"New Year's Day"},
+{"date":"2026-04-06","name":"Easter Monday"},
+{"date":"2026-05-01","name":"Labor Day"},
+{"date":"2026-05-09","name":"Europe Day"},
+{"date":"2026-05-14","name":"Ascension Day"},
+{"date":"2026-05-25","name":"Pentecost Monday"},
+{"date":"2026-06-23","name":"National Day"},
+{"date":"2026-08-15","name":"Assumption Day"},
+{"date":"2026-11-01","name":"All Saints' Day"},
+{"date":"2026-12-25","name":"Christmas Day"},
+{"date":"2026-12-26","name":"Saint Stephen's Day"}
+]
+}

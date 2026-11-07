@@ -1,9 +1,9 @@
 {
   "name": "Turnly",
   "title": "Turnly · As túas quendas, dunha ollada",
-  "description": "Calendario de quendas gratuíto e de código aberto para quen traballa a quendas en España. Sen anuncios, sen conta e sen conexión.",
-  "intro": "Calendario de quendas para quen traballa a quendas en España: sanidade, policía, bombeiros, industria, hostalaría ou calquera outro sector. Organiza mañás, tardes, noites, gardas, saíntes e días libres, e consulta a túa próxima quenda dunha ollada.",
-  "key_facts": "Gratis · Sen anuncios · Sen conta · Funciona sen conexión · Código aberto · Cinco idiomas",
+  "description": "Calendario de quendas gratuíto e de código aberto para quen traballa a quendas en España. Sen Pro, sen anuncios, sen conta e sen conexión.",
+  "intro": "Calendario de quendas para quen traballa a quendas en España (sanidade, policía, bombeiros, industria, hostalaría ou calquera outro sector): organiza mañás, tardes, noites, gardas, saíntes e días libres, e consulta a túa próxima quenda dunha ollada. Todo é gratis, sen versión Pro, anuncios nin conta, e cando cambias de móbil levas as túas quendas contigo sen volver pagar nada.",
+  "key_facts": "Todo gratis, sen Pro · Sen anuncios · Sen conta · Funciona sen conexión · Código aberto · Cinco idiomas",
   "features": [
     "Tarxeta de hoxe coa próxima quenda, o próximo día libre e a racha. O mes en cuadrícula ou lista, a axenda e o ano, coas citas do calendario do móbil xunto ás túas quendas. Notas por día con fotos, ficheiros e tarefas. Compara ata seis calendarios e mira que días tedes libres á vez.",
     "Toca ou arrastra para pintar varios días e, con «Engadir outra quenda», pon máis dunha no mesmo día. Copia, pega, desfai e refai. Asistente de rotacións con vista previa: quendas rotativas, 24/72, 4×4, 6×4, 5×2, 2-2-3 ou o teu propio patrón, desde o día do ciclo que che toque.",
@@ -20,7 +20,7 @@
   "faq": [
     {
       "question": "Canto custa?",
-      "answer": "Nada. Turnly é totalmente gratis e de código aberto: sen anuncios, sen versión Pro e sen compras dentro da app."
+      "answer": "Nada. Turnly é totalmente gratis e de código aberto: sen anuncios, sen versión Pro e sen compras dentro da app. Tampouco cando cambias de móbil: non hai nada que recuperar nin que volver pagar."
     },
     {
       "question": "Necesito unha conta ou conexión a internet?",
@@ -35,8 +35,8 @@
       "answer": "A versión para iPhone está en camiño. Sairá primeiro en TestFlight e despois na App Store."
     },
     {
-      "question": "Como paso as miñas quendas a outro móbil?",
-      "answer": "Leva un ficheiro .turnly: expórtao en Configuración › Copia de seguranza e ábreo no móbil novo (ou, en Android, usa a copia automática nun cartafol). As copias que quedan dentro da app pérdense ao desinstalala. En Android tamén funciona o paso directo do móbil vello ao novo. Non se restaura nada sen que o confirmes."
+      "question": "Como paso Turnly a un móbil novo?",
+      "answer": "Tes catro maneiras, e todas son de balde. Paso directo: cando configuras o móbil novo, copia nel as apps e os datos do vello por cable ou wifi; Turnly pasa con elas. Copia de Google: coa copia de seguranza de Android activada e un bloqueo de pantalla (PIN, padrón ou contrasinal), Android garda Turnly cifrado na túa conta de Google e recupérao cando configuras o móbil novo coa mesma conta (Android 9 ou posterior). Sen bloqueo de pantalla, Turnly non entra nesa copia. Ficheiro .turnly: en Configuración › Copia de seguranza, «Exportar ficheiro» ou «Gardar no dispositivo»; lévao ao móbil novo e ábreo, ou usa «Importar ficheiro». Copia automática nun cartafol (Android): deixa unha copia cada día no cartafol que escollas; se ese cartafol está na túa nube ou o pasas ao móbil novo, importa a última. Co ficheiro ou o cartafol, antes ves que contén a copia e non se substitúe nada sen que o confirmes. As copias que quedan dentro da app pérdense se a desinstalas sen outra copia."
     },
     {
       "question": "E se quero comezar de cero?",
@@ -60,7 +60,7 @@
   "privacy_date": "2026-11-04",
   "kicker": "Calendario de quendas",
   "tagline": "As túas quendas, dunha ollada.",
-  "chip": "Gratis, sen anuncios e sen conexión.",
+  "chip": "Todo gratis: sen Pro, sen anuncios e sen conta.",
   "nav_label": "Seccións",
   "theme_label": "Tema",
   "theme_system": "Sistema",

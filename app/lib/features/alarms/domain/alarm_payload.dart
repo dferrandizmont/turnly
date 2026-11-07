@@ -31,6 +31,11 @@ enum AlarmKind {
   /// open the app so the next alarms get scheduled. `shiftTypeId` is empty
   /// and `shiftDate` is the day of that last alarm. No buttons.
   renewal,
+
+  /// The mid-shift pause notice («Toca pausa», `PauseAlertSettings`): rings
+  /// halfway through the shift, or some time after it starts. A plain
+  /// notification (own channel, notification volume), no buttons.
+  pause,
 }
 
 /// What travels inside a notification, so that a notification action can act

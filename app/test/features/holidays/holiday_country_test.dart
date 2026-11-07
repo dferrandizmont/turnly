@@ -385,13 +385,16 @@ void main() {
         expect(line.toJson()['country'], 'MX');
       });
 
-      test('the shipped bundle: Spain plus the 21 countries of D4', () async {
-        final manifest = await HolidayBundleLoader(bundle: shippedBundle())
-            .readManifest();
-        expect(manifest.countries, hasLength(22));
-        expect(manifest.countries, containsAll(['ES', 'MX', 'DE', 'US']));
-        expect(manifest.countries, isNot(contains('PL')));
-      });
+      test(
+        'the shipped bundle: Spain plus the 40 countries of D4 and proposal 8',
+        () async {
+          final manifest = await HolidayBundleLoader(bundle: shippedBundle())
+              .readManifest();
+          expect(manifest.countries, hasLength(41));
+          expect(manifest.countries, containsAll(['ES', 'MX', 'DE', 'US']));
+          expect(manifest.countries, isNot(contains('MA')));
+        },
+      );
     });
   });
 }

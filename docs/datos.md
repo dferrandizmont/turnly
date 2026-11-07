@@ -456,6 +456,12 @@ Lo **usado** no se guarda: P3 lo cuenta de los días del calendario con alguno d
 siendo REAL (los cuartos son exactos en coma flotante); el dominio (`AbsenceBalance.problem`) exige al escribir que
 sea un número entero de unidades, y no se le añade CHECK porque una fila de antes podría no cumplirlo.
 
+Dos datos de un saldo no tienen columna y van en `settings` (viajan en la copia con la tabla entera, sin migración):
+la fecha en que caducan los días arrastrados (`absences.carryOverExpiry`) y si el saldo cuenta **solo días hábiles**
+(`absences.workingDays`, propuesta 8: lista ordenada de claves `<calendario>|<año>:<serie>`). Un saldo en días hábiles
+solo gasta los días de lunes a viernes que no son festivo del calendario (`isWorkingDay` en `absence_balance.dart`):
+una semana de vacaciones con un festivo gasta 4 días. Sin la marca cuenta cada día con uno de sus tipos, como antes.
+
 ### Repositorios (sin interfaz)
 `NoteAttachmentsRepository` y `DayTasksRepository` (`features/notes/data/`), `ShiftSwapsRepository`
 (`features/swaps/data/`) y `AbsenceBalancesRepository` (`features/absences/data/`), con sus modelos en `domain/`

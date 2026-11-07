@@ -63,6 +63,32 @@ void main() {
       expect(loaded.cellTextSize, CellTextSize.normal);
     });
 
+    test(
+      'pure black: off by default, round trip, bad values are off',
+      () async {
+        expect((await repository.load()).pureBlack, isFalse);
+        await repository.setPureBlack(true);
+        expect((await repository.load()).pureBlack, isTrue);
+        await repository.setPureBlack(false);
+        expect((await repository.load()).pureBlack, isFalse);
+        await store(PreferenceKeys.pureBlack, '"yes"');
+        expect((await repository.load()).pureBlack, isFalse);
+        await store(PreferenceKeys.pureBlack, 'not json');
+        expect((await repository.load()).pureBlack, isFalse);
+      },
+    );
+
+    test('every accent round-trips through the repository', () async {
+      for (final accent in AppAccent.values) {
+        await repository.setAccent(accent);
+        expect((await repository.load()).accent, accent);
+      }
+    });
+
+    test('pure black travels in the backup, like the accent', () {
+      expect(isDeviceSetting(PreferenceKeys.pureBlack), isFalse);
+    });
+
     test('the other preferences are not touched', () async {
       await repository.setCurrency('USD');
       await repository.setAccent(AppAccent.petrol);
@@ -88,12 +114,15 @@ void main() {
       final controller = container.read(preferencesProvider.notifier);
       await controller.setAccent(AppAccent.graphite);
       await controller.setCellTextSize(CellTextSize.extraLarge);
+      await controller.setPureBlack(true);
       final state = container.read(preferencesProvider);
       expect(state.accent, AppAccent.graphite);
       expect(state.cellTextSize, CellTextSize.extraLarge);
+      expect(state.pureBlack, isTrue);
       final stored = await repository.load();
       expect(stored.accent, AppAccent.graphite);
       expect(stored.cellTextSize, CellTextSize.extraLarge);
+      expect(stored.pureBlack, isTrue);
     });
   });
 
@@ -142,7 +171,7 @@ void main() {
   });
 
   group('Ajustes › Apariencia', () {
-    const tall = Size(390, 2200);
+    const tall = Size(390, 2600);
 
     Future<Preferences> stored(AppUnderTest app) =>
         app.real(() => PreferencesRepository(app.database).load());
@@ -156,7 +185,7 @@ void main() {
         find.descendant(of: find.byType(BottomSheet), matching: what);
 
     for (final brightness in Brightness.values) {
-      testWidgets('the accent: five options, live change, '
+      testWidgets('the accent: ten options, live change, '
           'stored (${brightness.name})', (tester) async {
         final app = await AppUnderTest.pump(
           tester,
@@ -179,6 +208,11 @@ void main() {
           'Petróleo',
           'Frambuesa',
           'Grafito',
+          'Violeta',
+          'Ciruela',
+          'Esmeralda',
+          'Oliva',
+          'Terracota',
         ]) {
           expect(inSheet(find.text(name)), findsOneWidget);
         }
@@ -242,6 +276,37 @@ void main() {
       );
       expect((await stored(app)).cellTextSize, CellTextSize.large);
     });
+
+    for (final brightness in Brightness.values) {
+      testWidgets('the pure black switch paints the dark background only, '
+          'stored (${brightness.name})', (tester) async {
+        final app = await AppUnderTest.pump(
+          tester,
+          size: tall,
+          platformBrightness: brightness,
+        );
+        final dark = brightness == Brightness.dark;
+        await app.openSettings();
+        final switchFinder = find.byKey(
+          const ValueKey('settings-pure-black-switch'),
+        );
+        expect(switchFinder, findsOneWidget);
+        expect(tester.widget<Switch>(switchFinder).value, isFalse);
+        expect(
+          app.theme.extension<AppColors>()!.background,
+          dark ? AppColors.dark.background : AppColors.light.background,
+        );
+
+        await tester.tap(switchFinder);
+        await tester.pumpAndSettle();
+        expect(tester.widget<Switch>(switchFinder).value, isTrue);
+        expect(
+          app.theme.extension<AppColors>()!.background,
+          dark ? const Color(0xFF000000) : AppColors.light.background,
+        );
+        expect((await stored(app)).pureBlack, isTrue);
+      });
+    }
 
     testWidgets('a dismissed sheet changes nothing', (tester) async {
       final app = await AppUnderTest.pump(tester, size: tall);

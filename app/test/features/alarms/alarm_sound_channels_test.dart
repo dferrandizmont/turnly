@@ -30,6 +30,9 @@ const _strings = AlarmStrings(
   reminderEmptyBody: 'Tienes un recordatorio para hoy',
   reminderChannelName: 'Recordatorios de notas',
   reminderChannelDescription: 'Los avisos de tus notas',
+  pauseTitle: 'Toca pausa',
+  pauseChannelName: 'Avisos de pausa',
+  pauseChannelDescription: 'Te avisa a mitad del turno',
 );
 String _t2(String a, String b) => '$a $b';
 String _t3(String a, String b, String c) => '$a $b $c';
@@ -172,6 +175,14 @@ void main() {
         isFalse,
       );
       expect(reminderChannelId.startsWith(alarmSoundChannelPrefix), isFalse);
+      expect(pauseChannelId.startsWith(alarmSoundChannelPrefix), isFalse);
+    });
+
+    test('the pause notice has its own channel whatever the sound', () {
+      expect(pauseChannelId, 'break_alerts');
+      expect(alarmChannelIdFor(AlarmKind.pause, null), pauseChannelId);
+      expect(alarmChannelIdFor(AlarmKind.pause, _soundA), pauseChannelId);
+      expect(isNoticeKind(AlarmKind.pause), isTrue);
     });
 
     test('a reminder has its own channel whatever the sound', () {
@@ -207,6 +218,7 @@ void main() {
         [
           defaultAlarmChannelId,
           reminderChannelId,
+          pauseChannelId,
           used,
           unused,
           'other_plugin_channel',
@@ -512,6 +524,78 @@ void main() {
       );
       expect(
         androidScheduleModeFor(AlarmKind.renewal, exact: false),
+        AndroidScheduleMode.inexactAllowWhileIdle,
+      );
+    });
+
+    test('configure creates the channel of the pause notices, as a '
+        'notification', () async {
+      await scheduler.configure(_strings);
+      final pause = android.channel(pauseChannelId)!;
+      expect(pause.name, 'Avisos de pausa');
+      expect(pause.importance, Importance.high);
+      expect(pause.audioAttributesUsage, AudioAttributesUsage.notification);
+      expect(pause.sound, isNull);
+    });
+
+    test('texts without the pause notice create no channel for it', () async {
+      await scheduler.configure(
+        const AlarmStrings(
+          title: _t2,
+          body: _t3,
+          channelName: 'Alarmas de turno',
+          channelDescription: 'Descripción',
+          dayBeforeTitle: _t2,
+          snoozeAction: 'Posponer 10 min',
+          awakeAction: 'Ya estoy despierto',
+          testTitle: 'Prueba',
+          testBody: 'Cuerpo',
+          reminderTitle: 'Recordatorio',
+          reminderEmptyBody: 'Tienes un recordatorio para hoy',
+          reminderChannelName: 'Recordatorios de notas',
+          reminderChannelDescription: 'Los avisos de tus notas',
+        ),
+      );
+      expect(android.channel(pauseChannelId), isNull);
+      expect(android.channel(reminderChannelId), isNotNull);
+    });
+
+    test('a pause notice rings on its own channel, as a notification, with '
+        'no buttons and the default sound', () async {
+      await scheduler.configure(_strings);
+      android.created.clear();
+      await scheduler.replaceAll([
+        const PlannedAlarm(
+          id: 11,
+          fireDate: CivilDate(2026, 10, 21),
+          fireMinute: 2 * 60,
+          shiftDate: CivilDate(2026, 10, 20),
+          shiftTypeId: 'night',
+          title: 'Toca pausa',
+          body: 'Noche: de 22:00 a 06:00',
+          kind: AlarmKind.pause,
+        ),
+      ]);
+      expect(android.created, isEmpty);
+      final call = plugin.scheduled.single;
+      expect(call.android.channelId, pauseChannelId);
+      expect(call.android.channelName, 'Avisos de pausa');
+      expect(call.android.actions, isNull);
+      expect(call.android.sound, isNull);
+      expect(
+        call.android.audioAttributesUsage,
+        AudioAttributesUsage.notification,
+      );
+      expect(call.android.importance, Importance.high);
+      expect(call.android.visibility, NotificationVisibility.private);
+      expect(AlarmPayload.decode(call.payload)!.kind, AlarmKind.pause);
+      expect(
+        androidScheduleModeFor(AlarmKind.pause, exact: true),
+        AndroidScheduleMode.exactAllowWhileIdle,
+        reason: 'not an alarm clock: no icon in the status bar',
+      );
+      expect(
+        androidScheduleModeFor(AlarmKind.pause, exact: false),
         AndroidScheduleMode.inexactAllowWhileIdle,
       );
     });

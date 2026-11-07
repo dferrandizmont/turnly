@@ -14,10 +14,11 @@ import '../application/preferences_controller.dart';
 import 'settings_widgets.dart';
 
 /// The rows of P8 · Apariencia (`docs/paridad-pago.md`) for Ajustes ›
-/// Apariencia: «Color de acento» and «Tamaño del turno en el mes». Hooked
+/// Apariencia: «Color de acento», «Fondo negro» and «Tamaño del turno en el mes». Hooked
 /// into the section with one line (`...appearanceStyleRows`).
 const List<Widget> appearanceStyleRows = [
   AccentSettingRow(key: ValueKey('settings-accent')),
+  PureBlackSettingRow(key: ValueKey('settings-pure-black')),
   CellTextSizeSettingRow(key: ValueKey('settings-cell-size')),
 ];
 
@@ -32,6 +33,9 @@ abstract final class _Glyphs {
   static IconData get accent =>
       _apple ? CupertinoIcons.paintbrush : Symbols.palette_rounded;
 
+  static IconData get pureBlack =>
+      _apple ? CupertinoIcons.moon_fill : Symbols.dark_mode_rounded;
+
   static IconData get cellSize =>
       _apple ? CupertinoIcons.textformat_size : Symbols.format_size_rounded;
 }
@@ -45,6 +49,11 @@ String accentName(BuildContext context, AppAccent accent) {
     AppAccent.petrol => l10n.appearanceAccentPetrol,
     AppAccent.raspberry => l10n.appearanceAccentRaspberry,
     AppAccent.graphite => l10n.appearanceAccentGraphite,
+    AppAccent.violet => l10n.appearanceAccentViolet,
+    AppAccent.plum => l10n.appearanceAccentPlum,
+    AppAccent.emerald => l10n.appearanceAccentEmerald,
+    AppAccent.olive => l10n.appearanceAccentOlive,
+    AppAccent.terracotta => l10n.appearanceAccentTerracotta,
   };
 }
 
@@ -58,7 +67,7 @@ String cellTextSizeName(BuildContext context, CellTextSize size) {
   };
 }
 
-/// Ajustes › Apariencia › Color de acento: five tested accents, Índigo by
+/// Ajustes › Apariencia › Color de acento: ten tested accents, Índigo by
 /// default (option 8.3 of the 31-oct canvas). The change repaints the app at
 /// once.
 class AccentSettingRow extends ConsumerWidget {
@@ -81,6 +90,30 @@ class AccentSettingRow extends ConsumerWidget {
           );
         }
       },
+    );
+  }
+}
+
+/// Ajustes › Apariencia › «Fondo negro»: pure black behind the screens of the
+/// dark theme, for OLED phones. Off by default; changes nothing in the light
+/// theme.
+class PureBlackSettingRow extends ConsumerWidget {
+  const PureBlackSettingRow({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final value = ref.watch(preferencesProvider.select((p) => p.pureBlack));
+    return SettingsSwitchRow(
+      icon: _Glyphs.pureBlack,
+      title: l10n.appearancePureBlackTitle,
+      subtitle: l10n.appearancePureBlackSubtitle,
+      value: value,
+      switchKey: const ValueKey('settings-pure-black-switch'),
+      onChanged: (enabled) => saveSetting(
+        context,
+        () => ref.read(preferencesProvider.notifier).setPureBlack(enabled),
+      ),
     );
   }
 }

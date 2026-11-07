@@ -1,0 +1,23 @@
+{
+"schema":1,
+"year":2026,
+"country":"RO",
+"national":[
+{"date":"2026-01-01","name":"Anul Nou"},
+{"date":"2026-01-02","name":"Anul Nou"},
+{"date":"2026-01-06","name":"Botezul Domnului - Boboteaza"},
+{"date":"2026-01-07","name":"Soborul Sfântului Proroc Ioan Botezătorul"},
+{"date":"2026-01-24","name":"Ziua Unirii Principatelor Române"},
+{"date":"2026-04-10","name":"Vinerea Mare"},
+{"date":"2026-04-12","name":"Paștele"},
+{"date":"2026-04-13","name":"Paștele"},
+{"date":"2026-05-01","name":"Ziua Muncii"},
+{"date":"2026-05-31","name":"Rusaliile"},
+{"date":"2026-06-01","name":"Rusaliile; Ziua Copilului"},
+{"date":"2026-08-15","name":"Adormirea Maicii Domnului"},
+{"date":"2026-11-30","name":"Sfântul Apostol Andrei, cel Întâi chemat, Ocrotitorul României"},
+{"date":"2026-12-01","name":"Ziua Națională a României"},
+{"date":"2026-12-25","name":"Crăciunul"},
+{"date":"2026-12-26","name":"Crăciunul"}
+]
+}

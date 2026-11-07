@@ -374,6 +374,18 @@ abstract class AppLocalizations {
   /// **'{minutes} min'**
   String durationMinutes(int minutes);
 
+  /// Etiqueta corta junto a la rueda de horas de un selector de duración.
+  ///
+  /// In es, this message translates to:
+  /// **'h'**
+  String get durationWheelHours;
+
+  /// Etiqueta corta junto a la rueda de minutos de un selector de duración.
+  ///
+  /// In es, this message translates to:
+  /// **'min'**
+  String get durationWheelMinutes;
+
   /// No description provided for @calendarNoShift.
   ///
   /// In es, this message translates to:
@@ -3619,6 +3631,18 @@ abstract class AppLocalizations {
   /// **'{count, plural, one{1 turno} other{{count} turnos}}'**
   String summaryFixedPlusCount(int count);
 
+  /// No description provided for @summaryNightPlus.
+  ///
+  /// In es, this message translates to:
+  /// **'Plus nocturno'**
+  String get summaryNightPlus;
+
+  /// No description provided for @summaryHolidayPlus.
+  ///
+  /// In es, this message translates to:
+  /// **'Plus festivo'**
+  String get summaryHolidayPlus;
+
   /// No description provided for @summaryEstimateNote.
   ///
   /// In es, this message translates to:
@@ -3708,6 +3732,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Objetivo: en un mes cuenta la doceava parte del anual; en un año, el mensual por 12; en unas fechas, la parte de sus días. La diferencia suma las trabajadas y las previstas.'**
   String get summaryNoteGoal;
+
+  /// No description provided for @summaryNoteClosingDay.
+  ///
+  /// In es, this message translates to:
+  /// **'Mes de nómina: con el día de cierre en el {day}, cada mes va del día siguiente al {day} del mes anterior hasta el {day} (o hasta el último día, si el mes es más corto). Las horas, el dinero, el objetivo y el tope de horas extra se cuentan así.'**
+  String summaryNoteClosingDay(int day);
 
   /// No description provided for @summaryGoalTitle.
   ///
@@ -4375,6 +4405,36 @@ abstract class AppLocalizations {
   /// **'Grafito'**
   String get appearanceAccentGraphite;
 
+  /// No description provided for @appearanceAccentViolet.
+  ///
+  /// In es, this message translates to:
+  /// **'Violeta'**
+  String get appearanceAccentViolet;
+
+  /// No description provided for @appearanceAccentPlum.
+  ///
+  /// In es, this message translates to:
+  /// **'Ciruela'**
+  String get appearanceAccentPlum;
+
+  /// No description provided for @appearanceAccentEmerald.
+  ///
+  /// In es, this message translates to:
+  /// **'Esmeralda'**
+  String get appearanceAccentEmerald;
+
+  /// No description provided for @appearanceAccentOlive.
+  ///
+  /// In es, this message translates to:
+  /// **'Oliva'**
+  String get appearanceAccentOlive;
+
+  /// No description provided for @appearanceAccentTerracotta.
+  ///
+  /// In es, this message translates to:
+  /// **'Terracota'**
+  String get appearanceAccentTerracotta;
+
   /// No description provided for @appearanceAccentDefault.
   ///
   /// In es, this message translates to:
@@ -4386,6 +4446,18 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Cambia enlaces, interruptores, selección y pestañas. Los colores de tus turnos no cambian.'**
   String get appearanceAccentNote;
+
+  /// No description provided for @appearancePureBlackTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Fondo negro'**
+  String get appearancePureBlackTitle;
+
+  /// No description provided for @appearancePureBlackSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Negro puro detrás de las pantallas en el tema oscuro, pensado para móviles OLED.'**
+  String get appearancePureBlackSubtitle;
 
   /// No description provided for @appearanceCellSizeTitle.
   ///
@@ -4900,7 +4972,7 @@ abstract class AppLocalizations {
   /// No description provided for @faqSummaryA.
   ///
   /// In es, this message translates to:
-  /// **'El icono de resumen del calendario enseña los turnos, las horas, las nocturnas y las de festivo del mes, de un año entero o de las fechas que elijas en «Fechas…» (hasta 366 días). Un turno cuenta en el día en que empieza, aunque cruce la medianoche.\n\nPara ver importes, pon el precio por hora y, si lo tienes, el plus fijo por tipo de turno en Ajustes › Mis turnos. La estimación incluye esos pluses fijos, antes de impuestos, en la moneda que elijas en Ajustes › Apariencia. No incluye pluses por hora nocturna o festiva ni retenciones.\n\nEl «Plus por turno» se suma una vez por cada turno trabajado de ese tipo, también si es partido; no depende de las horas. Los descansos y las ausencias no lo suman.'**
+  /// **'El icono de resumen del calendario enseña los turnos, las horas, las nocturnas y las de festivo del mes, de un año entero o de las fechas que elijas en «Fechas…» (hasta 366 días). Un turno cuenta en el día en que empieza, aunque cruce la medianoche.\n\nPara ver importes, pon el precio por hora y, si lo tienes, el plus fijo por tipo de turno en Ajustes › Mis turnos. La estimación incluye esos pluses fijos, antes de impuestos, en la moneda que elijas en Ajustes › Apariencia. También suma los pluses por hora nocturna y festiva que pongas en cada turno; la retención solo cambia el neto. En Ajustes › Horas y dinero tienes plantillas de pluses por sector, el día de cierre de tu mes de nómina y un tope de horas extra.\n\nEl «Plus por turno» se suma una vez por cada turno trabajado de ese tipo, también si es partido; no depende de las horas. Los descansos y las ausencias no lo suman.'**
   String get faqSummaryA;
 
   /// No description provided for @settingsVersionCopied.
@@ -7768,6 +7840,12 @@ abstract class AppLocalizations {
   /// **'Ciudad o región'**
   String get holidaysSubdivisionKindCityOrRegion;
 
+  /// No description provided for @holidaysSubdivisionKindDepartment.
+  ///
+  /// In es, this message translates to:
+  /// **'Departamento'**
+  String get holidaysSubdivisionKindDepartment;
+
   /// No description provided for @holidaysSubdivisionSearch.
   ///
   /// In es, this message translates to:
@@ -8092,6 +8170,12 @@ abstract class AppLocalizations {
   /// **'A las {time}'**
   String alarmsDayBeforeAt(String time);
 
+  /// Segunda línea de un tipo en Ajustes › Alarmas cuando tiene aviso de pausa: «Pausa: A mitad del turno».
+  ///
+  /// In es, this message translates to:
+  /// **'Pausa: {timing}'**
+  String alarmsTypePauseLine(String timing);
+
   /// No description provided for @alarmsDayBeforeTimeTitle.
   ///
   /// In es, this message translates to:
@@ -8223,6 +8307,24 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Te avisa a la hora que elijas en la nota de un día.'**
   String get alarmsReminderChannelDescription;
+
+  /// Título de la notificación del aviso de pausa a mitad de turno.
+  ///
+  /// In es, this message translates to:
+  /// **'Toca pausa'**
+  String get alarmsPauseTitle;
+
+  /// Nombre del canal de notificaciones de Android para los avisos de pausa.
+  ///
+  /// In es, this message translates to:
+  /// **'Avisos de pausa'**
+  String get alarmsPauseChannelName;
+
+  /// Descripción del canal de Android de los avisos de pausa.
+  ///
+  /// In es, this message translates to:
+  /// **'Te avisa a mitad del turno para que hagas una pausa.'**
+  String get alarmsPauseChannelDescription;
 
   /// Botón del detalle del día, bajo la nota: pide una hora y programa un aviso.
   ///
@@ -8428,6 +8530,84 @@ abstract class AppLocalizations {
   /// **'Usar el predeterminado'**
   String get shiftTypesSoundReset;
 
+  /// Cabecera de la sección del aviso de pausa en el editor de un tipo de turno.
+  ///
+  /// In es, this message translates to:
+  /// **'Aviso de pausa'**
+  String get shiftTypesPauseSection;
+
+  /// No description provided for @shiftTypesPauseSwitch.
+  ///
+  /// In es, this message translates to:
+  /// **'Avisarme para hacer una pausa'**
+  String get shiftTypesPauseSwitch;
+
+  /// Ayuda bajo el interruptor cuando el turno dura 8 horas o más. {duration}: duración del turno, p. ej. «12 h».
+  ///
+  /// In es, this message translates to:
+  /// **'Este turno dura {duration}: suele venir bien parar un rato a mitad.'**
+  String shiftTypesPauseHelperLong(String duration);
+
+  /// No description provided for @shiftTypesPauseHelperShort.
+  ///
+  /// In es, this message translates to:
+  /// **'Un aviso a mitad del turno para acordarte de parar.'**
+  String get shiftTypesPauseHelperShort;
+
+  /// No description provided for @shiftTypesPauseWhen.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuándo'**
+  String get shiftTypesPauseWhen;
+
+  /// No description provided for @shiftTypesPauseMid.
+  ///
+  /// In es, this message translates to:
+  /// **'A mitad del turno'**
+  String get shiftTypesPauseMid;
+
+  /// Cuándo suena el aviso de pausa. {duration}: «2 h», «1 h 30 min».
+  ///
+  /// In es, this message translates to:
+  /// **'{duration} después de empezar'**
+  String shiftTypesPauseAfter(String duration);
+
+  /// No description provided for @shiftTypesPauseSheetTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuándo te avisamos'**
+  String get shiftTypesPauseSheetTitle;
+
+  /// No description provided for @shiftTypesPauseCustomTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tiempo desde el inicio'**
+  String get shiftTypesPauseCustomTitle;
+
+  /// No description provided for @shiftTypesPauseCustomHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Horas y minutos después de que empiece el turno.'**
+  String get shiftTypesPauseCustomHelp;
+
+  /// Nota del aviso de pausa en un turno partido.
+  ///
+  /// In es, this message translates to:
+  /// **'En un turno partido, el aviso va en el tramo más largo.'**
+  String get shiftTypesPauseSplitNote;
+
+  /// Aviso de que el tiempo elegido no cabe dentro del turno.
+  ///
+  /// In es, this message translates to:
+  /// **'Ese tiempo es mayor que el turno: no sonará.'**
+  String get shiftTypesPauseOutside;
+
+  /// No description provided for @shiftTypesPauseAlarmsOff.
+  ///
+  /// In es, this message translates to:
+  /// **'Las alarmas están desactivadas. Actívalas en Ajustes › Alarmas para que suene el aviso.'**
+  String get shiftTypesPauseAlarmsOff;
+
   /// Plantillas de tipo de turno: nombre y código (1 a 3 caracteres, sin espacios, distinto en cada plantilla). Solo se usan al crear el tipo (instalación nueva, saliente automático…); los tipos ya guardados no se renombran.
   ///
   /// In es, this message translates to:
@@ -8581,7 +8761,7 @@ abstract class AppLocalizations {
   /// No description provided for @catalogPattern24x72Description.
   ///
   /// In es, this message translates to:
-  /// **'Guardia de 24 h y 72 h libres'**
+  /// **'Guardia de 24 h y 72 h libres (también 1-3)'**
   String get catalogPattern24x72Description;
 
   /// No description provided for @catalogPattern12hName.
@@ -8667,6 +8847,30 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Ciclo de 28 días en turnos de 12 h: 4 noches, 3 libres, 3 días, 1 libre, 3 noches, 3 libres, 4 días y 7 libres'**
   String get catalogPatternDupontDescription;
+
+  /// No description provided for @catalogPatternPn2226Name.
+  ///
+  /// In es, this message translates to:
+  /// **'Policía Nacional 2-2-2-6'**
+  String get catalogPatternPn2226Name;
+
+  /// No description provided for @catalogPatternPn2226Description.
+  ///
+  /// In es, this message translates to:
+  /// **'2 mañanas, 2 tardes, 2 noches, saliente y 5 libres (el 6x6 de la Policía Nacional)'**
+  String get catalogPatternPn2226Description;
+
+  /// No description provided for @catalogPatternGuard14Name.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardia 1-4'**
+  String get catalogPatternGuard14Name;
+
+  /// No description provided for @catalogPatternGuard14Description.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardia de 24 h y 4 días libres (1 guardia y 4 libres)'**
+  String get catalogPatternGuard14Description;
 
   /// No description provided for @holidayNameNewYear.
   ///
@@ -8986,6 +9190,12 @@ abstract class AppLocalizations {
   /// **'Permitidos'**
   String get absenceAllowed;
 
+  /// No description provided for @absenceWorkingDaysNote.
+  ///
+  /// In es, this message translates to:
+  /// **'En días hábiles'**
+  String get absenceWorkingDaysNote;
+
   /// No description provided for @absenceCarried.
   ///
   /// In es, this message translates to:
@@ -9105,6 +9315,18 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Arrastrar lo que sobre del año anterior'**
   String get absenceFieldCarry;
+
+  /// No description provided for @absenceFieldWorkingDays.
+  ///
+  /// In es, this message translates to:
+  /// **'Contar solo días hábiles'**
+  String get absenceFieldWorkingDays;
+
+  /// No description provided for @absenceFieldWorkingDaysHelper.
+  ///
+  /// In es, this message translates to:
+  /// **'De lunes a viernes, sin los festivos de tu calendario: un día pintado en fin de semana o en festivo no gasta saldo.'**
+  String get absenceFieldWorkingDaysHelper;
 
   /// No description provided for @absenceFieldCarryCap.
   ///
@@ -9339,6 +9561,270 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Escribe un número entero entre 0 y 100.'**
   String get moneyWithholdingInvalid;
+
+  /// No description provided for @closingDayTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Día de cierre'**
+  String get closingDayTitle;
+
+  /// No description provided for @closingDaySubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'El último día de tu mes de nómina'**
+  String get closingDaySubtitle;
+
+  /// No description provided for @closingDayNone.
+  ///
+  /// In es, this message translates to:
+  /// **'Fin de mes'**
+  String get closingDayNone;
+
+  /// No description provided for @closingDayValue.
+  ///
+  /// In es, this message translates to:
+  /// **'Día {day}'**
+  String closingDayValue(int day);
+
+  /// No description provided for @closingDayField.
+  ///
+  /// In es, this message translates to:
+  /// **'Día de cierre'**
+  String get closingDayField;
+
+  /// No description provided for @closingDayHelper.
+  ///
+  /// In es, this message translates to:
+  /// **'Si cobras del 21 al 20, escribe 20: el resumen de noviembre irá del 21 de octubre al 20 de noviembre. Déjalo vacío para contar el mes natural.'**
+  String get closingDayHelper;
+
+  /// No description provided for @closingDayInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe un día del 1 al 30, o déjalo vacío para el mes natural.'**
+  String get closingDayInvalid;
+
+  /// No description provided for @overtimeCapTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tope de horas extra'**
+  String get overtimeCapTitle;
+
+  /// No description provided for @overtimeCapSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Te avisa en el resumen al acercarte'**
+  String get overtimeCapSubtitle;
+
+  /// No description provided for @overtimeCapNone.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin tope'**
+  String get overtimeCapNone;
+
+  /// No description provided for @overtimeCapValueYear.
+  ///
+  /// In es, this message translates to:
+  /// **'{hours} h al año'**
+  String overtimeCapValueYear(int hours);
+
+  /// No description provided for @overtimeCapValueMonth.
+  ///
+  /// In es, this message translates to:
+  /// **'{hours} h al mes'**
+  String overtimeCapValueMonth(int hours);
+
+  /// No description provided for @overtimeCapIntro.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuenta las horas extra que anotas en cada día. El Estatuto de los Trabajadores pone un máximo de 80 al año; tu convenio puede fijar otro.'**
+  String get overtimeCapIntro;
+
+  /// No description provided for @overtimeCapPerYear.
+  ///
+  /// In es, this message translates to:
+  /// **'Al año'**
+  String get overtimeCapPerYear;
+
+  /// No description provided for @overtimeCapPerMonth.
+  ///
+  /// In es, this message translates to:
+  /// **'Al mes'**
+  String get overtimeCapPerMonth;
+
+  /// No description provided for @overtimeCapField.
+  ///
+  /// In es, this message translates to:
+  /// **'Horas extra como máximo'**
+  String get overtimeCapField;
+
+  /// No description provided for @overtimeCapHoursSuffix.
+  ///
+  /// In es, this message translates to:
+  /// **'h'**
+  String get overtimeCapHoursSuffix;
+
+  /// No description provided for @overtimeCapInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe un número entero de horas entre 1 y {max}.'**
+  String overtimeCapInvalid(int max);
+
+  /// No description provided for @overtimeCapRemove.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar el tope'**
+  String get overtimeCapRemove;
+
+  /// No description provided for @overtimeCapUsedYear.
+  ///
+  /// In es, this message translates to:
+  /// **'Horas extra del año'**
+  String get overtimeCapUsedYear;
+
+  /// No description provided for @overtimeCapUsedMonth.
+  ///
+  /// In es, this message translates to:
+  /// **'Horas extra del mes'**
+  String get overtimeCapUsedMonth;
+
+  /// No description provided for @overtimeCapOf.
+  ///
+  /// In es, this message translates to:
+  /// **'{used} de {cap}'**
+  String overtimeCapOf(String used, String cap);
+
+  /// No description provided for @overtimeCapLeft.
+  ///
+  /// In es, this message translates to:
+  /// **'Te quedan {left}'**
+  String overtimeCapLeft(String left);
+
+  /// No description provided for @overtimeCapNear.
+  ///
+  /// In es, this message translates to:
+  /// **'Te acercas al tope: te quedan {left}.'**
+  String overtimeCapNear(String left);
+
+  /// No description provided for @overtimeCapReached.
+  ///
+  /// In es, this message translates to:
+  /// **'Has llegado al tope de horas extra.'**
+  String get overtimeCapReached;
+
+  /// No description provided for @overtimeCapOver.
+  ///
+  /// In es, this message translates to:
+  /// **'Has pasado el tope de horas extra en {excess}.'**
+  String overtimeCapOver(String excess);
+
+  /// No description provided for @payTemplateTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Plantilla de pluses'**
+  String get payTemplateTitle;
+
+  /// No description provided for @payTemplateSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Sanidad pública, bomberos o vigilantes'**
+  String get payTemplateSubtitle;
+
+  /// No description provided for @payTemplateIntro.
+  ///
+  /// In es, this message translates to:
+  /// **'Rellena de una vez los pluses de tus turnos de trabajo. La plantilla no trae importes, porque cambian con cada convenio y cada año: empiezan en 0 y escribes los de tu nómina.'**
+  String get payTemplateIntro;
+
+  /// No description provided for @payTemplatePublicHealth.
+  ///
+  /// In es, this message translates to:
+  /// **'Sanidad pública'**
+  String get payTemplatePublicHealth;
+
+  /// No description provided for @payTemplateFirefighters.
+  ///
+  /// In es, this message translates to:
+  /// **'Bomberos'**
+  String get payTemplateFirefighters;
+
+  /// No description provided for @payTemplatePrivateSecurity.
+  ///
+  /// In es, this message translates to:
+  /// **'Vigilantes de seguridad'**
+  String get payTemplatePrivateSecurity;
+
+  /// No description provided for @payTemplateGuardPlus.
+  ///
+  /// In es, this message translates to:
+  /// **'Plus por guardia'**
+  String get payTemplateGuardPlus;
+
+  /// No description provided for @payTemplateGuardHelper.
+  ///
+  /// In es, this message translates to:
+  /// **'Se suma una vez por cada guardia: los turnos de {hours} h o más.'**
+  String payTemplateGuardHelper(int hours);
+
+  /// No description provided for @payTemplateHolidayHelper.
+  ///
+  /// In es, this message translates to:
+  /// **'Se suma por cada hora trabajada en festivo. Si una guardia cruza a un festivo, solo cuentan sus horas de ese día.'**
+  String get payTemplateHolidayHelper;
+
+  /// No description provided for @payTemplateAnnualHours.
+  ///
+  /// In es, this message translates to:
+  /// **'Jornada anual (opcional)'**
+  String get payTemplateAnnualHours;
+
+  /// No description provided for @payTemplateAnnualHoursHelper.
+  ///
+  /// In es, this message translates to:
+  /// **'Se guarda como tu objetivo de horas al año. Déjalo vacío para no cambiarlo.'**
+  String get payTemplateAnnualHoursHelper;
+
+  /// No description provided for @payTemplateAnnualHoursSource.
+  ///
+  /// In es, this message translates to:
+  /// **'El convenio estatal de empresas de seguridad fija {hours} h de trabajo efectivo al año. Se guarda como tu objetivo de horas al año; cámbialo o bórralo si el tuyo es otro.'**
+  String payTemplateAnnualHoursSource(int hours);
+
+  /// No description provided for @payTemplateAnnualHoursNone.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin cambios'**
+  String get payTemplateAnnualHoursNone;
+
+  /// No description provided for @payTemplateAnnualHoursInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe un número entero de horas entre 1 y {max}.'**
+  String payTemplateAnnualHoursInvalid(int max);
+
+  /// No description provided for @payTemplateTypes.
+  ///
+  /// In es, this message translates to:
+  /// **'Tipos de turno a los que se aplica'**
+  String get payTemplateTypes;
+
+  /// No description provided for @payTemplateTypesNone.
+  ///
+  /// In es, this message translates to:
+  /// **'No tienes tipos de turno de trabajo con horario para esta plantilla. Créalos en Mis turnos.'**
+  String get payTemplateTypesNone;
+
+  /// No description provided for @payTemplateApply.
+  ///
+  /// In es, this message translates to:
+  /// **'Aplicar'**
+  String get payTemplateApply;
+
+  /// No description provided for @payTemplateApplied.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =0{Plantilla aplicada: ningún tipo de turno cambia.} =1{Plantilla aplicada a 1 tipo de turno.} other{Plantilla aplicada a {count} tipos de turno.}}'**
+  String payTemplateApplied(int count);
 
   /// No description provided for @moneyGross.
   ///

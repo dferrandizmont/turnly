@@ -13,6 +13,7 @@ enum HolidaySubdivisionKind {
   canton,
   city,
   cityOrRegion,
+  department,
 }
 
 /// A subdivision of a country with its own holidays: an ISO 3166-2 code

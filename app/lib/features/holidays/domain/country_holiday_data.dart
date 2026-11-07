@@ -25,10 +25,30 @@ const List<String> bundledCountryCodes = [
   'BE',
   'CH',
   'AT',
+  'GT',
+  'BO',
+  'PY',
+  'PA',
+  'CR',
+  'DO',
+  'HN',
+  'SV',
+  'NI',
+  'CU',
+  'PL',
+  'SE',
+  'NO',
+  'DK',
+  'FI',
+  'LU',
+  'GR',
+  'RO',
+  'AD',
 ];
 
 /// Kind of subdivision each country offers (`state`, `federalState`,
-/// `province`, `region`, `nation`, `canton`, `city`, `cityOrRegion`).
+/// `province`, `region`, `nation`, `canton`, `city`, `cityOrRegion`,
+/// `department`).
 const Map<String, String> bundledSubdivisionKinds = {
   'AR': 'province',
   'CL': 'region',
@@ -41,6 +61,7 @@ const Map<String, String> bundledSubdivisionKinds = {
   'US': 'state',
   'CA': 'province',
   'CH': 'canton',
+  'BO': 'department',
 };
 
 /// ISO 3166-2 code -> name of the subdivisions of each country that has
@@ -385,5 +406,16 @@ const Map<String, Map<String, String>> bundledSubdivisionNames = {
     'CH-VS': 'Valais',
     'CH-ZG': 'Zug',
     'CH-ZH': 'Zürich',
+  },
+  'BO': {
+    'BO-B': 'El Beni',
+    'BO-C': 'Cochabamba',
+    'BO-H': 'Chuquisaca',
+    'BO-L': 'La Paz',
+    'BO-N': 'Pando',
+    'BO-O': 'Oruro',
+    'BO-P': 'Potosí',
+    'BO-S': 'Santa Cruz',
+    'BO-T': 'Tarija',
   },
 };

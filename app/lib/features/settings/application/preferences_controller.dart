@@ -118,6 +118,12 @@ class PreferencesController extends Notifier<Preferences> {
     (repository) => repository.setCellTextSize(size),
   );
 
+  /// Ajustes › Apariencia › «Fondo negro»; the dark theme repaints at once.
+  Future<void> setPureBlack(bool enabled) => _change(
+    state.copyWith(pureBlack: enabled),
+    (repository) => repository.setPureBlack(enabled),
+  );
+
   /// The percentage of the withholding of the estimated pay (P9): a whole
   /// number between 0 and 100.
   Future<void> setWithholdingPercent(int percent) => _change(

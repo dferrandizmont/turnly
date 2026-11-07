@@ -2,8 +2,8 @@ import 'package:cuadrante/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// P8 · Apariencia (option 8.3 of the 31-oct canvas): five accents, Índigo
-/// by default. Every accent reaches AA in light and dark, and it only paints
+/// P8 · Apariencia (option 8.3 of the 31-oct canvas): ten accents (the first
+/// five of 31-oct, the rest of proposal 8, 6-nov), Índigo by default. Every accent reaches AA in light and dark, and it only paints
 /// links, switches, selection and tabs: never the shifts nor the amber.
 void main() {
   const aa = 4.5;
@@ -12,8 +12,14 @@ void main() {
 
   group('every accent passes AA', () {
     for (final accent in AppAccent.values) {
-      for (final base in [AppColors.light, AppColors.dark]) {
-        final mode = base.isDark ? 'dark' : 'light';
+      for (final base in [
+        AppColors.light,
+        AppColors.dark,
+        AppColors.dark.withPureBlack(),
+      ]) {
+        final mode = base.isDark
+            ? (base.background == AppColors.pureBlack ? 'pure black' : 'dark')
+            : 'light';
         test('${accent.stored} · $mode', () {
           final c = base.withAccent(accent);
           // Links and small accent text on every surface they sit on.
@@ -62,6 +68,122 @@ void main() {
             reason: '${accent.stored} ${theme.brightness.name}',
           );
         }
+      }
+    });
+  });
+
+  group('the ten accents', () {
+    test('the first five keep their order and their stored names', () {
+      expect(AppAccent.values, hasLength(10));
+      expect(AppAccent.values.take(5).map((a) => a.stored), [
+        'indigo',
+        'blue',
+        'petrol',
+        'raspberry',
+        'graphite',
+      ]);
+      expect(AppAccent.values.skip(5).map((a) => a.stored), [
+        'violet',
+        'plum',
+        'emerald',
+        'olive',
+        'terracotta',
+      ]);
+      expect(
+        AppAccent.values.map((a) => a.stored).toSet(),
+        hasLength(10),
+        reason: 'two accents share a stored name',
+      );
+    });
+
+    test('no two accents share a colour in either theme', () {
+      expect(AppAccent.values.map((a) => a.light).toSet(), hasLength(10));
+      expect(AppAccent.values.map((a) => a.dark).toSet(), hasLength(10));
+    });
+
+    test('the amber of the app is not an accent', () {
+      for (final accent in AppAccent.values) {
+        expect(accent.light, isNot(AppColors.light.highlight));
+        expect(accent.dark, isNot(AppColors.dark.highlight));
+      }
+    });
+  });
+
+  group('pure black background (OLED)', () {
+    test('only the background of the dark theme changes', () {
+      final black = AppColors.dark.withPureBlack();
+      expect(black.background, const Color(0xFF000000));
+      final dark = AppColors.dark;
+      expect(black.surface, dark.surface);
+      expect(black.surfaceMuted, dark.surfaceMuted);
+      expect(black.surfaceRaised, dark.surfaceRaised);
+      expect(black.border, dark.border);
+      expect(black.textPrimary, dark.textPrimary);
+      expect(black.textMuted, dark.textMuted);
+      expect(black.accent, dark.accent);
+      expect(black.highlight, dark.highlight);
+      expect(black.isDark, isTrue);
+    });
+
+    test('the light theme ignores it', () {
+      expect(
+        identical(AppColors.light.withPureBlack(), AppColors.light),
+        isTrue,
+      );
+    });
+
+    test('every text token reads on pure black', () {
+      final c = AppColors.dark.withPureBlack();
+      for (final (name, color) in [
+        ('textPrimary', c.textPrimary),
+        ('textSecondary', c.textSecondary),
+        ('textMuted', c.textMuted),
+        ('highlight', c.highlight),
+        ('holiday', c.holiday),
+      ]) {
+        expect(
+          contrastRatio(color, c.background),
+          greaterThanOrEqualTo(aa),
+          reason: name,
+        );
+      }
+    });
+
+    test('the dark theme paints it, and the default stays as it was', () {
+      expect(
+        AppTheme.dark(pureBlack: true).scaffoldBackgroundColor,
+        const Color(0xFF000000),
+      );
+      expect(
+        AppTheme.dark().scaffoldBackgroundColor,
+        AppColors.dark.background,
+      );
+      expect(
+        AppTheme.light().scaffoldBackgroundColor,
+        AppColors.light.background,
+      );
+      expect(
+        identical(
+          AppTheme.dark(pureBlack: true),
+          AppTheme.dark(pureBlack: true),
+        ),
+        isTrue,
+      );
+      expect(
+        identical(AppTheme.dark(pureBlack: true), AppTheme.dark()),
+        isFalse,
+      );
+    });
+
+    test('the shift colours do not depend on it', () {
+      // The swatches come from the brightness only: a night shift reads the
+      // same on black as on the usual dark background.
+      for (final color in ShiftPalette.editorChoices) {
+        final swatch = ShiftSwatch.forColor(color.toARGB32(), Brightness.dark);
+        expect(
+          contrastRatio(swatch.ink, swatch.tint),
+          greaterThanOrEqualTo(kTextContrast),
+        );
       }
     });
   });

@@ -63,20 +63,26 @@ idioma. Código: `HolidayPlace.countryCode`, lista y nombres en `domain/holiday_
 
 ## Otros países (D4, 31-oct-2026)
 
-Festivos oficiales de 21 países, **sin red y sin API en ejecución**: se generan en desarrollo y viajan como ficheros del
+Festivos oficiales de 40 países (21 del 31-oct y 19 del 6-nov-2026, propuesta 8 del informe de competencia),
+**sin red y sin API en ejecución**: se generan en desarrollo y viajan como ficheros del
 paquete (`assets/holidays/{año}/<cc>.json`, alcance `country`), 2026 y 2027.
 
 | Zona | Países |
 |---|---|
 | América | México, Argentina, Colombia, Chile, Perú, Ecuador, Uruguay, Venezuela, Brasil, Estados Unidos, Canadá |
+| América (6-nov) | Guatemala, Bolivia, Paraguay, Panamá, Costa Rica, República Dominicana, Honduras, El Salvador, Nicaragua, Cuba |
 | Europa | Portugal, Francia, Italia, Alemania, Reino Unido, Irlanda, Países Bajos, Bélgica, Suiza, Austria |
+| Europa (6-nov) | Polonia, Suecia, Noruega, Dinamarca, Finlandia, Luxemburgo, Grecia, Rumanía, Andorra |
 
 Subdivisiones que se pueden elegir (código ISO 3166-2): Alemania (16 Länder), Estados Unidos (50 estados y DC), Canadá
 (13), Suiza (26 cantones), Reino Unido (Inglaterra, Gales, Escocia, Irlanda del Norte), Brasil (26 estados y DF),
 Argentina (24), Chile (16 regiones; solo 2 con día propio), Francia (14: Alsacia-Mosela y ultramar), Italia (107
 provincias: el patrón del capoluogo), Portugal (20: Azores, Madeira y las capitales de distrito con su festivo
-municipal). Sin subdivisión: México, Colombia, Perú, Ecuador, Uruguay, Venezuela, Irlanda, Países Bajos, Bélgica y
-Austria (la biblioteca no tiene ningún día de Land que sea festivo).
+municipal). Bolivia (9 departamentos, cada uno con su día: La Paz 16 jul, Santa Cruz 24 sep...; tipo «Departamento»). Sin
+subdivisión: México, Colombia, Perú, Ecuador, Uruguay, Venezuela, Irlanda, Países Bajos, Bélgica, Austria y los 18
+nuevos salvo Bolivia (Austria: la biblioteca no tiene ningún día de Land que sea festivo; en El Salvador, Nicaragua,
+Noruega, Finlandia y Andorra las subdivisiones solo añaden fiestas patronales de un municipio o parroquia, no se
+ofrecen).
 
 ### Cómo se genera
 
@@ -93,16 +99,18 @@ Reglas del export:
 
 1. Solo festivos **públicos** (la categoría por defecto), con la fecha **observada** cuando se traslada (`(observed)`,
    `(observado)`). El día original también se conserva: quien trabaja a turnos puede trabajar ese día.
-2. Idioma: español en los países hispanohablantes; el propio del país en Portugal (`pt_PT`), Brasil (`pt_BR`), Francia,
+2. Idioma: español en los países hispanohablantes (también los nuevos); el propio del país en Portugal (`pt_PT`), Brasil (`pt_BR`), Francia,
    Italia, Alemania, Países Bajos y Austria; inglés en Reino Unido, Irlanda, Estados Unidos y Canadá, y también en
-   Bélgica y Suiza (tres y cuatro lenguas oficiales: así no se elige bando). Estos nombres no se traducen a ca/gl/eu/en.
+   Bélgica y Suiza (tres y cuatro lenguas oficiales: así no se elige bando) y Luxemburgo (luxemburgués, francés y
+   alemán); el propio del país en Polonia (`pl`), Suecia (`sv`), Noruega (`no`), Dinamarca (`da`), Finlandia (`fi`),
+   Grecia (`el`), Rumanía (`ro`) y Andorra (`ca`). Estos nombres no se traducen a ca/gl/eu/en.
 3. `national` = los días que **todas** las subdivisiones tienen (por fecha). Un día del país que solo algunas
    mantienen va en esas subdivisiones como `national-optional`; el que solo ellas tienen, como `regional`. En Estados
    Unidos `national` son los festivos federales (con sus días observados) y los estados solo añaden los suyos.
 4. Un país ofrece subdivisiones si alguna añade un día; si ninguna lo hace (Austria), no tiene selector.
 5. Fuera quedan los territorios de Estados Unidos (PR, GU, AS, MP, VI, UM), `DROP_DAYS` (Venezuela, 15 de mayo: decreto
    de 2024 sin vigencia en 2026-27) y se renombra con `RENAME_DAYS` (Escocia, 15 jun 2026: «World Cup bank holiday», el
-   nombre de gov.scot).
+   nombre de gov.scot). También sale Guatemala, 15 ago: la Asunción es festivo solo de la capital, no del país.
 
 ### Regenerarlo cada año
 
@@ -149,6 +157,40 @@ Cada país se comparó, en sus días fijos y en al menos un día móvil, con una
 | Suiza | Nacionales 2027: 1 ene, Ascensión, 1 ago, 25 dic | officeholidays.com |
 | Austria | 2027 completo | officeholidays.com |
 
+### Festivos móviles (6-nov-2026)
+
+Ningún festivo móvil se escribe a mano: Pascua, Corpus Christi, Ascensión, Pentecostés, Carnaval, Semana Santa, los
+lunes de la ley (México, Colombia, Rep. Dominicana, Chile) y los trasladados los **calcula la biblioteca** al generar
+cada año, con una regla (`easter + n días`, «primer lunes de...»), y el fichero guarda el resultado. Grecia y Rumanía
+cuentan desde la Pascua ortodoxa. `test/features/holidays/movable_holidays_test.dart` lo comprueba con un segundo cálculo
+independiente (computus gregoriano y ortodoxo escritos en el test), no con las fechas del fichero:
+
+- los dos computus contra la Pascua de tres años distintos (2026: 5 y 12 abr; 2027: 28 mar y 2 may; 2028: 16 y 16 abr);
+- cada festivo móvil de 19 países de la lista (Jueves y Viernes Santo, Pascua, lunes de Pascua, Ascensión, Pentecostés,
+  Corpus, Carnaval, Lunes Limpio...) cae en `Pascua + n` en 2026 y en 2027, con su nombre;
+- al elegir el país (`savePlace`) se cargan sus festivos de los dos años y ninguno de España.
+
+El paquete solo trae 2026 y 2027, así que la prueba de un tercer año es la del cálculo (arriba); `--check` del exportador
+vuelve a comparar con la biblioteca al regenerar. Un año nuevo solo hace falta añadirlo a `YEARS`.
+
+### Contraste de los 19 nuevos (6-nov-2026)
+
+Los nuevos se **revisaron por muestras, no uno a uno contra el boletín oficial**: nombres y fechas fijas y los móviles
+contra Pascua (arriba), y estas decisiones contra fuentes:
+
+| País | Decisión | Fuente |
+|---|---|---|
+| Guatemala | Se quita el 15 ago (Asunción): solo es festivo en la capital. El 29 jun (Día del Ejército, el 30 trasladado al lunes) lo trae la biblioteca | conocimiento de la ley; revisar |
+| El Salvador | El 10 may (Día de la Madre) y el 17 jun (Día del Padre) vienen de la biblioteca como nacionales; las fuentes de prensa no coinciden en si son asueto general o de quien es madre o padre | jibble.io; prensa salvadoreña: **dudoso** |
+| Nicaragua | 30 may (Día de las Madres): feriado nacional por la Ley 1118 de 2022; en la práctica ha variado entre sector público y privado | La Prensa (Nicaragua) |
+| Polonia | 24 dic (Wigilia) festivo desde 2025; incluye Pascua y Pentecostés (domingos) | conocimiento de la ley |
+| Rumanía, Grecia | Calendario ortodoxo (Pascua 12 abr 2026 y 2 may 2027) | computus ortodoxo en la prueba |
+| Costa Rica, Honduras, Paraguay, Panamá, Rep. Dominicana, Cuba | Fijos y móviles de la biblioteca; los traslados a lunes (Rep. Dominicana: Ley 139-97; Paraguay: Jura de la Constitución) los aplica la biblioteca | revisión pendiente contra gaceta oficial |
+
+Fuera, a propósito: Marruecos y Filipinas (fechas por avistamiento de la luna o proclama anual), Puerto Rico (la
+biblioteca no trae español), Guinea Ecuatorial, Australia y Nueva Zelanda (días de estado sin códigos ISO ni nombres
+limpios). Siguen en el selector y salen como «sin festivos oficiales» hasta que tengan datos.
+
 ### Límites conocidos
 
 - **2027 es el calendario legal**: lo que se decreta cada año (puentes en Argentina, Ecuador o Perú; días puntuales
@@ -159,13 +201,17 @@ Cada país se comparó, en sus días fijos y en al menos un día móvil, con una
   distrito). El resto de municipios tiene el suyo: se añade a mano como festivo propio.
 - **Francia**: solo Alsacia-Mosela y ultramar; los festivos locales no entran.
 - **Uruguay**: solo los cinco feriados no laborables pagos.
+- **Regiones de los nuevos:** solo Bolivia tiene selector. Alemania y el resto se mantienen como estaban. En Suecia,
+  Noruega y Dinamarca los víspera-festivos de hecho (Nochebuena, Nochevieja, Midsommarafton) no son festivo legal y no
+  están, salvo Finlandia (Juhannusaatto, Jouluaatto) y Polonia (Wigilia), donde la biblioteca los trae.
 - Un nombre aparece solo en el idioma del país (arriba); los festivos propios y los de España siguen igual.
 
 ### Tamaño
 
-Los 42 ficheros de países pesan **116 KB** en bruto (el paquete de España, 270 KB), más `NOTICE` (1,7 KB) y los 9,7 KB
+Los 42 ficheros de los 21 primeros países pesan **116 KB** en bruto (el paquete de España, 270 KB), más `NOTICE` (1,7 KB) y los 9,7 KB
 de nombres de subdivisiones en Dart: en el APK, ~40 KB comprimidos. Al cambiar `bundleVersion` la base de datos guarda
-unas 2.700 filas más de festivos oficiales.
+unas 2.700 filas más de festivos oficiales. Los 38 ficheros de los 19 nuevos suman **28 KB** (el conjunto, 144 KB) y unas
+500 filas más.
 
 ## Traer festivos del calendario del móvil (gratis)
 

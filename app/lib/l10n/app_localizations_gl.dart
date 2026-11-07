@@ -193,6 +193,12 @@ class AppLocalizationsGl extends AppLocalizations {
   }
 
   @override
+  String get durationWheelHours => 'h';
+
+  @override
+  String get durationWheelMinutes => 'min';
+
+  @override
   String get calendarNoShift => 'Sen quenda';
 
   @override
@@ -2215,6 +2221,12 @@ class AppLocalizationsGl extends AppLocalizations {
   }
 
   @override
+  String get summaryNightPlus => 'Plus nocturno';
+
+  @override
+  String get summaryHolidayPlus => 'Plus festivo';
+
+  @override
   String get summaryEstimateNote => 'Estimación, antes de impostos';
 
   @override
@@ -2274,6 +2286,11 @@ class AppLocalizationsGl extends AppLocalizations {
   @override
   String get summaryNoteGoal =>
       'Obxectivo: nun mes conta a duodécima parte do anual; nun ano, o mensual por 12; nunhas datas, a parte dos seus días. A diferenza suma as traballadas e as previstas.';
+
+  @override
+  String summaryNoteClosingDay(int day) {
+    return 'Mes de nómina: co día de peche o $day, cada mes vai do día seguinte ao $day do mes anterior ata o $day (ou ata o último día, se o mes é máis curto). As horas, o diñeiro, o obxectivo e o límite de horas extra cóntanse así.';
+  }
 
   @override
   String get summaryGoalTitle => 'Obxectivo de horas';
@@ -2657,11 +2674,33 @@ class AppLocalizationsGl extends AppLocalizations {
   String get appearanceAccentGraphite => 'Grafito';
 
   @override
+  String get appearanceAccentViolet => 'Violeta';
+
+  @override
+  String get appearanceAccentPlum => 'Ameixa';
+
+  @override
+  String get appearanceAccentEmerald => 'Esmeralda';
+
+  @override
+  String get appearanceAccentOlive => 'Oliva';
+
+  @override
+  String get appearanceAccentTerracotta => 'Terracota';
+
+  @override
   String get appearanceAccentDefault => 'Predeterminada';
 
   @override
   String get appearanceAccentNote =>
       'Cambia ligazóns, interruptores, selección e pestanas. As cores das túas quendas non cambian.';
+
+  @override
+  String get appearancePureBlackTitle => 'Fondo negro';
+
+  @override
+  String get appearancePureBlackSubtitle =>
+      'Negro puro detrás das pantallas no tema escuro, pensado para móbiles OLED.';
 
   @override
   String get appearanceCellSizeTitle => 'Tamaño da quenda no mes';
@@ -2957,7 +2996,7 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get faqSummaryA =>
-      'A icona de resumo do calendario amosa as quendas, as horas, as nocturnas e as de festivo do mes, dun ano enteiro ou das datas que escollas en «Datas…» (ata 366 días). Unha quenda conta no día en que comeza, aínda que cruce a medianoite.\n\nPara ver importes, pon o prezo por hora e, se o tes, o complemento fixo por tipo de quenda en Configuración › As miñas quendas. A estimación inclúe eses complementos fixos, antes de impostos, na moeda que escollas en Configuración › Aparencia. Non inclúe complementos por hora nocturna ou festiva nin retencións.\n\nO «Plus por quenda» súmase unha vez por cada quenda traballada dese tipo, tamén se é partida; non depende das horas. Os descansos e as ausencias non o suman.';
+      'A icona de resumo do calendario amosa as quendas, as horas, as nocturnas e as de festivo do mes, dun ano enteiro ou das datas que escollas en «Datas…» (ata 366 días). Unha quenda conta no día en que comeza, aínda que cruce a medianoite.\n\nPara ver importes, pon o prezo por hora e, se o tes, o complemento fixo por tipo de quenda en Configuración › As miñas quendas. A estimación inclúe eses complementos fixos, antes de impostos, na moeda que escollas en Configuración › Aparencia. Tamén suma os pluses por hora nocturna e festiva que poñas en cada quenda; a retención só cambia o neto. En Configuración › Horas e diñeiro tes modelos de complementos por sector, o día de peche do teu mes de nómina e un límite de horas extra.\n\nO «Plus por quenda» súmase unha vez por cada quenda traballada dese tipo, tamén se é partida; non depende das horas. Os descansos e as ausencias non o suman.';
 
   @override
   String get settingsVersionCopied => 'Versión copiada';
@@ -4984,6 +5023,9 @@ class AppLocalizationsGl extends AppLocalizations {
   String get holidaysSubdivisionKindCityOrRegion => 'Cidade ou rexión';
 
   @override
+  String get holidaysSubdivisionKindDepartment => 'Departamento';
+
+  @override
   String get holidaysSubdivisionSearch => 'Buscar';
 
   @override
@@ -5178,6 +5220,11 @@ class AppLocalizationsGl extends AppLocalizations {
   }
 
   @override
+  String alarmsTypePauseLine(String timing) {
+    return 'Pausa: $timing';
+  }
+
+  @override
   String get alarmsDayBeforeTimeTitle => 'Hora do aviso';
 
   @override
@@ -5255,6 +5302,16 @@ class AppLocalizationsGl extends AppLocalizations {
   @override
   String get alarmsReminderChannelDescription =>
       'Avísate á hora que escollas na nota dun día.';
+
+  @override
+  String get alarmsPauseTitle => 'Toca pausa';
+
+  @override
+  String get alarmsPauseChannelName => 'Avisos de pausa';
+
+  @override
+  String get alarmsPauseChannelDescription =>
+      'Avísate a metade da quenda para que fagas unha pausa.';
 
   @override
   String get dayReminderAdd => 'Avisarme';
@@ -5370,6 +5427,54 @@ class AppLocalizationsGl extends AppLocalizations {
   String get shiftTypesSoundReset => 'Usar o predeterminado';
 
   @override
+  String get shiftTypesPauseSection => 'Aviso de pausa';
+
+  @override
+  String get shiftTypesPauseSwitch => 'Avisarme para facer unha pausa';
+
+  @override
+  String shiftTypesPauseHelperLong(String duration) {
+    return 'Esta quenda dura $duration: adoita vir ben parar un pouco a metade.';
+  }
+
+  @override
+  String get shiftTypesPauseHelperShort =>
+      'Un aviso a metade da quenda para lembrarte de parar.';
+
+  @override
+  String get shiftTypesPauseWhen => 'Cando';
+
+  @override
+  String get shiftTypesPauseMid => 'A metade da quenda';
+
+  @override
+  String shiftTypesPauseAfter(String duration) {
+    return '$duration despois de comezar';
+  }
+
+  @override
+  String get shiftTypesPauseSheetTitle => 'Cando te avisamos';
+
+  @override
+  String get shiftTypesPauseCustomTitle => 'Tempo desde o comezo';
+
+  @override
+  String get shiftTypesPauseCustomHelp =>
+      'Horas e minutos despois de que comece a quenda.';
+
+  @override
+  String get shiftTypesPauseSplitNote =>
+      'Nunha quenda partida, o aviso vai no tramo máis longo.';
+
+  @override
+  String get shiftTypesPauseOutside =>
+      'Ese tempo é maior que a quenda: non soará.';
+
+  @override
+  String get shiftTypesPauseAlarmsOff =>
+      'As alarmas están desactivadas. Actívaas en Configuración › Alarmas para que soe o aviso.';
+
+  @override
   String get catalogShiftMorningName => 'Mañá';
 
   @override
@@ -5446,7 +5551,8 @@ class AppLocalizationsGl extends AppLocalizations {
   String get catalogPattern24x72Name => '24 x 72';
 
   @override
-  String get catalogPattern24x72Description => 'Garda de 24 h e 72 h libres';
+  String get catalogPattern24x72Description =>
+      'Garda de 24 h e 72 h libres (tamén 1-3)';
 
   @override
   String get catalogPattern12hName => '12 horas';
@@ -5494,6 +5600,20 @@ class AppLocalizationsGl extends AppLocalizations {
   @override
   String get catalogPatternDupontDescription =>
       'Ciclo de 28 días en quendas de 12 h: 4 noites, 3 libres, 3 días, 1 libre, 3 noites, 3 libres, 4 días e 7 libres';
+
+  @override
+  String get catalogPatternPn2226Name => 'Policía Nacional 2-2-2-6';
+
+  @override
+  String get catalogPatternPn2226Description =>
+      '2 mañás, 2 tardes, 2 noites, saínte e 5 libres (o 6x6 da Policía Nacional)';
+
+  @override
+  String get catalogPatternGuard14Name => 'Garda 1-4';
+
+  @override
+  String get catalogPatternGuard14Description =>
+      'Garda de 24 h e 4 días libres (1 garda e 4 libres)';
 
   @override
   String get holidayNameNewYear => 'Aninovo';
@@ -5685,6 +5805,9 @@ class AppLocalizationsGl extends AppLocalizations {
   String get absenceAllowed => 'Permitidos';
 
   @override
+  String get absenceWorkingDaysNote => 'En días hábiles';
+
+  @override
   String get absenceCarried => 'Arrastrados';
 
   @override
@@ -5755,6 +5878,13 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get absenceFieldCarry => 'Arrastrar o que sobre do ano anterior';
+
+  @override
+  String get absenceFieldWorkingDays => 'Contar só os días hábiles';
+
+  @override
+  String get absenceFieldWorkingDaysHelper =>
+      'De luns a venres, sen os festivos do teu calendario: un día pintado en fin de semana ou en festivo non gasta saldo.';
 
   @override
   String get absenceFieldCarryCap => 'Máximo que se arrastra';
@@ -5893,6 +6023,176 @@ class AppLocalizationsGl extends AppLocalizations {
   @override
   String get moneyWithholdingInvalid =>
       'Escribe un número enteiro entre 0 e 100.';
+
+  @override
+  String get closingDayTitle => 'Día de peche';
+
+  @override
+  String get closingDaySubtitle => 'O último día do teu mes de nómina';
+
+  @override
+  String get closingDayNone => 'Fin de mes';
+
+  @override
+  String closingDayValue(int day) {
+    return 'Día $day';
+  }
+
+  @override
+  String get closingDayField => 'Día de peche';
+
+  @override
+  String get closingDayHelper =>
+      'Se cobras do 21 ao 20, escribe 20: o resumo de novembro irá do 21 de outubro ao 20 de novembro. Déixao baleiro para contar o mes natural.';
+
+  @override
+  String get closingDayInvalid =>
+      'Escribe un día do 1 ao 30, ou déixao baleiro para o mes natural.';
+
+  @override
+  String get overtimeCapTitle => 'Límite de horas extra';
+
+  @override
+  String get overtimeCapSubtitle => 'Avísate no resumo cando te achegas';
+
+  @override
+  String get overtimeCapNone => 'Sen límite';
+
+  @override
+  String overtimeCapValueYear(int hours) {
+    return '$hours h ao ano';
+  }
+
+  @override
+  String overtimeCapValueMonth(int hours) {
+    return '$hours h ao mes';
+  }
+
+  @override
+  String get overtimeCapIntro =>
+      'Conta as horas extra que anotas cada día. O Estatuto dos Traballadores fixa un máximo de 80 ao ano; o teu convenio pode fixar outro.';
+
+  @override
+  String get overtimeCapPerYear => 'Ao ano';
+
+  @override
+  String get overtimeCapPerMonth => 'Ao mes';
+
+  @override
+  String get overtimeCapField => 'Horas extra como máximo';
+
+  @override
+  String get overtimeCapHoursSuffix => 'h';
+
+  @override
+  String overtimeCapInvalid(int max) {
+    return 'Escribe un número enteiro de horas entre 1 e $max.';
+  }
+
+  @override
+  String get overtimeCapRemove => 'Quitar o límite';
+
+  @override
+  String get overtimeCapUsedYear => 'Horas extra do ano';
+
+  @override
+  String get overtimeCapUsedMonth => 'Horas extra do mes';
+
+  @override
+  String overtimeCapOf(String used, String cap) {
+    return '$used de $cap';
+  }
+
+  @override
+  String overtimeCapLeft(String left) {
+    return 'Quédanche $left';
+  }
+
+  @override
+  String overtimeCapNear(String left) {
+    return 'Achégaste ao límite: quédanche $left.';
+  }
+
+  @override
+  String get overtimeCapReached => 'Chegaches ao límite de horas extra.';
+
+  @override
+  String overtimeCapOver(String excess) {
+    return 'Pasaches o límite de horas extra en $excess.';
+  }
+
+  @override
+  String get payTemplateTitle => 'Modelo de complementos';
+
+  @override
+  String get payTemplateSubtitle => 'Sanidade pública, bombeiros ou vixiantes';
+
+  @override
+  String get payTemplateIntro =>
+      'Enche dunha vez os complementos das túas quendas de traballo. O modelo non trae importes, porque cambian con cada convenio e cada ano: comezan en 0 e escribes os da túa nómina.';
+
+  @override
+  String get payTemplatePublicHealth => 'Sanidade pública';
+
+  @override
+  String get payTemplateFirefighters => 'Bombeiros';
+
+  @override
+  String get payTemplatePrivateSecurity => 'Vixiantes de seguridade';
+
+  @override
+  String get payTemplateGuardPlus => 'Plus por garda';
+
+  @override
+  String payTemplateGuardHelper(int hours) {
+    return 'Súmase unha vez por cada garda: as quendas de $hours h ou máis.';
+  }
+
+  @override
+  String get payTemplateHolidayHelper =>
+      'Súmase por cada hora traballada en festivo. Se unha garda pasa a un festivo, só contan as súas horas dese día.';
+
+  @override
+  String get payTemplateAnnualHours => 'Xornada anual (opcional)';
+
+  @override
+  String get payTemplateAnnualHoursHelper =>
+      'Gárdase como o teu obxectivo de horas ao ano. Déixao baleiro para non cambialo.';
+
+  @override
+  String payTemplateAnnualHoursSource(int hours) {
+    return 'O convenio estatal de empresas de seguridade fixa $hours h de traballo efectivo ao ano. Gárdase como o teu obxectivo de horas ao ano; cámbiao ou bórrao se o teu é outro.';
+  }
+
+  @override
+  String get payTemplateAnnualHoursNone => 'Sen cambios';
+
+  @override
+  String payTemplateAnnualHoursInvalid(int max) {
+    return 'Escribe un número enteiro de horas entre 1 e $max.';
+  }
+
+  @override
+  String get payTemplateTypes => 'Tipos de quenda aos que se aplica';
+
+  @override
+  String get payTemplateTypesNone =>
+      'Non tes tipos de quenda de traballo con horario para este modelo. Créaos en As miñas quendas.';
+
+  @override
+  String get payTemplateApply => 'Aplicar';
+
+  @override
+  String payTemplateApplied(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Modelo aplicado a $count tipos de quenda.',
+      one: 'Modelo aplicado a 1 tipo de quenda.',
+      zero: 'Modelo aplicado: non cambia ningún tipo de quenda.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get moneyGross => 'Bruto estimado';

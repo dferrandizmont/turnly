@@ -135,7 +135,7 @@ void main() {
             } else {
               // Inside: scroll to the end and it is on screen, under the
               // last card.
-              await tester.drag(scroll, const Offset(0, -3000));
+              await tester.drag(scroll, const Offset(0, -8000));
               await tester.pumpAndSettle();
               final rect = tester.getRect(next);
               expect(rect.bottom, lessThanOrEqualTo(760 + 0.5));

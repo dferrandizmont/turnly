@@ -1,0 +1,30 @@
+{
+"schema":1,
+"year":2027,
+"country":"BO",
+"national":[
+{"date":"2027-01-01","name":"Año Nuevo"},
+{"date":"2027-01-22","name":"Día de la Creación del Estado Plurinacional de Bolivia"},
+{"date":"2027-02-08","name":"Carnaval"},
+{"date":"2027-02-09","name":"Carnaval"},
+{"date":"2027-03-26","name":"Viernes Santo"},
+{"date":"2027-05-01","name":"Día del Trabajo"},
+{"date":"2027-05-27","name":"Corpus Christi"},
+{"date":"2027-06-21","name":"Año Nuevo Aymara Amazónico"},
+{"date":"2027-08-06","name":"Día de la Independencia de Bolivia"},
+{"date":"2027-10-17","name":"Día de la Dignidad Nacional"},
+{"date":"2027-11-02","name":"Día de Todos los Difuntos"},
+{"date":"2027-12-25","name":"Navidad"}
+],
+"regional":{
+"BO-B":[{"date":"2027-11-18","name":"Día del departamento de Beni","origin":"regional"}],
+"BO-C":[{"date":"2027-09-14","name":"Día del departamento de Cochabamba","origin":"regional"}],
+"BO-H":[{"date":"2027-05-25","name":"Día del departamento de Chuquisaca","origin":"regional"}],
+"BO-L":[{"date":"2027-07-16","name":"Día del departamento de La Paz","origin":"regional"}],
+"BO-N":[{"date":"2027-10-11","name":"Día del departamento de Pando","origin":"regional"}],
+"BO-O":[{"date":"2027-02-05","name":"Carnaval de Oruro","origin":"regional"}],
+"BO-P":[{"date":"2027-11-10","name":"Día del departamento de Potosí","origin":"regional"}],
+"BO-S":[{"date":"2027-09-24","name":"Día del departamento de Santa Cruz","origin":"regional"}],
+"BO-T":[{"date":"2027-04-15","name":"La Tablada","origin":"regional"}]
+}
+}

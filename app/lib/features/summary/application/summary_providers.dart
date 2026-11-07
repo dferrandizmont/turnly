@@ -7,10 +7,13 @@ import '../../holidays/application/holidays_provider.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../../settings/application/preferences_controller.dart';
 import '../data/hours_goal_store.dart';
+import '../data/pay_rules_store.dart';
 import '../domain/earned_so_far.dart';
 import '../domain/hours_bag.dart';
 import '../domain/hours_goal.dart';
 import '../domain/month_summary.dart';
+import '../domain/overtime_cap.dart';
+import '../domain/pay_period.dart';
 import '../domain/payroll.dart';
 import '../domain/period_hours.dart';
 import '../domain/summary_range.dart';
@@ -20,9 +23,60 @@ final summaryHolidaysProvider = Provider<Set<CivilDate>>(
   (ref) => ref.watch(holidaysProvider.select((h) => h.keys.toSet())),
 );
 
+/// Where the closing day and the cap of the overtime are kept (tests
+/// override it).
+final payRulesStoreProvider = Provider<PayRulesStore>(
+  (ref) => PayRulesStore(ref.watch(appDatabaseProvider)),
+);
+
+/// The payroll rules (propuesta 8): the closing day of the month and the cap
+/// of the overtime. Read again each time the summary opens (auto dispose), so
+/// a restored backup shows its rules.
+class PayRulesController extends AsyncNotifier<PayRules> {
+  @override
+  Future<PayRules> build() => ref.watch(payRulesStoreProvider).load();
+
+  PayRules get _current => state.value ?? PayRules.none;
+
+  /// Sets the closing day (`null` = the calendar month).
+  Future<void> setClosingDay(int? day) async {
+    await ref.read(payRulesStoreProvider).setClosingDay(day);
+    state = AsyncData(
+      PayRules(closingDay: day, overtimeCap: _current.overtimeCap),
+    );
+  }
+
+  /// Sets the cap of the overtime (`null` removes it).
+  Future<void> setOvertimeCap(OvertimeCap? cap) async {
+    await ref.read(payRulesStoreProvider).setOvertimeCap(cap);
+    state = AsyncData(
+      PayRules(closingDay: _current.closingDay, overtimeCap: cap),
+    );
+  }
+}
+
+final payRulesProvider =
+    AsyncNotifierProvider.autoDispose<PayRulesController, PayRules>(
+      PayRulesController.new,
+    );
+
+/// The closing day of the month, `null` for the calendar month (also while
+/// the rules are read).
+final summaryClosingDayProvider = Provider.autoDispose<int?>(
+  (ref) => ref.watch(payRulesProvider.select((r) => r.value?.closingDay)),
+);
+
+/// The days of the month (any day of it) the summary counts: the payroll
+/// month with a closing day, the calendar month without one.
+final summaryMonthRangeProvider = Provider.autoDispose
+    .family<SummaryRange, CivilDate>(
+      (ref, month) => payPeriodOf(month, ref.watch(summaryClosingDayProvider)),
+    );
+
 /// The summary of a month (first day of the month) of the ACTIVE calendar.
 /// It follows the schedule and the holidays: painting a day or choosing
-/// another calendar updates it.
+/// another calendar updates it. With a closing day it is the payroll month
+/// named after that month.
 final monthSummaryProvider = Provider.autoDispose
     .family<MonthSummary, CivilDate>((ref, month) {
       final schedule = ref.watch(
@@ -32,6 +86,7 @@ final monthSummaryProvider = Provider.autoDispose
         schedule,
         month,
         holidays: ref.watch(summaryHolidaysProvider),
+        closingDay: ref.watch(summaryClosingDayProvider),
       );
     });
 
@@ -62,8 +117,47 @@ final yearTotalsProvider = Provider.autoDispose.family<YearTotals, int>((
     schedule,
     year,
     holidays: ref.watch(summaryHolidaysProvider),
+    closingDay: ref.watch(summaryClosingDayProvider),
   );
 });
+
+/// The overtime of the period against the cap, or `null` without a cap or
+/// when the cap is not counted on such a period. [OvertimeCapQuery.month] is
+/// the month on screen (a monthly cap counts its overtime, a yearly one the
+/// overtime of its year); without it the query is a whole year (only a
+/// yearly cap counts).
+final overtimeCapStatusProvider = Provider.autoDispose
+    .family<OvertimeCapStatus?, OvertimeCapQuery>((ref, query) {
+      final cap = ref.watch(payRulesProvider.select((r) => r.value?.overtimeCap));
+      if (cap == null) return null;
+      final month = query.month;
+      final int used;
+      switch (cap.period) {
+        case OvertimeCapPeriod.month:
+          if (month == null) return null;
+          used = ref.watch(monthSummaryProvider(month)).overtimeMinutes;
+        case OvertimeCapPeriod.year:
+          used = ref.watch(yearTotalsProvider(query.year)).overtimeMinutes;
+      }
+      return OvertimeCapStatus(cap: cap, usedMinutes: used);
+    });
+
+/// What [overtimeCapStatusProvider] is asked for: a month (its first day) or
+/// a whole [year].
+class OvertimeCapQuery {
+  OvertimeCapQuery.month(CivilDate this.month) : year = month.year;
+  const OvertimeCapQuery.year(this.year) : month = null;
+
+  final CivilDate? month;
+  final int year;
+
+  @override
+  bool operator ==(Object other) =>
+      other is OvertimeCapQuery && other.month == month && other.year == year;
+
+  @override
+  int get hashCode => Object.hash(month, year);
+}
 
 /// Today for the summary (A3), from [minuteClockProvider]: it changes only
 /// when the day does, so the summary follows midnight without rebuilding
@@ -169,6 +263,7 @@ final earnedSoFarProvider = Provider.autoDispose.family<EarnedSoFar, CivilDate>(
       nowMinuteOfDay: now.hour * 60 + now.minute,
       withholdingPercent: ref.watch(withholdingPercentProvider),
       holidays: ref.watch(summaryHolidaysProvider),
+      closingDay: ref.watch(summaryClosingDayProvider),
     );
   },
 );
@@ -186,6 +281,7 @@ final hoursBalanceProvider = Provider.autoDispose
       final holidays = ref.watch(summaryHolidaysProvider);
       final goal = ref.watch(hoursGoalProvider);
       final since = ref.watch(hoursGoalSinceProvider);
+      final closingDay = ref.watch(summaryClosingDayProvider);
       return goal.when(
         loading: () => const AsyncLoading(),
         error: (error, stack) => AsyncError(error, stack),
@@ -210,6 +306,7 @@ final hoursBalanceProvider = Provider.autoDispose
                 fromMonth: from,
                 toMonth: target,
                 holidays: holidays,
+                closingDay: closingDay,
               ),
             );
           },

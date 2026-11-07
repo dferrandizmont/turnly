@@ -3,14 +3,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/l10n/l10n.dart';
 import '../../../absences/presentation/absence_icons.dart';
+import '../../../summary/application/summary_providers.dart';
+import '../../../summary/domain/overtime_cap.dart';
+import '../../../summary/presentation/pay_icons.dart';
+import '../../../summary/presentation/pay_rules_sheets.dart';
+import '../../../summary/presentation/pay_template_sheet.dart';
 import '../../application/preferences_controller.dart';
 import '../settings_widgets.dart';
 import '../withholding_sheet.dart';
 
 /// «Horas y dinero» (P9): what the summary needs to turn the hours into an
-/// estimate of the pay. For now the withholding for the net estimate; the
-/// rate and the pluses of each shift are in «Mis turnos», the currency in
-/// «Apariencia».
+/// estimate of the pay. The withholding for the net estimate, the closing day
+/// of the payroll month, the cap of the overtime and the templates of pluses
+/// by sector (propuestas 2 y 8); the rate and the pluses of each shift are in
+/// «Mis turnos», the currency in «Apariencia».
 class MoneySection extends ConsumerWidget {
   const MoneySection({super.key});
 
@@ -20,6 +26,9 @@ class MoneySection extends ConsumerWidget {
     final percent = ref.watch(
       preferencesProvider.select((p) => p.withholdingPercent),
     );
+    final rules = ref.watch(payRulesProvider).value;
+    final closingDay = rules?.closingDay;
+    final cap = rules?.overtimeCap;
     return SettingsSection(
       title: l10n.moneySectionTitle,
       children: [
@@ -32,6 +41,35 @@ class MoneySection extends ConsumerWidget {
               ? l10n.moneyWithholdingNone
               : l10n.moneyWithholdingValue(percent),
           onTap: () => editWithholding(context, ref),
+        ),
+        SettingsRow(
+          key: const ValueKey('settings-closing-day'),
+          icon: PayIcons.closingDay,
+          title: l10n.closingDayTitle,
+          subtitle: l10n.closingDaySubtitle,
+          value: closingDay == null
+              ? l10n.closingDayNone
+              : l10n.closingDayValue(closingDay),
+          onTap: () => editClosingDay(context, ref),
+        ),
+        SettingsRow(
+          key: const ValueKey('settings-overtime-cap'),
+          icon: PayIcons.overtimeCap,
+          title: l10n.overtimeCapTitle,
+          subtitle: l10n.overtimeCapSubtitle,
+          value: cap == null
+              ? l10n.overtimeCapNone
+              : cap.period == OvertimeCapPeriod.year
+              ? l10n.overtimeCapValueYear(cap.hours)
+              : l10n.overtimeCapValueMonth(cap.hours),
+          onTap: () => editOvertimeCap(context, ref),
+        ),
+        SettingsRow(
+          key: const ValueKey('settings-pay-template'),
+          icon: PayIcons.template,
+          title: l10n.payTemplateTitle,
+          subtitle: l10n.payTemplateSubtitle,
+          onTap: () => openPayTemplate(context, ref),
         ),
       ],
     );

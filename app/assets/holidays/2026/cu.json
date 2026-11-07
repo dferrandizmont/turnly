@@ -1,0 +1,17 @@
+{
+"schema":1,
+"year":2026,
+"country":"CU",
+"national":[
+{"date":"2026-01-01","name":"Triunfo de la Revolución"},
+{"date":"2026-01-02","name":"Día de la Victoria"},
+{"date":"2026-04-03","name":"Viernes Santo"},
+{"date":"2026-05-01","name":"Día Internacional de los Trabajadores"},
+{"date":"2026-07-25","name":"Conmemoración del asalto a Moncada"},
+{"date":"2026-07-26","name":"Día de la Rebeldía Nacional"},
+{"date":"2026-07-27","name":"Conmemoración del asalto a Moncada"},
+{"date":"2026-10-10","name":"Inicio de las Guerras de Independencia"},
+{"date":"2026-12-25","name":"Día de Navidad"},
+{"date":"2026-12-31","name":"Fiesta de Fin de Año"}
+]
+}

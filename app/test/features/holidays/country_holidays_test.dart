@@ -17,10 +17,13 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../support/test_storage.dart' show openMemoryDatabase;
 import 'bundle_support.dart';
 
-/// The 21 countries of D4, in the order of the roadmap.
+/// The 21 countries of D4 plus the 19 of proposal 8 (6-nov-2026), in the
+/// order the export writes them.
 const _countries = [
   'MX', 'AR', 'CO', 'CL', 'PE', 'EC', 'UY', 'VE', 'PT', 'BR', //
   'FR', 'IT', 'DE', 'GB', 'IE', 'US', 'CA', 'NL', 'BE', 'CH', 'AT',
+  'GT', 'BO', 'PY', 'PA', 'CR', 'DO', 'HN', 'SV', 'NI', 'CU', //
+  'PL', 'SE', 'NO', 'DK', 'FI', 'LU', 'GR', 'RO', 'AD',
 ];
 
 /// A national day each country must have, as (country, date). Fixed days and
@@ -81,6 +84,33 @@ const _nationalDays = <(String, String)>[
   ('CH', '2027-05-06'), // Auffahrt
   ('AT', '2027-10-26'),
   ('AT', '2027-05-27'), // Fronleichnam
+  // Proposal 8: Latin America and the rest of Europe.
+  ('GT', '2026-06-29'), // Día del Ejército, moved to the Monday
+  ('GT', '2027-03-26'), // Viernes Santo
+  ('BO', '2026-06-22'), // Año Nuevo Aymara, observed on the Monday
+  ('BO', '2027-02-09'), // Martes de Carnaval
+  ('PY', '2027-06-20'), // Jura de la Constitución
+  ('PA', '2026-12-21'), // Duelo Nacional (puente)
+  ('CR', '2026-07-25'), // Anexión del Partido de Nicoya
+  ('DO', '2026-01-05'), // Reyes, moved to the Monday (Ley 139-97)
+  ('DO', '2027-11-06'), // Constitución
+  ('HN', '2027-10-07'), // Semana Morazánica
+  ('SV', '2026-08-06'),
+  ('NI', '2026-07-19'),
+  ('CU', '2027-10-11'), // 10 de octubre, observed
+  ('PL', '2026-12-24'), // Wigilia, a holiday since 2025
+  ('PL', '2027-05-27'), // Boże Ciało
+  ('SE', '2027-06-26'), // Midsommardagen
+  ('NO', '2027-05-17'), // Grunnlovsdag
+  ('DK', '2027-05-06'), // Kristi himmelfartsdag
+  ('FI', '2026-06-20'), // Juhannuspäivä
+  ('FI', '2026-12-06'),
+  ('LU', '2026-06-23'),
+  ('LU', '2027-05-09'), // Europe Day
+  ('GR', '2027-05-04'), // Labour Day moved after the Orthodox Easter
+  ('GR', '2026-04-10'), // Good Friday, Orthodox
+  ('RO', '2027-06-21'), // Rusalii, Orthodox
+  ('AD', '2026-09-08'), // Meritxell
 ];
 
 /// (subdivision, date, name fragment): a day that only that subdivision has.
@@ -100,6 +130,8 @@ const _subdivisionDays = <(String, String, String)>[
   ('PT-20', '2026-05-25', 'Açores'),
   ('CL-AP', '2026-06-07', 'Morro de Arica'),
   ('CH-ZH', '2027-03-26', 'Good Friday'),
+  ('BO-L', '2026-07-16', 'La Paz'),
+  ('BO-S', '2027-09-24', 'Santa Cruz'),
 ];
 
 Future<List<HolidayEntry>> _entries() => shippedEntries();
@@ -121,7 +153,7 @@ void main() {
 
   group('the bundle', () {
     test(
-      'lists the 21 countries plus Spain, every file checked by the loader',
+      'lists the 40 countries plus Spain, every file checked by the loader',
       () {
         expect(
           manifest.countries,
@@ -340,6 +372,8 @@ void main() {
       expect(counts['AR'], 24);
       expect(counts['CL'], 16);
       expect(counts['IT'], 107);
+      expect(counts['BO'], 9); // the nine departments
+      expect(counts.containsKey('PL'), isFalse);
       expect(counts.containsKey('MX'), isFalse);
       expect(counts.containsKey('AT'), isFalse); // no day of their own
     });

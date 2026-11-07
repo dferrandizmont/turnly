@@ -129,12 +129,12 @@ void main() {
     testWidgets('a country in the list without data yet says so', (
       tester,
     ) async {
-      final app = await _openIn(tester, 'PL');
-      expect(_state(app).countryCode, 'PL');
+      final app = await _openIn(tester, 'MA');
+      expect(_state(app).countryCode, 'MA');
       await app.toLastStep();
       expect(
         find.text(
-          'Aún no tenemos los festivos oficiales de Polonia. Puedes añadir '
+          'Aún no tenemos los festivos oficiales de Marruecos. Puedes añadir '
           'los tuyos en Ajustes › Festivos.',
         ),
         findsOneWidget,

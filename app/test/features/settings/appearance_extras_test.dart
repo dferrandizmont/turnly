@@ -34,7 +34,7 @@ const List<int> _png = [
 Future<Uint8List?> _fakePicker() async => Uint8List.fromList(_png);
 
 void main() {
-  const tall = Size(390, 2200);
+  const tall = Size(390, 3000);
 
   Future<Preferences> stored(AppUnderTest app) =>
       app.real(() => PreferencesRepository(app.database).load());

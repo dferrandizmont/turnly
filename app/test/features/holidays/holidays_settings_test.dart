@@ -22,7 +22,7 @@ void main() {
   setUpAll(initializeLocale);
 
   // Tall enough for a whole year of holidays without scrolling.
-  const tall = Size(390, 2900);
+  const tall = Size(390, 4200);
 
   Finder key(String value) => find.byKey(ValueKey(value));
 

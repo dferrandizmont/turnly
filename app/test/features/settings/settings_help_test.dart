@@ -11,7 +11,7 @@ import '../../support/app_harness.dart';
 void main() {
   setUpAll(initializeLocale);
 
-  const tall = Size(390, 3600);
+  const tall = Size(390, 4200);
 
   Finder key(String value) => find.byKey(ValueKey(value));
 

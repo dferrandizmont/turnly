@@ -11,6 +11,7 @@ import '../domain/preferences.dart';
 /// table (`appearance.themeMode`, `calendar.weekStart`,
 /// `calendar.weekNumbers`, `appearance.language`, `appearance.timeFormat`,
 /// `appearance.currency`, `appearance.accent`, `appearance.cellTextSize`,
+/// `appearance.pureBlack`,
 /// `summary.withholdingPercent`).
 ///
 /// A row that is missing, is not JSON or holds a value the app does not offer
@@ -44,6 +45,9 @@ class PreferencesRepository {
       cellTextSize: CellTextSize.fromStored(
         values[PreferenceKeys.cellTextSize],
       ),
+      pureBlack: values[PreferenceKeys.pureBlack] is bool
+          ? values[PreferenceKeys.pureBlack]! as bool
+          : defaults.pureBlack,
       withholdingPercent:
           withholding is int && isValidWithholdingPercent(withholding)
           ? withholding
@@ -192,6 +196,10 @@ class PreferencesRepository {
   Future<void> setCellTextSize(CellTextSize size) =>
       _write(PreferenceKeys.cellTextSize, size.stored);
 
+  /// Ajustes › Apariencia › «Fondo negro» (OLED).
+  Future<void> setPureBlack(bool enabled) =>
+      _write(PreferenceKeys.pureBlack, enabled);
+
   /// The percentage of the withholding of the estimated pay (P9). Throws
   /// [ArgumentError] unless it is a whole number between 0 and 100.
   Future<void> setWithholdingPercent(int percent) async {
@@ -236,6 +244,7 @@ class PreferencesRepository {
     PreferenceKeys.currency,
     PreferenceKeys.accent,
     PreferenceKeys.cellTextSize,
+    PreferenceKeys.pureBlack,
     PreferenceKeys.withholdingPercent,
     PreferenceKeys.showNoteInMonth,
     PreferenceKeys.paintSound,

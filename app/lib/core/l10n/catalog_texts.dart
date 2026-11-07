@@ -87,6 +87,14 @@ CatalogTexts catalogTextsFrom(AppLocalizations l10n) => CatalogTexts(
       name: l10n.catalogPatternDupontName,
       description: l10n.catalogPatternDupontDescription,
     ),
+    'pn-2-2-2-6': (
+      name: l10n.catalogPatternPn2226Name,
+      description: l10n.catalogPatternPn2226Description,
+    ),
+    'guard-1-4': (
+      name: l10n.catalogPatternGuard14Name,
+      description: l10n.catalogPatternGuard14Description,
+    ),
   },
 );
 

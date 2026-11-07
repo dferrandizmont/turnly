@@ -46,6 +46,45 @@ enum AppAccent {
     lightSoft: Color(0xFFE2E2E5),
     dark: Color(0xFFC9C9D2),
     darkSoft: Color(0xFF393940),
+  ),
+
+  // Added on 6-nov-2026 (proposal 8 of `docs/competencia-2026-11.md`): five
+  // more hues, same rules, same test. Appended: the stored names and the
+  // order of the first five never change.
+  violet(
+    'violet',
+    light: Color(0xFF6A3FD0),
+    lightSoft: Color(0xFFE9E2FA),
+    dark: Color(0xFFB79BFF),
+    darkSoft: Color(0xFF2E2257),
+  ),
+  plum(
+    'plum',
+    light: Color(0xFF8F2A93),
+    lightSoft: Color(0xFFF3E0F4),
+    dark: Color(0xFFE69BEA),
+    darkSoft: Color(0xFF45224A),
+  ),
+  emerald(
+    'emerald',
+    light: Color(0xFF0F7A4A),
+    lightSoft: Color(0xFFDCEFE5),
+    dark: Color(0xFF5FD398),
+    darkSoft: Color(0xFF1E3D2E),
+  ),
+  olive(
+    'olive',
+    light: Color(0xFF5E6F12),
+    lightSoft: Color(0xFFE8ECD3),
+    dark: Color(0xFFBCCB5A),
+    darkSoft: Color(0xFF363B1A),
+  ),
+  terracotta(
+    'terracotta',
+    light: Color(0xFFB1472A),
+    lightSoft: Color(0xFFF7E3DC),
+    dark: Color(0xFFFF9A7A),
+    darkSoft: Color(0xFF4A2A22),
   );
 
   const AppAccent(

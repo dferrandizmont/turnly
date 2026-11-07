@@ -27,7 +27,9 @@ bool? watchDayAlarmSkip(WidgetRef ref, CivilDate date) {
   final rings = viewing.$2
       .resolve(date)
       .shifts
-      .any((s) => canShiftTypeRing(s) && settings.forShiftType(s.id).enabled);
+      .any(
+        (s) => canShiftTypeRing(s) && settings.forShiftType(s.id).anyEnabled,
+      );
   if (!rings && !skipped) return null;
   return skipped;
 }

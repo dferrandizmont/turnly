@@ -341,13 +341,13 @@ void main() {
           for (final p in patternPresets)
             if (containsShift(p.steps, 'night')) p.id,
         ],
-        ['correturnos', 'continental'],
+        ['correturnos', 'continental', 'pn-2-2-2-6'],
       );
-      expect(startingWith('guard24'), ['24x72']);
+      expect(startingWith('guard24'), ['24x72', 'guard-1-4']);
       expect(startingWith('night12'), ['dupont']);
       expect(
         startingWith('morning'),
-        containsAll(['6x4', '5x2', 'continental']),
+        containsAll(['6x4', '5x2', 'continental', 'pn-2-2-2-6']),
       );
     });
   });

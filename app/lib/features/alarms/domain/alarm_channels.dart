@@ -29,18 +29,28 @@ String alarmSoundChannelId(String? sound) => sound == null
 String? effectiveAlarmSound(String? sound, Set<String> unavailable) =>
     sound == null || unavailable.contains(sound) ? null : sound;
 
+/// Android channel of the mid-shift pause notices (docs/alarmas.md).
+const String pauseChannelId = 'break_alerts';
+
 /// Whether an alarm of [kind] is a plain notification (notification volume,
 /// default tone, no custom sound) rather than an alarm: the reminder of a
-/// note and the renewal notice (A1), which reuses the reminders' channel.
+/// note, the renewal notice (A1), which reuses the reminders' channel, and
+/// the pause notice, which has its own.
 bool isNoticeKind(AlarmKind kind) =>
-    kind == AlarmKind.reminder || kind == AlarmKind.renewal;
+    kind == AlarmKind.reminder ||
+    kind == AlarmKind.renewal ||
+    kind == AlarmKind.pause;
 
 /// The channel an alarm of [kind] rings on. Reminders and the renewal notice
-/// share their own channel (notification volume, default tone); the alarms
-/// before a shift and the evening-before ones use the channel of their
-/// [sound] (already resolved with [effectiveAlarmSound]).
-String alarmChannelIdFor(AlarmKind kind, String? sound) =>
-    isNoticeKind(kind) ? reminderChannelId : alarmSoundChannelId(sound);
+/// share their own channel (notification volume, default tone), the pause
+/// notice has another one; the alarms before a shift and the evening-before
+/// ones use the channel of their [sound] (already resolved with
+/// [effectiveAlarmSound]).
+String alarmChannelIdFor(AlarmKind kind, String? sound) => switch (kind) {
+  AlarmKind.pause => pauseChannelId,
+  AlarmKind.reminder || AlarmKind.renewal => reminderChannelId,
+  _ => alarmSoundChannelId(sound),
+};
 
 /// The channels of [existing] that carry a custom sound and that none of the
 /// [inUseSounds] needs any more: the ones to delete. Channels of the default

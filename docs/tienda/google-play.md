@@ -2,7 +2,9 @@
 
 > **Actualizado · 4-nov-2026 (app 0.8.4).** La ficha está publicada en prueba cerrada desde la 0.6.16/0.6.17 con los textos de la 0.6; aquí está el texto que hay que dejar en la consola en la próxima subida (0.8.4 o posterior). **La app es totalmente gratuita y de código abierto** (decisión del usuario del 26-oct-2026): sin compras, sin suscripciones, sin anuncios y sin cuentas. No hay ningún precio que insertar ni condiciones de compra que redactar. Nombre: **Turnly** (decisión del usuario del 30-oct-2026, pregunta 20; antes «Cuadrante»). Cada título lleva la palabra de búsqueda local (cuadrante, quadrant, cadro de quendas, txanden egutegia, shift calendar).
 
-Los bloques de texto son los campos para copiar; los títulos, recuentos y notas son internos. Recuento en caracteres Unicode normalizados NFC, incluidos espacios, signos y saltos de línea LF; sin el salto final del bloque (contado con un script el 4-nov-2026). Idiomas en orden: es, ca, gl, eu, en. Inglés neutro con grafía US. Los nombres de las funciones son los de los ARB de cada idioma («Mantener al día», «Probar restauración», «Libro de cambios»…). Revisión nativa de ca/gl/eu pendiente según el glosario.
+Los bloques de texto son los campos para copiar; los títulos, recuentos y notas son internos. Recuento en caracteres Unicode normalizados NFC, incluidos espacios, signos y saltos de línea LF; sin el salto final del bloque (contado con un script el 4-nov-2026 y otra vez el 6-nov-2026).
+
+**6-nov-2026 (propuesta 4 de [`docs/competencia-2026-11.md`](../competencia-2026-11.md)):** la descripción breve y el primer párrafo de la completa dicen ya que todo es gratis, sin «Pro», anuncios ni cuenta, y que al cambiar de móvil no hay nada que volver a pagar y los turnos se vienen contigo (paso directo de móvil a móvil, copia de Google cifrada con bloqueo de pantalla o archivo `.turnly`). Es la queja que más se repite en la competencia (volver a pagar o perder los datos al cambiar de móvil) junto con los muros de pago y los anuncios. La breve pierde «widget» y «código abierto»: siguen en la completa. Idiomas en orden: es, ca, gl, eu, en. Inglés neutro con grafía US. Los nombres de las funciones son los de los ARB de cada idioma («Mantener al día», «Probar restauración», «Libro de cambios»…). Revisión nativa de ca/gl/eu pendiente según el glosario.
 
 Fuentes leídas: [especificación §7](../../turnos-spec.md), [CHANGELOG](../../CHANGELOG.md) (0.7.0 a 0.8.4), [publicación](../plan-publicacion.md), [preguntas](../preguntas.md), [glosario](../glosario-idiomas.md), los ARB de `app/lib/l10n/` y el informe de revisión de MiniMax del 3-nov-2026 (sus correcciones de gallego y euskera se comprobaron una a una; varias no se aplicaron).
 
@@ -29,13 +31,15 @@ Turnly: Cuadrante de turnos
 ### Descripción breve · 77/80 caracteres
 
 ```text
-Calendario de turnos de trabajo, widget y copias. Gratis y de código abierto.
+Turnos gratis, sin Pro, anuncios ni cuenta. Cambias de móvil y no pagas nada.
 ```
 
-### Descripción completa · 3166/4000 caracteres
+### Descripción completa · 3514/4000 caracteres
 
 ```text
-Tus turnos, de un vistazo. Turnly te ayuda a organizar mañanas, tardes, noches, guardias, salientes y días libres, sin cuenta, sin anuncios, sin compras y sin conexión.
+Tus turnos, de un vistazo. Turnly te ayuda a organizar mañanas, tardes, noches, guardias, salientes y días libres, y funciona sin conexión.
+
+Todo es gratis: no hay versión Pro, ni anuncios, ni compras, ni cuenta. Al cambiar de móvil no tienes nada que volver a pagar, y tus turnos se vienen contigo: con el paso directo del móvil viejo al nuevo cuando lo estrenas, con la copia de Google, que Turnly solo hace cifrada (necesita bloqueo de pantalla), o con un archivo .turnly.
 
 Pinta los días o aplica un patrón de correturnos, 24/72, 4x4 o tu propia rotación. Añade varios turnos en un día y consulta cada uno con color, código y horario. Mira el mes, la agenda o el año. En cada día puedes escribir una nota, añadir fotos, dibujos o archivos y llevar una lista de tareas.
 
@@ -46,7 +50,7 @@ ALARMAS DE TURNO
 Cada tipo de turno puede tener su aviso, que suena como una alarma de despertador y se programa con un mes de margen. Turnly también puede silenciar el móvil durante los turnos que elijas y devolverle el sonido al acabar.
 
 COPIAS QUE PUEDES COMPROBAR
-Turnly guarda copias en el móvil y, con «Probar restauración», compruebas que se pueden recuperar. Antes de restaurar ves qué contienen. La copia automática en una carpeta deja una al día en la carpeta que elijas (Drive, Dropbox, OneDrive o el propio móvil) y guarda las 10 últimas. Para cambiar de móvil, lleva un archivo .turnly al nuevo: las copias que se quedan dentro de la app se pierden al desinstalarla.
+Turnly guarda copias en el móvil y, con «Probar restauración», compruebas que se pueden recuperar. Antes de restaurar ves qué contienen. La copia automática en una carpeta deja una al día en la carpeta que elijas (Drive, Dropbox, OneDrive o el propio móvil) y guarda las 10 últimas. Para cambiar de móvil sin depender de nada más, lleva un archivo .turnly al nuevo: las copias que se quedan dentro de la app se pierden si la desinstalas sin otra copia.
 
 TRAE Y LLEVA TUS TURNOS
 Importa tu copia .Shifter de LRHSoft (Calendario de Turnos), el calendario del móvil, un .ics o un CSV, y revisa la vista previa antes de guardar. Con «Mantener al día», tus turnos pasan al calendario del móvil y se actualizan cada vez que cambias el cuadrante; también puedes guardarlos en un archivo .ics. Y las citas del móvil se ven junto a tus turnos.
@@ -81,13 +85,15 @@ Turnly: Quadrant de torns
 ### Descripción breve · 79/80 caracteres
 
 ```text
-Calendari de torns de treball, widget al dia i còpies. Gratuït i de codi obert.
+Torns de franc, sense Pro, anuncis ni compte. Canvies de mòbil i no pagues res.
 ```
 
-### Descripción completa · 3150/4000 caracteres
+### Descripción completa · 3486/4000 caracteres
 
 ```text
-Els teus torns, d’un cop d’ull. Turnly t’ajuda a organitzar matins, tardes, nits, guàrdies, sortints i dies lliures, sense compte, sense anuncis, sense compres i sense connexió.
+Els teus torns, d’un cop d’ull. Turnly t’ajuda a organitzar matins, tardes, nits, guàrdies, sortints i dies lliures, i funciona sense connexió.
+
+Tot és gratuït: no hi ha versió Pro, ni anuncis, ni compres, ni compte. Quan canvies de mòbil no has de tornar a pagar res, i els teus torns venen amb tu: amb el pas directe del mòbil vell al nou quan l’estrenes, amb la còpia de Google, que Turnly només fa xifrada (cal un bloqueig de pantalla), o amb un fitxer .turnly.
 
 Pinta els dies o aplica un patró de torns rotatius, 24/72, 4x4 o la teva pròpia rotació. Afegeix diversos torns en un dia i consulta’ls amb color, codi i horari. Mira el mes, l’agenda o l’any. A cada dia pots escriure una nota, afegir-hi fotos, dibuixos o fitxers i portar una llista de tasques.
 
@@ -98,7 +104,7 @@ ALARMES DE TORN
 Cada tipus de torn pot tenir el seu avís, que sona com una alarma de despertador i es programa amb un mes de marge. Turnly també pot silenciar el mòbil durant els torns que triïs i tornar-li el so quan acabes.
 
 CÒPIES QUE POTS COMPROVAR
-Turnly desa còpies al mòbil i, amb «Prova la restauració», comproves que es poden recuperar. Abans de restaurar veus què contenen. La còpia automàtica en una carpeta en deixa una cada dia a la carpeta que triïs (Drive, Dropbox, OneDrive o el mateix mòbil) i en guarda les 10 últimes. Per canviar de mòbil, porta un fitxer .turnly al nou: les còpies que queden dins de l’app es perden en desinstal·lar-la.
+Turnly desa còpies al mòbil i, amb «Prova la restauració», comproves que es poden recuperar. Abans de restaurar veus què contenen. La còpia automàtica en una carpeta en deixa una cada dia a la carpeta que triïs (Drive, Dropbox, OneDrive o el mateix mòbil) i en guarda les 10 últimes. Per canviar de mòbil sense dependre de res més, porta un fitxer .turnly al nou: les còpies que queden dins de l’app es perden si la desinstal·les sense una altra còpia.
 
 IMPORTA I EXPORTA ELS TEUS TORNS
 Importa la còpia .Shifter de LRHSoft (Calendario de Turnos), el calendari del mòbil, un .ics o un CSV, i revisa la vista prèvia abans de desar. Amb «Mantenir al dia», els teus torns passen al calendari del mòbil i s’actualitzen cada vegada que canvies el quadrant; també els pots desar en un fitxer .ics. I les cites del mòbil es veuen al costat dels teus torns.
@@ -130,16 +136,18 @@ Tot el que hi ha a l’app és gratuït, i el codi és obert: el pots revisar i 
 Turnly: Cadro de quendas
 ```
 
-### Descripción breve · 68/80 caracteres
+### Descripción breve · 79/80 caracteres
 
 ```text
-Calendario de quendas, widget e copias. De balde e de código aberto.
+Quendas de balde, sen Pro, anuncios nin conta. Cambias de móbil sen pagar nada.
 ```
 
-### Descripción completa · 3113/4000 caracteres
+### Descripción completa · 3454/4000 caracteres
 
 ```text
-As túas quendas, dunha ollada. Turnly axúdache a organizar mañás, tardes, noites, gardas, saíntes e días libres, sen conta, sen anuncios, sen compras e sen conexión.
+As túas quendas, dunha ollada. Turnly axúdache a organizar mañás, tardes, noites, gardas, saíntes e días libres, e funciona sen conexión.
+
+Todo é de balde: non hai versión Pro, nin anuncios, nin compras, nin conta. Cando cambias de móbil non tes que volver pagar nada, e as túas quendas veñen contigo: co paso directo do móbil vello ao novo cando o estreas, coa copia de Google, que Turnly só fai cifrada (precisa un bloqueo de pantalla), ou cun ficheiro .turnly.
 
 Pinta os días ou aplica un patrón de quendas rotativas, 24/72, 4x4 ou a túa propia rotación. Engade varias quendas nun día e consulta cada unha con cor, código e horario. Mira o mes, a axenda ou o ano. En cada día podes escribir unha nota, engadir fotos, debuxos ou ficheiros e levar unha lista de tarefas.
 
@@ -150,7 +158,7 @@ ALARMAS DE QUENDA
 Cada tipo de quenda pode ter o seu aviso, que soa como unha alarma de espertador e prográmase cun mes de marxe. Turnly tamén pode silenciar o móbil durante as quendas que escollas e devolverlle o son ao remataren.
 
 COPIAS QUE PODES COMPROBAR
-Turnly garda copias no móbil e, con «Probar restauración», comprobas que se poden recuperar. Antes de restaurar ves que conteñen. A copia automática nun cartafol deixa unha ao día no cartafol que escollas (Drive, Dropbox, OneDrive ou o propio móbil) e garda as 10 últimas. Para cambiar de móbil, leva un ficheiro .turnly ao novo: as copias que quedan dentro da app pérdense ao desinstalala.
+Turnly garda copias no móbil e, con «Probar restauración», comprobas que se poden recuperar. Antes de restaurar ves que conteñen. A copia automática nun cartafol deixa unha ao día no cartafol que escollas (Drive, Dropbox, OneDrive ou o propio móbil) e garda as 10 últimas. Para cambiar de móbil sen depender de nada máis, leva un ficheiro .turnly ao novo: as copias que quedan dentro da app pérdense se a desinstalas sen outra copia.
 
 TRAE E LEVA AS TÚAS QUENDAS
 Importa a túa copia .Shifter de LRHSoft (Calendario de Turnos), o calendario do móbil, un .ics ou un CSV, e revisa a vista previa antes de gardar. Con «Manter ao día», as túas quendas pasan ao calendario do móbil e actualízanse cada vez que cambias o cadro; tamén podes gardalas nun ficheiro .ics. E as citas do móbil vense xunto ás túas quendas.
@@ -182,16 +190,18 @@ Todo o que hai na app é de balde, e o código é aberto: podes revisalo e compi
 Turnly: Txanden egutegia
 ```
 
-### Descripción breve · 72/80 caracteres
+### Descripción breve · 78/80 caracteres
 
 ```text
-Lan-txanden egutegia, widgeta eta babeskopiak. Doakoa eta kode irekikoa.
+Txandak doan, Pro, iragarki eta konturik gabe. Mugikorrez aldatzean ere, doan.
 ```
 
-### Descripción completa · 3495/4000 caracteres
+### Descripción completa · 3878/4000 caracteres
 
 ```text
-Zure txandak, begirada batean. Turnly aplikazioarekin goizeko, arratsaldeko eta gaueko txandak, guardiak, gau-ondokoak eta egun libreak antola ditzakezu, konturik, iragarkirik, erosketarik eta Interneteko konexiorik gabe.
+Zure txandak, begirada batean. Turnly aplikazioarekin goizeko, arratsaldeko eta gaueko txandak, guardiak, gau-ondokoak eta egun libreak antola ditzakezu, Interneteko konexiorik gabe.
+
+Dena doakoa da: ez dago Pro bertsiorik, ez iragarkirik, ez erosketarik, ez konturik. Mugikorrez aldatzean ez duzu ezer berriro ordaindu behar, eta zure txandak zurekin datoz: mugikor berria estreinatzean zaharretik zuzenean pasatuta, Google-ren babeskopiarekin (Turnly-k zifratuta bakarrik egiten du, eta pantailaren blokeoa behar du) edo .turnly fitxategi batekin.
 
 Margotu egunak edo aplikatu txanda birakarien eredua, 24/72, 4x4 edo zure txandaketa. Gehitu hainbat txanda egun berean, bakoitza kolorearekin, kodearekin eta ordutegiarekin. Ikusi hilabetea, agenda edo urtea. Egun bakoitzean oharra idatz dezakezu, argazkiak, marrazkiak edo fitxategiak erantsi eta zereginen zerrenda bat egin.
 
@@ -202,7 +212,7 @@ TXANDA-ALARMAK
 Txanda mota bakoitzak bere abisua izan dezake: iratzargailu-alarma gisa jotzen du, eta hilabeteko tartearekin programatzen da. Gainera, zuk aukeratutako txandetan Turnly-k mugikorra isildu eta, txanda amaitzean, soinua itzul dezake.
 
 EGIAZTA DITZAKEZUN BABESKOPIAK
-Turnly-k babeskopiak gordetzen ditu mugikorrean, eta «Probatu leheneratzea» erabiliz berreskura daitezkeela egiazta dezakezu. Leheneratu aurretik, zer duten ikusten duzu. «Kopia automatikoa karpeta batean» aukerak egunean kopia bat uzten du aukeratzen duzun karpetan (Drive, Dropbox, OneDrive edo mugikorra bera), eta azken 10ak gordetzen ditu. Mugikorrez aldatzeko, eraman .turnly fitxategi bat berrira: aplikazioaren barruan geratzen diren kopiak galdu egiten dira desinstalatzean.
+Turnly-k babeskopiak gordetzen ditu mugikorrean, eta «Probatu leheneratzea» erabiliz berreskura daitezkeela egiazta dezakezu. Leheneratu aurretik, zer duten ikusten duzu. «Kopia automatikoa karpeta batean» aukerak egunean kopia bat uzten du aukeratzen duzun karpetan (Drive, Dropbox, OneDrive edo mugikorra bera), eta azken 10ak gordetzen ditu. Mugikorrez aldatzeko beste ezeren mende egon gabe, eraman .turnly fitxategi bat berrira: aplikazioaren barruan geratzen diren kopiak galdu egiten dira beste kopiarik gabe desinstalatzen baduzu.
 
 EKARRI ETA ERAMAN ZURE TXANDAK
 Inportatu LRHSoft-en (Calendario de Turnos) .Shifter kopia, mugikorreko egutegia, .ics bat edo CSV bat, eta berrikusi aurrebista gorde aurretik. «Eguneratuta mantendu» aukerarekin, zure txandak mugikorreko egutegira pasatzen dira, eta txandak aldatzen dituzun bakoitzean eguneratzen dira; .ics fitxategi batean ere gorde ditzakezu. Mugikorreko hitzorduak ere zure txanden ondoan ikusten dira.
@@ -234,16 +244,18 @@ Aplikazioan dagoen guztia doakoa da, eta kodea irekia da: berrikusi eta konpilat
 Turnly: Work Shift Calendar
 ```
 
-### Descripción breve · 69/80 caracteres
+### Descripción breve · 79/80 caracteres
 
 ```text
-Your shifts, widgets and backups you can check. Free and open source.
+Free shift calendar with no Pro, ads or account. Nothing to pay on a new phone.
 ```
 
-### Descripción completa · 3045/4000 caracteres
+### Descripción completa · 3404/4000 caracteres
 
 ```text
-Your shifts at a glance. Turnly helps you plan mornings, afternoons, nights, 24-hour shifts, post-night days and days off, without an account, ads, purchases or an internet connection.
+Your shifts at a glance. Turnly helps you plan mornings, afternoons, nights, 24-hour shifts, post-night days and days off, and it works offline.
+
+Everything is free: no Pro version, no ads, no purchases and no account. When you change phones there is nothing to pay again, and your shifts come with you: through the direct transfer from your old phone when you set up the new one, through the Google backup, which Turnly only makes encrypted (it needs a screen lock), or with a .turnly file.
 
 Paint days or apply a rotating shift pattern, 24/72, 4x4 or your own rotation. Add several shifts to a day and see each one with a color, code and times. View the month, the agenda or the year. On each day you can write a note, add photos, drawings or files and keep a task list.
 
@@ -254,7 +266,7 @@ SHIFT ALARMS
 Each shift type can have its own alarm, which rings like an alarm clock and is scheduled a month ahead. Turnly can also silence your phone during the shifts you pick and bring the sound back when they end.
 
 BACKUPS YOU CAN CHECK
-Turnly keeps backups on your phone, and Test restore checks that they can be recovered. Before restoring, you see what they contain. Automatic backup to a folder leaves one copy a day in the folder you choose (Drive, Dropbox, OneDrive or the phone itself) and keeps the last 10. To change phones, take a .turnly file to the new one: the backups that stay inside the app are lost when you uninstall it.
+Turnly keeps backups on your phone, and Test restore checks that they can be recovered. Before restoring, you see what they contain. Automatic backup to a folder leaves one copy a day in the folder you choose (Drive, Dropbox, OneDrive or the phone itself) and keeps the last 10. To change phones without relying on anything else, take a .turnly file to the new one: the backups that stay inside the app are lost if you uninstall it without another copy.
 
 BRING YOUR SHIFTS IN AND OUT
 Import your .Shifter backup from LRHSoft (Calendario de Turnos), your phone calendar, an .ics or a CSV file, and review the preview before saving. With Keep up to date, your shifts go to your phone calendar and update every time you change your schedule; you can also save them as an .ics file. And your phone events show next to your shifts.

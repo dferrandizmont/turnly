@@ -267,6 +267,10 @@ adjuntos** es un **ZIP** (`domain/backup_container.dart`), con la misma extensi�
   un archivo que lo trae no lo cambia y restaurar deja el idioma como estaba (`isDeviceSetting`). Lo mismo
   `appearance.timeFormat` (reloj de 12 h o 24 h). `appearance.currency` **sí entra**: los importes de la copia solo
   tienen sentido en su moneda; una copia anterior, sin la fila, se lee como euros.
+- **El aspecto sí entra:** `appearance.themeMode`, `appearance.accent` (uno de los diez acentos), `appearance.cellTextSize` y
+  `appearance.pureBlack` (fondo negro, `true`/`false`) viajan en la copia. Una copia anterior, sin las filas, restaura
+  Índigo y fondo negro desactivado; un acento que esta versión no conozca (copia de una versión futura) se lee como
+  Índigo. Prueba de ida y vuelta de los diez acentos: `test/features/backup/appearance_backup_test.dart`.
 - **`calendarSync` (exportación continua) y `deviceEvents` (calendarios del móvil junto a los turnos) tampoco
   entran**: los dos guardan identificadores de calendarios que reparte este móvil y no significan nada en otro, así
   que son ajustes de dispositivo (`isDeviceSetting`). No se exportan, un archivo que los traiga no los cambia y
@@ -574,7 +578,10 @@ aparece en Archivos › iCloud Drive › Turnly cuando `Info.plist` declara `NSU
   `flutter test test/features/backup/golden_v3_fixture_test.dart --dart-define=REGENERATE_GOLDEN=true`.
 
 El estado de pago no es un dato de la base de datos y queda fuera del conjunto (no hay compras: R9 sale de la
-matriz); las alarmas configuradas están representadas por su clave en `settings`.
+matriz); las alarmas configuradas están representadas por su clave en `settings`. Eso incluye el **aviso de pausa**
+de cada tipo de turno (`types.<id>.pause` dentro de `alarms`, `docs/alarmas.md`, «Aviso de pausa a mitad de turno»):
+no es un campo nuevo del formato ni sube la versión, y una copia anterior se restaura con el aviso apagado. Ida y
+vuelta probada en `test/features/backup/pause_alert_backup_test.dart`.
 
 ## 6. Pruebas
 

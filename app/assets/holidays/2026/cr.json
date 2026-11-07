@@ -1,0 +1,16 @@
+{
+"schema":1,
+"year":2026,
+"country":"CR",
+"national":[
+{"date":"2026-01-01","name":"Año Nuevo"},
+{"date":"2026-04-02","name":"Jueves Santo"},
+{"date":"2026-04-03","name":"Viernes Santo"},
+{"date":"2026-04-11","name":"Día de Juan Santamaría"},
+{"date":"2026-05-01","name":"Día Internacional del Trabajo"},
+{"date":"2026-07-25","name":"Anexión del Partido de Nicoya a Costa Rica"},
+{"date":"2026-08-15","name":"Día de la Madre"},
+{"date":"2026-09-15","name":"Día de la Independencia"},
+{"date":"2026-12-25","name":"Navidad"}
+]
+}

@@ -5,7 +5,7 @@ Estado: planificador, programador local, sincronización y **pantalla de ajustes
 prueba en dispositivos reales (ver el final). Todo está apagado por defecto. Referencias: `turnos-spec.md` §3 P0.5
 y §6, `docs/plan-publicacion.md` §3. Las alarmas son completas y gratis (`docs/roadmap.md`): aviso el día anterior,
 posponer y saltar un día están hechos; en la 0.6.0 se añaden el **recordatorio dentro de una nota** y el **sonido por
-tipo de turno** (secciones de más abajo).
+tipo de turno**, y después el **aviso de pausa a mitad de turno** (secciones de más abajo).
 
 ## Qué hace
 
@@ -15,7 +15,8 @@ anterior. Todo en el móvil, sin servidor ni cuenta. Para que no caduquen aunque
 y, en Android, una tarea en segundo plano los vuelven a programar (ver «Renovación de los avisos»).
 
 - **Ajustes** (`AlarmSettings`, tabla `settings`, clave `alarms`, JSON versionado): interruptor global, horizonte en
-  días (30 por defecto, máximo 30), días saltados (`skippedDates`) y, por id de tipo de turno, `enabled`,
+  días (30 por defecto, máximo 30), días saltados (`skippedDates`) y, por id de tipo de turno, `pause` (aviso de pausa,
+  sección propia), `enabled`,
   `minutesBefore` (90 por defecto, 0 a 1440), `label` opcional (sustituye al título del aviso de antes del turno),
   `dayBefore` (aviso el día anterior, apagado por defecto) y `dayBeforeMinute` (minutos desde las 00:00, 1200 = 20:00
   por defecto). Sin nada guardado, todo apagado. Forma del JSON (los campos nuevos son opcionales y un valor antiguo se
@@ -52,7 +53,8 @@ y, en Android, una tarea en segundo plano los vuelven a programar (ver «Renovac
   conserva el interruptor aunque cambie el turno). Los días anteriores a hoy se podan al guardar cualquier cambio de
   los ajustes.
 - **Planificador puro** (`planAlarms`): de `Schedule` + ajustes + «ahora» saca la lista de `PlannedAlarm`.
-  - Un aviso por turno (un día con dos turnos suena dos veces). Los turnos sin horario no tienen aviso.
+  - Un aviso por turno (un día con dos turnos suena dos veces). Los turnos sin horario no tienen aviso. El **aviso de
+    pausa** (sección «Aviso de pausa a mitad de turno») es un aviso más por turno, independiente del de antes del turno.
   - **Turno partido (0.6.0, A12):** un tipo con segundo tramo suena **antes del primer tramo** (como siempre) y, si el
     tipo tiene «Avisar también antes del segundo tramo» (`secondSegment`, **activado por defecto**), otra vez antes del
     segundo, con la misma antelación (`minutesBefore`) y el texto propio del tipo si lo hay; el cuerpo es el del tramo
@@ -118,6 +120,73 @@ y, en Android, una tarea en segundo plano los vuelven a programar (ver «Renovac
   turno o la tarde anterior) que la última sincronización entregó de verdad al sistema (`AlarmSync.lastPlan`), no un
   cálculo aparte. Sin permiso no se programa nada y la línea no sale; tampoco si no hay ningún aviso (la línea de
   encima ya dice «No hay ningún aviso previsto…» y la tarjeta de permisos, por qué).
+
+## Aviso de pausa a mitad de turno
+
+Propuesta 6 de `docs/competencia-2026-11.md` (Turnify 1.17 lo tiene en turnos de 12 y 24 h). En cada tipo de turno se
+puede activar un aviso «Toca pausa» que suena durante el turno. **Apagado por defecto.**
+
+- **Dónde.** Ajustes › Mis turnos › (un tipo) › sección «Aviso de pausa» (`ShiftPauseSection`), debajo de «Alarma».
+  Sale en los tipos que pueden sonar (con horario y que no son ausencia: `alarmSectionApplies`, la misma regla que
+  `canShiftTypeRing`) y, a diferencia del sonido, en Android y en iOS. Un interruptor «Avisarme para hacer una pausa»
+  y, con él encendido, la fila «Cuándo» (mismo aspecto que las filas de Ajustes › Alarmas, con `ValueRow`): «A mitad del
+  turno» o «X después de empezar» (1 h a 6 h, o personalizado de 15 min a 23 h 59 min con el selector de horas y
+  minutos). Se guarda al pulsar «Guardar», como el resto del formulario (igual que «No molestar durante este turno»).
+- **Se propone en turnos de 8 horas o más** (`PauseAlertSettings.suggestedFromMinutes`): la ayuda bajo el interruptor
+  dice «Este turno dura 12 h: suele venir bien parar un rato a mitad.»; en turnos más cortos dice «Un aviso a mitad del
+  turno para acordarte de parar.». Nunca se activa solo.
+- **Dato.** `AlarmTypeSettings.pause` (`PauseAlertSettings`: `enabled`, `timing` `midShift`/`afterStart`,
+  `afterMinutes`, 15 a 1439, 240 por defecto) en la misma fila `alarms` de la tabla `settings`; **sin cambio de
+  esquema de Drift**. JSON: `"pause": {"enabled": true, "timing": "mid" | "after", "afterMinutes": 240}`, solo cuando el
+  tipo lo ha tocado (un tipo que nunca lo tocó conserva su JSON de siempre y una app anterior ignora la clave). Es
+  tolerante: tipos erróneos vuelven a apagado / a mitad / 4 h. Viaja en la copia de seguridad con el resto de los
+  ajustes (`docs/copia-de-seguridad.md`).
+- **Planificador** (`AlarmKind.pause`, `_planPause`). Un aviso por turno del día:
+  - Va en el **tramo largo** de un turno partido (el primero si los dos duran lo mismo); en un turno normal, en el
+    único tramo. Lleva el tramo en el payload (`g`, solo si es 1).
+  - «A mitad del turno» suena al medio del tramo (duración / 2, redondeada hacia abajo al minuto); «X después de
+    empezar» suena X minutos después de que empiece ese tramo. Si X es igual o mayor que lo que dura el tramo, no hay
+    aviso.
+  - Es **hora de pared** contada desde el día del turno, como todos los avisos: un turno de noche (22:00 a 06:00) tiene
+    el aviso a las 02:00 **del día siguiente** (`fireDate` = día siguiente, `shiftDate` = día del turno). Las reglas del
+    horario de verano son las de siempre (sección «Horario de verano»): en la noche del 28 al 29 de marzo, las 02:00 no
+    existen y suena a las 03:00; en la del 24 al 25 de octubre, las 02:00 se repiten y suena la primera vez. La app
+    cuenta las horas de un turno por hora de pared en todas partes (`scheduledMinutes`), y el aviso hace lo mismo. Si el
+    cambio de hora empuja el aviso al final del tramo o más allá (un turno de 01:00 a 03:00 el 29 de marzo), se descarta.
+  - **No suena** si ese día hay cualquier ausencia (vacaciones, libre disposición, baja...; se mira el día resuelto, sea
+    override o rotación), si el turno está quitado (un día sin turno no genera nada), si el día tiene «Sin alarma este
+    día», con el interruptor general apagado o sin permiso de notificaciones (como los demás avisos), pasada su hora o
+    fuera del horizonte.
+  - Es **independiente de «Antes del turno»**: un tipo puede tener solo el aviso de pausa (la fila de Ajustes › Alarmas
+    cuenta ese tipo como activo: `AlarmTypeSettings.anyEnabled`, `anyActive`, `alarmsCanRing`, y la renovación en segundo
+    plano sigue funcionando). Sí necesita el **interruptor general** de Ajustes › Alarmas; si está apagado, el
+    editor lo dice bajo la fila «Cuándo» («Las alarmas están desactivadas. Actívalas en Ajustes › Alarmas…»).
+  - Texto: título «Toca pausa» (`alarmsPauseTitle`), cuerpo el de siempre del turno («Noche: de 22:00 a 06:00», con
+    las horas del tramo al que pertenece). Sin botones (no se pospone) y sin sonido propio.
+  - Id determinista (`fecha|tipo|índice|pause`, más `|s2` si es el segundo tramo): reprogramar no duplica y un aviso
+    quitado se cancela con los demás sobrantes. Cuenta en el tope de 60 con los avisos de turno y puede provocar el
+    aviso de renovación como ellos. **No sale en «Próximo aviso»** (esa línea habla de turnos: `nextAlarm` lo salta).
+  - Sin los textos (`AlarmStrings.pauseTitle`, que `fromL10n` siempre trae) no se planifica ninguno.
+- **Canal.** `break_alerts` («Avisos de pausa»): importancia alta, tono y volumen de notificación, no de alarma
+  (`isNoticeKind`), categoría `reminder`, `visibility: private`. **Respeta «No molestar» y el modo silencio** como los
+  recordatorios de notas y el aviso del día anterior; en Android se programa `exactAllowWhileIdle` (no `setAlarmClock`:
+  no es una alarma de despertador y no debe salir en la barra de estado). Tiene su propio canal para que el usuario pueda
+  silenciarlo en los ajustes del sistema sin tocar las alarmas. Si el usuario tiene activo «No molestar durante este
+  turno» (P13), el móvil estará silenciado y el aviso llegará sin sonido: es lo esperado.
+- **Garantías.** Mismas que las demás: lo programa `AlarmSync` (al arrancar, al volver a primer plano, al cambiar turnos
+  o ajustes y tras restaurar una copia), la renovación en segundo plano de Android lo vuelve a planificar con el mismo
+  planificador, `replaceAll` lee la zona del móvil en cada pasada (un cambio de zona se nota en la siguiente
+  sincronización y con `clockChanged`) y los avisos que ya estaban programados sobreviven a un reinicio por el receptor
+  de arranque del plugin. Al apagar el aviso o el interruptor general, o al perder el permiso, la siguiente pasada lo
+  cancela.
+- **Pruebas** (`test/features/alarms/alarm_pause_test.dart`, `alarm_sound_channels_test.dart`,
+  `test/features/shift_types/shift_type_pause_test.dart`, `test/features/backup/pause_alert_backup_test.dart`): ajustes
+  (JSON, tolerancia, `anyActive`), instante (turno de día, de noche que cruza la medianoche, partido con cada tramo largo,
+  tramo largo pasada la medianoche, 28 de marzo y 24 de octubre), días sin aviso (ausencia, turno quitado, «Sin alarma
+  este día», interruptor general, sin textos, hora pasada, fuera del horizonte), cancelación al apagarlo con `AlarmSync`,
+  cambio de zona con `LocalAlarmScheduler`, canal y modo de programación, editor, y ida y vuelta por la copia.
+- **Sin probar en dispositivo:** que suene con la app cerrada y con ahorro de batería, el canal en los ajustes del
+  sistema y el aspecto de la sección en pantallas pequeñas con texto grande (hay prueba de widget a 320 px y texto x2).
 
 ## Posponer y «Ya estoy despierto»
 
@@ -385,7 +454,7 @@ a instante está en `data/wall_clock.dart`, con pruebas para 2026-03-29 y 2026-1
   `android/app/src/main/res/raw/keep.xml` (`tools:keep`) lo conserva, y `tool/qa/release_apk_check.sh` (primer paso de
   `release_check.sh`) falla si el APK de release no lo trae. Un recurso que solo se nombre desde el Dart se añade a esa
   lista.
-- **Canales.** `shift_alarms` (sonido por defecto): importancia máxima, sonido y vibración, uso de audio «alarma»
+- **Canales.** `break_alerts`: avisos de pausa (ver «Aviso de pausa a mitad de turno»). `shift_alarms` (sonido por defecto): importancia máxima, sonido y vibración, uso de audio «alarma»
   (suena con el volumen de alarmas, no el de tono) y categoría `alarm`. `shift_alarm_<hash>`: uno por sonido
   propio, igual que el anterior con ese sonido (ver «Sonido por tipo de turno»). `note_reminders`: recordatorios
   de notas, importancia alta y volumen de notificación.

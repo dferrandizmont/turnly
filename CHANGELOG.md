@@ -10,6 +10,25 @@ at once, so they can skip numbers.
 
 ## Unreleased
 
+## 0.9.0 · 2026-11-07
+
+Money, breaks and more rotations, from a review of the leading shift apps. Release for Google Play, GitHub and the web.
+
+- Summary: the estimate now breaks down the night and holiday premiums, fixed allowances and extra amounts.
+- Settings › Hours and money: allowance templates for public healthcare, firefighters and security guards that fill in the allowance types of your shifts (amounts start at 0; you type yours).
+- Settings › Hours and money: a closing day for your pay month (paid from the 21st to the 20th? set 20), used by the summary, the year table, the hours bag and “earned so far”.
+- Settings › Hours and money: an overtime cap per month or year, with a warning in the summary from 80 % of the cap, at the cap and above it.
+- Vacation and leave: a balance can count working days only (Monday to Friday, without the holidays of your calendar).
+- Appearance: five more accent colours (Violet, Plum, Emerald, Olive and Terracotta) and a “Fondo negro” switch for OLED screens in dark mode; both are saved in the backup.
+- Holidays: official holidays for 19 more countries: Guatemala, Bolivia (with its departments), Paraguay, Panama, Costa Rica, Dominican Republic, Honduras, El Salvador, Nicaragua, Cuba, Poland, Sweden, Norway, Denmark, Finland, Luxembourg, Greece, Romania and Andorra.
+- Shift types: new optional break alert, off by default and suggested for shifts of 8 hours or more. It says “Toca pausa” halfway through the shift (the longer part of a split shift) or a set time after it starts, stays silent on days with an absence, a removed shift or “Sin alarma este día”, and follows the alarm switch, Do Not Disturb and silent mode.
+- New ready-made rotations: “Policía Nacional 2-2-2-6” and “Guardia 1-4” (a 24 h shift and 4 days off), grouped under Police and Firefighters and offered first for those jobs in the first run. The 24 x 72 rotation now says it is also known as 1-3.
+- Play listing and website now say up front that everything is free: no Pro, no ads, no account, and nothing to pay again on a new phone.
+- Website: new FAQ “How do I move Turnly to a new phone?” with the four ways (direct transfer, encrypted Google backup, .turnly file, automatic folder backup).
+- Settings › Alarms now shows each shift type's break alert and when it rings.
+- Allowance templates no longer write a night premium on shift types without night hours.
+- The custom time wheel for the break alert and the alarm lead shows hours and minutes consistently, and input hints no longer look like typed text.
+
 ## 0.8.9 · 2026-11-05
 
 Tablets and busy days, from testing on a real phone and tablet. Release for Google Play, GitHub and the web.

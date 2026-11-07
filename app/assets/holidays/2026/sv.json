@@ -1,0 +1,18 @@
+{
+"schema":1,
+"year":2026,
+"country":"SV",
+"national":[
+{"date":"2026-01-01","name":"Año Nuevo"},
+{"date":"2026-04-02","name":"Jueves Santo"},
+{"date":"2026-04-03","name":"Viernes Santo"},
+{"date":"2026-04-04","name":"Sábado Santo"},
+{"date":"2026-05-01","name":"Día del Trabajo"},
+{"date":"2026-05-10","name":"Día de la Madre"},
+{"date":"2026-06-17","name":"Día del Padre"},
+{"date":"2026-08-06","name":"Celebración del Divino Salvador del Mundo"},
+{"date":"2026-09-15","name":"Día de la Independencia"},
+{"date":"2026-11-02","name":"Día de los Difuntos"},
+{"date":"2026-12-25","name":"Navidad"}
+]
+}

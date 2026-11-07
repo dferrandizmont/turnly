@@ -22,6 +22,9 @@ class AlarmStrings {
     required this.reminderChannelDescription,
     this.renewalTitle,
     this.renewalBody,
+    this.pauseTitle,
+    this.pauseChannelName,
+    this.pauseChannelDescription,
     this.clock,
   });
 
@@ -50,6 +53,9 @@ class AlarmStrings {
       AppDateFormat(l10n.localeName)
           .weekdayDayMonth(DateTime(day.year, day.month, day.day)),
     ),
+    pauseTitle: l10n.alarmsPauseTitle,
+    pauseChannelName: l10n.alarmsPauseChannelName,
+    pauseChannelDescription: l10n.alarmsPauseChannelDescription,
     clock: clock,
   );
 
@@ -123,6 +129,13 @@ class AlarmStrings {
   /// always sets both.
   final String? renewalTitle;
   final String Function(CivilDate lastDay)? renewalBody;
+
+  /// The pause notice («Toca pausa», its body is the shift's [body]) and its
+  /// Android channel. Null (test texts, [blank]) plans no pause notice;
+  /// [AlarmStrings.fromL10n] always sets all three.
+  final String? pauseTitle;
+  final String? pauseChannelName;
+  final String? pauseChannelDescription;
 }
 
 String _blank2(String a, String b) => '';

@@ -1,0 +1,19 @@
+{
+"schema":1,
+"year":2026,
+"country":"DO",
+"national":[
+{"date":"2026-01-01","name":"Año Nuevo"},
+{"date":"2026-01-05","name":"Día de los Santos Reyes"},
+{"date":"2026-01-21","name":"Día de la Altagracia"},
+{"date":"2026-01-26","name":"Día de Duarte"},
+{"date":"2026-02-27","name":"Día de la Independencia Nacional"},
+{"date":"2026-04-03","name":"Viernes Santo"},
+{"date":"2026-05-04","name":"Día del Trabajo"},
+{"date":"2026-06-04","name":"Corpus Christi"},
+{"date":"2026-08-16","name":"Día de la Restauración"},
+{"date":"2026-09-24","name":"Día de las Mercedes"},
+{"date":"2026-11-09","name":"Día de la Constitución"},
+{"date":"2026-12-25","name":"Día de Navidad"}
+]
+}

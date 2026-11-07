@@ -1,0 +1,20 @@
+{
+"schema":1,
+"year":2026,
+"country":"PA",
+"national":[
+{"date":"2026-01-01","name":"Año Nuevo"},
+{"date":"2026-01-09","name":"Día de los Mártires"},
+{"date":"2026-02-17","name":"Martes de Carnaval"},
+{"date":"2026-04-03","name":"Viernes Santo"},
+{"date":"2026-05-01","name":"Día del Trabajo"},
+{"date":"2026-11-03","name":"Separación de Panamá de Colombia"},
+{"date":"2026-11-05","name":"Día de Colón"},
+{"date":"2026-11-10","name":"Primer Grito de Independencia"},
+{"date":"2026-11-28","name":"Independencia de Panamá de España"},
+{"date":"2026-12-08","name":"Día de la Madre"},
+{"date":"2026-12-20","name":"Día de Duelo Nacional"},
+{"date":"2026-12-21","name":"Día de Duelo Nacional (puente)"},
+{"date":"2026-12-25","name":"Navidad"}
+]
+}

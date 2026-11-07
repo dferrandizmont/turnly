@@ -1,5 +1,90 @@
 import '../../schedule/domain/civil_date.dart';
 
+/// When the mid-shift pause notice rings (docs/alarmas.md, «Aviso de pausa»).
+enum PauseTiming {
+  /// Halfway through the shift (or through the long segment of a split one).
+  midShift,
+
+  /// [PauseAlertSettings.afterMinutes] after the shift starts.
+  afterStart,
+}
+
+/// The pause notice of one shift type: "Toca pausa" in the middle of the
+/// shift. Off until the user opts in, per shift type.
+class PauseAlertSettings {
+  const PauseAlertSettings({
+    this.enabled = false,
+    this.timing = PauseTiming.midShift,
+    this.afterMinutes = defaultAfterMinutes,
+  });
+
+  /// 4 h after the start: the usual break of an 8 h shift.
+  static const int defaultAfterMinutes = 4 * 60;
+
+  /// Shortest and longest "after the start" we accept (a day minus a minute:
+  /// a longer lead never fits inside a shift).
+  static const int minAfterMinutes = 15;
+  static const int maxAfterMinutes = 1439;
+
+  /// A shift of this many minutes or more is the one the form suggests the
+  /// notice for (8 h).
+  static const int suggestedFromMinutes = 8 * 60;
+
+  static const PauseAlertSettings off = PauseAlertSettings();
+
+  final bool enabled;
+  final PauseTiming timing;
+
+  /// Minutes after the start, only for [PauseTiming.afterStart].
+  final int afterMinutes;
+
+  PauseAlertSettings copyWith({
+    bool? enabled,
+    PauseTiming? timing,
+    int? afterMinutes,
+  }) => PauseAlertSettings(
+    enabled: enabled ?? this.enabled,
+    timing: timing ?? this.timing,
+    afterMinutes: afterMinutes ?? this.afterMinutes,
+  );
+
+  Map<String, Object?> toJson() => {
+    'enabled': enabled,
+    'timing': timing == PauseTiming.midShift ? 'mid' : 'after',
+    'afterMinutes': afterMinutes,
+  };
+
+  /// Tolerant: wrong types fall back to the defaults (off, mid-shift, 4 h)
+  /// and the lead is clamped.
+  factory PauseAlertSettings.fromJson(Map<String, Object?> json) {
+    final after = json['afterMinutes'];
+    return PauseAlertSettings(
+      enabled: json['enabled'] == true,
+      timing: json['timing'] == 'after'
+          ? PauseTiming.afterStart
+          : PauseTiming.midShift,
+      afterMinutes: after is num && after.isFinite
+          ? after.clamp(minAfterMinutes, maxAfterMinutes).round()
+          : defaultAfterMinutes,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      other is PauseAlertSettings &&
+      other.enabled == enabled &&
+      other.timing == timing &&
+      other.afterMinutes == afterMinutes;
+
+  @override
+  int get hashCode => Object.hash(enabled, timing, afterMinutes);
+
+  @override
+  String toString() =>
+      'PauseAlertSettings(enabled: $enabled, timing: ${timing.name}, '
+      'after: $afterMinutes)';
+}
+
 /// Alarm choices of one shift type. Off until the user opts in.
 class AlarmTypeSettings {
   const AlarmTypeSettings({
@@ -9,6 +94,7 @@ class AlarmTypeSettings {
     this.dayBefore = false,
     this.dayBeforeMinute = defaultDayBeforeMinute,
     this.secondSegment = true,
+    this.pause = PauseAlertSettings.off,
   }) : assert(dayBeforeMinute >= 0 && dayBeforeMinute < 1440);
 
   static const int defaultMinutesBefore = 90;
@@ -43,6 +129,14 @@ class AlarmTypeSettings {
   /// reminder (about the shift as a whole) does not depend on it.
   final bool secondSegment;
 
+  /// The pause notice of this type (independent of [enabled]: a type can have
+  /// only the pause notice).
+  final PauseAlertSettings pause;
+
+  /// Whether this type can make any notice ring: the alarm before the shift
+  /// or the pause notice.
+  bool get anyEnabled => enabled || pause.enabled;
+
   /// [label] without surrounding blanks, or null when there is none.
   String? get cleanLabel {
     final trimmed = label?.trim();
@@ -57,6 +151,7 @@ class AlarmTypeSettings {
     bool? dayBefore,
     int? dayBeforeMinute,
     bool? secondSegment,
+    PauseAlertSettings? pause,
   }) => AlarmTypeSettings(
     enabled: enabled ?? this.enabled,
     minutesBefore: minutesBefore ?? this.minutesBefore,
@@ -64,6 +159,7 @@ class AlarmTypeSettings {
     dayBefore: dayBefore ?? this.dayBefore,
     dayBeforeMinute: dayBeforeMinute ?? this.dayBeforeMinute,
     secondSegment: secondSegment ?? this.secondSegment,
+    pause: pause ?? this.pause,
   );
 
   Map<String, Object?> toJson() => {
@@ -76,6 +172,9 @@ class AlarmTypeSettings {
     // reads as, so settings of a type without a second segment stay as they
     // were.
     if (!secondSegment) 'secondSegment': false,
+    // Same idea: a type that never touched the pause notice keeps its JSON
+    // as it was (an older app ignores the key).
+    if (pause != PauseAlertSettings.off) 'pause': pause.toJson(),
   };
 
   /// Tolerant: wrong types (and NaN or infinite numbers) fall back to the
@@ -85,6 +184,7 @@ class AlarmTypeSettings {
     final minutes = json['minutesBefore'];
     final label = json['label'];
     final dayBeforeMinute = json['dayBeforeMinute'];
+    final pause = json['pause'];
     return AlarmTypeSettings(
       enabled: json['enabled'] == true,
       minutesBefore: minutes is num && minutes.isFinite
@@ -96,6 +196,9 @@ class AlarmTypeSettings {
           ? dayBeforeMinute.clamp(0, 1439).round()
           : defaultDayBeforeMinute,
       secondSegment: json['secondSegment'] != false,
+      pause: pause is Map
+          ? PauseAlertSettings.fromJson(pause.cast<String, Object?>())
+          : PauseAlertSettings.off,
     );
   }
 
@@ -107,7 +210,8 @@ class AlarmTypeSettings {
       other.cleanLabel == cleanLabel &&
       other.dayBefore == dayBefore &&
       other.dayBeforeMinute == dayBeforeMinute &&
-      other.secondSegment == secondSegment;
+      other.secondSegment == secondSegment &&
+      other.pause == pause;
 
   @override
   int get hashCode => Object.hash(
@@ -117,13 +221,14 @@ class AlarmTypeSettings {
     dayBefore,
     dayBeforeMinute,
     secondSegment,
+    pause,
   );
 
   @override
   String toString() =>
       'AlarmTypeSettings(enabled: $enabled, minutesBefore: $minutesBefore, '
       'label: $cleanLabel, dayBefore: $dayBefore @ $dayBeforeMinute, '
-      'secondSegment: $secondSegment)';
+      'secondSegment: $secondSegment, pause: $pause)';
 }
 
 /// All alarm settings: a global switch and horizon, one [AlarmTypeSettings]
@@ -163,8 +268,9 @@ class AlarmSettings {
   AlarmTypeSettings forShiftType(String shiftTypeId) =>
       byShiftType[shiftTypeId] ?? AlarmTypeSettings.off;
 
-  /// Whether any alarm could ring: the global switch and one type on.
-  bool get anyActive => enabled && byShiftType.values.any((t) => t.enabled);
+  /// Whether any alarm could ring: the global switch and one type with its
+  /// alarm or its pause notice on.
+  bool get anyActive => enabled && byShiftType.values.any((t) => t.anyEnabled);
 
   bool isSkipped(CivilDate date) => skippedDates.contains(date);
 

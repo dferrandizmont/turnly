@@ -261,8 +261,51 @@ class AppColors extends ThemeExtension<AppColors> {
     );
   }
 
+  /// Pure black behind everything, for OLED screens (Ajustes › Apariencia ›
+  /// Fondo negro, `docs/diseno.md`): only [background] changes, in the dark
+  /// theme. Cards, cells and the rest keep their tokens, so every text and
+  /// every shift colour keeps the contrast it was checked with (it is higher
+  /// on black). The light theme is returned as it is.
+  AppColors withPureBlack() => isDark ? copyWith(background: pureBlack) : this;
+
+  /// `#000000`: the background of the pure-black variant.
+  static const Color pureBlack = Color(0xFF000000);
+
   @override
-  AppColors copyWith() => this;
+  AppColors copyWith({Color? background}) => background == null
+      ? this
+      : AppColors(
+          brightness: brightness,
+          background: background,
+          surface: surface,
+          surfaceMuted: surfaceMuted,
+          surfaceRaised: surfaceRaised,
+          border: border,
+          borderStrong: borderStrong,
+          textPrimary: textPrimary,
+          textSecondary: textSecondary,
+          textMuted: textMuted,
+          accent: accent,
+          onAccent: onAccent,
+          accentText: accentText,
+          accentSoft: accentSoft,
+          controlBorder: controlBorder,
+          highlight: highlight,
+          onHighlight: onHighlight,
+          todayRing: todayRing,
+          holiday: holiday,
+          primaryButton: primaryButton,
+          onPrimaryButton: onPrimaryButton,
+          fab: fab,
+          onFab: onFab,
+          fabBorder: fabBorder,
+          danger: danger,
+          dangerContainer: dangerContainer,
+          success: success,
+          successContainer: successContainer,
+          scrim: scrim,
+          softShadow: softShadow,
+        );
 
   @override
   AppColors lerp(ThemeExtension<AppColors>? other, double t) {

@@ -1,5 +1,6 @@
 import '../../schedule/domain/schedule_domain.dart';
 import 'month_summary.dart';
+import 'pay_period.dart';
 import 'payroll.dart';
 
 /// What the user has earned so far this month (P9, fila 25 de
@@ -63,7 +64,8 @@ class EarnedSoFar {
 /// [withholdingPercent] gives the net.
 ///
 /// [holidays] are the holiday dates of the user's place and [window] is the
-/// night window, as in [summarizeMonth].
+/// night window, as in [summarizeMonth]. With a [closingDay] the month is
+/// the payroll month named after [month].
 EarnedSoFar earnedSoFar(
   Schedule schedule,
   CivilDate month, {
@@ -72,9 +74,11 @@ EarnedSoFar earnedSoFar(
   int withholdingPercent = 0,
   Set<CivilDate> holidays = const {},
   NightWindow window = const NightWindow(),
+  int? closingDay,
 }) {
-  final first = month.firstDayOfMonth;
-  final last = month.lastDayOfMonth;
+  final period = payPeriodOf(month, closingDay);
+  final first = period.from;
+  final last = period.to;
   // Only the days up to today: the future of the month is not money yet.
   final end = today.isAfter(last) ? last : today;
   final summary = summarizeRange(
@@ -87,7 +91,7 @@ EarnedSoFar earnedSoFar(
   );
   final gross = summary.earningsCents;
   return EarnedSoFar(
-    month: first,
+    month: month.firstDayOfMonth,
     grossCents: gross,
     netCents: gross == null ? null : netCentsFrom(gross, withholdingPercent),
     workedMinutes: summary.workedMinutes,

@@ -56,7 +56,7 @@ PINNED_VERSION = "0.107"
 
 # Date of the data snapshot: goes to `source.published` in the manifest. Bump
 # it when the script is re-run with new data.
-SNAPSHOT_DATE = "2026-10-31"
+SNAPSHOT_DATE = "2026-11-06"
 
 YEARS = (2026, 2027)
 
@@ -67,7 +67,7 @@ SOURCE_URL = "https://github.com/vacanza/holidays"
 # country's own language elsewhere, English for the multilingual ones (Belgium,
 # Switzerland: Dutch/French/German/Italian) and Ireland (library default).
 # kind: state, federalState, province, region, nation, canton, city,
-# cityOrRegion, or None (no subdivisions offered).
+# cityOrRegion, department, or None (no subdivisions offered).
 COUNTRIES: list[tuple[str, str | None, str | None]] = [
     ("MX", "es", None),
     ("AR", "es", "province"),
@@ -90,6 +90,31 @@ COUNTRIES: list[tuple[str, str | None, str | None]] = [
     ("BE", "en_US", None),
     ("CH", "en_US", "canton"),
     ("AT", "de", "federalState"),
+    # 6 Nov 2026 (proposal 8 of docs/competencia-2026-11.md): the rest of
+    # Latin America the reviews ask for, and the Nordic, Central European and
+    # small neighbours of the picker list. Not exported: Morocco (religious
+    # days follow the moon sighting), the Philippines (proclaimed every year),
+    # Puerto Rico (the library has no Spanish), Equatorial Guinea, Australia
+    # and New Zealand (state days with no ISO codes), see docs/festivos.md.
+    ("GT", "es", None),
+    ("BO", "es", "department"),
+    ("PY", "es", None),
+    ("PA", "es", None),
+    ("CR", "es", None),
+    ("DO", "es", None),
+    ("HN", "es", None),
+    ("SV", "es", None),
+    ("NI", "es", None),
+    ("CU", "es", None),
+    ("PL", "pl", None),
+    ("SE", "sv", None),
+    ("NO", "no", None),
+    ("DK", "da", None),
+    ("FI", "fi", None),
+    ("LU", "en_US", None),
+    ("GR", "el", None),
+    ("RO", "ro", None),
+    ("AD", "ca", None),
 ]
 
 # Library subdivisions we do not offer, with the reason (kept for the review).
@@ -107,6 +132,10 @@ DROP_DAYS: dict[tuple[str, str], str] = {
     # 2026-27, and the labour law (LOTTT art. 184) does not list it.
     ("VE", "2026-05-15"): "Dia de la Familia, one-off decree of 2024",
     ("VE", "2027-05-15"): "Dia de la Familia, one-off decree of 2024",
+    # Assumption is a holiday of Guatemala City only (a municipal day), not
+    # of the country: it would mark a day off to everyone else.
+    ("GT", "2026-08-15"): "Dia de la Asuncion, only Guatemala City",
+    ("GT", "2027-08-15"): "Dia de la Asuncion, only Guatemala City",
 }
 
 # Names we write differently from the library, as (country, date) -> name.
@@ -276,7 +305,8 @@ def dart_source(countries: list[str], kinds: dict[str, str], subs: dict[str, dic
         "];",
         "",
         "/// Kind of subdivision each country offers (`state`, `federalState`,",
-        "/// `province`, `region`, `nation`, `canton`, `city`, `cityOrRegion`).",
+        "/// `province`, `region`, `nation`, `canton`, `city`, `cityOrRegion`,",
+        "/// `department`).",
         "const Map<String, String> bundledSubdivisionKinds = {",
     ]
     out += [f"  {q(c)}: {q(k)}," for c, k in kinds.items()]

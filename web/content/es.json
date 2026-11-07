@@ -1,9 +1,9 @@
 {
   "name": "Turnly",
   "title": "Turnly · Tus turnos, de un vistazo",
-  "description": "Calendario de turnos gratuito y de código abierto para quienes trabajan a turnos en España. Sin anuncios, sin cuenta y sin conexión.",
-  "intro": "Calendario de turnos para quienes trabajan a turnos en España: sanidad, policía, bomberos, industria, hostelería o cualquier otro sector. Organiza mañanas, tardes, noches, guardias, salientes y días libres, y consulta tu próximo turno de un vistazo.",
-  "key_facts": "Gratis · Sin anuncios · Sin cuenta · Funciona sin conexión · Código abierto · Cinco idiomas",
+  "description": "Calendario de turnos gratuito y de código abierto para quienes trabajan a turnos en España. Sin Pro, sin anuncios, sin cuenta y sin conexión.",
+  "intro": "Calendario de turnos para quienes trabajan a turnos en España (sanidad, policía, bomberos, industria, hostelería o cualquier otro sector): organiza mañanas, tardes, noches, guardias, salientes y días libres, y consulta tu próximo turno de un vistazo. Todo es gratis, sin versión Pro, anuncios ni cuenta, y al cambiar de móvil te llevas tus turnos sin volver a pagar nada.",
+  "key_facts": "Todo gratis, sin Pro · Sin anuncios · Sin cuenta · Funciona sin conexión · Código abierto · Cinco idiomas",
   "features": [
     "Tarjeta de hoy con el próximo turno, el próximo día libre y la racha. El mes en cuadrícula o lista, la agenda y el año, con las citas del calendario del móvil junto a tus turnos. Notas por día con fotos, archivos y tareas. Compara hasta seis calendarios y mira qué días libráis a la vez.",
     "Toca o arrastra para pintar varios días y, con «Añadir otro turno», pon más de uno en el mismo día. Copia, pega, deshaz y rehaz. Asistente de rotaciones con vista previa: correturnos, 24/72, 4×4, 6×4, 5×2, 2-2-3 o tu propio patrón, desde el día del ciclo que te toque.",
@@ -20,7 +20,7 @@
   "faq": [
     {
       "question": "¿Cuánto cuesta?",
-      "answer": "Nada. Turnly es totalmente gratis y de código abierto: sin anuncios, sin versión Pro y sin compras dentro de la app."
+      "answer": "Nada. Turnly es totalmente gratis y de código abierto: sin anuncios, sin versión Pro y sin compras dentro de la app. Tampoco al cambiar de móvil: no hay nada que recuperar ni que volver a pagar."
     },
     {
       "question": "¿Necesito una cuenta o conexión a internet?",
@@ -35,8 +35,8 @@
       "answer": "La versión de iPhone está en camino. Saldrá primero en TestFlight y después en la App Store."
     },
     {
-      "question": "¿Cómo paso mis turnos a otro móvil?",
-      "answer": "Lleva un archivo .turnly: expórtalo en Ajustes › Copia de seguridad y ábrelo en el móvil nuevo (o, en Android, usa la copia automática en una carpeta). Las copias que se quedan dentro de la app se pierden al desinstalarla. En Android también funciona el paso directo del móvil viejo al nuevo. Nada se restaura sin que lo confirmes."
+      "question": "¿Cómo paso Turnly a un móvil nuevo?",
+      "answer": "Tienes cuatro formas, y todas son gratis. Paso directo: al configurar el móvil nuevo, copia en él las apps y los datos del viejo por cable o wifi; Turnly pasa con ellas. Copia de Google: con la copia de seguridad de Android activada y un bloqueo de pantalla (PIN, patrón o contraseña), Android guarda Turnly cifrado en tu cuenta de Google y lo recupera al configurar el móvil nuevo con la misma cuenta (Android 9 o posterior). Sin bloqueo de pantalla, Turnly no entra en esa copia. Archivo .turnly: en Ajustes › Copia de seguridad, «Exportar archivo» o «Guardar en el dispositivo»; llévalo al móvil nuevo y ábrelo, o usa «Importar archivo». Copia automática en una carpeta (Android): deja una copia al día en la carpeta que elijas; si esa carpeta está en tu nube o la pasas al móvil nuevo, importa la última. Con el archivo o la carpeta, antes ves qué contiene la copia y nada se sustituye sin que lo confirmes. Las copias que se quedan dentro de la app se pierden si la desinstalas sin otra copia."
     },
     {
       "question": "¿Y si quiero empezar de cero?",
@@ -60,7 +60,7 @@
   "privacy_date": "2026-11-04",
   "kicker": "Calendario de turnos",
   "tagline": "Tus turnos, de un vistazo.",
-  "chip": "Gratis, sin anuncios y sin conexión.",
+  "chip": "Todo gratis: sin Pro, sin anuncios y sin cuenta.",
   "nav_label": "Secciones",
   "theme_label": "Tema",
   "theme_system": "Sistema",

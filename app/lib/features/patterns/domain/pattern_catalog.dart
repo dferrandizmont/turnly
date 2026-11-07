@@ -7,8 +7,8 @@ enum PatternGroup { health, police, firefighters, industry, security }
 /// order. (A preset not listed here still shows, under "Otros".)
 const Map<PatternGroup, List<String>> patternGroupPresets = {
   PatternGroup.health: ['12h'],
-  PatternGroup.police: ['6x4', '4x4'],
-  PatternGroup.firefighters: ['24x72'],
+  PatternGroup.police: ['pn-2-2-2-6', '6x4', '4x4'],
+  PatternGroup.firefighters: ['24x72', 'guard-1-4'],
   PatternGroup.industry: ['correturnos', 'continental', 'dupont', '5x2'],
   PatternGroup.security: ['2-2-3'],
 };

@@ -4,10 +4,12 @@ import '../../../core/database/database_provider.dart';
 import '../../../core/providers.dart';
 import '../../calendar/application/schedule_controller.dart';
 import '../../calendars/application/calendars_providers.dart';
+import '../../holidays/application/holidays_provider.dart';
 import '../../schedule/application/schedule_providers.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../data/absence_balances_repository.dart';
 import '../data/absence_carry_over_store.dart';
+import '../data/absence_working_days_store.dart';
 import '../domain/absence_balance.dart';
 import '../domain/absence_calculator.dart';
 import '../domain/absence_status.dart';
@@ -20,6 +22,11 @@ final absenceBalancesRepositoryProvider = Provider<AbsenceBalancesRepository>(
 /// Where the day the carried days expire is kept.
 final absenceCarryOverStoreProvider = Provider<AbsenceCarryOverStore>(
   (ref) => AbsenceCarryOverStore(ref.watch(appDatabaseProvider)),
+);
+
+/// Which balances count only working days («días hábiles»).
+final absenceWorkingDaysStoreProvider = Provider<AbsenceWorkingDaysStore>(
+  (ref) => AbsenceWorkingDaysStore(ref.watch(appDatabaseProvider)),
 );
 
 /// The absence balances of a year and what is left of each one (P3).
@@ -74,9 +81,28 @@ class AbsenceBalancesController
       minuteClockProvider.select((now) => CivilDate.fromDateTime(now)),
     );
 
-    final balances = await ref.read(absenceBalancesRepositoryProvider).list();
+    // A holiday added or removed changes what a balance in working days
+    // spends.
+    final holidays = ref.watch(
+      holidaysProvider.select((h) => h.keys.toSet()),
+    );
+
+    final stored = await ref.read(absenceBalancesRepositoryProvider).list();
     final expiry = await ref.read(absenceCarryOverStoreProvider).load();
+    final workingDays = await ref.read(absenceWorkingDaysStoreProvider).load();
     final primaryId = await ref.read(calendarsRepositoryProvider).primaryId();
+    final balances = [
+      for (final balance in stored)
+        workingDays.contains(
+              absenceCarryOverExpiryKey(
+                balance.year,
+                balance.type,
+                balance.calendarId ?? primaryId,
+              ),
+            )
+            ? balance.copyWith(workingDaysOnly: true)
+            : balance,
+    ];
     final schedules = await _schedules(
       activeId: activeId,
       activeSchedule: activeSchedule,
@@ -90,6 +116,7 @@ class AbsenceBalancesController
       primaryCalendarId: primaryId,
       today: today,
       carryOverExpiry: expiry,
+      holidays: holidays,
     ).statusesOf(year);
   }
 
@@ -136,15 +163,33 @@ class AbsenceBalancesController
         updatedAt: now,
       ),
     );
+    await ref
+        .read(absenceWorkingDaysStoreProvider)
+        .set(
+          balance.year,
+          balance.type,
+          await _calendarOf(balance),
+          workingDaysOnly: balance.workingDaysOnly,
+        );
     _refresh();
   }
 
   /// Removes the balance of the series [type] in [year]. Returns whether a
   /// row went.
   Future<bool> delete(int year, String type) async {
-    final deleted = await ref
-        .read(absenceBalancesRepositoryProvider)
-        .delete(year, type);
+    final repository = ref.read(absenceBalancesRepositoryProvider);
+    final existing = await repository.find(year, type);
+    final deleted = await repository.delete(year, type);
+    if (existing != null) {
+      await ref
+          .read(absenceWorkingDaysStoreProvider)
+          .set(
+            year,
+            type,
+            await _calendarOf(existing),
+            workingDaysOnly: false,
+          );
+    }
     _refresh();
     return deleted;
   }
@@ -162,6 +207,12 @@ class AbsenceBalancesController
         .setExpiry(year, type, date, calendarId: calendarId);
     _refresh();
   }
+
+  /// The calendar whose days count for [balance] (the primary one for rows
+  /// written before v6).
+  Future<String> _calendarOf(AbsenceBalance balance) async =>
+      balance.calendarId ??
+      await ref.read(calendarsRepositoryProvider).primaryId();
 
   /// Every year is read again: a change in one of them changes the carry-over
   /// of the next.

@@ -193,6 +193,12 @@ class AppLocalizationsCa extends AppLocalizations {
   }
 
   @override
+  String get durationWheelHours => 'h';
+
+  @override
+  String get durationWheelMinutes => 'min';
+
+  @override
   String get calendarNoShift => 'Sense torn';
 
   @override
@@ -2215,6 +2221,12 @@ class AppLocalizationsCa extends AppLocalizations {
   }
 
   @override
+  String get summaryNightPlus => 'Plus nocturn';
+
+  @override
+  String get summaryHolidayPlus => 'Plus festiu';
+
+  @override
   String get summaryEstimateNote => 'Estimació, abans d’impostos';
 
   @override
@@ -2274,6 +2286,11 @@ class AppLocalizationsCa extends AppLocalizations {
   @override
   String get summaryNoteGoal =>
       'Objectiu: en un mes compta la dotzena part de l’anual; en un any, el mensual per 12; en unes dates, la part dels seus dies. La diferència suma les treballades i les previstes.';
+
+  @override
+  String summaryNoteClosingDay(int day) {
+    return 'Mes de nòmina: amb el dia de tancament el $day, cada mes va de l’endemà del dia $day del mes anterior fins al dia $day (o fins a l’últim dia, si el mes és més curt). Les hores, els diners, l’objectiu i el límit d’hores extra es compten així.';
+  }
 
   @override
   String get summaryGoalTitle => 'Objectiu d’hores';
@@ -2658,11 +2675,33 @@ class AppLocalizationsCa extends AppLocalizations {
   String get appearanceAccentGraphite => 'Grafit';
 
   @override
+  String get appearanceAccentViolet => 'Violeta';
+
+  @override
+  String get appearanceAccentPlum => 'Pruna';
+
+  @override
+  String get appearanceAccentEmerald => 'Maragda';
+
+  @override
+  String get appearanceAccentOlive => 'Oliva';
+
+  @override
+  String get appearanceAccentTerracotta => 'Terracota';
+
+  @override
   String get appearanceAccentDefault => 'Per defecte';
 
   @override
   String get appearanceAccentNote =>
       'Canvia enllaços, interruptors, selecció i pestanyes. Els colors dels teus torns no canvien.';
+
+  @override
+  String get appearancePureBlackTitle => 'Fons negre';
+
+  @override
+  String get appearancePureBlackSubtitle =>
+      'Negre pur darrere de les pantalles al tema fosc, pensat per a mòbils OLED.';
 
   @override
   String get appearanceCellSizeTitle => 'Mida del torn al mes';
@@ -2957,7 +2996,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get faqSummaryA =>
-      'La icona de resum del calendari mostra els torns, les hores, les nocturnes i les de festiu del mes, d’un any sencer o de les dates que triïs a «Dates…» (fins a 366 dies). Un torn compta el dia que comença, encara que passi la mitjanit.\n\nPer veure imports, posa el preu per hora i, si en tens, el plus fix per tipus de torn a Configuració › Els meus torns. L’estimació inclou aquests plusos fixos, abans d’impostos, en la moneda que triïs a Configuració › Aparença. No inclou plusos per hora nocturna o festiva ni retencions.\n\nEl «Plus per torn» se suma una vegada per cada torn treballat d’aquell tipus, també si és partit; no depèn de les hores. Els descansos i les absències no el sumen.';
+      'La icona de resum del calendari mostra els torns, les hores, les nocturnes i les de festiu del mes, d’un any sencer o de les dates que triïs a «Dates…» (fins a 366 dies). Un torn compta el dia que comença, encara que passi la mitjanit.\n\nPer veure imports, posa el preu per hora i, si en tens, el plus fix per tipus de torn a Configuració › Els meus torns. L’estimació inclou aquests plusos fixos, abans d’impostos, en la moneda que triïs a Configuració › Aparença. També suma els plusos per hora nocturna i festiva que posis a cada torn; la retenció només canvia el net. A Configuració › Hores i diners tens plantilles de plusos per sector, el dia de tancament del teu mes de nòmina i un límit d’hores extra.\n\nEl «Plus per torn» se suma una vegada per cada torn treballat d’aquell tipus, també si és partit; no depèn de les hores. Els descansos i les absències no el sumen.';
 
   @override
   String get settingsVersionCopied => 'S’ha copiat la versió';
@@ -4987,6 +5026,9 @@ class AppLocalizationsCa extends AppLocalizations {
   String get holidaysSubdivisionKindCityOrRegion => 'Ciutat o regió';
 
   @override
+  String get holidaysSubdivisionKindDepartment => 'Departament';
+
+  @override
   String get holidaysSubdivisionSearch => 'Cerca';
 
   @override
@@ -5180,6 +5222,11 @@ class AppLocalizationsCa extends AppLocalizations {
   }
 
   @override
+  String alarmsTypePauseLine(String timing) {
+    return 'Pausa: $timing';
+  }
+
+  @override
   String get alarmsDayBeforeTimeTitle => 'Hora de l’avís';
 
   @override
@@ -5256,6 +5303,16 @@ class AppLocalizationsCa extends AppLocalizations {
   @override
   String get alarmsReminderChannelDescription =>
       'T’avisa a l’hora que triïs a la nota d’un dia.';
+
+  @override
+  String get alarmsPauseTitle => 'Toca pausa';
+
+  @override
+  String get alarmsPauseChannelName => 'Avisos de pausa';
+
+  @override
+  String get alarmsPauseChannelDescription =>
+      'T’avisa a mig torn perquè facis una pausa.';
 
   @override
   String get dayReminderAdd => 'Avisa’m';
@@ -5370,6 +5427,54 @@ class AppLocalizationsCa extends AppLocalizations {
   String get shiftTypesSoundReset => 'Fes servir el predeterminat';
 
   @override
+  String get shiftTypesPauseSection => 'Avís de pausa';
+
+  @override
+  String get shiftTypesPauseSwitch => 'Avisa’m per fer una pausa';
+
+  @override
+  String shiftTypesPauseHelperLong(String duration) {
+    return 'Aquest torn dura $duration: sol anar bé parar una estona a mig torn.';
+  }
+
+  @override
+  String get shiftTypesPauseHelperShort =>
+      'Un avís a mig torn per recordar-te de parar.';
+
+  @override
+  String get shiftTypesPauseWhen => 'Quan';
+
+  @override
+  String get shiftTypesPauseMid => 'A mig torn';
+
+  @override
+  String shiftTypesPauseAfter(String duration) {
+    return '$duration després de començar';
+  }
+
+  @override
+  String get shiftTypesPauseSheetTitle => 'Quan t’avisem';
+
+  @override
+  String get shiftTypesPauseCustomTitle => 'Temps des de l’inici';
+
+  @override
+  String get shiftTypesPauseCustomHelp =>
+      'Hores i minuts després que comenci el torn.';
+
+  @override
+  String get shiftTypesPauseSplitNote =>
+      'En un torn partit, l’avís va al tram més llarg.';
+
+  @override
+  String get shiftTypesPauseOutside =>
+      'Aquest temps és més llarg que el torn: no sonarà.';
+
+  @override
+  String get shiftTypesPauseAlarmsOff =>
+      'Les alarmes estan desactivades. Activa-les a Configuració › Alarmes perquè soni l’avís.';
+
+  @override
   String get catalogShiftMorningName => 'Matí';
 
   @override
@@ -5446,7 +5551,8 @@ class AppLocalizationsCa extends AppLocalizations {
   String get catalogPattern24x72Name => '24 x 72';
 
   @override
-  String get catalogPattern24x72Description => 'Guàrdia de 24 h i 72 h lliures';
+  String get catalogPattern24x72Description =>
+      'Guàrdia de 24 h i 72 h lliures (també 1-3)';
 
   @override
   String get catalogPattern12hName => '12 hores';
@@ -5494,6 +5600,20 @@ class AppLocalizationsCa extends AppLocalizations {
   @override
   String get catalogPatternDupontDescription =>
       'Cicle de 28 dies en torns de 12 h: 4 nits, 3 lliures, 3 dies, 1 lliure, 3 nits, 3 lliures, 4 dies i 7 lliures';
+
+  @override
+  String get catalogPatternPn2226Name => 'Policia Nacional 2-2-2-6';
+
+  @override
+  String get catalogPatternPn2226Description =>
+      '2 matins, 2 tardes, 2 nits, sortint i 5 lliures (el 6x6 de la Policia Nacional)';
+
+  @override
+  String get catalogPatternGuard14Name => 'Guàrdia 1-4';
+
+  @override
+  String get catalogPatternGuard14Description =>
+      'Guàrdia de 24 h i 4 dies lliures (1 guàrdia i 4 lliures)';
 
   @override
   String get holidayNameNewYear => 'Cap d’Any';
@@ -5683,6 +5803,9 @@ class AppLocalizationsCa extends AppLocalizations {
   String get absenceAllowed => 'Permesos';
 
   @override
+  String get absenceWorkingDaysNote => 'En dies hàbils';
+
+  @override
   String get absenceCarried => 'Arrossegats';
 
   @override
@@ -5753,6 +5876,13 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get absenceFieldCarry => 'Arrossega el que sobri de l’any anterior';
+
+  @override
+  String get absenceFieldWorkingDays => 'Compta només els dies hàbils';
+
+  @override
+  String get absenceFieldWorkingDaysHelper =>
+      'De dilluns a divendres, sense els festius del teu calendari: un dia pintat en cap de setmana o en festiu no gasta saldo.';
 
   @override
   String get absenceFieldCarryCap => 'Màxim que s’arrossega';
@@ -5889,6 +6019,176 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get moneyWithholdingInvalid => 'Escriu un nombre enter entre 0 i 100.';
+
+  @override
+  String get closingDayTitle => 'Dia de tancament';
+
+  @override
+  String get closingDaySubtitle => 'L’últim dia del teu mes de nòmina';
+
+  @override
+  String get closingDayNone => 'Final de mes';
+
+  @override
+  String closingDayValue(int day) {
+    return 'Dia $day';
+  }
+
+  @override
+  String get closingDayField => 'Dia de tancament';
+
+  @override
+  String get closingDayHelper =>
+      'Si cobres del 21 al 20, escriu 20: el resum de novembre anirà del 21 d’octubre al 20 de novembre. Deixa’l buit per comptar el mes natural.';
+
+  @override
+  String get closingDayInvalid =>
+      'Escriu un dia de l’1 al 30, o deixa’l buit per al mes natural.';
+
+  @override
+  String get overtimeCapTitle => 'Límit d’hores extra';
+
+  @override
+  String get overtimeCapSubtitle => 'T’avisa al resum quan t’hi acostes';
+
+  @override
+  String get overtimeCapNone => 'Sense límit';
+
+  @override
+  String overtimeCapValueYear(int hours) {
+    return '$hours h l’any';
+  }
+
+  @override
+  String overtimeCapValueMonth(int hours) {
+    return '$hours h al mes';
+  }
+
+  @override
+  String get overtimeCapIntro =>
+      'Compta les hores extra que anotes cada dia. L’Estatut dels Treballadors en fixa un màxim de 80 l’any; el teu conveni en pot fixar un altre.';
+
+  @override
+  String get overtimeCapPerYear => 'L’any';
+
+  @override
+  String get overtimeCapPerMonth => 'Al mes';
+
+  @override
+  String get overtimeCapField => 'Hores extra com a màxim';
+
+  @override
+  String get overtimeCapHoursSuffix => 'h';
+
+  @override
+  String overtimeCapInvalid(int max) {
+    return 'Escriu un nombre enter d’hores entre 1 i $max.';
+  }
+
+  @override
+  String get overtimeCapRemove => 'Treu el límit';
+
+  @override
+  String get overtimeCapUsedYear => 'Hores extra de l’any';
+
+  @override
+  String get overtimeCapUsedMonth => 'Hores extra del mes';
+
+  @override
+  String overtimeCapOf(String used, String cap) {
+    return '$used de $cap';
+  }
+
+  @override
+  String overtimeCapLeft(String left) {
+    return 'Et queden $left';
+  }
+
+  @override
+  String overtimeCapNear(String left) {
+    return 'T’acostes al límit: et queden $left.';
+  }
+
+  @override
+  String get overtimeCapReached => 'Has arribat al límit d’hores extra.';
+
+  @override
+  String overtimeCapOver(String excess) {
+    return 'Has passat el límit d’hores extra en $excess.';
+  }
+
+  @override
+  String get payTemplateTitle => 'Plantilla de plusos';
+
+  @override
+  String get payTemplateSubtitle => 'Sanitat pública, bombers o vigilants';
+
+  @override
+  String get payTemplateIntro =>
+      'Omple d’una vegada els plusos dels teus torns de treball. La plantilla no porta imports, perquè canvien amb cada conveni i cada any: comencen a 0 i hi escrius els de la teva nòmina.';
+
+  @override
+  String get payTemplatePublicHealth => 'Sanitat pública';
+
+  @override
+  String get payTemplateFirefighters => 'Bombers';
+
+  @override
+  String get payTemplatePrivateSecurity => 'Vigilants de seguretat';
+
+  @override
+  String get payTemplateGuardPlus => 'Plus per guàrdia';
+
+  @override
+  String payTemplateGuardHelper(int hours) {
+    return 'Se suma un cop per cada guàrdia: els torns de $hours h o més.';
+  }
+
+  @override
+  String get payTemplateHolidayHelper =>
+      'Se suma per cada hora treballada en festiu. Si una guàrdia passa a un festiu, només compten les hores d’aquell dia.';
+
+  @override
+  String get payTemplateAnnualHours => 'Jornada anual (opcional)';
+
+  @override
+  String get payTemplateAnnualHoursHelper =>
+      'Es desa com el teu objectiu d’hores l’any. Deixa’l buit per no canviar-lo.';
+
+  @override
+  String payTemplateAnnualHoursSource(int hours) {
+    return 'El conveni estatal d’empreses de seguretat fixa $hours h de treball efectiu l’any. Es desa com el teu objectiu d’hores l’any; canvia’l o esborra’l si el teu és un altre.';
+  }
+
+  @override
+  String get payTemplateAnnualHoursNone => 'Sense canvis';
+
+  @override
+  String payTemplateAnnualHoursInvalid(int max) {
+    return 'Escriu un nombre enter d’hores entre 1 i $max.';
+  }
+
+  @override
+  String get payTemplateTypes => 'Tipus de torn als quals s’aplica';
+
+  @override
+  String get payTemplateTypesNone =>
+      'No tens tipus de torn de treball amb horari per a aquesta plantilla. Crea’ls a Els meus torns.';
+
+  @override
+  String get payTemplateApply => 'Aplica';
+
+  @override
+  String payTemplateApplied(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Plantilla aplicada a $count tipus de torn.',
+      one: 'Plantilla aplicada a 1 tipus de torn.',
+      zero: 'Plantilla aplicada: no canvia cap tipus de torn.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get moneyGross => 'Brut estimat';

@@ -309,6 +309,9 @@ class _BalanceCard extends StatelessWidget {
             id: 'absence-allowed-$_id',
             label: l10n.absenceAllowed,
             value: absenceDaysText(l10n, status.allowedDays),
+            detail: status.balance.workingDaysOnly
+                ? l10n.absenceWorkingDaysNote
+                : null,
           ),
           if (status.balance.carryOver || status.carriedDays > 0)
             SummaryStatRow(

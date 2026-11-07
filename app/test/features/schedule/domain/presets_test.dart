@@ -50,6 +50,8 @@ void main() {
         '2-2-3',
         'continental',
         'dupont',
+        'pn-2-2-2-6',
+        'guard-1-4',
       ]);
       expect(patternPresetById('correturnos').suggestedStart, DateTime.monday);
       expect(patternPresetById('5x2').suggestedStart, DateTime.monday);
@@ -87,6 +89,8 @@ void main() {
       ('2-2-3', 14, 7, 7),
       ('continental', 28, 21, 7),
       ('dupont', 28, 14, 14),
+      ('pn-2-2-2-6', 12, 6, 6),
+      ('guard-1-4', 5, 1, 4),
     ];
 
     for (final (id, length, work, rest) in specs) {
@@ -167,6 +171,23 @@ void main() {
     test('24x72 with stepOffset 1 starts on a rest day', () {
       final s = presetSchedule('24x72', jan1, stepOffset: 1);
       expect(codesOf(s, jan1, 8), 'L L L G L L L G');
+    });
+
+    test('pn-2-2-2-6: 2 mornings, 2 afternoons, 2 nights, saliente, 5 off', () {
+      final s = presetSchedule('pn-2-2-2-6', jan1);
+      expect(
+        codesOf(s, jan1, 25),
+        'M M T T N N S L L L L L M M T T N N S L L L L L M',
+      );
+      expect(patternPresetById('pn-2-2-2-6').name, contains('2-2-2-6'));
+    });
+
+    test('guard-1-4: one 24 h guard and four days off', () {
+      final s = presetSchedule('guard-1-4', jan1);
+      expect(codesOf(s, jan1, 11), 'G L L L L G L L L L G');
+      for (final day in [1, 6, 11, 16, 21]) {
+        expect(s.resolve(CivilDate(2026, 1, day)).shifts.single.id, 'guard24');
+      }
     });
 
     test('12h: day, night, post-night, rest', () {
@@ -270,6 +291,9 @@ void main() {
 
     test('2-2-3 is also the 2-2-3-2-2-3: one preset, no duplicate', () {
       expect(patternPresets.where((p) => p.steps.length == 14), hasLength(1));
+      // And no two presets are the same cycle under different names.
+      final cycles = {for (final p in patternPresets) p.steps.join('|')};
+      expect(cycles, hasLength(patternPresets.length));
       expect(patternPresetById('2-2-3').description, contains('2-2-3-2-2-3'));
       // Two weeks of 2 on, 2 off, 3 on, 2 on... as the name reads.
       expect(

@@ -36,7 +36,8 @@ claro»). Esta página manda sobre cualquier valor de color, tamaño o forma de 
 
 ### Acento elegible (opción 8.3B, 31-oct-2026)
 
-En Ajustes › Apariencia › **Color de acento**, cinco acentos; Índigo (el de la tabla de arriba) por defecto. El
+En Ajustes › Apariencia › **Color de acento**, diez acentos (cinco del 31-oct y cinco del 6-nov-2026, propuesta 8 de
+`docs/competencia-2026-11.md`); Índigo (el de la tabla de arriba) por defecto. El
 acento solo cambia `accent`, `accentText` y `accentSoft` (`AppColors.withAccent`, valores en
 `core/theme/app_appearance.dart`): enlaces, interruptores, casillas, selección, pestañas, indicadores y botones de
 texto. **Nunca** cambia los colores de los turnos, el ámbar (`highlight`: cuenta atrás, pincel, «Pintar»), el anillo
@@ -49,11 +50,30 @@ de hoy ni los botones principales.
 | Petróleo | `#0D7270` / `#DDEBEB` | `#5ED3CF` / `#243B3F` |
 | Frambuesa | `#B4235A` / `#F5E0E8` | `#FF8FB8` / `#442D3A` |
 | Grafito | `#3A3A44` / `#E2E2E5` | `#C9C9D2` / `#393940` |
+| Violeta | `#6A3FD0` / `#E9E2FA` | `#B79BFF` / `#2E2257` |
+| Ciruela | `#8F2A93` / `#F3E0F4` | `#E69BEA` / `#45224A` |
+| Esmeralda | `#0F7A4A` / `#DCEFE5` | `#5FD398` / `#1E3D2E` |
+| Oliva | `#5E6F12` / `#E8ECD3` | `#BCCB5A` / `#363B1A` |
+| Terracota | `#B1472A` / `#F7E3DC` | `#FF9A7A` / `#4A2A22` |
 
 Todos pasan 4,5:1 como texto sobre `background`, `surface` y `surfaceRaised`; `onAccent` 4,5:1 sobre el acento;
 `textPrimary` 4,5:1 sobre `accentSoft`; y 3:1 (no texto) del acento sobre `accentSoft` y `surface`
 (`test/core/theme/accent_contrast_test.dart`). Se guarda en `appearance.accent` (ausente = Índigo) y viaja en la
 copia, como el tema. El selector muestra cada acento como un disco mitad claro, mitad oscuro.
+
+Los cinco nuevos entran **añadidos al final** (el orden y los nombres guardados de los cinco primeros no cambian; un
+valor desconocido sigue siendo Índigo). Ninguno se acerca al ámbar de `highlight` (cuenta atrás, «Pintar»), que no es un
+acento. La prueba recorre `AppAccent.values`, así que un acento nuevo no entra sin pasar el contraste en claro, oscuro y
+oscuro con fondo negro.
+
+### Fondo negro (OLED, 6-nov-2026)
+
+Ajustes › Apariencia › **Fondo negro** (interruptor, desactivado por defecto; se guarda en `appearance.pureBlack` y viaja
+en la copia como el acento). Solo actúa en el tema oscuro: `AppColors.dark.withPureBlack()` cambia **un solo token**,
+`background`, de `#0A0A0D` a `#000000`. Tarjetas, casillas, `surfaceMuted`, `surfaceRaised`, bordes, texto y los colores de
+los turnos no cambian: los turnos se derivan de `surface` (`ShiftSwatch`), así que su contraste sigue siendo el probado, y
+los textos y acentos leen mejor sobre negro que sobre `#0A0A0D` (`accent_contrast_test.dart` lo comprueba para los diez
+acentos). En el tema claro no hace nada.
 
 ## Color de cada turno
 

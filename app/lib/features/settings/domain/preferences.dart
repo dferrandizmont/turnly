@@ -49,6 +49,10 @@ abstract final class PreferenceKeys {
   /// Travels in the backup, like the theme.
   static const cellTextSize = 'appearance.cellTextSize';
 
+  /// `true` paints the background of the dark theme `#000000` (OLED). Off by
+  /// default; travels in the backup, like the theme and the accent.
+  static const pureBlack = 'appearance.pureBlack';
+
   /// The percentage of the withholding of the estimated pay (P9): `0` to
   /// `100`, whole per cent. Travels in the backup, like the currency (it
   /// describes the same amounts).
@@ -171,6 +175,7 @@ class Preferences {
     this.currency = defaultCurrency,
     this.accent = AppAccent.defaultAccent,
     this.cellTextSize = CellTextSize.normal,
+    this.pureBlack = false,
     this.withholdingPercent = 0,
     this.showNoteInMonth = false,
     this.paintSound = false,
@@ -199,6 +204,10 @@ class Preferences {
 
   /// Ajustes › Apariencia › Tamaño del turno en el mes.
   final CellTextSize cellTextSize;
+
+  /// Ajustes › Apariencia › «Fondo negro»: pure black behind the screens of
+  /// the dark theme (OLED). Does nothing in the light theme.
+  final bool pureBlack;
 
   /// Percentage of the withholding of the estimated pay (P9): 0 (none) to
   /// 100. The app does not know the payroll of anybody, so the net it shows
@@ -229,6 +238,7 @@ class Preferences {
     String? currency,
     AppAccent? accent,
     CellTextSize? cellTextSize,
+    bool? pureBlack,
     int? withholdingPercent,
     bool? showNoteInMonth,
     bool? paintSound,
@@ -243,6 +253,7 @@ class Preferences {
     currency: currency ?? this.currency,
     accent: accent ?? this.accent,
     cellTextSize: cellTextSize ?? this.cellTextSize,
+    pureBlack: pureBlack ?? this.pureBlack,
     withholdingPercent: withholdingPercent ?? this.withholdingPercent,
     showNoteInMonth: showNoteInMonth ?? this.showNoteInMonth,
     paintSound: paintSound ?? this.paintSound,
@@ -262,6 +273,7 @@ class Preferences {
       other.currency == currency &&
       other.accent == accent &&
       other.cellTextSize == cellTextSize &&
+      other.pureBlack == pureBlack &&
       other.withholdingPercent == withholdingPercent &&
       other.showNoteInMonth == showNoteInMonth &&
       other.paintSound == paintSound &&
@@ -277,6 +289,7 @@ class Preferences {
     currency,
     accent,
     cellTextSize,
+    pureBlack,
     withholdingPercent,
     showNoteInMonth,
     paintSound,
@@ -289,6 +302,7 @@ class Preferences {
       'weekNumbers $weekNumbers, language ${language.name}, '
       'timeFormat ${timeFormat.stored}, currency $currency, '
       'accent ${accent.stored}, cellTextSize ${cellTextSize.stored}, '
+      'pureBlack $pureBlack, '
       'withholding $withholdingPercent%, '
       'showNoteInMonth $showNoteInMonth, paintSound $paintSound, '
       'calendarBackground $calendarBackgroundPath)';

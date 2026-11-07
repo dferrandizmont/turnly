@@ -1,0 +1,31 @@
+{
+"schema":1,
+"year":2026,
+"country":"BO",
+"national":[
+{"date":"2026-01-01","name":"Año Nuevo"},
+{"date":"2026-01-22","name":"Día de la Creación del Estado Plurinacional de Bolivia"},
+{"date":"2026-02-16","name":"Carnaval"},
+{"date":"2026-02-17","name":"Carnaval"},
+{"date":"2026-04-03","name":"Viernes Santo"},
+{"date":"2026-05-01","name":"Día del Trabajo"},
+{"date":"2026-06-04","name":"Corpus Christi"},
+{"date":"2026-06-21","name":"Año Nuevo Aymara Amazónico"},
+{"date":"2026-06-22","name":"Año Nuevo Aymara Amazónico (observado)"},
+{"date":"2026-08-06","name":"Día de la Independencia de Bolivia"},
+{"date":"2026-10-17","name":"Día de la Dignidad Nacional"},
+{"date":"2026-11-02","name":"Día de Todos los Difuntos"},
+{"date":"2026-12-25","name":"Navidad"}
+],
+"regional":{
+"BO-B":[{"date":"2026-11-18","name":"Día del departamento de Beni","origin":"regional"}],
+"BO-C":[{"date":"2026-09-14","name":"Día del departamento de Cochabamba","origin":"regional"}],
+"BO-H":[{"date":"2026-05-25","name":"Día del departamento de Chuquisaca","origin":"regional"}],
+"BO-L":[{"date":"2026-07-16","name":"Día del departamento de La Paz","origin":"regional"}],
+"BO-N":[{"date":"2026-10-11","name":"Día del departamento de Pando","origin":"regional"}],
+"BO-O":[{"date":"2026-02-13","name":"Carnaval de Oruro","origin":"regional"}],
+"BO-P":[{"date":"2026-11-10","name":"Día del departamento de Potosí","origin":"regional"}],
+"BO-S":[{"date":"2026-09-24","name":"Día del departamento de Santa Cruz","origin":"regional"}],
+"BO-T":[{"date":"2026-04-15","name":"La Tablada","origin":"regional"}]
+}
+}

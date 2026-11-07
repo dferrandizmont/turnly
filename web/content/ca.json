@@ -1,9 +1,9 @@
 {
   "name": "Turnly",
   "title": "Turnly · Els teus torns, d’un cop d’ull",
-  "description": "Calendari de torns gratuït i de codi obert per a qui treballa a torns a Espanya. Sense anuncis, sense compte i sense connexió.",
-  "intro": "Calendari de torns per a qui treballa a torns a Espanya: sanitat, policia, bombers, indústria, hostaleria o qualsevol altre sector. Organitza matins, tardes, nits, guàrdies, sortints i dies lliures, i consulta el teu proper torn d’un cop d’ull.",
-  "key_facts": "Gratis · Sense anuncis · Sense compte · Funciona sense connexió · Codi obert · Cinc idiomes",
+  "description": "Calendari de torns gratuït i de codi obert per a qui treballa a torns a Espanya. Sense Pro, sense anuncis, sense compte i sense connexió.",
+  "intro": "Calendari de torns per a qui treballa a torns a Espanya (sanitat, policia, bombers, indústria, hostaleria o qualsevol altre sector): organitza matins, tardes, nits, guàrdies, sortints i dies lliures, i consulta el teu proper torn d’un cop d’ull. Tot és gratis, sense versió Pro, anuncis ni compte, i quan canvies de mòbil t’emportes els teus torns sense tornar a pagar res.",
+  "key_facts": "Tot gratis, sense Pro · Sense anuncis · Sense compte · Funciona sense connexió · Codi obert · Cinc idiomes",
   "features": [
     "Targeta d’avui amb el proper torn, el proper dia lliure i la ratxa. El mes en quadrícula o llista, l’agenda i l’any, amb les cites del calendari del mòbil al costat dels teus torns. Notes per dia amb fotos, fitxers i tasques. Compara fins a sis calendaris i mira quins dies teniu lliures alhora.",
     "Toca o arrossega per pintar diversos dies i, amb «Afegeix un altre torn», posa’n més d’un al mateix dia. Copia, enganxa, desfés i refés. Assistent de rotacions amb vista prèvia: torns rotatius, 24/72, 4×4, 6×4, 5×2, 2-2-3 o el teu propi patró, des del dia del cicle que et toqui.",
@@ -20,7 +20,7 @@
   "faq": [
     {
       "question": "Quant costa?",
-      "answer": "Res. Turnly és totalment gratis i de codi obert: sense anuncis, sense versió Pro i sense compres dins de l’app."
+      "answer": "Res. Turnly és totalment gratis i de codi obert: sense anuncis, sense versió Pro i sense compres dins de l’app. Tampoc quan canvies de mòbil: no hi ha res a recuperar ni a tornar a pagar."
     },
     {
       "question": "Necessito un compte o connexió a internet?",
@@ -35,8 +35,8 @@
       "answer": "La versió d’iPhone és en camí. Sortirà primer a TestFlight i després a l’App Store."
     },
     {
-      "question": "Com passo els meus torns a un altre mòbil?",
-      "answer": "Porta-hi un fitxer .turnly: exporta’l a Configuració › Còpia de seguretat i obre’l al mòbil nou (o, a Android, fes servir la còpia automàtica en una carpeta). Les còpies que queden dins de l’app es perden en desinstal·lar-la. A Android també funciona el pas directe del mòbil vell al nou. No es restaura res sense que ho confirmis."
+      "question": "Com passo Turnly a un mòbil nou?",
+      "answer": "Tens quatre maneres, i totes són gratis. Pas directe: quan configures el mòbil nou, copia-hi les apps i les dades del vell per cable o wifi; Turnly hi passa amb elles. Còpia de Google: amb la còpia de seguretat d’Android activada i un bloqueig de pantalla (PIN, patró o contrasenya), Android desa Turnly xifrat al teu compte de Google i el recupera quan configures el mòbil nou amb el mateix compte (Android 9 o posterior). Sense bloqueig de pantalla, Turnly no entra en aquesta còpia. Fitxer .turnly: a Configuració › Còpia de seguretat, «Exporta un fitxer» o «Desa al dispositiu»; porta’l al mòbil nou i obre’l, o fes servir «Importa un fitxer». Còpia automàtica en una carpeta (Android): en deixa una cada dia a la carpeta que triïs; si aquesta carpeta és al teu núvol o la passes al mòbil nou, importa’n l’última. Amb el fitxer o la carpeta, abans veus què conté la còpia i no se substitueix res sense que ho confirmis. Les còpies que queden dins de l’app es perden si la desinstal·les sense una altra còpia."
     },
     {
       "question": "I si vull començar de zero?",
@@ -60,7 +60,7 @@
   "privacy_date": "2026-11-04",
   "kicker": "Calendari de torns",
   "tagline": "Els teus torns, d’un cop d’ull.",
-  "chip": "Gratis, sense anuncis i sense connexió.",
+  "chip": "Tot gratis: sense Pro, sense anuncis i sense compte.",
   "nav_label": "Seccions",
   "theme_label": "Tema",
   "theme_system": "Sistema",

@@ -32,6 +32,7 @@ import '../../calendar/presentation/shift_format.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../application/summary_providers.dart';
 import '../domain/month_summary.dart';
+import '../domain/pay_period.dart';
 import '../domain/payroll.dart';
 import '../domain/period_hours.dart';
 import '../domain/summary_range.dart';
@@ -39,6 +40,7 @@ import 'hours_goal_section.dart';
 import 'how_am_i_doing_card.dart';
 import '../../reports/presentation/report_share_button.dart';
 import 'month_sharing.dart';
+import 'overtime_cap_card.dart';
 import 'summary_format.dart';
 import 'summary_stat_row.dart';
 import 'year_table.dart';
@@ -215,6 +217,7 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
     final type = context.type;
     final format = AppDateFormat.of(context);
     final sharing = ref.watch(monthSharingProvider);
+    final closingDay = ref.watch(summaryClosingDayProvider);
     final periodLabel = switch (_period) {
       _Period.year => '${_month.year}',
       _Period.month => capitalize(
@@ -348,6 +351,27 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                   ),
                 ),
               ),
+            // With a closing day the month is the payroll month: its dates
+            // say which days it counts.
+            if (closingDay != null &&
+                (_period == _Period.month || _period == _Period.year))
+              Center(
+                child: Builder(
+                  builder: (context) {
+                    final range = _period == _Period.month
+                        ? payPeriodOf(_month, closingDay)
+                        : payYearOf(_month.year, closingDay);
+                    return Text(
+                      formatRange(format.locale, range.from, range.to),
+                      key: const ValueKey('summary-pay-period-dates'),
+                      textAlign: TextAlign.center,
+                      style: type.meta.copyWith(
+                        color: context.colors.textSecondary,
+                      ),
+                    );
+                  },
+                ),
+              ),
             if (_period == _Period.range) ...[
               const SizedBox(height: Sp.s),
               _RangePicker(
@@ -409,7 +433,8 @@ class _MonthBody extends ConsumerWidget {
       summary: summary,
       previous: previous,
       previousName: previousName,
-      period: SummaryRange.month(month),
+      period: ref.watch(summaryMonthRangeProvider(month)),
+      month: month,
     );
   }
 }
@@ -425,14 +450,16 @@ class _YearBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final empty = ref.watch(yearTotalsProvider(year).select((t) => t.isEmpty));
+    final closingDay = ref.watch(summaryClosingDayProvider);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (!empty) ...[
           HowAmIDoingCard(
             span: GoalSpan.year,
-            range: SummaryRange(CivilDate(year, 1, 1), CivilDate(year, 12, 31)),
+            range: payYearOf(year, closingDay),
           ),
+          OvertimeCapCard(query: OvertimeCapQuery.year(year)),
           AbsenceSummaryCard(year: year),
           const SizedBox(height: Sp.section),
         ],
@@ -635,11 +662,16 @@ class _PeriodBody extends ConsumerWidget {
     required this.previous,
     required this.previousName,
     required this.period,
+    this.month,
     this.isRange = false,
   });
 
   final MonthSummary summary;
   final MonthSummary previous;
+
+  /// The month on screen (its first day), or `null` for a quarter or free
+  /// dates. With a closing day [period] is its payroll month.
+  final CivilDate? month;
 
   /// How the period before is named in the comparison ("septiembre", "los 7
   /// días anteriores").
@@ -668,10 +700,12 @@ class _PeriodBody extends ConsumerWidget {
     final estimateNone = !summary.hasEarnings && summary.workedMinutes > 0;
     // «Llevas ganado» is about the month that is running now.
     final today = ref.watch(summaryTodayProvider);
+    final shownMonth = month;
     final runningMonth =
-        !isRange &&
-        period.from.year == today.year &&
-        period.from.month == today.month;
+        shownMonth != null &&
+        !today.isBefore(period.from) &&
+        !today.isAfter(period.to);
+    final closingDay = ref.watch(summaryClosingDayProvider);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -680,7 +714,9 @@ class _PeriodBody extends ConsumerWidget {
           range: period,
         ),
         const SizedBox(height: Sp.card),
-        AbsenceSummaryCard(year: period.from.year),
+        if (shownMonth != null)
+          OvertimeCapCard(query: OvertimeCapQuery.month(shownMonth)),
+        AbsenceSummaryCard(year: shownMonth?.year ?? period.from.year),
         _BreakdownCard(
           summary: summary,
           previous: previous,
@@ -691,7 +727,7 @@ class _PeriodBody extends ConsumerWidget {
           const SizedBox(height: Sp.card),
           _EstimateCard(summary: summary),
         ],
-        if (runningMonth) _EarnedSoFarCard(month: period.from),
+        if (runningMonth) _EarnedSoFarCard(month: shownMonth),
         for (final group in [
           (l10n.summaryGroupWork, summary.workTypes),
           (l10n.summaryGroupRest, summary.restTypes),
@@ -716,6 +752,7 @@ class _PeriodBody extends ConsumerWidget {
           holidays: showHolidays,
           tense: hours.tense,
           goal: hasGoal,
+          closingDay: shownMonth == null ? null : closingDay,
         ),
       ],
     );
@@ -893,6 +930,24 @@ class _EstimateCard extends ConsumerWidget {
               label: l10n.summaryFixedPluses,
               value: formatMoneyCents(context, summary.fixedPlusCents),
               detail: l10n.summaryFixedPlusCount(summary.fixedPlusCount),
+            ),
+          if (summary.nightPlusCents > 0)
+            SummaryStatRow(
+              id: 'summary-night-plus',
+              label: l10n.summaryNightPlus,
+              value: formatMoneyCents(context, summary.nightPlusCents),
+            ),
+          if (summary.holidayPlusCents > 0)
+            SummaryStatRow(
+              id: 'summary-holiday-plus',
+              label: l10n.summaryHolidayPlus,
+              value: formatMoneyCents(context, summary.holidayPlusCents),
+            ),
+          if (summary.extraAmountCents != 0)
+            SummaryStatRow(
+              id: 'summary-extra-amount',
+              label: l10n.moneyReportExtraTotal,
+              value: formatMoneyCents(context, summary.extraAmountCents),
             ),
           if (summary.extrasWithoutRateMinutes > 0) ...[
             const SizedBox(height: Sp.s),
@@ -1169,9 +1224,13 @@ class _Notes extends StatelessWidget {
     required this.tense,
     this.goal = false,
     this.range = false,
+    this.closingDay,
   });
 
   final MonthSummary summary;
+
+  /// The closing day of the month on screen: its note shows.
+  final int? closingDay;
 
   /// Where the period stands against today: the note on worked and planned
   /// hours shows when there are planned ones.
@@ -1200,6 +1259,7 @@ class _Notes extends StatelessWidget {
       if (holidays) l10n.summaryNoteHoliday,
       if (tense != PeriodTense.past) l10n.summaryNoteTense,
       if (goal) l10n.summaryNoteGoal,
+      if (closingDay case final day?) l10n.summaryNoteClosingDay(day),
     ];
     return AppCard.tinted(
       key: const ValueKey('summary-notes'),

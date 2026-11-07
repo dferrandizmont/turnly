@@ -193,6 +193,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get durationWheelHours => 'h';
+
+  @override
+  String get durationWheelMinutes => 'min';
+
+  @override
   String get calendarNoShift => 'No shift';
 
   @override
@@ -2215,6 +2221,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get summaryNightPlus => 'Night premium';
+
+  @override
+  String get summaryHolidayPlus => 'Holiday premium';
+
+  @override
   String get summaryEstimateNote => 'Estimate, before tax';
 
   @override
@@ -2274,6 +2286,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get summaryNoteGoal =>
       'Goal: a month counts a twelfth of the yearly goal; a year, the monthly goal times 12; a date range, the share of its days. The difference adds up worked and planned hours.';
+
+  @override
+  String summaryNoteClosingDay(int day) {
+    return 'Pay month: with the closing day on day $day, each month runs from the day after day $day of the month before to day $day (or to the last day, if the month is shorter). Hours, money, the goal and the overtime cap are counted this way.';
+  }
 
   @override
   String get summaryGoalTitle => 'Hours goal';
@@ -2657,11 +2674,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appearanceAccentGraphite => 'Graphite';
 
   @override
+  String get appearanceAccentViolet => 'Violet';
+
+  @override
+  String get appearanceAccentPlum => 'Plum';
+
+  @override
+  String get appearanceAccentEmerald => 'Emerald';
+
+  @override
+  String get appearanceAccentOlive => 'Olive';
+
+  @override
+  String get appearanceAccentTerracotta => 'Terracotta';
+
+  @override
   String get appearanceAccentDefault => 'Default';
 
   @override
   String get appearanceAccentNote =>
       'Changes links, switches, selection and tabs. Your shift colors stay the same.';
+
+  @override
+  String get appearancePureBlackTitle => 'Pure black background';
+
+  @override
+  String get appearancePureBlackSubtitle =>
+      'Pure black behind the screens in the dark theme, made for OLED phones.';
 
   @override
   String get appearanceCellSizeTitle => 'Shift size in the month';
@@ -2957,7 +2996,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get faqSummaryA =>
-      'The summary icon on the calendar shows the shifts, hours, night hours and public holiday hours of the month, a whole year or the dates you choose in “Dates…” (up to 366 days). A shift counts on the day it starts, even if it crosses midnight.\n\nTo see amounts, set each shift type’s hourly rate and, if you have one, fixed allowance in Settings › My shifts. The estimate includes those fixed allowances, before tax, in the currency you pick in Settings › Appearance. It excludes allowances per night or public holiday hour and deductions.\n\n“Shift allowance” is added once for each worked shift of that type, including split shifts; it does not depend on the hours. Rest days and absences do not add it.';
+      'The summary icon on the calendar shows the shifts, hours, night hours and public holiday hours of the month, a whole year or the dates you choose in “Dates…” (up to 366 days). A shift counts on the day it starts, even if it crosses midnight.\n\nTo see amounts, set each shift type’s hourly rate and, if you have one, fixed allowance in Settings › My shifts. The estimate includes those fixed allowances, before tax, in the currency you pick in Settings › Appearance. It also adds the night and public holiday premiums per hour you set on each shift; the withholding only changes the net. In Settings › Hours and money you have allowance templates by sector, the closing day of your pay month and an overtime cap.\n\n“Shift allowance” is added once for each worked shift of that type, including split shifts; it does not depend on the hours. Rest days and absences do not add it.';
 
   @override
   String get settingsVersionCopied => 'Version copied';
@@ -4972,6 +5011,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get holidaysSubdivisionKindCityOrRegion => 'City or region';
 
   @override
+  String get holidaysSubdivisionKindDepartment => 'Department';
+
+  @override
   String get holidaysSubdivisionSearch => 'Search';
 
   @override
@@ -5166,6 +5208,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String alarmsTypePauseLine(String timing) {
+    return 'Break: $timing';
+  }
+
+  @override
   String get alarmsDayBeforeTimeTitle => 'Alert time';
 
   @override
@@ -5242,6 +5289,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get alarmsReminderChannelDescription =>
       'Alerts you at the time you choose in a day’s note.';
+
+  @override
+  String get alarmsPauseTitle => 'Time for a break';
+
+  @override
+  String get alarmsPauseChannelName => 'Break alerts';
+
+  @override
+  String get alarmsPauseChannelDescription =>
+      'Alerts you halfway through your shift to take a break.';
 
   @override
   String get dayReminderAdd => 'Remind me';
@@ -5357,6 +5414,54 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shiftTypesSoundReset => 'Use the default';
 
   @override
+  String get shiftTypesPauseSection => 'Break alert';
+
+  @override
+  String get shiftTypesPauseSwitch => 'Remind me to take a break';
+
+  @override
+  String shiftTypesPauseHelperLong(String duration) {
+    return 'This shift lasts $duration: a break halfway through usually helps.';
+  }
+
+  @override
+  String get shiftTypesPauseHelperShort =>
+      'An alert halfway through the shift to remind you to stop.';
+
+  @override
+  String get shiftTypesPauseWhen => 'When';
+
+  @override
+  String get shiftTypesPauseMid => 'Halfway through the shift';
+
+  @override
+  String shiftTypesPauseAfter(String duration) {
+    return '$duration after it starts';
+  }
+
+  @override
+  String get shiftTypesPauseSheetTitle => 'When to alert you';
+
+  @override
+  String get shiftTypesPauseCustomTitle => 'Time after the start';
+
+  @override
+  String get shiftTypesPauseCustomHelp =>
+      'Hours and minutes after the shift starts.';
+
+  @override
+  String get shiftTypesPauseSplitNote =>
+      'On a split shift, the alert goes in the longer part.';
+
+  @override
+  String get shiftTypesPauseOutside =>
+      'That time is longer than the shift: it won’t ring.';
+
+  @override
+  String get shiftTypesPauseAlarmsOff =>
+      'Alarms are turned off. Turn them on in Settings › Alarms for the alert to ring.';
+
+  @override
   String get catalogShiftMorningName => 'Morning';
 
   @override
@@ -5433,7 +5538,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get catalogPattern24x72Name => '24 x 72';
 
   @override
-  String get catalogPattern24x72Description => '24-hour shift and 72 hours off';
+  String get catalogPattern24x72Description =>
+      '24-hour shift and 72 hours off (also 1-3)';
 
   @override
   String get catalogPattern12hName => '12 hours';
@@ -5481,6 +5587,20 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get catalogPatternDupontDescription =>
       '28-day cycle of 12-hour shifts: 4 nights, 3 off, 3 days, 1 off, 3 nights, 3 off, 4 days and 7 off';
+
+  @override
+  String get catalogPatternPn2226Name => 'Spanish National Police 2-2-2-6';
+
+  @override
+  String get catalogPatternPn2226Description =>
+      '2 mornings, 2 afternoons, 2 nights, post-night and 5 off (the National Police 6x6)';
+
+  @override
+  String get catalogPatternGuard14Name => '24-hour shift 1-4';
+
+  @override
+  String get catalogPatternGuard14Description =>
+      '24-hour shift and 4 days off (1 shift, 4 off)';
 
   @override
   String get holidayNameNewYear => 'New Year’s Day';
@@ -5670,6 +5790,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get absenceAllowed => 'Allowed';
 
   @override
+  String get absenceWorkingDaysNote => 'In working days';
+
+  @override
   String get absenceCarried => 'Carried over';
 
   @override
@@ -5740,6 +5863,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get absenceFieldCarry => 'Carry over what is left from last year';
+
+  @override
+  String get absenceFieldWorkingDays => 'Count working days only';
+
+  @override
+  String get absenceFieldWorkingDaysHelper =>
+      'Monday to Friday, without the public holidays of your calendar: a day painted on a weekend or a public holiday does not use the balance.';
 
   @override
   String get absenceFieldCarryCap => 'Maximum carried over';
@@ -5876,6 +6006,177 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get moneyWithholdingInvalid =>
       'Enter a whole number between 0 and 100.';
+
+  @override
+  String get closingDayTitle => 'Closing day';
+
+  @override
+  String get closingDaySubtitle => 'The last day of your pay month';
+
+  @override
+  String get closingDayNone => 'End of month';
+
+  @override
+  String closingDayValue(int day) {
+    return 'Day $day';
+  }
+
+  @override
+  String get closingDayField => 'Closing day';
+
+  @override
+  String get closingDayHelper =>
+      'If you are paid from the 21st to the 20th, type 20: the November summary will run from 21 October to 20 November. Leave it empty to count the calendar month.';
+
+  @override
+  String get closingDayInvalid =>
+      'Type a day from 1 to 30, or leave it empty for the calendar month.';
+
+  @override
+  String get overtimeCapTitle => 'Overtime cap';
+
+  @override
+  String get overtimeCapSubtitle => 'Warns you in the summary as you get close';
+
+  @override
+  String get overtimeCapNone => 'No cap';
+
+  @override
+  String overtimeCapValueYear(int hours) {
+    return '$hours h a year';
+  }
+
+  @override
+  String overtimeCapValueMonth(int hours) {
+    return '$hours h a month';
+  }
+
+  @override
+  String get overtimeCapIntro =>
+      'Counts the overtime you note on each day. Spain’s Workers’ Statute sets a maximum of 80 hours a year; your collective agreement may set another.';
+
+  @override
+  String get overtimeCapPerYear => 'Per year';
+
+  @override
+  String get overtimeCapPerMonth => 'Per month';
+
+  @override
+  String get overtimeCapField => 'Maximum overtime';
+
+  @override
+  String get overtimeCapHoursSuffix => 'h';
+
+  @override
+  String overtimeCapInvalid(int max) {
+    return 'Type a whole number of hours between 1 and $max.';
+  }
+
+  @override
+  String get overtimeCapRemove => 'Remove the cap';
+
+  @override
+  String get overtimeCapUsedYear => 'Overtime this year';
+
+  @override
+  String get overtimeCapUsedMonth => 'Overtime this month';
+
+  @override
+  String overtimeCapOf(String used, String cap) {
+    return '$used of $cap';
+  }
+
+  @override
+  String overtimeCapLeft(String left) {
+    return '$left left';
+  }
+
+  @override
+  String overtimeCapNear(String left) {
+    return 'You are close to the cap: $left left.';
+  }
+
+  @override
+  String get overtimeCapReached => 'You have reached the overtime cap.';
+
+  @override
+  String overtimeCapOver(String excess) {
+    return 'You are over the overtime cap by $excess.';
+  }
+
+  @override
+  String get payTemplateTitle => 'Allowance template';
+
+  @override
+  String get payTemplateSubtitle =>
+      'Public healthcare, firefighters or security guards';
+
+  @override
+  String get payTemplateIntro =>
+      'Fill in the allowances of your work shifts in one go. The template brings no amounts, because they change with every agreement and every year: they start at 0 and you type the ones on your payslip.';
+
+  @override
+  String get payTemplatePublicHealth => 'Public healthcare';
+
+  @override
+  String get payTemplateFirefighters => 'Firefighters';
+
+  @override
+  String get payTemplatePrivateSecurity => 'Security guards';
+
+  @override
+  String get payTemplateGuardPlus => 'Long-shift allowance';
+
+  @override
+  String payTemplateGuardHelper(int hours) {
+    return 'Added once per long shift: shifts of $hours h or more.';
+  }
+
+  @override
+  String get payTemplateHolidayHelper =>
+      'Added for each hour worked on a public holiday. If a long shift runs into a public holiday, only its hours on that day count.';
+
+  @override
+  String get payTemplateAnnualHours => 'Annual working hours (optional)';
+
+  @override
+  String get payTemplateAnnualHoursHelper =>
+      'Saved as your yearly hours goal. Leave it empty to keep your goal as it is.';
+
+  @override
+  String payTemplateAnnualHoursSource(int hours) {
+    return 'Spain’s national agreement for security companies sets $hours h of actual work a year. Saved as your yearly hours goal; change or delete it if yours is different.';
+  }
+
+  @override
+  String get payTemplateAnnualHoursNone => 'No change';
+
+  @override
+  String payTemplateAnnualHoursInvalid(int max) {
+    return 'Type a whole number of hours between 1 and $max.';
+  }
+
+  @override
+  String get payTemplateTypes => 'Shift types it applies to';
+
+  @override
+  String get payTemplateTypesNone =>
+      'You have no work shift types with times for this template. Create them in My shifts.';
+
+  @override
+  String get payTemplateApply => 'Apply';
+
+  @override
+  String payTemplateApplied(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Template applied to $count shift types.',
+      one: 'Template applied to 1 shift type.',
+      zero: 'Template applied: no shift type changes.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get moneyGross => 'Estimated gross';

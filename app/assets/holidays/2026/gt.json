@@ -1,0 +1,17 @@
+{
+"schema":1,
+"year":2026,
+"country":"GT",
+"national":[
+{"date":"2026-01-01","name":"Año Nuevo"},
+{"date":"2026-04-02","name":"Jueves Santo"},
+{"date":"2026-04-03","name":"Viernes Santo"},
+{"date":"2026-04-04","name":"Sábado Santo"},
+{"date":"2026-05-01","name":"Día del Trabajo"},
+{"date":"2026-06-29","name":"Día del Ejército"},
+{"date":"2026-09-15","name":"Día de la Independencia"},
+{"date":"2026-10-20","name":"Día de la Revolución"},
+{"date":"2026-11-01","name":"Día de Todos los Santos"},
+{"date":"2026-12-25","name":"Día de Navidad"}
+]
+}

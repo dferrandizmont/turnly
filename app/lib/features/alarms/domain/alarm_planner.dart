@@ -28,12 +28,12 @@ bool canShiftTypeRing(ShiftType type) =>
 
 /// Whether any alarm could really ring with [settings] over [shiftTypes]: the
 /// global switch on and at least one type that can ring ([canShiftTypeRing])
-/// with its own switch on. A switch left on in a type that has since lost its
-/// times, or became an absence, does not count.
+/// with its own switch (or its pause notice) on. A switch left on in a type
+/// that has since lost its times, or became an absence, does not count.
 bool alarmsCanRing(AlarmSettings settings, Iterable<ShiftType> shiftTypes) =>
     settings.enabled &&
     shiftTypes.any(
-      (t) => canShiftTypeRing(t) && settings.forShiftType(t.id).enabled,
+      (t) => canShiftTypeRing(t) && settings.forShiftType(t.id).anyEnabled,
     );
 
 /// One alarm to schedule: a wall-clock instant and its text.
@@ -243,6 +243,11 @@ String _hhmm(int minuteOfDay) {
 /// - A type with `dayBefore` on also rings at `dayBeforeMinute` of the day
 ///   before each of its shifts (a wall-clock time too, so it keeps the same
 ///   local hour on the nights the clocks change).
+/// - A type with its pause notice on (`AlarmTypeSettings.pause`, independent
+///   of the alarm before the shift) also rings once in the middle of each of
+///   its shifts: see [AlarmKind.pause] and `_planPause`. The global switch
+///   is needed, "Sin alarma este día" silences it, and so does any absence
+///   on that day.
 /// - A shift on a day in `settings.skippedDates` makes no alarm of any kind.
 /// - The reminder of a day's note (`DayEntry.noteReminderMinute`, A1) rings
 ///   at that wall-clock minute of that day. It is **independent of the
@@ -400,6 +405,7 @@ AlarmPlan _plan({
           today,
           strings,
           today.addDays(settings.horizonDays + 1 + lookaheadDays),
+          zone,
         )
       : <PlannedAlarm>[];
 
@@ -517,6 +523,7 @@ List<PlannedAlarm> _planShiftAlarms(
   CivilDate today,
   AlarmStrings strings,
   CivilDate lastShiftDay,
+  tz.Location zone,
 ) {
   final alarms = <PlannedAlarm>[];
   // A second segment can belong to yesterday's shift and start today.
@@ -524,13 +531,18 @@ List<PlannedAlarm> _planShiftAlarms(
   for (final day in schedule.resolveRange(today.addDays(-1), lastShiftDay)) {
     if (settings.isSkipped(day.date)) continue;
     final dayStart = day.date.epochDay * _minutesPerDay;
+    // Any absence on the day (vacation, sick leave...) silences the pause
+    // notices of its other shifts: nobody is taking a break from work.
+    final hasAbsence = day.shifts.any(
+      (s) => s.category == ShiftCategory.absence,
+    );
     for (var index = 0; index < day.shifts.length; index++) {
       final shift = day.shifts[index];
       final typeSettings = settings.forShiftType(shift.id);
       // Sick leave, vacation... are not shifts you go to: they never ring,
       // whatever was stored (a notification about them would put a health
       // absence on the lock screen).
-      if (!typeSettings.enabled || !canShiftTypeRing(shift)) continue;
+      if (!typeSettings.anyEnabled || !canShiftTypeRing(shift)) continue;
 
       final startAbs = shift.startMinute!;
       final start = strings.time(startAbs);
@@ -563,47 +575,128 @@ List<PlannedAlarm> _planShiftAlarms(
             shiftName: shift.name,
             snoozeLabel: buttons ? strings.snoozeAction : null,
             awakeLabel: buttons ? strings.awakeAction : null,
-            sound: shift.alarmSound,
+            // A pause notice is a plain notification: no custom sound.
+            sound: kind == AlarmKind.pause ? null : shift.alarmSound,
             segment: segment,
           ),
         );
       }
 
-      add(
-        AlarmKind.shift,
-        dayStart + startAbs - typeSettings.minutesBefore,
-        typeSettings.cleanLabel ?? strings.title(shift.name, start),
-        buttons: true,
-      );
-      // A split shift (A12) rings again before its second segment, with the
-      // same lead, unless the type opted out. The second segment may begin
-      // after midnight: the wall-clock minute is counted from the shift's day.
-      if (shift.hasSegment2 && typeSettings.secondSegment) {
-        final second = ShiftOccurrence.allOf(day.date, shift).last;
-        final start2 = strings.time(second.startMinuteAbs);
+      if (typeSettings.enabled) {
         add(
           AlarmKind.shift,
-          dayStart + second.startMinuteAbs - typeSettings.minutesBefore,
-          typeSettings.cleanLabel ?? strings.title(shift.name, start2),
+          dayStart + startAbs - typeSettings.minutesBefore,
+          typeSettings.cleanLabel ?? strings.title(shift.name, start),
           buttons: true,
-          segment: 1,
-          text: strings.body(
-            shift.name,
-            start2,
-            strings.time(second.endMinuteAbs),
-          ),
         );
+        // A split shift (A12) rings again before its second segment, with the
+        // same lead, unless the type opted out. The second segment may begin
+        // after midnight: the wall-clock minute is counted from the shift's day.
+        if (shift.hasSegment2 && typeSettings.secondSegment) {
+          final second = ShiftOccurrence.allOf(day.date, shift).last;
+          final start2 = strings.time(second.startMinuteAbs);
+          add(
+            AlarmKind.shift,
+            dayStart + second.startMinuteAbs - typeSettings.minutesBefore,
+            typeSettings.cleanLabel ?? strings.title(shift.name, start2),
+            buttons: true,
+            segment: 1,
+            text: strings.body(
+              shift.name,
+              start2,
+              strings.time(second.endMinuteAbs),
+            ),
+          );
+        }
+        if (typeSettings.dayBefore) {
+          add(
+            AlarmKind.dayBefore,
+            dayStart - _minutesPerDay + typeSettings.dayBeforeMinute,
+            strings.dayBeforeTitle(shift.name, start),
+          );
+        }
       }
-      if (typeSettings.dayBefore) {
-        add(
-          AlarmKind.dayBefore,
-          dayStart - _minutesPerDay + typeSettings.dayBeforeMinute,
-          strings.dayBeforeTitle(shift.name, start),
-        );
+      if (typeSettings.pause.enabled && !hasAbsence) {
+        _planPause(shift, typeSettings.pause, day.date, strings, zone, add);
       }
     }
   }
   return alarms;
+}
+
+typedef _AddAlarm = void Function(
+  AlarmKind kind,
+  int wall,
+  String title, {
+  bool buttons,
+  int segment,
+  String? text,
+});
+
+/// The pause notice of one shift (docs/alarmas.md, «Aviso de pausa»), added
+/// through [add] when it fits.
+///
+/// - The notice belongs to the **long segment** of a split shift (the first
+///   one when both last the same) and to the only segment of any other.
+/// - [PauseTiming.midShift] rings at the middle of that segment,
+///   [PauseTiming.afterStart] `afterMinutes` after its start. Both are
+///   wall-clock times counted from the start of the shift's day like every
+///   alarm, so a night shift that crosses midnight rings after midnight and
+///   the daylight-saving rules of `wall_clock.dart` apply.
+/// - If the moment is not strictly inside the segment (an "after the start"
+///   longer than the shift), or the clock change pushes it to the end of the
+///   segment or past it, there is no notice.
+/// - Without the texts of [strings] (`pauseTitle`) there is no notice.
+/// - Its text is the shift's usual one («Noche: de 22:00 a 06:00», with the
+///   times of the segment it belongs to), under the title «Toca pausa».
+void _planPause(
+  ShiftType shift,
+  PauseAlertSettings pause,
+  CivilDate date,
+  AlarmStrings strings,
+  tz.Location zone,
+  _AddAlarm add,
+) {
+  final title = strings.pauseTitle;
+  if (title == null) return;
+  final segments = ShiftOccurrence.allOf(date, shift);
+  var target = segments.first;
+  for (final candidate in segments.skip(1)) {
+    if (candidate.durationMinutes > target.durationMinutes) target = candidate;
+  }
+  final offset = pause.timing == PauseTiming.midShift
+      ? target.durationMinutes ~/ 2
+      : pause.afterMinutes;
+  if (offset <= 0 || offset >= target.durationMinutes) return;
+
+  final dayStart = date.epochDay * _minutesPerDay;
+  tz.TZDateTime instantOf(int wall) {
+    final epochDay = (wall / _minutesPerDay).floor();
+    final day = CivilDate.fromEpochDay(epochDay);
+    return resolveWallClock(
+      zone,
+      day.year,
+      day.month,
+      day.day,
+      wall - epochDay * _minutesPerDay,
+    );
+  }
+
+  final wall = dayStart + target.startMinuteAbs + offset;
+  if (!instantOf(wall).isBefore(instantOf(dayStart + target.endMinuteAbs))) {
+    return;
+  }
+  add(
+    AlarmKind.pause,
+    wall,
+    title,
+    segment: target.segment,
+    text: strings.body(
+      shift.name,
+      strings.time(target.startMinuteAbs),
+      strings.time(target.endMinuteAbs),
+    ),
+  );
 }
 
 /// The reminders of the notes inside the window, one per day with a
@@ -675,7 +768,7 @@ PlannedAlarm? nextAlarm({
   strings: AlarmStrings.blank,
   includeReminders: false,
   location: location,
-).firstOrNull;
+).where((alarm) => alarm.kind != AlarmKind.pause).firstOrNull;
 
 /// Two alarms hashing to the same id would silently replace each other:
 /// move the later one to the next free id (deterministic, since the input

@@ -35,6 +35,8 @@ class CuadranteApp extends ConsumerWidget {
     final cellSize = ref.watch(
       preferencesProvider.select((p) => p.cellTextSize),
     );
+    // Ajustes › Apariencia › Fondo negro (OLED): only in the dark theme.
+    final pureBlack = ref.watch(preferencesProvider.select((p) => p.pureBlack));
     // Ajustes › Idioma: a language forces its locale; «Sistema» (null)
     // follows the phone through [resolveAppLocale], Spanish when the phone's
     // language is not one the app has.
@@ -48,7 +50,11 @@ class CuadranteApp extends ConsumerWidget {
       onGenerateTitle: (context) => context.l10n.appName,
       routerConfig: router,
       theme: AppTheme.light(accent: accent, cellSize: cellSize),
-      darkTheme: AppTheme.dark(accent: accent, cellSize: cellSize),
+      darkTheme: AppTheme.dark(
+        accent: accent,
+        cellSize: cellSize,
+        pureBlack: pureBlack,
+      ),
       themeMode: themeMode,
       locale: forced != null && supportedLocales.contains(forced)
           ? forced

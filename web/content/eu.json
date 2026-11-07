@@ -1,9 +1,9 @@
 {
   "name": "Turnly",
   "title": "Turnly · Zure txandak, begi-kolpe batean",
-  "description": "Txanden egutegi doakoa eta kode irekikoa, Espainian txandaka lan egiten dutenentzat. Iragarkirik gabe, konturik gabe eta konexiorik gabe.",
-  "intro": "Txanden egutegia Espainian txandaka lan egiten dutenentzat: osasungintza, polizia, suhiltzaileak, industria, ostalaritza edo beste edozein sektore. Antolatu goizak, arratsaldeak, gauak, guardiak, gau-ondokoak eta egun libreak, eta ikusi zure hurrengo txanda begi-kolpe batean.",
-  "key_facts": "Doakoa · Iragarkirik gabe · Konturik gabe · Konexiorik gabe dabil · Kode irekia · Bost hizkuntza",
+  "description": "Txanden egutegi doakoa eta kode irekikoa, Espainian txandaka lan egiten dutenentzat. Pro bertsiorik, iragarkirik, konturik eta konexiorik gabe.",
+  "intro": "Txanden egutegia Espainian txandaka lan egiten dutenentzat (osasungintza, polizia, suhiltzaileak, industria, ostalaritza edo beste edozein sektore): antolatu goizak, arratsaldeak, gauak, guardiak, gau-ondokoak eta egun libreak, eta ikusi zure hurrengo txanda begi-kolpe batean. Dena doakoa da, Pro bertsiorik, iragarkirik eta konturik gabe, eta mugikorrez aldatzean zure txandak eramaten dituzu, ezer berriro ordaindu gabe.",
+  "key_facts": "Dena doan, Pro bertsiorik gabe · Iragarkirik gabe · Konturik gabe · Konexiorik gabe dabil · Kode irekia · Bost hizkuntza",
   "features": [
     "Gaurko txartela, hurrengo txandarekin, hurrengo egun librearekin eta lan-boladarekin. Hilabetea saretan edo zerrendan, agenda eta urtea; mugikorreko egutegiko hitzorduak txanden ondoan ikusten dira. Eguneko oharrak, argazki, fitxategi eta zereginekin. Alderatu sei egutegi arte eta ikusi zein egunetan zaudeten libre aldi berean.",
     "Ukitu edo arrastatu hainbat egun margotzeko, eta «Gehitu beste txanda bat» erabiliz, jarri txanda bat baino gehiago egun berean. Kopiatu, itsatsi, desegin eta berregin. Txandaketen laguntzailea aurrebistarekin: txanda birakariak, 24/72, 4×4, 6×4, 5×2, 2-2-3 edo zure eredua, tokatzen zaizun zikloko egunetik hasita.",
@@ -20,7 +20,7 @@
   "faq": [
     {
       "question": "Zenbat balio du?",
-      "answer": "Ezer ez. Turnly guztiz doakoa eta kode irekikoa da: iragarkirik gabe, Pro bertsiorik gabe eta aplikazio barneko erosketarik gabe."
+      "answer": "Ezer ez. Turnly guztiz doakoa eta kode irekikoa da: iragarkirik gabe, Pro bertsiorik gabe eta aplikazio barneko erosketarik gabe. Mugikorrez aldatzean ere ez: ez dago ezer berreskuratu edo berriro ordaindu beharrik."
     },
     {
       "question": "Kontu bat edo Interneteko konexioa behar al dut?",
@@ -35,8 +35,8 @@
       "answer": "iPhonerako bertsioa bidean da. Lehenik TestFlight-en aterako da, eta gero App Store-n."
     },
     {
-      "question": "Nola eraman ditzaket nire txandak beste mugikor batera?",
-      "answer": "Eraman .turnly fitxategi bat: esportatu Ezarpenak › Babeskopia ataletik eta ireki mugikor berrian (edo, Androiden, erabili karpeta bateko kopia automatikoa). Aplikazioaren barruan geratzen diren kopiak galdu egiten dira hura desinstalatzean. Androiden, mugikor zaharretik berrira zuzenean pasatzeak ere funtzionatzen du. Ez da ezer leheneratzen zuk berretsi arte."
+      "question": "Nola eraman dezaket Turnly mugikor berri batera?",
+      "answer": "Lau modu dituzu, eta guztiak doakoak dira. Zuzenean pasatzea: mugikor berria konfiguratzean, kopiatu bertara zaharraren aplikazioak eta datuak kable edo wifi bidez; Turnly ere haiekin pasatzen da. Google-ren babeskopia: Androiden babeskopia aktibatuta badago eta pantailaren blokeoa (PINa, eredua edo pasahitza) baduzu, Androidek Turnly zifratuta gordetzen du zure Google kontuan, eta mugikor berria kontu berarekin konfiguratzean berreskuratzen du (Android 9 edo berriagoa). Pantailaren blokeorik gabe, Turnly ez da kopia horretan sartzen. .turnly fitxategia: Ezarpenak › Babeskopia atalean, «Esportatu fitxategia» edo «Gorde gailuan»; eraman mugikor berrira eta ireki, edo erabili «Inportatu fitxategia». Kopia automatikoa karpeta batean (Android): egunean kopia bat uzten du aukeratzen duzun karpetan; karpeta hori zure hodeian badago edo mugikor berrira pasatzen baduzu, inportatu azkena. Fitxategiarekin edo karpetarekin, kopiak zer duen ikusten duzu aurretik, eta ez da ezer ordezkatzen zuk berretsi arte. Aplikazioaren barruan geratzen diren kopiak galdu egiten dira beste kopiarik gabe desinstalatzen baduzu."
     },
     {
       "question": "Eta hutsetik hasi nahi badut?",
@@ -60,7 +60,7 @@
   "privacy_date": "2026-11-04",
   "kicker": "Txanden egutegia",
   "tagline": "Zure txandak, begi-kolpe batean.",
-  "chip": "Doan, iragarkirik gabe eta konexiorik gabe.",
+  "chip": "Dena doan: Pro bertsiorik, iragarkirik eta konturik gabe.",
   "nav_label": "Atalak",
   "theme_label": "Gaia",
   "theme_system": "Sistema",

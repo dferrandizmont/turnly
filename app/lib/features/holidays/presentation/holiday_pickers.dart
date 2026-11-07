@@ -433,6 +433,7 @@ String? holidaySubdivisionTitle(BuildContext context, String? countryCode) {
     HolidaySubdivisionKind.city => l10n.holidaysSubdivisionKindCity,
     HolidaySubdivisionKind.cityOrRegion =>
       l10n.holidaysSubdivisionKindCityOrRegion,
+    HolidaySubdivisionKind.department => l10n.holidaysSubdivisionKindDepartment,
     null => null,
   };
 }

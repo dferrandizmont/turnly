@@ -451,6 +451,21 @@ Qué **no** prueba: lanzadores de Samsung o Xiaomi (ahorro de batería agresivo,
 anterior a 12 (los colores en oscuro de los widgets dependen de `RemoteViews.setColorInt`) ni que el usuario conceda la
 alarma exacta (se concede por `appops`).
 
+### En móviles reales con Android 15 y 16, en cada versión (desde el 6-nov-2026)
+
+La competencia acumula quejas de widgets que se quedan en un día viejo en Android 15 y 16 (`docs/competencia-2026-11.md`,
+propuesta 5), y el emulador no reproduce el ahorro de batería de cada fabricante. Por eso **cada versión que vaya a Play
+o a GitHub público** pasa, además de W01–W06, esta comprobación en dos móviles reales con la APK firmada de esa versión:
+
+| Dispositivo | Android | Qué se comprueba |
+|---|---|---|
+| OnePlus 10 Pro (`56f682ca`) | 15 | Con la app cerrada (quitada de recientes) y el ahorro de batería activo: el widget pasa solo al día siguiente a medianoche, enseña el turno correcto de hoy y mañana, y tocar un día abre ese día. Tras reiniciar el móvil, sigue al día sin abrir la app. |
+| Redmi Pad 2 Pro (`192.168.0.228:5555`) | 16 (HyperOS) | Lo mismo, con el ahorro de batería de Xiaomi en su valor por defecto. |
+
+Para no esperar a la medianoche real basta con mirar el widget a la mañana siguiente de instalar la versión (la app
+sin abrir desde la noche anterior). Se anota en el informe de QA de la versión (`qa/<versión>/`) con la fecha, la hora
+y una captura. Un fallo bloquea la publicación igual que W02.
+
 ## Límites conocidos
 
 - El plugin de notificaciones no enseña la hora de disparo de una pendiente: Q11 comprueba lo que *planifica* la app

@@ -1,0 +1,17 @@
+{
+"schema":1,
+"year":2026,
+"country":"NI",
+"national":[
+{"date":"2026-01-01","name":"Año Nuevo"},
+{"date":"2026-04-02","name":"Jueves Santo"},
+{"date":"2026-04-03","name":"Viernes Santo"},
+{"date":"2026-05-01","name":"Día del Trabajo"},
+{"date":"2026-05-30","name":"Día de la Madre"},
+{"date":"2026-07-19","name":"Día de la Revolución"},
+{"date":"2026-09-14","name":"Batalla de San Jacinto"},
+{"date":"2026-09-15","name":"Día de la Independencia"},
+{"date":"2026-12-08","name":"Concepción de María"},
+{"date":"2026-12-25","name":"Navidad"}
+]
+}

@@ -64,7 +64,7 @@ void main() {
       });
 
       testWidgets('Settings at 320 dp, text 1.3', (tester) async {
-        await pump(tester, const Size(320, 3000));
+        await pump(tester, const Size(320, 3600));
         await tester.tap(find.byTooltip(l10n.settingsOpenTooltip));
         await tester.pumpAndSettle();
         expect(find.text(l10n.settingsTitle), findsWidgets);

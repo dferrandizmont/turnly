@@ -90,6 +90,7 @@ class _AbsenceBalanceSheetState extends ConsumerState<AbsenceBalanceSheet> {
         : absenceDaysInput(_existing!.carryOverMaxDays!),
   );
   late bool _carry = _existing?.carryOver ?? false;
+  late bool _workingDays = _existing?.workingDaysOnly ?? false;
   late CivilDate? _expiry = widget.status?.carryOverExpiry;
   late final Map<String, int> _types = {...?_existing?.shiftTypeQuarters};
 
@@ -163,6 +164,7 @@ class _AbsenceBalanceSheetState extends ConsumerState<AbsenceBalanceSheet> {
       carryOverMaxDays: _carry ? cap : null,
       clearCarryOverMaxDays: !_carry || cap == null,
       shiftTypeQuarters: {..._types},
+      workingDaysOnly: _workingDays,
     );
     setState(() => _saving = true);
     try {
@@ -194,6 +196,7 @@ class _AbsenceBalanceSheetState extends ConsumerState<AbsenceBalanceSheet> {
     _cap.text = cap == null ? '' : absenceDaysInput(cap);
     // Continuing a series means receiving what is left of the year before.
     _carry = true;
+    _workingDays = previous.workingDaysOnly;
   });
 
   /// Stops continuing the series: a new balance starts a brand-new one.
@@ -236,6 +239,7 @@ class _AbsenceBalanceSheetState extends ConsumerState<AbsenceBalanceSheet> {
       carryOverMaxDays: _carry ? cap : null,
       clearCarryOverMaxDays: !_carry || cap == null,
       shiftTypeQuarters: {..._types},
+      workingDaysOnly: _workingDays,
       sortOrder: 0,
       clearCreatedAt: true,
       clearUpdatedAt: true,
@@ -449,6 +453,14 @@ class _AbsenceBalanceSheetState extends ConsumerState<AbsenceBalanceSheet> {
           ),
         ),
         const SizedBox(height: Sp.s),
+        SwitchListTile(
+          key: const ValueKey('absence-field-working-days'),
+          contentPadding: EdgeInsets.zero,
+          title: Text(l10n.absenceFieldWorkingDays),
+          subtitle: Text(l10n.absenceFieldWorkingDaysHelper),
+          value: _workingDays,
+          onChanged: (value) => setState(() => _workingDays = value),
+        ),
         SwitchListTile(
           key: const ValueKey('absence-field-carry'),
           contentPadding: EdgeInsets.zero,

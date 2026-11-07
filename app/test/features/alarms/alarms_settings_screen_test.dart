@@ -6,8 +6,8 @@ import 'package:cuadrante/features/alarms/data/alarm_settings_repository.dart';
 import 'package:cuadrante/features/alarms/domain/alarm_planner.dart';
 import 'package:cuadrante/features/alarms/domain/alarm_settings.dart';
 import 'package:cuadrante/features/schedule/domain/civil_date.dart';
+import 'package:cuadrante/features/alarms/presentation/alarm_pickers.dart';
 import 'package:cuadrante/features/alarms/presentation/alarms_settings_screen.dart';
-import 'package:flutter/cupertino.dart' show CupertinoTimerPicker;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -315,9 +315,16 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(_key('alarms-lead-picker'), findsOneWidget);
+    // F6: hours unpadded ("2"), minutes always two digits ("00").
+    Finder inWheel(String wheel, String text) =>
+        find.descendant(of: _key(wheel), matching: find.text(text));
+    expect(inWheel('duration-wheel-hours', '2'), findsWidgets);
+    expect(inWheel('duration-wheel-hours', '02'), findsNothing);
+    expect(inWheel('duration-wheel-minutes', '00'), findsWidgets);
+    expect(inWheel('duration-wheel-minutes', '5'), findsNothing);
     tester
-        .widget<CupertinoTimerPicker>(_key('alarms-lead-picker'))
-        .onTimerDurationChanged(const Duration(minutes: 45));
+        .widget<DurationWheel>(_key('alarms-lead-picker'))
+        .onChanged(const Duration(minutes: 45));
     await tester.tap(_key('alarms-lead-apply'));
     await tester.pumpAndSettle();
     expect((await stored(app)).forShiftType('night').minutesBefore, 45);
@@ -706,5 +713,48 @@ void main() {
       ),
       findsOneWidget,
     );
+  });
+
+  testWidgets('a type with a break alert shows when it rings, even with its '
+      'own switch off', (tester) async {
+    scheduler.permission = AlarmPermission.granted;
+    final app = await AppUnderTest.pump(
+      tester,
+      size: tall,
+      overrides: [alarmSchedulerProvider.overrideWithValue(scheduler)],
+      prepare: (db) => AlarmSettingsRepository(db).save(
+        const AlarmSettings(
+          enabled: true,
+          byShiftType: {
+            'morning': AlarmTypeSettings(
+              pause: PauseAlertSettings(enabled: true),
+            ),
+            'afternoon': AlarmTypeSettings(
+              enabled: true,
+              pause: PauseAlertSettings(
+                enabled: true,
+                timing: PauseTiming.afterStart,
+                afterMinutes: 120,
+              ),
+            ),
+          },
+        ),
+      ),
+    );
+    await app.openSettings();
+    await tester.ensureVisible(_key('settings-alarms'));
+    await tester.tap(_key('settings-alarms'));
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.widget<Text>(_key('alarms-type-pause-morning')).data,
+      'Pausa: A mitad del turno',
+    );
+    expect(
+      tester.widget<Text>(_key('alarms-type-pause-afternoon')).data,
+      'Pausa: 2 h después de empezar',
+    );
+    // Only the types that have it show the line.
+    expect(_key('alarms-type-pause-night'), findsNothing);
   });
 }

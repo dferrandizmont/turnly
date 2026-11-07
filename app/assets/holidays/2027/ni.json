@@ -1,0 +1,17 @@
+{
+"schema":1,
+"year":2027,
+"country":"NI",
+"national":[
+{"date":"2027-01-01","name":"Año Nuevo"},
+{"date":"2027-03-25","name":"Jueves Santo"},
+{"date":"2027-03-26","name":"Viernes Santo"},
+{"date":"2027-05-01","name":"Día del Trabajo"},
+{"date":"2027-05-30","name":"Día de la Madre"},
+{"date":"2027-07-19","name":"Día de la Revolución"},
+{"date":"2027-09-14","name":"Batalla de San Jacinto"},
+{"date":"2027-09-15","name":"Día de la Independencia"},
+{"date":"2027-12-08","name":"Concepción de María"},
+{"date":"2027-12-25","name":"Navidad"}
+]
+}

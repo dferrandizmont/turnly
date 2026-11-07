@@ -1,0 +1,18 @@
+{
+"schema":1,
+"year":2027,
+"country":"NO",
+"national":[
+{"date":"2027-01-01","name":"Første nyttårsdag"},
+{"date":"2027-03-25","name":"Skjærtorsdag"},
+{"date":"2027-03-26","name":"Langfredag"},
+{"date":"2027-03-28","name":"Første påskedag"},
+{"date":"2027-03-29","name":"Andre påskedag"},
+{"date":"2027-05-01","name":"Arbeidernes dag"},
+{"date":"2027-05-06","name":"Kristi himmelfartsdag"},
+{"date":"2027-05-16","name":"Første pinsedag"},
+{"date":"2027-05-17","name":"Andre pinsedag; Grunnlovsdag"},
+{"date":"2027-12-25","name":"Første juledag"},
+{"date":"2027-12-26","name":"Andre juledag"}
+]
+}

@@ -1,0 +1,17 @@
+{
+"schema":1,
+"year":2026,
+"country":"DK",
+"national":[
+{"date":"2026-01-01","name":"Nytårsdag"},
+{"date":"2026-04-02","name":"Skærtorsdag"},
+{"date":"2026-04-03","name":"Langfredag"},
+{"date":"2026-04-05","name":"Påskedag"},
+{"date":"2026-04-06","name":"Anden påskedag"},
+{"date":"2026-05-14","name":"Kristi himmelfartsdag"},
+{"date":"2026-05-24","name":"Pinsedag"},
+{"date":"2026-05-25","name":"Anden pinsedag"},
+{"date":"2026-12-25","name":"Juledag"},
+{"date":"2026-12-26","name":"Anden juledag"}
+]
+}

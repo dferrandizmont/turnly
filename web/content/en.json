@@ -1,9 +1,9 @@
 {
   "name": "Turnly",
   "title": "Turnly · Your shifts at a glance",
-  "description": "A free, open-source shift calendar for people who work shifts in Spain. No ads, no account, and it works offline.",
-  "intro": "A shift calendar for people who work shifts in Spain: healthcare, police, firefighters, industry, hospitality or any other sector. Set up mornings, afternoons, nights, on-call shifts, post-night days and days off, and see your next shift at a glance.",
-  "key_facts": "Free · No ads · No account · Works offline · Open source · Five languages",
+  "description": "A free, open-source shift calendar for people who work shifts in Spain. No Pro, no ads, no account, and it works offline.",
+  "intro": "A shift calendar for people who work shifts in Spain (healthcare, police, firefighters, industry, hospitality or any other sector): set up mornings, afternoons, nights, on-call shifts, post-night days and days off, and see your next shift at a glance. Everything is free, with no Pro version, ads or account, and when you change phones your shifts come with you without paying anything again.",
+  "key_facts": "All free, no Pro · No ads · No account · Works offline · Open source · Five languages",
   "features": [
     "A Today card with your next shift, next day off and work streak. The month as a grid or list, the agenda and the year, with your phone calendar events next to your shifts. Daily notes with photos, files and tasks. Compare up to six calendars to see the days you are all off.",
     "Tap or drag to paint several days and, with “Add another shift”, put more than one on the same day. Copy, paste, undo and redo. A rotation wizard with a preview: rotating shifts, 24/72, 4×4, 6×4, 5×2, 2-2-3 or your own pattern, starting from the day of the cycle you are on.",
@@ -20,7 +20,7 @@
   "faq": [
     {
       "question": "How much does it cost?",
-      "answer": "Nothing. Turnly is completely free and open source: no ads, no Pro tier and no in-app purchases."
+      "answer": "Nothing. Turnly is completely free and open source: no ads, no Pro tier and no in-app purchases. Not when you change phones either: there is nothing to buy again."
     },
     {
       "question": "Do I need an account or an internet connection?",
@@ -35,8 +35,8 @@
       "answer": "The iPhone version is on its way. It will come to TestFlight first and then to the App Store."
     },
     {
-      "question": "How do I move my shifts to another phone?",
-      "answer": "Take a .turnly file: export it from Settings › Backup and open it on the new phone (or, on Android, use the automatic backup to a folder). Backups that stay inside the app are lost when you uninstall it. On Android, moving straight from the old phone to the new one also works. Nothing is restored until you confirm it."
+      "question": "How do I move Turnly to a new phone?",
+      "answer": "There are four ways, and all of them are free. Direct transfer: when you set up the new phone, copy the apps and data from the old one by cable or Wi-Fi; Turnly moves with them. Google backup: with Android backup turned on and a screen lock (PIN, pattern or password), Android stores Turnly encrypted in your Google account and brings it back when you set up the new phone with the same account (Android 9 or later). Without a screen lock, Turnly is left out of that backup. A .turnly file: in Settings › Backup, use “Export file” or “Save to device”; take it to the new phone and open it, or use “Import file”. Automatic backup to a folder (Android): it leaves one copy a day in the folder you choose; if that folder is in your cloud or you move it to the new phone, import the latest one. With the file or the folder, you first see what the backup contains, and nothing is replaced until you confirm it. Backups that stay inside the app are lost if you uninstall it without another copy."
     },
     {
       "question": "What if I want to start over?",
@@ -60,7 +60,7 @@
   "privacy_date": "2026-11-04",
   "kicker": "Shift calendar",
   "tagline": "Your shifts at a glance.",
-  "chip": "Free, no ads and works offline.",
+  "chip": "All free: no Pro, no ads and no account.",
   "nav_label": "Sections",
   "theme_label": "Theme",
   "theme_system": "System",

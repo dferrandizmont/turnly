@@ -148,8 +148,14 @@ enum Profession {
   List<String> get presetIds => switch (this) {
     Profession.nursing => const ['12h', 'correturnos', 'continental', '5x2'],
     Profession.medicine => const ['5x2', '24x72', '12h'],
-    Profession.police => const ['6x4', '4x4', 'correturnos', '5x2'],
-    Profession.firefighters => const ['24x72', '4x4', '6x4'],
+    Profession.police => const [
+      'pn-2-2-2-6',
+      '6x4',
+      '4x4',
+      'correturnos',
+      '5x2',
+    ],
+    Profession.firefighters => const ['24x72', 'guard-1-4', '4x4', '6x4'],
     Profession.industry => const [
       'correturnos',
       'continental',

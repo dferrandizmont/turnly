@@ -44,6 +44,20 @@ bool isWholeUnits(double days, AbsenceUnit unit) =>
 
 const _quarterMapEq = MapEquality<String, int>();
 
+/// Whether [date] is a working day («día hábil»): Monday to Friday and not
+/// one of [holidays] (the holidays of the calendar's place).
+bool isWorkingDay(CivilDate date, Set<CivilDate> holidays) =>
+    date.weekday <= DateTime.friday && !holidays.contains(date);
+
+/// The working days ([isWorkingDay]) from [from] to [to], both included.
+int countWorkingDays(CivilDate from, CivilDate to, Set<CivilDate> holidays) {
+  var count = 0;
+  for (var d = from; !d.isAfter(to); d = d.addDays(1)) {
+    if (isWorkingDay(d, holidays)) count++;
+  }
+  return count;
+}
+
 /// The days of vacation or leave available in one period (an
 /// `absence_balances` row; extended in schema v6, docs/datos.md). What is used
 /// is never stored: it is counted from the days of the calendar that have one
@@ -71,6 +85,7 @@ class AbsenceBalance {
     this.sortOrder = 0,
     this.createdAt,
     this.updatedAt,
+    this.workingDaysOnly = false,
   });
 
   final int year;
@@ -109,6 +124,15 @@ class AbsenceBalance {
   final int? createdAt;
   final int? updatedAt;
 
+  /// Whether only **working days** use the balance («días hábiles», propuesta
+  /// 8): Monday to Friday that are not a holiday of the calendar
+  /// ([isWorkingDay]). A vacation painted over a weekend or a holiday then
+  /// costs nothing, as the 22 working days of vacation of the public sector
+  /// count. Off = every day with one of the types counts (what the app always
+  /// did). The v6 schema has no column for it: it is kept in the `settings`
+  /// table (`AbsenceWorkingDaysStore`) and travels in the backup with it.
+  final bool workingDaysOnly;
+
   /// First and last day (both included) of the period.
   CivilDate get start => periodStart ?? CivilDate(year, 1, 1);
   CivilDate get end => periodEnd ?? CivilDate(year, 12, 31);
@@ -137,6 +161,7 @@ class AbsenceBalance {
     int? sortOrder,
     int? createdAt,
     int? updatedAt,
+    bool? workingDaysOnly,
     bool clearCalendarId = false,
     bool clearName = false,
     bool clearPeriod = false,
@@ -161,6 +186,7 @@ class AbsenceBalance {
     sortOrder: sortOrder ?? this.sortOrder,
     createdAt: clearCreatedAt ? null : createdAt ?? this.createdAt,
     updatedAt: clearUpdatedAt ? null : updatedAt ?? this.updatedAt,
+    workingDaysOnly: workingDaysOnly ?? this.workingDaysOnly,
   );
 
   /// Why this balance cannot be written by the app, or `null` when it is
@@ -212,7 +238,8 @@ class AbsenceBalance {
       other.adjustmentDays == adjustmentDays &&
       other.sortOrder == sortOrder &&
       other.createdAt == createdAt &&
-      other.updatedAt == updatedAt;
+      other.updatedAt == updatedAt &&
+      other.workingDaysOnly == workingDaysOnly;
 
   @override
   int get hashCode => Object.hash(
@@ -231,6 +258,7 @@ class AbsenceBalance {
     sortOrder,
     createdAt,
     updatedAt,
+    workingDaysOnly,
   );
 
   @override

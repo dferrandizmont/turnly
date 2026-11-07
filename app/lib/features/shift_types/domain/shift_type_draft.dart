@@ -1,3 +1,5 @@
+import '../../alarms/domain/alarm_settings.dart'
+    show PauseAlertSettings, PauseTiming;
 import '../../schedule/domain/schedule_domain.dart';
 
 /// Longest name of a shift type.
@@ -180,16 +182,19 @@ class ShiftTypeDraft {
     this.nightPlusCentsPerHour,
     this.holidayPlusCentsPerHour,
     this.dndEnabled = false,
+    this.pause = PauseAlertSettings.off,
   });
 
   /// A draft that shows [type] as it is stored. [moneyDecimals] are the
   /// decimals of the currency the rate and the plus are typed in.
   /// [dndEnabled] is the «No molestar durante este turno» choice (P13), which
-  /// lives with the silence settings, not in the shift type row.
+  /// lives with the silence settings, not in the shift type row. [pause] is
+  /// the pause notice, which lives with the alarm settings.
   factory ShiftTypeDraft.fromShiftType(
     ShiftType type, {
     int moneyDecimals = 2,
     bool dndEnabled = false,
+    PauseAlertSettings pause = PauseAlertSettings.off,
   }) {
     final paid = type.paidMinutes;
     final unpaid = paid == null ? 0 : type.scheduledMinutes - paid;
@@ -218,6 +223,7 @@ class ShiftTypeDraft {
       nightPlusCentsPerHour: type.nightPlusCentsPerHour,
       holidayPlusCentsPerHour: type.holidayPlusCentsPerHour,
       dndEnabled: dndEnabled,
+      pause: pause,
     );
   }
 
@@ -276,6 +282,11 @@ class ShiftTypeDraft {
   /// type; the form carries it so leaving with a change asks first.
   final bool dndEnabled;
 
+  /// The pause notice («Toca pausa», docs/alarmas.md). Like [dndEnabled] it is
+  /// stored with its own settings (`AlarmSettings`), not in the shift type;
+  /// the form carries it so leaving with a change asks first.
+  final PauseAlertSettings pause;
+
   /// The place as it is written (trimmed); `null` when there is none.
   String? get place {
     final trimmed = location?.trim();
@@ -317,6 +328,29 @@ class ShiftTypeDraft {
   /// for: with times and not an absence (the same rule as `canShiftTypeRing`
   /// of the alarm planner). The chosen sound is kept in the draft either way.
   bool get alarmSectionApplies => hasTimes && category != ShiftCategory.absence;
+
+  /// The pause-notice section applies where an alarm can ring (the same rule
+  /// as [alarmSectionApplies]).
+  bool get pauseSectionApplies => alarmSectionApplies;
+
+  /// The longest segment of the shift, in minutes: where the pause notice
+  /// rings (the first one when both last the same). 0 without times.
+  int get pauseSegmentMinutes {
+    if (!hasTimes) return 0;
+    final second = segment2Fits ? segment2DurationMinutes! : 0;
+    return second > durationMinutes ? second : durationMinutes;
+  }
+
+  /// The shift is long enough for the form to suggest the pause notice.
+  bool get suggestsPause =>
+      scheduledMinutes >= PauseAlertSettings.suggestedFromMinutes;
+
+  /// The pause notice is on and asks for a time that does not fit inside the
+  /// segment it belongs to: it would never ring.
+  bool get pauseOutsideShift =>
+      pause.enabled &&
+      pause.timing == PauseTiming.afterStart &&
+      pause.afterMinutes >= pauseSegmentMinutes;
 
   /// The «No molestar» switch only applies to shifts the phone can be
   /// silenced during: worked shifts with times (the same rule as
@@ -370,6 +404,7 @@ class ShiftTypeDraft {
     int? holidayPlusCentsPerHour,
     bool clearHolidayPlus = false,
     bool? dndEnabled,
+    PauseAlertSettings? pause,
   }) => ShiftTypeDraft(
     code: code ?? this.code,
     name: name ?? this.name,
@@ -395,6 +430,7 @@ class ShiftTypeDraft {
         ? null
         : holidayPlusCentsPerHour ?? this.holidayPlusCentsPerHour,
     dndEnabled: dndEnabled ?? this.dndEnabled,
+    pause: pause ?? this.pause,
     segment2StartMinute: clearSegment2
         ? null
         : segment2StartMinute ?? this.segment2StartMinute,
@@ -434,10 +470,11 @@ class ShiftTypeDraft {
       other.location == location &&
       other.nightPlusCentsPerHour == nightPlusCentsPerHour &&
       other.holidayPlusCentsPerHour == holidayPlusCentsPerHour &&
-      other.dndEnabled == dndEnabled;
+      other.dndEnabled == dndEnabled &&
+      other.pause == pause;
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     code,
     name,
     colorValue,
@@ -458,7 +495,8 @@ class ShiftTypeDraft {
     nightPlusCentsPerHour,
     holidayPlusCentsPerHour,
     dndEnabled,
-  );
+    pause,
+  ]);
 
   /// The draft with the «Turno partido» switch on: a second segment of 4 h
   /// that starts 4 h after the first one ends (09:00-13:00 + 17:00-21:00).

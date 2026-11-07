@@ -25,25 +25,28 @@ class AppTheme {
     CellTextSize cellSize = CellTextSize.normal,
   }) => _cached(Brightness.light, accent, cellSize);
 
-  /// The dark theme; see [light].
+  /// The dark theme; see [light]. [pureBlack] paints the background of the
+  /// screens `#000000` (OLED): the only token it changes.
   static ThemeData dark({
     AppAccent accent = AppAccent.defaultAccent,
     CellTextSize cellSize = CellTextSize.normal,
-  }) => _cached(Brightness.dark, accent, cellSize);
+    bool pureBlack = false,
+  }) => _cached(Brightness.dark, accent, cellSize, pureBlack: pureBlack);
 
-  // Fifteen combinations per brightness at most: built once each, so the
-  // app does not rebuild a whole ThemeData whenever another preference
-  // changes.
-  static final Map<(Brightness, AppAccent, CellTextSize), ThemeData> _themes =
-      {};
+  // At most thirty combinations per brightness (ten accents, three sizes):
+  // built once each, so the app does not rebuild a whole ThemeData whenever
+  // another preference changes.
+  static final Map<(Brightness, AppAccent, CellTextSize, bool), ThemeData>
+  _themes = {};
 
   static ThemeData _cached(
     Brightness brightness,
     AppAccent accent,
-    CellTextSize cellSize,
-  ) => _themes.putIfAbsent((brightness, accent, cellSize), () {
+    CellTextSize cellSize, {
+    bool pureBlack = false,
+  }) => _themes.putIfAbsent((brightness, accent, cellSize, pureBlack), () {
     final base = brightness == Brightness.dark
-        ? AppColors.dark
+        ? (pureBlack ? AppColors.dark.withPureBlack() : AppColors.dark)
         : AppColors.light;
     return _build(
       base.withAccent(accent),
@@ -352,7 +355,7 @@ class AppTheme {
           horizontal: Sp.l,
           vertical: 14,
         ),
-        hintStyle: type.body.copyWith(color: c.textSecondary),
+        hintStyle: type.body.copyWith(color: c.textMuted),
         labelStyle: type.meta,
         floatingLabelStyle: type.meta,
         helperStyle: type.meta,

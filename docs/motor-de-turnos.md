@@ -277,6 +277,8 @@ opcional como «empieza en lunes»), y `preset.materialize(Map<String clave, Str
 | 2-2-3 | 14 | D D L L D D D L L D D L L L |
 | continental | 28 | M M T T N N N L L, M M T T T N N L L, M M M T T N N L L L |
 | dupont | 28 | N12×4 L×3 D×3 L N12×3 L×3 D×4 L×7 |
+| pn-2-2-2-6 | 12 | M M T T N N S L×5 (Policía Nacional, el «6x6») |
+| guard-1-4 | 5 | G L×4 |
 
 **2-2-3 y «2-2-3-2-2-3» son el mismo preset.** Los 14 días son las dos semanas del 2-2-3 escritas una tras otra
 (2 trabajo, 2 libres, 3 trabajo | 2 libres, 2 trabajo, 3 libres); también se conoce como Pitman o Panamá. No hay un
@@ -293,6 +295,13 @@ se incluye.
 
 **DuPont** (4 equipos, turnos de 12 h, 28 días): 4 noches, 3 libres, 3 días, 1 libre, 3 noches, 3 libres, 4 días y
 7 libres. Usa los tipos `day12` (D, 08–20) y `night12` (N12, 20–08).
+
+**Rotaciones de un cuerpo** (grupo del asistente: Sanidad, Policía y Guardia Civil, Bomberos, Industria, Seguridad). Solo entra
+una rotación con ciclo comprobado en fuente pública. `pn-2-2-2-6`: dos mañanas (07–15), dos tardes (15–23) y dos noches
+(23–07), saliente y cinco libres; fuentes: Campus Training, «Turnos de la Policía Nacional», y JUCIL (en vigor desde
+marzo de 2020, provisional y prorrogada). `guard-1-4`: guardia de 24 h y cuatro libres (Campus Training, «Horario de
+trabajo de bomberos»: «habituales los turnos de 1-4 o 1-5»); el `24x72` es el 1-3 con otro nombre y su descripción lo
+nombra. Lo que se buscó y no se pudo comprobar está en `docs/competencia-2026-11.md`, §7.
 
 Los turnos Libre de los presets son el tipo L explícito (así se pinta el gris), no un paso vacío.
 
@@ -409,6 +418,30 @@ calendario activo; `summarizeYearTotals` junta los doce. Definiciones exactas:
   entra entera. `SummaryRange` (`domain/summary_range.dart`) valida de 1 a 366 días, recorta el final al límite y
   compara con los mismos días inmediatamente anteriores. En la pantalla (`/resumen` › «Fechas…») no hay imagen para
   compartir.
+- **Día de cierre del mes (propuesta 8 de `docs/competencia-2026-11.md`, `domain/pay_period.dart`).** Opcional, en
+  Ajustes › Horas y dinero: el último día del mes de nómina (1 a 30; vacío = mes natural). El mes de nómina se llama
+  como el mes en que **termina**: con 20, «noviembre» va del 21 de octubre al 20 de noviembre; un día que el mes no
+  tiene (30 en febrero) es su último día, y los meses se siguen sin huecos ni solapes (hay prueba). Lo usan el resumen
+  del mes (`summarizeMonth(closingDay:)`), la tabla del año (12 meses de nómina, `payYearOf`), «¿Cómo voy?» del año,
+  la bolsa de horas y «Llevas ganado». Los trimestres y «Fechas…» siguen siendo fechas que elige el usuario; la imagen
+  del mes y los informes siguen con el mes natural (son la página del calendario). Fila `summary.closingDay` de
+  `settings` (`data/pay_rules_store.dart`).
+- **Tope de horas extra (propuesta 8, `domain/overtime_cap.dart`).** Opcional, en horas enteras al mes o al año (la
+  hoja propone 80 al año, el máximo del art. 35.2 del Estatuto de los Trabajadores). Cuenta las horas extra anotadas en
+  los días (`MonthSummary.overtimeMinutes`) del mes de nómina o del año de nómina. Avisa desde el 80 % («Te acercas al
+  tope»), al llegar y al pasarlo, siempre con icono y texto, nunca solo color. Fila `summary.overtimeCap` de
+  `settings`, JSON `{"period": "year", "hours": 80}`.
+- **Plantillas de pluses (propuesta 2, `domain/pay_templates.dart`).** Sanidad pública, bomberos y vigilantes de
+  seguridad. Una plantilla solo dice qué pluses tiene el sector y en qué turnos (nocturnidad y festivo por hora en
+  todos los de trabajo con horario; plus por guardia en los de 17 h o más) y los escribe en los tres campos que ya
+  tiene cada tipo de turno. **No trae importes**: empiezan en 0 (o en el que ya compartan los tipos) y los escribe el
+  usuario. La única cifra es la jornada anual de vigilantes, 1782 h de trabajo efectivo (convenio estatal de empresas
+  de seguridad, BOE de abril de 2026, la misma cifra que los convenios desde 2015), que se guarda como objetivo anual
+  si el usuario la deja. Si el cambio llega a días ya pasados, pregunta como el editor de un turno («Corregir en todos
+  los días» o «Solo a partir de hoy»). Una guardia de 24 h que cruza a un festivo reparte sus horas por día natural
+  (`splitByCivilDay`): desde la víspera, 8 h en el festivo; el mismo festivo, 16 h (pruebas en
+  `test/features/summary/domain/pay_templates_test.dart`). El estimado del resumen desglosa plus nocturno, plus
+  festivo, pluses fijos e importes extra.
 La imagen del mes (`presentation/month_share_card.dart`, `month_image.dart`) se dibuja fuera de pantalla con tema
 claro a 400 dp x 3 (1200 px de ancho) y no lleva notas, horas, importes ni la marca de horas extra (es privado); sí
 lleva el icono del turno cuando cabe, con la misma regla que la casilla del mes.

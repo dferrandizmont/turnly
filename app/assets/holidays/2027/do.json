@@ -1,0 +1,19 @@
+{
+"schema":1,
+"year":2027,
+"country":"DO",
+"national":[
+{"date":"2027-01-01","name":"Año Nuevo"},
+{"date":"2027-01-04","name":"Día de los Santos Reyes"},
+{"date":"2027-01-21","name":"Día de la Altagracia"},
+{"date":"2027-01-25","name":"Día de Duarte"},
+{"date":"2027-02-27","name":"Día de la Independencia Nacional"},
+{"date":"2027-03-26","name":"Viernes Santo"},
+{"date":"2027-05-01","name":"Día del Trabajo"},
+{"date":"2027-05-27","name":"Corpus Christi"},
+{"date":"2027-08-16","name":"Día de la Restauración"},
+{"date":"2027-09-24","name":"Día de las Mercedes"},
+{"date":"2027-11-06","name":"Día de la Constitución"},
+{"date":"2027-12-25","name":"Día de Navidad"}
+]
+}

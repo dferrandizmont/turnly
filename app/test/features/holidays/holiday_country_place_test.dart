@@ -195,12 +195,15 @@ void main() {
       await repo.addUserHoliday(date: own, name: 'Mi fiesta');
     });
 
-    test('Poland without data: only the own holidays, no 12 October', () async {
-      final place = await repo.savePlace(countryCode: 'PL');
-      final entries = await repo.entriesFor(place);
-      expect(entries.every((e) => e.source == HolidaySource.user), isTrue);
-      expect(await datesFor(place), ['2026-06-03']);
-    });
+    test(
+      'Morocco without data: only the own holidays, no 12 October',
+      () async {
+        final place = await repo.savePlace(countryCode: 'MA');
+        final entries = await repo.entriesFor(place);
+        expect(entries.every((e) => e.source == HolidaySource.user), isTrue);
+        expect(await datesFor(place), ['2026-06-03']);
+      },
+    );
 
     test('«Otro país»: only the own holidays', () async {
       final place = await repo.savePlace(countryCode: otherCountryCode);
@@ -209,26 +212,26 @@ void main() {
       expect(snapshot.byDay.keys, [own]);
     });
 
-    test('Poland with rows: its national ones, never Spain\'s', () async {
+    test('Morocco with rows: its national ones, never Spain\'s', () async {
       await db.batch((b) {
         b.insertAll(db.holidays, [
           HolidaysCompanion.insert(
             date: '2026-09-16',
             scope: HolidayScope.national.name,
             name: 'Día de la Independencia',
-            regionCode: const Value('PL'),
+            regionCode: const Value('MA'),
             source: HolidaySource.bundled.name,
           ),
           HolidaysCompanion.insert(
             date: '2026-01-06',
             scope: HolidayScope.national.name,
             name: 'Reyes',
-            regionCode: const Value('PL-MZ'),
+            regionCode: const Value('MA-01'),
             source: HolidaySource.bundled.name,
           ),
         ]);
       });
-      final poland = await repo.savePlace(countryCode: 'PL');
+      final poland = await repo.savePlace(countryCode: 'MA');
       expect(await datesFor(poland), ['2026-06-03', '2026-09-16']);
       // Spain does not see them, and the «No son festivo en…» note only
       // reads Spanish regions.
