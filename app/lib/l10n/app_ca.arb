@@ -2899,6 +2899,35 @@
       }
     }
   },
+  "calendarsDelete": "Esborra",
+  "calendarsDeleteSemantic": "Esborra «{name}» per sempre",
+  "@calendarsDeleteSemantic": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarsDeleteTitle": "Vols esborrar «{name}» per sempre?",
+  "@calendarsDeleteTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarsDeleteBody": "S’esborraran d’aquest mòbil els seus torns, notes, tasques i canvis de torn. No es pot desfer. Abans desarem una còpia de seguretat per si la necessites.",
+  "calendarsDeleteConfirm": "Esborra per sempre",
+  "calendarsDeleted": "S’ha esborrat «{name}»",
+  "@calendarsDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarsDeleteNotArchivedError": "Només es poden esborrar els calendaris arxivats.",
+  "calendarsDeleteBackupFailed": "No s’ha pogut desar la còpia de seguretat prèvia, així que no s’ha esborrat res. Revisa l’espai del mòbil i torna-ho a provar.",
   "calendarsLastError": "No pots arxivar l’últim calendari: sempre n’hi ha d’haver un.",
   "calendarsNameRequired": "Posa un nom al calendari.",
   "calendarsNotFoundError": "Aquest calendari ja no existeix.",
@@ -3405,6 +3434,42 @@
   "holidayNameStJamesGalicia": "Sant Jaume / Dia de Galícia",
   "holidayNameCataloniaDay": "Diada Nacional de Catalunya",
   "holidayNameBasqueDay": "Dia del País Basc",
+  "holidayNameStJohn": "Sant Joan",
+  "holidayNameAndalusiaDay": "Dia d’Andalusia",
+  "holidayNameDayAfterAllSaints": "Dia després de Tots Sants",
+  "holidayNameMondayAfterConstitution": "Dilluns següent al Dia de la Constitució",
+  "holidayNameAragonDay": "Sant Jordi / Dia d’Aragó",
+  "holidayNameAsturiasDay": "Dia d’Astúries",
+  "holidayNameCantabriaInstitutionsDay": "Dia de les Institucions de Cantàbria",
+  "holidayNameBienAparecida": "La Bien Aparecida",
+  "holidayNameEidAdha": "Festa del Sacrifici (Eid al-Adha)",
+  "holidayNameEidFitr": "Festa de l’Eid al-Fitr",
+  "holidayNameOurLadyAfrica": "Nostra Senyora d’Àfrica",
+  "holidayNameCeutaDay": "Dia de Ceuta",
+  "holidayNameCastileLeonDay": "Festa de Castella i Lleó",
+  "holidayNameCorpusChristi": "Corpus Christi",
+  "holidayNameCanaryDay": "Dia de Canàries",
+  "holidayNameExtremaduraDay": "Dia d’Extremadura",
+  "holidayNameMurciaDay": "Dia de la Regió de Múrcia",
+  "holidayNameMadridDay": "Festa de la Comunitat de Madrid",
+  "holidayNameRiojaDay": "Dia de La Rioja",
+  "holidayNameValencianDay": "Dia de la Comunitat Valenciana",
+  "holidayNameBalearicDay": "Dia de les Illes Balears",
+  "holidayNameMondayAfterBalearicDay": "Dilluns següent al Dia de les Illes Balears",
+  "holidayNameCastillaMancha": "Dia de Castella-la Manxa",
+  "holidayNameAugustReplacement": "Substitució del 15 d’agost",
+  "holidayNameMondayAfterAssumption": "Dilluns següent a l’Assumpció",
+  "holidayNameAssumptionMoved": "Trasllat de l’Assumpció",
+  "holidayNameGalicianLettersDay": "Dia de les Lletres Gallegues",
+  "holidayNameFirstBasqueGovernment": "Aniversari del primer Govern Basc",
+  "holidayNameIslandPino": "Festa insular (Nostra Senyora del Pino)",
+  "holidayNameIslandPena": "Festa insular (Nostra Senyora de la Peña)",
+  "holidayNameIslandVolcanoes": "Festa insular (Nostra Senyora dels Volcans)",
+  "holidayNameIslandCandelaria": "Festa insular (Mare de Déu de la Candelaria)",
+  "holidayNameIslandGuadalupe": "Festa insular (Nostra Senyora de Guadalupe)",
+  "holidayNameIslandNieves": "Festa insular (Nostra Senyora de les Neus)",
+  "holidayNameIslandReyes": "Festa insular (Nostra Senyora dels Reis)",
+  "holidayNameLocalFeast": "Festa local ({place})",
   "catalogCalendarMainName": "El meu quadrant",
   "historyUndone": "Canvi desfet",
   "historyRedone": "Canvi refet",

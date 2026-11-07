@@ -583,10 +583,10 @@ cambiar allí nada. Lo que ya está preparado para ello:
 
 ## Lo de `official.ts` que no se replica
 
-- **Idiomas:** el paquete trae solo español (`label.es`). Los nombres de los festivos estatales y de los autonómicos
-  más comunes se traducen al mostrarse (ca, gl, eu, en), con claves `holidayName*` de los ARB y
+- **Idiomas:** el paquete trae solo español (`label.es`). Los nombres de **todos** los festivos de España (estatales, autonómicos
+  e insulares y locales con nombre: «Fiesta local (lugar)» lleva el lugar tal cual) se traducen al mostrarse (ca, gl, eu, en), con claves `holidayName*` de los ARB y
   `lib/features/holidays/presentation/holiday_names.dart`; el paquete no tiene ids, así que la clave estable es el
-  nombre en español plegado (`foldSpanish`). Un nombre sin traducción se muestra tal cual viene del paquete, y un
+  nombre en español plegado (`foldSpanish`). Una prueba (`holiday_names_test.dart`) falla si un nombre de España del paquete se queda sin clave en alguno de los cuatro idiomas: al añadir un año o un festivo, añade la clave. Un nombre sin traducción se muestra tal cual viene del paquete, y un
   festivo añadido por la persona nunca se traduce (H-T21-1).
 - **Cobertura** (`officialCoverage`: disponible/pendiente/faltante): no se guarda en la base de datos. La UI puede
   deducir «sin datos locales para tu municipio» comprobando si hay filas `local`; «pendiente» se sabe leyendo

@@ -10,6 +10,7 @@ import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_snack_bar.dart';
 import '../../../core/widgets/buttons.dart';
+import '../../../core/widgets/confirm_dialog.dart';
 import '../../../core/widgets/content_app_bar.dart';
 import '../../../core/widgets/error_state.dart';
 import '../../../core/widgets/page_body.dart';
@@ -119,7 +120,8 @@ class _Content extends ConsumerWidget {
 }
 
 /// «Archivados (2)»: collapsed by default; open, each archived calendar with
-/// «Recuperar» (H-T07-1), preserving its rotations and days.
+/// «Recuperar» (H-T07-1), preserving its rotations and days, and «Borrar»,
+/// which deletes it for good after a confirmation (N4 of the 0.9.1 tablet QA).
 class _ArchivedCalendars extends ConsumerStatefulWidget {
   const _ArchivedCalendars({required this.calendars});
 
@@ -139,6 +141,31 @@ class _ArchivedCalendarsState extends ConsumerState<_ArchivedCalendars> {
     try {
       await ref.read(calendarsControllerProvider.notifier).restore(calendar.id);
       message = l10n.calendarsRestored(calendar.name);
+    } catch (error) {
+      message = calendarErrorMessage(l10n, error);
+    }
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(appSnackBar(content: Text(message)));
+  }
+
+  Future<void> _delete(Calendar calendar) async {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.of(context);
+    final controller = ref.read(calendarsControllerProvider.notifier);
+    final confirmed = await showConfirmDialog(
+      context,
+      title: l10n.calendarsDeleteTitle(calendar.name),
+      body: l10n.calendarsDeleteBody,
+      confirmLabel: l10n.calendarsDeleteConfirm,
+      destructive: true,
+      confirmKey: const ValueKey('calendar-delete-confirm'),
+    );
+    if (!confirmed) return;
+    String message;
+    try {
+      await controller.deleteArchived(calendar.id);
+      message = l10n.calendarsDeleted(calendar.name);
     } catch (error) {
       message = calendarErrorMessage(l10n, error);
     }
@@ -216,18 +243,40 @@ class _ArchivedCalendarsState extends ConsumerState<_ArchivedCalendars> {
                       ],
                     ),
                     const SizedBox(height: Sp.s),
-                    Semantics(
-                      label: l10n.calendarsRestoreSemantic(calendar.name),
-                      excludeSemantics: true,
-                      button: true,
-                      onTap: () => _restore(calendar),
-                      child: SecondaryButton(
-                        key: ValueKey('calendar-restore-${calendar.id}'),
-                        label: l10n.calendarsRestore,
-                        icon: AppIcons.undo,
-                        expand: false,
-                        onPressed: () => _restore(calendar),
-                      ),
+                    Wrap(
+                      spacing: Sp.s,
+                      runSpacing: Sp.s,
+                      children: [
+                        Semantics(
+                          label: l10n.calendarsRestoreSemantic(calendar.name),
+                          excludeSemantics: true,
+                          button: true,
+                          onTap: () => _restore(calendar),
+                          child: SecondaryButton(
+                            key: ValueKey('calendar-restore-${calendar.id}'),
+                            label: l10n.calendarsRestore,
+                            icon: AppIcons.undo,
+                            expand: false,
+                            onPressed: () => _restore(calendar),
+                          ),
+                        ),
+                        Semantics(
+                          label: l10n.calendarsDeleteSemantic(calendar.name),
+                          excludeSemantics: true,
+                          button: true,
+                          onTap: () => _delete(calendar),
+                          child: OutlinedButton.icon(
+                            key: ValueKey('calendar-delete-${calendar.id}'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: colors.danger,
+                              side: BorderSide(color: colors.danger),
+                            ),
+                            onPressed: () => _delete(calendar),
+                            icon: Icon(AppIcons.delete, size: IconSize.button),
+                            label: Text(l10n.calendarsDelete),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

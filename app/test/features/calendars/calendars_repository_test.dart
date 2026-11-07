@@ -3,6 +3,7 @@ import 'package:cuadrante/features/calendars/data/calendars_repository.dart';
 import 'package:cuadrante/features/calendars/domain/calendar.dart';
 import 'package:cuadrante/features/schedule/data/schedule_repository.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
+import 'package:drift/drift.dart' show Variable;
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/test_storage.dart';
@@ -323,6 +324,147 @@ void main() {
       await db.customStatement('DELETE FROM calendars');
       expect(await repo.primaryId(), 'main');
       expect(await repo.list(), hasLength(1));
+    });
+  });
+
+  group('deleteArchived', () {
+    /// One of every kind of row that belongs to a calendar.
+    Future<void> seedOwnedBy(String calendar) async {
+      Future<void> sql(String statement, [List<Object?> args = const []]) =>
+          db.customStatement(statement, args);
+      await sql(
+        'INSERT OR IGNORE INTO patterns (id, name, steps, created_at, '
+        "updated_at) VALUES ('p', 'P', '[[\"t\"]]', 0, 0)",
+      );
+      await sql(
+        'INSERT INTO pattern_runs (id, calendar_id, pattern_id, start_date, '
+        "seq, created_at) VALUES (?, ?, 'p', '2026-10-01', ?, 0)",
+        ['run-$calendar', calendar, calendar == 'main' ? 1 : 2],
+      );
+      await sql(
+        'INSERT INTO day_entries (calendar_id, date, note, updated_at) '
+        "VALUES (?, '2026-10-02', 'nota', 0)",
+        [calendar],
+      );
+      await sql(
+        'INSERT INTO day_tasks (id, calendar_id, date, title, created_at, '
+        "updated_at) VALUES (?, ?, '2026-10-02', 'Tarea', 0, 0)",
+        ['task-$calendar', calendar],
+      );
+      await sql(
+        'INSERT INTO shift_swaps (id, calendar_id, date, colleague, '
+        "direction, created_at, updated_at) VALUES (?, ?, '2026-10-03', "
+        "'Marta', 'theyOwe', 0, 0)",
+        ['swap-$calendar', calendar],
+      );
+      await sql(
+        'INSERT INTO note_attachments (id, calendar_id, date, kind, '
+        'relative_path, mime_type, size_bytes, sha256, created_at) '
+        "VALUES (?, ?, '2026-10-02', 'file', ?, 'text/plain', 1, ?, 0)",
+        ['att-$calendar', calendar, '$calendar/a.txt', 'a' * 64],
+      );
+      await sql(
+        'INSERT INTO absence_balances (year, type, allowed_days, calendar_id) '
+        'VALUES (2026, ?, 22, ?)',
+        ['vac-$calendar', calendar],
+      );
+    }
+
+    Future<int> count(String table, String calendar) async {
+      final rows = await db
+          .customSelect(
+            'SELECT COUNT(*) AS n FROM $table WHERE calendar_id = ?',
+            variables: [Variable.withString(calendar)],
+          )
+          .getSingle();
+      return rows.read<int>('n');
+    }
+
+    const owned = [
+      'pattern_runs',
+      'day_entries',
+      'day_tasks',
+      'shift_swaps',
+      'note_attachments',
+      'absence_balances',
+    ];
+
+    test('removes the calendar and only the rows that belong to it', () async {
+      final other = await repo.create(name: 'Prueba', colorValue: 1);
+      await seedOwnedBy('main');
+      await seedOwnedBy(other.id);
+      // A balance that follows the primary calendar belongs to none.
+      await db.customStatement(
+        'INSERT INTO absence_balances (year, type, allowed_days) '
+        "VALUES (2026, 'shared', 5)",
+      );
+      for (final table in owned) {
+        expect(await count(table, other.id), 1, reason: table);
+      }
+      await repo.archive(other.id);
+
+      await repo.deleteArchived(other.id);
+
+      expect(await repo.get(other.id), isNull);
+      expect((await repo.list(includeArchived: true)).map((c) => c.id), [
+        'main',
+      ]);
+      for (final table in owned) {
+        expect(await count(table, other.id), 0, reason: table);
+        expect(await count(table, 'main'), 1, reason: table);
+      }
+      final shared = await db
+          .customSelect(
+            'SELECT COUNT(*) AS n FROM absence_balances '
+            'WHERE calendar_id IS NULL',
+          )
+          .getSingle();
+      expect(shared.read<int>('n'), 1);
+      // Patterns are shared: they stay.
+      final patterns = await db
+          .customSelect('SELECT COUNT(*) AS n FROM patterns')
+          .getSingle();
+      expect(patterns.read<int>('n'), 1);
+    });
+
+    test(
+      'refuses a calendar that is not archived and changes nothing',
+      () async {
+        final other = await repo.create(name: 'Prueba', colorValue: 1);
+        await seedOwnedBy(other.id);
+
+        await expectLater(
+          repo.deleteArchived(other.id),
+          throwsA(isA<CalendarNotArchived>()),
+        );
+        await expectLater(
+          repo.deleteArchived('main'),
+          throwsA(isA<CalendarNotArchived>()),
+        );
+
+        expect(await repo.get(other.id), isNotNull);
+        for (final table in owned) {
+          expect(await count(table, other.id), 1, reason: table);
+        }
+      },
+    );
+
+    test('refuses an unknown id', () async {
+      await expectLater(
+        repo.deleteArchived('nope'),
+        throwsA(isA<CalendarNotFound>()),
+      );
+    });
+
+    test('never deletes the only calendar there is', () async {
+      await db.customStatement(
+        "UPDATE calendars SET archived = 1 WHERE id = 'main'",
+      );
+      await expectLater(
+        repo.deleteArchived('main'),
+        throwsA(isA<LastCalendarCannotBeArchived>()),
+      );
+      expect(await repo.get('main'), isNotNull);
     });
   });
 }

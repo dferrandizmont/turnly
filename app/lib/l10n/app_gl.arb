@@ -2899,6 +2899,35 @@
       }
     }
   },
+  "calendarsDelete": "Borrar",
+  "calendarsDeleteSemantic": "Borrar «{name}» para sempre",
+  "@calendarsDeleteSemantic": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarsDeleteTitle": "Queres borrar «{name}» para sempre?",
+  "@calendarsDeleteTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarsDeleteBody": "Borraranse deste móbil as súas quendas, notas, tarefas e cambios de quenda. Non se pode desfacer. Antes gardaremos unha copia de seguranza por se a precisas.",
+  "calendarsDeleteConfirm": "Borrar para sempre",
+  "calendarsDeleted": "«{name}» borrado",
+  "@calendarsDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarsDeleteNotArchivedError": "Só se poden borrar os calendarios arquivados.",
+  "calendarsDeleteBackupFailed": "Non se puido gardar a copia de seguranza previa, así que non se borrou nada. Revisa o espazo do móbil e volve tentalo.",
   "calendarsLastError": "Non podes arquivar o último calendario: sempre ten que haber un.",
   "calendarsNameRequired": "Ponlle un nome ao calendario.",
   "calendarsNotFoundError": "Ese calendario xa non existe.",
@@ -3405,6 +3434,42 @@
   "holidayNameStJamesGalicia": "Santiago Apóstolo / Día Nacional de Galicia",
   "holidayNameCataloniaDay": "Diada de Cataluña",
   "holidayNameBasqueDay": "Día do País Vasco",
+  "holidayNameStJohn": "San Xoán",
+  "holidayNameAndalusiaDay": "Día de Andalucía",
+  "holidayNameDayAfterAllSaints": "Día seguinte a Todos os Santos",
+  "holidayNameMondayAfterConstitution": "Luns seguinte ao Día da Constitución",
+  "holidayNameAragonDay": "San Xurxo / Día de Aragón",
+  "holidayNameAsturiasDay": "Día de Asturias",
+  "holidayNameCantabriaInstitutionsDay": "Día das Institucións de Cantabria",
+  "holidayNameBienAparecida": "La Bien Aparecida",
+  "holidayNameEidAdha": "Festa do Sacrificio (Eid al-Adha)",
+  "holidayNameEidFitr": "Festa do Eid al-Fitr",
+  "holidayNameOurLadyAfrica": "Nosa Señora de África",
+  "holidayNameCeutaDay": "Día de Ceuta",
+  "holidayNameCastileLeonDay": "Festa de Castela e León",
+  "holidayNameCorpusChristi": "Corpus Christi",
+  "holidayNameCanaryDay": "Día de Canarias",
+  "holidayNameExtremaduraDay": "Día de Extremadura",
+  "holidayNameMurciaDay": "Día da Rexión de Murcia",
+  "holidayNameMadridDay": "Festa da Comunidade de Madrid",
+  "holidayNameRiojaDay": "Día de La Rioja",
+  "holidayNameValencianDay": "Día da Comunidade Valenciana",
+  "holidayNameBalearicDay": "Día das Illes Balears",
+  "holidayNameMondayAfterBalearicDay": "Luns seguinte ao Día das Illes Balears",
+  "holidayNameCastillaMancha": "Día de Castela-A Mancha",
+  "holidayNameAugustReplacement": "Substitución do 15 de agosto",
+  "holidayNameMondayAfterAssumption": "Luns seguinte á Asunción",
+  "holidayNameAssumptionMoved": "Traslado da Asunción",
+  "holidayNameGalicianLettersDay": "Día das Letras Galegas",
+  "holidayNameFirstBasqueGovernment": "Aniversario do primeiro Goberno Vasco",
+  "holidayNameIslandPino": "Festa insular (Nosa Señora do Pino)",
+  "holidayNameIslandPena": "Festa insular (Nosa Señora da Peña)",
+  "holidayNameIslandVolcanoes": "Festa insular (Nosa Señora dos Volcáns)",
+  "holidayNameIslandCandelaria": "Festa insular (Virxe da Candelaria)",
+  "holidayNameIslandGuadalupe": "Festa insular (Nosa Señora de Guadalupe)",
+  "holidayNameIslandNieves": "Festa insular (Nosa Señora das Neves)",
+  "holidayNameIslandReyes": "Festa insular (Nosa Señora dos Reis)",
+  "holidayNameLocalFeast": "Festa local ({place})",
   "catalogCalendarMainName": "O meu cadro de quendas",
   "historyUndone": "Cambio desfeito",
   "historyRedone": "Cambio refeito",

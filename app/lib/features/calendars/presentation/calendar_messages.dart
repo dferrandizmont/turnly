@@ -8,6 +8,8 @@ String calendarErrorMessage(AppLocalizations l10n, Object error) =>
     switch (error) {
       LastCalendarCannotBeArchived() => l10n.calendarsLastError,
       CalendarNotFound() => l10n.calendarsNotFoundError,
+      CalendarNotArchived() => l10n.calendarsDeleteNotArchivedError,
+      CalendarDeleteBackupFailed() => l10n.calendarsDeleteBackupFailed,
       ArgumentError() => l10n.calendarsNameRequired,
       _ => l10n.calendarsSaveFailed,
     };

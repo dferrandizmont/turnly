@@ -10,7 +10,11 @@ import 'package:cuadrante/features/calendars/application/primary_schedule.dart';
 import 'package:cuadrante/features/calendars/domain/calendar.dart';
 import 'package:cuadrante/features/schedule/application/schedule_providers.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
+import 'package:cuadrante/features/backup/application/backup_providers.dart';
+import 'package:cuadrante/features/backup/domain/backup_store.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
+import 'package:drift/drift.dart' show Variable;
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/test_storage.dart';
@@ -52,10 +56,11 @@ void main() {
   late ProviderContainer container;
   late FakeAlarmScheduler scheduler;
 
-  ProviderContainer makeContainer() {
+  ProviderContainer makeContainer({List<Override> extra = const []}) {
     final c = ProviderContainer(
       overrides: [
         ...storage.overrides,
+        ...extra,
         clockProvider.overrideWithValue(() => _now),
         alarmSchedulerProvider.overrideWithValue(scheduler),
       ],
@@ -111,6 +116,117 @@ void main() {
         ...created.map((c) => c.id),
       ]);
       expect((await calendarsState()).archived, isEmpty);
+    });
+
+    group('deleteArchived', () {
+      final entry = BackupEntry(
+        id: 'pre-reset-test',
+        modifiedAt: DateTime.utc(2026, 11, 7),
+        sizeBytes: 1,
+      );
+
+      /// Replaces the container with one whose safety copy is [copy], and
+      /// returns the ids of the calendars that existed at each copy.
+      List<List<String>> useCopy(
+        Future<BackupEntry> Function(List<String> calendarIds) copy,
+      ) {
+        final copies = <List<String>>[];
+        container = makeContainer(
+          extra: [
+            resetBackupProvider.overrideWithValue(() async {
+              final ids = [
+                for (final c
+                    in await container
+                        .read(calendarsControllerProvider.future)
+                        .then((s) => [...s.calendars, ...s.archived]))
+                  c.id,
+              ];
+              copies.add(ids);
+              return copy(ids);
+            }),
+          ],
+        );
+        return copies;
+      }
+
+      test(
+        'makes the safety copy first, then removes the calendar and its days',
+        () async {
+          final copies = useCopy((_) async => entry);
+          final c = await calendars().create(name: 'Prueba', colorValue: 7);
+          await container
+              .read(scheduleRepositoryProvider)
+              .apply(
+                c.id,
+                ScheduleChange(
+                  patch: EntriesPatch({
+                    _today: EntryChange(
+                      null,
+                      DayEntry(date: _today, shiftTypeIds: const ['night']),
+                    ),
+                  }),
+                ),
+              );
+          await calendars().archive(c.id);
+
+          await calendars().deleteArchived(c.id);
+
+          // The copy still had the calendar in it.
+          expect(copies, [
+            ['main', c.id],
+          ]);
+          final s = await calendarsState();
+          expect(s.calendars.map((x) => x.id), ['main']);
+          expect(s.archived, isEmpty);
+          final left = await storage.database
+              .customSelect(
+                'SELECT COUNT(*) AS n FROM day_entries WHERE calendar_id = ?',
+                variables: [Variable.withString(c.id)],
+              )
+              .getSingle();
+          expect(left.read<int>('n'), 0);
+          // The widget and the alarms keep following a calendar that exists.
+          expect(s.primaryId, 'main');
+          expect(scheduleState().calendarId, 'main');
+        },
+      );
+
+      test('without a safety copy nothing is deleted', () async {
+        useCopy((_) async => throw StateError('disk full'));
+        final c = await calendars().create(name: 'Prueba', colorValue: 7);
+        await calendars().archive(c.id);
+
+        await expectLater(
+          calendars().deleteArchived(c.id),
+          throwsA(isA<CalendarDeleteBackupFailed>()),
+        );
+
+        final s = await calendarsState();
+        expect(s.archived.map((x) => x.id), [c.id]);
+      });
+
+      test(
+        'a calendar that is not archived is refused before any copy',
+        () async {
+          final copies = useCopy((_) async => entry);
+          final c = await calendars().create(name: 'Prueba', colorValue: 7);
+
+          await expectLater(
+            calendars().deleteArchived(c.id),
+            throwsA(isA<CalendarNotArchived>()),
+          );
+          await expectLater(
+            calendars().deleteArchived('main'),
+            throwsA(isA<CalendarNotArchived>()),
+          );
+
+          expect(copies, isEmpty);
+          expect((await calendarsState()).calendars.map((x) => x.id), [
+            'main',
+            c.id,
+          ]);
+        },
+      );
     });
 
     test('rename and recolor show up in the list', () async {

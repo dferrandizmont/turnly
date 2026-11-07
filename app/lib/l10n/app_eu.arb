@@ -2899,6 +2899,35 @@
       }
     }
   },
+  "calendarsDelete": "Ezabatu",
+  "calendarsDeleteSemantic": "Ezabatu «{name}» betiko",
+  "@calendarsDeleteSemantic": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarsDeleteTitle": "«{name}» betiko ezabatu nahi duzu?",
+  "@calendarsDeleteTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarsDeleteBody": "Mugikor honetatik haren txandak, oharrak, zereginak eta txanda-aldaketak ezabatuko dira. Ezin da desegin. Aurretik segurtasun-kopia bat gordeko dugu, behar baduzu.",
+  "calendarsDeleteConfirm": "Ezabatu betiko",
+  "calendarsDeleted": "«{name}» ezabatu da",
+  "@calendarsDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarsDeleteNotArchivedError": "Artxibatutako egutegiak bakarrik ezabatu daitezke.",
+  "calendarsDeleteBackupFailed": "Ezin izan da aurretiko segurtasun-kopia gorde, beraz ez da ezer ezabatu. Begiratu mugikorraren lekua eta saiatu berriro.",
   "calendarsLastError": "Ezin duzu azken egutegia artxibatu: beti egon behar da bat.",
   "calendarsNameRequired": "Jarri izen bat egutegiari.",
   "calendarsNotFoundError": "Egutegi hori ez dago jada.",
@@ -3386,25 +3415,61 @@
   "catalogPatternPn2226Description": "2 goiz, 2 arratsalde, 2 gau, gau-ondokoa eta 5 libre (Polizia Nazionalaren 6x6a)",
   "catalogPatternGuard14Name": "Guardia 1-4",
   "catalogPatternGuard14Description": "24 orduko guardia eta 4 egun libre (guardia 1 eta libre 4)",
-  "holidayNameNewYear": "Urteberri eguna",
+  "holidayNameNewYear": "Urte Berri eguna",
   "holidayNameEpiphany": "Errege eguna",
   "holidayNameMaundyThursday": "Ostegun Santua",
   "holidayNameGoodFriday": "Ostiral Santua",
   "holidayNameEasterMonday": "Pazko astelehena",
   "holidayNameLabourDay": "Langileen eguna",
-  "holidayNameAssumption": "Andre Mariaren Jasokundea",
+  "holidayNameAssumption": "Ama Birjinaren Jasokundea",
   "holidayNameNationalDay": "Espainiako Jai Nazionala",
   "holidayNameAllSaints": "Santu Guztien eguna",
   "holidayNameConstitution": "Konstituzio eguna",
   "holidayNameImmaculate": "Sortzez Garbiaren eguna",
   "holidayNameChristmas": "Eguberri eguna",
   "holidayNameStStephen": "San Esteban",
-  "holidayNameStJoseph": "San José",
+  "holidayNameStJoseph": "San Jose",
   "holidayNameStJames": "Santiago Apostolua",
   "holidayNameGaliciaDay": "Galiziako eguna",
   "holidayNameStJamesGalicia": "Santiago Apostolua / Galiziako eguna",
   "holidayNameCataloniaDay": "Kataluniako Diada",
   "holidayNameBasqueDay": "Euskadiko eguna",
+  "holidayNameStJohn": "San Joan",
+  "holidayNameAndalusiaDay": "Andaluziako eguna",
+  "holidayNameDayAfterAllSaints": "Santu Guztien biharamuna",
+  "holidayNameMondayAfterConstitution": "Konstituzio egunaren hurrengo astelehena",
+  "holidayNameAragonDay": "San Jorge / Aragoiko eguna",
+  "holidayNameAsturiasDay": "Asturiasko eguna",
+  "holidayNameCantabriaInstitutionsDay": "Kantabriako Erakundeen eguna",
+  "holidayNameBienAparecida": "La Bien Aparecida",
+  "holidayNameEidAdha": "Sakrifizioaren jaia (Eid al-Adha)",
+  "holidayNameEidFitr": "Eid al-Fitr jaia",
+  "holidayNameOurLadyAfrica": "Afrikako Andre Maria",
+  "holidayNameCeutaDay": "Zeutako eguna",
+  "holidayNameCastileLeonDay": "Gaztela eta Leongo jaia",
+  "holidayNameCorpusChristi": "Corpus Christi",
+  "holidayNameCanaryDay": "Kanarietako eguna",
+  "holidayNameExtremaduraDay": "Extremadurako eguna",
+  "holidayNameMurciaDay": "Murtziako Eskualdearen eguna",
+  "holidayNameMadridDay": "Madrilgo Erkidegoaren jaia",
+  "holidayNameRiojaDay": "Errioxako eguna",
+  "holidayNameValencianDay": "Valentziako Erkidegoaren eguna",
+  "holidayNameBalearicDay": "Balear Uharteetako eguna",
+  "holidayNameMondayAfterBalearicDay": "Balear Uharteetako egunaren hurrengo astelehena",
+  "holidayNameCastillaMancha": "Gaztela-Mantxako eguna",
+  "holidayNameAugustReplacement": "Abuztuaren 15aren ordezkoa",
+  "holidayNameMondayAfterAssumption": "Jasokundearen hurrengo astelehena",
+  "holidayNameAssumptionMoved": "Jasokundearen lekualdatzea",
+  "holidayNameGalicianLettersDay": "Galiziar Letren eguna",
+  "holidayNameFirstBasqueGovernment": "Lehen Eusko Jaurlaritzaren urteurrena",
+  "holidayNameIslandPino": "Uharteko jaia (Pinoko Andre Maria)",
+  "holidayNameIslandPena": "Uharteko jaia (Peñako Andre Maria)",
+  "holidayNameIslandVolcanoes": "Uharteko jaia (Sumendien Andre Maria)",
+  "holidayNameIslandCandelaria": "Uharteko jaia (Kandelariako Ama Birjina)",
+  "holidayNameIslandGuadalupe": "Uharteko jaia (Guadalupeko Andre Maria)",
+  "holidayNameIslandNieves": "Uharteko jaia (Elurren Andre Maria)",
+  "holidayNameIslandReyes": "Uharteko jaia (Erregeen Andre Maria)",
+  "holidayNameLocalFeast": "Tokiko jaia ({place})",
   "catalogCalendarMainName": "Nire txanden egutegia",
   "historyUndone": "Aldaketa desegin da",
   "historyRedone": "Aldaketa berregin da",

@@ -10,6 +10,16 @@ at once, so they can skip numbers.
 
 ## Unreleased
 
+## 0.9.2 · 2026-11-07
+
+Fixes from testing 0.9.1 on a OnePlus 10 Pro and a Redmi Pad, checked again on the phone and on the tablet emulator.
+
+- Month: the system back button now leaves Paint mode instead of closing the app.
+- Settings › Calendars: an archived calendar can now be deleted for good, after a confirmation and an automatic backup.
+- Basque holiday names follow the official calendar of the Basque Government (Urte Berri eguna, San Jose, Ama Birjinaren Jasokundea, San Joan).
+- Tablets in landscape with large text: the side navigation bar keeps its four names instead of showing icons only.
+- Holidays: every Spanish holiday name (regional, island and local, such as San Juan) is now translated into Catalan, Galician, Basque and English.
+
 ## 0.9.1 · 2026-11-07
 
 Fixes from testing 0.9.0 on the phone and tablet emulators.

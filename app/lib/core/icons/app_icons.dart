@@ -87,6 +87,10 @@ class AppIcons {
       _pick(CupertinoIcons.arrow_up, Symbols.arrow_upward_rounded);
   static IconData get arrowDown =>
       _pick(CupertinoIcons.arrow_down, Symbols.arrow_downward_rounded);
+
+  /// Delete for good (an archived calendar).
+  static IconData get delete =>
+      _pick(CupertinoIcons.trash, Symbols.delete_rounded);
   static IconData get remove =>
       _pick(CupertinoIcons.minus_circle, Symbols.remove_circle_rounded);
   static IconData get copy =>

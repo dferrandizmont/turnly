@@ -4831,6 +4831,39 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get calendarsDelete => 'Borrar';
+
+  @override
+  String calendarsDeleteSemantic(String name) {
+    return 'Borrar «$name» para siempre';
+  }
+
+  @override
+  String calendarsDeleteTitle(String name) {
+    return '¿Borrar «$name» para siempre?';
+  }
+
+  @override
+  String get calendarsDeleteBody =>
+      'Se borrarán de este móvil sus turnos, notas, tareas y cambios de turno. No se puede deshacer. Antes guardaremos una copia de seguridad por si la necesitas.';
+
+  @override
+  String get calendarsDeleteConfirm => 'Borrar para siempre';
+
+  @override
+  String calendarsDeleted(String name) {
+    return '«$name» borrado';
+  }
+
+  @override
+  String get calendarsDeleteNotArchivedError =>
+      'Solo se pueden borrar los calendarios archivados.';
+
+  @override
+  String get calendarsDeleteBackupFailed =>
+      'No se ha podido guardar la copia de seguridad previa, así que no se ha borrado nada. Revisa el espacio del móvil y vuelve a intentarlo.';
+
+  @override
   String get calendarsLastError =>
       'No puedes archivar el último calendario: siempre tiene que haber uno.';
 
@@ -5679,6 +5712,128 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get holidayNameBasqueDay => 'Día del País Vasco';
+
+  @override
+  String get holidayNameStJohn => 'San Juan';
+
+  @override
+  String get holidayNameAndalusiaDay => 'Día de Andalucía';
+
+  @override
+  String get holidayNameDayAfterAllSaints => 'Día siguiente a Todos los Santos';
+
+  @override
+  String get holidayNameMondayAfterConstitution =>
+      'Lunes siguiente al Día de la Constitución';
+
+  @override
+  String get holidayNameAragonDay => 'San Jorge / Día de Aragón';
+
+  @override
+  String get holidayNameAsturiasDay => 'Día de Asturias';
+
+  @override
+  String get holidayNameCantabriaInstitutionsDay =>
+      'Día de las Instituciones de Cantabria';
+
+  @override
+  String get holidayNameBienAparecida => 'La Bien Aparecida';
+
+  @override
+  String get holidayNameEidAdha => 'Fiesta del Sacrificio (Eidul Adha)';
+
+  @override
+  String get holidayNameEidFitr => 'Fiesta del Eid Fitr';
+
+  @override
+  String get holidayNameOurLadyAfrica => 'Nuestra Señora de África';
+
+  @override
+  String get holidayNameCeutaDay => 'Día de Ceuta';
+
+  @override
+  String get holidayNameCastileLeonDay => 'Fiesta de Castilla y León';
+
+  @override
+  String get holidayNameCorpusChristi => 'Corpus Christi';
+
+  @override
+  String get holidayNameCanaryDay => 'Día de Canarias';
+
+  @override
+  String get holidayNameExtremaduraDay => 'Día de Extremadura';
+
+  @override
+  String get holidayNameMurciaDay => 'Día de la Región de Murcia';
+
+  @override
+  String get holidayNameMadridDay => 'Fiesta de la Comunidad de Madrid';
+
+  @override
+  String get holidayNameRiojaDay => 'Día de La Rioja';
+
+  @override
+  String get holidayNameValencianDay => 'Día de la Comunitat Valenciana';
+
+  @override
+  String get holidayNameBalearicDay => 'Día de les Illes Balears';
+
+  @override
+  String get holidayNameMondayAfterBalearicDay =>
+      'Lunes siguiente al Día de les Illes Balears';
+
+  @override
+  String get holidayNameCastillaMancha => 'Día de Castilla-La Mancha';
+
+  @override
+  String get holidayNameAugustReplacement => 'Sustitución del 15 de agosto';
+
+  @override
+  String get holidayNameMondayAfterAssumption =>
+      'Lunes siguiente a la Asunción de la Virgen';
+
+  @override
+  String get holidayNameAssumptionMoved => 'Traslado de la Asunción';
+
+  @override
+  String get holidayNameGalicianLettersDay => 'Día de las Letras Gallegas';
+
+  @override
+  String get holidayNameFirstBasqueGovernment =>
+      'Aniversario del primer Gobierno Vasco';
+
+  @override
+  String get holidayNameIslandPino =>
+      'Fiesta insular (Nuestra Señora del Pino)';
+
+  @override
+  String get holidayNameIslandPena =>
+      'Fiesta insular (Nuestra Señora de la Peña)';
+
+  @override
+  String get holidayNameIslandVolcanoes =>
+      'Fiesta insular (Nuestra Señora de los Volcanes)';
+
+  @override
+  String get holidayNameIslandCandelaria =>
+      'Fiesta insular (Virgen de la Candelaria)';
+
+  @override
+  String get holidayNameIslandGuadalupe =>
+      'Fiesta insular (Nuestra Señora de Guadalupe)';
+
+  @override
+  String get holidayNameIslandNieves =>
+      'Fiesta insular (Nuestra Señora de las Nieves)';
+
+  @override
+  String get holidayNameIslandReyes =>
+      'Fiesta insular (Nuestra Señora de los Reyes)';
+
+  @override
+  String holidayNameLocalFeast(String place) {
+    return 'Fiesta local ($place)';
+  }
 
   @override
   String get catalogCalendarMainName => 'Mi cuadrante';

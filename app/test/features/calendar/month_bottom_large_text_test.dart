@@ -1,5 +1,6 @@
 import 'package:cuadrante/core/bootstrap/bootstrap.dart';
 import 'package:cuadrante/core/theme/theme_context.dart';
+import 'package:cuadrante/features/calendar/presentation/month_destinations.dart';
 import 'package:cuadrante/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -92,5 +93,61 @@ void main() {
     await tester.tap(key('month-select-days'));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
+  });
+
+  /// QA 0.9.1 N1: on a tablet in landscape at text x2.0 the rail dropped its
+  /// four names while the phone bar kept them. The rail follows the same rule
+  /// (names at any text size, drawn at most at x1.3, on one line).
+  testWidgets('1280 x 800, text x2.0, Basque: the rail keeps its four names', (
+    tester,
+  ) async {
+    expect(await tester.runAsync(loadRoboto), isTrue);
+    addTearDown(() => AppTypography.debugFamily = null);
+    final l10n = lookupAppLocalizations(const Locale('eu'));
+    await pumpCalendar(
+      tester,
+      textScale: 2.0,
+      locale: const Locale('eu'),
+      size: const Size(1280, 800),
+      openCard: false,
+    );
+    expect(tester.takeException(), isNull);
+
+    final rail = key('month-nav-rail');
+    expect(rail, findsOneWidget);
+    expect(key('month-nav-bar'), findsNothing);
+    final railRect = tester.getRect(rail);
+    for (final name in [
+      l10n.monthNavMonth,
+      l10n.monthNavRotation,
+      l10n.monthNavAgenda,
+      l10n.monthNavSummary,
+    ]) {
+      final label = find.descendant(of: rail, matching: find.text(name));
+      expect(label, findsOneWidget, reason: name);
+      final rect = tester.getRect(label);
+      expect(rect.left, greaterThanOrEqualTo(railRect.left));
+      expect(rect.right, lessThanOrEqualTo(railRect.right));
+      // One line: the name is drawn at most at x1.3 of the caption.
+      expect(rect.height, lessThan(30), reason: name);
+    }
+    // The rail grows only as much as the longest name needs.
+    expect(railRect.width, lessThanOrEqualTo(MonthNavigationRail.maxWidth));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('1280 x 800, text x1.0: the rail keeps its normal width', (
+    tester,
+  ) async {
+    await pumpCalendar(tester, size: const Size(1280, 800), openCard: false);
+    expect(tester.getSize(key('month-nav-rail')).width, 80);
+    final l10n = lookupAppLocalizations(const Locale('es'));
+    expect(
+      find.descendant(
+        of: key('month-nav-rail'),
+        matching: find.text(l10n.monthNavMonth),
+      ),
+      findsOneWidget,
+    );
   });
 }

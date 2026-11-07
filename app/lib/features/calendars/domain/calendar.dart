@@ -89,3 +89,17 @@ class LastCalendarCannotBeArchived extends CalendarException {
 class CalendarNotFound extends CalendarException {
   const CalendarNotFound(String id) : super('No active calendar "$id"');
 }
+
+/// Only an archived calendar can be deleted for good: the one in use (or any
+/// calendar that still shows in the lists) has to be archived first.
+class CalendarNotArchived extends CalendarException {
+  const CalendarNotArchived(String id)
+    : super('Calendar "$id" is not archived');
+}
+
+/// The safety copy that comes before deleting a calendar could not be made,
+/// so nothing was deleted.
+class CalendarDeleteBackupFailed extends CalendarException {
+  const CalendarDeleteBackupFailed()
+    : super('The safety copy could not be made; nothing was deleted');
+}

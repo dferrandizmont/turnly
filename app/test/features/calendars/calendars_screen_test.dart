@@ -1,6 +1,8 @@
 import 'package:cuadrante/core/bootstrap/bootstrap.dart';
 import 'package:cuadrante/core/database/app_database.dart';
 import 'package:cuadrante/core/theme/app_colors.dart';
+import 'package:cuadrante/features/backup/application/backup_providers.dart';
+import 'package:cuadrante/features/backup/domain/backup_store.dart';
 import 'package:cuadrante/features/calendars/application/calendars_controller.dart';
 import 'package:cuadrante/features/calendars/data/calendars_repository.dart';
 import 'package:cuadrante/features/calendars/domain/calendar.dart';
@@ -10,6 +12,7 @@ import 'package:cuadrante/features/calendars/presentation/calendars_screen.dart'
 import 'package:cuadrante/l10n/app_localizations.dart';
 import 'package:drift/drift.dart' show Variable;
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/app_harness.dart';
@@ -400,6 +403,102 @@ void main() {
       // What is on screen does not change.
       expect(app.schedule.calendarId, 'main');
       expect(badge('main', 'Activo'), findsOneWidget);
+    });
+  });
+
+  group('delete an archived calendar', () {
+    /// Counts the safety copies the delete asks for.
+    var copies = 0;
+    late List<Override> backupOverrides;
+
+    setUp(() {
+      copies = 0;
+      backupOverrides = [
+        resetBackupProvider.overrideWithValue(() async {
+          copies++;
+          return BackupEntry(
+            id: 'pre-reset-test',
+            modifiedAt: DateTime.utc(2026, 11, 7),
+            sizeBytes: 1,
+          );
+        }),
+      ];
+    });
+
+    Future<AppUnderTest> openArchived(
+      WidgetTester tester,
+      void Function(String id) onSecond,
+    ) async {
+      final app = await AppUnderTest.pump(
+        tester,
+        overrides: backupOverrides,
+        prepare: (db) async {
+          final second = await addSecondCalendar(db);
+          onSecond(second);
+          await CalendarsRepository(db).archive(second);
+        },
+      );
+      await app.openCalendars();
+      await tapKey(tester, 'calendars-archived-toggle');
+      return app;
+    }
+
+    testWidgets('only archived calendars offer it', (tester) async {
+      late String second;
+      await openArchived(tester, (id) => second = id);
+
+      expect(find.byKey(ValueKey('calendar-delete-$second')), findsOneWidget);
+      // The list of calendars in use has no delete button.
+      expect(find.byKey(const ValueKey('calendar-delete-main')), findsNothing);
+    });
+
+    testWidgets('asks first, names the calendar and says it cannot be undone', (
+      tester,
+    ) async {
+      late String second;
+      final app = await openArchived(tester, (id) => second = id);
+      await tapKey(tester, 'calendar-delete-$second');
+
+      expect(find.text('¿Borrar «Pareja» para siempre?'), findsOneWidget);
+      expect(find.textContaining('No se puede deshacer'), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('confirm-cancel')));
+      await tester.pumpAndSettle();
+
+      expect(copies, 0);
+      expect((await storedCalendars(app)).map((c) => c.id), contains(second));
+      expect(find.byKey(ValueKey('calendar-archived-$second')), findsOneWidget);
+    });
+
+    testWidgets('confirming makes a copy and deletes it for good', (
+      tester,
+    ) async {
+      late String second;
+      final app = await openArchived(tester, (id) => second = id);
+      await tapKey(tester, 'calendar-delete-$second');
+      await tapKey(tester, 'calendar-delete-confirm');
+      // The sweep of the attachment files is real file work, one step per
+      // turn of the real event loop.
+      for (var i = 0; i < 20; i++) {
+        await app.real(
+          () => Future<void>.delayed(const Duration(milliseconds: 25)),
+        );
+        await tester.pumpAndSettle();
+      }
+
+      expect(copies, 1);
+      expect(find.text('«Pareja» borrado'), findsOneWidget);
+      // The archived section is gone: it was the only one.
+      expect(find.byKey(const ValueKey('calendars-archived')), findsNothing);
+      expect((await storedCalendars(app)).map((c) => c.id), ['main']);
+      final days = await app.real(
+        () => app.database
+            .customSelect(
+              'SELECT COUNT(*) AS n FROM day_entries WHERE calendar_id = ?',
+              variables: [Variable.withString(second)],
+            )
+            .getSingle(),
+      );
+      expect(days.read<int>('n'), 0);
     });
   });
 

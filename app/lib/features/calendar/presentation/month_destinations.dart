@@ -92,34 +92,29 @@ void openMonthDestination(
   };
 }
 
-/// The text scale the names of the bottom bar stop growing at: the bar has a
-/// fixed height, so above this the names stay as readable as they can be
-/// without breaking it (the icons and the rest of the screen keep growing).
+/// The text scale the names of the destinations stop growing at, on the
+/// bottom bar and on the rail: both have a fixed size, so above this the
+/// names stay as readable as they can be without breaking it (the icons and
+/// the rest of the screen keep growing).
 const double navNameMaxScale = 1.3;
 
-/// Whether the names go under the destinations. On the bottom bar
-/// ([capScale]) they stay at any text size, drawn at most at [navNameMaxScale]
-/// and on one line, as long as the longest still fits its slot; otherwise
-/// (and on the rail, from text ×1.6) the destinations keep their icon only
-/// and the name is the tooltip and the spoken label, like the other bars
-/// with names under each button (`docs/diseno.md`).
-bool _namesFit(
-  BuildContext context,
-  double slotWidth, {
-  bool capScale = false,
-}) {
-  var scaler = MediaQuery.textScalerOf(context);
-  if (capScale) {
-    scaler = scaler.clamp(maxScaleFactor: navNameMaxScale);
-  } else if (scaler.scale(10) / 10 >= 1.6) {
-    return false;
-  }
+/// The width the longest name of the destinations takes on one line, drawn at
+/// the user's text size but at most [navNameMaxScale], plus its side room.
+/// The one rule of both bars (`docs/diseno.md`): the names stay at any text
+/// size, and the destinations keep only their icon (the name is the tooltip
+/// and the spoken label) when this does not fit the room the bar has.
+double _namesWidth(BuildContext context) {
+  final scaler = MediaQuery.textScalerOf(context)
+      .clamp(maxScaleFactor: navNameMaxScale);
   final style = context.type.caption.copyWith(fontWeight: FontWeight.w800);
-  return MonthDestination.values.every(
-    (d) =>
-        textWidth(_describe(context, d).label, style, scaler) <=
-        slotWidth - 2 * Sp.xs,
-  );
+  var widest = 0.0;
+  for (final d in MonthDestination.values) {
+    widest = math.max(
+      widest,
+      textWidth(_describe(context, d).label, style, scaler),
+    );
+  }
+  return widest + 2 * Sp.xs;
 }
 
 /// The bottom bar of the month in one column.
@@ -132,11 +127,9 @@ class MonthNavigationBar extends ConsumerWidget {
     final type = context.type;
     return LayoutBuilder(
       builder: (context, box) {
-        final names = _namesFit(
-          context,
-          box.maxWidth / MonthDestination.values.length,
-          capScale: true,
-        );
+        final names =
+            _namesWidth(context) <=
+            box.maxWidth / MonthDestination.values.length;
         return MediaQuery.withClampedTextScaling(
           maxScaleFactor: navNameMaxScale,
           child: DecoratedBox(
@@ -190,38 +183,52 @@ class MonthNavigationRail extends ConsumerWidget {
 
   final MonthDestination current;
 
-  /// The width of the rail (Material's).
+  /// The width of the rail at normal text (Material's).
   static const double width = 80;
+
+  /// The widest the rail grows to keep the names at a large text size; a name
+  /// that needs more leaves the rail with its icons only.
+  static const double maxWidth = 128;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.colors;
-    final names = _namesFit(context, width);
-    return NavigationRail(
-      key: const ValueKey('month-nav-rail'),
-      backgroundColor: colors.background,
-      minWidth: width,
-      groupAlignment: -1,
-      selectedIndex: current.index,
-      labelType: names
-          ? NavigationRailLabelType.all
-          : NavigationRailLabelType.none,
-      onDestinationSelected: (index) => openMonthDestination(
-        context,
-        ref,
-        MonthDestination.values[index],
-        from: current,
-      ),
-      destinations: [
-        for (final destination in MonthDestination.values)
-          NavigationRailDestination(
-            icon: KeyedSubtree(
-              key: _destinationKeys[destination],
-              child: Icon(_describe(context, destination).icon),
+    final needed = _namesWidth(context);
+    final names = needed <= maxWidth;
+    final railWidth = math.max(width, math.min(needed, maxWidth));
+    return MediaQuery.withClampedTextScaling(
+      maxScaleFactor: navNameMaxScale,
+      child: NavigationRail(
+        key: const ValueKey('month-nav-rail'),
+        backgroundColor: colors.background,
+        minWidth: railWidth,
+        groupAlignment: -1,
+        selectedIndex: current.index,
+        labelType: names
+            ? NavigationRailLabelType.all
+            : NavigationRailLabelType.none,
+        onDestinationSelected: (index) => openMonthDestination(
+          context,
+          ref,
+          MonthDestination.values[index],
+          from: current,
+        ),
+        destinations: [
+          for (final destination in MonthDestination.values)
+            NavigationRailDestination(
+              icon: KeyedSubtree(
+                key: _destinationKeys[destination],
+                child: Icon(_describe(context, destination).icon),
+              ),
+              label: Text(
+                _describe(context, destination).label,
+                maxLines: 1,
+                softWrap: false,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-            label: Text(_describe(context, destination).label),
-          ),
-      ],
+        ],
+      ),
     );
   }
 }

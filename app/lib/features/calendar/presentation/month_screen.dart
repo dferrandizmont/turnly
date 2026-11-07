@@ -367,14 +367,17 @@ class _MonthScreenState extends ConsumerState<MonthScreen>
     }
 
     return PopScope(
-      // The system back button leaves selection mode before anything else,
-      // then closes the day open in the pane.
+      // The system back button leaves paint or selection mode before
+      // anything else, then closes the day open in the pane.
       canPop:
+          !painting &&
           !ref.watch(selectionControllerProvider.select((s) => s.active)) &&
           !(split && dayOpen),
       onPopInvokedWithResult: (didPop, _) {
         if (didPop) return;
-        if (ref.read(selectionControllerProvider).active) {
+        if (ref.read(paintControllerProvider).active) {
+          ref.read(paintControllerProvider.notifier).exit();
+        } else if (ref.read(selectionControllerProvider).active) {
           ref.read(selectionControllerProvider.notifier).exit();
         } else {
           ref.read(openDayProvider.notifier).close();

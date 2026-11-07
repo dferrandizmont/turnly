@@ -107,6 +107,11 @@ El motor no cambia: un `Schedule` es el de un calendario. `ScheduleRepository.lo
 - **Archivar** no borra: las rotaciones y los días se quedan guardados. Se rechaza archivar el último calendario
   (`LastCalendarCannotBeArchived`) o uno que no existe (`CalendarNotFound`). Si el archivado era el activo o el
   primario, esos ajustes pasan al primer calendario que queda.
+- **Borrar** (solo un archivado): `requireDeletable` y `deleteArchived` borran el calendario y lo suyo (rotaciones, días,
+  adjuntos, tareas, cambios de turno y saldos de ausencias de ese calendario) en una transacción, sin cambio de esquema; los
+  tipos de turno y las rotaciones guardadas son compartidos. `CalendarsController.deleteArchived` hace antes la copia
+  verificada de «Borrar todo» y después barre los ficheros de adjuntos sin fila. Rechaza uno no archivado
+  (`CalendarNotArchived`) y el último calendario.
 - **Sin límite de calendarios.** Ya no existe `CalendarLimits` (ni `free`, ni `pro`, ni `calendarLimitsProvider`): con la
   gratuidad total (decisión del 26-oct-2026) el tope de 10 **se retiró del código** y no hay nivel «pro». `create` no
   comprueba ningún tope ni lanza `CalendarLimitReached`; los archivados tampoco influyen. Se pueden crear todos los

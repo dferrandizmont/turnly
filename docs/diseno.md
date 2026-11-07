@@ -445,9 +445,8 @@ oculta en Pintar y Selección (su hoja de herramientas ocupa ese sitio) y con el
 con cualquier tamaño de texto, dibujados como mucho a ×1,3 (la barra tiene altura fija) y en una línea; solo si el más
 largo no cabe en su cuarto de ancho a ese tamaño, los destinos quedan solo con el icono y el nombre como tooltip y texto
 leído. «Seleccionar días», bajo la cuadrícula, deja sitio al «Pintar» flotante: si con el texto grande no caben los dos
-(p. ej. euskera a ×2), se queda en su icono, con el nombre como tooltip y texto leído. El raíl, desde texto ×1,6, sigue
-con solo iconos. Con dos paneles los mismos destinos van en un **raíl** de 80 dp a la izquierda del mes
-(`NavigationRail`, nombres debajo; solo iconos desde texto ×1,6 o si un nombre no cabe), porque una barra inferior se comería el alto que le
+(p. ej. euskera a ×2), se queda en su icono, con el nombre como tooltip y texto leído. Con dos paneles los mismos destinos van en un **raíl** de 80 dp a la izquierda del mes
+(`NavigationRail`, nombres debajo; con la misma regla que la barra: los nombres se quedan con cualquier tamaño de texto, a ×1,3 como mucho y en una línea, y el raíl se ensancha lo justo para el más largo, hasta 128 dp; solo si ni así cabe, queda con solo iconos; comparten la medida en `month_destinations.dart`), porque una barra inferior se comería el alto que le
 falta al mes en un móvil horizontal. Ese raíl lo llevan también Rotación, Agenda y Resumen (`DestinationRailShell`, puesto en la ruta) cuando hay dos paneles: el mismo punto de corte (`Adaptive.useSplit`), con su destino marcado; tocar otro destino sustituye la pantalla (el atrás sigue yendo al mes) y «Mes» vuelve al mes de hoy. Con una columna (móvil, tableta en vertical) no cambia nada.
 
 Qué abre cada uno (los tres últimos se abren encima, con su botón atrás, como antes):

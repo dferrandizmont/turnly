@@ -7555,6 +7555,54 @@ abstract class AppLocalizations {
   /// **'«{name}» recuperado'**
   String calendarsRestored(String name);
 
+  /// No description provided for @calendarsDelete.
+  ///
+  /// In es, this message translates to:
+  /// **'Borrar'**
+  String get calendarsDelete;
+
+  /// No description provided for @calendarsDeleteSemantic.
+  ///
+  /// In es, this message translates to:
+  /// **'Borrar «{name}» para siempre'**
+  String calendarsDeleteSemantic(String name);
+
+  /// No description provided for @calendarsDeleteTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Borrar «{name}» para siempre?'**
+  String calendarsDeleteTitle(String name);
+
+  /// No description provided for @calendarsDeleteBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Se borrarán de este móvil sus turnos, notas, tareas y cambios de turno. No se puede deshacer. Antes guardaremos una copia de seguridad por si la necesitas.'**
+  String get calendarsDeleteBody;
+
+  /// No description provided for @calendarsDeleteConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Borrar para siempre'**
+  String get calendarsDeleteConfirm;
+
+  /// No description provided for @calendarsDeleted.
+  ///
+  /// In es, this message translates to:
+  /// **'«{name}» borrado'**
+  String calendarsDeleted(String name);
+
+  /// No description provided for @calendarsDeleteNotArchivedError.
+  ///
+  /// In es, this message translates to:
+  /// **'Solo se pueden borrar los calendarios archivados.'**
+  String get calendarsDeleteNotArchivedError;
+
+  /// No description provided for @calendarsDeleteBackupFailed.
+  ///
+  /// In es, this message translates to:
+  /// **'No se ha podido guardar la copia de seguridad previa, así que no se ha borrado nada. Revisa el espacio del móvil y vuelve a intentarlo.'**
+  String get calendarsDeleteBackupFailed;
+
   /// No description provided for @calendarsLastError.
   ///
   /// In es, this message translates to:
@@ -8985,6 +9033,222 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Día del País Vasco'**
   String get holidayNameBasqueDay;
+
+  /// No description provided for @holidayNameStJohn.
+  ///
+  /// In es, this message translates to:
+  /// **'San Juan'**
+  String get holidayNameStJohn;
+
+  /// No description provided for @holidayNameAndalusiaDay.
+  ///
+  /// In es, this message translates to:
+  /// **'Día de Andalucía'**
+  String get holidayNameAndalusiaDay;
+
+  /// No description provided for @holidayNameDayAfterAllSaints.
+  ///
+  /// In es, this message translates to:
+  /// **'Día siguiente a Todos los Santos'**
+  String get holidayNameDayAfterAllSaints;
+
+  /// No description provided for @holidayNameMondayAfterConstitution.
+  ///
+  /// In es, this message translates to:
+  /// **'Lunes siguiente al Día de la Constitución'**
+  String get holidayNameMondayAfterConstitution;
+
+  /// No description provided for @holidayNameAragonDay.
+  ///
+  /// In es, this message translates to:
+  /// **'San Jorge / Día de Aragón'**
+  String get holidayNameAragonDay;
+
+  /// No description provided for @holidayNameAsturiasDay.
+  ///
+  /// In es, this message translates to:
+  /// **'Día de Asturias'**
+  String get holidayNameAsturiasDay;
+
+  /// No description provided for @holidayNameCantabriaInstitutionsDay.
+  ///
+  /// In es, this message translates to:
+  /// **'Día de las Instituciones de Cantabria'**
+  String get holidayNameCantabriaInstitutionsDay;
+
+  /// No description provided for @holidayNameBienAparecida.
+  ///
+  /// In es, this message translates to:
+  /// **'La Bien Aparecida'**
+  String get holidayNameBienAparecida;
+
+  /// No description provided for @holidayNameEidAdha.
+  ///
+  /// In es, this message translates to:
+  /// **'Fiesta del Sacrificio (Eidul Adha)'**
+  String get holidayNameEidAdha;
+
+  /// No description provided for @holidayNameEidFitr.
+  ///
+  /// In es, this message translates to:
+  /// **'Fiesta del Eid Fitr'**
+  String get holidayNameEidFitr;
+
+  /// No description provided for @holidayNameOurLadyAfrica.
+  ///
+  /// In es, this message translates to:
+  /// **'Nuestra Señora de África'**
+  String get holidayNameOurLadyAfrica;
+
+  /// No description provided for @holidayNameCeutaDay.
+  ///
+  /// In es, this message translates to:
+  /// **'Día de Ceuta'**
+  String get holidayNameCeutaDay;
+
+  /// No description provided for @holidayNameCastileLeonDay.
+  ///
+  /// In es, this message translates to:
+  /// **'Fiesta de Castilla y León'**
+  String get holidayNameCastileLeonDay;
+
+  /// No description provided for @holidayNameCorpusChristi.
+  ///
+  /// In es, this message translates to:
+  /// **'Corpus Christi'**
+  String get holidayNameCorpusChristi;
+
+  /// No description provided for @holidayNameCanaryDay.
+  ///
+  /// In es, this message translates to:
+  /// **'Día de Canarias'**
+  String get holidayNameCanaryDay;
+
+  /// No description provided for @holidayNameExtremaduraDay.
+  ///
+  /// In es, this message translates to:
+  /// **'Día de Extremadura'**
+  String get holidayNameExtremaduraDay;
+
+  /// No description provided for @holidayNameMurciaDay.
+  ///
+  /// In es, this message translates to:
+  /// **'Día de la Región de Murcia'**
+  String get holidayNameMurciaDay;
+
+  /// No description provided for @holidayNameMadridDay.
+  ///
+  /// In es, this message translates to:
+  /// **'Fiesta de la Comunidad de Madrid'**
+  String get holidayNameMadridDay;
+
+  /// No description provided for @holidayNameRiojaDay.
+  ///
+  /// In es, this message translates to:
+  /// **'Día de La Rioja'**
+  String get holidayNameRiojaDay;
+
+  /// No description provided for @holidayNameValencianDay.
+  ///
+  /// In es, this message translates to:
+  /// **'Día de la Comunitat Valenciana'**
+  String get holidayNameValencianDay;
+
+  /// No description provided for @holidayNameBalearicDay.
+  ///
+  /// In es, this message translates to:
+  /// **'Día de les Illes Balears'**
+  String get holidayNameBalearicDay;
+
+  /// No description provided for @holidayNameMondayAfterBalearicDay.
+  ///
+  /// In es, this message translates to:
+  /// **'Lunes siguiente al Día de les Illes Balears'**
+  String get holidayNameMondayAfterBalearicDay;
+
+  /// No description provided for @holidayNameCastillaMancha.
+  ///
+  /// In es, this message translates to:
+  /// **'Día de Castilla-La Mancha'**
+  String get holidayNameCastillaMancha;
+
+  /// No description provided for @holidayNameAugustReplacement.
+  ///
+  /// In es, this message translates to:
+  /// **'Sustitución del 15 de agosto'**
+  String get holidayNameAugustReplacement;
+
+  /// No description provided for @holidayNameMondayAfterAssumption.
+  ///
+  /// In es, this message translates to:
+  /// **'Lunes siguiente a la Asunción de la Virgen'**
+  String get holidayNameMondayAfterAssumption;
+
+  /// No description provided for @holidayNameAssumptionMoved.
+  ///
+  /// In es, this message translates to:
+  /// **'Traslado de la Asunción'**
+  String get holidayNameAssumptionMoved;
+
+  /// No description provided for @holidayNameGalicianLettersDay.
+  ///
+  /// In es, this message translates to:
+  /// **'Día de las Letras Gallegas'**
+  String get holidayNameGalicianLettersDay;
+
+  /// No description provided for @holidayNameFirstBasqueGovernment.
+  ///
+  /// In es, this message translates to:
+  /// **'Aniversario del primer Gobierno Vasco'**
+  String get holidayNameFirstBasqueGovernment;
+
+  /// No description provided for @holidayNameIslandPino.
+  ///
+  /// In es, this message translates to:
+  /// **'Fiesta insular (Nuestra Señora del Pino)'**
+  String get holidayNameIslandPino;
+
+  /// No description provided for @holidayNameIslandPena.
+  ///
+  /// In es, this message translates to:
+  /// **'Fiesta insular (Nuestra Señora de la Peña)'**
+  String get holidayNameIslandPena;
+
+  /// No description provided for @holidayNameIslandVolcanoes.
+  ///
+  /// In es, this message translates to:
+  /// **'Fiesta insular (Nuestra Señora de los Volcanes)'**
+  String get holidayNameIslandVolcanoes;
+
+  /// No description provided for @holidayNameIslandCandelaria.
+  ///
+  /// In es, this message translates to:
+  /// **'Fiesta insular (Virgen de la Candelaria)'**
+  String get holidayNameIslandCandelaria;
+
+  /// No description provided for @holidayNameIslandGuadalupe.
+  ///
+  /// In es, this message translates to:
+  /// **'Fiesta insular (Nuestra Señora de Guadalupe)'**
+  String get holidayNameIslandGuadalupe;
+
+  /// No description provided for @holidayNameIslandNieves.
+  ///
+  /// In es, this message translates to:
+  /// **'Fiesta insular (Nuestra Señora de las Nieves)'**
+  String get holidayNameIslandNieves;
+
+  /// No description provided for @holidayNameIslandReyes.
+  ///
+  /// In es, this message translates to:
+  /// **'Fiesta insular (Nuestra Señora de los Reyes)'**
+  String get holidayNameIslandReyes;
+
+  /// Nombre de un festivo local del paquete de datos («Fiesta local (Cerceda)»); place es el nombre del lugar.
+  ///
+  /// In es, this message translates to:
+  /// **'Fiesta local ({place})'**
+  String holidayNameLocalFeast(String place);
 
   /// No description provided for @catalogCalendarMainName.
   ///

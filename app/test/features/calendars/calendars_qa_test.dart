@@ -193,6 +193,7 @@ void main() {
         await app.openCalendars();
         await tapKey(tester, 'calendars-archived-toggle');
         expect(_key('calendar-restore-$second'), findsOneWidget);
+        expect(_key('calendar-delete-$second'), findsOneWidget);
         expect(brokenParagraphs(tester), isEmpty);
         expect(tester.takeException(), isNull);
       });

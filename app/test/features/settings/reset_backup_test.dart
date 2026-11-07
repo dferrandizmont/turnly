@@ -8,7 +8,6 @@ import 'package:cuadrante/features/backup/application/backup_service.dart';
 import 'package:cuadrante/features/backup/data/local_file_backup_store.dart';
 import 'package:cuadrante/features/backup/domain/backup_codec.dart';
 import 'package:cuadrante/features/backup/domain/backup_retention.dart';
-import 'package:cuadrante/features/settings/application/reset_providers.dart';
 import 'package:cuadrante/features/settings/data/reset_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';

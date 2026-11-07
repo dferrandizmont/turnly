@@ -2899,6 +2899,35 @@
       }
     }
   },
+  "calendarsDelete": "Delete",
+  "calendarsDeleteSemantic": "Delete “{name}” for good",
+  "@calendarsDeleteSemantic": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarsDeleteTitle": "Delete “{name}” for good?",
+  "@calendarsDeleteTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarsDeleteBody": "Its shifts, notes, tasks and swaps will be deleted from this phone. This can’t be undone. First we’ll save a backup in case you need it.",
+  "calendarsDeleteConfirm": "Delete for good",
+  "calendarsDeleted": "“{name}” deleted",
+  "@calendarsDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarsDeleteNotArchivedError": "Only archived calendars can be deleted.",
+  "calendarsDeleteBackupFailed": "Couldn’t save the backup that comes first, so nothing was deleted. Check your phone’s storage and try again.",
   "calendarsLastError": "You can’t archive the last calendar: there always has to be one.",
   "calendarsNameRequired": "Give the calendar a name.",
   "calendarsNotFoundError": "That calendar no longer exists.",
@@ -3405,6 +3434,42 @@
   "holidayNameStJamesGalicia": "St James’ Day / Galicia Day",
   "holidayNameCataloniaDay": "Catalonia National Day",
   "holidayNameBasqueDay": "Basque Country Day",
+  "holidayNameStJohn": "St John’s Day",
+  "holidayNameAndalusiaDay": "Andalusia Day",
+  "holidayNameDayAfterAllSaints": "Day after All Saints’ Day",
+  "holidayNameMondayAfterConstitution": "Monday after Constitution Day",
+  "holidayNameAragonDay": "St George’s Day / Aragon Day",
+  "holidayNameAsturiasDay": "Asturias Day",
+  "holidayNameCantabriaInstitutionsDay": "Cantabria Institutions Day",
+  "holidayNameBienAparecida": "La Bien Aparecida",
+  "holidayNameEidAdha": "Feast of the Sacrifice (Eid al-Adha)",
+  "holidayNameEidFitr": "Eid al-Fitr",
+  "holidayNameOurLadyAfrica": "Our Lady of Africa",
+  "holidayNameCeutaDay": "Ceuta Day",
+  "holidayNameCastileLeonDay": "Castile and León Day",
+  "holidayNameCorpusChristi": "Corpus Christi",
+  "holidayNameCanaryDay": "Canary Islands Day",
+  "holidayNameExtremaduraDay": "Extremadura Day",
+  "holidayNameMurciaDay": "Region of Murcia Day",
+  "holidayNameMadridDay": "Community of Madrid Day",
+  "holidayNameRiojaDay": "La Rioja Day",
+  "holidayNameValencianDay": "Valencian Community Day",
+  "holidayNameBalearicDay": "Balearic Islands Day",
+  "holidayNameMondayAfterBalearicDay": "Monday after Balearic Islands Day",
+  "holidayNameCastillaMancha": "Castilla-La Mancha Day",
+  "holidayNameAugustReplacement": "Replacement for 15 August",
+  "holidayNameMondayAfterAssumption": "Monday after Assumption Day",
+  "holidayNameAssumptionMoved": "Assumption Day (moved)",
+  "holidayNameGalicianLettersDay": "Galician Literature Day",
+  "holidayNameFirstBasqueGovernment": "Anniversary of the first Basque Government",
+  "holidayNameIslandPino": "Island holiday (Our Lady of Pino)",
+  "holidayNameIslandPena": "Island holiday (Our Lady of La Peña)",
+  "holidayNameIslandVolcanoes": "Island holiday (Our Lady of the Volcanoes)",
+  "holidayNameIslandCandelaria": "Island holiday (Virgin of Candelaria)",
+  "holidayNameIslandGuadalupe": "Island holiday (Our Lady of Guadalupe)",
+  "holidayNameIslandNieves": "Island holiday (Our Lady of the Snows)",
+  "holidayNameIslandReyes": "Island holiday (Our Lady of the Kings)",
+  "holidayNameLocalFeast": "Local holiday ({place})",
   "catalogCalendarMainName": "My roster",
   "historyUndone": "Change undone",
   "historyRedone": "Change redone",

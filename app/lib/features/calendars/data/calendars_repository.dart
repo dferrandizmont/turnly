@@ -145,6 +145,50 @@ class CalendarsRepository {
     );
   });
 
+  /// Throws if [id] cannot be deleted for good: [CalendarNotFound] for an
+  /// unknown id, [CalendarNotArchived] for one that is not archived and
+  /// [LastCalendarCannotBeArchived] when it is the only calendar there is.
+  Future<void> requireDeletable(String id) async {
+    final target = await get(id);
+    if (target == null) throw CalendarNotFound(id);
+    if (!target.archived) throw CalendarNotArchived(id);
+    if ((await list(includeArchived: true)).length < 2) {
+      throw const LastCalendarCannotBeArchived();
+    }
+  }
+
+  /// Deletes an archived calendar for good, with everything that belongs
+  /// only to it: its rotations, days (override, note, reminder, overtime),
+  /// attachment rows, tasks, swaps and the balances of absences that count
+  /// only its days. Shift types, patterns and the other calendars are not
+  /// touched. The files of the attachments are left for the sweep of the
+  /// attachment store, which removes whatever no row points at.
+  ///
+  /// Throws as [requireDeletable] does. Take a safety copy first: this
+  /// cannot be undone.
+  Future<void> deleteArchived(String id) => _db.transaction(() async {
+    await requireDeletable(id);
+    await (_db.delete(
+      _db.noteAttachments,
+    )..where((t) => t.calendarId.equals(id))).go();
+    await (_db.delete(
+      _db.dayTasks,
+    )..where((t) => t.calendarId.equals(id))).go();
+    await (_db.delete(
+      _db.shiftSwaps,
+    )..where((t) => t.calendarId.equals(id))).go();
+    await (_db.delete(
+      _db.absenceBalances,
+    )..where((t) => t.calendarId.equals(id))).go();
+    await (_db.delete(
+      _db.dayEntries,
+    )..where((t) => t.calendarId.equals(id))).go();
+    await (_db.delete(
+      _db.patternRuns,
+    )..where((t) => t.calendarId.equals(id))).go();
+    await (_db.delete(_db.calendars)..where((c) => c.id.equals(id))).go();
+  });
+
   /// The calendar on screen: `calendars.active` if it is a calendar that can
   /// be shown, else the primary one. Never throws for a bad stored value.
   Future<String> activeId() => _db.transaction(() async {

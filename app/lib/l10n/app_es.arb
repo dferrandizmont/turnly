@@ -3281,6 +3281,35 @@
       }
     }
   },
+  "calendarsDelete": "Borrar",
+  "calendarsDeleteSemantic": "Borrar «{name}» para siempre",
+  "@calendarsDeleteSemantic": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarsDeleteTitle": "¿Borrar «{name}» para siempre?",
+  "@calendarsDeleteTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarsDeleteBody": "Se borrarán de este móvil sus turnos, notas, tareas y cambios de turno. No se puede deshacer. Antes guardaremos una copia de seguridad por si la necesitas.",
+  "calendarsDeleteConfirm": "Borrar para siempre",
+  "calendarsDeleted": "«{name}» borrado",
+  "@calendarsDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "calendarsDeleteNotArchivedError": "Solo se pueden borrar los calendarios archivados.",
+  "calendarsDeleteBackupFailed": "No se ha podido guardar la copia de seguridad previa, así que no se ha borrado nada. Revisa el espacio del móvil y vuelve a intentarlo.",
   "calendarsLastError": "No puedes archivar el último calendario: siempre tiene que haber uno.",
   "calendarsNameRequired": "Pon un nombre al calendario.",
   "calendarsNotFoundError": "Ese calendario ya no existe.",
@@ -3840,6 +3869,50 @@
   "holidayNameStJamesGalicia": "Santiago Apóstol / Día Nacional de Galicia",
   "holidayNameCataloniaDay": "Diada Nacional de Cataluña",
   "holidayNameBasqueDay": "Día del País Vasco",
+  "holidayNameStJohn": "San Juan",
+  "holidayNameAndalusiaDay": "Día de Andalucía",
+  "holidayNameDayAfterAllSaints": "Día siguiente a Todos los Santos",
+  "holidayNameMondayAfterConstitution": "Lunes siguiente al Día de la Constitución",
+  "holidayNameAragonDay": "San Jorge / Día de Aragón",
+  "holidayNameAsturiasDay": "Día de Asturias",
+  "holidayNameCantabriaInstitutionsDay": "Día de las Instituciones de Cantabria",
+  "holidayNameBienAparecida": "La Bien Aparecida",
+  "holidayNameEidAdha": "Fiesta del Sacrificio (Eidul Adha)",
+  "holidayNameEidFitr": "Fiesta del Eid Fitr",
+  "holidayNameOurLadyAfrica": "Nuestra Señora de África",
+  "holidayNameCeutaDay": "Día de Ceuta",
+  "holidayNameCastileLeonDay": "Fiesta de Castilla y León",
+  "holidayNameCorpusChristi": "Corpus Christi",
+  "holidayNameCanaryDay": "Día de Canarias",
+  "holidayNameExtremaduraDay": "Día de Extremadura",
+  "holidayNameMurciaDay": "Día de la Región de Murcia",
+  "holidayNameMadridDay": "Fiesta de la Comunidad de Madrid",
+  "holidayNameRiojaDay": "Día de La Rioja",
+  "holidayNameValencianDay": "Día de la Comunitat Valenciana",
+  "holidayNameBalearicDay": "Día de les Illes Balears",
+  "holidayNameMondayAfterBalearicDay": "Lunes siguiente al Día de les Illes Balears",
+  "holidayNameCastillaMancha": "Día de Castilla-La Mancha",
+  "holidayNameAugustReplacement": "Sustitución del 15 de agosto",
+  "holidayNameMondayAfterAssumption": "Lunes siguiente a la Asunción de la Virgen",
+  "holidayNameAssumptionMoved": "Traslado de la Asunción",
+  "holidayNameGalicianLettersDay": "Día de las Letras Gallegas",
+  "holidayNameFirstBasqueGovernment": "Aniversario del primer Gobierno Vasco",
+  "holidayNameIslandPino": "Fiesta insular (Nuestra Señora del Pino)",
+  "holidayNameIslandPena": "Fiesta insular (Nuestra Señora de la Peña)",
+  "holidayNameIslandVolcanoes": "Fiesta insular (Nuestra Señora de los Volcanes)",
+  "holidayNameIslandCandelaria": "Fiesta insular (Virgen de la Candelaria)",
+  "holidayNameIslandGuadalupe": "Fiesta insular (Nuestra Señora de Guadalupe)",
+  "holidayNameIslandNieves": "Fiesta insular (Nuestra Señora de las Nieves)",
+  "holidayNameIslandReyes": "Fiesta insular (Nuestra Señora de los Reyes)",
+  "holidayNameLocalFeast": "Fiesta local ({place})",
+  "@holidayNameLocalFeast": {
+    "description": "Nombre de un festivo local del paquete de datos («Fiesta local (Cerceda)»); place es el nombre del lugar.",
+    "placeholders": {
+      "place": {
+        "type": "String"
+      }
+    }
+  },
   "catalogCalendarMainName": "Mi cuadrante",
   "historyUndone": "Cambio deshecho",
   "historyRedone": "Cambio rehecho",

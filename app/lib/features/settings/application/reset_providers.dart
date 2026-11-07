@@ -42,27 +42,8 @@ import '../data/preferences_repository.dart';
 import 'preferences_controller.dart';
 import 'reset_everything.dart';
 
-/// A strict, read-back verified local safety copy. Only the two newest
-/// verified pre-reset files rotate; automatic backups and cloud never touch it.
-final resetBackupProvider = Provider<Future<BackupEntry> Function()>((ref) {
-  return () async {
-    final tools = await ref.read(backupToolsProvider.future);
-    final bytes = await tools.service.exportBytes();
-    final entry = await tools.preResetStore.save(
-      bytes,
-      at: ref.read(clockProvider)(),
-    );
-    try {
-      await tools.service.decodeFile(await tools.preResetStore.read(entry));
-    } catch (_) {
-      await tools.preResetStore.delete(entry);
-      rethrow;
-    }
-    await tools.preResetStore.prune();
-    ref.invalidate(backupCopiesProvider);
-    return entry;
-  };
-});
+export '../../backup/application/backup_providers.dart'
+    show resetBackupProvider;
 
 /// Uses the existing backup share sheet, sharing the saved file, never an
 /// export of the now-empty database.

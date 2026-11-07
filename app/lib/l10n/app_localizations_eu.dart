@@ -4835,6 +4835,39 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
+  String get calendarsDelete => 'Ezabatu';
+
+  @override
+  String calendarsDeleteSemantic(String name) {
+    return 'Ezabatu «$name» betiko';
+  }
+
+  @override
+  String calendarsDeleteTitle(String name) {
+    return '«$name» betiko ezabatu nahi duzu?';
+  }
+
+  @override
+  String get calendarsDeleteBody =>
+      'Mugikor honetatik haren txandak, oharrak, zereginak eta txanda-aldaketak ezabatuko dira. Ezin da desegin. Aurretik segurtasun-kopia bat gordeko dugu, behar baduzu.';
+
+  @override
+  String get calendarsDeleteConfirm => 'Ezabatu betiko';
+
+  @override
+  String calendarsDeleted(String name) {
+    return '«$name» ezabatu da';
+  }
+
+  @override
+  String get calendarsDeleteNotArchivedError =>
+      'Artxibatutako egutegiak bakarrik ezabatu daitezke.';
+
+  @override
+  String get calendarsDeleteBackupFailed =>
+      'Ezin izan da aurretiko segurtasun-kopia gorde, beraz ez da ezer ezabatu. Begiratu mugikorraren lekua eta saiatu berriro.';
+
+  @override
   String get calendarsLastError =>
       'Ezin duzu azken egutegia artxibatu: beti egon behar da bat.';
 
@@ -5630,7 +5663,7 @@ class AppLocalizationsEu extends AppLocalizations {
       '24 orduko guardia eta 4 egun libre (guardia 1 eta libre 4)';
 
   @override
-  String get holidayNameNewYear => 'Urteberri eguna';
+  String get holidayNameNewYear => 'Urte Berri eguna';
 
   @override
   String get holidayNameEpiphany => 'Errege eguna';
@@ -5648,7 +5681,7 @@ class AppLocalizationsEu extends AppLocalizations {
   String get holidayNameLabourDay => 'Langileen eguna';
 
   @override
-  String get holidayNameAssumption => 'Andre Mariaren Jasokundea';
+  String get holidayNameAssumption => 'Ama Birjinaren Jasokundea';
 
   @override
   String get holidayNameNationalDay => 'Espainiako Jai Nazionala';
@@ -5669,7 +5702,7 @@ class AppLocalizationsEu extends AppLocalizations {
   String get holidayNameStStephen => 'San Esteban';
 
   @override
-  String get holidayNameStJoseph => 'San José';
+  String get holidayNameStJoseph => 'San Jose';
 
   @override
   String get holidayNameStJames => 'Santiago Apostolua';
@@ -5686,6 +5719,124 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get holidayNameBasqueDay => 'Euskadiko eguna';
+
+  @override
+  String get holidayNameStJohn => 'San Joan';
+
+  @override
+  String get holidayNameAndalusiaDay => 'Andaluziako eguna';
+
+  @override
+  String get holidayNameDayAfterAllSaints => 'Santu Guztien biharamuna';
+
+  @override
+  String get holidayNameMondayAfterConstitution =>
+      'Konstituzio egunaren hurrengo astelehena';
+
+  @override
+  String get holidayNameAragonDay => 'San Jorge / Aragoiko eguna';
+
+  @override
+  String get holidayNameAsturiasDay => 'Asturiasko eguna';
+
+  @override
+  String get holidayNameCantabriaInstitutionsDay =>
+      'Kantabriako Erakundeen eguna';
+
+  @override
+  String get holidayNameBienAparecida => 'La Bien Aparecida';
+
+  @override
+  String get holidayNameEidAdha => 'Sakrifizioaren jaia (Eid al-Adha)';
+
+  @override
+  String get holidayNameEidFitr => 'Eid al-Fitr jaia';
+
+  @override
+  String get holidayNameOurLadyAfrica => 'Afrikako Andre Maria';
+
+  @override
+  String get holidayNameCeutaDay => 'Zeutako eguna';
+
+  @override
+  String get holidayNameCastileLeonDay => 'Gaztela eta Leongo jaia';
+
+  @override
+  String get holidayNameCorpusChristi => 'Corpus Christi';
+
+  @override
+  String get holidayNameCanaryDay => 'Kanarietako eguna';
+
+  @override
+  String get holidayNameExtremaduraDay => 'Extremadurako eguna';
+
+  @override
+  String get holidayNameMurciaDay => 'Murtziako Eskualdearen eguna';
+
+  @override
+  String get holidayNameMadridDay => 'Madrilgo Erkidegoaren jaia';
+
+  @override
+  String get holidayNameRiojaDay => 'Errioxako eguna';
+
+  @override
+  String get holidayNameValencianDay => 'Valentziako Erkidegoaren eguna';
+
+  @override
+  String get holidayNameBalearicDay => 'Balear Uharteetako eguna';
+
+  @override
+  String get holidayNameMondayAfterBalearicDay =>
+      'Balear Uharteetako egunaren hurrengo astelehena';
+
+  @override
+  String get holidayNameCastillaMancha => 'Gaztela-Mantxako eguna';
+
+  @override
+  String get holidayNameAugustReplacement => 'Abuztuaren 15aren ordezkoa';
+
+  @override
+  String get holidayNameMondayAfterAssumption =>
+      'Jasokundearen hurrengo astelehena';
+
+  @override
+  String get holidayNameAssumptionMoved => 'Jasokundearen lekualdatzea';
+
+  @override
+  String get holidayNameGalicianLettersDay => 'Galiziar Letren eguna';
+
+  @override
+  String get holidayNameFirstBasqueGovernment =>
+      'Lehen Eusko Jaurlaritzaren urteurrena';
+
+  @override
+  String get holidayNameIslandPino => 'Uharteko jaia (Pinoko Andre Maria)';
+
+  @override
+  String get holidayNameIslandPena => 'Uharteko jaia (Peñako Andre Maria)';
+
+  @override
+  String get holidayNameIslandVolcanoes =>
+      'Uharteko jaia (Sumendien Andre Maria)';
+
+  @override
+  String get holidayNameIslandCandelaria =>
+      'Uharteko jaia (Kandelariako Ama Birjina)';
+
+  @override
+  String get holidayNameIslandGuadalupe =>
+      'Uharteko jaia (Guadalupeko Andre Maria)';
+
+  @override
+  String get holidayNameIslandNieves => 'Uharteko jaia (Elurren Andre Maria)';
+
+  @override
+  String get holidayNameIslandReyes => 'Uharteko jaia (Erregeen Andre Maria)';
+
+  @override
+  String holidayNameLocalFeast(String place) {
+    return 'Tokiko jaia ($place)';
+  }
 
   @override
   String get catalogCalendarMainName => 'Nire txanden egutegia';

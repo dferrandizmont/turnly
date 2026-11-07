@@ -4813,6 +4813,39 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get calendarsDelete => 'Delete';
+
+  @override
+  String calendarsDeleteSemantic(String name) {
+    return 'Delete “$name” for good';
+  }
+
+  @override
+  String calendarsDeleteTitle(String name) {
+    return 'Delete “$name” for good?';
+  }
+
+  @override
+  String get calendarsDeleteBody =>
+      'Its shifts, notes, tasks and swaps will be deleted from this phone. This can’t be undone. First we’ll save a backup in case you need it.';
+
+  @override
+  String get calendarsDeleteConfirm => 'Delete for good';
+
+  @override
+  String calendarsDeleted(String name) {
+    return '“$name” deleted';
+  }
+
+  @override
+  String get calendarsDeleteNotArchivedError =>
+      'Only archived calendars can be deleted.';
+
+  @override
+  String get calendarsDeleteBackupFailed =>
+      'Couldn’t save the backup that comes first, so nothing was deleted. Check your phone’s storage and try again.';
+
+  @override
   String get calendarsLastError =>
       'You can’t archive the last calendar: there always has to be one.';
 
@@ -5658,6 +5691,124 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get holidayNameBasqueDay => 'Basque Country Day';
+
+  @override
+  String get holidayNameStJohn => 'St John’s Day';
+
+  @override
+  String get holidayNameAndalusiaDay => 'Andalusia Day';
+
+  @override
+  String get holidayNameDayAfterAllSaints => 'Day after All Saints’ Day';
+
+  @override
+  String get holidayNameMondayAfterConstitution =>
+      'Monday after Constitution Day';
+
+  @override
+  String get holidayNameAragonDay => 'St George’s Day / Aragon Day';
+
+  @override
+  String get holidayNameAsturiasDay => 'Asturias Day';
+
+  @override
+  String get holidayNameCantabriaInstitutionsDay =>
+      'Cantabria Institutions Day';
+
+  @override
+  String get holidayNameBienAparecida => 'La Bien Aparecida';
+
+  @override
+  String get holidayNameEidAdha => 'Feast of the Sacrifice (Eid al-Adha)';
+
+  @override
+  String get holidayNameEidFitr => 'Eid al-Fitr';
+
+  @override
+  String get holidayNameOurLadyAfrica => 'Our Lady of Africa';
+
+  @override
+  String get holidayNameCeutaDay => 'Ceuta Day';
+
+  @override
+  String get holidayNameCastileLeonDay => 'Castile and León Day';
+
+  @override
+  String get holidayNameCorpusChristi => 'Corpus Christi';
+
+  @override
+  String get holidayNameCanaryDay => 'Canary Islands Day';
+
+  @override
+  String get holidayNameExtremaduraDay => 'Extremadura Day';
+
+  @override
+  String get holidayNameMurciaDay => 'Region of Murcia Day';
+
+  @override
+  String get holidayNameMadridDay => 'Community of Madrid Day';
+
+  @override
+  String get holidayNameRiojaDay => 'La Rioja Day';
+
+  @override
+  String get holidayNameValencianDay => 'Valencian Community Day';
+
+  @override
+  String get holidayNameBalearicDay => 'Balearic Islands Day';
+
+  @override
+  String get holidayNameMondayAfterBalearicDay =>
+      'Monday after Balearic Islands Day';
+
+  @override
+  String get holidayNameCastillaMancha => 'Castilla-La Mancha Day';
+
+  @override
+  String get holidayNameAugustReplacement => 'Replacement for 15 August';
+
+  @override
+  String get holidayNameMondayAfterAssumption => 'Monday after Assumption Day';
+
+  @override
+  String get holidayNameAssumptionMoved => 'Assumption Day (moved)';
+
+  @override
+  String get holidayNameGalicianLettersDay => 'Galician Literature Day';
+
+  @override
+  String get holidayNameFirstBasqueGovernment =>
+      'Anniversary of the first Basque Government';
+
+  @override
+  String get holidayNameIslandPino => 'Island holiday (Our Lady of Pino)';
+
+  @override
+  String get holidayNameIslandPena => 'Island holiday (Our Lady of La Peña)';
+
+  @override
+  String get holidayNameIslandVolcanoes =>
+      'Island holiday (Our Lady of the Volcanoes)';
+
+  @override
+  String get holidayNameIslandCandelaria =>
+      'Island holiday (Virgin of Candelaria)';
+
+  @override
+  String get holidayNameIslandGuadalupe =>
+      'Island holiday (Our Lady of Guadalupe)';
+
+  @override
+  String get holidayNameIslandNieves =>
+      'Island holiday (Our Lady of the Snows)';
+
+  @override
+  String get holidayNameIslandReyes => 'Island holiday (Our Lady of the Kings)';
+
+  @override
+  String holidayNameLocalFeast(String place) {
+    return 'Local holiday ($place)';
+  }
 
   @override
   String get catalogCalendarMainName => 'My roster';

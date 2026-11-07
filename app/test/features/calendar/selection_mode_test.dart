@@ -232,6 +232,21 @@ void main() {
       expect(_selection(tester).active, isFalse);
     });
 
+    testWidgets('the system back button leaves paint mode, not the app', (
+      tester,
+    ) async {
+      await pumpCalendar(tester);
+      paintOf(tester).enter();
+      await tester.pumpAndSettle();
+      expect(containerOf(tester).read(paintControllerProvider).active, isTrue);
+
+      final popped = await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(popped, isTrue);
+      expect(containerOf(tester).read(paintControllerProvider).active, isFalse);
+      expect(find.text('Pintar'), findsOneWidget);
+    });
+
     testWidgets('survives large text, a small screen and the dark theme', (
       tester,
     ) async {

@@ -1,7 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../alarms/application/alarm_providers.dart';
+import '../../backup/application/backup_providers.dart'
+    show resetBackupProvider;
 import '../../calendar/application/schedule_controller.dart';
+import '../../notes/application/notes_providers.dart';
 import '../domain/calendar.dart';
 import 'calendars_providers.dart';
 
@@ -95,6 +98,36 @@ class CalendarsController extends AsyncNotifier<CalendarsState> {
   /// Brings the archived calendar [id] back (H-T07-1).
   Future<void> restore(String id) async {
     await ref.read(calendarsRepositoryProvider).unarchive(id);
+    await _refresh();
+  }
+
+  /// Deletes the archived calendar [id] for good, with its rotations, days,
+  /// notes, tasks and swaps. A verified safety copy (the one «Borrar todo»
+  /// makes, kept as «antes de borrar») comes first, inside the write queue so
+  /// it matches what is stored; if it cannot be made nothing is deleted and
+  /// [CalendarDeleteBackupFailed] is thrown. Refuses (without a copy) a
+  /// calendar that is unknown, not archived or the last one.
+  ///
+  /// An archived calendar is never on screen nor the primary one, so the
+  /// widget and the alarms have nothing to drop; the attachment files left
+  /// without a row are swept.
+  Future<void> deleteArchived(String id) async {
+    final repository = ref.read(calendarsRepositoryProvider);
+    await repository.requireDeletable(id);
+    await ref.read(scheduleControllerProvider.notifier).runExclusive(() async {
+      try {
+        await ref.read(resetBackupProvider)();
+      } catch (_) {
+        throw const CalendarDeleteBackupFailed();
+      }
+      await repository.deleteArchived(id);
+    });
+    try {
+      final attachments = await ref.read(noteAttachmentsServiceProvider.future);
+      await attachments.sweep(minAge: attachmentSweepMinAge);
+    } catch (_) {
+      // Housekeeping: the sweep of the next start-up removes the leftovers.
+    }
     await _refresh();
   }
 
