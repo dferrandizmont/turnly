@@ -325,31 +325,97 @@ class _Segment extends StatelessWidget {
 
 /// «Seleccionar días» shares the fixed row under the month with the paint
 /// scroll buttons (and, outside editing, with the floating «Pintar»).
+///
+/// With [underFab] the floating button sits over the end of this row, so the
+/// control only gets the room before it: when the label does not fit there
+/// (large text, long names such as Basque «Hautatu egunak») it shrinks to
+/// its icon, with the name as tooltip and spoken label, instead of running
+/// under «Pintar».
 class MonthSelectDaysControl extends ConsumerWidget {
-  const MonthSelectDaysControl({super.key});
+  const MonthSelectDaysControl({super.key, this.underFab = false});
+
+  final bool underFab;
+
+  /// Outer padding of the control on each side.
+  static const double _outer = Sp.xs;
+
+  /// Gap Material leaves between the icon and the label of a button.
+  static const double _iconGap = 8;
+
+  /// The width the floating «Pintar» takes from the end of the row: its
+  /// padding, icon, gap and label (at the user's text size), and the margin
+  /// the scaffold leaves at the edge.
+  static double fabWidth(BuildContext context) =>
+      Sp.xl +
+      24 +
+      Sp.m +
+      textWidth(
+        context.l10n.paintFab,
+        context.type.button,
+        MediaQuery.textScalerOf(context),
+      ) +
+      Sp.xxl +
+      16;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => Align(
-    alignment: Alignment.centerLeft,
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: Sp.xs),
-      // A real button, not a link: in dark mode the accent text alone was
-      // hard to see next to the grid (1-nov-2026).
-      child: OutlinedButton.icon(
-        key: const ValueKey('month-select-days'),
-        style: OutlinedButton.styleFrom(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final label = context.l10n.monthSelectDays;
+    final style = context.type.meta.copyWith(fontWeight: FontWeight.w700);
+    final colors = context.colors;
+    final scaler = MediaQuery.textScalerOf(context);
+    return LayoutBuilder(
+      builder: (context, box) {
+        final needed =
+            2 * _outer +
+            2 * Sp.m +
+            IconSize.button +
+            _iconGap +
+            textWidth(label, style, scaler);
+        final room = box.maxWidth - (underFab ? fabWidth(context) : 0);
+        final iconOnly = needed > room;
+        final buttonStyle = OutlinedButton.styleFrom(
           minimumSize: const Size(Sp.touch, Sp.touch),
-          padding: const EdgeInsets.symmetric(horizontal: Sp.m),
-          foregroundColor: context.colors.textPrimary,
-          backgroundColor: context.colors.surfaceMuted,
-          side: BorderSide(color: context.colors.border),
+          padding: EdgeInsets.symmetric(horizontal: iconOnly ? 0 : Sp.m),
+          foregroundColor: colors.textPrimary,
+          backgroundColor: colors.surfaceMuted,
+          side: BorderSide(color: colors.border),
           shape: RoundedRectangleBorder(borderRadius: Rad.inputRadius),
-          textStyle: context.type.meta.copyWith(fontWeight: FontWeight.w700),
-        ),
-        onPressed: ref.read(selectionControllerProvider.notifier).enter,
-        icon: Icon(AppIcons.selectDays, size: IconSize.button),
-        label: Text(context.l10n.monthSelectDays),
-      ),
-    ),
-  );
+          textStyle: style,
+        );
+        final onPressed = ref.read(selectionControllerProvider.notifier).enter;
+        final icon = Icon(AppIcons.selectDays, size: IconSize.button);
+        return Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: _outer),
+            // A real button, not a link: in dark mode the accent text alone
+            // was hard to see next to the grid (1-nov-2026).
+            child: iconOnly
+                ? Tooltip(
+                    message: label,
+                    child: Semantics(
+                      label: label,
+                      button: true,
+                      excludeSemantics: true,
+                      onTap: onPressed,
+                      child: OutlinedButton(
+                        key: const ValueKey('month-select-days'),
+                        style: buttonStyle,
+                        onPressed: onPressed,
+                        child: icon,
+                      ),
+                    ),
+                  )
+                : OutlinedButton.icon(
+                    key: const ValueKey('month-select-days'),
+                    style: buttonStyle,
+                    onPressed: onPressed,
+                    icon: icon,
+                    label: Text(label),
+                  ),
+          ),
+        );
+      },
+    );
+  }
 }

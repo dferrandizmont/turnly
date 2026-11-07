@@ -351,6 +351,7 @@ class _MonthScreenState extends ConsumerState<MonthScreen>
                           MediaQuery.viewPaddingOf(context).bottom
                     : 0.0,
                 fixedRow: fixedRow,
+                fabShown: !(editing || keyboardUp),
                 noticeRoom: noticeRoom,
                 // The rows of the grid are tall enough for the code and its
                 // time at the user's text size: the code grows with the text
@@ -498,6 +499,7 @@ class _MonthScreenState extends ConsumerState<MonthScreen>
     required double bottomRoom,
     required double? noticeRoom,
     double fixedRow = Sp.touch,
+    bool fabShown = false,
     bool ringOpenDay = false,
     double minCellHeight = MonthGrid.defaultMinCellHeight,
   }) {
@@ -618,7 +620,7 @@ class _MonthScreenState extends ConsumerState<MonthScreen>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    const Expanded(child: MonthSelectDaysControl()),
+                    Expanded(child: MonthSelectDaysControl(underFab: fabShown)),
                     if (painting && !listing && _gridScrolls)
                       IconButton(
                         key: const ValueKey('paint-scroll-up'),

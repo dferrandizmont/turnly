@@ -24,11 +24,11 @@ void main() {
     final fakeStart = tester.binding.clock.now();
 
     await app.choosePath('rotation'); // 1
-    await app.tap(key('onboarding-pattern-12h')); // 2
-    await app.tap(key('onboarding-next')); // 3
-    await app.tap(key('onboarding-shift-night12')); // 4: the night of the cycle
-    await app.tap(key('onboarding-next')); // 5
-    await app.tap(key('onboarding-profession-nursing')); // 6
+    await app.tap(key('onboarding-profession-nursing')); // 2: asked first
+    await app.tap(key('onboarding-pattern-12h')); // 3
+    await app.tap(key('onboarding-next')); // 4
+    await app.tap(key('onboarding-shift-night12')); // 5: the night of the cycle
+    await app.tap(key('onboarding-next')); // 6
     await app.tap(key('onboarding-region')); // 7
     await app.tap(find.text('Comunidad de Madrid')); // 8
     await app.tap(key('onboarding-next')); // 9: "Continuar" (writes)
@@ -58,10 +58,10 @@ void main() {
     );
     // Any overflow or build error fails the test by itself.
     await app.choosePath('rotation');
+    await app.tap(key('onboarding-profession-hospitality'));
     await app.tap(key('onboarding-pattern-5x2'));
     await app.tap(key('onboarding-next'));
     await app.tap(key('onboarding-next'));
-    await app.tap(key('onboarding-profession-hospitality'));
     await app.tap(key('onboarding-region'));
     await app.tap(find.text('Illes Balears'));
     await app.tap(key('onboarding-municipality'));

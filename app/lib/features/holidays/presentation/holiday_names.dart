@@ -4,14 +4,17 @@ import '../domain/holiday.dart';
 
 /// The name of [holiday] in the app's language (H-T21-1).
 ///
-/// The holiday bundle carries Spanish names only. The national holidays and
-/// the common regional ones have a translation in the ARB files
-/// (`holidayName*`); any other name stays as the bundle has it. A holiday the
-/// person added is theirs: never translated.
-String holidayDisplayName(AppLocalizations l10n, Holiday holiday) =>
-    holiday.isUserAdded
-    ? holiday.name
-    : localizedHolidayName(l10n, holiday.name) ?? holiday.name;
+/// Spain's bundle carries Spanish names. Its national holidays and the common
+/// regional ones have a translation in the ARB files (`holidayName*`); any
+/// other name stays as the bundle has it. Every other country shows its own
+/// local names (see `docs/festivos.md`), in every app language: translating
+/// only the few that match a Spanish key would mix two languages in one list
+/// (Bolivia, Portugal). A holiday the person added is theirs: never
+/// translated.
+String holidayDisplayName(AppLocalizations l10n, Holiday holiday) {
+  if (holiday.isUserAdded || holiday.countryCode != 'ES') return holiday.name;
+  return localizedHolidayName(l10n, holiday.name) ?? holiday.name;
+}
 
 /// The translation of the bundle name [bundleName], or `null` when there is
 /// none. The bundle has no ids, so the stable key is the Spanish name folded

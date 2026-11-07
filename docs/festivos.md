@@ -104,6 +104,11 @@ Reglas del export:
    Bélgica y Suiza (tres y cuatro lenguas oficiales: así no se elige bando) y Luxemburgo (luxemburgués, francés y
    alemán); el propio del país en Polonia (`pl`), Suecia (`sv`), Noruega (`no`), Dinamarca (`da`), Finlandia (`fi`),
    Grecia (`el`), Rumanía (`ro`) y Andorra (`ca`). Estos nombres no se traducen a ca/gl/eu/en.
+
+   **Nombre en pantalla (7-nov-2026):** solo los festivos de España se traducen a es/ca/gl/eu/en (`holidayDisplayName`,
+   claves `holidayName*`). Los demás países muestran siempre el nombre local del paquete, en cualquier idioma de la app:
+   traducir solo los pocos que coinciden con una clave española mezclaba dos idiomas en una lista (Bolivia, Portugal).
+   `Holiday.countryCode` lo decide; la prueba `holiday_names_test.dart` recorre todos los países e idiomas.
 3. `national` = los días que **todas** las subdivisiones tienen (por fecha). Un día del país que solo algunas
    mantienen va en esas subdivisiones como `national-optional`; el que solo ellas tienen, como `regional`. En Estados
    Unidos `national` son los festivos federales (con sus días observados) y los estados solo añaden los suyos.

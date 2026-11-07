@@ -210,11 +210,13 @@ class OnboardingController extends Notifier<OnboardingState> {
     _go(OnboardingStage.place);
   }
 
-  // ---- last step (optional): job --------------------------------------------
+  // ---- job (optional): rotation screen, or the last step ------------------
 
   /// Tapping the chosen job again leaves none (the question is optional).
-  /// The rotation is chosen before and stays: the job only sets the hours
-  /// of the shift types.
+  /// The job is asked on the rotation screen (before the list, which it
+  /// orders) when the person uses a rotation, and in the last step on the
+  /// other ways. The rotation chosen stays: the job only sets the hours of
+  /// the shift types.
   void selectProfession(Profession profession) =>
       state = state.profession == profession
       ? state.copyWith(clearProfession: true)
@@ -333,8 +335,13 @@ class OnboardingController extends Notifier<OnboardingState> {
       case OnboardingStage.place:
         // The country stays (the proposed one, or the one chosen): skipping
         // the community must not bring Spain's holidays to someone in
-        // another country. The job and the community go.
-        state = state.copyWith(clearPlace: true, clearProfession: true);
+        // another country. The community goes, and the job too unless it
+        // was asked on the rotation screen (then it is not part of this
+        // step and stays).
+        state = state.copyWith(
+          clearPlace: true,
+          clearProfession: state.path != OnboardingPath.rotation,
+        );
         await finish();
       case OnboardingStage.choose || OnboardingStage.ready:
         break;

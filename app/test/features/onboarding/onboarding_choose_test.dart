@@ -58,11 +58,11 @@ void main() {
     testWidgets('rotation', (tester) async {
       final app = await open(tester);
       await app.choosePath('rotation');
+      await app.tap(key('onboarding-profession-nursing'));
       await app.tap(key('onboarding-pattern-12h'));
       await app.tap(key('onboarding-next'));
       await app.selectCycleDay(1);
       await app.tap(key('onboarding-next'));
-      await app.tap(key('onboarding-profession-nursing'));
       await app.tap(key('onboarding-region'));
       await app.tap(find.text('Comunidad de Madrid'));
       await app.tap(key('onboarding-next'));

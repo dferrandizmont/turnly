@@ -15,6 +15,7 @@ class Holiday {
     required this.name,
     required this.scope,
     this.source = HolidaySource.bundled,
+    this.countryCode = 'ES',
   });
 
   final CivilDate date;
@@ -25,6 +26,10 @@ class Holiday {
   final HolidayScope scope;
   final HolidaySource source;
 
+  /// ISO country of an official row (Spain by default). Decides whether the
+  /// name is translated: only Spain's names are (holiday_names.dart).
+  final String countryCode;
+
   bool get isUserAdded => source == HolidaySource.user;
 
   @override
@@ -33,10 +38,11 @@ class Holiday {
       other.date == date &&
       other.name == name &&
       other.scope == scope &&
-      other.source == source;
+      other.source == source &&
+      other.countryCode == countryCode;
 
   @override
-  int get hashCode => Object.hash(date, name, scope, source);
+  int get hashCode => Object.hash(date, name, scope, source, countryCode);
 
   @override
   String toString() => 'Holiday($date, $name, ${scope.name}, ${source.name})';

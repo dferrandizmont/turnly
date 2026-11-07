@@ -23,7 +23,8 @@ import 'profession_step.dart';
 /// community (a list of 19) and, optionally, the municipality (a search over
 /// the bundled index, filtered by region); outside Spain a line says there
 /// are no official holidays for that country yet and where to add one's
-/// own. Under it, «¿A qué te dedicas?» ([ProfessionSection]). «Saltar»
+/// own. Under it, «¿A qué te dedicas?» ([ProfessionSection]), unless the
+/// person uses a rotation (then it was asked on that screen). «Saltar»
 /// keeps the country, so a phone outside Spain never gets Spain's holidays.
 class PlaceStep extends ConsumerWidget {
   const PlaceStep({super.key});
@@ -73,13 +74,18 @@ class PlaceStep extends ConsumerWidget {
       ),
     );
 
+    final jobAsked = state.path == OnboardingPath.rotation;
+
     Widget withJob(List<Widget> place) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         optional,
         ...place,
-        const SizedBox(height: Sp.section + Sp.s),
-        const ProfessionSection(),
+        // With a rotation the job was asked on that screen, before the list.
+        if (!jobAsked) ...[
+          const SizedBox(height: Sp.section + Sp.s),
+          const ProfessionSection(),
+        ],
       ],
     );
 

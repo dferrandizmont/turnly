@@ -21,12 +21,7 @@ void main() {
 
   // Spanish name of the bundle -> ca / gl / eu / en.
   const expected = <String, List<String>>{
-    'Año Nuevo': [
-      'Cap d’Any',
-      'Aninovo',
-      'Urteberri eguna',
-      'New Year’s Day',
-    ],
+    'Año Nuevo': ['Cap d’Any', 'Aninovo', 'Urteberri eguna', 'New Year’s Day'],
     'Epifanía del Señor': ['Reis', 'Reis', 'Errege eguna', 'Epiphany'],
     'Jueves Santo': [
       'Dijous Sant',
@@ -183,6 +178,45 @@ void main() {
             isNotNull,
             reason: '$name ($year) in $code',
           );
+        }
+      }
+    }
+  });
+
+  test('every other country shows one language: its own bundle names', () {
+    final dir = Directory('assets/holidays/2026');
+    final files = dir
+        .listSync()
+        .whereType<File>()
+        .where((f) => f.path.endsWith('.json'))
+        .toList();
+    expect(files.length, greaterThan(40));
+    for (final file in files) {
+      final json = jsonDecode(file.readAsStringSync()) as Map<String, Object?>;
+      final cc = (json['country'] as String?) ?? 'ES';
+      if (cc == 'ES') continue;
+      final names = <String>[
+        for (final h in json['national']! as List<Object?>)
+          (h! as Map<String, Object?>)['name']! as String,
+        for (final list
+            in ((json['regional'] ?? <String, Object?>{})
+                    as Map<String, Object?>)
+                .values)
+          for (final h in list! as List<Object?>)
+            (h! as Map<String, Object?>)['name']! as String,
+      ];
+      for (final code in ['es', ...languages]) {
+        for (final name in names) {
+          final shown = holidayDisplayName(
+            l10nOf(code),
+            Holiday(
+              date: const CivilDate(2026, 1, 1),
+              name: name,
+              scope: HolidayScope.national,
+              countryCode: cc,
+            ),
+          );
+          expect(shown, name, reason: '$cc "$name" in $code');
         }
       }
     }

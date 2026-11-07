@@ -56,7 +56,13 @@ class HolidayEntry {
   }
 
   Holiday toHoliday() =>
-      Holiday(date: date, name: name, scope: scope, source: source);
+      Holiday(
+        date: date,
+        name: name,
+        scope: scope,
+        source: source,
+        countryCode: countryCode,
+      );
 
   @override
   bool operator ==(Object other) =>

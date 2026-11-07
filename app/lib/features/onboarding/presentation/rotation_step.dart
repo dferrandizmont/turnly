@@ -15,10 +15,11 @@ import '../../schedule/domain/schedule_domain.dart';
 import '../application/onboarding_controller.dart';
 import '../domain/profession.dart';
 import 'onboarding_widgets.dart';
+import 'profession_step.dart';
 
-/// «¿Cómo es tu rotación?» (first screen of «Usar una rotación»): the
-/// catalogue (the same cards as the pattern wizard), the patterns of the job
-/// first when one is chosen (coming back from the last step), or «Lo pinto a
+/// «¿Cómo es tu rotación?» (first screen of «Usar una rotación»): the job
+/// (optional, compact), the catalogue (the same cards as the pattern wizard)
+/// with the patterns of the job first when one is chosen, or «Lo pinto a
 /// mano».
 class RotationStep extends ConsumerWidget {
   const RotationStep({super.key});
@@ -63,6 +64,9 @@ class RotationStep extends ConsumerWidget {
           titleKey: const ValueKey('onboarding-title'),
           help: l10n.onboardingRotationHelp,
         ),
+        // The job first: it orders the list below («Lo habitual en tu
+        // trabajo») and sets the hours the rotation is drawn with.
+        const ProfessionSection(compact: true),
         if (typical.isNotEmpty) ...[
           GroupLabel(l10n.onboardingRotationTypical),
           for (final p in typical) card(p),

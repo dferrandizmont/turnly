@@ -607,17 +607,16 @@ void main() {
         );
         // The first question has no «Siguiente»: a card per way to start.
         await app.choosePath('rotation');
+        // The job is asked on the rotation screen, above the list.
+        await app.tap(
+          find.byKey(const ValueKey('onboarding-profession-nursing')),
+        );
         await app.tap(find.byKey(const ValueKey('onboarding-pattern-12h')));
         final next = find.byKey(const ValueKey('onboarding-next'));
-        // Rotation, start day and the last step (place and job).
+        // Rotation (and job), start day and the last step (place).
         for (var step = 0; step < 3; step++) {
           expect(tester.getRect(next).bottom, lessThanOrEqualTo(412.5));
           expect(tester.getRect(next).top, greaterThan(0));
-          if (step == 2) {
-            await app.tap(
-              find.byKey(const ValueKey('onboarding-profession-nursing')),
-            );
-          }
           await app.tap(next);
         }
         expect(app.title, 'Listo');

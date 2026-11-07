@@ -112,10 +112,10 @@ void main() {
         expect(app.title, l10n.onboardingChooseTitle);
         if (language == AppLanguage.eu) {
           await app.choosePath('rotation');
+          await app.tap(key('onboarding-profession-nursing'));
           await app.tap(key('onboarding-pattern-12h'));
           await app.tap(key('onboarding-next'));
           await app.tap(key('onboarding-next'));
-          await app.tap(key('onboarding-profession-nursing'));
           await app.tap(key('onboarding-next'));
         } else {
           await app.choosePath('paint');

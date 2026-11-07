@@ -10,6 +10,14 @@ at once, so they can skip numbers.
 
 ## Unreleased
 
+## 0.9.1 · 2026-11-07
+
+Fixes from testing 0.9.0 on the phone and tablet emulators.
+
+- First run: the job is now asked above the rotation list, so the usual rotations of your job (Police, Firefighters…) already come first when you choose one.
+- Month with large text: “Select days” no longer runs under the Paint button, and the bottom bar keeps its tab names.
+- Holiday names no longer mix languages: countries other than Spain always show their own local names, whatever the app language.
+
 ## 0.9.0 · 2026-11-07
 
 Money, breaks and more rotations, from a review of the leading shift apps. Release for Google Play, GitHub and the web.

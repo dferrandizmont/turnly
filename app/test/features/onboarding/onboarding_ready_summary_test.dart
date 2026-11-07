@@ -24,11 +24,11 @@ void main() {
       textScale: textScale,
     );
     await app.choosePath('rotation');
+    await app.tap(key('onboarding-profession-nursing'));
     await app.tap(key('onboarding-pattern-correturnos'));
     await app.tap(key('onboarding-next'));
     await app.selectCycleDay(cycleDay - 1);
     await app.tap(key('onboarding-next'));
-    await app.tap(key('onboarding-profession-nursing'));
     await app.tap(key('onboarding-next'));
     expect(app.title, 'Listo');
     return app;

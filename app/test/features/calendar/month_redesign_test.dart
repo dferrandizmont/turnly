@@ -129,9 +129,8 @@ void main() {
     });
 
     for (final scale in [1.6, 2.0]) {
-      testWidgets('320 dp, text x$scale: icons only, names as tooltips', (
-        tester,
-      ) async {
+      testWidgets('320 dp, text x$scale: the names stay, drawn at most at '
+          'x1.3 (QA 0.9.0 F4)', (tester) async {
         final handle = tester.ensureSemantics();
         await pumpCalendar(
           tester,
@@ -141,10 +140,20 @@ void main() {
         final bar = tester.widget<NavigationBar>(key('month-nav-bar'));
         expect(
           bar.labelBehavior,
-          NavigationDestinationLabelBehavior.alwaysHide,
+          NavigationDestinationLabelBehavior.alwaysShow,
         );
         for (final name in ['Mes', 'Rotación', 'Agenda', 'Resumen']) {
-          expect(find.byTooltip(name), findsOneWidget);
+          final label = find.descendant(
+            of: key('month-nav-bar'),
+            matching: find.text(name),
+          );
+          expect(label, findsOneWidget, reason: name);
+          expect(tester.getRect(label).right, lessThanOrEqualTo(320.5));
+          expect(
+            tester.widget<Text>(label).maxLines,
+            anyOf(isNull, 1),
+            reason: '$name on one line',
+          );
         }
         expect(find.bySemanticsLabel(RegExp('Resumen')), findsWidgets);
         for (final destination in [

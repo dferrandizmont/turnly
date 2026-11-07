@@ -92,12 +92,28 @@ void openMonthDestination(
   };
 }
 
-/// Text from ×1.6, or a name wider than its slot, leaves the destinations
-/// with their icon only and the name as tooltip and spoken label, like the
-/// other bars with names under each button (`docs/diseno.md`).
-bool _namesFit(BuildContext context, double slotWidth) {
-  final scaler = MediaQuery.textScalerOf(context);
-  if (scaler.scale(10) / 10 >= 1.6) return false;
+/// The text scale the names of the bottom bar stop growing at: the bar has a
+/// fixed height, so above this the names stay as readable as they can be
+/// without breaking it (the icons and the rest of the screen keep growing).
+const double navNameMaxScale = 1.3;
+
+/// Whether the names go under the destinations. On the bottom bar
+/// ([capScale]) they stay at any text size, drawn at most at [navNameMaxScale]
+/// and on one line, as long as the longest still fits its slot; otherwise
+/// (and on the rail, from text ×1.6) the destinations keep their icon only
+/// and the name is the tooltip and the spoken label, like the other bars
+/// with names under each button (`docs/diseno.md`).
+bool _namesFit(
+  BuildContext context,
+  double slotWidth, {
+  bool capScale = false,
+}) {
+  var scaler = MediaQuery.textScalerOf(context);
+  if (capScale) {
+    scaler = scaler.clamp(maxScaleFactor: navNameMaxScale);
+  } else if (scaler.scale(10) / 10 >= 1.6) {
+    return false;
+  }
   final style = context.type.caption.copyWith(fontWeight: FontWeight.w800);
   return MonthDestination.values.every(
     (d) =>
@@ -119,42 +135,46 @@ class MonthNavigationBar extends ConsumerWidget {
         final names = _namesFit(
           context,
           box.maxWidth / MonthDestination.values.length,
+          capScale: true,
         );
-        return DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border(top: BorderSide(color: colors.border)),
-          ),
-          child: NavigationBar(
-            key: const ValueKey('month-nav-bar'),
-            backgroundColor: colors.surface,
-            selectedIndex: MonthDestination.month.index,
-            labelBehavior: names
-                ? NavigationDestinationLabelBehavior.alwaysShow
-                : NavigationDestinationLabelBehavior.alwaysHide,
-            labelTextStyle: WidgetStateProperty.resolveWith(
-              (states) => type.caption.copyWith(
-                overflow: TextOverflow.ellipsis,
-                color: states.contains(WidgetState.selected)
-                    ? colors.textPrimary
-                    : colors.textMuted,
-                fontWeight: states.contains(WidgetState.selected)
-                    ? FontWeight.w800
-                    : FontWeight.w600,
-              ),
+        return MediaQuery.withClampedTextScaling(
+          maxScaleFactor: navNameMaxScale,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: colors.border)),
             ),
-            onDestinationSelected: (index) => openMonthDestination(
-              context,
-              ref,
-              MonthDestination.values[index],
-            ),
-            destinations: [
-              for (final destination in MonthDestination.values)
-                NavigationDestination(
-                  key: _destinationKeys[destination],
-                  icon: Icon(_describe(context, destination).icon),
-                  label: _describe(context, destination).label,
+            child: NavigationBar(
+              key: const ValueKey('month-nav-bar'),
+              backgroundColor: colors.surface,
+              selectedIndex: MonthDestination.month.index,
+              labelBehavior: names
+                  ? NavigationDestinationLabelBehavior.alwaysShow
+                  : NavigationDestinationLabelBehavior.alwaysHide,
+              labelTextStyle: WidgetStateProperty.resolveWith(
+                (states) => type.caption.copyWith(
+                  overflow: TextOverflow.ellipsis,
+                  color: states.contains(WidgetState.selected)
+                      ? colors.textPrimary
+                      : colors.textMuted,
+                  fontWeight: states.contains(WidgetState.selected)
+                      ? FontWeight.w800
+                      : FontWeight.w600,
                 ),
-            ],
+              ),
+              onDestinationSelected: (index) => openMonthDestination(
+                context,
+                ref,
+                MonthDestination.values[index],
+              ),
+              destinations: [
+                for (final destination in MonthDestination.values)
+                  NavigationDestination(
+                    key: _destinationKeys[destination],
+                    icon: Icon(_describe(context, destination).icon),
+                    label: _describe(context, destination).label,
+                  ),
+              ],
+            ),
           ),
         );
       },

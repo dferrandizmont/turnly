@@ -74,20 +74,16 @@ void main() {
     expect(app.title, '¿Cuándo empiezas?');
     // No job yet: the hours as they are.
     expect(
-      find.text(
-        keepTimeRangesTogether('Ese día te toca: Mañana 06:00–14:00'),
-      ),
+      find.text(keepTimeRangesTogether('Ese día te toca: Mañana 06:00–14:00')),
       findsOneWidget,
     );
-    // The job is chosen in the last step; back on the start day it shows.
-    await app.tap(key('onboarding-next'));
-    await app.tap(key('onboarding-profession-nursing'));
+    // The job is chosen on the rotation screen; on the start day it shows.
     await app.tap(key('onboarding-back'));
+    await app.tap(key('onboarding-profession-nursing'));
+    await app.tap(key('onboarding-next'));
     // Day 1 of the cycle is a Mañana: 08:00-15:00 for a nurse, not 06:00-14:00.
     expect(
-      find.text(
-        keepTimeRangesTogether('Ese día te toca: Mañana 08:00–15:00'),
-      ),
+      find.text(keepTimeRangesTogether('Ese día te toca: Mañana 08:00–15:00')),
       findsOneWidget,
     );
 

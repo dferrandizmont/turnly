@@ -9,12 +9,19 @@ import '../application/onboarding_controller.dart';
 import '../domain/profession.dart';
 import 'onboarding_widgets.dart';
 
-/// «¿A qué te dedicas? Opcional», in the last step: one pill per job of the
-/// country (Spain: the Spanish sector's list; elsewhere a neutral one), and
-/// under them the usual hours of the one chosen. It only sets the hours of
-/// the shift types; tapping the chosen one again leaves none.
+/// «¿A qué te dedicas? Opcional»: one pill per job of the country (Spain: the
+/// Spanish sector's list; elsewhere a neutral one), and under them the usual
+/// hours of the one chosen. It only sets the hours of the shift types (and
+/// which rotations come first); tapping the chosen one again leaves none.
+///
+/// It is asked on the rotation screen when the person uses a rotation (so
+/// «Lo habitual en tu trabajo» is already ordered there), and in the last step
+/// on the other ways. The [compact] form (the rotation screen) has a smaller
+/// title and no help line.
 class ProfessionSection extends ConsumerWidget {
-  const ProfessionSection({super.key});
+  const ProfessionSection({super.key, this.compact = false});
+
+  final bool compact;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -47,15 +54,17 @@ class ProfessionSection extends ConsumerWidget {
                 ),
               ],
             ),
-            style: type.title,
+            style: compact ? type.bodyStrong : type.title,
           ),
         ),
-        const SizedBox(height: Sp.xs),
-        Text(
-          l10n.onboardingProfessionHelp,
-          style: type.body.copyWith(color: colors.textSecondary),
-        ),
-        const SizedBox(height: Sp.m),
+        if (!compact) ...[
+          const SizedBox(height: Sp.xs),
+          Text(
+            l10n.onboardingProfessionHelp,
+            style: type.body.copyWith(color: colors.textSecondary),
+          ),
+        ],
+        SizedBox(height: compact ? Sp.s : Sp.m),
         Wrap(
           spacing: Sp.s,
           runSpacing: Sp.s,

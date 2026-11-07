@@ -1527,3 +1527,4 @@ app/test/features/summary/domain/pay_period_test.dart
 app/test/features/summary/domain/pay_templates_test.dart
 app/test/features/summary/pay_rules_store_test.dart
 app/test/features/summary/summary_pay_rules_test.dart
+app/test/features/calendar/month_bottom_large_text_test.dart

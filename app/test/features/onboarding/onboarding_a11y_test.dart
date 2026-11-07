@@ -25,17 +25,15 @@ void main() {
     final app = await FirstLaunch.open(tester);
 
     await app.choosePath('rotation');
-    final preset = RegExp('^12 horas');
-    expect(_selected(tester, preset), isFalse);
-    await app.tap(key('onboarding-pattern-12h'));
-    expect(_selected(tester, preset), isTrue);
-    await _next(app);
-    await _next(app);
-
     expect(_selected(tester, RegExp('^Enfermería')), isFalse);
     await app.tap(key('onboarding-profession-nursing'));
     expect(_selected(tester, RegExp('^Enfermería')), isTrue);
     expect(_selected(tester, RegExp('^Medicina')), isFalse);
+
+    final preset = RegExp('^12 horas');
+    expect(_selected(tester, preset), isFalse);
+    await app.tap(key('onboarding-pattern-12h'));
+    expect(_selected(tester, preset), isTrue);
     handle.dispose();
   });
 

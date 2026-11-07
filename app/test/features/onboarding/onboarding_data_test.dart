@@ -368,8 +368,8 @@ void main() {
       final ids = [for (final t in app.schedule.shiftTypes) t.id];
 
       await app.choosePath('rotation');
-      await app.tap(key('onboarding-skip')); // rotation
       await app.tap(key('onboarding-profession-nursing'));
+      await app.tap(key('onboarding-skip')); // rotation
       await app.tap(key('onboarding-next')); // last step -> writes
       await app.flushWrites();
 
@@ -419,6 +419,7 @@ void main() {
       final start = onboardingToday.addDays(3);
 
       await app.choosePath('rotation');
+      await app.tap(key('onboarding-profession-nursing'));
       await app.tap(key('onboarding-pattern-correturnos'));
       await app.tap(key('onboarding-next'));
       await tester.tap(key('onboarding-start-date'));
@@ -432,7 +433,6 @@ void main() {
       await tester.pumpAndSettle();
       await app.selectCycleDay(6);
       await app.tap(key('onboarding-next'));
-      await app.tap(key('onboarding-profession-nursing'));
       await app.tap(key('onboarding-next')); // last step -> writes
       await app.flushWrites();
 
@@ -476,10 +476,10 @@ void main() {
     ) async {
       final app = await FirstLaunch.open(tester);
       await app.choosePath('rotation');
+      await app.tap(key('onboarding-profession-firefighters'));
       await app.tap(key('onboarding-pattern-24x72'));
       await app.tap(key('onboarding-next'));
       await app.tap(key('onboarding-next'));
-      await app.tap(key('onboarding-profession-firefighters'));
       await app.tap(key('onboarding-next'));
       await app.tap(key('onboarding-next'));
       expect(find.byType(MonthScreen), findsOneWidget);

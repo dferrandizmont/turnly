@@ -441,10 +441,13 @@ Los avisos y anuncios también están localizados; no se añaden sufijos a varia
 **Mes · Rotación · Agenda · Resumen**, siempre con nombre, en una barra inferior (`NavigationBar` del tema: fondo
 `surface` con filete `border` arriba, indicador `accentSoft` en forma de píldora, icono de 24 dp; nombre en `caption`,
 `textPrimary` 800 el elegido y `textMuted` 600 los demás). El botón «Pintar» flota encima, a la derecha. La barra se
-oculta en Pintar y Selección (su hoja de herramientas ocupa ese sitio) y con el teclado abierto. Desde texto ×1,6, o si
-un nombre no cabe en su cuarto de ancho, los destinos quedan solo con el icono y el nombre como tooltip y texto leído,
-como las demás barras con nombre. Con dos paneles los mismos destinos van en un **raíl** de 80 dp a la izquierda del mes
-(`NavigationRail`, nombres debajo; solo iconos con la misma regla), porque una barra inferior se comería el alto que le
+oculta en Pintar y Selección (su hoja de herramientas ocupa ese sitio) y con el teclado abierto. Los nombres se quedan
+con cualquier tamaño de texto, dibujados como mucho a ×1,3 (la barra tiene altura fija) y en una línea; solo si el más
+largo no cabe en su cuarto de ancho a ese tamaño, los destinos quedan solo con el icono y el nombre como tooltip y texto
+leído. «Seleccionar días», bajo la cuadrícula, deja sitio al «Pintar» flotante: si con el texto grande no caben los dos
+(p. ej. euskera a ×2), se queda en su icono, con el nombre como tooltip y texto leído. El raíl, desde texto ×1,6, sigue
+con solo iconos. Con dos paneles los mismos destinos van en un **raíl** de 80 dp a la izquierda del mes
+(`NavigationRail`, nombres debajo; solo iconos desde texto ×1,6 o si un nombre no cabe), porque una barra inferior se comería el alto que le
 falta al mes en un móvil horizontal. Ese raíl lo llevan también Rotación, Agenda y Resumen (`DestinationRailShell`, puesto en la ruta) cuando hay dos paneles: el mismo punto de corte (`Adaptive.useSplit`), con su destino marcado; tocar otro destino sustituye la pantalla (el atrás sigue yendo al mes) y «Mes» vuelve al mes de hoy. Con una columna (móvil, tableta en vertical) no cambia nada.
 
 Qué abre cada uno (los tres últimos se abren encima, con su botón atrás, como antes):
@@ -534,11 +537,12 @@ calendario útil en menos de 60 s sin responder nada que no haga falta.
   y su `bar`, y el pincel). Debajo, en `meta` centrado, «Después te preguntamos el país…» y el botón de texto
   **Recuperar una copia de seguridad** (abre Ajustes › Copia; si se restaura, el flujo termina en el mes).
 - **Cada camino lleva a lo suyo:** importar → «¿Vienes de otra app?» (importar ahora o la copia de LRHSoft) →
-  último paso; rotación → catálogo → día de inicio y **turno y día del ciclo** → último paso; a mano → último paso, y
-  el mes se abre ya en modo pintar. «Lo pinto a mano» sigue en el catálogo y hace lo mismo sin salir del camino.
+  último paso; rotación → catálogo (con «¿A qué te dedicas? Opcional» arriba, en `bodyStrong` y sin línea de ayuda:
+  la profesión elegida pone primero «Lo habitual en tu trabajo», como Policía con la 2-2-2-6) → día de inicio y
+  **turno y día del ciclo** → último paso; a mano → último paso, y el mes se abre ya en modo pintar. «Lo pinto a mano» sigue en el catálogo y hace lo mismo sin salir del camino.
 - **Último paso, opcional** (`PlaceStep`): «Paso N de M · Opcional» en `meta` seminegrita, «¿Dónde trabajas?» (país,
-  comunidad y municipio como antes) y, debajo, «¿A qué te dedicas? Opcional» en `title` con las profesiones del país
-  en `ChoicePill` (la elegida con borde `todayRing` y check; tocarla otra vez la quita) y sus horas habituales en una
+  comunidad y municipio como antes) y, debajo (salvo en el camino de la rotación, que ya la preguntó en el catálogo),
+  «¿A qué te dedicas? Opcional» en `title` con las profesiones del país en `ChoicePill` (la elegida con borde `todayRing` y check; tocarla otra vez la quita) y sus horas habituales en una
   línea debajo. «Saltar» o «Continuar» guardan siempre el país (el propuesto o el elegido). Luego «Listo» con el
   resumen y «Ver mi calendario».
 - **Barra:** atrás, una raya por pantalla del camino (la actual más larga, nunca solo color; «Paso N de M» para el
