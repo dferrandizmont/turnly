@@ -33,7 +33,7 @@ void main() {
           size: Size(width, 800),
           textScale: scale,
         );
-        await app.choosePath('rotation');
+        await app.chooseRotation();
         expect(skip, findsOneWidget);
         expect(lines(tester), 1);
         expect(tester.takeException(), isNull);

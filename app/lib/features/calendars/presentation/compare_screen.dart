@@ -579,7 +579,7 @@ class _DatePill extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: colors.surfaceRaised,
-          borderRadius: Rad.pill,
+          borderRadius: Rad.chipSmallRadius,
           border: Border.all(color: colors.border),
         ),
         child: Padding(

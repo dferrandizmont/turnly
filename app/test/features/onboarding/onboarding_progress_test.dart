@@ -35,23 +35,26 @@ void main() {
 
     Future<void> record() async => seen[app.title] = progress(tester);
 
+    // With a rotation the place comes first (its country sets the week the
+    // preview is drawn with).
     await app.choosePath('rotation');
-    await record(); // ¿Cómo es tu rotación?
+    await record(); // ¿Dónde trabajas?
     expect(dashes(tester), 3);
+    expect(find.text('Paso 1 de 3 · Opcional'), findsOneWidget);
+    await app.tap(key('onboarding-next'));
+    await record(); // ¿Cómo es tu rotación?
     await app.tap(key('onboarding-pattern-12h'));
     await app.tap(key('onboarding-next'));
     await record(); // ¿Cuándo empiezas?
-    await app.tap(key('onboarding-next'));
-    await record(); // ¿Dónde trabajas?
-    expect(find.text('Paso 3 de 3 · Opcional'), findsOneWidget);
 
     expect(seen.keys, [
+      '¿Dónde trabajas?',
       '¿Cómo es tu rotación?',
       '¿Cuándo empiezas?',
-      '¿Dónde trabajas?',
     ]);
     expect(seen.values, ['Paso 1 de 3', 'Paso 2 de 3', 'Paso 3 de 3']);
 
+    // The start step is now the last one: it writes and lands on «Listo».
     await app.tap(key('onboarding-next'));
     expect(app.title, 'Listo');
     expect(dots(), isFalse, reason: '«Listo» has no number');

@@ -68,7 +68,7 @@ void main() {
     tester,
   ) async {
     final app = await FirstLaunch.open(tester);
-    await app.choosePath('rotation');
+    await app.chooseRotation();
     await app.tap(key('onboarding-pattern-continental'));
     await app.tap(key('onboarding-next'));
     expect(app.title, '¿Cuándo empiezas?');
@@ -87,8 +87,7 @@ void main() {
       findsOneWidget,
     );
 
-    await app.tap(key('onboarding-next'));
-    await app.tap(key('onboarding-next'));
+    await app.tap(key('onboarding-next')); // the start step writes
     await app.flushWrites();
     await app.tap(key('onboarding-next'));
     expect(find.byType(MonthScreen), findsOneWidget);

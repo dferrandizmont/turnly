@@ -118,7 +118,7 @@ class AppTheme {
 
     final overlay = overlayStyle(brightness);
     final shape14 = RoundedRectangleBorder(borderRadius: Rad.inputRadius);
-    const pill = StadiumBorder();
+    final buttonShape = RoundedRectangleBorder(borderRadius: Rad.buttonRadius);
     final disabledFill = c.primaryButton.withValues(alpha: 0.4);
 
     WidgetStateProperty<Color?> overlayColor(Color base) =>
@@ -217,7 +217,7 @@ class AppTheme {
           elevation: const WidgetStatePropertyAll(0),
           shadowColor: const WidgetStatePropertyAll(clear),
           surfaceTintColor: const WidgetStatePropertyAll(clear),
-          shape: const WidgetStatePropertyAll(pill),
+          shape: WidgetStatePropertyAll(buttonShape),
           textStyle: WidgetStatePropertyAll(type.button),
           backgroundColor: WidgetStateProperty.resolveWith(
             (s) => s.contains(WidgetState.disabled)
@@ -242,7 +242,7 @@ class AppTheme {
           elevation: const WidgetStatePropertyAll(0),
           shadowColor: const WidgetStatePropertyAll(clear),
           surfaceTintColor: const WidgetStatePropertyAll(clear),
-          shape: const WidgetStatePropertyAll(pill),
+          shape: WidgetStatePropertyAll(buttonShape),
           textStyle: WidgetStatePropertyAll(type.button),
           backgroundColor: WidgetStatePropertyAll(c.surface),
           foregroundColor: WidgetStateProperty.resolveWith(
@@ -264,7 +264,7 @@ class AppTheme {
             EdgeInsets.symmetric(horizontal: Sp.l, vertical: Sp.s),
           ),
           elevation: const WidgetStatePropertyAll(0),
-          shape: const WidgetStatePropertyAll(pill),
+          shape: WidgetStatePropertyAll(buttonShape),
           textStyle: WidgetStatePropertyAll(type.button),
           foregroundColor: WidgetStateProperty.resolveWith(
             (s) =>
@@ -403,7 +403,7 @@ class AppTheme {
         pressElevation: 0,
         showCheckmark: false,
         side: BorderSide(color: c.border),
-        shape: const StadiumBorder(),
+        shape: RoundedRectangleBorder(borderRadius: Rad.chipSmallRadius),
         labelStyle: type.button,
         secondaryLabelStyle: type.button.copyWith(color: c.onAccent),
         labelPadding: const EdgeInsets.symmetric(horizontal: Sp.xs),
@@ -417,7 +417,7 @@ class AppTheme {
         shadowColor: clear,
         elevation: 0,
         indicatorColor: c.accentSoft,
-        indicatorShape: const StadiumBorder(),
+        indicatorShape: RoundedRectangleBorder(borderRadius: Rad.innerRadius),
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
         iconTheme: WidgetStateProperty.resolveWith(
           (s) => IconThemeData(
@@ -440,7 +440,7 @@ class AppTheme {
         backgroundColor: c.background,
         elevation: 0,
         indicatorColor: c.accentSoft,
-        indicatorShape: const StadiumBorder(),
+        indicatorShape: RoundedRectangleBorder(borderRadius: Rad.innerRadius),
         labelType: NavigationRailLabelType.all,
         minWidth: 80,
         useIndicator: true,

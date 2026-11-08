@@ -26,3 +26,7 @@ qa/*/evidence/
 
 # Browser automation output
 .playwright-mcp/
+
+# Store images: copies of docs/store made by store_shots.py for play-upload.py
+fastlane/metadata/android/*/images/
+fastlane/metadata/android/shots-manifest.json

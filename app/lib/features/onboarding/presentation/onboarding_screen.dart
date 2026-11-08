@@ -20,8 +20,10 @@ import 'rotation_step.dart';
 /// First use (turnos-spec.md section 4, «Primer uso»; docs/diseno.md, 2A):
 /// one question, «¿Cómo empiezas tu cuadrante?», with three ways (import,
 /// rotation, by hand) and «Recuperar una copia de seguridad». Each way has
-/// its own screens, then an optional last step (holidays and job) and
-/// «Listo». Every screen after the question can be skipped ("Saltar") and
+/// its own screens, with an optional place step (holidays, and the job on the
+/// ways without a rotation screen) and «Listo»; with a rotation the place
+/// comes first, so the country's week start is already set when the rotation
+/// is previewed. Every screen after the question can be skipped ("Saltar") and
 /// undone. Nothing is written until the last step is left.
 class OnboardingScreen extends ConsumerWidget {
   const OnboardingScreen({super.key});
@@ -42,9 +44,15 @@ class OnboardingScreen extends ConsumerWidget {
     final stage = state.stage;
     final ready = stage == OnboardingStage.ready;
 
+    // «Continuar» on the last screen of the path (and on the import screen);
+    // «Siguiente» on the rest. On the rotation path the place comes first,
+    // so the last screen is the start of the rotation.
+    final rotationPath = state.path == OnboardingPath.rotation;
     final label = switch (stage) {
       OnboardingStage.importCalendar ||
-      OnboardingStage.place => l10n.onboardingContinue,
+      OnboardingStage.start => l10n.onboardingContinue,
+      OnboardingStage.place =>
+        rotationPath ? l10n.onboardingNext : l10n.onboardingContinue,
       OnboardingStage.ready => l10n.onboardingOpenCalendar,
       _ => l10n.onboardingNext,
     };

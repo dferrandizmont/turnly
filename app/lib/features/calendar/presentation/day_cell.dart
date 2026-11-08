@@ -176,7 +176,25 @@ class _DayCellState extends State<DayCell> {
     // A month change recreates the date-keyed cell but keeps its positional
     // node. Attaching an already focused node need not emit onFocusChange.
     _keyboardFocused = widget.focusNode?.hasFocus ?? false;
+    FocusManager.instance.addHighlightModeListener(_onHighlightMode);
   }
+
+  @override
+  void dispose() {
+    FocusManager.instance.removeHighlightModeListener(_onHighlightMode);
+    super.dispose();
+  }
+
+  void _onHighlightMode(FocusHighlightMode _) {
+    if (_keyboardFocused && mounted) setState(() {});
+  }
+
+  /// The focus ring only shows while the person uses a keyboard: with touch
+  /// the app may still move the focus (to today, after switching Grid and
+  /// List), and a ring nobody asked for looks like a stuck selection.
+  bool get _showFocusRing =>
+      _keyboardFocused &&
+      FocusManager.instance.highlightMode == FocusHighlightMode.traditional;
 
   @override
   void didUpdateWidget(covariant DayCell oldWidget) {
@@ -432,7 +450,7 @@ class _DayCellState extends State<DayCell> {
       ),
       onTap: onTap,
       onLongPress: onLongPress,
-      child: _keyboardFocused
+      child: _showFocusRing
           ? DecoratedBox(
               key: ValueKey('keyboard-focus-${day.date.toIso()}'),
               // Outside the existing day/selection ring; no layout changes.

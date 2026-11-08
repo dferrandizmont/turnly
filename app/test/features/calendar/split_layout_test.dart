@@ -606,15 +606,15 @@ void main() {
           textScale: scale,
         );
         // The first question has no «Siguiente»: a card per way to start.
-        await app.choosePath('rotation');
+        await app.chooseRotation();
         // The job is asked on the rotation screen, above the list.
         await app.tap(
           find.byKey(const ValueKey('onboarding-profession-nursing')),
         );
         await app.tap(find.byKey(const ValueKey('onboarding-pattern-12h')));
         final next = find.byKey(const ValueKey('onboarding-next'));
-        // Rotation (and job), start day and the last step (place).
-        for (var step = 0; step < 3; step++) {
+        // Rotation (and job) and the start day, the last step (it writes).
+        for (var step = 0; step < 2; step++) {
           expect(tester.getRect(next).bottom, lessThanOrEqualTo(412.5));
           expect(tester.getRect(next).top, greaterThan(0));
           await app.tap(next);

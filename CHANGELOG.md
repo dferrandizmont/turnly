@@ -10,6 +10,14 @@ at once, so they can skip numbers.
 
 ## Unreleased
 
+## 0.9.3 · 2026-11-08
+
+Tweaks from using 0.9.2 on a Redmi Pad. Release for Google Play, GitHub and the web.
+
+- Month: with touch, the day the app keeps in focus (today, after switching Grid and List) no longer shows an extra purple frame; it only shows when you use a keyboard.
+- Buttons, filter chips, the calendar switcher, the «Paint» button and the selected-destination highlight are now rounded rectangles instead of pills, matching the «Grid | List» control.
+- First use with a rotation: the country, community and municipality are now asked before the rotation, so the preview ("Así quedará") already starts the week on the day of the country you chose (it showed Sunday-first weeks to a Spanish user on a phone set to the US).
+
 ## 0.9.2 · 2026-11-07
 
 Fixes from testing 0.9.1 on a OnePlus 10 Pro and a Redmi Pad, checked again on the phone and on the tablet emulator.

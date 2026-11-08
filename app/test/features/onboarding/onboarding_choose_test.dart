@@ -47,7 +47,7 @@ void main() {
 
       // Every way still works in this theme.
       await app.choosePath('rotation');
-      expect(app.title, '¿Cómo es tu rotación?');
+      expect(app.title, '¿Dónde trabajas?');
     });
   }
 
@@ -58,13 +58,13 @@ void main() {
     testWidgets('rotation', (tester) async {
       final app = await open(tester);
       await app.choosePath('rotation');
+      await app.tap(key('onboarding-region'));
+      await app.tap(find.text('Comunidad de Madrid'));
+      await app.tap(key('onboarding-next'));
       await app.tap(key('onboarding-profession-nursing'));
       await app.tap(key('onboarding-pattern-12h'));
       await app.tap(key('onboarding-next'));
       await app.selectCycleDay(1);
-      await app.tap(key('onboarding-next'));
-      await app.tap(key('onboarding-region'));
-      await app.tap(find.text('Comunidad de Madrid'));
       await app.tap(key('onboarding-next'));
       expect(app.title, 'Listo');
       await app.tap(key('onboarding-next'));
@@ -201,9 +201,9 @@ void main() {
 
     test('the screens of each way', () {
       expect(OnboardingStage.stepsOf(OnboardingPath.rotation), [
+        OnboardingStage.place,
         OnboardingStage.rotation,
         OnboardingStage.start,
-        OnboardingStage.place,
       ]);
       expect(OnboardingStage.stepsOf(OnboardingPath.import), [
         OnboardingStage.importCalendar,

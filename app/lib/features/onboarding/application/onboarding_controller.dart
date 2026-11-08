@@ -22,8 +22,11 @@ import 'onboarding_providers.dart';
 enum OnboardingPath { import, rotation, paint }
 
 /// Where the person is in the first-use flow: the first question
-/// ([choose]), the screens of the path chosen, the optional last step
-/// ([place]: holidays and job) and [ready].
+/// ([choose]), the screens of the path chosen, the optional step [place]
+/// (country, community and municipality for the holidays; on the import and
+/// paint paths also the job) and [ready]. On the rotation path [place] comes
+/// first, before the rotation, so the country's formats (first day of the
+/// week) are already set when the preview is drawn.
 enum OnboardingStage {
   choose,
   rotation,
@@ -35,7 +38,7 @@ enum OnboardingStage {
   /// The screens of [path] that carry «Paso N de M», in order (H-T01-9: one
   /// number per screen). The first question and «Listo» carry none.
   static List<OnboardingStage> stepsOf(OnboardingPath? path) => switch (path) {
-    OnboardingPath.rotation => const [rotation, start, place],
+    OnboardingPath.rotation => const [place, rotation, start],
     OnboardingPath.import => const [importCalendar, place],
     OnboardingPath.paint || null => const [place],
   };
@@ -69,7 +72,7 @@ class OnboardingState {
   final Profession? profession;
 
   /// Country of the holidays (alpha-2, or [otherCountryCode]): proposed from
-  /// the phone's region, changed in the last step. It also picks the list of
+  /// the phone's region, changed in the place step. It also picks the list of
   /// jobs ([professionsFor]).
   final String countryCode;
 
@@ -186,11 +189,12 @@ class OnboardingController extends Notifier<OnboardingState> {
 
   // ---- first question: how to start --------------------------------------
 
-  /// «Usar una rotación»: the rotation catalogue. A rotation chosen before
-  /// (and the way back here) is kept.
+  /// «Usar una rotación»: first the place (its country sets the week start
+  /// the rotation preview uses), then the rotation catalogue. A rotation
+  /// chosen before (and the way back here) is kept.
   void chooseRotation() {
     state = state.copyWith(path: OnboardingPath.rotation, byHand: false);
-    _go(OnboardingStage.rotation);
+    _go(OnboardingStage.place);
   }
 
   /// «Importar mis turnos»: the import screen, without any rotation.
@@ -199,7 +203,7 @@ class OnboardingController extends Notifier<OnboardingState> {
     _go(OnboardingStage.importCalendar);
   }
 
-  /// «Pintar a mano»: no rotation; after the last step the month opens in
+  /// «Pintar a mano»: no rotation; after the place step the month opens in
   /// paint mode.
   void choosePaint() {
     state = state.copyWith(
@@ -210,11 +214,11 @@ class OnboardingController extends Notifier<OnboardingState> {
     _go(OnboardingStage.place);
   }
 
-  // ---- job (optional): rotation screen, or the last step ------------------
+  // ---- job (optional): rotation screen, or the place step -----------------
 
   /// Tapping the chosen job again leaves none (the question is optional).
   /// The job is asked on the rotation screen (before the list, which it
-  /// orders) when the person uses a rotation, and in the last step on the
+  /// orders) when the person uses a rotation, and in the place step on the
   /// other ways. The rotation chosen stays: the job only sets the hours of
   /// the shift types.
   void selectProfession(Profession profession) =>
@@ -222,7 +226,7 @@ class OnboardingController extends Notifier<OnboardingState> {
       ? state.copyWith(clearProfession: true)
       : state.copyWith(profession: profession);
 
-  // ---- last step (optional): place ------------------------------------------
+  // ---- place (optional) ------------------------------------------------------
 
   /// Another country drops the region and municipality (in Spain, its
   /// autonomous community and municipality; elsewhere, its subdivision) and,
@@ -285,12 +289,13 @@ class OnboardingController extends Notifier<OnboardingState> {
   void selectPreset(String presetId) =>
       state = state.copyWith(presetId: presetId, byHand: false, stepOffset: 0);
 
-  /// "Lo pinto a mano" on the rotation screen: no rotation, on to the last
-  /// step (and the month in paint mode at the end).
-  void paintByHand() {
+  /// "Lo pinto a mano" on the rotation screen: no rotation, and since the
+  /// place was already asked, the choices are written (and the month opens in
+  /// paint mode at the end).
+  Future<void> paintByHand() async {
     if (state.finishing) return;
     state = state.copyWith(clearRotation: true, byHand: true);
-    _go(OnboardingStage.place);
+    await finish();
   }
 
   void setStart(CivilDate date) => state = state.copyWith(start: date);
@@ -307,16 +312,22 @@ class OnboardingController extends Notifier<OnboardingState> {
     _ => true,
   };
 
-  /// "Siguiente" / "Continuar". From the last step it writes the choices
-  /// and lands on "Listo".
+  /// "Siguiente" / "Continuar". From the last step of the path it writes the
+  /// choices and lands on "Listo".
   Future<void> next() async {
     if (state.finishing || !canAdvance) return;
     switch (state.stage) {
       case OnboardingStage.rotation:
         _go(OnboardingStage.start);
-      case OnboardingStage.start || OnboardingStage.importCalendar:
+      case OnboardingStage.importCalendar:
         _go(OnboardingStage.place);
       case OnboardingStage.place:
+        if (state.path == OnboardingPath.rotation) {
+          _go(OnboardingStage.rotation);
+        } else {
+          await finish();
+        }
+      case OnboardingStage.start:
         await finish();
       case OnboardingStage.choose || OnboardingStage.ready:
         break;
@@ -328,21 +339,25 @@ class OnboardingController extends Notifier<OnboardingState> {
     if (state.finishing) return;
     switch (state.stage) {
       case OnboardingStage.rotation || OnboardingStage.start:
+        // The place was asked before: no rotation, and the choices are
+        // written.
         state = state.copyWith(clearRotation: true);
-        _go(OnboardingStage.place);
+        await finish();
       case OnboardingStage.importCalendar:
         _go(OnboardingStage.place);
       case OnboardingStage.place:
         // The country stays (the proposed one, or the one chosen): skipping
         // the community must not bring Spain's holidays to someone in
         // another country. The community goes, and the job too unless it
-        // was asked on the rotation screen (then it is not part of this
+        // is asked on the rotation screen (then it is not part of this
         // step and stays).
-        state = state.copyWith(
-          clearPlace: true,
-          clearProfession: state.path != OnboardingPath.rotation,
-        );
-        await finish();
+        final rotation = state.path == OnboardingPath.rotation;
+        state = state.copyWith(clearPlace: true, clearProfession: !rotation);
+        if (rotation) {
+          _go(OnboardingStage.rotation);
+        } else {
+          await finish();
+        }
       case OnboardingStage.choose || OnboardingStage.ready:
         break;
     }
@@ -355,18 +370,18 @@ class OnboardingController extends Notifier<OnboardingState> {
     switch (state.stage) {
       case OnboardingStage.choose || OnboardingStage.ready:
         return false;
-      case OnboardingStage.rotation || OnboardingStage.importCalendar:
+      case OnboardingStage.importCalendar:
         _go(OnboardingStage.choose);
+      case OnboardingStage.rotation:
+        _go(OnboardingStage.place);
       case OnboardingStage.start:
         _go(OnboardingStage.rotation);
       case OnboardingStage.place:
         _go(switch (state.path) {
-          OnboardingPath.rotation =>
-            state.hasRotation
-                ? OnboardingStage.start
-                : OnboardingStage.rotation,
           OnboardingPath.import => OnboardingStage.importCalendar,
-          OnboardingPath.paint || null => OnboardingStage.choose,
+          OnboardingPath.rotation ||
+          OnboardingPath.paint ||
+          null => OnboardingStage.choose,
         });
     }
     return true;
@@ -378,7 +393,7 @@ class OnboardingController extends Notifier<OnboardingState> {
 
   /// The person came back from the import opened from the flow: what it
   /// brought is theirs, so [finish] must still write the choices made after
-  /// it (the country and the job of the last step).
+  /// it (the country and the job of the place step).
   void acceptImported() => _baseline = _probe();
 
   /// Whether a backup was restored while the flow was open (from

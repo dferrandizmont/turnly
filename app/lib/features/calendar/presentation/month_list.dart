@@ -263,7 +263,23 @@ class _MonthListDayState extends State<MonthListDay> {
   void initState() {
     super.initState();
     _focused = widget.focusNode.hasFocus;
+    FocusManager.instance.addHighlightModeListener(_onHighlightMode);
   }
+
+  @override
+  void dispose() {
+    FocusManager.instance.removeHighlightModeListener(_onHighlightMode);
+    super.dispose();
+  }
+
+  void _onHighlightMode(FocusHighlightMode _) {
+    if (_focused && mounted) setState(() {});
+  }
+
+  /// The ring of the focused row shows only with a keyboard (see `DayCell`).
+  bool get _showFocusRing =>
+      _focused &&
+      FocusManager.instance.highlightMode == FocusHighlightMode.traditional;
 
   KeyEventResult _key(FocusNode node, KeyEvent event) {
     final key = event.logicalKey;
@@ -293,7 +309,7 @@ class _MonthListDayState extends State<MonthListDay> {
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(Rad.row),
       side: BorderSide(
-        color: widget.selected || widget.opened || _focused || widget.isToday
+        color: widget.selected || widget.opened || _showFocusRing || widget.isToday
             ? colors.todayRing
             : colors.border,
         width: widget.selected ? Sp.selectedBorder : Sp.ring,

@@ -367,10 +367,9 @@ void main() {
       final before = app.schedule.shiftTypes.length;
       final ids = [for (final t in app.schedule.shiftTypes) t.id];
 
-      await app.choosePath('rotation');
+      await app.chooseRotation();
       await app.tap(key('onboarding-profession-nursing'));
-      await app.tap(key('onboarding-skip')); // rotation
-      await app.tap(key('onboarding-next')); // last step -> writes
+      await app.tap(key('onboarding-skip')); // rotation: last one, writes
       await app.flushWrites();
 
       // In memory, the palette of the paint bar and the engine.
@@ -418,7 +417,7 @@ void main() {
       final app = await FirstLaunch.open(tester);
       final start = onboardingToday.addDays(3);
 
-      await app.choosePath('rotation');
+      await app.chooseRotation();
       await app.tap(key('onboarding-profession-nursing'));
       await app.tap(key('onboarding-pattern-correturnos'));
       await app.tap(key('onboarding-next'));
@@ -432,8 +431,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       await app.selectCycleDay(6);
-      await app.tap(key('onboarding-next'));
-      await app.tap(key('onboarding-next')); // last step -> writes
+      await app.tap(key('onboarding-next')); // the start step writes
       await app.flushWrites();
 
       // The same request through the engine on the schedule as it was.
@@ -475,13 +473,12 @@ void main() {
       tester,
     ) async {
       final app = await FirstLaunch.open(tester);
-      await app.choosePath('rotation');
+      await app.chooseRotation();
       await app.tap(key('onboarding-profession-firefighters'));
       await app.tap(key('onboarding-pattern-24x72'));
-      await app.tap(key('onboarding-next'));
-      await app.tap(key('onboarding-next'));
-      await app.tap(key('onboarding-next'));
-      await app.tap(key('onboarding-next'));
+      await app.tap(key('onboarding-next')); // start
+      await app.tap(key('onboarding-next')); // writes
+      await app.tap(key('onboarding-next')); // «Ver mi calendario»
       expect(find.byType(MonthScreen), findsOneWidget);
       // 24 x 72 from today: G on the 19th and the 23rd, rest between.
       expect(

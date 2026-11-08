@@ -129,6 +129,15 @@ comparte, la vista previa del asistente), el código se encoge hasta caber en ve
 
 ## Componentes
 
+**Formas de botones y fichas** (7-nov-2026, el usuario pidió botones «más cuadrados, como el de Cuadrícula | Lista»):
+nada que se toque es una píldora. Los botones del tema (`FilledButton`, `OutlinedButton`, `TextButton`) son un
+rectángulo redondeado de radio `Rad.button` (12, el mismo del control «Cuadrícula | Lista»; el alto sigue en 48 dp);
+las fichas (`ChipTheme`, `ChoicePill`, la ficha del selector de calendario) usan `Rad.chipSmall` (10); el indicador
+de la barra y del raíl de destinos, `Rad.inner` (12); el botón «Pintar», `Rad.fab` (16). `Rad.chip` (999, `Rad.pill`)
+queda solo para lo que no es un botón: barras de progreso, puntos de paso y líneas del esqueleto. Siguen siendo
+redondos por diseño los círculos de turno (`Disc`), los botones de icono circulares, las muestras de color y el anillo
+de hoy.
+
 **Tarjeta de hoy** (arriba del mes): `surface`, radio 24, padding 18, barra inferior de 5 px en `bar` del turno.
 Bajo la fila del contador y «Mañana», dos líneas discretas de `meta` (C1): el próximo libre en `textSecondary` y en
 negrita («Libras el jueves 5», «Mañana libras», «Hoy libras; vuelves el lunes 9») y, en `textMuted`, el próximo fin de
@@ -198,7 +207,7 @@ del número del día y delante del clip de la nota y del punto de festivo (esa f
 hora; en una casilla muy estrecha la fila encoge hasta el 60 % en vez de salirse); el texto leído de la casilla dice «horas extra: 1 h 30 min» / «salida anticipada: 30 min».
 En el distintivo de 44 px (lista de turnos, detalle del día), en las fichas redondas de pintar y en la leyenda el
 icono va encima del código (12-14 dp) o delante del nombre; el código no desaparece nunca.
-**Cuatro turnos o más en un día:** como mucho 3 bandas. Se ven los 2 primeros turnos y una tercera banda neutra «+N» (`surfaceMuted`, borde superior `borderStrong` de `Sp.hair`, texto `textMuted` en `cellCodeMulti`), nunca en color de turno; la altura de la fila se mide con ese tope y el lector de pantalla nombra todos los turnos. Las bandas se reparten la altura de la casilla en proporción a lo que necesita cada una (su código y su hora; la primera, además, la fila del número; la última, la barra), y la fila mide la suma de esas alturas, no la banda más alta por el número de bandas.**Forma de las fichas:** `ChoicePill` es una píldora por defecto; las fichas de etiqueta larga o de varias líneas (profesión, turno y tanda del día del ciclo) usan `Rad.inputRadius`.
+**Cuatro turnos o más en un día:** como mucho 3 bandas. Se ven los 2 primeros turnos y una tercera banda neutra «+N» (`surfaceMuted`, borde superior `borderStrong` de `Sp.hair`, texto `textMuted` en `cellCodeMulti`), nunca en color de turno; la altura de la fila se mide con ese tope y el lector de pantalla nombra todos los turnos. Las bandas se reparten la altura de la casilla en proporción a lo que necesita cada una (su código y su hora; la primera, además, la fila del número; la última, la barra), y la fila mide la suma de esas alturas, no la banda más alta por el número de bandas.**Forma de las fichas:** `ChoicePill` es un rectángulo redondeado de radio `Rad.chipSmall` por defecto; las fichas de etiqueta larga o de varias líneas (profesión, turno y tanda del día del ciclo) usan `Rad.inputRadius`.
 
 **Modo pintar** (B3, opción 3A del lienzo del 31-oct; una línea y hoja que mide lo que sobra, decisión 28): cabecera
 **de una línea** «PINTANDO · CAMBIAR EL TURNO» (`label`: «PINTANDO» en `ink` del turno elegido y el modo en `textMuted`;
@@ -291,14 +300,14 @@ cerrar el día juntos arriba, y ocupa todo el alto del panel.
 precio», archivar y asa para arrastrar; «Nuevo turno» fijo abajo. El formulario va de arriba abajo: nombre, código,
 **vista previa** (la celda real en claro y en oscuro, con el contraste del código impreso debajo), rejilla de colores
 (los 8 de la especificación y 16 más, círculos de 44 px; el elegido con anillo `todayRing` y marca de verificación),
-categoría y opciones en **píldoras** (`ChoicePill`: borde `borderStrong`; la elegida con anillo de 2 px `todayRing`, marca
+categoría y opciones en **fichas** (`ChoicePill`, radio `Rad.chipSmall`: borde `borderStrong`; la elegida con anillo de 2 px `todayRing`, marca
 y negrita), horario (interruptor «Sin horario» y dos botones de hora de 24 h) y, solo en turnos de trabajo con
 horario, descanso no pagado, turno nocturno y precio por hora. El campo **Icono** (opcional; debajo de la categoría)
 es un botón con el icono actual o «Sin icono» que abre una hoja con una rejilla de blancos de 48 px: «Sin icono» y los
 30 símbolos de la lista cerrada `ShiftIcon`; el elegido con anillo `todayRing` y marca de verificación, y cada uno
 con su nombre para el lector de pantalla.
 
-**Botón «Pintar»** (FAB extendido): ver tokens `fab`; alto 56, radio 28, icono de pincel en `highlight`.
+**Botón «Pintar»** (FAB extendido): ver tokens `fab`; alto 56, radio 16 (`Rad.fab`), icono de pincel en `highlight`.
 
 **Widgets**: misma lógica que la tarjeta de hoy (pequeño), tira de 7 días con barras (mediano), mes en miniatura
 (grande); fondo `surface` del tema del sistema; barra inferior en el pequeño.
@@ -439,7 +448,7 @@ Los avisos y anuncios también están localizados; no se añaden sufijos a varia
 ## Barra de destinos (B1, opción 1A, 31-oct-2026)
 
 **Mes · Rotación · Agenda · Resumen**, siempre con nombre, en una barra inferior (`NavigationBar` del tema: fondo
-`surface` con filete `border` arriba, indicador `accentSoft` en forma de píldora, icono de 24 dp; nombre en `caption`,
+`surface` con filete `border` arriba, indicador `accentSoft` en rectángulo redondeado (`Rad.inner`), icono de 24 dp; nombre en `caption`,
 `textPrimary` 800 el elegido y `textMuted` 600 los demás). El botón «Pintar» flota encima, a la derecha. La barra se
 oculta en Pintar y Selección (su hoja de herramientas ocupa ese sitio) y con el teclado abierto. Los nombres se quedan
 con cualquier tamaño de texto, dibujados como mucho a ×1,3 (la barra tiene altura fija) y en una línea; solo si el más
@@ -536,10 +545,12 @@ calendario útil en menos de 60 s sin responder nada que no haga falta.
   y su `bar`, y el pincel). Debajo, en `meta` centrado, «Después te preguntamos el país…» y el botón de texto
   **Recuperar una copia de seguridad** (abre Ajustes › Copia; si se restaura, el flujo termina en el mes).
 - **Cada camino lleva a lo suyo:** importar → «¿Vienes de otra app?» (importar ahora o la copia de LRHSoft) →
-  último paso; rotación → catálogo (con «¿A qué te dedicas? Opcional» arriba, en `bodyStrong` y sin línea de ayuda:
-  la profesión elegida pone primero «Lo habitual en tu trabajo», como Policía con la 2-2-2-6) → día de inicio y
-  **turno y día del ciclo** → último paso; a mano → último paso, y el mes se abre ya en modo pintar. «Lo pinto a mano» sigue en el catálogo y hace lo mismo sin salir del camino.
-- **Último paso, opcional** (`PlaceStep`): «Paso N de M · Opcional» en `meta` seminegrita, «¿Dónde trabajas?» (país,
+  último paso; rotación → **primero el lugar** (el país fija el primer día de la semana, y así «Así quedará» ya sale
+  con la semana del país elegido) → catálogo (con «¿A qué te dedicas? Opcional» arriba, en `bodyStrong` y sin línea de
+  ayuda: la profesión elegida pone primero «Lo habitual en tu trabajo», como Policía con la 2-2-2-6) → día de inicio y
+  **turno y día del ciclo**, que es el último paso («Continuar» guarda); a mano → último paso, y el mes se abre ya en modo
+  pintar. «Lo pinto a mano» sigue en el catálogo y termina ahí mismo, sin volver a preguntar el lugar.
+- **Paso del lugar, opcional** (`PlaceStep`; el último salvo con una rotación, donde es el primero): «Paso N de M · Opcional» en `meta` seminegrita, «¿Dónde trabajas?» (país,
   comunidad y municipio como antes) y, debajo (salvo en el camino de la rotación, que ya la preguntó en el catálogo),
   «¿A qué te dedicas? Opcional» en `title` con las profesiones del país en `ChoicePill` (la elegida con borde `todayRing` y check; tocarla otra vez la quita) y sus horas habituales en una
   línea debajo. «Saltar» o «Continuar» guardan siempre el país (el propuesto o el elegido). Luego «Listo» con el
@@ -561,10 +572,10 @@ posterior), en 200 ms; la cabecera y la fila del mes no se mueven. Con «reducir
   de radio `Rad.row` con el nombre, el ciclo («28 días») y la secuencia como **fichas pequeñas** (`Disc.s`, `disc` +
   `ink` del turno, el código siempre visible). La elegida lleva el borde `todayRing` y un check, no solo color.
 - **Selector de turno y día del ciclo** (mismo componente en el paso 2 del asistente y en «¿Cuándo empiezas?» del
-  primer uso, `CycleStartPicker`): la pregunta es **qué turno** tiene ese día, con una píldora `ChoicePill` por turno
+  primer uso, `CycleStartPicker`): la pregunta es **qué turno** tiene ese día, con una ficha `ChoicePill` por turno
   distinto del ciclo (radio `Rad.inputRadius`, el mismo de las fichas de profesión; color y código en un `ShiftBadge`,
   nunca solo color; los del catálogo hablan el idioma de la app). Si ese turno aparece varias veces en el ciclo, debajo
-  sale **una píldora por día del turno**, rotulada por su tanda («2.º de 5 · Mañana»; «Tanda 2 · 1.º de 2 · Libre,
+  sale **una ficha por día del turno**, rotulada por su tanda («2.º de 5 · Mañana»; «Tanda 2 · 1.º de 2 · Libre,
   después de Noche» cuando el turno tiene varias tandas separadas, nombradas por el turno del día anterior). Una tanda
   sólo se rotula «después de X» cuando el día inmediatamente anterior tiene otro turno; si está vacío, se cae esa parte.
   La cuadrícula numerada de todo el ciclo sigue detrás de «Ver el ciclo completo» (fichas `Disc.m`, con el número del

@@ -15,8 +15,8 @@ import 'onboarding_widgets.dart';
 /// which rotations come first); tapping the chosen one again leaves none.
 ///
 /// It is asked on the rotation screen when the person uses a rotation (so
-/// «Lo habitual en tu trabajo» is already ordered there), and in the last step
-/// on the other ways. The [compact] form (the rotation screen) has a smaller
+/// «Lo habitual en tu trabajo» is already ordered there), and in the place
+/// step on the other ways. The [compact] form (the rotation screen) has a smaller
 /// title and no help line.
 class ProfessionSection extends ConsumerWidget {
   const ProfessionSection({super.key, this.compact = false});

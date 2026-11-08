@@ -24,7 +24,7 @@ void main() {
     final handle = tester.ensureSemantics();
     final app = await FirstLaunch.open(tester);
 
-    await app.choosePath('rotation');
+    await app.chooseRotation();
     expect(_selected(tester, RegExp('^Enfermería')), isFalse);
     await app.tap(key('onboarding-profession-nursing'));
     expect(_selected(tester, RegExp('^Enfermería')), isTrue);
@@ -41,7 +41,7 @@ void main() {
     testWidgets('H-T18-1: the cells «Día N» of the start step are at least '
         '48 x 48 dp (text x$scale)', (tester) async {
       final app = await FirstLaunch.open(tester, textScale: scale);
-      await app.choosePath('rotation');
+      await app.chooseRotation();
       await app.tap(key('onboarding-pattern-12h'));
       await _next(app);
       expect(app.title, '¿Cuándo empiezas?');
@@ -62,7 +62,7 @@ void main() {
   testWidgets('H-T18-1: the shift and «which of its days» pills are at least '
       '48 x 48 dp (text x2.0)', (tester) async {
     final app = await FirstLaunch.open(tester, textScale: 2.0);
-    await app.choosePath('rotation');
+    await app.chooseRotation();
     await app.tap(key('onboarding-pattern-continental'));
     await _next(app);
     expect(app.title, '¿Cuándo empiezas?');

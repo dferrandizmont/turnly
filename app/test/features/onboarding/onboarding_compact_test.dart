@@ -33,7 +33,7 @@ void main() {
     tester,
   ) async {
     final app = await FirstLaunch.open(tester, size: const Size(390, 844));
-    await app.choosePath('rotation');
+    await app.chooseRotation();
     expect(barScrolls(), isFalse);
     expect(nextScrolls(), isFalse);
     expect(
@@ -51,7 +51,7 @@ void main() {
       tester,
     ) async {
       final app = await FirstLaunch.open(tester, size: size, textScale: scale);
-      await app.choosePath('rotation');
+      await app.chooseRotation();
       expect(barScrolls(), isTrue);
 
       // The scroll view starts at the top of the screen (the bar is inside
@@ -121,7 +121,7 @@ void main() {
             size: Size(width, 760),
             textScale: scale,
           );
-          await app.choosePath('rotation');
+          await app.chooseRotation();
           for (var step = 0; step < 2; step++) {
             expect(nextScrolls(), scale >= 1.5, reason: 'step $step');
             final next = key('onboarding-next');

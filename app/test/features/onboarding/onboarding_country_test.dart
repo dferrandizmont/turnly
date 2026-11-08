@@ -238,8 +238,8 @@ void main() {
     ) async {
       final app = await _openIn(tester, 'MX');
       await app.choosePath('rotation');
-      await app.tap(key('onboarding-skip')); // rotation
-      await app.tap(key('onboarding-skip')); // last step: finishes
+      await app.tap(key('onboarding-skip')); // place: the country stays
+      await app.tap(key('onboarding-skip')); // rotation: last one, finishes
       expect(app.title, 'Listo');
       expect(find.text('Festivos: México'), findsOneWidget);
       expect(

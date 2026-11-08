@@ -867,6 +867,14 @@ void main() {
       controller.endStroke();
       await tester.pumpAndSettle();
       expect(builds, {_day.addDays(1): 1, _day.addDays(2): 1});
+      // Keyboard use from here on: the first key press would otherwise
+      // switch the highlight mode and repaint the focused row once more.
+      FocusManager.instance.highlightStrategy =
+          FocusHighlightStrategy.alwaysTraditional;
+      addTearDown(
+        () => FocusManager.instance.highlightStrategy =
+            FocusHighlightStrategy.automatic,
+      );
       tester.widget<MonthListDay>(_row(_day)).focusNode.requestFocus();
       await tester.pumpAndSettle();
       builds.clear();

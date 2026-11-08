@@ -18,7 +18,8 @@ import '../application/onboarding_providers.dart';
 import 'onboarding_widgets.dart';
 import 'profession_step.dart';
 
-/// The last step, optional («Paso N de M · Opcional»): «¿Dónde trabajas?»,
+/// The place step, optional («Paso N de M · Opcional»; the last one except
+/// with a rotation, where it comes first): «¿Dónde trabajas?»,
 /// the country (proposed from the phone's region) and, in Spain, the
 /// community (a list of 19) and, optionally, the municipality (a search over
 /// the bundled index, filtered by region); outside Spain a line says there
@@ -59,7 +60,7 @@ class PlaceStep extends ConsumerWidget {
       },
     );
 
-    // «Paso 3 de 3 · Opcional»: the dots say the number, this says it can
+    // «Paso 1 de 3 · Opcional»: the dots say the number, this says it can
     // be left.
     final step = state.stepNumber;
     final optional = Padding(

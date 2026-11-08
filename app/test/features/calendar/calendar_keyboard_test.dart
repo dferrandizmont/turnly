@@ -16,6 +16,16 @@ import 'harness.dart';
 
 void main() {
   setUpAll(initializeLocale);
+  // These tests drive the calendar with a keyboard: the focus ring only
+  // shows in the keyboard highlight mode.
+  setUp(
+    () => FocusManager.instance.highlightStrategy =
+        FocusHighlightStrategy.alwaysTraditional,
+  );
+  tearDown(
+    () => FocusManager.instance.highlightStrategy =
+        FocusHighlightStrategy.automatic,
+  );
   const first = CivilDate(2026, 9, 28);
   const day = CivilDate(2026, 10, 19);
 
@@ -43,6 +53,21 @@ void main() {
       tester.element(cell(date)).colors.accent,
     );
   }
+
+  testWidgets('with touch, a focused day shows no focus ring', (tester) async {
+    FocusManager.instance.highlightStrategy =
+        FocusHighlightStrategy.alwaysTouch;
+    await open(tester);
+    await focus(tester, day);
+    expect(tester.widget<DayCell>(cell(day)).focusNode!.hasFocus, isTrue);
+    expect(find.byKey(ValueKey('keyboard-focus-${day.toIso()}')), findsNothing);
+
+    // The first key press brings it back.
+    FocusManager.instance.highlightStrategy =
+        FocusHighlightStrategy.alwaysTraditional;
+    await tester.pumpAndSettle();
+    expectFocus(tester, day);
+  });
 
   for (final navigation in ['button', 'swipe']) {
     for (final painting in [false, true]) {

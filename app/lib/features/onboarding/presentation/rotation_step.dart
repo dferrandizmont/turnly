@@ -17,7 +17,7 @@ import '../domain/profession.dart';
 import 'onboarding_widgets.dart';
 import 'profession_step.dart';
 
-/// «¿Cómo es tu rotación?» (first screen of «Usar una rotación»): the job
+/// «¿Cómo es tu rotación?» (second screen of «Usar una rotación», after the place): the job
 /// (optional, compact), the catalogue (the same cards as the pattern wizard)
 /// with the patterns of the job first when one is chosen, or «Lo pinto a
 /// mano».

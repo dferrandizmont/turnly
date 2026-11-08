@@ -47,9 +47,9 @@ class CalendarSwitcher extends ConsumerWidget {
         excludeSemantics: true,
         child: InkWell(
           key: const ValueKey('calendar-switcher'),
-          borderRadius: Rad.pill,
+          borderRadius: Rad.chipSmallRadius,
           onTap: () => showCalendarSwitcherSheet(context),
-          // The pill itself is about 36 dp tall; the touch target is 48.
+          // The chip itself is about 36 dp tall; the touch target is 48.
           child: ConstrainedBox(
             constraints: const BoxConstraints(minHeight: Sp.touch),
             child: Center(
@@ -57,7 +57,7 @@ class CalendarSwitcher extends ConsumerWidget {
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   color: colors.surfaceRaised,
-                  borderRadius: Rad.pill,
+                  borderRadius: Rad.chipSmallRadius,
                   border: Border.all(color: colors.border),
                 ),
                 child: Padding(

@@ -23,13 +23,12 @@ void main() {
       size: size,
       textScale: textScale,
     );
-    await app.choosePath('rotation');
+    await app.chooseRotation();
     await app.tap(key('onboarding-profession-nursing'));
     await app.tap(key('onboarding-pattern-correturnos'));
     await app.tap(key('onboarding-next'));
     await app.selectCycleDay(cycleDay - 1);
-    await app.tap(key('onboarding-next'));
-    await app.tap(key('onboarding-next'));
+    await app.tap(key('onboarding-next')); // the start step writes
     expect(app.title, 'Listo');
     return app;
   }
@@ -62,9 +61,8 @@ void main() {
 
   testWidgets('a rotation painted by hand has no cycle line', (tester) async {
     final app = await FirstLaunch.open(tester);
-    await app.choosePath('rotation');
+    await app.chooseRotation();
     await app.tap(key('onboarding-by-hand'));
-    await app.tap(key('onboarding-next'));
     expect(app.title, 'Listo');
     expect(summary(tester), contains('la pintas tú a mano'));
     expect(summary(tester), isNot(contains('del ciclo')));

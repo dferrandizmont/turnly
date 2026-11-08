@@ -69,6 +69,8 @@ class Sp {
 class Rad {
   const Rad._();
 
+  /// Fully round (bars, dots, skeleton lines). Never a button or a chip:
+  /// those are rounded rectangles ([button], [chipSmall]).
   static const double chip = 999;
 
   /// Tiny legend swatches (10-14 dp squares).
@@ -86,7 +88,10 @@ class Rad {
   static const double inner = 12;
   static const double cell = 12;
   static const double input = 14;
-  static const double button = 14;
+
+  /// Buttons (filled, outlined, text) and segmented-control tracks: the same
+  /// outer radius as the «Cuadrícula | Lista» control ([inner]).
+  static const double button = 12;
 
   /// The card and row radius: every `AppCard` uses it by default.
   static const double row = 16;
@@ -100,8 +105,9 @@ class Rad {
   /// Bottom sheets (paint tools, day sheet) and dialogs.
   static const double sheet = 26;
 
-  /// The extended "Pintar" button (56 dp tall, fully rounded ends).
-  static const double fab = 28;
+  /// The extended "Pintar" button (56 dp tall): a rounded rectangle, like
+  /// the cards ([row]), not a pill.
+  static const double fab = 16;
 
   /// The home-screen widget preview (Android's launcher widget radius).
   static const double preview = 24;
@@ -112,6 +118,7 @@ class Rad {
   static BorderRadius get badgeRadius => BorderRadius.circular(badge);
   static BorderRadius get countdownRadius => BorderRadius.circular(countdown);
   static BorderRadius get inputRadius => BorderRadius.circular(input);
+  static BorderRadius get buttonRadius => BorderRadius.circular(button);
   static BorderRadius get innerRadius => BorderRadius.circular(inner);
   static BorderRadius get chipSmallRadius => BorderRadius.circular(chipSmall);
   static BorderRadius get swatchRadius => BorderRadius.circular(swatch);

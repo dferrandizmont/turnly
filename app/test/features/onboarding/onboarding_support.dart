@@ -95,6 +95,13 @@ class FirstLaunch {
   /// `rotation` or `paint`.
   Future<void> choosePath(String path) => tap(key('onboarding-path-$path'));
 
+  /// «Usar una rotación» and on through its place step (the country as proposed):
+  /// lands on «¿Cómo es tu rotación?». Two taps (the card and «Siguiente»).
+  Future<void> chooseRotation() async {
+    await choosePath('rotation');
+    await tap(key('onboarding-next'));
+  }
+
   /// The last step (optional) with nothing chosen before: «Pintar a mano».
   Future<void> toLastStep() => choosePath('paint');
 

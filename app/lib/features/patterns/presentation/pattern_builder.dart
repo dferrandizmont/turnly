@@ -281,7 +281,8 @@ class _BuilderChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final shape = StadiumBorder(
+    final shape = RoundedRectangleBorder(
+      borderRadius: Rad.chipSmallRadius,
       side: BorderSide(
         color: selected ? colors.todayRing : colors.borderStrong,
         width: selected ? Sp.ring : 1,

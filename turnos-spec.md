@@ -155,7 +155,7 @@ Diseño elegido el 31-oct-2026 (2A, `docs/diseno.md`, «Primer uso: tres caminos
 1. «¿Cómo empiezas tu cuadrante?» Tres caminos: **Importar mis turnos** (calendario del móvil, `.ics`, CSV o copia de
    LRHSoft), **Usar una rotación** (eliges un patrón, el día de inicio y el día del ciclo) o **Pintar a mano** (el mes se
    abre en modo pintar). Debajo, «Recuperar una copia de seguridad».
-2. Último paso, opcional: «¿Dónde trabajas?» (país, comunidad y municipio, para los festivos) y «¿A qué te dedicas?»
+2. Paso del lugar, opcional (con una rotación va antes de la rotación, para que su vista previa use la semana del país): «¿Dónde trabajas?» (país, comunidad y municipio, para los festivos) y «¿A qué te dedicas?»
    (Enfermería / Policía o GC / Bomberos / Industria / Seguridad / Hostelería / Otro; ajusta las horas de los turnos).
    Se puede saltar; el país propuesto se guarda siempre.
 3. Listo: el mes ya pintado. Sugerencia para añadir el widget, con una animación de cómo se hace.

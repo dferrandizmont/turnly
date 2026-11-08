@@ -379,7 +379,7 @@ class MonthSelectDaysControl extends ConsumerWidget {
           foregroundColor: colors.textPrimary,
           backgroundColor: colors.surfaceMuted,
           side: BorderSide(color: colors.border),
-          shape: RoundedRectangleBorder(borderRadius: Rad.inputRadius),
+          shape: RoundedRectangleBorder(borderRadius: Rad.buttonRadius),
           textStyle: style,
         );
         final onPressed = ref.read(selectionControllerProvider.notifier).enter;

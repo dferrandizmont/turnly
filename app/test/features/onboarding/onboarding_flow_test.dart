@@ -34,28 +34,28 @@ FilledButton _nextButton(WidgetTester tester) => tester.widget<FilledButton>(
   ),
 );
 
-/// «Usar una rotación», the 12 h one chosen, on its start day. The [job] (a
-/// `Profession` name), when given, is chosen first: it is asked on the
-/// rotation screen, above the list.
+/// «Usar una rotación» (the place goes first: left as proposed), the 12 h one
+/// chosen, on its start day. The [job] (a `Profession` name), when given, is
+/// chosen first: it is asked on the rotation screen, above the list.
 Future<void> _toStart(
   FirstLaunch app, {
   String preset = '12h',
   String? job,
 }) async {
-  await app.choosePath('rotation');
+  await app.chooseRotation();
   if (job != null) await app.tap(key('onboarding-profession-$job'));
   await app.tap(key('onboarding-pattern-$preset'));
   await _next(app);
 }
 
-/// Nursing and Comunidad de Madrid, on the last step (the ways that ask the
-/// job there: not the rotation, which asks it on its first screen).
+/// Nursing and Comunidad de Madrid, on the place step (the ways that ask the
+/// job there: not the rotation, which asks it on its own screen).
 Future<void> _nurseInMadrid(FirstLaunch app) async {
   await app.tap(key('onboarding-profession-nursing'));
   await _inMadrid(app);
 }
 
-/// Comunidad de Madrid, on the last step.
+/// Comunidad de Madrid, on the place step.
 Future<void> _inMadrid(FirstLaunch app) async {
   await app.tap(key('onboarding-region'));
   await app.tap(find.text('Comunidad de Madrid'));
@@ -122,7 +122,7 @@ void main() {
     ) async {
       final app = await FirstLaunch.open(tester);
       await app.choosePath('rotation');
-      expect(app.title, '¿Cómo es tu rotación?');
+      expect(app.title, '¿Dónde trabajas?');
       await tester.binding.handlePopRoute();
       await tester.pumpAndSettle();
       expect(app.title, '¿Cómo empiezas tu cuadrante?');
@@ -134,7 +134,7 @@ void main() {
       tester,
     ) async {
       final app = await FirstLaunch.open(tester);
-      await app.choosePath('rotation');
+      await app.chooseRotation();
       expect(app.title, '¿Cómo es tu rotación?');
       expect(find.text('LO HABITUAL EN TU TRABAJO'), findsNothing);
       expect(find.text('ROTACIONES'), findsOneWidget);
@@ -147,7 +147,7 @@ void main() {
       'Siguiente needs a rotation; then the start day and cycle day',
       (tester) async {
         final app = await FirstLaunch.open(tester);
-        await app.choosePath('rotation');
+        await app.chooseRotation();
         expect(_nextButton(tester).onPressed, isNull);
         await app.tap(key('onboarding-pattern-12h'));
         expect(_nextButton(tester).onPressed, isNotNull);
@@ -168,14 +168,15 @@ void main() {
           ),
           findsOneWidget,
         );
+        // The start step is the last one with a rotation: it writes.
         await _next(app);
-        expect(app.title, '¿Dónde trabajas?');
+        expect(app.title, 'Listo');
       },
     );
 
     testWidgets('a shift that repeats asks which of its days', (tester) async {
       final app = await FirstLaunch.open(tester);
-      await app.choosePath('rotation');
+      await app.chooseRotation();
       await app.tap(key('onboarding-profession-nursing'));
       await app.tap(key('onboarding-pattern-continental'));
       await _next(app);
@@ -214,8 +215,7 @@ void main() {
       ];
       expect(labels.toSet(), hasLength(labels.length));
       await app.tap(key('onboarding-occurrence-9'));
-      await _next(app);
-      await _next(app);
+      await _next(app); // the start step writes
 
       expect(app.title, 'Listo');
       // The 10th day of the cycle is a morning (M2 T2 N3 L2 M2...).
@@ -229,7 +229,7 @@ void main() {
       tester,
     ) async {
       final app = await FirstLaunch.open(tester);
-      await app.choosePath('rotation');
+      await app.chooseRotation();
       await app.tap(key('onboarding-pattern-continental'));
       await _next(app);
 
@@ -253,7 +253,7 @@ void main() {
       debugPhoneLocales = const [Locale('en', 'US')];
       addTearDown(() => debugPhoneLocales = const [Locale('es', 'ES')]);
       final app = await FirstLaunch.open(tester);
-      await app.choosePath('rotation');
+      await app.chooseRotation();
 
       // The chips of a card with afternoon and off: Spanish T/L, not the
       // stored English A/O.
@@ -280,7 +280,7 @@ void main() {
       debugPhoneLocales = const [Locale('en', 'US')];
       addTearDown(() => debugPhoneLocales = const [Locale('es', 'ES')]);
       final app = await FirstLaunch.open(tester);
-      await app.choosePath('rotation');
+      await app.chooseRotation();
       await app.tap(key('onboarding-pattern-correturnos'));
       await _next(app);
       await app.tap(key('onboarding-shift-afternoon'));
@@ -304,6 +304,12 @@ void main() {
         'at once (QA 0.9.0 F2)', (tester) async {
       final app = await FirstLaunch.open(tester);
       await app.choosePath('rotation');
+      // The place comes first and does not ask the job: it is asked on the
+      // rotation screen.
+      expect(app.title, '¿Dónde trabajas?');
+      expect(key('onboarding-profession-title'), findsNothing);
+      await _next(app);
+      expect(app.title, '¿Cómo es tu rotación?');
       // No job yet: one list, none first.
       expect(find.text('LO HABITUAL EN TU TRABAJO'), findsNothing);
       expect(key('onboarding-profession-title'), findsOneWidget);
@@ -326,14 +332,11 @@ void main() {
         tester.getTopLeft(key('onboarding-by-hand')).dy,
         lessThan(tester.getTopLeft(key('onboarding-pattern-24x72')).dy),
       );
-      // Choosing the rotation after the job keeps the job, and going on
-      // does not ask it again in the last step.
+      // Choosing the rotation after the job keeps the job.
       await app.tap(key('onboarding-pattern-12h'));
       expect(_nextButton(tester).onPressed, isNotNull);
       await _next(app);
-      await _next(app);
-      expect(app.title, '¿Dónde trabajas?');
-      expect(key('onboarding-profession-title'), findsNothing);
+      expect(app.title, '¿Cuándo empiezas?');
       final state = app.container.read(onboardingControllerProvider);
       expect(state.presetId, '12h');
       expect(state.profession, Profession.nursing);
@@ -342,7 +345,7 @@ void main() {
     testWidgets('Police puts the Policía Nacional rotation first, '
         'Firefighters the 24 x 72 (QA 0.9.0 F2)', (tester) async {
       final app = await FirstLaunch.open(tester);
-      await app.choosePath('rotation');
+      await app.chooseRotation();
       await app.tap(key('onboarding-profession-police'));
       final police = tester.getTopLeft(key('onboarding-pattern-pn-2-2-2-6')).dy;
       for (final id in ['12h', 'correturnos']) {
@@ -359,13 +362,11 @@ void main() {
       );
     });
 
-    testWidgets('"Lo pinto a mano" goes to the last step without rotation, '
-        'and the month opens ready to paint', (tester) async {
+    testWidgets('"Lo pinto a mano" finishes without rotation (the place was '
+        'asked before), and the month opens ready to paint', (tester) async {
       final app = await FirstLaunch.open(tester);
-      await app.choosePath('rotation');
+      await app.chooseRotation();
       await app.tap(key('onboarding-by-hand'));
-      expect(app.title, '¿Dónde trabajas?');
-      await _next(app);
       expect(app.title, 'Listo');
       expect(find.text('Rotación: la pintas tú a mano'), findsOneWidget);
       await app.flushWrites();
@@ -699,22 +700,30 @@ void main() {
   group('navigation', () {
     testWidgets('back keeps what was chosen, screen by screen', (tester) async {
       final app = await FirstLaunch.open(tester);
-      await _toStart(app, preset: 'continental', job: 'nursing');
-      await app.selectCycleDay(3);
-      await _next(app);
+      await app.choosePath('rotation');
       await _inMadrid(app);
       expect(app.title, '¿Dónde trabajas?');
+      await _next(app);
+      await app.tap(key('onboarding-profession-nursing'));
+      await app.tap(key('onboarding-pattern-continental'));
+      await _next(app);
+      await app.selectCycleDay(3);
+      expect(app.title, '¿Cuándo empiezas?');
 
       await app.tap(key('onboarding-back'));
-      expect(app.title, '¿Cuándo empiezas?');
-      await app.tap(key('onboarding-back'));
       expect(app.title, '¿Cómo es tu rotación?');
+      await app.tap(key('onboarding-back'));
+      expect(app.title, '¿Dónde trabajas?');
+      expect(find.text('Comunidad de Madrid'), findsOneWidget);
       await app.tap(key('onboarding-back'));
       expect(app.title, '¿Cómo empiezas tu cuadrante?');
       expect(key('onboarding-back'), findsNothing);
 
       // Forward again: the choices are still there.
       await app.choosePath('rotation');
+      expect(find.text('Comunidad de Madrid'), findsOneWidget);
+      await _next(app);
+      expect(app.title, '¿Cómo es tu rotación?');
       await _next(app);
       expect(app.title, '¿Cuándo empiezas?');
       // Continental, day 4 of the cycle (M M T T N N N ...): a Tarde, with
@@ -724,7 +733,8 @@ void main() {
         findsOneWidget,
       );
       await _next(app);
-      expect(find.text('Comunidad de Madrid'), findsOneWidget);
+      expect(app.title, 'Listo');
+      expect(find.text('Festivos: Comunidad de Madrid'), findsOneWidget);
     });
 
     testWidgets('the system back button goes back, not out of the app', (
@@ -744,9 +754,9 @@ void main() {
         'and the country', (tester) async {
       final app = await FirstLaunch.open(tester);
       await app.choosePath('rotation');
-      await app.tap(key('onboarding-skip')); // rotation
-      expect(app.title, '¿Dónde trabajas?');
-      await app.tap(key('onboarding-skip')); // last step: finishes
+      await app.tap(key('onboarding-skip')); // place: the country stays
+      expect(app.title, '¿Cómo es tu rotación?');
+      await app.tap(key('onboarding-skip')); // rotation: last one, finishes
       expect(app.title, 'Listo');
       expect(key('onboarding-skip'), findsNothing);
       expect(key('onboarding-back'), findsNothing);
@@ -769,15 +779,19 @@ void main() {
       tester,
     ) async {
       final app = await FirstLaunch.open(tester);
-      await _toStart(app, job: 'nursing');
-      await app.tap(key('onboarding-skip')); // the start day: no rotation
-      expect(app.title, '¿Dónde trabajas?');
+      await app.choosePath('rotation');
       await _inMadrid(app);
       await app.tap(key('onboarding-skip')); // the community goes
+      expect(app.title, '¿Cómo es tu rotación?');
+      await app.tap(key('onboarding-profession-nursing'));
+      await app.tap(key('onboarding-pattern-12h'));
+      await _next(app);
+      expect(app.title, '¿Cuándo empiezas?');
+      await app.tap(key('onboarding-skip')); // the start day: no rotation
       expect(app.title, 'Listo');
       await app.flushWrites();
       expect(app.schedule.runs, isEmpty);
-      // The job was answered on the rotation screen, not on this one: it
+      // The job was answered on the rotation screen, not on the place: it
       // stays.
       expect(
         await app.real(OnboardingRepository(app.database).loadProfile),
@@ -793,9 +807,7 @@ void main() {
       tester,
     ) async {
       final app = await FirstLaunch.open(tester);
-      await _toStart(app, job: 'nursing');
-      await app.tap(key('onboarding-shift-night12'));
-      await _next(app);
+      await app.choosePath('rotation');
       await app.tap(key('onboarding-region'));
       await app.tap(find.text('Comunidad de Madrid'));
       await app.tap(key('onboarding-municipality'));
@@ -803,6 +815,11 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(key('municipality-28079'));
       await tester.pumpAndSettle();
+      await _next(app);
+      await app.tap(key('onboarding-profession-nursing'));
+      await app.tap(key('onboarding-pattern-12h'));
+      await _next(app);
+      await app.tap(key('onboarding-shift-night12'));
       await _next(app);
 
       expect(app.title, 'Listo');
@@ -870,12 +887,12 @@ void main() {
   });
 
   group('finishing', () {
-    // Nurse, no place, no rotation: only the shift types are written.
+    // Nurse, no rotation: only the shift types are written. «Saltar» on the
+    // rotation screen (the last one the person sees) is what writes.
     Future<void> toLastStep(FirstLaunch app) async {
-      await app.choosePath('rotation');
+      await app.chooseRotation();
       await app.tap(key('onboarding-profession-nursing'));
-      await app.tap(key('onboarding-skip'));
-      expect(app.title, '¿Dónde trabajas?');
+      expect(app.title, '¿Cómo es tu rotación?');
     }
 
     testWidgets('«Listo» comes only after the shift types are in the '
@@ -901,7 +918,7 @@ void main() {
           savedWhenReady = repository.saved.length;
         }
       });
-      await app.tap(key('onboarding-next'));
+      await app.tap(key('onboarding-skip'));
       // The writes take 50 ms each: let fake time pass until it ends.
       for (var i = 0; i < 40 && savedWhenReady < 0; i++) {
         await tester.pump(const Duration(milliseconds: 50));
@@ -937,7 +954,7 @@ void main() {
         ],
       );
       await toLastStep(app);
-      await app.tap(key('onboarding-next'));
+      await app.tap(key('onboarding-skip'));
       for (var i = 0; i < 40; i++) {
         await tester.pump(const Duration(milliseconds: 50));
       }
@@ -953,10 +970,13 @@ void main() {
     testWidgets('data that appeared meanwhile (a restore) is not '
         'overwritten', (tester) async {
       final app = await FirstLaunch.open(tester);
-      await _toStart(app, job: 'nursing');
-      await _next(app);
+      await app.choosePath('rotation');
       await _inMadrid(app);
-      expect(app.title, '¿Dónde trabajas?');
+      await _next(app);
+      await app.tap(key('onboarding-profession-nursing'));
+      await app.tap(key('onboarding-pattern-12h'));
+      await _next(app);
+      expect(app.title, '¿Cuándo empiezas?');
 
       // A backup is restored under the flow: a rotation of its own.
       await app.real(

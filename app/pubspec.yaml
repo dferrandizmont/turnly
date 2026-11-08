@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # Cuadrante: the version of a plain `flutter build`. Every build that is handed
 # out passes --build-name, --build-number and --dart-define=APP_VERSION with the
 # same name (tool/release_android.sh; docs/mac-ios.md, section 6.1).
-version: 0.6.0+1
+version: 0.9.3+2015
 
 environment:
   sdk: ^3.13.5

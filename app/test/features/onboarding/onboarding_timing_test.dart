@@ -23,14 +23,14 @@ void main() {
     final appTime = Stopwatch()..start();
     final fakeStart = tester.binding.clock.now();
 
-    await app.choosePath('rotation'); // 1
-    await app.tap(key('onboarding-profession-nursing')); // 2: asked first
-    await app.tap(key('onboarding-pattern-12h')); // 3
+    await app.choosePath('rotation'); // 1: the place comes first
+    await app.tap(key('onboarding-region')); // 2
+    await app.tap(find.text('Comunidad de Madrid')); // 3
     await app.tap(key('onboarding-next')); // 4
-    await app.tap(key('onboarding-shift-night12')); // 5: the night of the cycle
-    await app.tap(key('onboarding-next')); // 6
-    await app.tap(key('onboarding-region')); // 7
-    await app.tap(find.text('Comunidad de Madrid')); // 8
+    await app.tap(key('onboarding-profession-nursing')); // 5: asked first
+    await app.tap(key('onboarding-pattern-12h')); // 6
+    await app.tap(key('onboarding-next')); // 7
+    await app.tap(key('onboarding-shift-night12')); // 8: the night of the cycle
     await app.tap(key('onboarding-next')); // 9: "Continuar" (writes)
     await app.tap(key('onboarding-next')); // 10: "Ver mi calendario"
 
@@ -58,10 +58,6 @@ void main() {
     );
     // Any overflow or build error fails the test by itself.
     await app.choosePath('rotation');
-    await app.tap(key('onboarding-profession-hospitality'));
-    await app.tap(key('onboarding-pattern-5x2'));
-    await app.tap(key('onboarding-next'));
-    await app.tap(key('onboarding-next'));
     await app.tap(key('onboarding-region'));
     await app.tap(find.text('Illes Balears'));
     await app.tap(key('onboarding-municipality'));
@@ -69,6 +65,10 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.textContaining('Palma').first);
     await tester.pumpAndSettle();
+    await app.tap(key('onboarding-next'));
+    await app.tap(key('onboarding-profession-hospitality'));
+    await app.tap(key('onboarding-pattern-5x2'));
+    await app.tap(key('onboarding-next'));
     await app.tap(key('onboarding-next'));
     expect(app.title, 'Listo');
     await app.tap(key('onboarding-next'));
