@@ -472,7 +472,7 @@ class _CalendarChoice extends StatelessWidget {
                 DecoratedBox(
                   decoration: BoxDecoration(
                     color: color == null ? colors.accent : Color(color!),
-                    shape: BoxShape.circle,
+                    borderRadius: Rad.squareRadius(Sp.xxl),
                   ),
                   child: const SizedBox.square(dimension: Sp.xxl),
                 ),

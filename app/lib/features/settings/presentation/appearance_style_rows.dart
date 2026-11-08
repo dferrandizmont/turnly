@@ -213,7 +213,7 @@ class AccentSwatch extends StatelessWidget {
       width: Disc.m,
       height: Disc.m,
       decoration: BoxDecoration(
-        shape: BoxShape.circle,
+        borderRadius: Rad.squareRadius(Disc.m),
         border: Border.all(color: context.colors.border),
         gradient: LinearGradient(
           begin: Alignment.topLeft,

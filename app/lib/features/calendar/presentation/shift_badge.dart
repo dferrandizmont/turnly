@@ -23,6 +23,11 @@ class ShiftBadge extends StatelessWidget {
   /// Size of the icon above the code.
   static const double iconSize = 14;
 
+  /// Corner radius for a badge of [size] ([Rad.square]): a fixed 14 dp turned
+  /// the small badges (28 dp) into circles; this keeps every badge a rounded
+  /// square.
+  static double radiusFor(double size) => Rad.square(size);
+
   @override
   Widget build(BuildContext context) {
     final swatch = shift.swatch(context.colors.brightness);
@@ -36,7 +41,7 @@ class ShiftBadge extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: swatch.disc,
-          borderRadius: Rad.inputRadius,
+          borderRadius: BorderRadius.circular(radiusFor(size)),
         ),
         child: SizedBox.square(
           dimension: size,

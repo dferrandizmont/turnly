@@ -62,7 +62,10 @@ class SkeletonCard extends StatelessWidget {
           Container(
             width: Disc.m,
             height: Disc.m,
-            decoration: BoxDecoration(color: fill, shape: BoxShape.circle),
+            decoration: BoxDecoration(
+              color: fill,
+              borderRadius: Rad.squareRadius(Disc.m),
+            ),
           ),
           const SizedBox(width: Sp.m),
           const Expanded(

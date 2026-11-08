@@ -124,7 +124,7 @@ class SettingsRow extends StatelessWidget {
                 height: Disc.m,
                 decoration: BoxDecoration(
                   color: tone.bg,
-                  shape: BoxShape.circle,
+                  borderRadius: Rad.squareRadius(Disc.m),
                 ),
                 child: Icon(icon, size: IconSize.button, color: tone.fg),
               ),

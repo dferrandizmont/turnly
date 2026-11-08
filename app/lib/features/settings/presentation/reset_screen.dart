@@ -277,7 +277,7 @@ class _ResetItemRow extends StatelessWidget {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: colors.surfaceMuted,
-                shape: BoxShape.circle,
+                borderRadius: Rad.squareRadius(Disc.m),
               ),
               child: Icon(
                 icon,
@@ -310,7 +310,10 @@ class _KeepNote extends StatelessWidget {
         width: Disc.m,
         height: Disc.m,
         alignment: Alignment.center,
-        decoration: BoxDecoration(color: tone.bg, shape: BoxShape.circle),
+        decoration: BoxDecoration(
+          color: tone.bg,
+          borderRadius: Rad.squareRadius(Disc.m),
+        ),
         child: Icon(
           SettingsIcons.backup,
           size: IconSize.button,

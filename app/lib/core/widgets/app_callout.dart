@@ -64,7 +64,10 @@ class AppCallout extends StatelessWidget {
         width: Disc.m,
         height: Disc.m,
         alignment: Alignment.center,
-        decoration: BoxDecoration(color: tone.bg, shape: BoxShape.circle),
+        decoration: BoxDecoration(
+          color: tone.bg,
+          borderRadius: Rad.squareRadius(Disc.m),
+        ),
         child: Icon(icon, size: IconSize.button, fill: 1, color: tone.fg),
       ),
     );

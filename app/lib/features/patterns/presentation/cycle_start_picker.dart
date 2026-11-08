@@ -179,6 +179,48 @@ class _CycleStartPickerState extends State<CycleStartPicker> {
       onTap: () => widget.onOffsetChanged(i),
     );
 
+    // Grid cells as wide as their longest text needs at the reader's text
+    // size, so a word never breaks inside a cell (QA 0.9.5, F1).
+    final scaler = MediaQuery.textScalerOf(context);
+    final direction = Directionality.of(context);
+    double textWidth(String text, TextStyle style) {
+      final painter = TextPainter(
+        text: TextSpan(text: text, style: style),
+        textDirection: direction,
+        textScaler: scaler,
+        maxLines: 1,
+      )..layout();
+      final width = painter.width;
+      painter.dispose();
+      return width;
+    }
+
+    double widest(Iterable<double> widths) =>
+        widths.fold(0.0, (a, b) => a > b ? a : b);
+
+    final nameStyle = type.body.copyWith(fontWeight: FontWeight.w800);
+    final shiftCellWidth =
+        widest([
+          for (final id in order)
+            if (widget.shiftOf(id) case final shift?) ...[
+              textWidth(shift.name, nameStyle),
+              textWidth(shift.timeRange(format) ?? '', type.meta),
+            ],
+        ]) +
+        ChoicePill.chromeWidth(
+          compact: true,
+          hasLeading: true,
+          leadingSize: Disc.s,
+        ) +
+        1;
+    final occurrenceCellWidth =
+        widest([
+          for (final option in runOptions)
+            textWidth(optionLabel(option), nameStyle),
+        ]) +
+        ChoicePill.chromeWidth(compact: false, hasLeading: false) +
+        1;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -189,43 +231,42 @@ class _CycleStartPickerState extends State<CycleStartPicker> {
         const SizedBox(height: Sp.xs),
         Text(l10n.patternStartShiftHelp(date), style: type.meta),
         const SizedBox(height: Sp.m),
-        Wrap(
-          spacing: Sp.s,
-          runSpacing: Sp.s,
+        ChoiceGrid(
+          minCellWidth: shiftCellWidth,
           children: [
             for (final id in order)
-              Builder(
-                builder: (context) {
-                  final shift = widget.shiftOf(id);
-                  if (shift == null) return const SizedBox.shrink();
-                  final times = shift.timeRange(format);
-                  final label = times == null
-                      ? shift.name
-                      : keepTimeRangesTogether(
-                          l10n.calendarShiftWithTimes(shift.name, times),
-                        );
-                  return ChoicePill(
-                    key: ValueKey('${widget.keyPrefix}shift-$id'),
-                    label: label,
-                    selected: id == currentShiftId,
-                    radius: Rad.inputRadius,
-                    leading: ShiftBadge(shift: shift, size: Disc.s),
-                    onTap: () {
-                      // Tapping the shift already chosen keeps the day that
-                      // is chosen: only a different shift moves the offset.
-                      if (id == currentShiftId) return;
-                      final options = shiftRunOptions(steps, id);
-                      if (options.isEmpty) return;
-                      // A day can hold two shifts: remember which one was
-                      // tapped so its pill stays selected even when the offset
-                      // does not move (the tapped shift shares the chosen day
-                      // with the one that was selected).
-                      setState(() => _chosenShiftId = id);
-                      widget.onOffsetChanged(options.first.offset);
-                    },
-                  );
-                },
-              ),
+              if (widget.shiftOf(id) case final shift?)
+                Builder(
+                  builder: (context) {
+                    final times = shift.timeRange(format);
+                    return ChoicePill(
+                      key: ValueKey('${widget.keyPrefix}shift-$id'),
+                      label: shift.name,
+                      // Not kept together: the cell is sized to fit the hours
+                      // on one line, and when even one column is too narrow
+                      // (huge text) they wrap at the dash, not inside a time.
+                      detail: times,
+                      expand: true,
+                      compact: true,
+                      selected: id == currentShiftId,
+                      radius: Rad.inputRadius,
+                      leading: ShiftBadge(shift: shift, size: Disc.s),
+                      onTap: () {
+                        // Tapping the shift already chosen keeps the day that
+                        // is chosen: only a different shift moves the offset.
+                        if (id == currentShiftId) return;
+                        final options = shiftRunOptions(steps, id);
+                        if (options.isEmpty) return;
+                        // A day can hold two shifts: remember which one was
+                        // tapped so its pill stays selected even when the offset
+                        // does not move (the tapped shift shares the chosen day
+                        // with the one that was selected).
+                        setState(() => _chosenShiftId = id);
+                        widget.onOffsetChanged(options.first.offset);
+                      },
+                    );
+                  },
+                ),
           ],
         ),
         if (runOptions.length > 1) ...[
@@ -242,12 +283,13 @@ class _CycleStartPickerState extends State<CycleStartPicker> {
           const SizedBox(height: Sp.xs),
           Text(l10n.patternStartOccurrenceHelp, style: type.meta),
           const SizedBox(height: Sp.m),
-          Wrap(
-            spacing: Sp.s,
-            runSpacing: Sp.s,
+          ChoiceGrid(
+            minCellWidth: occurrenceCellWidth,
             children: [
               for (final option in runOptions)
                 ChoicePill(
+                  expand: true,
+                  reserveIcon: true,
                   key: ValueKey(
                     '${widget.keyPrefix}occurrence-${option.offset}',
                   ),
@@ -376,6 +418,62 @@ class PatternMonthPreview extends StatelessWidget {
           MiniMonth(month: second, schedule: plan!.schedule),
         ],
       ],
+    );
+  }
+}
+
+/// Choices laid out in aligned columns, every cell the same width and every
+/// row as tall as its tallest cell, so «Mañana», «Tarde», «Noche»… line up
+/// instead of wrapping ragged. As many columns (up to three) as fit cells of
+/// [minCellWidth]: two on a phone, one when a cell would not fit its longest
+/// text (narrow screen, large text), so no word ever breaks inside a cell.
+class ChoiceGrid extends StatelessWidget {
+  const ChoiceGrid({
+    super.key,
+    required this.minCellWidth,
+    required this.children,
+  });
+
+  /// The narrowest a cell may be: its longest text plus the pill around it.
+  final double minCellWidth;
+
+  final List<Widget> children;
+
+  /// How many columns of [minCellWidth] fit in [width] (1 to 3).
+  static int columnsFor(double width, double minCellWidth) =>
+      ((width + Sp.s) / (minCellWidth + Sp.s)).floor().clamp(1, 3);
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final columns = columnsFor(constraints.maxWidth, minCellWidth);
+        final rows = <Widget>[];
+        for (var i = 0; i < children.length; i += columns) {
+          if (rows.isNotEmpty) rows.add(const SizedBox(height: Sp.s));
+          rows.add(
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (var c = 0; c < columns; c++) ...[
+                    if (c > 0) const SizedBox(width: Sp.s),
+                    Expanded(
+                      child: i + c < children.length
+                          ? children[i + c]
+                          : const SizedBox.shrink(),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          );
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: rows,
+        );
+      },
     );
   }
 }

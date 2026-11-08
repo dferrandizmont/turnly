@@ -81,7 +81,7 @@ class RotationStep extends ConsumerWidget {
               DecoratedBox(
                 decoration: BoxDecoration(
                   color: context.colors.surfaceRaised,
-                  shape: BoxShape.circle,
+                  borderRadius: Rad.squareRadius(Disc.m),
                 ),
                 child: SizedBox.square(
                   dimension: Disc.m,

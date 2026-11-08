@@ -218,7 +218,7 @@ class PaintBar extends ConsumerWidget {
       disabledBackgroundColor: colors.surfaceRaised,
       foregroundColor: colors.textPrimary,
       disabledForegroundColor: colors.textMuted,
-      shape: const CircleBorder(),
+      shape: RoundedRectangleBorder(borderRadius: Rad.squareRadius(Disc.round)),
     );
 
     final limited = maxHeight != null && !card;
@@ -345,7 +345,9 @@ class PaintBar extends ConsumerWidget {
                                 disc: DecoratedBox(
                                   decoration: BoxDecoration(
                                     color: colors.surfaceMuted,
-                                    shape: BoxShape.circle,
+                                    borderRadius: Rad.squareRadius(
+                                      Disc.toolPuck,
+                                    ),
                                     border: Border.all(
                                       color: colors.borderStrong,
                                       width: 1.5,
@@ -384,7 +386,9 @@ class PaintBar extends ConsumerWidget {
                                 selected: false,
                                 disc: DecoratedBox(
                                   decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
+                                    borderRadius: Rad.squareRadius(
+                                      Disc.toolPuck,
+                                    ),
                                     border: Border.all(
                                       color: colors.borderStrong,
                                       width: 1.5,
@@ -720,7 +724,9 @@ class _PuckState extends State<_Puck> {
                         child: IgnorePointer(
                           child: DecoratedBox(
                             decoration: BoxDecoration(
-                              shape: BoxShape.circle,
+                              borderRadius: Rad.squareRadius(
+                                Disc.toolPuck + 2 * ringOutset,
+                              ),
                               border: Border.all(
                                 color: colors.todayRing,
                                 width: Sp.selectionRing,
@@ -753,7 +759,10 @@ class _ShiftDisc extends StatelessWidget {
   Widget build(BuildContext context) {
     final swatch = shift.swatch(context.colors.brightness);
     return DecoratedBox(
-      decoration: BoxDecoration(color: swatch.disc, shape: BoxShape.circle),
+      decoration: BoxDecoration(
+        color: swatch.disc,
+        borderRadius: Rad.squareRadius(Disc.toolPuck),
+      ),
       child: Center(
         child: FittedBox(
           fit: BoxFit.scaleDown,

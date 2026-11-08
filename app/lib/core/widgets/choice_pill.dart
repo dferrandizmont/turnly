@@ -17,6 +17,9 @@ class ChoicePill extends StatelessWidget {
     this.leading,
     this.reserveIcon = false,
     this.radius,
+    this.detail,
+    this.expand = false,
+    this.compact = false,
   });
 
   final String label;
@@ -41,6 +44,34 @@ class ChoicePill extends StatelessWidget {
   /// dedicas?») can ask for a larger one.
   final BorderRadiusGeometry? radius;
 
+  /// A second, quieter line under the label (a shift's hours), so a pill in
+  /// a narrow grid column never has to squeeze «Mañana 07:00–15:00» on one
+  /// line.
+  final String? detail;
+
+  /// Fills the width it is given (a cell of an aligned grid) instead of
+  /// hugging its label.
+  final bool expand;
+
+  /// For narrow grid cells: 12 dp sides instead of 16 and, with a
+  /// [leading], the check drawn on its corner instead of in a slot of its
+  /// own, so «Mañana» and its hours fit two to a row on a 360 dp phone.
+  final bool compact;
+
+  /// Horizontal room the pill itself takes around its texts (padding,
+  /// [leading] and its gap, the check slot, the selected ring), for a grid
+  /// sizing its columns.
+  static double chromeWidth({
+    required bool compact,
+    required bool hasLeading,
+    double leadingSize = 0,
+  }) {
+    final side = compact ? Sp.m : Sp.l;
+    final lead = hasLeading ? leadingSize + Sp.s : 0;
+    final slot = compact && hasLeading ? 0 : IconSize.inline + Sp.s;
+    return 2 * side + lead + slot + 2 * Sp.ring;
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
@@ -53,14 +84,16 @@ class ChoicePill extends StatelessWidget {
               ),
             );
     final glyph = selected ? AppIcons.check : icon;
-    final showIconSlot = glyph != null || reserveIcon;
+    // Compact with a leading: the check rides on the leading's corner.
+    final checkOnLeading = compact && leading != null;
+    final showIconSlot = !checkOnLeading && (glyph != null || reserveIcon);
     return Semantics(
       container: true,
       button: true,
       selected: selected,
       enabled: onTap != null,
       excludeSemantics: true,
-      label: label,
+      label: detail == null ? label : '$label, $detail',
       onTap: onTap,
       child: Material(
         color: selected ? colors.surfaceRaised : Colors.transparent,
@@ -71,12 +104,42 @@ class ChoicePill extends StatelessWidget {
           child: ConstrainedBox(
             constraints: const BoxConstraints(minHeight: Sp.touch),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: Sp.l),
+              padding: EdgeInsets.symmetric(horizontal: compact ? Sp.m : Sp.l),
               child: Row(
-                mainAxisSize: MainAxisSize.min,
+                mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
                 children: [
                   if (leading != null) ...[
-                    leading!,
+                    if (checkOnLeading)
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          leading!,
+                          if (selected)
+                            Positioned(
+                              right: -Sp.xs,
+                              top: -Sp.xs,
+                              child: DecoratedBox(
+                                key: const ValueKey('choice-pill-check'),
+                                decoration: BoxDecoration(
+                                  color: colors.todayRing,
+                                  borderRadius: Rad.squareRadius(
+                                    IconSize.inline,
+                                  ),
+                                ),
+                                child: SizedBox.square(
+                                  dimension: IconSize.inline,
+                                  child: Icon(
+                                    AppIcons.check,
+                                    size: IconSize.inline - Sp.xs,
+                                    color: colors.surface,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      )
+                    else
+                      leading!,
                     const SizedBox(width: Sp.s),
                   ],
                   if (showIconSlot) ...[
@@ -94,12 +157,30 @@ class ChoicePill extends StatelessWidget {
                     const SizedBox(width: Sp.s),
                   ],
                   Flexible(
-                    child: Text(
-                      label,
-                      style: context.type.body.copyWith(
-                        fontWeight: selected
-                            ? FontWeight.w800
-                            : FontWeight.w600,
+                    child: Padding(
+                      padding: detail == null
+                          ? EdgeInsets.zero
+                          : const EdgeInsets.symmetric(vertical: Sp.s),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            label,
+                            style: context.type.body.copyWith(
+                              fontWeight: selected
+                                  ? FontWeight.w800
+                                  : FontWeight.w600,
+                            ),
+                          ),
+                          if (detail != null)
+                            Text(
+                              detail!,
+                              style: context.type.meta.copyWith(
+                                color: colors.textSecondary,
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                   ),

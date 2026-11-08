@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/widgets.dart';
 
 /// Spacing scale (dp): 4, 8, 12, 16, 20, 24, 32, 40.
@@ -124,9 +126,18 @@ class Rad {
   static BorderRadius get swatchRadius => BorderRadius.circular(swatch);
   static BorderRadius get previewRadius => BorderRadius.circular(preview);
   static BorderRadius get pill => BorderRadius.circular(chip);
+
+  /// Corner radius of a rounded square of side [size] (shift discs, pucks,
+  /// icon tiles, colour swatches and the rings around them): a quarter of
+  /// the side, never more than [input]. Nothing in the UI is a circle
+  /// (`docs/diseno.md`); only dots of 8 dp or less stay round.
+  static double square(double size) => math.min(size / 4, input);
+
+  static BorderRadius squareRadius(double size) =>
+      BorderRadius.circular(square(size));
 }
 
-/// Round icon-disc diameters (dp).
+/// Icon-tile / shift-disc sides (dp): rounded squares ([Rad.squareRadius]).
 class Disc {
   const Disc._();
 
@@ -152,7 +163,7 @@ class Disc {
   /// leaves the month its room (decision 28).
   static const double toolPuck = 48;
 
-  /// Round undo / redo buttons of the paint tools.
+  /// Square undo / redo buttons of the paint tools.
   static const double round = 48;
 }
 

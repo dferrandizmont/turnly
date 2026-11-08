@@ -529,7 +529,10 @@ class _Disc extends StatelessWidget {
       width: Disc.s - Sp.xs,
       height: Disc.s - Sp.xs,
       alignment: Alignment.center,
-      decoration: BoxDecoration(color: shift.disc, shape: BoxShape.circle),
+      decoration: BoxDecoration(
+        color: shift.disc,
+        borderRadius: Rad.squareRadius(Disc.s - Sp.xs),
+      ),
       child: FittedBox(
         child: Padding(
           padding: const EdgeInsets.all(Sp.hair),
@@ -609,9 +612,8 @@ class _FourWeeks extends StatelessWidget {
                                       dark: dark,
                                       isToday:
                                           days[week * 7 + d].date == day.date,
-                                      note:
-                                          snapshot.notes?[days[week * 7 + d]
-                                              .date],
+                                      note: snapshot
+                                          .notes?[days[week * 7 + d].date],
                                     )
                                   : const SizedBox.shrink(),
                             ),
@@ -677,9 +679,7 @@ class _FourWeeksCell extends StatelessWidget {
               '${day.dayOfMonth}',
               maxLines: 1,
               style: type.caption.copyWith(
-                color: day.isHoliday
-                    ? colors.holiday
-                    : colors.textSecondary,
+                color: day.isHoliday ? colors.holiday : colors.textSecondary,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -718,7 +718,12 @@ class _FourWeeksCell extends StatelessWidget {
             Row(
               children: [
                 for (final b in shown)
-                  Expanded(child: SizedBox(height: Sp.xs, child: ColoredBox(color: b.$2.bar))),
+                  Expanded(
+                    child: SizedBox(
+                      height: Sp.xs,
+                      child: ColoredBox(color: b.$2.bar),
+                    ),
+                  ),
               ],
             ),
         ],

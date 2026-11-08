@@ -450,7 +450,10 @@ class _ShiftSwatchDot extends StatelessWidget {
       child: Container(
         width: IconSize.inline,
         height: IconSize.inline,
-        decoration: BoxDecoration(color: swatch.bar, shape: BoxShape.circle),
+        decoration: BoxDecoration(
+          color: swatch.bar,
+          borderRadius: Rad.squareRadius(IconSize.inline),
+        ),
       ),
     );
   }

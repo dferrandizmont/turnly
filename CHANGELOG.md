@@ -10,6 +10,24 @@ at once, so they can skip numbers.
 
 ## Unreleased
 
+## 0.9.6 · 2026-11-08
+
+Fixes from the 0.9.5 QA.
+
+- The rotation start choices now go two per row on 360 dp phones too, and no word breaks with large text: each cell is sized to its longest name or hours, and the check sits on the shift badge.
+
+## 0.9.5 · 2026-11-08
+
+Private prerelease to try the aligned choices on a phone.
+
+- When you set up a rotation, the shift and day choices line up in a tidy grid (two per row on a phone) with the hours under each name.
+
+## 0.9.4 · 2026-11-08
+
+Private prerelease to try the square shapes on a phone.
+
+- Everything is square now: shift badges, paint tools, colour swatches, icon buttons and icon tiles are rounded squares instead of circles, matching the buttons.
+
 ## 0.9.3 · 2026-11-08
 
 Tweaks from using 0.9.2 on a Redmi Pad. Release for Google Play, GitHub and the web.

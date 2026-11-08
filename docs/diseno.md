@@ -20,7 +20,7 @@ claro»). Esta página manda sobre cualquier valor de color, tamaño o forma de 
 | `background` | `#F2F2F6` | `#0A0A0D` | Fondo de pantalla |
 | `surface` | `#FFFFFF` | `#15151B` | Celdas del mes, tarjetas, hojas |
 | `surfaceMuted` | `#ECECF1` | `#0F0F13` | Días de otro mes |
-| `surfaceRaised` | `#F4F4F7` | `#1C1C23` | Botones redondos, fichas sin seleccionar |
+| `surfaceRaised` | `#F4F4F7` | `#1C1C23` | Botones de icono, fichas sin seleccionar |
 | `border` | `#DCDCE2` | `#23232B` | Bordes suaves |
 | `borderStrong` | `#C9C9D2` | `#34343E` | Bordes de controles |
 | `textPrimary` | `#15151A` | `#ECECF1` | Texto principal |
@@ -59,7 +59,7 @@ de hoy ni los botones principales.
 Todos pasan 4,5:1 como texto sobre `background`, `surface` y `surfaceRaised`; `onAccent` 4,5:1 sobre el acento;
 `textPrimary` 4,5:1 sobre `accentSoft`; y 3:1 (no texto) del acento sobre `accentSoft` y `surface`
 (`test/core/theme/accent_contrast_test.dart`). Se guarda en `appearance.accent` (ausente = Índigo) y viaja en la
-copia, como el tema. El selector muestra cada acento como un disco mitad claro, mitad oscuro.
+copia, como el tema. El selector muestra cada acento como un cuadrado redondeado mitad claro, mitad oscuro.
 
 Los cinco nuevos entran **añadidos al final** (el orden y los nombres guardados de los cinco primeros no cambian; un
 valor desconocido sigue siendo Índigo). Ninguno se acerca al ámbar de `highlight` (cuenta atrás, «Pintar»), que no es un
@@ -134,9 +134,16 @@ nada que se toque es una píldora. Los botones del tema (`FilledButton`, `Outlin
 rectángulo redondeado de radio `Rad.button` (12, el mismo del control «Cuadrícula | Lista»; el alto sigue en 48 dp);
 las fichas (`ChipTheme`, `ChoicePill`, la ficha del selector de calendario) usan `Rad.chipSmall` (10); el indicador
 de la barra y del raíl de destinos, `Rad.inner` (12); el botón «Pintar», `Rad.fab` (16). `Rad.chip` (999, `Rad.pill`)
-queda solo para lo que no es un botón: barras de progreso, puntos de paso y líneas del esqueleto. Siguen siendo
-redondos por diseño los círculos de turno (`Disc`), los botones de icono circulares, las muestras de color y el anillo
-de hoy.
+queda solo para lo que no es un botón: barras de progreso, líneas del esqueleto y barras de color.
+
+**Nada es un círculo** (8-nov-2026, el usuario pidió «todo cuadrado»): los discos de turno (`Disc`, `ShiftBadge`), las
+fichas de pintar, los botones de icono (también los del tema), los iconos de las tarjetas y los estados vacíos, las
+muestras de color y sus anillos de selección son **cuadrados redondeados** de radio `Rad.square(lado)` (un cuarto del
+lado, máximo 14; `Rad.squareRadius(lado)`). El anillo de selección sigue la misma forma, separado del elemento, con el
+radio de su propio lado. El `InkWell` o el `ButtonStyle` de cada uno usa la misma forma (`customBorder`/`shape`), para
+que la salpicadura no sea un círculo. Solo siguen redondos los **puntos de 8 dp o menos** (marca de festivo, de evento
+del móvil y de dos segmentos en la casilla, punto de recomendación del control «Cuadrícula | Lista», punto de festivo
+del año y de su leyenda) y el interruptor del sistema (`Switch`).
 
 **Tarjeta de hoy** (arriba del mes): `surface`, radio 24, padding 18, barra inferior de 5 px en `bar` del turno.
 Bajo la fila del contador y «Mañana», dos líneas discretas de `meta` (C1): el próximo libre en `textSecondary` y en
@@ -205,9 +212,9 @@ icono con el texto al 100 % y no al 130 %; los códigos de 2-3 letras solo lo ll
 salí antes** (A6): un «+» de 11 px (`AppIcons.extras`, `textMuted` del tono del turno) arriba a la derecha, en la fila
 del número del día y delante del clip de la nota y del punto de festivo (esa fila no la invade nunca el código ni la
 hora; en una casilla muy estrecha la fila encoge hasta el 60 % en vez de salirse); el texto leído de la casilla dice «horas extra: 1 h 30 min» / «salida anticipada: 30 min».
-En el distintivo de 44 px (lista de turnos, detalle del día), en las fichas redondas de pintar y en la leyenda el
+En el distintivo de 44 px (lista de turnos, detalle del día), en las fichas cuadradas de pintar y en la leyenda el
 icono va encima del código (12-14 dp) o delante del nombre; el código no desaparece nunca.
-**Cuatro turnos o más en un día:** como mucho 3 bandas. Se ven los 2 primeros turnos y una tercera banda neutra «+N» (`surfaceMuted`, borde superior `borderStrong` de `Sp.hair`, texto `textMuted` en `cellCodeMulti`), nunca en color de turno; la altura de la fila se mide con ese tope y el lector de pantalla nombra todos los turnos. Las bandas se reparten la altura de la casilla en proporción a lo que necesita cada una (su código y su hora; la primera, además, la fila del número; la última, la barra), y la fila mide la suma de esas alturas, no la banda más alta por el número de bandas.**Forma de las fichas:** `ChoicePill` es un rectángulo redondeado de radio `Rad.chipSmall` por defecto; las fichas de etiqueta larga o de varias líneas (profesión, turno y tanda del día del ciclo) usan `Rad.inputRadius`.
+**Cuatro turnos o más en un día:** como mucho 3 bandas. Se ven los 2 primeros turnos y una tercera banda neutra «+N» (`surfaceMuted`, borde superior `borderStrong` de `Sp.hair`, texto `textMuted` en `cellCodeMulti`), nunca en color de turno; la altura de la fila se mide con ese tope y el lector de pantalla nombra todos los turnos. Las bandas se reparten la altura de la casilla en proporción a lo que necesita cada una (su código y su hora; la primera, además, la fila del número; la última, la barra), y la fila mide la suma de esas alturas, no la banda más alta por el número de bandas.**Forma de las fichas:** `ChoicePill` es un rectángulo redondeado de radio `Rad.chipSmall` por defecto; las fichas de etiqueta larga o de varias líneas (profesión, turno y tanda del día del ciclo) usan `Rad.inputRadius`. En «¿Qué turno te toca ese día?» y «¿qué día te toca?» (`CycleStartPicker`) las fichas van en una cuadrícula alineada (`ChoiceGrid`): celdas del mismo ancho, filas de la misma altura, tantas columnas como quepan (hasta tres) con celdas medidas por su texto más largo a la escala de letra de cada uno, para que ninguna palabra se parta: dos en un móvil de 360 dp, una con letra grande; el horario en una segunda línea `meta`, y la marca de elegido en la esquina del distintivo (cuadrado `todayRing` de 18 dp con la marca en `surface`) en vez de en un hueco propio (`ChoicePill.compact`) (8-nov-2026, el usuario las quería «en 2 y 2», no desordenadas).
 
 **Modo pintar** (B3, opción 3A del lienzo del 31-oct; una línea y hoja que mide lo que sobra, decisión 28): cabecera
 **de una línea** «PINTANDO · CAMBIAR EL TURNO» (`label`: «PINTANDO» en `ink` del turno elegido y el modo en `textMuted`;
@@ -224,7 +231,7 @@ el separador). Abajo, hoja `surface` radio 26 con, de arriba abajo:
   color; iconos de 18 dp que desaparecen desde texto ×1,6; las etiquetas se parten entre palabras, nunca se
   cortan). Sustituye al chip «Doblar»: la palabra del sector se conserva en el nombre leído («Añadir otro turno
   (doblar)») y en la miniatura. Con «Borrar» elegido el control se atenúa y no responde.
-- **La miniatura del efecto** a la izquierda de Deshacer y Rehacer (círculos de 48 px en `surfaceRaised`, siempre a la
+- **La miniatura del efecto** a la izquierda de Deshacer y Rehacer (cuadrados redondeados de 48 px en `surfaceRaised`, siempre a la
   vista), en **una línea**: «Al tocar un día» en `caption`, dos casillas pequeñas reales (`tint`, códigos en `ink` y
   barra de 4 dp en `bar`, en segmentos con dos turnos; 36 dp como mínimo y crecen con el texto) y, a su derecha, las
   **horas del turno elegido** en `meta` negrita («[T] → [M] 06:00–14:00»). Lo que no cabe en la línea se va por el final:
@@ -232,7 +239,7 @@ el separador). Abajo, hoja `surface` radio 26 con, de arriba abajo:
   antes es un ejemplo: el primer otro turno de trabajo de la paleta. Cambia (fundido de 200 ms) en cuanto se elige otro
   turno, «Borrar» o el otro modo. El lector la lee entera («Al tocar un día: Tarde pasa a Mañana, 06:00–14:00.
   Sustituye al que haya»), y la ficha elegida lee su nombre y sus horas («Mañana, 06:00–14:00»).
-- La zona de **fichas redondas** de 48 dp (`Disc.toolPuck`; `disc` + `ink`, etiqueta `caption` debajo; la seleccionada
+- La zona de **fichas cuadradas** de 48 dp (`Disc.toolPuck`; `disc` + `ink`, etiqueta `caption` debajo; la seleccionada
   con anillo de 2,5 px `todayRing` separado 3 px; «Borrar» con borde `borderStrong`).
 Durante el trazo, las celdas tocadas se rellenan con `disc` y anillo de 2 px en `bar`.
 La cabecera mide **siempre lo mismo** al cambiar de herramienta (el mes de debajo no se mueve); «PINTANDO · …» se
@@ -272,7 +279,7 @@ Rehacer sigue en Pintar. Debajo, por capas:
    si está cambiado a mano, «Volver al patrón» (botón con borde) con lo que da la rotación en `meta`.
 2. **Añadir turno** (botón con borde a todo el ancho) abre la **paleta en la misma hoja**: tarjeta `surfaceRaised`
    radio 16 con borde, título en `bodyStrong` («Añadir turno» en un día vacío, «Doblar con otro turno» si ya tiene uno,
-   «Cambiar Noche por…» desde el menú de una fila), botón de cerrar y las fichas redondas de 44 px de pintar (con salto
+   «Cambiar Noche por…» desde el menú de una fila), botón de cerrar y las fichas cuadradas de 44 px de pintar (con salto
    de línea y los nombres enteros; las que el día ya tiene, atenuadas y sin acción). Al elegir, la paleta se cierra y
    la fila nueva dice lo que pasó. En un día sin turno la paleta ya sale abierta (es a lo que se abre).
 3. **Nota**, siempre a la vista: campo `surfaceMuted` de 2 líneas mínimo con el clip delante; el lector de pantalla lo
@@ -299,7 +306,7 @@ cerrar el día juntos arriba, y ocupa todo el alto del panel.
 **Mis turnos** (Ajustes): lista de tarjetas `surface` radio 16 con el distintivo del turno, «horas · categoría ·
 precio», archivar y asa para arrastrar; «Nuevo turno» fijo abajo. El formulario va de arriba abajo: nombre, código,
 **vista previa** (la celda real en claro y en oscuro, con el contraste del código impreso debajo), rejilla de colores
-(los 8 de la especificación y 16 más, círculos de 44 px; el elegido con anillo `todayRing` y marca de verificación),
+(los 8 de la especificación y 16 más, cuadrados redondeados de 44 px; el elegido con anillo `todayRing` y marca de verificación),
 categoría y opciones en **fichas** (`ChoicePill`, radio `Rad.chipSmall`: borde `borderStrong`; la elegida con anillo de 2 px `todayRing`, marca
 y negrita), horario (interruptor «Sin horario» y dos botones de hora de 24 h) y, solo en turnos de trabajo con
 horario, descanso no pagado, turno nocturno y precio por hora. El campo **Icono** (opcional; debajo de la categoría)
@@ -356,8 +363,8 @@ móvil) va debajo con borde y dice «Guardando la copia…» mientras tanto. La 
 puede recuperar entera» en `success` (cada copia se vuelve a leer entera al guardarla).
 
 **Estados vacíos** (diseño 8.1B, B10): los que esperan turnos llevan un **dibujo hecho con las piezas de la app**
-(`EmptyIllustration`, 200×124 dp, `CustomPaint` + los códigos como texto) en lugar del disco con icono: tres fichas
-redondas en arco con un «+» punteado (agenda), tres casillas con su barra y una punteada (resumen sin turnos, año
+(`EmptyIllustration`, 200×124 dp, `CustomPaint` + los códigos como texto) en lugar del icono en su cuadrado: tres fichas
+cuadradas en arco con un «+» punteado (agenda), tres casillas con su barra y una punteada (resumen sin turnos, año
 vacío, rotaciones, Mis turnos, comparar) y dos casillas en una tarjeta con un camino punteado y un check en
 `accentSoft`/`accent` (sin copias). Usa **los colores y códigos de los turnos de la persona** (los tres primeros que no
 son Libre; si faltan, Mañana, Tarde y Noche de partida), así que sigue al tema y a la paleta, y nunca es solo color.

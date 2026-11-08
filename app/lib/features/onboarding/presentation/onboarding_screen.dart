@@ -286,7 +286,7 @@ class _Header extends ConsumerWidget {
                                   color: i <= current
                                       ? colors.accent
                                       : colors.borderStrong,
-                                  borderRadius: Rad.pill,
+                                  borderRadius: Rad.swatchRadius,
                                 ),
                               ),
                             ),

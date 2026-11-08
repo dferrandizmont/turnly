@@ -148,7 +148,7 @@ class _DndPermissionCard extends ConsumerWidget {
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: colors.successContainer,
-                      shape: BoxShape.circle,
+                      borderRadius: Rad.squareRadius(Disc.m),
                     ),
                     child: Icon(
                       AppIcons.check,

@@ -144,7 +144,9 @@ class _Swatch extends StatelessWidget {
       onTap: onTap,
       child: InkResponse(
         onTap: onTap,
-        customBorder: const CircleBorder(),
+        customBorder: RoundedRectangleBorder(
+          borderRadius: Rad.squareRadius(Sp.touch),
+        ),
         child: SizedBox.square(
           // Room for the ring and a 48 dp target.
           dimension: Sp.touch,
@@ -158,7 +160,7 @@ class _Swatch extends StatelessWidget {
                   DecoratedBox(
                     decoration: BoxDecoration(
                       color: fill,
-                      shape: BoxShape.circle,
+                      borderRadius: Rad.squareRadius(ShiftColorGrid._size),
                       // Libre is grey on grey: it needs its outline.
                       border: swatch.isRest
                           ? Border.all(color: colors.borderStrong, width: 1.5)
@@ -177,7 +179,9 @@ class _Swatch extends StatelessWidget {
                       child: IgnorePointer(
                         child: DecoratedBox(
                           decoration: BoxDecoration(
-                            shape: BoxShape.circle,
+                            borderRadius: Rad.squareRadius(
+                              ShiftColorGrid._size + 2 * ringOutset,
+                            ),
                             border: Border.all(
                               color: colors.todayRing,
                               width: Sp.selectionRing,

@@ -126,7 +126,11 @@ class _NamesHeader extends StatelessWidget {
     return Container(
       height: height,
       alignment: Alignment.centerLeft,
-      padding: const EdgeInsets.only(left: Sp.xs, right: Sp.xs, bottom: Sp.hair),
+      padding: const EdgeInsets.only(
+        left: Sp.xs,
+        right: Sp.xs,
+        bottom: Sp.hair,
+      ),
       decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: colors.border)),
       ),
@@ -156,10 +160,7 @@ class _NameCell extends StatelessWidget {
       child: Container(
         key: ValueKey('compare-name-${calendar.id}'),
         height: height,
-        padding: const EdgeInsets.symmetric(
-          horizontal: Sp.xs,
-          vertical: Sp.xs,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: Sp.xs, vertical: Sp.xs),
         decoration: BoxDecoration(
           border: Border(bottom: BorderSide(color: colors.border)),
         ),
@@ -329,7 +330,7 @@ class _DayHeaderCell extends StatelessWidget {
                       key: ValueKey('compare-free-${date.toIso()}'),
                       decoration: BoxDecoration(
                         color: markColor,
-                        shape: BoxShape.circle,
+                        borderRadius: Rad.squareRadius(_markSize + 2 * Sp.hair),
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(Sp.hair),
@@ -419,9 +420,7 @@ class _ShiftCell extends StatelessWidget {
     final colors = context.colors;
     final type = context.type;
     final brightness = colors.brightness;
-    final swatches = [
-      for (final shift in day.shifts) shift.swatch(brightness),
-    ];
+    final swatches = [for (final shift in day.shifts) shift.swatch(brightness)];
     final lead = swatches.isEmpty ? null : swatches.first;
     final label = day.shifts.isEmpty
         ? l10n.compareNoShiftMark
@@ -468,7 +467,7 @@ class UnrecordedMark extends StatelessWidget {
     final colors = context.colors;
     return DecoratedBox(
       decoration: BoxDecoration(
-        shape: BoxShape.circle,
+        borderRadius: Rad.squareRadius(size + 2 * Sp.hair),
         border: Border.all(color: colors.borderStrong),
       ),
       child: Padding(

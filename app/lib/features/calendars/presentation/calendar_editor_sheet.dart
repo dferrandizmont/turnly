@@ -302,7 +302,9 @@ class _ColorChoice extends StatelessWidget {
       excludeSemantics: true,
       child: InkWell(
         onTap: onTap,
-        customBorder: const CircleBorder(),
+        customBorder: RoundedRectangleBorder(
+          borderRadius: Rad.squareRadius(Sp.touch),
+        ),
         child: SizedBox.square(
           dimension: Sp.touch,
           child: Center(
@@ -311,7 +313,7 @@ class _ColorChoice extends StatelessWidget {
               height: _outer,
               padding: const EdgeInsets.all(Sp.selectionGap),
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
+                borderRadius: Rad.squareRadius(_outer),
                 border: Border.all(
                   color: selected ? colors.todayRing : Colors.transparent,
                   width: Sp.selectionRing,

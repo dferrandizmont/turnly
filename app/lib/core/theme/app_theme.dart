@@ -297,6 +297,11 @@ class AppTheme {
       iconButtonTheme: IconButtonThemeData(
         style: ButtonStyle(
           minimumSize: const WidgetStatePropertyAll(Size(48, 48)),
+          // Material 3 draws icon buttons (and their splash) as circles;
+          // nothing is a circle here (`docs/diseno.md`).
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(borderRadius: Rad.squareRadius(Sp.touch)),
+          ),
           foregroundColor: WidgetStateProperty.resolveWith(
             (s) => s.contains(WidgetState.disabled)
                 ? c.disabledContent

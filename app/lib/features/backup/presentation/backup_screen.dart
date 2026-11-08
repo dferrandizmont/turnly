@@ -84,9 +84,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
       await _actions.backupNow();
       // A copy that lacks attachments (their file is missing, damaged or
       // could not be read) says so instead of just "Copia hecha".
-      final skipped = skippedAttachmentCount(
-        await _actions.lastCopyWarnings(),
-      );
+      final skipped = skippedAttachmentCount(await _actions.lastCopyWarnings());
       if (mounted) {
         _snack(
           skipped > 0
@@ -350,7 +348,7 @@ class _StatusSection extends ConsumerWidget {
                           color: latest == null
                               ? colors.dangerContainer
                               : colors.successContainer,
-                          shape: BoxShape.circle,
+                          borderRadius: Rad.squareRadius(Disc.l),
                         ),
                         child: Icon(
                           latest == null ? BackupIcons.warning : AppIcons.check,

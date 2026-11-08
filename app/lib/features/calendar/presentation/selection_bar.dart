@@ -88,7 +88,7 @@ class SelectionBar extends ConsumerWidget {
       disabledBackgroundColor: colors.surfaceRaised,
       foregroundColor: colors.textPrimary,
       disabledForegroundColor: colors.textMuted,
-      shape: const CircleBorder(),
+      shape: RoundedRectangleBorder(borderRadius: Rad.squareRadius(Disc.round)),
     );
 
     return Semantics(
@@ -552,7 +552,7 @@ class _ActionTool extends StatelessWidget {
           DecoratedBox(
             decoration: BoxDecoration(
               color: colors.surfaceRaised,
-              shape: BoxShape.circle,
+              borderRadius: Rad.squareRadius(Disc.round),
             ),
             child: SizedBox.square(
               dimension: Disc.round,

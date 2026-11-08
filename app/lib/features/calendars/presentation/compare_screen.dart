@@ -78,10 +78,7 @@ class _CompareScreenState extends ConsumerState<CompareScreen> {
       setState(() => _picked = [for (final c in compared.reversed) c.id]);
 
   /// Opens the sheet that picks the calendars to compare.
-  Future<void> _choose(
-    List<Calendar> all,
-    List<Calendar> compared,
-  ) async {
+  Future<void> _choose(List<Calendar> all, List<Calendar> compared) async {
     final ids = await showCompareCalendarsSheet(
       context,
       calendars: all,
@@ -255,10 +252,7 @@ class _Comparison extends ConsumerWidget {
             child: Center(child: CircularProgressIndicator()),
           )
         else ...[
-          CompareTable(
-            comparison: comparison.requireValue,
-            today: today,
-          ),
+          CompareTable(comparison: comparison.requireValue, today: today),
           const SizedBox(height: Sp.l),
           _Summary(comparison: comparison.requireValue),
         ],
@@ -307,8 +301,7 @@ class _SelectorCard extends StatelessWidget {
               ],
             ),
           ),
-          for (final calendar in calendars)
-            _CalendarRow(calendar: calendar),
+          for (final calendar in calendars) _CalendarRow(calendar: calendar),
           const SizedBox(height: Sp.xs),
         ],
       ),
@@ -365,7 +358,9 @@ class _Summary extends StatelessWidget {
     final weekends = comparison.commonFreeWeekends;
     // The weekend days that are not part of a whole free weekend: a free
     // Saturday whose Sunday somebody works.
-    final whole = {for (final w in weekends) ...[w.saturday, w.sunday]};
+    final whole = {
+      for (final w in weekends) ...[w.saturday, w.sunday],
+    };
     final halfWeekends = [
       for (final date in comparison.commonFreeWeekendDays)
         if (!whole.contains(date)) date,
@@ -385,7 +380,9 @@ class _Summary extends StatelessWidget {
                   DecoratedBox(
                     decoration: BoxDecoration(
                       color: markColor,
-                      shape: BoxShape.circle,
+                      borderRadius: Rad.squareRadius(
+                        IconSize.inline + 2 * Sp.hair,
+                      ),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(Sp.hair),
@@ -513,9 +510,7 @@ class _Summary extends StatelessWidget {
                   children: [
                     for (final date in halfWeekends)
                       _DatePill(
-                        key: ValueKey(
-                          'compare-weekend-day-${date.toIso()}',
-                        ),
+                        key: ValueKey('compare-weekend-day-${date.toIso()}'),
                         label: format.shortDate(
                           DateTime(date.year, date.month, date.day),
                         ),

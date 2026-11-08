@@ -145,7 +145,7 @@ class _CalendarRow extends StatelessWidget {
                 color: calendar.colorValue == null
                     ? colors.borderStrong
                     : Color(calendar.colorValue!),
-                shape: BoxShape.circle,
+                borderRadius: Rad.squareRadius(Sp.xxl),
               ),
               child: const SizedBox.square(dimension: Sp.xxl),
             ),

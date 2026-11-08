@@ -230,7 +230,7 @@ class _BuilderPuck extends StatelessWidget {
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: swatch.disc,
-                    shape: BoxShape.circle,
+                    borderRadius: Rad.squareRadius(Disc.puck),
                   ),
                   child: Center(
                     child: FittedBox(

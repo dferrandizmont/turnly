@@ -27,7 +27,10 @@ class CalendarDot extends StatelessWidget {
     return SizedBox.square(
       dimension: size,
       child: DecoratedBox(
-        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: Rad.squareRadius(size),
+        ),
       ),
     );
   }

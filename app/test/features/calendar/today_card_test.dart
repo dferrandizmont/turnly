@@ -1,6 +1,7 @@
 import 'package:cuadrante/core/bootstrap/bootstrap.dart';
 import 'package:cuadrante/core/theme/app_colors.dart';
 import 'package:cuadrante/core/theme/shift_palette.dart';
+import 'package:cuadrante/core/theme/spacing.dart';
 import 'package:cuadrante/core/theme/shift_swatch.dart';
 import 'package:cuadrante/features/calendar/application/paint_controller.dart';
 import 'package:cuadrante/features/calendar/application/schedule_controller.dart';
@@ -321,7 +322,7 @@ void main() {
       expect(find.text('Borrar'), findsOneWidget); // the puck
       expect(find.text(' · BORRAR'), findsOneWidget); // the header
 
-      // A puck is a 48 dp circle in the disc colour.
+      // A puck is a 48 dp rounded square in the disc colour.
       final disc = ShiftSwatch.forColor(
         ShiftPalette.night.toARGB32(),
         Brightness.light,
@@ -333,7 +334,8 @@ void main() {
               w is DecoratedBox &&
               w.decoration is BoxDecoration &&
               (w.decoration as BoxDecoration).color == disc &&
-              (w.decoration as BoxDecoration).shape == BoxShape.circle,
+              (w.decoration as BoxDecoration).borderRadius ==
+                  Rad.squareRadius(Disc.toolPuck),
         ),
       );
       expect(puck, findsOneWidget);

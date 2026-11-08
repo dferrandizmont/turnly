@@ -307,7 +307,7 @@ class _PaintArt extends ConsumerWidget {
             child: DecoratedBox(
               decoration: BoxDecoration(
                 color: colors.surfaceRaised,
-                shape: BoxShape.circle,
+                borderRadius: Rad.squareRadius(IconSize.inline + 2 * Sp.hair),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(Sp.hair),

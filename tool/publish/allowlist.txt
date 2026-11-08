@@ -1529,3 +1529,4 @@ app/test/features/summary/pay_rules_store_test.dart
 app/test/features/summary/summary_pay_rules_test.dart
 app/test/features/calendar/month_bottom_large_text_test.dart
 app/test/features/onboarding/onboarding_place_first_test.dart
+app/test/features/calendar/shift_badge_shape_test.dart

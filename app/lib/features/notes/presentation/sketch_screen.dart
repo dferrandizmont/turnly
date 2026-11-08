@@ -22,11 +22,7 @@ import '../domain/sketch.dart';
 /// (a PNG that carries the strokes inside it, so it can be reopened and
 /// edited after a restore).
 class SketchScreen extends ConsumerStatefulWidget {
-  const SketchScreen({
-    super.key,
-    required this.date,
-    required this.calendarId,
-  });
+  const SketchScreen({super.key, required this.date, required this.calendarId});
 
   /// The day the drawing belongs to.
   final CivilDate date;
@@ -123,7 +119,8 @@ class _SketchScreenState extends ConsumerState<SketchScreen> {
         children: [
           Expanded(
             child: LayoutBuilder(
-              builder: (context, constraints) => _canvas(constraints, colorValue),
+              builder: (context, constraints) =>
+                  _canvas(constraints, colorValue),
             ),
           ),
           Container(
@@ -132,7 +129,12 @@ class _SketchScreenState extends ConsumerState<SketchScreen> {
             child: SafeArea(
               top: false,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(Sp.page, Sp.m, Sp.page, Sp.m),
+                padding: const EdgeInsets.fromLTRB(
+                  Sp.page,
+                  Sp.m,
+                  Sp.page,
+                  Sp.m,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -229,9 +231,7 @@ class _SketchScreenState extends ConsumerState<SketchScreen> {
       return _canvasWidth;
     }
     final ratio = height / width;
-    return (1000 * ratio)
-        .round()
-        .clamp(1, maxSketchDimension.toInt());
+    return (1000 * ratio).round().clamp(1, maxSketchDimension.toInt());
   }
 
   void _onDown(DragDownDetails details) => _onStart(details.localPosition);
@@ -485,8 +485,10 @@ class _ToolButton extends StatelessWidget {
                 children: [
                   DecoratedBox(
                     decoration: BoxDecoration(
-                      color: selected ? colors.accentSoft : colors.surfaceRaised,
-                      shape: BoxShape.circle,
+                      color: selected
+                          ? colors.accentSoft
+                          : colors.surfaceRaised,
+                      borderRadius: Rad.squareRadius(Disc.toolPuck),
                     ),
                     child: Icon(
                       icon,
@@ -505,7 +507,9 @@ class _ToolButton extends StatelessWidget {
                       child: IgnorePointer(
                         child: DecoratedBox(
                           decoration: BoxDecoration(
-                            shape: BoxShape.circle,
+                            borderRadius: Rad.squareRadius(
+                              Disc.toolPuck + 2 * ringOutset,
+                            ),
                             border: Border.all(
                               color: colors.todayRing,
                               width: Sp.selectionRing,
@@ -560,7 +564,9 @@ class _ColorButton extends StatelessWidget {
       onTap: onPressed,
       child: InkWell(
         onTap: onPressed,
-        customBorder: const CircleBorder(),
+        customBorder: RoundedRectangleBorder(
+          borderRadius: Rad.squareRadius(Sp.touch),
+        ),
         child: SizedBox.square(
           dimension: Sp.touch,
           child: Center(
@@ -573,7 +579,7 @@ class _ColorButton extends StatelessWidget {
                   DecoratedBox(
                     decoration: BoxDecoration(
                       color: color,
-                      shape: BoxShape.circle,
+                      borderRadius: Rad.squareRadius(Disc.s),
                       border: Border.all(color: colors.border),
                     ),
                     child: selected
@@ -593,7 +599,9 @@ class _ColorButton extends StatelessWidget {
                       child: IgnorePointer(
                         child: DecoratedBox(
                           decoration: BoxDecoration(
-                            shape: BoxShape.circle,
+                            borderRadius: Rad.squareRadius(
+                              Disc.s + 2 * ringOutset,
+                            ),
                             border: Border.all(
                               color: colors.todayRing,
                               width: Sp.selectionRing,

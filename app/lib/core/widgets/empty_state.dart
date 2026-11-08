@@ -64,7 +64,10 @@ class EmptyState extends StatelessWidget {
               width: Disc.xl,
               height: Disc.xl,
               alignment: Alignment.center,
-              decoration: BoxDecoration(color: tone.bg, shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                color: tone.bg,
+                borderRadius: Rad.squareRadius(Disc.xl),
+              ),
               child: Icon(icon, size: IconSize.hero, color: tone.fg, fill: 1),
             ),
           ),

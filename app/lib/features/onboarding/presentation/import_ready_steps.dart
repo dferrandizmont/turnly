@@ -39,7 +39,7 @@ class _HeroDisc extends StatelessWidget {
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: colors.surfaceRaised,
-            shape: BoxShape.circle,
+            borderRadius: Rad.squareRadius(Disc.xl),
           ),
           child: SizedBox.square(
             dimension: Disc.xl,

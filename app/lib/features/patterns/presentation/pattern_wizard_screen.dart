@@ -371,7 +371,7 @@ class _ChooseStep extends ConsumerWidget {
               DecoratedBox(
                 decoration: BoxDecoration(
                   color: colors.surfaceRaised,
-                  shape: BoxShape.circle,
+                  borderRadius: Rad.squareRadius(Disc.m),
                 ),
                 child: SizedBox.square(
                   dimension: Disc.m,

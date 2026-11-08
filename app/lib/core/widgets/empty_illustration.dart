@@ -345,7 +345,7 @@ class _IllustrationPainter extends CustomPainter {
         ..color = _tone(s.tone);
       switch (s.kind) {
         case _ShapeKind.disc:
-          canvas.drawOval(s.rect, Paint()..color = s.fill!);
+          canvas.drawRRect(_square(s.rect), Paint()..color = s.fill!);
         case _ShapeKind.box:
           canvas.drawRRect(
             RRect.fromRectAndRadius(s.rect, Radius.circular(s.radius)),
@@ -371,7 +371,7 @@ class _IllustrationPainter extends CustomPainter {
         case _ShapeKind.dashedCircle:
           _dashed(
             canvas,
-            Path()..addOval(s.rect),
+            Path()..addRRect(_square(s.rect)),
             stroke..strokeWidth = 2,
             s.dash,
             s.gap,
@@ -392,7 +392,7 @@ class _IllustrationPainter extends CustomPainter {
           canvas.drawLine(c.translate(0, -h), c.translate(0, h), stroke);
           canvas.drawLine(c.translate(-h, 0), c.translate(h, 0), stroke);
         case _ShapeKind.check:
-          canvas.drawOval(s.rect, Paint()..color = colors.accentSoft);
+          canvas.drawRRect(_square(s.rect), Paint()..color = colors.accentSoft);
           final c = s.rect.center;
           final path = Path()
             ..moveTo(c.dx - 9, c.dy)
@@ -402,6 +402,11 @@ class _IllustrationPainter extends CustomPainter {
       }
     }
   }
+
+  /// A square piece of the drawing: a rounded square, never a circle
+  /// (`docs/diseno.md`).
+  static RRect _square(Rect r) =>
+      RRect.fromRectAndRadius(r, Radius.circular(Rad.square(r.width)));
 
   static void _dashed(
     Canvas canvas,

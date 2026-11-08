@@ -140,7 +140,7 @@ class DayAddPuck extends StatelessWidget {
                 DecoratedBox(
                   decoration: BoxDecoration(
                     color: swatch.disc,
-                    shape: BoxShape.circle,
+                    borderRadius: Rad.squareRadius(Disc.l),
                   ),
                   child: SizedBox.square(
                     dimension: Disc.l,

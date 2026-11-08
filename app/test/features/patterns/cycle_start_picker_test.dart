@@ -8,6 +8,8 @@ import 'package:cuadrante/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/text_lines.dart';
+
 /// The shared "which day of the cycle" picker on its own, without the whole
 /// app: the labels of «ese turno se repite», the tap that keeps the choice,
 /// the empty cycle and the first-use texts of the catalogue.
@@ -191,5 +193,57 @@ void main() {
       find.text('Tanda 1 · Dia 2 de 2, després de Lliure'),
       findsOneWidget,
     );
+  });
+
+  Future<List<Rect>> pumpAt(
+    WidgetTester tester, {
+    required Size size,
+    double textScale = 1,
+  }) async {
+    tester.view.physicalSize = size;
+    tester.view.devicePixelRatio = 1;
+    tester.platformDispatcher.textScaleFactorTestValue = textScale;
+    addTearDown(tester.view.reset);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await _pump(tester, steps: patternPresetById('continental').steps);
+    final pills = find.byType(ChoicePill);
+    return [for (var i = 0; i < 4; i++) tester.getRect(pills.at(i))];
+  }
+
+  // The test font is much wider than the app's (every glyph a square), so
+  // the phone here is wider than the 360 dp one that gets two columns.
+  testWidgets('on a phone the shift choices go two by two, aligned', (
+    tester,
+  ) async {
+    final rects = await pumpAt(tester, size: const Size(480, 900));
+    expect(rects[0].width, moreOrLessEquals(rects[1].width));
+    expect(rects[0].top, moreOrLessEquals(rects[1].top));
+    expect(rects[0].height, moreOrLessEquals(rects[1].height));
+    expect(rects[1].left, greaterThan(rects[0].right));
+    expect(rects[0].left, moreOrLessEquals(rects[2].left));
+    expect(rects[1].left, moreOrLessEquals(rects[3].left));
+    expect(rects[2].top, greaterThan(rects[0].bottom));
+    expect(brokenParagraphs(tester), isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final (size, scale) in [
+    (const Size(320, 900), 1.3),
+    (const Size(420, 900), 2.0),
+    (const Size(760, 1000), 2.0),
+    (const Size(1200, 800), 1.0),
+  ]) {
+    testWidgets('no word breaks in the choices at ${size.width} dp, text '
+        '$scale', (tester) async {
+      await pumpAt(tester, size: size, textScale: scale);
+      expect(brokenParagraphs(tester), isEmpty);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  test('the grid fits one to three columns', () {
+    expect(ChoiceGrid.columnsFor(320, 150), 2);
+    expect(ChoiceGrid.columnsFor(320, 200), 1);
+    expect(ChoiceGrid.columnsFor(2000, 150), 3);
   });
 }

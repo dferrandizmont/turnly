@@ -194,7 +194,7 @@ class _IconTile extends StatelessWidget {
                           color: colors.isDark
                               ? colors.highlight
                               : colors.accent,
-                          shape: BoxShape.circle,
+                          borderRadius: Rad.squareRadius(18),
                         ),
                         child: Padding(
                           padding: const EdgeInsets.all(Sp.hair),
