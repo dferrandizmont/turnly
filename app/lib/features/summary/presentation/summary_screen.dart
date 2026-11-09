@@ -10,6 +10,7 @@ import '../../../core/router.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/buttons.dart';
+import '../../../core/widgets/choice_grid.dart';
 import '../../../core/widgets/choice_pill.dart';
 import '../../../core/widgets/content_app_bar.dart';
 import '../../../core/widgets/empty_illustration.dart';
@@ -266,29 +267,37 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
             Sp.section,
           ),
           children: [
-            Wrap(
-              spacing: Sp.s,
-              runSpacing: Sp.s,
-              children: [
+            ChoiceGrid.pills(
+              sizing: ChoiceGridSizing.wholeLabel,
+              maxColumns: 4,
+              pills: [
                 ChoicePill(
+                  expand: true,
+                  reserveIcon: true,
                   key: const ValueKey('summary-mode-month'),
                   label: l10n.summaryModeMonth,
                   selected: _period == _Period.month,
                   onTap: () => _setPeriod(_Period.month),
                 ),
                 ChoicePill(
+                  expand: true,
+                  reserveIcon: true,
                   key: const ValueKey('summary-mode-quarter'),
                   label: l10n.moneyModeQuarter,
                   selected: _period == _Period.quarter,
                   onTap: () => _setPeriod(_Period.quarter),
                 ),
                 ChoicePill(
+                  expand: true,
+                  reserveIcon: true,
                   key: const ValueKey('summary-mode-year'),
                   label: l10n.summaryModeYear,
                   selected: _yearView,
                   onTap: () => _setPeriod(_Period.year),
                 ),
                 ChoicePill(
+                  expand: true,
+                  reserveIcon: true,
                   key: const ValueKey('summary-mode-range'),
                   label: l10n.summaryModeRange,
                   selected: _period == _Period.range,

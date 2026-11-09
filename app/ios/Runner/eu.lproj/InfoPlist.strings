@@ -2,3 +2,5 @@
 "NSCalendarsFullAccessUsageDescription" = "Inportatzean zure egutegiko txandak irakurtzeko eta, zuk eskatuz gero, zure txandak aukeratzen duzun egutegian gehitzeko. Egutegi hori kontu batekin sinkronizatzen bada, kontu horrek ere jasoko ditu.";
 "NSCalendarsUsageDescription" = "Inportatzean zure egutegiko txandak irakurtzeko eta, zuk eskatuz gero, zure txandak aukeratzen duzun egutegian gehitzeko. Egutegi hori kontu batekin sinkronizatzen bada, kontu horrek ere jasoko ditu.";
 "NSCalendarsWriteOnlyAccessUsageDescription" = "Zure txandak aukeratzen duzun egutegian gehitzeko, bertan duzuna irakurri gabe. Egutegi hori kontu batekin sinkronizatzen bada, kontu horrek ere jasoko ditu.";
+"NSCameraUsageDescription" = "Argazki bat ateratzeko eta zure txanden egutegiko egun baten oharrari gehitzeko.";
+"NSPhotoLibraryUsageDescription" = "Zure galeriatik argazki bat aukeratzeko, dela zure txanden egutegiko egun baten oharrari gehitzeko edo egutegiaren atzeko irudi gisa erabiltzeko. Aukeratzen duzun argazkia baino ez da irakurtzen.";

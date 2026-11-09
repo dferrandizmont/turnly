@@ -1530,3 +1530,8 @@ app/test/features/summary/summary_pay_rules_test.dart
 app/test/features/calendar/month_bottom_large_text_test.dart
 app/test/features/onboarding/onboarding_place_first_test.dart
 app/test/features/calendar/shift_badge_shape_test.dart
+
+# Added on 9-nov-2026: ChoiceGrid for every group of choice pills.
+app/lib/core/widgets/choice_grid.dart
+app/test/core/widgets/choice_grid_test.dart
+app/test/features/onboarding/onboarding_profession_grid_test.dart

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/choice_grid.dart';
 import '../../../core/widgets/choice_pill.dart';
 import '../../calendar/application/schedule_controller.dart';
 import '../../calendars/application/calendars_controller.dart';
@@ -136,17 +137,20 @@ class ImportPreviewStep extends ConsumerWidget {
           style: type.body.copyWith(color: colors.textSecondary),
         ),
         const SizedBox(height: Sp.s),
-        Wrap(
-          spacing: Sp.s,
-          runSpacing: Sp.s,
-          children: [
+        ChoiceGrid.pills(
+          maxColumns: 2,
+          pills: [
             ChoicePill(
+              expand: true,
+              reserveIcon: true,
               key: const ValueKey('import-conflict-replace'),
               label: l10n.importConflictReplace,
               selected: wizard.policy == ConflictPolicy.replace,
               onTap: () => notifier.setPolicy(ConflictPolicy.replace),
             ),
             ChoicePill(
+              expand: true,
+              reserveIcon: true,
               key: const ValueKey('import-conflict-keep'),
               label: l10n.importConflictKeep,
               selected: wizard.policy == ConflictPolicy.keep,

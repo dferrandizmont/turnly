@@ -5,8 +5,9 @@ import 'package:flutter/services.dart';
 /// How the device clock moved under the running app.
 enum ClockChange { timezone, time }
 
-/// What the alarms need from Android beyond the notifications plugin
-/// (`app.cuadrante/alarm_system`, `AlarmSystemChannel.kt`): whether the
+/// What the alarms need from the platform beyond the notifications plugin
+/// (`app.cuadrante/alarm_system`: `AlarmSystemChannel.kt` on Android,
+/// `AlarmSystemChannel.swift` on iOS): whether the
 /// notification permission is blocked for good, the screen of the system
 /// settings that fixes it, and a notice when the time zone or the time is
 /// changed while the app is alive.
@@ -27,7 +28,7 @@ abstract interface class AlarmSystem {
   Stream<ClockChange> get clockChanges;
 }
 
-/// The Android implementation, over the platform channel.
+/// The Android and iOS implementation, over the platform channel.
 class PlatformAlarmSystem implements AlarmSystem {
   PlatformAlarmSystem({MethodChannel? channel})
     : _channel = channel ?? const MethodChannel(channelName) {
@@ -86,7 +87,7 @@ class PlatformAlarmSystem implements AlarmSystem {
   }
 }
 
-/// Hosts without these system screens (tests, desktop, iOS for now).
+/// Hosts without these system screens (tests, desktop).
 class NoAlarmSystem implements AlarmSystem {
   const NoAlarmSystem();
 

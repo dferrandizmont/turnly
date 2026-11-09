@@ -115,6 +115,21 @@ Future<void> main() async {
     expect(publisher.published, hasLength(2));
   });
 
+  test('flushPending runs a waiting edit at once (app leaving)', () async {
+    await service.request(WidgetSyncTrigger.appStart);
+    final runs = service.runs;
+    first = 'afternoon';
+    await service.request(WidgetSyncTrigger.scheduleChanged);
+    expect(service.runs, runs, reason: 'still inside the debounce');
+    await service.flushPending();
+    expect(service.runs, runs + 1, reason: 'published before suspension');
+    await Future<void>.delayed(
+      WidgetSyncPlanner.editDebounce + const Duration(milliseconds: 200),
+    );
+    await service.flush();
+    expect(service.runs, runs + 1, reason: 'the cancelled timer never fires');
+  });
+
   test('triggers wait for the texts and run once they arrive', () async {
     final waiting = WidgetSyncService(
       publisher: publisher,

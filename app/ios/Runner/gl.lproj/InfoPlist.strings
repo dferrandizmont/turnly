@@ -2,3 +2,5 @@
 "NSCalendarsFullAccessUsageDescription" = "Para ler quendas do teu calendario ao importar e, se o pides, engadir as túas quendas ao calendario que escollas. Se ese calendario se sincroniza cunha conta, esa conta tamén as recibirá.";
 "NSCalendarsUsageDescription" = "Para ler quendas do teu calendario ao importar e, se o pides, engadir as túas quendas ao calendario que escollas. Se ese calendario se sincroniza cunha conta, esa conta tamén as recibirá.";
 "NSCalendarsWriteOnlyAccessUsageDescription" = "Para engadir as túas quendas ao calendario que escollas, sen ler o que xa tes nel. Se ese calendario se sincroniza cunha conta, esa conta tamén as recibirá.";
+"NSCameraUsageDescription" = "Para facer unha foto e engadila á nota dun día do teu cadro de quendas.";
+"NSPhotoLibraryUsageDescription" = "Para escoller unha foto da túa galería, xa sexa para engadila á nota dun día do teu cadro de quendas ou para usala como fondo do calendario. Só se le a foto que escolles.";

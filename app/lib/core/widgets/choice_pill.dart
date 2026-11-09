@@ -86,7 +86,12 @@ class ChoicePill extends StatelessWidget {
     final glyph = selected ? AppIcons.check : icon;
     // Compact with a leading: the check rides on the leading's corner.
     final checkOnLeading = compact && leading != null;
-    final showIconSlot = !checkOnLeading && (glyph != null || reserveIcon);
+    // A grid cell without a leading: label centred, 12 dp sides and no empty
+    // slot kept for the check (it only appears on the chosen cell), so a long
+    // job name gets the whole cell and reads as a block, not pushed right.
+    final centered = expand && leading == null;
+    final showIconSlot =
+        !checkOnLeading && (glyph != null || (reserveIcon && !centered));
     return Semantics(
       container: true,
       button: true,
@@ -104,9 +109,14 @@ class ChoicePill extends StatelessWidget {
           child: ConstrainedBox(
             constraints: const BoxConstraints(minHeight: Sp.touch),
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: compact ? Sp.m : Sp.l),
+              padding: EdgeInsets.symmetric(
+                horizontal: compact || centered ? Sp.m : Sp.l,
+              ),
               child: Row(
                 mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
+                mainAxisAlignment: centered
+                    ? MainAxisAlignment.center
+                    : MainAxisAlignment.start,
                 children: [
                   if (leading != null) ...[
                     if (checkOnLeading)
@@ -158,15 +168,23 @@ class ChoicePill extends StatelessWidget {
                   ],
                   Flexible(
                     child: Padding(
-                      padding: detail == null
+                      // A grid cell (expand) can wrap its label onto two or
+                      // three lines: keep air above and below it, as with a
+                      // detail line, so the text never touches the border.
+                      padding: detail == null && !expand
                           ? EdgeInsets.zero
                           : const EdgeInsets.symmetric(vertical: Sp.s),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: centered
+                            ? CrossAxisAlignment.center
+                            : CrossAxisAlignment.start,
                         children: [
                           Text(
                             label,
+                            textAlign: centered
+                                ? TextAlign.center
+                                : TextAlign.start,
                             style: context.type.body.copyWith(
                               fontWeight: selected
                                   ? FontWeight.w800

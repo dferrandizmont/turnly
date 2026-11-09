@@ -7,6 +7,7 @@ import '../../../core/l10n/l10n.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/buttons.dart';
+import '../../../core/widgets/choice_grid.dart';
 import '../../../core/widgets/choice_pill.dart';
 import '../../../core/widgets/content_app_bar.dart';
 import '../../../core/widgets/page_body.dart';
@@ -315,6 +316,7 @@ class _HolidaysSettingsScreenState
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final snapshot = ref.watch(holidayControllerProvider);
+    final years = _yearsOf(snapshot);
     final place = snapshot.place;
     final region = regionByCode(place.regionCode);
     final index = ref.watch(municipalityIndexProvider).value;
@@ -429,12 +431,15 @@ class _HolidaysSettingsScreenState
                 onPressed: _importFromPhone,
               ),
               const SizedBox(height: Sp.section),
-              Wrap(
-                spacing: Sp.s,
-                runSpacing: Sp.s,
-                children: [
-                  for (final year in _yearsOf(snapshot))
+              // Equal cells, one row when the years fit.
+              ChoiceGrid.pills(
+                sizing: ChoiceGridSizing.wholeLabel,
+                maxColumns: years.length,
+                pills: [
+                  for (final year in years)
                     ChoicePill(
+                      expand: true,
+                      reserveIcon: true,
                       key: ValueKey('holidays-year-$year'),
                       label: '$year',
                       selected: year == _year,

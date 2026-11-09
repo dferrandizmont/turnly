@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme_context.dart';
+import '../../../core/widgets/choice_grid.dart';
 import '../../../core/widgets/choice_pill.dart';
 import '../../holidays/domain/holiday_country.dart';
 import '../application/onboarding_controller.dart';
@@ -65,12 +66,12 @@ class ProfessionSection extends ConsumerWidget {
           ),
         ],
         SizedBox(height: compact ? Sp.s : Sp.m),
-        Wrap(
-          spacing: Sp.s,
-          runSpacing: Sp.s,
-          children: [
+        ChoiceGrid.pills(
+          pills: [
             for (final profession in professionsFor(country))
               ChoicePill(
+                expand: true,
+                reserveIcon: true,
                 key: ValueKey('onboarding-profession-${profession.name}'),
                 label: profession.label(l10n, spain: spain),
                 selected: selected == profession,

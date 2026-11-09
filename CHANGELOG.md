@@ -10,6 +10,20 @@ at once, so they can skip numbers.
 
 ## Unreleased
 
+- iOS: if you said "Don't Allow" to notifications, the Alarms screen now says so and its "Open settings" button takes you straight to Turnly's notification settings; coming back, it notices they are on. Before, "Allow" did nothing. Alarms are also planned again at once when the time zone or the clock changes.
+- iOS: a `.turnly` backup opened from AirDrop, WhatsApp, Mail or Files now reaches the restore preview (nothing is restored until you confirm). Not yet tried on an iPhone.
+- iOS: home-screen and lock-screen widgets (small, medium, large, inline, circular and rectangular) that change day on their own for 60 days; on the lock screen any absence shows only as "Absence". Not yet tried on an iPhone.
+- iOS: the camera and photo library permission texts are now translated into all five languages, so the dialog says what it is for (a photo for the note of a day, or the calendar background) instead of falling back to Spanish.
+
+## 0.9.7 · 2026-11-09
+
+Private prerelease: aligned choices everywhere.
+
+- Every group of choice pills (jobs, periods, years, categories, swap shifts...) now lines up in an even grid with equal cells and level rows, and no word breaks inside a pill.
+- Widget: a change made just before leaving the app (for example finishing the first use) now reaches the widget at once instead of on the next opening.
+- Month: in dark mode the chosen half of "Grid | List" is now filled with the accent colour, so you can tell which one is selected at a glance.
+- Month: in the List there is now a small gap between the last visible row and the floating "Paint" button, so a row cut by the edge never looks hidden under it.
+
 ## 0.9.6 · 2026-11-08
 
 Fixes from the 0.9.5 QA.

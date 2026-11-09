@@ -2,3 +2,5 @@
 "NSCalendarsFullAccessUsageDescription" = "To read shifts from your calendar when importing and, if you ask, add your shifts to the calendar you choose. If that calendar syncs with an account, that account will receive them too.";
 "NSCalendarsUsageDescription" = "To read shifts from your calendar when importing and, if you ask, add your shifts to the calendar you choose. If that calendar syncs with an account, that account will receive them too.";
 "NSCalendarsWriteOnlyAccessUsageDescription" = "To add your shifts to the calendar you choose, without reading what you already have in it. If that calendar syncs with an account, that account will receive them too.";
+"NSCameraUsageDescription" = "To take a photo and add it to the note of a day of your schedule.";
+"NSPhotoLibraryUsageDescription" = "To choose a photo from your gallery, either to add it to the note of a day of your schedule or to use it as the calendar background. Only the photo you choose is read.";

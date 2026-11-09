@@ -9,6 +9,7 @@ import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/app_sheet.dart';
 import '../../../core/widgets/app_snack_bar.dart';
 import '../../../core/widgets/buttons.dart';
+import '../../../core/widgets/choice_grid.dart';
 import '../../../core/widgets/choice_pill.dart';
 import '../../../core/widgets/choice_row.dart';
 import '../../calendar/application/schedule_controller.dart';
@@ -161,11 +162,12 @@ class _ReportSheetState extends ConsumerState<ReportSheet> {
           style: type.meta.copyWith(color: colors.textMuted),
         ),
         const SizedBox(height: Sp.l),
-        Wrap(
-          spacing: Sp.s,
-          runSpacing: Sp.s,
-          children: [
+        ChoiceGrid.pills(
+          maxColumns: 2,
+          pills: [
             ChoicePill(
+              expand: true,
+              reserveIcon: true,
               key: const ValueKey('report-format-pdf'),
               label: l10n.reportFormatPdf,
               icon: ReportIcons.report,
@@ -173,6 +175,8 @@ class _ReportSheetState extends ConsumerState<ReportSheet> {
               onTap: () => setState(() => _format = ReportFormat.pdf),
             ),
             ChoicePill(
+              expand: true,
+              reserveIcon: true,
               key: const ValueKey('report-format-csv'),
               label: l10n.reportFormatCsv,
               icon: ReportIcons.report,
@@ -182,17 +186,21 @@ class _ReportSheetState extends ConsumerState<ReportSheet> {
           ],
         ),
         const SizedBox(height: Sp.l),
-        Wrap(
-          spacing: Sp.s,
-          runSpacing: Sp.s,
-          children: [
+        ChoiceGrid.pills(
+          sizing: ChoiceGridSizing.wholeLabel,
+          maxColumns: 2,
+          pills: [
             ChoicePill(
+              expand: true,
+              reserveIcon: true,
               key: const ValueKey('report-period-month'),
               label: l10n.summaryModeMonth,
               selected: _period == _Period.month,
               onTap: () => setState(() => _period = _Period.month),
             ),
             ChoicePill(
+              expand: true,
+              reserveIcon: true,
               key: const ValueKey('report-period-range'),
               label: l10n.summaryModeRange,
               selected: _period == _Period.range,

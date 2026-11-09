@@ -5,6 +5,7 @@ import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/app_sheet.dart';
 import '../../../core/widgets/buttons.dart';
+import '../../../core/widgets/choice_grid.dart';
 import '../../../core/widgets/choice_pill.dart';
 import '../../../core/widgets/labeled_field.dart';
 import '../../../core/widgets/minute_picker.dart';
@@ -220,10 +221,10 @@ class _NewTypeFormState extends State<NewTypeForm> {
         const SizedBox(height: Sp.xl),
         LabeledField(
           label: l10n.shiftTypesCategoryLabel,
-          child: Wrap(
-            spacing: Sp.s,
-            runSpacing: Sp.s,
-            children: [
+          child: ChoiceGrid.pills(
+            sizing: ChoiceGridSizing.wholeLabel,
+            maxColumns: 3,
+            pills: [
               for (final (key, category, label) in [
                 ('work', ShiftCategory.work, l10n.shiftTypesCategoryWork),
                 ('rest', ShiftCategory.rest, l10n.shiftTypesCategoryRest),
@@ -234,6 +235,8 @@ class _NewTypeFormState extends State<NewTypeForm> {
                 ),
               ])
                 ChoicePill(
+                  expand: true,
+                  reserveIcon: true,
                   key: ValueKey('import-new-category-$key'),
                   label: label,
                   selected: _draft.category == category,

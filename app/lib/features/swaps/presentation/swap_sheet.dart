@@ -10,6 +10,7 @@ import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/app_sheet.dart';
 import '../../../core/widgets/app_snack_bar.dart';
 import '../../../core/widgets/buttons.dart';
+import '../../../core/widgets/choice_grid.dart';
 import '../../../core/widgets/choice_pill.dart';
 import '../../../core/widgets/confirm_dialog.dart';
 import '../../../core/widgets/labeled_field.dart';
@@ -282,17 +283,21 @@ class _SwapSheetState extends ConsumerState<SwapSheet> {
         LabeledField(
           label: l10n.swapFieldDirection,
           helper: l10n.swapFieldDirectionHelper,
-          child: Wrap(
-            spacing: Sp.s,
-            runSpacing: Sp.s,
-            children: [
+          child: ChoiceGrid.pills(
+            sizing: ChoiceGridSizing.wholeLabel,
+            maxColumns: 2,
+            pills: [
               ChoicePill(
+                expand: true,
+                reserveIcon: true,
                 key: const ValueKey('swap-direction-they-owe'),
                 label: l10n.swapDirectionTheyOwe,
                 selected: _direction == SwapDirection.theyOwe,
                 onTap: () => setState(() => _direction = SwapDirection.theyOwe),
               ),
               ChoicePill(
+                expand: true,
+                reserveIcon: true,
                 key: const ValueKey('swap-direction-i-owe'),
                 label: l10n.swapDirectionIOwe,
                 selected: _direction == SwapDirection.iOwe,
@@ -412,12 +417,13 @@ class _SwapSheetState extends ConsumerState<SwapSheet> {
       );
     }
     final format = AppDateFormat.of(context);
-    return Wrap(
-      spacing: Sp.s,
-      runSpacing: Sp.s,
-      children: [
+    return ChoiceGrid.pills(
+      leadingSize: IconSize.inline,
+      pills: [
         for (final shift in palette)
           ChoicePill(
+            expand: true,
+            reserveIcon: true,
             key: ValueKey('$keyPrefix-${shift.id}'),
             label: _typePillLabel(shift, format),
             leading: _ShiftSwatchDot(shift: shift),

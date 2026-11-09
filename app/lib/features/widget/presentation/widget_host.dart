@@ -68,7 +68,12 @@ class _WidgetHostState extends ConsumerState<WidgetHost> {
   @override
   void initState() {
     super.initState();
-    _lifecycle = AppLifecycleListener(onResume: _onResume);
+    _lifecycle = AppLifecycleListener(
+      onResume: _onResume,
+      // Leaving the app: an edit still in its quiet period goes out now.
+      onInactive: _flushPending,
+      onHide: _flushPending,
+    );
     final now = ref.read(clockProvider)();
     _remember(now);
     // Android tells us at once when the zone or the time changes under the
@@ -131,6 +136,10 @@ class _WidgetHostState extends ConsumerState<WidgetHost> {
   }
 
   // ---- Triggers -----------------------------------------------------------
+
+  void _flushPending() {
+    unawaited(ref.read(widgetSyncProvider).flushPending());
+  }
 
   void _onResume() {
     _remember(ref.read(clockProvider)());

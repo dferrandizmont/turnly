@@ -37,7 +37,9 @@ final alarmSchedulerProvider = Provider<AlarmScheduler>(
 /// The Android system screens and clock notices the alarms use. Tests
 /// override it with a `FakeAlarmSystem`.
 final alarmSystemProvider = Provider<AlarmSystem>(
-  (ref) => Platform.isAndroid ? PlatformAlarmSystem() : const NoAlarmSystem(),
+  (ref) => Platform.isAndroid || Platform.isIOS
+      ? PlatformAlarmSystem()
+      : const NoAlarmSystem(),
 );
 
 /// The phone's alarm sounds: the Android picker; nothing to choose

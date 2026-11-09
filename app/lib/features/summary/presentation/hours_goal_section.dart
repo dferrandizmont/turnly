@@ -7,6 +7,7 @@ import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/app_sheet.dart';
 import '../../../core/widgets/app_snack_bar.dart';
 import '../../../core/widgets/buttons.dart';
+import '../../../core/widgets/choice_grid.dart';
 import '../../../core/widgets/choice_pill.dart';
 import '../../../core/widgets/labeled_field.dart';
 import '../application/summary_providers.dart';
@@ -156,17 +157,21 @@ class _GoalSheetState extends State<_GoalSheet> {
           child: Text(l10n.summaryGoalTitle, style: type.headline),
         ),
         const SizedBox(height: Sp.m),
-        Wrap(
-          spacing: Sp.s,
-          runSpacing: Sp.s,
-          children: [
+        ChoiceGrid.pills(
+          sizing: ChoiceGridSizing.wholeLabel,
+          maxColumns: 2,
+          pills: [
             ChoicePill(
+              expand: true,
+              reserveIcon: true,
               key: const ValueKey('summary-goal-year'),
               label: l10n.summaryGoalChoiceYear,
               selected: yearly,
               onTap: () => _choose(HoursGoalPeriod.year),
             ),
             ChoicePill(
+              expand: true,
+              reserveIcon: true,
               key: const ValueKey('summary-goal-month'),
               label: l10n.summaryGoalChoiceMonth,
               selected: !yearly,

@@ -187,7 +187,13 @@ class MonthPresentationControl extends ConsumerWidget {
                       width: Sp.cellSegmentDot,
                       height: Sp.cellSegmentDot,
                       decoration: BoxDecoration(
-                        color: colors.accent,
+                        // On the filled thumb of dark mode the accent
+                        // would vanish: the dot takes the ink colour there.
+                        color:
+                            presentation == MonthPresentation.list &&
+                                colors.isDark
+                            ? colors.onAccent
+                            : colors.accent,
                         shape: BoxShape.circle,
                       ),
                     )
@@ -248,7 +254,22 @@ class _Segment extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final ink = selected ? colors.textPrimary : colors.textSecondary;
+    // In dark mode the soft accent is almost the colour of the track
+    // (about 1.3:1), so the chosen half is filled with the accent itself and
+    // its label uses `onAccent` (both guaranteed AA for every accent,
+    // `test/core/theme/accent_contrast_test.dart`). In light mode the soft
+    // accent already stands out.
+    final solid = selected && colors.isDark;
+    final ink = solid
+        ? colors.onAccent
+        : selected
+        ? colors.textPrimary
+        : colors.textSecondary;
+    final fill = solid
+        ? colors.accent
+        : selected
+        ? colors.accentSoft
+        : Colors.transparent;
     final radius = BorderRadius.circular(Rad.chipSmall);
     return Semantics(
       container: true,
@@ -283,12 +304,12 @@ class _Segment extends StatelessWidget {
                     vertical: Sp.xs,
                   ),
                   decoration: BoxDecoration(
-                    // The soft accent, not `surface`: in dark mode `surface`
-                    // and the track are almost the same colour.
-                    color: selected ? colors.accentSoft : Colors.transparent,
+                    color: fill,
                     borderRadius: radius,
                     border: Border.all(
-                      color: selected
+                      color: solid
+                          ? colors.accent
+                          : selected
                           ? colors.borderStrong
                           : Colors.transparent,
                     ),

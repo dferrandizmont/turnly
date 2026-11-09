@@ -617,7 +617,12 @@ class _MonthScreenState extends ConsumerState<MonthScreen>
             // In portrait the tools sheet already reserves the system inset.
             bottom: Adaptive.useSplit(MediaQuery.sizeOf(context)),
             child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: fixedRow),
+              // In the list the rows are cut by the edge of the scroll; with
+              // «Pintar» floating right under that edge a cut row would read
+              // as hidden by the button, so the list gets a gap above it.
+              constraints: BoxConstraints(
+                minHeight: fixedRow + (listing && fabShown ? Sp.s : 0),
+              ),
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: Row(

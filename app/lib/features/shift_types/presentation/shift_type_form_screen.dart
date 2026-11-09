@@ -13,6 +13,7 @@ import '../../../core/providers.dart';
 import '../../../core/router.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/buttons.dart';
+import '../../../core/widgets/choice_grid.dart';
 import '../../../core/widgets/choice_pill.dart';
 import '../../../core/widgets/confirm_dialog.dart';
 import '../../../core/widgets/content_app_bar.dart';
@@ -707,10 +708,10 @@ class _ShiftTypeFormScreenState extends ConsumerState<ShiftTypeFormScreen> {
               const SizedBox(height: Sp.section),
               LabeledField(
                 label: l10n.shiftTypesCategoryLabel,
-                child: Wrap(
-                  spacing: Sp.s,
-                  runSpacing: Sp.s,
-                  children: [
+                child: ChoiceGrid.pills(
+                  sizing: ChoiceGridSizing.wholeLabel,
+                  maxColumns: 3,
+                  pills: [
                     for (final (key, category, label) in [
                       ('work', ShiftCategory.work, l10n.shiftTypesCategoryWork),
                       ('rest', ShiftCategory.rest, l10n.shiftTypesCategoryRest),
@@ -721,6 +722,8 @@ class _ShiftTypeFormScreenState extends ConsumerState<ShiftTypeFormScreen> {
                       ),
                     ])
                       ChoicePill(
+                        expand: true,
+                        reserveIcon: true,
                         key: ValueKey('category-$key'),
                         label: label,
                         selected: _draft.category == category,
@@ -819,10 +822,8 @@ class _ShiftTypeFormScreenState extends ConsumerState<ShiftTypeFormScreen> {
                 LabeledField(
                   label: l10n.shiftTypesNightLabel,
                   helper: l10n.shiftTypesNightHelper,
-                  child: Wrap(
-                    spacing: Sp.s,
-                    runSpacing: Sp.s,
-                    children: [
+                  child: ChoiceGrid.pills(
+                    pills: [
                       for (final (key, value, label)
                           in <(String, bool?, String)>[
                             ('auto', null, l10n.shiftTypesNightAuto),
@@ -830,6 +831,8 @@ class _ShiftTypeFormScreenState extends ConsumerState<ShiftTypeFormScreen> {
                             ('never', false, l10n.shiftTypesNightNever),
                           ])
                         ChoicePill(
+                          expand: true,
+                          reserveIcon: true,
                           key: ValueKey('night-$key'),
                           label: label,
                           selected: _draft.nightOverride == value,

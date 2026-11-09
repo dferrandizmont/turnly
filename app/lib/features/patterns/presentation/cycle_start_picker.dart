@@ -6,6 +6,7 @@ import '../../../core/icons/app_icons.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/choice_grid.dart';
 import '../../../core/widgets/choice_pill.dart';
 import '../../calendar/presentation/shift_badge.dart';
 import '../../calendar/presentation/shift_format.dart';
@@ -179,48 +180,6 @@ class _CycleStartPickerState extends State<CycleStartPicker> {
       onTap: () => widget.onOffsetChanged(i),
     );
 
-    // Grid cells as wide as their longest text needs at the reader's text
-    // size, so a word never breaks inside a cell (QA 0.9.5, F1).
-    final scaler = MediaQuery.textScalerOf(context);
-    final direction = Directionality.of(context);
-    double textWidth(String text, TextStyle style) {
-      final painter = TextPainter(
-        text: TextSpan(text: text, style: style),
-        textDirection: direction,
-        textScaler: scaler,
-        maxLines: 1,
-      )..layout();
-      final width = painter.width;
-      painter.dispose();
-      return width;
-    }
-
-    double widest(Iterable<double> widths) =>
-        widths.fold(0.0, (a, b) => a > b ? a : b);
-
-    final nameStyle = type.body.copyWith(fontWeight: FontWeight.w800);
-    final shiftCellWidth =
-        widest([
-          for (final id in order)
-            if (widget.shiftOf(id) case final shift?) ...[
-              textWidth(shift.name, nameStyle),
-              textWidth(shift.timeRange(format) ?? '', type.meta),
-            ],
-        ]) +
-        ChoicePill.chromeWidth(
-          compact: true,
-          hasLeading: true,
-          leadingSize: Disc.s,
-        ) +
-        1;
-    final occurrenceCellWidth =
-        widest([
-          for (final option in runOptions)
-            textWidth(optionLabel(option), nameStyle),
-        ]) +
-        ChoicePill.chromeWidth(compact: false, hasLeading: false) +
-        1;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -231,8 +190,22 @@ class _CycleStartPickerState extends State<CycleStartPicker> {
         const SizedBox(height: Sp.xs),
         Text(l10n.patternStartShiftHelp(date), style: type.meta),
         const SizedBox(height: Sp.m),
-        ChoiceGrid(
-          minCellWidth: shiftCellWidth,
+        // Cells as wide as their longest name or hours at the reader's text
+        // size, so a word never breaks inside a cell (QA 0.9.5, F1).
+        ChoiceGrid.forLabels(
+          sizing: ChoiceGridSizing.wholeLabel,
+          compact: true,
+          hasLeading: true,
+          leadingSize: Disc.s,
+          labels: [
+            for (final id in order)
+              if (widget.shiftOf(id) case final shift?) shift.name,
+          ],
+          details: [
+            for (final id in order)
+              if (widget.shiftOf(id) case final shift?)
+                ?shift.timeRange(format),
+          ],
           children: [
             for (final id in order)
               if (widget.shiftOf(id) case final shift?)
@@ -283,8 +256,9 @@ class _CycleStartPickerState extends State<CycleStartPicker> {
           const SizedBox(height: Sp.xs),
           Text(l10n.patternStartOccurrenceHelp, style: type.meta),
           const SizedBox(height: Sp.m),
-          ChoiceGrid(
-            minCellWidth: occurrenceCellWidth,
+          ChoiceGrid.forLabels(
+            sizing: ChoiceGridSizing.wholeLabel,
+            labels: [for (final option in runOptions) optionLabel(option)],
             children: [
               for (final option in runOptions)
                 ChoicePill(
@@ -418,62 +392,6 @@ class PatternMonthPreview extends StatelessWidget {
           MiniMonth(month: second, schedule: plan!.schedule),
         ],
       ],
-    );
-  }
-}
-
-/// Choices laid out in aligned columns, every cell the same width and every
-/// row as tall as its tallest cell, so «Mañana», «Tarde», «Noche»… line up
-/// instead of wrapping ragged. As many columns (up to three) as fit cells of
-/// [minCellWidth]: two on a phone, one when a cell would not fit its longest
-/// text (narrow screen, large text), so no word ever breaks inside a cell.
-class ChoiceGrid extends StatelessWidget {
-  const ChoiceGrid({
-    super.key,
-    required this.minCellWidth,
-    required this.children,
-  });
-
-  /// The narrowest a cell may be: its longest text plus the pill around it.
-  final double minCellWidth;
-
-  final List<Widget> children;
-
-  /// How many columns of [minCellWidth] fit in [width] (1 to 3).
-  static int columnsFor(double width, double minCellWidth) =>
-      ((width + Sp.s) / (minCellWidth + Sp.s)).floor().clamp(1, 3);
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final columns = columnsFor(constraints.maxWidth, minCellWidth);
-        final rows = <Widget>[];
-        for (var i = 0; i < children.length; i += columns) {
-          if (rows.isNotEmpty) rows.add(const SizedBox(height: Sp.s));
-          rows.add(
-            IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  for (var c = 0; c < columns; c++) ...[
-                    if (c > 0) const SizedBox(width: Sp.s),
-                    Expanded(
-                      child: i + c < children.length
-                          ? children[i + c]
-                          : const SizedBox.shrink(),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          );
-        }
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: rows,
-        );
-      },
     );
   }
 }

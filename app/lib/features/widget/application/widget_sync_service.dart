@@ -86,6 +86,18 @@ class WidgetSyncService {
   /// Completes when the run in flight (if any) has finished.
   Future<void> flush() => _loop ?? Future.value();
 
+  /// Runs a debounced trigger that is still waiting, now. The host calls it
+  /// when the app leaves the screen: a suspended app never fires the timer,
+  /// so an edit made just before leaving would reach the widget only on the
+  /// next opening (seen on iOS right after the first use).
+  Future<void> flushPending() {
+    if (_disposed || _paused) return Future.value();
+    if (_timer == null) return flush();
+    _timer!.cancel();
+    _timer = null;
+    return _kick();
+  }
+
   void dispose() {
     _disposed = true;
     _timer?.cancel();

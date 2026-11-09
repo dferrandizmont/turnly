@@ -15,6 +15,17 @@ import flutter_local_notifications
   }
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
+    // «Abrir un .turnly desde otra app» (docs/mac-ios.md 4.3, step 4): before
+    // the plugins, because Flutter stops dispatching a scene event at the first
+    // delegate that claims it (this one never does).
+    if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "TurnlyIncomingBackup") {
+      registrar.addSceneDelegate(IncomingBackupChannel.shared)
+      IncomingBackupChannel.shared.register(with: registrar)
+    }
+    // Alarms: notifications denied for good, their settings screen, clock changes.
+    if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "TurnlyAlarmSystem") {
+      AlarmSystemChannel.shared.register(with: registrar)
+    }
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
     // flutter_local_notifications: the engine that runs «Posponer» with the app
     // closed needs the plugins too (docs/mac-ios.md 4.2, step 4).

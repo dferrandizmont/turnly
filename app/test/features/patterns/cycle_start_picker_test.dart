@@ -1,6 +1,7 @@
 import 'package:cuadrante/core/bootstrap/bootstrap.dart';
 import 'package:cuadrante/core/l10n/catalog_texts.dart';
 import 'package:cuadrante/core/theme/app_theme.dart';
+import 'package:cuadrante/core/widgets/choice_grid.dart';
 import 'package:cuadrante/core/widgets/choice_pill.dart';
 import 'package:cuadrante/features/patterns/presentation/cycle_start_picker.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';

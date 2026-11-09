@@ -54,15 +54,17 @@ Future<ShiftSwap> _register(
 }) async {
   final container = _container(tester);
   final swap = await tester.runAsync(
-    () => container.read(swapLedgerProvider.notifier).register(
-      colleague: colleague,
-      date: date,
-      direction: direction,
-      returnDate: returnDate,
-      givenShiftTypeIds: givenShiftTypeIds,
-      receivedShiftTypeIds: receivedShiftTypeIds,
-      note: note,
-    ),
+    () => container
+        .read(swapLedgerProvider.notifier)
+        .register(
+          colleague: colleague,
+          date: date,
+          direction: direction,
+          returnDate: returnDate,
+          givenShiftTypeIds: givenShiftTypeIds,
+          receivedShiftTypeIds: receivedShiftTypeIds,
+          note: note,
+        ),
   );
   await _settle(tester);
   return swap!;
@@ -80,11 +82,7 @@ Future<void> _open(WidgetTester tester) async {
 }
 
 /// Opens the menu of a change and chooses an action.
-Future<void> _menu(
-  WidgetTester tester,
-  String swapId,
-  String actionKey,
-) async {
+Future<void> _menu(WidgetTester tester, String swapId, String actionKey) async {
   await tester.tap(_key('swap-menu-$swapId'));
   await tester.pumpAndSettle();
   await tester.tap(_key(actionKey));
@@ -115,20 +113,13 @@ void main() {
       colleague: 'Marta',
       givenShiftTypeIds: const ['morning'],
     );
-    await _register(
-      tester,
-      colleague: 'Luis',
-      direction: SwapDirection.iOwe,
-    );
+    await _register(tester, colleague: 'Luis', direction: SwapDirection.iOwe);
     await _open(tester);
 
     expect(find.byType(SwapsScreen), findsOneWidget);
     // The balance: what each one owes.
     expect(
-      find.descendant(
-        of: _key('swap-balances'),
-        matching: find.text('Marta'),
-      ),
+      find.descendant(of: _key('swap-balances'), matching: find.text('Marta')),
       findsOneWidget,
     );
     expect(find.text('Me debe 1 turno'), findsOneWidget);
@@ -148,14 +139,10 @@ void main() {
       colleague: 'Ana',
       givenShiftTypeIds: const ['morning'],
     );
-    await _register(
-      tester,
-      colleague: 'Luis',
-      direction: SwapDirection.iOwe,
-    );
-    await _container(tester).read(swapLedgerProvider.notifier).settle(
-      settled.id,
-    );
+    await _register(tester, colleague: 'Luis', direction: SwapDirection.iOwe);
+    await _container(tester)
+        .read(swapLedgerProvider.notifier)
+        .settle(settled.id);
     await _settle(tester);
     await _open(tester);
 
@@ -185,11 +172,16 @@ void main() {
     expect(await _stored(tester), isEmpty);
 
     await tester.enterText(_key('swap-field-colleague'), 'Marta');
+    await tester.ensureVisible(_key('swap-direction-they-owe'));
     await tester.tap(_key('swap-direction-they-owe'));
     await tester.ensureVisible(_key('swap-given-morning'));
     await tester.tap(_key('swap-given-morning'));
     await tester.enterText(_key('swap-field-note'), 'Me lo devuelve el lunes');
+    // The sheet is still growing under the pills when the note is typed:
+    // let it settle before bringing the button into view.
+    await tester.pumpAndSettle();
     await tester.ensureVisible(_key('swap-save'));
+    await tester.pumpAndSettle();
     await tester.tap(_key('swap-save'));
     await _settle(tester);
 
@@ -243,10 +235,7 @@ void main() {
     await _settle(tester);
     expect(find.text('Saldado'), findsOneWidget);
     expect((await _stored(tester)).single.isReturned, isTrue);
-    expect(
-      _container(tester).read(swapLedgerProvider).value!.pending,
-      isEmpty,
-    );
+    expect(_container(tester).read(swapLedgerProvider).value!.pending, isEmpty);
 
     // And it can be owed again.
     await _menu(tester, swap.id, 'swap-menu-reopen');
@@ -257,9 +246,7 @@ void main() {
     );
   });
 
-  testWidgets('a change is applied to the calendar and undone', (
-    tester,
-  ) async {
+  testWidgets('a change is applied to the calendar and undone', (tester) async {
     await pumpCalendar(tester, size: const Size(390, 1600));
     final swap = await _register(
       tester,

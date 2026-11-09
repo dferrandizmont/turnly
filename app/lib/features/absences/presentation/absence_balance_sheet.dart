@@ -9,6 +9,7 @@ import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/app_sheet.dart';
 import '../../../core/widgets/app_snack_bar.dart';
 import '../../../core/widgets/buttons.dart';
+import '../../../core/widgets/choice_grid.dart';
 import '../../../core/widgets/choice_pill.dart';
 import '../../../core/widgets/confirm_dialog.dart';
 import '../../../core/widgets/labeled_field.dart';
@@ -365,12 +366,12 @@ class _AbsenceBalanceSheetState extends ConsumerState<AbsenceBalanceSheet> {
           const SizedBox(height: Sp.xs),
           Text(l10n.absenceContinueSeriesHelper, style: type.meta),
           const SizedBox(height: Sp.s),
-          Wrap(
-            spacing: Sp.s,
-            runSpacing: Sp.s,
-            children: [
+          ChoiceGrid.pills(
+            pills: [
               for (final previous in widget.previousBalances)
                 ChoicePill(
+                  expand: true,
+                  reserveIcon: true,
                   key: ValueKey('absence-continue-${previous.type}'),
                   label: '${previous.displayName} · ${previous.year}',
                   selected: _type == previous.type,
@@ -534,12 +535,12 @@ class _AbsenceBalanceSheetState extends ConsumerState<AbsenceBalanceSheet> {
             style: type.body.copyWith(color: colors.textSecondary),
           )
         else
-          Wrap(
-            spacing: Sp.s,
-            runSpacing: Sp.s,
-            children: [
+          ChoiceGrid.pills(
+            pills: [
               for (final t in absenceTypes)
                 ChoicePill(
+                  expand: true,
+                  reserveIcon: true,
                   key: ValueKey('absence-type-${t.id}'),
                   label: '${t.code} · ${t.name}',
                   selected: _types.containsKey(t.id),

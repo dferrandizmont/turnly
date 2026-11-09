@@ -8,6 +8,7 @@ import '../../../core/icons/selection_icons.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/theme_context.dart';
+import '../../../core/widgets/choice_grid.dart';
 import '../../../core/widgets/choice_pill.dart';
 import '../../../core/widgets/content_app_bar.dart';
 import '../../../core/widgets/empty_illustration.dart';
@@ -202,15 +203,16 @@ class _ModeToggle extends StatelessWidget {
     final l10n = context.l10n;
     return Padding(
       padding: const EdgeInsets.fromLTRB(Sp.page, Sp.s, Sp.page, 0),
-      // A Wrap, not a Row: with large text or a long translation the second
-      // pill goes to the next line instead of breaking a word.
+      // An aligned grid, not a Row: with large text or a long translation the
+      // second pill goes under the first instead of breaking a word.
       child: Align(
         alignment: AlignmentDirectional.centerStart,
-        child: Wrap(
-          spacing: Sp.s,
-          runSpacing: Sp.s,
-          children: [
+        child: ChoiceGrid.pills(
+          sizing: ChoiceGridSizing.wholeLabel,
+          maxColumns: 2,
+          pills: [
             ChoicePill(
+              expand: true,
               key: const ValueKey('agenda-mode-notes'),
               label: l10n.agendaModeNotes,
               // The icon's room is reserved: choosing one pill does not make
@@ -220,6 +222,7 @@ class _ModeToggle extends StatelessWidget {
               onTap: () => onSelected(AgendaMode.notes),
             ),
             ChoicePill(
+              expand: true,
               key: const ValueKey('agenda-mode-shifts'),
               label: l10n.agendaModeShifts,
               reserveIcon: true,

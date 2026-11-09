@@ -855,7 +855,8 @@ iCloud) con lo que lleve dentro, bajas incluidas. Con `true`, los archivos que v
 leen del original con acceso de ámbito de seguridad, sin dejar copia. AirDrop, Correo y otras apps pueden seguir
 entregando una copia en `Inbox`: el Swift la borra al leer o descartar (abajo).
 
-**Swift (falta, en el Mac):** el `SceneDelegate` (`FlutterSceneDelegate`) o un `FlutterSceneLifeCycleDelegate`
+**Swift (hecho el 9-nov-2026; falta probarlo en un iPhone):** `Runner/IncomingBackupChannel.swift` (canal y delegado de
+escena) y `Runner/IncomingFileStore.swift` (copia por trozos, tope y limpieza de `Inbox`). Lo previsto: el `SceneDelegate` (`FlutterSceneDelegate`) o un `FlutterSceneLifeCycleDelegate`
 registrado con el registrador (como hace `home_widget`) recibe la URL en `scene(_:willConnectTo:options:)`
 (`connectionOptions.urlContexts`, arranque en frío) y en `scene(_:openURLContexts:)` (app abierta). **Comprobar en el
 Mac** que `home_widget` y este delegado conviven: `home_widget` solo devuelve `true` para URLs con el parámetro

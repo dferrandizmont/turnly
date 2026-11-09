@@ -2,3 +2,5 @@
 "NSCalendarsFullAccessUsageDescription" = "Per llegir torns del teu calendari en importar i, si ho demanes, afegir els teus torns al calendari que triïs. Si aquest calendari se sincronitza amb un compte, aquest compte també els rebrà.";
 "NSCalendarsUsageDescription" = "Per llegir torns del teu calendari en importar i, si ho demanes, afegir els teus torns al calendari que triïs. Si aquest calendari se sincronitza amb un compte, aquest compte també els rebrà.";
 "NSCalendarsWriteOnlyAccessUsageDescription" = "Per afegir els teus torns al calendari que triïs, sense llegir el que ja hi tens. Si aquest calendari se sincronitza amb un compte, aquest compte també els rebrà.";
+"NSCameraUsageDescription" = "Per fer una foto i afegir-la a la nota d’un dia del teu quadrant.";
+"NSPhotoLibraryUsageDescription" = "Per triar una foto de la teva galeria, ja sigui per afegir-la a la nota d’un dia del teu quadrant o per fer-la servir de fons del calendari. Només es llegeix la foto que tries.";

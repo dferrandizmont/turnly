@@ -9,6 +9,7 @@ import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/app_sheet.dart';
 import '../../../core/widgets/app_snack_bar.dart';
 import '../../../core/widgets/buttons.dart';
+import '../../../core/widgets/choice_grid.dart';
 import '../../../core/widgets/choice_pill.dart';
 import '../../../core/widgets/labeled_field.dart';
 import '../../calendar/application/schedule_controller.dart';
@@ -283,12 +284,12 @@ class _PayTemplateSheetState extends State<_PayTemplateSheet> {
           style: type.body.copyWith(color: colors.textSecondary),
         ),
         const SizedBox(height: Sp.l),
-        Wrap(
-          spacing: Sp.s,
-          runSpacing: Sp.s,
-          children: [
+        ChoiceGrid.pills(
+          pills: [
             for (final template in payTemplates)
               ChoicePill(
+                expand: true,
+                reserveIcon: true,
                 key: ValueKey('pay-template-${template.kind.stored}'),
                 label: _templateName(l10n, template.kind),
                 selected: template.kind == _template.kind,
