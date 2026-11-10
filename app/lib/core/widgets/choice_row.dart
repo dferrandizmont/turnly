@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import '../icons/app_icons.dart';
 import '../theme/theme_context.dart';
 
-/// One row of a list of choices in a bottom sheet: the label, and a check
-/// when it is the current one. The communities, the municipalities and every
-/// other single-choice sheet use this row, so they share the same indent,
-/// height and trailing mark (H-T01-4: the two onboarding sheets used to
-/// differ, one with a chevron and another indent, the other without).
+/// One row of a single-choice list (the sheets of jobs, communities,
+/// municipalities, holidays, currency and reports, and the job card of the
+/// profession step): the label, and a check when it is the current one.
+/// Announced by screen readers as an option of a mutually exclusive group
+/// that can be activated; the chosen one is only in bold, with the mark.
 ///
 /// The text starts [Sp.xs] inside the gutter of the sheet; in a sheet whose
 /// list owns the whole width, wrap the row in a `Padding` of
@@ -37,10 +37,12 @@ class ChoiceRow extends StatelessWidget {
     final colors = context.colors;
     final type = context.type;
     return Semantics(
-      button: true,
-      selected: selected,
+      container: true,
+      checked: selected,
+      inMutuallyExclusiveGroup: true,
       excludeSemantics: true,
       label: subtitle == null ? label : '$label, $subtitle',
+      onTap: onTap,
       child: InkWell(
         borderRadius: Rad.rowRadius,
         onTap: onTap,
@@ -59,7 +61,10 @@ class ChoiceRow extends StatelessWidget {
                     children: [
                       Text(
                         label,
-                        style: selected ? type.bodyStrong : type.body,
+                        // Same size selected or not, only bolder: the row never jumps.
+                        style: selected
+                            ? type.body.copyWith(fontWeight: FontWeight.w700)
+                            : type.body,
                       ),
                       if (subtitle != null)
                         Text(

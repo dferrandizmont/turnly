@@ -28,12 +28,10 @@ Totes les funcions disponibles són obertes, sense Pro ni compres dins de l’ap
 <p>
   <a href="https://play.google.com/apps/testing/es.cuadrante.app"><img src="https://img.shields.io/badge/Google_Play-Beta-414141?logo=googleplay&amp;style=for-the-badge" alt="Beta a Google Play"></a>
   <a href="https://github.com/dferrandizmont/turnly/releases/latest"><img src="https://img.shields.io/badge/Disponible_a-GitHub-181717?logo=github&amp;style=for-the-badge" alt="Disponible a GitHub"></a>
-  <!--
-  <a href="[ENLACE_APP_STORE]"><img src="https://img.shields.io/badge/App_Store-Baixa-0D96F6?logo=appstore&amp;style=for-the-badge" alt="Disponible a l’App Store"></a>
-  -->
+  <a href="https://apps.apple.com/es/app/turnly-cuadrante-de-turnos/id6832554552"><img src="https://img.shields.io/badge/App_Store-Baixa-0D96F6?logo=appstore&amp;style=for-the-badge" alt="Disponible a l’App Store"></a>
 </p>
 
-Android en proves; iPhone, aviat. Mode clar i fosc.
+Android en proves; iPhone, a l’App Store. Mode clar i fosc.
 
 <details>
 <summary>Uneix-te a la beta de Google Play</summary>
@@ -98,8 +96,8 @@ per [tests de Flutter](app/test/store/), també [en castellà](README.es.md#capt
 - **Alarmes, widgets i no molestar.** Alarma per tipus de torn, recordatoris de
   notes i widgets d’Android, inclòs un de quatre setmanes. A Android, «Silencia
   el mòbil durant els meus torns» el silencia mentre treballes. La puntualitat
-  depèn dels permisos i les restriccions del sistema. El widget d’iPhone està
-  pendent.
+  depèn dels permisos i les restriccions del sistema. A l’iPhone també hi ha
+  widgets, a la pantalla d’inici i a la de bloqueig.
 - **Còpia, informes i calendari del mòbil.** Còpies de seguretat locals
   automàtiques i, a Android, una còpia diària a la carpeta que triïs (Drive,
   Dropbox, OneDrive o el mòbil), amb vista prèvia en restaurar i «Prova la
@@ -153,6 +151,8 @@ dades van a la destinació que triïs. El fitxer de còpia `.turnly` no està xi
 [Detall tècnic](docs/privacy.md) (en castellà) · Suport: **turnly@mainshai.com**.
 
 ## Novetats
+
+- **1.0.0 (10-nov-2026):** primera versió a l’App Store, per a iPhone. Android continua en proves a Google Play.
 
 Els canvis de cada versió són al [CHANGELOG.md](CHANGELOG.md) i a les
 [versions publicades](https://github.com/dferrandizmont/turnly/releases).

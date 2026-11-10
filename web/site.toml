@@ -13,5 +13,5 @@ privacy_fallback = { ca = "es", gl = "es", eu = "es" }
 downloads = [
   { kind = "play", state = "closed_test", url = "https://play.google.com/apps/testing/es.cuadrante.app" },
   { kind = "apk", state = "beta", url = "https://github.com/dferrandizmont/turnly/releases/latest" },
-  { kind = "app_store", state = "soon" },
+  { kind = "app_store", state = "available", url = "https://apps.apple.com/es/app/turnly-cuadrante-de-turnos/id6832554552" },
 ]

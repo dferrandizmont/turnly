@@ -40,8 +40,7 @@ class ChoicePill extends StatelessWidget {
   final bool reserveIcon;
 
   /// Corner radius, or `null` for [Rad.chipSmall] (a rounded rectangle, like
-  /// the other chips). A choice of longer labels (the jobs of «¿A qué te
-  /// dedicas?») can ask for a larger one.
+  /// the other chips). A choice of longer labels can ask for a larger one.
   final BorderRadiusGeometry? radius;
 
   /// A second, quieter line under the label (a shift's hours), so a pill in

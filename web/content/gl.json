@@ -32,7 +32,7 @@
     },
     {
       "question": "E no iPhone?",
-      "answer": "A versión para iPhone está en camiño. Sairá primeiro en TestFlight e despois na App Store."
+      "answer": "Si: Turnly está na App Store desde o 10 de novembro de 2026, de balde e para iPhone con iOS 17 ou posterior."
     },
     {
       "question": "Como paso Turnly a un móbil novo?",
@@ -67,12 +67,12 @@
   "theme_light": "Claro",
   "theme_dark": "Escuro",
   "theme_hint": "Cambiar o tema",
-  "download_title": "Android en probas; iPhone, proximamente.",
+  "download_title": "Android en probas; iPhone, na App Store.",
   "download_intro": "Modo claro e escuro. Gratis e sen conta.",
   "download_notes": {
     "play": "Calquera pode apuntarse: primeiro entras no grupo de testers e despois aceptas a proba.",
     "apk": "Instálalo á man. Desde a 0.8.3 leva a mesma sinatura que a versión de Google Play: podes pasar dunha á outra sen desinstalar.",
-    "app_store": "Turnly chegará ao iPhone. Mentres tanto, só se pode instalar en Android."
+    "app_store": "De balde na App Store, para iPhone con iOS 17 ou posterior."
   },
   "join_title": "Como unirte á proba de Google Play",
   "join_steps": [

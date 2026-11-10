@@ -1,5 +1,6 @@
 import 'package:cuadrante/core/bootstrap/bootstrap.dart';
 import 'package:cuadrante/core/format/text_wrap.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -67,11 +68,16 @@ void main() {
         );
         await app.toLastStep();
         for (final id in ['nursing', 'police', 'industry', 'hospitality']) {
-          // The hours of the job chosen show under the pills.
-          await app.tap(key('onboarding-profession-$id'));
-          final hint = key('onboarding-profession-hint');
-          await tester.ensureVisible(hint);
+          // The hours of the job show under its name, in the same row.
+          final row = key('onboarding-profession-$id');
+          await tester.ensureVisible(row);
           await tester.pumpAndSettle();
+          final hint = find.descendant(
+            of: row,
+            matching: find.byWidgetPredicate(
+              (w) => w is Text && (w.data?.contains('–') ?? false),
+            ),
+          );
           final paragraph = tester.renderObject<RenderParagraph>(hint);
           for (final line in linesOf(paragraph)) {
             final shown = line.trim();

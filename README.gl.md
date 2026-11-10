@@ -28,12 +28,10 @@ Todas as funcións dispoñibles están abertas, sen Pro nin compras dentro da ap
 <p>
   <a href="https://play.google.com/apps/testing/es.cuadrante.app"><img src="https://img.shields.io/badge/Google_Play-Beta-414141?logo=googleplay&amp;style=for-the-badge" alt="Beta en Google Play"></a>
   <a href="https://github.com/dferrandizmont/turnly/releases/latest"><img src="https://img.shields.io/badge/Dispo%C3%B1ible_en-GitHub-181717?logo=github&amp;style=for-the-badge" alt="Dispoñible en GitHub"></a>
-  <!--
-  <a href="[ENLACE_APP_STORE]"><img src="https://img.shields.io/badge/App_Store-Descargar-0D96F6?logo=appstore&amp;style=for-the-badge" alt="Dispoñible na App Store"></a>
-  -->
+  <a href="https://apps.apple.com/es/app/turnly-cuadrante-de-turnos/id6832554552"><img src="https://img.shields.io/badge/App_Store-Descargar-0D96F6?logo=appstore&amp;style=for-the-badge" alt="Dispoñible na App Store"></a>
 </p>
 
-Android en probas; iPhone, proximamente. Modo claro e escuro.
+Android en probas; iPhone, na App Store. Modo claro e escuro.
 
 <details>
 <summary>Únete á beta de Google Play</summary>
@@ -98,8 +96,8 @@ por [tests de Flutter](app/test/store/), tamén [en castelán](README.es.md#capt
 - **Alarmas, widgets e non molestar.** Alarma por tipo de quenda, recordatorios
   de notas e widgets de Android, incluído un de catro semanas. En Android,
   «Silenciar o móbil nas miñas quendas» silénciao mentres traballas. A
-  puntualidade depende dos permisos e das restricións do sistema. O widget de
-  iPhone está pendente.
+  puntualidade depende dos permisos e das restricións do sistema. No iPhone tamén
+  hai widgets, na pantalla de inicio e na de bloqueo.
 - **Copia, informes e calendario do móbil.** Copias de seguranza locais
   automáticas e, en Android, unha copia diaria na carpeta que escollas (Drive,
   Dropbox, OneDrive ou o móbil), con vista previa ao restaurar e «Probar
@@ -153,6 +151,8 @@ datos van ao destino que escollas. O ficheiro de copia `.turnly` non está cifra
 [Detalle técnico](docs/privacy.md) (en castelán) · Soporte: **turnly@mainshai.com**.
 
 ## Novidades
+
+- **1.0.0 (10-nov-2026):** primeira versión na App Store, para iPhone. Android segue en probas en Google Play.
 
 O que cambia en cada versión está no [CHANGELOG.md](CHANGELOG.md) e nas
 [versións publicadas](https://github.com/dferrandizmont/turnly/releases).

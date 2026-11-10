@@ -29,12 +29,10 @@ barneko erosketarik gabe.
 <p>
   <a href="https://play.google.com/apps/testing/es.cuadrante.app"><img src="https://img.shields.io/badge/Google_Play-Beta-414141?logo=googleplay&amp;style=for-the-badge" alt="Google Play-ko beta"></a>
   <a href="https://github.com/dferrandizmont/turnly/releases/latest"><img src="https://img.shields.io/badge/Deskargatu-GitHub-181717?logo=github&amp;style=for-the-badge" alt="Deskargatu GitHub-etik"></a>
-  <!--
-  <a href="[ENLACE_APP_STORE]"><img src="https://img.shields.io/badge/App_Store-Deskargatu-0D96F6?logo=appstore&amp;style=for-the-badge" alt="App Store-n eskuragarri"></a>
-  -->
+  <a href="https://apps.apple.com/es/app/turnly-cuadrante-de-turnos/id6832554552"><img src="https://img.shields.io/badge/App_Store-Deskargatu-0D96F6?logo=appstore&amp;style=for-the-badge" alt="App Store-n eskuragarri"></a>
 </p>
 
-Android probetan; iPhone, laster. Modu argia eta iluna.
+Android probetan; iPhone, App Store-n. Modu argia eta iluna.
 
 <details>
 <summary>Sartu Google Play-ko betan</summary>
@@ -102,7 +100,7 @@ Sakatu pantaila-argazki bat handitzeko. Benetako pantailak dira, datu asmatuekin
   gogorarazpenak eta Androiderako widgetak, lau astekoa barne. Androiden, «Isildu
   mugikorra nire txandetan» aukerak mugikorra isilarazten du lanean ari zaren
   bitartean. Puntualtasuna sistemaren baimenen eta murrizketen araberakoa da.
-  iPhoneko widgeta egiteke dago.
+  iPhonen ere badaude widgetak, hasierako pantailan eta blokeo-pantailan.
 - **Babeskopia, txostenak eta mugikorreko egutegia.** Tokiko babeskopia automatikoak
   eta, Androiden, eguneroko kopia bat zuk aukeratutako karpetan (Drive, Dropbox,
   OneDrive edo mugikorra), leheneratu aurreko aurrebistarekin eta «Probatu
@@ -161,6 +159,8 @@ dago zifratuta.
 [Xehetasun teknikoak](docs/privacy.md) (gaztelaniaz) · Laguntza: **turnly@mainshai.com**.
 
 ## Berriak
+
+- **1.0.0 (2026-11-10):** lehen bertsioa App Store-n, iPhonerako. Androidek Google Playko probetan jarraitzen du.
 
 Zer aldatu den bertsio bakoitzean [CHANGELOG.md](CHANGELOG.md) eta
 [argitalpenetan](https://github.com/dferrandizmont/turnly/releases) dago.

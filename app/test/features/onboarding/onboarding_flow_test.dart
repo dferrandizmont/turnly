@@ -657,7 +657,7 @@ void main() {
   });
 
   group('last step: ¿A qué te dedicas? (optional)', () {
-    testWidgets('one pill per job; the chosen one has a check and its hours', (
+    testWidgets('one row per job; the chosen one has a check and its hours', (
       tester,
     ) async {
       final app = await FirstLaunch.open(tester);
@@ -674,7 +674,6 @@ void main() {
       expect(key('onboarding-profession-transport'), findsNothing);
       expect(find.text('Enfermería, TCAE y celadores'), findsOneWidget);
       expect(find.text('Policía y Guardia Civil'), findsOneWidget);
-      expect(key('onboarding-profession-hint'), findsNothing);
 
       await app.tap(key('onboarding-profession-police'));
       expect(
@@ -685,13 +684,14 @@ void main() {
         findsOneWidget,
         reason: 'la elegida lleva marca, no solo color',
       );
-      final hint = tester.widget<Text>(key('onboarding-profession-hint'));
-      expect(hint.data, keepTimeRangesTogether('M 07–15, T 15–23 y N 23–07'));
+      expect(
+        find.text(keepTimeRangesTogether('M 07–15, T 15–23 y N 23–07')),
+        findsOneWidget,
+      );
 
       // Optional: the chosen one, tapped again, leaves none.
       await app.tap(key('onboarding-profession-police'));
       expect(app.container.read(onboardingControllerProvider).profession, null);
-      expect(key('onboarding-profession-hint'), findsNothing);
       // «Continuar» never waits for a job.
       expect(_nextButton(tester).onPressed, isNotNull);
     });

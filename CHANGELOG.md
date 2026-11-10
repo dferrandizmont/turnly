@@ -10,10 +10,21 @@ at once, so they can skip numbers.
 
 ## Unreleased
 
+## 1.0.0 · 2026-11-10
+
+First version on the App Store, for iPhone, with everything up to 0.9.7. Android stays in Google Play's closed testing on the 0.9 line for now.
+
 - iOS: if you said "Don't Allow" to notifications, the Alarms screen now says so and its "Open settings" button takes you straight to Turnly's notification settings; coming back, it notices they are on. Before, "Allow" did nothing. Alarms are also planned again at once when the time zone or the clock changes.
-- iOS: a `.turnly` backup opened from AirDrop, WhatsApp, Mail or Files now reaches the restore preview (nothing is restored until you confirm). Not yet tried on an iPhone.
-- iOS: home-screen and lock-screen widgets (small, medium, large, inline, circular and rectangular) that change day on their own for 60 days; on the lock screen any absence shows only as "Absence". Not yet tried on an iPhone.
+- iOS: a `.turnly` backup opened from AirDrop, WhatsApp, Mail or Files now reaches the restore preview (nothing is restored until you confirm).
+- iOS: home-screen and lock-screen widgets (small, medium, large, inline, circular and rectangular) that change day on their own for 60 days; on the lock screen any absence shows only as "Absence".
 - iOS: the camera and photo library permission texts are now translated into all five languages, so the dialog says what it is for (a photo for the note of a day, or the calendar background) instead of falling back to Spanish.
+
+## 0.9.8 · 2026-11-10
+
+Private prerelease: a clearer job list.
+
+- First use: "What do you do?" is now a single list, one job per row with its usual hours underneath, and only the one you pick gets a check, so it is clear you choose just one.
+- Every list where you pick one option (language, appearance, town, holidays, currency, reports) keeps the chosen option the same size, only in bold, and screen readers now read it as one option of a group that you can select.
 
 ## 0.9.7 · 2026-11-09
 

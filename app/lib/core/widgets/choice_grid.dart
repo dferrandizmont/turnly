@@ -10,8 +10,8 @@ enum ChoiceGridSizing {
   wholeLabel,
 
   /// A cell only needs the longest single word plus the pill around it, and
-  /// the label wraps onto two or three lines inside it (long labels: the jobs
-  /// of «¿A qué te dedicas?»). A word never breaks.
+  /// the label wraps onto two or three lines inside it (long labels: shift
+  /// types, absence kinds, template names). A word never breaks.
   longestWord,
 }
 

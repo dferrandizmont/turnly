@@ -29,12 +29,10 @@ la app.
 <p>
   <a href="https://play.google.com/apps/testing/es.cuadrante.app"><img src="https://img.shields.io/badge/Google_Play-Beta-414141?logo=googleplay&amp;style=for-the-badge" alt="Beta en Google Play"></a>
   <a href="https://github.com/dferrandizmont/turnly/releases/latest"><img src="https://img.shields.io/badge/Disponible_en-GitHub-181717?logo=github&amp;style=for-the-badge" alt="Disponible en GitHub"></a>
-  <!--
-  <a href="[ENLACE_APP_STORE]"><img src="https://img.shields.io/badge/App_Store-Descargar-0D96F6?logo=appstore&amp;style=for-the-badge" alt="Disponible en App Store"></a>
-  -->
+  <a href="https://apps.apple.com/es/app/turnly-cuadrante-de-turnos/id6832554552"><img src="https://img.shields.io/badge/App_Store-Descargar-0D96F6?logo=appstore&amp;style=for-the-badge" alt="Disponible en App Store"></a>
 </p>
 
-Android en pruebas; iPhone, próximamente. Modo claro y oscuro.
+Android en pruebas; iPhone, en la App Store. Modo claro y oscuro.
 
 <details>
 <summary>Únete a la beta de Google Play</summary>
@@ -99,8 +97,8 @@ por [tests de Flutter](app/test/store/), también [en inglés](README.md#screens
 - **Alarmas, widgets y no molestar.** Alarma por tipo de turno, recordatorios de
   notas y widgets de Android, incluido uno de cuatro semanas. En Android,
   «Silenciar el móvil en mis turnos» lo silencia mientras trabajas. La puntualidad
-  depende de los permisos y las restricciones del sistema. El widget de iPhone está
-  pendiente.
+  depende de los permisos y las restricciones del sistema. En iPhone también hay
+  widgets, en la pantalla de inicio y en la de bloqueo.
 - **Copia, informes y calendario del móvil.** Copias de seguridad locales
   automáticas y, en Android, una copia diaria en la carpeta que elijas (Drive,
   Dropbox, OneDrive o el móvil), con vista previa al restaurar y «Probar
@@ -154,6 +152,8 @@ datos van al destino que elijas. El archivo de copia `.turnly` no está cifrado.
 [Detalle técnico](docs/privacy.md) · Soporte: **turnly@mainshai.com**.
 
 ## Novedades
+
+- **1.0.0 (10-nov-2026):** primera versión en la App Store, para iPhone. Android sigue en pruebas en Google Play.
 
 Lo que cambia en cada versión está en [CHANGELOG.md](CHANGELOG.md) y en las
 [versiones publicadas](https://github.com/dferrandizmont/turnly/releases).

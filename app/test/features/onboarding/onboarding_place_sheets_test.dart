@@ -77,7 +77,9 @@ void main() {
 
     final shown = [
       for (final row in tester.widgetList<ChoiceRow>(find.byType(ChoiceRow)))
-        row.label,
+        if (row.key is ValueKey<String> &&
+            (row.key! as ValueKey<String>).value.startsWith('municipality-'))
+          row.label,
     ];
     expect(shown.length, greaterThan(8));
     for (var i = 1; i < shown.length; i++) {
@@ -96,7 +98,11 @@ void main() {
     await app.toLastStep();
 
     await app.tap(key('onboarding-region'));
-    final communities = find.byType(ChoiceRow);
+    final communities = find.byWidgetPredicate(
+      (w) =>
+          w is ChoiceRow &&
+          alphabeticalRegions.any((r) => r.name == w.label),
+    );
     expect(communities, findsWidgets);
     final communityX = tester
         .getTopLeft(
@@ -115,7 +121,12 @@ void main() {
     await tester.pumpAndSettle();
 
     await app.tap(key('onboarding-municipality'));
-    final municipalities = find.byType(ChoiceRow);
+    final municipalities = find.byWidgetPredicate(
+      (w) =>
+          w is ChoiceRow &&
+          w.key is ValueKey<String> &&
+          (w.key! as ValueKey<String>).value.startsWith('municipality-'),
+    );
     expect(municipalities, findsWidgets);
     final municipalityX = tester
         .getTopLeft(
@@ -146,7 +157,7 @@ void main() {
 
     List<String> labels() => [
       for (final row in tester.widgetList<ChoiceRow>(find.byType(ChoiceRow)))
-        row.label,
+        if (alphabeticalRegions.any((r) => r.name == row.label)) row.label,
     ];
 
     await app.tap(key('onboarding-region'));
