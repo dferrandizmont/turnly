@@ -16,6 +16,7 @@ import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/page_body.dart';
 import '../../calendar/application/schedule_controller.dart';
 import '../../schedule/domain/schedule_domain.dart';
+import '../domain/pattern_catalog.dart';
 import '../../../core/widgets/app_snack_bar.dart';
 
 /// "Ajustes > Mis rotaciones": the patterns running on the calendar, each
@@ -69,9 +70,7 @@ class RunsScreen extends ConsumerWidget {
                   return _RunCard(
                     key: ValueKey('run-${run.id}'),
                     run: run,
-                    patternName:
-                        schedule.patternById(run.patternId)?.name ??
-                        run.patternId,
+                    patternName: _patternLabel(schedule, run.patternId),
                     today: today,
                   );
                 },
@@ -79,6 +78,11 @@ class RunsScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+String _patternLabel(Schedule schedule, String patternId) {
+  final pattern = schedule.patternById(patternId);
+  return pattern == null ? patternId : patternDisplayName(schedule, pattern);
 }
 
 class _RunCard extends ConsumerWidget {

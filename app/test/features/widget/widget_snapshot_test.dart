@@ -734,7 +734,7 @@ Future<void> main() async {
       expect(
         a.encode(),
         startsWith(
-          '{"v":2,"generatedAt":"2026-10-19T08:30:00.000Z","contentHash":"',
+          '{"v":3,"generatedAt":"2026-10-19T08:30:00.000Z","contentHash":"',
         ),
       );
     });
@@ -869,55 +869,67 @@ Future<void> main() async {
     });
   });
 
-  group(
-    'overtime, early leave and reminders are not in the widget (0.6.0)',
-    () {
-      test('the snapshot is the same with and without them', () {
-        final plain = _rotation(today);
-        final annotated = _rotation(
+  group('day adjustments and private reminders', () {
+    test('adjustments change the payload while keeping base shifts', () {
+      final plain = _rotation(today);
+      final annotated = _rotation(
+        today,
+        entries: {
+          today: DayEntry(
+            date: today,
+            overtimeMinutes: 60,
+            earlyLeaveMinutes: 15,
+            noteReminderMinute: 480,
+          ),
+          today.addDays(3): DayEntry(
+            date: today.addDays(3),
+            overtimeMinutes: 30,
+          ),
+        },
+      );
+      final snapshot = _build(today, schedule: annotated);
+      final base = _build(today, schedule: plain);
+      expect(snapshot.contentHash, isNot(base.contentHash));
+      expect(
+        snapshot.days.first.shifts.single.toJson(),
+        base.days.first.shifts.single.toJson(),
+      );
+      expect(
+        snapshot.days.first.small.toJson(),
+        base.days.first.small.toJson(),
+      );
+      expect(snapshot.dayExtras![today.toIso()], [
+        '+1 h extra',
+        'Salí 15 min antes',
+      ]);
+      final reminderOnly = _build(
+        today,
+        schedule: _rotation(
+          today,
+          entries: {today: DayEntry(date: today, noteReminderMinute: 480)},
+        ),
+      );
+      expect(reminderOnly.encode(), base.encode());
+    });
+
+    test('a note still marks its day, with or without a reminder', () {
+      final plain = _build(
+        today,
+        schedule: _rotation(
+          today,
+          entries: {today: DayEntry(date: today, note: 'Nota')},
+        ),
+      );
+      final withReminder = _build(
+        today,
+        schedule: _rotation(
           today,
           entries: {
-            today: DayEntry(
-              date: today,
-              overtimeMinutes: 60,
-              earlyLeaveMinutes: 15,
-              noteReminderMinute: 480,
-            ),
-            today.addDays(3): DayEntry(
-              date: today.addDays(3),
-              overtimeMinutes: 30,
-            ),
+            today: DayEntry(date: today, note: 'Nota', noteReminderMinute: 480),
           },
-        );
-        expect(
-          jsonEncode(_build(today, schedule: annotated).toJson()),
-          jsonEncode(_build(today, schedule: plain).toJson()),
-        );
-      });
-
-      test('a note still marks its day, with or without a reminder', () {
-        final plain = _build(
-          today,
-          schedule: _rotation(
-            today,
-            entries: {today: DayEntry(date: today, note: 'Nota')},
-          ),
-        );
-        final withReminder = _build(
-          today,
-          schedule: _rotation(
-            today,
-            entries: {
-              today: DayEntry(
-                date: today,
-                note: 'Nota',
-                noteReminderMinute: 480,
-              ),
-            },
-          ),
-        );
-        expect(jsonEncode(withReminder.toJson()), jsonEncode(plain.toJson()));
-      });
-    },
-  );
+        ),
+      );
+      expect(jsonEncode(withReminder.toJson()), jsonEncode(plain.toJson()));
+    });
+  });
 }

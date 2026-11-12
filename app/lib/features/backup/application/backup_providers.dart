@@ -492,6 +492,8 @@ List<ResultSetImplementation<dynamic, dynamic>> _userTables(AppDatabase db) => [
   db.noteAttachments,
   db.dayTasks,
   db.shiftSwaps,
+  db.overtimeTypes,
+  db.overtimeBlocks,
   db.holidays,
   db.absenceBalances,
   db.settings,

@@ -29,9 +29,23 @@
             android:visibility="gone"/>
     </LinearLayout>
     <LinearLayout
-        android:id="@+id/agenda_shifts"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:orientation="vertical"/>
+        android:orientation="vertical">
+        <LinearLayout
+            android:id="@+id/agenda_shifts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"/>
+        <TextView
+            android:id="@+id/agenda_extras"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:gravity="start"
+            android:textSize="@dimen/widget_cell_time_size"
+            android:textColor="@color/widget_text_secondary"
+            android:visibility="gone" />
+    </LinearLayout>
 </LinearLayout>

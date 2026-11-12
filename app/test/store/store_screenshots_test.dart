@@ -234,7 +234,23 @@ void main() {
               final date = CivilDate(2026, 12, day);
               changes[date] = EntryChange(
                 null,
-                DayEntry(date: date, shiftTypeIds: [id]),
+                DayEntry(
+                  date: date,
+                  shiftTypeIds: [id],
+                  // Two hours of overtime right after the morning shift on
+                  // 2 and 3 December (0.10.0): «+2 h» in the month and the
+                  // overtime line in the summary.
+                  overtimeBlocks: [
+                    if (day == 2 || day == 3)
+                      OvertimeBlock(
+                        id: 'store-overtime-$day',
+                        date: date,
+                        typeId: 'overtime',
+                        startMinute: 14 * 60,
+                        endMinute: 16 * 60,
+                      ),
+                  ],
+                ),
               );
             }
             await repository.apply(
@@ -375,7 +391,8 @@ void main() {
             holidays: holidays.byDay.keys.toSet(),
           );
           expect(summary.shiftsWorked, 9);
-          expect(summary.workedMinutes, 72 * 60);
+          expect(summary.workedMinutes, 76 * 60);
+          expect(summary.overtimeMinutes, 4 * 60);
           expect(summary.nightMinutes, 24 * 60);
           expect(summary.holidayMinutes, 8 * 60);
           final initial = index == 3

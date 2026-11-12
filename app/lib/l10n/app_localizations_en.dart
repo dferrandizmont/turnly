@@ -295,7 +295,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get upcomingTitle => 'Upcoming days';
 
   @override
-  String get dayDetailSourcePattern => 'From your pattern';
+  String dayDetailSourcePattern(String name) {
+    return 'From your rotation “$name”';
+  }
 
   @override
   String get dayDetailSourceOverride => 'Changed by hand';
@@ -307,11 +309,92 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dayDetailDouble => 'Add a second shift';
 
   @override
-  String get dayDetailReset => 'Back to the pattern';
+  String get dayDetailReset => 'Back to the rotation';
 
   @override
   String dayDetailPatternGives(String shifts) {
-    return 'The pattern gives: $shifts';
+    return 'According to your rotation: $shifts';
+  }
+
+  @override
+  String dayRotationEnded(String name, String date) {
+    return 'Your rotation “$name” ended on $date';
+  }
+
+  @override
+  String get dayRotationMenu => 'Rotation';
+
+  @override
+  String get dayRotationRestart => 'Start the rotation here';
+
+  @override
+  String get dayRotationEndHere => 'Last day of this rotation';
+
+  @override
+  String get dayRotationResume => 'Start your rotation here';
+
+  @override
+  String get dayRotationRestartTitle => 'Start the rotation here?';
+
+  @override
+  String dayRotationRestartBody(String name, String date, String shifts) {
+    return 'Your rotation “$name” will start again on $date: that day becomes the first day of the cycle ($shifts).';
+  }
+
+  @override
+  String get dayRotationEndKeepsOthers =>
+      'The other rotations keep their dates.';
+
+  @override
+  String dayRotationRestartOthersUntil(String date) {
+    return 'This rotation will take priority up to and including $date. The other rotations will still apply on dates outside that interval.';
+  }
+
+  @override
+  String get dayRotationRestartOthers =>
+      'The rotations you had set for after that day will be removed.';
+
+  @override
+  String get dayRotationKeeps =>
+      'The days before and your changes by hand are not touched.';
+
+  @override
+  String get dayRotationStartConfirm => 'Start here';
+
+  @override
+  String dayRotationStartDone(String date) {
+    return 'The rotation starts on $date';
+  }
+
+  @override
+  String get dayRotationEndTitle => 'End the rotation on this day?';
+
+  @override
+  String dayRotationEndBody(String name, String date) {
+    return 'Your rotation “$name” will end on $date.';
+  }
+
+  @override
+  String dayRotationEndThenNone(String date) {
+    return 'On $date, no rotation will be assigned.';
+  }
+
+  @override
+  String dayRotationEndThenOther(String date, String name) {
+    return 'On $date your rotation “$name” will apply.';
+  }
+
+  @override
+  String get dayRotationResumeTitle => 'Start your rotation here?';
+
+  @override
+  String dayRotationResumeBody(String name, String date) {
+    return 'Your rotation “$name” will apply again from $date, with no end date.';
+  }
+
+  @override
+  String dayRotationResumeBodyUntil(String name, String date, String until) {
+    return 'Your rotation “$name” will apply again from $date to $until, the day before the next rotation starts.';
   }
 
   @override
@@ -491,6 +574,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String shiftTypesRestored(String name) {
     return '“$name” restored';
   }
+
+  @override
+  String get discardChangesTitle => 'Discard your changes?';
+
+  @override
+  String get discardChangesBody => 'Unsaved changes will be lost.';
+
+  @override
+  String get discardChangesConfirm => 'Discard';
+
+  @override
+  String get discardChangesKeep => 'Keep editing';
 
   @override
   String get shiftTypesDiscardTitle => 'Discard your changes?';
@@ -1085,7 +1180,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectionClear => 'Clear';
 
   @override
-  String get selectionReset => 'Back to the pattern';
+  String get selectionReset => 'Back to the rotation';
 
   @override
   String get selectionCopy => 'Copy';
@@ -5591,7 +5686,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get catalogPattern4x4Name => '4 x 4';
 
   @override
-  String get catalogPattern4x4Description => '4 12-hour days and 4 off';
+  String get catalogPattern4x4Description =>
+      '4 12-hour days and 4 off (4x4 or four on, four off)';
 
   @override
   String get catalogPattern5x2Name => '5 x 2';
@@ -5605,7 +5701,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get catalogPattern223Description =>
-      'Two 12-hour days, two off, three 12-hour days, two off, two 12-hour days and three off (also 2-2-3-2-2-3)';
+      'Two 12-hour days, two off, three 12-hour days, two off, two 12-hour days and three off (also 2-2-3-2-2-3). Also known as Pitman or Panama.';
 
   @override
   String get catalogPatternContinentalName => 'Continental';
@@ -5845,6 +5941,47 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get monthNavSummary => 'Summary';
+
+  @override
+  String monthStripHoursGoal(String worked, String goal) {
+    return '$worked / $goal';
+  }
+
+  @override
+  String monthStripFacts(String first, String second) {
+    return '$first · $second';
+  }
+
+  @override
+  String monthStripShort(String hours) {
+    return '$hours to go';
+  }
+
+  @override
+  String monthStripOver(String hours) {
+    return '$hours over';
+  }
+
+  @override
+  String monthStripNextOff(String date, int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Next day off: $date, in $days days',
+      one: 'Next day off: $date, in 1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String monthStripFirstOff(String date) {
+    return 'First day off: $date';
+  }
+
+  @override
+  String monthStripLabel(String facts) {
+    return 'Month summary: $facts';
+  }
 
   @override
   String get todayCardCollapse => 'Fold today’s card';
@@ -7117,4 +7254,265 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backupUiOriginPreReset => 'Backup from just before starting over';
+
+  @override
+  String get overtimeSheetAdd => 'Add overtime';
+
+  @override
+  String get overtimeSheetEdit => 'Edit overtime';
+
+  @override
+  String get overtimeTypeLabel => 'Type';
+
+  @override
+  String get overtimeManageTypes => 'Manage types';
+
+  @override
+  String get overtimeAfterShift => 'Right after the shift';
+
+  @override
+  String get overtimeNextDay => 'Ends the next day';
+
+  @override
+  String get overtimeQuickLabel => 'Length';
+
+  @override
+  String overtimeQuickHours(int hours) {
+    return '+$hours h';
+  }
+
+  @override
+  String get overtimeBreakLabel => 'Unpaid break (optional)';
+
+  @override
+  String get overtimeBreakUnit => 'min';
+
+  @override
+  String get overtimeNoteLabel => 'Short note (optional)';
+
+  @override
+  String overtimePreviewPriced(String duration, String rate, String amount) {
+    return '$duration × $rate = $amount';
+  }
+
+  @override
+  String overtimePreviewUnpriced(String duration) {
+    return '$duration, no rate';
+  }
+
+  @override
+  String get overtimeBreakTooLong =>
+      'The break has to be shorter than the block.';
+
+  @override
+  String overtimeDayTotal(String hours) {
+    return 'Day total: $hours';
+  }
+
+  @override
+  String overtimeDayTotalMoney(String hours, String amount) {
+    return 'Day total: $hours · $amount';
+  }
+
+  @override
+  String get overtimeBaseRateTitle => 'Base hourly rate';
+
+  @override
+  String get overtimeBaseRateHelp =>
+      'Used by overtime paid “as the shift” on days without a priced shift.';
+
+  @override
+  String get overtimeBaseRateNone => 'No base rate';
+
+  @override
+  String get overtimeBaseRateField => 'Hourly rate';
+
+  @override
+  String get overtimeTypesTitle => 'Overtime types';
+
+  @override
+  String get overtimeTypesHelp =>
+      'Each block of overtime has a type: how it is paid and whether it counts toward your hours goal.';
+
+  @override
+  String overtimeTypesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count types',
+      one: '1 type',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get overtimeNewType => 'New type';
+
+  @override
+  String get overtimeEditType => 'Edit type';
+
+  @override
+  String overtimeTypeMoveUp(String name) {
+    return 'Move $name up';
+  }
+
+  @override
+  String overtimeTypeMoveDown(String name) {
+    return 'Move $name down';
+  }
+
+  @override
+  String get overtimeTypeArchive => 'Archive';
+
+  @override
+  String get overtimeTypeRestore => 'Restore';
+
+  @override
+  String overtimeTypesArchived(int count) {
+    return 'Archived ($count)';
+  }
+
+  @override
+  String get overtimeTypeCounts => 'Counts toward the goal';
+
+  @override
+  String get overtimeTypeNotCounts => 'Does not count toward the goal';
+
+  @override
+  String get overtimeRateLabel => 'How it is paid';
+
+  @override
+  String get overtimeRateShift => 'As the shift';
+
+  @override
+  String get overtimeRateMultiplier => 'Multiplier';
+
+  @override
+  String get overtimeRateFixed => 'Fixed hourly rate';
+
+  @override
+  String get overtimeRateNone => 'No rate';
+
+  @override
+  String overtimeRateMultiplierSummary(String factor) {
+    return 'Shift ×$factor';
+  }
+
+  @override
+  String overtimeRateFixedSummary(String amount) {
+    return '$amount an hour';
+  }
+
+  @override
+  String get overtimeRateShiftHelp =>
+      'The hourly rate of the day’s shift; without a priced shift, the base rate.';
+
+  @override
+  String overtimeMultiplierShortcut(String factor) {
+    return '×$factor';
+  }
+
+  @override
+  String get overtimeMultiplierField => 'Other multiplier';
+
+  @override
+  String get overtimeFixedRateField => 'Hourly rate';
+
+  @override
+  String get overtimeCountsForGoal => 'Counts toward my hours goal';
+
+  @override
+  String get overtimeTypeNameLabel => 'Name';
+
+  @override
+  String get overtimeTypeColorLabel => 'Color';
+
+  @override
+  String get overtimeTypeInvalidName => 'Give it a name.';
+
+  @override
+  String get overtimeTypeInvalidMultiplier =>
+      'Enter a multiplier between 0.01 and 100.';
+
+  @override
+  String get overtimeTypeInvalidRate => 'Enter an hourly rate.';
+
+  @override
+  String get overtimeTypeOvertime => 'Overtime';
+
+  @override
+  String get overtimeTypeOtherWork => 'Other job';
+
+  @override
+  String dayCellOvertime(String hours) {
+    return '+$hours h';
+  }
+
+  @override
+  String get overtimeOnNextDay => 'Next day';
+
+  @override
+  String overtimeTypeArchiveNamed(String name) {
+    return 'Archive $name';
+  }
+
+  @override
+  String get catalogPattern2x2Name => '2 on, 2 off';
+
+  @override
+  String get catalogPattern2x2Description =>
+      '2 work days and 2 off (2x2). Choose your work shift.';
+
+  @override
+  String get catalogPattern3x1Name => '3 on, 1 off';
+
+  @override
+  String get catalogPattern3x1Description =>
+      '3 work days and 1 off (3x1). Choose your work shift.';
+
+  @override
+  String patternStartConfirmation(String date) {
+    return 'Your rotation starts on $date and repeats from that day.';
+  }
+
+  @override
+  String get patternWorkShiftTitle => 'Which shift do you work on work days?';
+
+  @override
+  String get summaryLongestStreak => 'Longest streak';
+
+  @override
+  String summaryStreakDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count consecutive days',
+      one: '1 consecutive day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get summaryStreakHelp =>
+      'The streak counts only days with a work shift within the period. Days off, absences and empty days break it, even if they have overtime.';
+
+  @override
+  String widgetOvertime(String duration) {
+    return '+$duration overtime';
+  }
+
+  @override
+  String widgetOvertimeType(String duration, String type) {
+    return '+$duration $type';
+  }
+
+  @override
+  String widgetEarlyLeave(String duration) {
+    return 'Left $duration early';
+  }
+
+  @override
+  String widgetSevenDayHours(String duration) {
+    return '7 days: $duration';
+  }
 }

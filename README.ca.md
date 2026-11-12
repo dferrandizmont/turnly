@@ -27,7 +27,7 @@ Totes les funcions disponibles són obertes, sense Pro ni compres dins de l’ap
 
 <p>
   <a href="https://play.google.com/apps/testing/es.cuadrante.app"><img src="https://img.shields.io/badge/Google_Play-Beta-414141?logo=googleplay&amp;style=for-the-badge" alt="Beta a Google Play"></a>
-  <a href="https://github.com/dferrandizmont/turnly/releases/latest"><img src="https://img.shields.io/badge/Disponible_a-GitHub-181717?logo=github&amp;style=for-the-badge" alt="Disponible a GitHub"></a>
+  <a href="https://github.com/dferrandizmont/turnly/releases"><img src="https://img.shields.io/badge/Disponible_a-GitHub-181717?logo=github&amp;style=for-the-badge" alt="Disponible a GitHub"></a>
   <a href="https://apps.apple.com/es/app/turnly-cuadrante-de-turnos/id6832554552"><img src="https://img.shields.io/badge/App_Store-Baixa-0D96F6?logo=appstore&amp;style=for-the-badge" alt="Disponible a l’App Store"></a>
 </p>
 
@@ -49,7 +49,7 @@ Si pots, queda’t a la prova almenys 14 dies i fes-la servir de tant en tant (p
 <details>
 <summary>Instal·la l’APK des de GitHub</summary>
 
-També pots baixar l’APK de la [darrera versió](https://github.com/dferrandizmont/turnly/releases/latest) i instal·lar-lo a mà (cal permetre «instal·lar aplicacions d’origen desconegut»). Des de la 0.8.3 està signat amb la mateixa clau que la versió de Google Play, així que pots passar de l’una a l’altra sense desinstal·lar i sense perdre res; Android només no deixa tornar a una versió més antiga. Si vas instal·lar Turnly des de Google Play abans de la 0.8.3, desinstal·la-la una vegada (exporta abans una còpia des de l’app: `.turnly`; les versions anteriors la desen com a `.cuadrante`).
+També pots baixar l’APK de la [darrera versió](https://github.com/dferrandizmont/turnly/releases) i instal·lar-lo a mà (cal permetre «instal·lar aplicacions d’origen desconegut»). Des de la 0.8.3 està signat amb la mateixa clau que la versió de Google Play, així que pots passar de l’una a l’altra sense desinstal·lar i sense perdre res; Android només no deixa tornar a una versió més antiga. Si vas instal·lar Turnly des de Google Play abans de la 0.8.3, desinstal·la-la una vegada (exporta abans una còpia des de l’app: `.turnly`; les versions anteriors la desen com a `.cuadrante`).
 
 </details>
 
@@ -85,16 +85,19 @@ per [tests de Flutter](app/test/store/), també [en castellà](README.es.md#capt
 - **Mes, rotació, agenda i resum.** Barra inferior (Mes · Rotació · Agenda ·
   Resum) i targeta d’avui plegable amb el proper torn, el proper dia lliure i la
   ratxa. Cada torn porta color, codi i horari, en quadrícula o llista, amb vista
-  anual i notes per dia.
+  anual i notes per dia. Sota el mes, una franja amb els torns, les hores respecte
+  de l’objectiu i el proper dia lliure; toca-la per obrir el resum d’aquell mes.
 - **Pintar torns i rotacions.** Toca o arrossega per seleccionar diversos dies,
   doblar, copiar i enganxar, desfer i refer; assistent de rotacions amb vista
-  prèvia: torns rotatius, 24/72, 4×4, 6×4, 5×2, 2-2-3 i patrons propis. Tipus de
-  torn, colors, icones i horaris editables.
+  prèvia: torns rotatius, 24/72, 4×4, 6×4, 5×2, 2-2-3, «2 i 2», «3 i 1» i patrons
+  propis. En les dues noves tries el torn de treball. Tipus de torn, colors,
+  icones i horaris editables.
 - **Festius per país.** Espanya amb les seves comunitats i municipis, i 21 països
   més (Portugal, Brasil, Llatinoamèrica, Europa, Estats Units i Canadà), tot
   sense connexió, a més dels que hi afegeixis tu.
 - **Alarmes, widgets i no molestar.** Alarma per tipus de torn, recordatoris de
-  notes i widgets d’Android, inclòs un de quatre setmanes. A Android, «Silencia
+  notes i widgets d’Android, inclòs un de quatre setmanes. Mostren extres i
+  sortides anticipades; el de set dies suma les hores. A Android, «Silencia
   el mòbil durant els meus torns» el silencia mentre treballes. La puntualitat
   depèn dels permisos i les restriccions del sistema. A l’iPhone també hi ha
   widgets, a la pantalla d’inici i a la de bloqueig.
@@ -104,14 +107,18 @@ per [tests de Flutter](app/test/store/), també [en castellà](README.es.md#capt
   restauració». Informes en PDF i CSV d’un mes o de les dates que vulguis,
   «Mantenir al dia» per seguir els teus torns al calendari del mòbil, i
   importació des de LRHSoft, `.ics`, CSV i el calendari del mòbil.
-- **Hores, diners i permisos.** Hores treballades, nocturnes i festives, extres
-  i sortides anticipades; plusos de nit i de festiu per hora; estimació bruta i
+- **Hores, diners i permisos.** Hores treballades, nocturnes i festives, sortides
+  anticipades i extres per blocs, amb tipus i tarifa; tries si cada tipus compta
+  per a l’objectiu d’hores. El Resum i el PDF mostren la ratxa més llarga de dies
+  treballats seguits. Plusos de nit i de festiu per hora; estimació bruta i
   neta amb la retenció que posis. Saldos de vacances i permisos per any i tipus,
   amb els dies arrossegats i els que et queden.
 
 <details>
 <summary>Més funcions</summary>
 
+- **Rotació des del dia.** Inicia, acaba o reprèn la rotació des del detall d’un
+  dia, amb una explicació del que canvia i l’opció de desfer.
 - **Llibre de canvis.** Anota un torn que cedeixis o rebis d’un company, mira el
   seu balanç («Em deu 2 torns», «Li dec 1 torn»), l’estat i els torns de cada
   canvi, i aplica’l al calendari amb un sol desfer.
@@ -152,6 +159,7 @@ dades van a la destinació que triïs. El fitxer de còpia `.turnly` no està xi
 
 ## Novetats
 
+- **0.10.0 (12-nov-2026):** hores extra per blocs amb tipus i tarifa, i accions de rotació des del dia. Franja del mes amb el proper dia lliure, ratxa més llarga al Resum, widgets d’Android amb extres i total de set dies, i rotacions «2 i 2» / «3 i 1».
 - **1.0.0 (10-nov-2026):** primera versió a l’App Store, per a iPhone. Android continua en proves a Google Play.
 
 Els canvis de cada versió són al [CHANGELOG.md](CHANGELOG.md) i a les

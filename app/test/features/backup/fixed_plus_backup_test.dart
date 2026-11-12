@@ -45,10 +45,10 @@ void main() {
         exportedAt: DateTime.utc(2026, 10, 24),
       );
       final file = codec.decode(bytes);
-      expect(file.schemaVersion, 3);
-      expect(file.data, data);
+      expect(file.schemaVersion, 4);
+      expect(file.data, data.upgradedOvertime());
       await repo.restore(file.data);
-      expect(await repo.readAll(), data);
+      expect(await repo.readAll(), data.upgradedOvertime());
       final restored = await ScheduleRepository(db).load('main');
       expect(
         restored.schedule.shiftTypes
@@ -96,7 +96,11 @@ void main() {
       );
       expect(BackupCodec.checksumOf(old.data), old.checksum);
       await makeRepository(db, dir).restore(old.data);
-      expect(await makeRepository(db, dir).readAll(), old.data);
+      // Its overtime minutes come back as blocks (database v7).
+      expect(
+        await makeRepository(db, dir).readAll(),
+        old.data.upgradedOvertime(),
+      );
     },
   );
 

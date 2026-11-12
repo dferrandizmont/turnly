@@ -48,7 +48,7 @@ void main() {
         now: () => DateTime.utc(2026, 12, 1, 10, 30),
       );
       final bytes = await service.exportBytes();
-      expect(readEnvelope(bytes)['schemaVersion'], 3);
+      expect(readEnvelope(bytes)['schemaVersion'], 4);
 
       final other = openMemoryDatabase();
       addTearDown(other.close);
@@ -144,7 +144,7 @@ void main() {
         final safety = Directory(p.join(dir.path, 'safety'));
         final copy = safety.listSync().whereType<File>().single;
         final decoded = codec.decode(copy.readAsBytesSync());
-        expect(decoded.schemaVersion, 3);
+        expect(decoded.schemaVersion, 4);
         expect(decoded.data, before);
         expect(decoded.data.calendars, hasLength(3));
       },

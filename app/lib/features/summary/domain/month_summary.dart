@@ -1,5 +1,6 @@
 import '../../schedule/domain/schedule_domain.dart';
 import 'pay_period.dart';
+import 'work_streak.dart';
 
 /// Free monthly summary (docs/roadmap.md, "Ingresos estimados"): shifts per
 /// type, hours, night hours, estimated pay, rest days, absences and holiday
@@ -166,6 +167,37 @@ class ShiftTypeMonth {
           : unpricedMinutes! > 0);
 }
 
+/// The extra hours of one overtime type in a summary (schema v7).
+class OvertimeTypeTotal {
+  const OvertimeTypeTotal({
+    required this.type,
+    required this.minutes,
+    this.amountCents,
+  });
+
+  final OvertimeType type;
+
+  /// Paid minutes of its blocks (worked so far, with a cutoff).
+  final int minutes;
+
+  /// What they earn, in the minor unit of the currency; `null` when none of
+  /// them has a price.
+  final int? amountCents;
+
+  @override
+  bool operator ==(Object other) =>
+      other is OvertimeTypeTotal &&
+      other.type == type &&
+      other.minutes == minutes &&
+      other.amountCents == amountCents;
+
+  @override
+  int get hashCode => Object.hash(type, minutes, amountCents);
+
+  @override
+  String toString() => 'OvertimeTypeTotal(${type.id}, $minutes, $amountCents)';
+}
+
 /// The summary of one month.
 class MonthSummary {
   const MonthSummary({
@@ -182,6 +214,8 @@ class MonthSummary {
     required this.earningsCents,
     required this.shiftsWithoutTimes,
     this.overtimeMinutes = 0,
+    this.goalExcludedMinutes = 0,
+    this.overtimeTypes = const [],
     this.earlyLeaveMinutes = 0,
     this.overtimeCents = 0,
     this.earlyLeaveCents = 0,
@@ -191,6 +225,7 @@ class MonthSummary {
     this.nightPlusCents = 0,
     this.holidayPlusCents = 0,
     this.extraAmountCents = 0,
+    this.longestStreak,
   });
 
   /// First day of the month.
@@ -206,13 +241,33 @@ class MonthSummary {
   /// Days with at least one work shift.
   final int workedDays;
 
+  final WorkStreak? longestStreak;
+
   /// Total minutes worked: the shifts' paid minutes + [overtimeMinutes] -
   /// [earlyLeaveMinutes].
   final int workedMinutes;
   final int nightMinutes;
 
-  /// Extra minutes noted on the days of the month (A6).
+  /// Extra minutes noted on the days of the month (A6): the paid minutes of
+  /// the overtime blocks plus the old minutes of a day, if any.
   final int overtimeMinutes;
+
+  /// Minutes of [overtimeTypes] whose type does not count for the hours
+  /// goal («Otro trabajo»): in [workedMinutes], not in [goalCountedMinutes].
+  final int goalExcludedMinutes;
+
+  /// The extra hours by overtime type, in the order of the schedule's types
+  /// (only the types with minutes).
+  final List<OvertimeTypeTotal> overtimeTypes;
+
+  /// The worked minutes that count for the hours goal: [workedMinutes]
+  /// without the overtime types that do not count.
+  int get goalCountedMinutes => workedMinutes - goalExcludedMinutes;
+
+  /// The overtime the cap counts (`overtime_cap.dart`): [overtimeMinutes]
+  /// without the types that do not count for the goal (another job is not
+  /// overtime of this one).
+  int get cappedOvertimeMinutes => overtimeMinutes - goalExcludedMinutes;
 
   /// Minutes of early leave applied (never more than the day had), A6.
   final int earlyLeaveMinutes;
@@ -349,7 +404,7 @@ class _Piece {
 /// The pieces of one work shift of a day (two for a split shift), or the
 /// overtime that extends the last shift of the day ([owner]).
 class _Group {
-  _Group(this.date, this.type, {this.owner});
+  _Group(this.date, this.type, {this.owner, this.block = false});
 
   final CivilDate date;
 
@@ -358,6 +413,9 @@ class _Group {
 
   /// For overtime: the shift it extends (a holiday shift counts once).
   final _Group? owner;
+
+  /// An overtime block (schema v7): its own clock, not a shift.
+  final bool block;
   final List<_Piece> pieces = [];
 
   int get paid => pieces.fold(0, (sum, p) => sum + p.paid);
@@ -535,6 +593,11 @@ MonthSummary summarizeRange(
   var holidayShifts = 0;
   var holidayMinutes = 0;
   var overtimeMinutes = 0;
+  var goalExcludedMinutes = 0;
+  // Per overtime type: paid minutes, and minutes x rate units of the priced
+  // ones (`overtimeRateUnits`).
+  final blockMinutes = <String, int>{};
+  final blockUnits = <String, int>{};
   var earlyLeaveMinutes = 0;
   var overtimeCentMinutes = 0;
   var earlyLeaveCentMinutes = 0;
@@ -641,14 +704,88 @@ MonthSummary summarizeRange(
     // clock, so it counts even on the day of a cutoff.
     extraAmountCents += schedule.entries[day.date]?.extraAmountCents ?? 0;
 
-    // The extras of the day (A6) only count when the shift they belong to
-    // has already ended; on a day still in progress they are not known yet.
+    // The old extras of the day (A6) only count when the shift they belong
+    // to has already ended; on a day still in progress they are not known
+    // yet. The early leave cuts the shifts (and the old overtime), never an
+    // overtime block: those have their own clock.
     final dayEnded = cutMinute == null || dayLastEnd <= cutMinute;
-    final overtime = dayEnded ? day.overtimeMinutes : 0;
-    final early = dayEnded
-        ? _min(day.earlyLeaveMinutes, dayPaid + overtime)
+    final legacyOvertime = dayEnded
+        ? schedule.entries[day.date]?.overtimeMinutes ?? 0
         : 0;
-    _placeExtras(groups, overtime, early);
+    final early = dayEnded
+        ? _min(day.earlyLeaveMinutes, dayPaid + legacyOvertime)
+        : 0;
+    _placeExtras(groups, legacyOvertime, early);
+
+    // The overtime blocks (schema v7): on their own clock, with the price of
+    // their type. With a cutoff only the part already worked counts, like a
+    // shift. A block «as the shift» (or a multiple of it) is the shift going
+    // on, as the old overtime was: it takes the night override and the
+    // pluses per hour of the day's last shift with a schedule, which earn on
+    // that shift's type, and makes that shift one worked on a holiday if it
+    // runs into one. A fixed rate or no rate is a job of its own.
+    _Group? lastShift;
+    var lastShiftEnd = -1;
+    for (final group in groups) {
+      for (final piece in group.pieces) {
+        if (piece.end >= lastShiftEnd) {
+          lastShiftEnd = piece.end;
+          lastShift = group.owner ?? group;
+        }
+      }
+    }
+    var blockOvertime = 0;
+    for (final block in day.overtimeBlocks) {
+      // A block of an unknown type cannot happen (foreign key, backup
+      // validation); if it did, it is left out rather than guessed.
+      final type = schedule.overtimeTypeById(block.typeId);
+      if (type == null) continue;
+      // After a shift that ends past midnight it may be the morning after.
+      final start = overtimeStartAbs(block, day);
+      var end = start + block.durationMinutes;
+      var paid = block.paidMinutes;
+      if (cutMinute != null) {
+        if (start >= cutMinute) continue;
+        if (end > cutMinute) {
+          end = cutMinute;
+          paid = _min(paid, cutMinute - start);
+        }
+      }
+      if (paid <= 0) continue;
+      final owner = overtimeFollowsShift(type) ? lastShift : null;
+      groups.add(
+        _Group(
+          day.date,
+          owner?.type ??
+              ShiftType(
+                id: 'overtime:${type.id}',
+                code: '+',
+                name: type.id,
+                colorValue: type.colorValue,
+                category: ShiftCategory.work,
+              ),
+          owner: owner,
+          block: true,
+        )..pieces.add(_Piece(start, end, paid)),
+      );
+      blockOvertime += paid;
+      blockMinutes.update(type.id, (n) => n + paid, ifAbsent: () => paid);
+      if (!type.countsForGoal) goalExcludedMinutes += paid;
+      final units = overtimeRateUnits(type, day, schedule.baseHourlyRateCents);
+      if (units != null) {
+        blockUnits.update(
+          type.id,
+          (n) => n + paid * units,
+          ifAbsent: () => paid * units,
+        );
+      } else if (type.rateMode != OvertimeRateMode.none) {
+        // Priced «as the shift» on a day without a priced shift and without
+        // a base rate: out of the euros, and the summary says so.
+        extrasWithoutRate += paid;
+      }
+    }
+    overtimeMinutes += blockOvertime;
+    workedMinutes += blockOvertime;
 
     // Night and holiday hours of the day, on the adjusted pieces, and the
     // pluses per hour of the type (P9).
@@ -658,7 +795,11 @@ MonthSummary summarizeRange(
       nightMinutes += groupNight;
       final (:minutes, :touches) = group.holidayMinutes(holidays);
       holidayMinutes += minutes;
-      if (touches) holidayRoots.add(group.owner ?? group);
+      // A block on its own is not a shift worked on a holiday; one that goes
+      // on with a shift makes that shift one (as the old overtime did).
+      if (touches && (!group.block || group.owner != null)) {
+        holidayRoots.add(group.owner ?? group);
+      }
       final tally = tallies[group.type.id];
       final nightPlus = group.type.nightPlusCentsPerHour;
       if (nightPlus != null && nightPlus > 0) {
@@ -673,14 +814,14 @@ MonthSummary summarizeRange(
     }
     holidayShifts += holidayRoots.length;
 
-    if (overtime > 0 || early > 0) {
-      overtimeMinutes += overtime;
+    if (legacyOvertime > 0 || early > 0) {
+      overtimeMinutes += legacyOvertime;
       earlyLeaveMinutes += early;
-      workedMinutes += overtime - early;
+      workedMinutes += legacyOvertime - early;
       if (dayRate == null) {
-        extrasWithoutRate += overtime + early;
+        extrasWithoutRate += legacyOvertime + early;
       } else {
-        final overtimePay = overtime * dayRate;
+        final overtimePay = legacyOvertime * dayRate;
         overtimeCentMinutes += overtimePay;
         earlyLeaveCentMinutes += _min(
           early * dayRate,
@@ -716,8 +857,27 @@ MonthSummary summarizeRange(
     nightPlusCents += t.nightPlusCents;
     holidayPlusCents += t.holidayPlusCents;
   }
-  final overtimeCents = (overtimeCentMinutes + 30) ~/ 60;
+  // Each overtime type is rounded once, on the sum of its minutes.
+  final overtimeTypes = [
+    for (final type in schedule.overtimeTypes)
+      if (blockMinutes[type.id] case final minutes?)
+        OvertimeTypeTotal(
+          type: type,
+          minutes: minutes,
+          amountCents: switch (blockUnits[type.id]) {
+            final units? => (units + 300000) ~/ 600000,
+            null => null,
+          },
+        ),
+  ];
+  final blockCents = overtimeTypes.fold(
+    0,
+    (sum, t) => sum + (t.amountCents ?? 0),
+  );
+  final overtimeCents = (overtimeCentMinutes + 30) ~/ 60 + blockCents;
   final earlyLeaveCents = (earlyLeaveCentMinutes + 30) ~/ 60;
+  // A priced block makes the summary show money, even when it is 0.
+  if (blockUnits.isNotEmpty) earnings ??= 0;
   if (overtimeCents != 0 || earlyLeaveCents != 0) {
     earnings = _max(0, (earnings ?? 0) + overtimeCents - earlyLeaveCents);
   }
@@ -733,6 +893,9 @@ MonthSummary summarizeRange(
     types: types,
     shiftsWorked: shiftsWorked,
     workedDays: workedDays,
+    longestStreak: longestWorkStreak(
+      days.where((day) => cutoff == null || !day.date.isAfter(cutoff.date)),
+    ),
     workedMinutes: workedMinutes,
     nightMinutes: nightMinutes,
     restDays: restDays,
@@ -742,6 +905,8 @@ MonthSummary summarizeRange(
     earningsCents: earnings,
     shiftsWithoutTimes: shiftsWithoutTimes,
     overtimeMinutes: overtimeMinutes,
+    overtimeTypes: overtimeTypes,
+    goalExcludedMinutes: goalExcludedMinutes,
     earlyLeaveMinutes: earlyLeaveMinutes,
     overtimeCents: overtimeCents,
     earlyLeaveCents: earlyLeaveCents,
@@ -801,6 +966,7 @@ class YearTotals {
   int get absenceDays => _sum((m) => m.absenceDays);
   int get holidayMinutes => _sum((m) => m.holidayMinutes);
   int get overtimeMinutes => _sum((m) => m.overtimeMinutes);
+  int get cappedOvertimeMinutes => _sum((m) => m.cappedOvertimeMinutes);
   int get earlyLeaveMinutes => _sum((m) => m.earlyLeaveMinutes);
   bool get hasExtras => overtimeMinutes > 0 || earlyLeaveMinutes > 0;
 

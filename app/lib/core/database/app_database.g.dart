@@ -3881,7 +3881,10 @@ class DayEntryRow extends DataClass implements Insertable<DayEntryRow> {
   /// schema v3.
   final int? noteReminderMinute;
 
-  /// Extra minutes worked this day (>= 0). Added in schema v3.
+  /// Extra minutes worked this day (>= 0). Added in schema v3; since schema
+  /// v7 the extra hours are blocks ([OvertimeBlocks]): the step to v7 turns
+  /// every value into a block and leaves the column NULL, and nothing writes
+  /// it again (kept so the older steps and backups stay as they were).
   final int? overtimeMinutes;
 
   /// Minutes left before the end of the shift (>= 0). Added in schema v3.
@@ -7805,6 +7808,1127 @@ class SettingsCompanion extends UpdateCompanion<SettingRow> {
   }
 }
 
+class $OvertimeTypesTable extends OvertimeTypes
+    with TableInfo<$OvertimeTypesTable, OvertimeTypeRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $OvertimeTypesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _colorValueMeta = const VerificationMeta(
+    'colorValue',
+  );
+  @override
+  late final GeneratedColumn<int> colorValue = GeneratedColumn<int>(
+    'color_value',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<OvertimeRateMode, String>
+  rateMode = GeneratedColumn<String>(
+    'rate_mode',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  ).withConverter<OvertimeRateMode>($OvertimeTypesTable.$converterrateMode);
+  static const VerificationMeta _multiplierBasisPointsMeta =
+      const VerificationMeta('multiplierBasisPoints');
+  @override
+  late final GeneratedColumn<int> multiplierBasisPoints = GeneratedColumn<int>(
+    'multiplier_basis_points',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(10000),
+  );
+  static const VerificationMeta _hourlyRateCentsMeta = const VerificationMeta(
+    'hourlyRateCents',
+  );
+  @override
+  late final GeneratedColumn<int> hourlyRateCents = GeneratedColumn<int>(
+    'hourly_rate_cents',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _countsForGoalMeta = const VerificationMeta(
+    'countsForGoal',
+  );
+  @override
+  late final GeneratedColumn<bool> countsForGoal = GeneratedColumn<bool>(
+    'counts_for_goal',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("counts_for_goal" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _archivedMeta = const VerificationMeta(
+    'archived',
+  );
+  @override
+  late final GeneratedColumn<bool> archived = GeneratedColumn<bool>(
+    'archived',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("archived" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    colorValue,
+    rateMode,
+    multiplierBasisPoints,
+    hourlyRateCents,
+    countsForGoal,
+    archived,
+    sortOrder,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'overtime_types';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<OvertimeTypeRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    }
+    if (data.containsKey('color_value')) {
+      context.handle(
+        _colorValueMeta,
+        colorValue.isAcceptableOrUnknown(data['color_value']!, _colorValueMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_colorValueMeta);
+    }
+    if (data.containsKey('multiplier_basis_points')) {
+      context.handle(
+        _multiplierBasisPointsMeta,
+        multiplierBasisPoints.isAcceptableOrUnknown(
+          data['multiplier_basis_points']!,
+          _multiplierBasisPointsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('hourly_rate_cents')) {
+      context.handle(
+        _hourlyRateCentsMeta,
+        hourlyRateCents.isAcceptableOrUnknown(
+          data['hourly_rate_cents']!,
+          _hourlyRateCentsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('counts_for_goal')) {
+      context.handle(
+        _countsForGoalMeta,
+        countsForGoal.isAcceptableOrUnknown(
+          data['counts_for_goal']!,
+          _countsForGoalMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_countsForGoalMeta);
+    }
+    if (data.containsKey('archived')) {
+      context.handle(
+        _archivedMeta,
+        archived.isAcceptableOrUnknown(data['archived']!, _archivedMeta),
+      );
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  OvertimeTypeRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return OvertimeTypeRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      ),
+      colorValue: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}color_value'],
+      )!,
+      rateMode: $OvertimeTypesTable.$converterrateMode.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}rate_mode'],
+        )!,
+      ),
+      multiplierBasisPoints: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}multiplier_basis_points'],
+      )!,
+      hourlyRateCents: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}hourly_rate_cents'],
+      ),
+      countsForGoal: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}counts_for_goal'],
+      )!,
+      archived: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}archived'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+    );
+  }
+
+  @override
+  $OvertimeTypesTable createAlias(String alias) {
+    return $OvertimeTypesTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<OvertimeRateMode, String, String>
+  $converterrateMode = const EnumNameConverter<OvertimeRateMode>(
+    OvertimeRateMode.values,
+  );
+}
+
+class OvertimeTypeRow extends DataClass implements Insertable<OvertimeTypeRow> {
+  final String id;
+
+  /// NULL = a built-in type the user has not renamed (shown in the app's
+  /// language).
+  final String? name;
+  final int colorValue;
+  final OvertimeRateMode rateMode;
+  final int multiplierBasisPoints;
+  final int? hourlyRateCents;
+  final bool countsForGoal;
+  final bool archived;
+  final int sortOrder;
+  const OvertimeTypeRow({
+    required this.id,
+    this.name,
+    required this.colorValue,
+    required this.rateMode,
+    required this.multiplierBasisPoints,
+    this.hourlyRateCents,
+    required this.countsForGoal,
+    required this.archived,
+    required this.sortOrder,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    if (!nullToAbsent || name != null) {
+      map['name'] = Variable<String>(name);
+    }
+    map['color_value'] = Variable<int>(colorValue);
+    {
+      map['rate_mode'] = Variable<String>(
+        $OvertimeTypesTable.$converterrateMode.toSql(rateMode),
+      );
+    }
+    map['multiplier_basis_points'] = Variable<int>(multiplierBasisPoints);
+    if (!nullToAbsent || hourlyRateCents != null) {
+      map['hourly_rate_cents'] = Variable<int>(hourlyRateCents);
+    }
+    map['counts_for_goal'] = Variable<bool>(countsForGoal);
+    map['archived'] = Variable<bool>(archived);
+    map['sort_order'] = Variable<int>(sortOrder);
+    return map;
+  }
+
+  OvertimeTypesCompanion toCompanion(bool nullToAbsent) {
+    return OvertimeTypesCompanion(
+      id: Value(id),
+      name: name == null && nullToAbsent ? const Value.absent() : Value(name),
+      colorValue: Value(colorValue),
+      rateMode: Value(rateMode),
+      multiplierBasisPoints: Value(multiplierBasisPoints),
+      hourlyRateCents: hourlyRateCents == null && nullToAbsent
+          ? const Value.absent()
+          : Value(hourlyRateCents),
+      countsForGoal: Value(countsForGoal),
+      archived: Value(archived),
+      sortOrder: Value(sortOrder),
+    );
+  }
+
+  factory OvertimeTypeRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return OvertimeTypeRow(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String?>(json['name']),
+      colorValue: serializer.fromJson<int>(json['colorValue']),
+      rateMode: $OvertimeTypesTable.$converterrateMode.fromJson(
+        serializer.fromJson<String>(json['rateMode']),
+      ),
+      multiplierBasisPoints: serializer.fromJson<int>(
+        json['multiplierBasisPoints'],
+      ),
+      hourlyRateCents: serializer.fromJson<int?>(json['hourlyRateCents']),
+      countsForGoal: serializer.fromJson<bool>(json['countsForGoal']),
+      archived: serializer.fromJson<bool>(json['archived']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String?>(name),
+      'colorValue': serializer.toJson<int>(colorValue),
+      'rateMode': serializer.toJson<String>(
+        $OvertimeTypesTable.$converterrateMode.toJson(rateMode),
+      ),
+      'multiplierBasisPoints': serializer.toJson<int>(multiplierBasisPoints),
+      'hourlyRateCents': serializer.toJson<int?>(hourlyRateCents),
+      'countsForGoal': serializer.toJson<bool>(countsForGoal),
+      'archived': serializer.toJson<bool>(archived),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+    };
+  }
+
+  OvertimeTypeRow copyWith({
+    String? id,
+    Value<String?> name = const Value.absent(),
+    int? colorValue,
+    OvertimeRateMode? rateMode,
+    int? multiplierBasisPoints,
+    Value<int?> hourlyRateCents = const Value.absent(),
+    bool? countsForGoal,
+    bool? archived,
+    int? sortOrder,
+  }) => OvertimeTypeRow(
+    id: id ?? this.id,
+    name: name.present ? name.value : this.name,
+    colorValue: colorValue ?? this.colorValue,
+    rateMode: rateMode ?? this.rateMode,
+    multiplierBasisPoints: multiplierBasisPoints ?? this.multiplierBasisPoints,
+    hourlyRateCents: hourlyRateCents.present
+        ? hourlyRateCents.value
+        : this.hourlyRateCents,
+    countsForGoal: countsForGoal ?? this.countsForGoal,
+    archived: archived ?? this.archived,
+    sortOrder: sortOrder ?? this.sortOrder,
+  );
+  OvertimeTypeRow copyWithCompanion(OvertimeTypesCompanion data) {
+    return OvertimeTypeRow(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      colorValue: data.colorValue.present
+          ? data.colorValue.value
+          : this.colorValue,
+      rateMode: data.rateMode.present ? data.rateMode.value : this.rateMode,
+      multiplierBasisPoints: data.multiplierBasisPoints.present
+          ? data.multiplierBasisPoints.value
+          : this.multiplierBasisPoints,
+      hourlyRateCents: data.hourlyRateCents.present
+          ? data.hourlyRateCents.value
+          : this.hourlyRateCents,
+      countsForGoal: data.countsForGoal.present
+          ? data.countsForGoal.value
+          : this.countsForGoal,
+      archived: data.archived.present ? data.archived.value : this.archived,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OvertimeTypeRow(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('colorValue: $colorValue, ')
+          ..write('rateMode: $rateMode, ')
+          ..write('multiplierBasisPoints: $multiplierBasisPoints, ')
+          ..write('hourlyRateCents: $hourlyRateCents, ')
+          ..write('countsForGoal: $countsForGoal, ')
+          ..write('archived: $archived, ')
+          ..write('sortOrder: $sortOrder')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    name,
+    colorValue,
+    rateMode,
+    multiplierBasisPoints,
+    hourlyRateCents,
+    countsForGoal,
+    archived,
+    sortOrder,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is OvertimeTypeRow &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.colorValue == this.colorValue &&
+          other.rateMode == this.rateMode &&
+          other.multiplierBasisPoints == this.multiplierBasisPoints &&
+          other.hourlyRateCents == this.hourlyRateCents &&
+          other.countsForGoal == this.countsForGoal &&
+          other.archived == this.archived &&
+          other.sortOrder == this.sortOrder);
+}
+
+class OvertimeTypesCompanion extends UpdateCompanion<OvertimeTypeRow> {
+  final Value<String> id;
+  final Value<String?> name;
+  final Value<int> colorValue;
+  final Value<OvertimeRateMode> rateMode;
+  final Value<int> multiplierBasisPoints;
+  final Value<int?> hourlyRateCents;
+  final Value<bool> countsForGoal;
+  final Value<bool> archived;
+  final Value<int> sortOrder;
+  final Value<int> rowid;
+  const OvertimeTypesCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.colorValue = const Value.absent(),
+    this.rateMode = const Value.absent(),
+    this.multiplierBasisPoints = const Value.absent(),
+    this.hourlyRateCents = const Value.absent(),
+    this.countsForGoal = const Value.absent(),
+    this.archived = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  OvertimeTypesCompanion.insert({
+    required String id,
+    this.name = const Value.absent(),
+    required int colorValue,
+    required OvertimeRateMode rateMode,
+    this.multiplierBasisPoints = const Value.absent(),
+    this.hourlyRateCents = const Value.absent(),
+    required bool countsForGoal,
+    this.archived = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       colorValue = Value(colorValue),
+       rateMode = Value(rateMode),
+       countsForGoal = Value(countsForGoal);
+  static Insertable<OvertimeTypeRow> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<int>? colorValue,
+    Expression<String>? rateMode,
+    Expression<int>? multiplierBasisPoints,
+    Expression<int>? hourlyRateCents,
+    Expression<bool>? countsForGoal,
+    Expression<bool>? archived,
+    Expression<int>? sortOrder,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (colorValue != null) 'color_value': colorValue,
+      if (rateMode != null) 'rate_mode': rateMode,
+      if (multiplierBasisPoints != null)
+        'multiplier_basis_points': multiplierBasisPoints,
+      if (hourlyRateCents != null) 'hourly_rate_cents': hourlyRateCents,
+      if (countsForGoal != null) 'counts_for_goal': countsForGoal,
+      if (archived != null) 'archived': archived,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  OvertimeTypesCompanion copyWith({
+    Value<String>? id,
+    Value<String?>? name,
+    Value<int>? colorValue,
+    Value<OvertimeRateMode>? rateMode,
+    Value<int>? multiplierBasisPoints,
+    Value<int?>? hourlyRateCents,
+    Value<bool>? countsForGoal,
+    Value<bool>? archived,
+    Value<int>? sortOrder,
+    Value<int>? rowid,
+  }) {
+    return OvertimeTypesCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      colorValue: colorValue ?? this.colorValue,
+      rateMode: rateMode ?? this.rateMode,
+      multiplierBasisPoints:
+          multiplierBasisPoints ?? this.multiplierBasisPoints,
+      hourlyRateCents: hourlyRateCents ?? this.hourlyRateCents,
+      countsForGoal: countsForGoal ?? this.countsForGoal,
+      archived: archived ?? this.archived,
+      sortOrder: sortOrder ?? this.sortOrder,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (colorValue.present) {
+      map['color_value'] = Variable<int>(colorValue.value);
+    }
+    if (rateMode.present) {
+      map['rate_mode'] = Variable<String>(
+        $OvertimeTypesTable.$converterrateMode.toSql(rateMode.value),
+      );
+    }
+    if (multiplierBasisPoints.present) {
+      map['multiplier_basis_points'] = Variable<int>(
+        multiplierBasisPoints.value,
+      );
+    }
+    if (hourlyRateCents.present) {
+      map['hourly_rate_cents'] = Variable<int>(hourlyRateCents.value);
+    }
+    if (countsForGoal.present) {
+      map['counts_for_goal'] = Variable<bool>(countsForGoal.value);
+    }
+    if (archived.present) {
+      map['archived'] = Variable<bool>(archived.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OvertimeTypesCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('colorValue: $colorValue, ')
+          ..write('rateMode: $rateMode, ')
+          ..write('multiplierBasisPoints: $multiplierBasisPoints, ')
+          ..write('hourlyRateCents: $hourlyRateCents, ')
+          ..write('countsForGoal: $countsForGoal, ')
+          ..write('archived: $archived, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $OvertimeBlocksTable extends OvertimeBlocks
+    with TableInfo<$OvertimeBlocksTable, OvertimeBlockRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $OvertimeBlocksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _calendarIdMeta = const VerificationMeta(
+    'calendarId',
+  );
+  @override
+  late final GeneratedColumn<String> calendarId = GeneratedColumn<String>(
+    'calendar_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES calendars (id) ON DELETE CASCADE',
+    ),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<CivilDate, String> date =
+      GeneratedColumn<String>(
+        'date',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<CivilDate>($OvertimeBlocksTable.$converterdate);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _typeIdMeta = const VerificationMeta('typeId');
+  @override
+  late final GeneratedColumn<String> typeId = GeneratedColumn<String>(
+    'type_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES overtime_types (id)',
+    ),
+  );
+  static const VerificationMeta _startMinuteMeta = const VerificationMeta(
+    'startMinute',
+  );
+  @override
+  late final GeneratedColumn<int> startMinute = GeneratedColumn<int>(
+    'start_minute',
+    aliasedName,
+    false,
+    check: () => ComparableExpr(startMinute).isBetweenValues(0, 1439),
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endMinuteMeta = const VerificationMeta(
+    'endMinute',
+  );
+  @override
+  late final GeneratedColumn<int> endMinute = GeneratedColumn<int>(
+    'end_minute',
+    aliasedName,
+    false,
+    check: () => ComparableExpr(endMinute).isBetweenValues(0, 1439),
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _breakMinutesMeta = const VerificationMeta(
+    'breakMinutes',
+  );
+  @override
+  late final GeneratedColumn<int> breakMinutes = GeneratedColumn<int>(
+    'break_minutes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  @override
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+    'note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    calendarId,
+    date,
+    id,
+    typeId,
+    startMinute,
+    endMinute,
+    breakMinutes,
+    note,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'overtime_blocks';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<OvertimeBlockRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('calendar_id')) {
+      context.handle(
+        _calendarIdMeta,
+        calendarId.isAcceptableOrUnknown(data['calendar_id']!, _calendarIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_calendarIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('type_id')) {
+      context.handle(
+        _typeIdMeta,
+        typeId.isAcceptableOrUnknown(data['type_id']!, _typeIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_typeIdMeta);
+    }
+    if (data.containsKey('start_minute')) {
+      context.handle(
+        _startMinuteMeta,
+        startMinute.isAcceptableOrUnknown(
+          data['start_minute']!,
+          _startMinuteMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_startMinuteMeta);
+    }
+    if (data.containsKey('end_minute')) {
+      context.handle(
+        _endMinuteMeta,
+        endMinute.isAcceptableOrUnknown(data['end_minute']!, _endMinuteMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_endMinuteMeta);
+    }
+    if (data.containsKey('break_minutes')) {
+      context.handle(
+        _breakMinutesMeta,
+        breakMinutes.isAcceptableOrUnknown(
+          data['break_minutes']!,
+          _breakMinutesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('note')) {
+      context.handle(
+        _noteMeta,
+        note.isAcceptableOrUnknown(data['note']!, _noteMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {calendarId, date, id};
+  @override
+  OvertimeBlockRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return OvertimeBlockRow(
+      calendarId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}calendar_id'],
+      )!,
+      date: $OvertimeBlocksTable.$converterdate.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}date'],
+        )!,
+      ),
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      typeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}type_id'],
+      )!,
+      startMinute: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}start_minute'],
+      )!,
+      endMinute: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}end_minute'],
+      )!,
+      breakMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}break_minutes'],
+      )!,
+      note: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}note'],
+      ),
+    );
+  }
+
+  @override
+  $OvertimeBlocksTable createAlias(String alias) {
+    return $OvertimeBlocksTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<CivilDate, String> $converterdate =
+      const CivilDateConverter();
+}
+
+class OvertimeBlockRow extends DataClass
+    implements Insertable<OvertimeBlockRow> {
+  final String calendarId;
+  final CivilDate date;
+  final String id;
+
+  /// A type in use cannot be deleted (no cascade): it is archived.
+  final String typeId;
+  final int startMinute;
+  final int endMinute;
+  final int breakMinutes;
+  final String? note;
+  const OvertimeBlockRow({
+    required this.calendarId,
+    required this.date,
+    required this.id,
+    required this.typeId,
+    required this.startMinute,
+    required this.endMinute,
+    required this.breakMinutes,
+    this.note,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['calendar_id'] = Variable<String>(calendarId);
+    {
+      map['date'] = Variable<String>(
+        $OvertimeBlocksTable.$converterdate.toSql(date),
+      );
+    }
+    map['id'] = Variable<String>(id);
+    map['type_id'] = Variable<String>(typeId);
+    map['start_minute'] = Variable<int>(startMinute);
+    map['end_minute'] = Variable<int>(endMinute);
+    map['break_minutes'] = Variable<int>(breakMinutes);
+    if (!nullToAbsent || note != null) {
+      map['note'] = Variable<String>(note);
+    }
+    return map;
+  }
+
+  OvertimeBlocksCompanion toCompanion(bool nullToAbsent) {
+    return OvertimeBlocksCompanion(
+      calendarId: Value(calendarId),
+      date: Value(date),
+      id: Value(id),
+      typeId: Value(typeId),
+      startMinute: Value(startMinute),
+      endMinute: Value(endMinute),
+      breakMinutes: Value(breakMinutes),
+      note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+    );
+  }
+
+  factory OvertimeBlockRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return OvertimeBlockRow(
+      calendarId: serializer.fromJson<String>(json['calendarId']),
+      date: serializer.fromJson<CivilDate>(json['date']),
+      id: serializer.fromJson<String>(json['id']),
+      typeId: serializer.fromJson<String>(json['typeId']),
+      startMinute: serializer.fromJson<int>(json['startMinute']),
+      endMinute: serializer.fromJson<int>(json['endMinute']),
+      breakMinutes: serializer.fromJson<int>(json['breakMinutes']),
+      note: serializer.fromJson<String?>(json['note']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'calendarId': serializer.toJson<String>(calendarId),
+      'date': serializer.toJson<CivilDate>(date),
+      'id': serializer.toJson<String>(id),
+      'typeId': serializer.toJson<String>(typeId),
+      'startMinute': serializer.toJson<int>(startMinute),
+      'endMinute': serializer.toJson<int>(endMinute),
+      'breakMinutes': serializer.toJson<int>(breakMinutes),
+      'note': serializer.toJson<String?>(note),
+    };
+  }
+
+  OvertimeBlockRow copyWith({
+    String? calendarId,
+    CivilDate? date,
+    String? id,
+    String? typeId,
+    int? startMinute,
+    int? endMinute,
+    int? breakMinutes,
+    Value<String?> note = const Value.absent(),
+  }) => OvertimeBlockRow(
+    calendarId: calendarId ?? this.calendarId,
+    date: date ?? this.date,
+    id: id ?? this.id,
+    typeId: typeId ?? this.typeId,
+    startMinute: startMinute ?? this.startMinute,
+    endMinute: endMinute ?? this.endMinute,
+    breakMinutes: breakMinutes ?? this.breakMinutes,
+    note: note.present ? note.value : this.note,
+  );
+  OvertimeBlockRow copyWithCompanion(OvertimeBlocksCompanion data) {
+    return OvertimeBlockRow(
+      calendarId: data.calendarId.present
+          ? data.calendarId.value
+          : this.calendarId,
+      date: data.date.present ? data.date.value : this.date,
+      id: data.id.present ? data.id.value : this.id,
+      typeId: data.typeId.present ? data.typeId.value : this.typeId,
+      startMinute: data.startMinute.present
+          ? data.startMinute.value
+          : this.startMinute,
+      endMinute: data.endMinute.present ? data.endMinute.value : this.endMinute,
+      breakMinutes: data.breakMinutes.present
+          ? data.breakMinutes.value
+          : this.breakMinutes,
+      note: data.note.present ? data.note.value : this.note,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OvertimeBlockRow(')
+          ..write('calendarId: $calendarId, ')
+          ..write('date: $date, ')
+          ..write('id: $id, ')
+          ..write('typeId: $typeId, ')
+          ..write('startMinute: $startMinute, ')
+          ..write('endMinute: $endMinute, ')
+          ..write('breakMinutes: $breakMinutes, ')
+          ..write('note: $note')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    calendarId,
+    date,
+    id,
+    typeId,
+    startMinute,
+    endMinute,
+    breakMinutes,
+    note,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is OvertimeBlockRow &&
+          other.calendarId == this.calendarId &&
+          other.date == this.date &&
+          other.id == this.id &&
+          other.typeId == this.typeId &&
+          other.startMinute == this.startMinute &&
+          other.endMinute == this.endMinute &&
+          other.breakMinutes == this.breakMinutes &&
+          other.note == this.note);
+}
+
+class OvertimeBlocksCompanion extends UpdateCompanion<OvertimeBlockRow> {
+  final Value<String> calendarId;
+  final Value<CivilDate> date;
+  final Value<String> id;
+  final Value<String> typeId;
+  final Value<int> startMinute;
+  final Value<int> endMinute;
+  final Value<int> breakMinutes;
+  final Value<String?> note;
+  final Value<int> rowid;
+  const OvertimeBlocksCompanion({
+    this.calendarId = const Value.absent(),
+    this.date = const Value.absent(),
+    this.id = const Value.absent(),
+    this.typeId = const Value.absent(),
+    this.startMinute = const Value.absent(),
+    this.endMinute = const Value.absent(),
+    this.breakMinutes = const Value.absent(),
+    this.note = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  OvertimeBlocksCompanion.insert({
+    required String calendarId,
+    required CivilDate date,
+    required String id,
+    required String typeId,
+    required int startMinute,
+    required int endMinute,
+    this.breakMinutes = const Value.absent(),
+    this.note = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : calendarId = Value(calendarId),
+       date = Value(date),
+       id = Value(id),
+       typeId = Value(typeId),
+       startMinute = Value(startMinute),
+       endMinute = Value(endMinute);
+  static Insertable<OvertimeBlockRow> custom({
+    Expression<String>? calendarId,
+    Expression<String>? date,
+    Expression<String>? id,
+    Expression<String>? typeId,
+    Expression<int>? startMinute,
+    Expression<int>? endMinute,
+    Expression<int>? breakMinutes,
+    Expression<String>? note,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (calendarId != null) 'calendar_id': calendarId,
+      if (date != null) 'date': date,
+      if (id != null) 'id': id,
+      if (typeId != null) 'type_id': typeId,
+      if (startMinute != null) 'start_minute': startMinute,
+      if (endMinute != null) 'end_minute': endMinute,
+      if (breakMinutes != null) 'break_minutes': breakMinutes,
+      if (note != null) 'note': note,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  OvertimeBlocksCompanion copyWith({
+    Value<String>? calendarId,
+    Value<CivilDate>? date,
+    Value<String>? id,
+    Value<String>? typeId,
+    Value<int>? startMinute,
+    Value<int>? endMinute,
+    Value<int>? breakMinutes,
+    Value<String?>? note,
+    Value<int>? rowid,
+  }) {
+    return OvertimeBlocksCompanion(
+      calendarId: calendarId ?? this.calendarId,
+      date: date ?? this.date,
+      id: id ?? this.id,
+      typeId: typeId ?? this.typeId,
+      startMinute: startMinute ?? this.startMinute,
+      endMinute: endMinute ?? this.endMinute,
+      breakMinutes: breakMinutes ?? this.breakMinutes,
+      note: note ?? this.note,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (calendarId.present) {
+      map['calendar_id'] = Variable<String>(calendarId.value);
+    }
+    if (date.present) {
+      map['date'] = Variable<String>(
+        $OvertimeBlocksTable.$converterdate.toSql(date.value),
+      );
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (typeId.present) {
+      map['type_id'] = Variable<String>(typeId.value);
+    }
+    if (startMinute.present) {
+      map['start_minute'] = Variable<int>(startMinute.value);
+    }
+    if (endMinute.present) {
+      map['end_minute'] = Variable<int>(endMinute.value);
+    }
+    if (breakMinutes.present) {
+      map['break_minutes'] = Variable<int>(breakMinutes.value);
+    }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OvertimeBlocksCompanion(')
+          ..write('calendarId: $calendarId, ')
+          ..write('date: $date, ')
+          ..write('id: $id, ')
+          ..write('typeId: $typeId, ')
+          ..write('startMinute: $startMinute, ')
+          ..write('endMinute: $endMinute, ')
+          ..write('breakMinutes: $breakMinutes, ')
+          ..write('note: $note, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -7825,6 +8949,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this,
   );
   late final $SettingsTable settings = $SettingsTable(this);
+  late final $OvertimeTypesTable overtimeTypes = $OvertimeTypesTable(this);
+  late final $OvertimeBlocksTable overtimeBlocks = $OvertimeBlocksTable(this);
   late final Index idxNoteAttachmentsDay = Index(
     'idx_note_attachments_day',
     'CREATE INDEX idx_note_attachments_day ON note_attachments (calendar_id, date)',
@@ -7858,6 +8984,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     holidays,
     absenceBalances,
     settings,
+    overtimeTypes,
+    overtimeBlocks,
     idxNoteAttachmentsDay,
     idxDayTasksDay,
     idxShiftSwapsDay,
@@ -7899,6 +9027,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('absence_balances', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'calendars',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('overtime_blocks', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -8035,6 +9170,24 @@ final class $$CalendarsTableReferences
     final cache = $_typedResult.readTableOrNull(
       _absenceBalancesRefsTable($_db),
     );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$OvertimeBlocksTable, List<OvertimeBlockRow>>
+  _overtimeBlocksRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.overtimeBlocks,
+    aliasName: 'calendars__id__overtime_blocks__calendar_id',
+  );
+
+  $$OvertimeBlocksTableProcessedTableManager get overtimeBlocksRefs {
+    final manager = $$OvertimeBlocksTableTableManager(
+      $_db,
+      $_db.overtimeBlocks,
+    ).filter((f) => f.calendarId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_overtimeBlocksRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -8226,6 +9379,31 @@ class $$CalendarsTableFilterComposer
           }) => $$AbsenceBalancesTableFilterComposer(
             $db: $db,
             $table: $db.absenceBalances,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> overtimeBlocksRefs(
+    Expression<bool> Function($$OvertimeBlocksTableFilterComposer f) f,
+  ) {
+    final $$OvertimeBlocksTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.overtimeBlocks,
+      getReferencedColumn: (t) => t.calendarId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$OvertimeBlocksTableFilterComposer(
+            $db: $db,
+            $table: $db.overtimeBlocks,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -8462,6 +9640,31 @@ class $$CalendarsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> overtimeBlocksRefs<T extends Object>(
+    Expression<T> Function($$OvertimeBlocksTableAnnotationComposer a) f,
+  ) {
+    final $$OvertimeBlocksTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.overtimeBlocks,
+      getReferencedColumn: (t) => t.calendarId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$OvertimeBlocksTableAnnotationComposer(
+            $db: $db,
+            $table: $db.overtimeBlocks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$CalendarsTableTableManager
@@ -8484,6 +9687,7 @@ class $$CalendarsTableTableManager
             bool dayTasksRefs,
             bool shiftSwapsRefs,
             bool absenceBalancesRefs,
+            bool overtimeBlocksRefs,
           })
         > {
   $$CalendarsTableTableManager(_$AppDatabase db, $CalendarsTable table)
@@ -8553,6 +9757,7 @@ class $$CalendarsTableTableManager
                 dayTasksRefs = false,
                 shiftSwapsRefs = false,
                 absenceBalancesRefs = false,
+                overtimeBlocksRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -8563,6 +9768,7 @@ class $$CalendarsTableTableManager
                     if (dayTasksRefs) db.dayTasks,
                     if (shiftSwapsRefs) db.shiftSwaps,
                     if (absenceBalancesRefs) db.absenceBalances,
+                    if (overtimeBlocksRefs) db.overtimeBlocks,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -8693,6 +9899,27 @@ class $$CalendarsTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (overtimeBlocksRefs)
+                        await $_getPrefetchedData<
+                          CalendarRow,
+                          $CalendarsTable,
+                          OvertimeBlockRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$CalendarsTableReferences
+                              ._overtimeBlocksRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$CalendarsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).overtimeBlocksRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.calendarId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -8720,6 +9947,7 @@ typedef $$CalendarsTableProcessedTableManager =
         bool dayTasksRefs,
         bool shiftSwapsRefs,
         bool absenceBalancesRefs,
+        bool overtimeBlocksRefs,
       })
     >;
 typedef $$ShiftTypesTableCreateCompanionBuilder = ShiftTypesCompanion Function({
@@ -13268,6 +14496,867 @@ typedef $$SettingsTableProcessedTableManager =
       SettingRow,
       PrefetchHooks Function()
     >;
+typedef $$OvertimeTypesTableCreateCompanionBuilder =
+    OvertimeTypesCompanion Function({
+      required String id,
+      Value<String?> name,
+      required int colorValue,
+      required OvertimeRateMode rateMode,
+      Value<int> multiplierBasisPoints,
+      Value<int?> hourlyRateCents,
+      required bool countsForGoal,
+      Value<bool> archived,
+      Value<int> sortOrder,
+      Value<int> rowid,
+    });
+typedef $$OvertimeTypesTableUpdateCompanionBuilder =
+    OvertimeTypesCompanion Function({
+      Value<String> id,
+      Value<String?> name,
+      Value<int> colorValue,
+      Value<OvertimeRateMode> rateMode,
+      Value<int> multiplierBasisPoints,
+      Value<int?> hourlyRateCents,
+      Value<bool> countsForGoal,
+      Value<bool> archived,
+      Value<int> sortOrder,
+      Value<int> rowid,
+    });
+
+final class $$OvertimeTypesTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $OvertimeTypesTable, OvertimeTypeRow> {
+  $$OvertimeTypesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static MultiTypedResultKey<$OvertimeBlocksTable, List<OvertimeBlockRow>>
+  _overtimeBlocksRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.overtimeBlocks,
+    aliasName: 'overtime_types__id__overtime_blocks__type_id',
+  );
+
+  $$OvertimeBlocksTableProcessedTableManager get overtimeBlocksRefs {
+    final manager = $$OvertimeBlocksTableTableManager(
+      $_db,
+      $_db.overtimeBlocks,
+    ).filter((f) => f.typeId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_overtimeBlocksRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$OvertimeTypesTableFilterComposer
+    extends Composer<_$AppDatabase, $OvertimeTypesTable> {
+  $$OvertimeTypesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get colorValue => $composableBuilder(
+    column: $table.colorValue,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<OvertimeRateMode, OvertimeRateMode, String>
+  get rateMode => $composableBuilder(
+    column: $table.rateMode,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<int> get multiplierBasisPoints => $composableBuilder(
+    column: $table.multiplierBasisPoints,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get hourlyRateCents => $composableBuilder(
+    column: $table.hourlyRateCents,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get countsForGoal => $composableBuilder(
+    column: $table.countsForGoal,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get archived => $composableBuilder(
+    column: $table.archived,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> overtimeBlocksRefs(
+    Expression<bool> Function($$OvertimeBlocksTableFilterComposer f) f,
+  ) {
+    final $$OvertimeBlocksTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.overtimeBlocks,
+      getReferencedColumn: (t) => t.typeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$OvertimeBlocksTableFilterComposer(
+            $db: $db,
+            $table: $db.overtimeBlocks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$OvertimeTypesTableOrderingComposer
+    extends Composer<_$AppDatabase, $OvertimeTypesTable> {
+  $$OvertimeTypesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get colorValue => $composableBuilder(
+    column: $table.colorValue,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rateMode => $composableBuilder(
+    column: $table.rateMode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get multiplierBasisPoints => $composableBuilder(
+    column: $table.multiplierBasisPoints,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get hourlyRateCents => $composableBuilder(
+    column: $table.hourlyRateCents,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get countsForGoal => $composableBuilder(
+    column: $table.countsForGoal,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get archived => $composableBuilder(
+    column: $table.archived,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$OvertimeTypesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $OvertimeTypesTable> {
+  $$OvertimeTypesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get colorValue => $composableBuilder(
+    column: $table.colorValue,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<OvertimeRateMode, String> get rateMode =>
+      $composableBuilder(column: $table.rateMode, builder: (column) => column);
+
+  GeneratedColumn<int> get multiplierBasisPoints => $composableBuilder(
+    column: $table.multiplierBasisPoints,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get hourlyRateCents => $composableBuilder(
+    column: $table.hourlyRateCents,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get countsForGoal => $composableBuilder(
+    column: $table.countsForGoal,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get archived =>
+      $composableBuilder(column: $table.archived, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  Expression<T> overtimeBlocksRefs<T extends Object>(
+    Expression<T> Function($$OvertimeBlocksTableAnnotationComposer a) f,
+  ) {
+    final $$OvertimeBlocksTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.overtimeBlocks,
+      getReferencedColumn: (t) => t.typeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$OvertimeBlocksTableAnnotationComposer(
+            $db: $db,
+            $table: $db.overtimeBlocks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$OvertimeTypesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $OvertimeTypesTable,
+          OvertimeTypeRow,
+          $$OvertimeTypesTableFilterComposer,
+          $$OvertimeTypesTableOrderingComposer,
+          $$OvertimeTypesTableAnnotationComposer,
+          $$OvertimeTypesTableCreateCompanionBuilder,
+          $$OvertimeTypesTableUpdateCompanionBuilder,
+          (OvertimeTypeRow, $$OvertimeTypesTableReferences),
+          OvertimeTypeRow,
+          PrefetchHooks Function({bool overtimeBlocksRefs})
+        > {
+  $$OvertimeTypesTableTableManager(_$AppDatabase db, $OvertimeTypesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$OvertimeTypesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$OvertimeTypesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$OvertimeTypesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String?> name = const Value.absent(),
+                Value<int> colorValue = const Value.absent(),
+                Value<OvertimeRateMode> rateMode = const Value.absent(),
+                Value<int> multiplierBasisPoints = const Value.absent(),
+                Value<int?> hourlyRateCents = const Value.absent(),
+                Value<bool> countsForGoal = const Value.absent(),
+                Value<bool> archived = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => OvertimeTypesCompanion(
+                id: id,
+                name: name,
+                colorValue: colorValue,
+                rateMode: rateMode,
+                multiplierBasisPoints: multiplierBasisPoints,
+                hourlyRateCents: hourlyRateCents,
+                countsForGoal: countsForGoal,
+                archived: archived,
+                sortOrder: sortOrder,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                Value<String?> name = const Value.absent(),
+                required int colorValue,
+                required OvertimeRateMode rateMode,
+                Value<int> multiplierBasisPoints = const Value.absent(),
+                Value<int?> hourlyRateCents = const Value.absent(),
+                required bool countsForGoal,
+                Value<bool> archived = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => OvertimeTypesCompanion.insert(
+                id: id,
+                name: name,
+                colorValue: colorValue,
+                rateMode: rateMode,
+                multiplierBasisPoints: multiplierBasisPoints,
+                hourlyRateCents: hourlyRateCents,
+                countsForGoal: countsForGoal,
+                archived: archived,
+                sortOrder: sortOrder,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$OvertimeTypesTable, OvertimeTypeRow>(table),
+                  $$OvertimeTypesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({overtimeBlocksRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (overtimeBlocksRefs) db.overtimeBlocks,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (overtimeBlocksRefs)
+                    await $_getPrefetchedData<
+                      OvertimeTypeRow,
+                      $OvertimeTypesTable,
+                      OvertimeBlockRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$OvertimeTypesTableReferences
+                          ._overtimeBlocksRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$OvertimeTypesTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).overtimeBlocksRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.typeId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$OvertimeTypesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $OvertimeTypesTable,
+      OvertimeTypeRow,
+      $$OvertimeTypesTableFilterComposer,
+      $$OvertimeTypesTableOrderingComposer,
+      $$OvertimeTypesTableAnnotationComposer,
+      $$OvertimeTypesTableCreateCompanionBuilder,
+      $$OvertimeTypesTableUpdateCompanionBuilder,
+      (OvertimeTypeRow, $$OvertimeTypesTableReferences),
+      OvertimeTypeRow,
+      PrefetchHooks Function({bool overtimeBlocksRefs})
+    >;
+typedef $$OvertimeBlocksTableCreateCompanionBuilder =
+    OvertimeBlocksCompanion Function({
+      required String calendarId,
+      required CivilDate date,
+      required String id,
+      required String typeId,
+      required int startMinute,
+      required int endMinute,
+      Value<int> breakMinutes,
+      Value<String?> note,
+      Value<int> rowid,
+    });
+typedef $$OvertimeBlocksTableUpdateCompanionBuilder =
+    OvertimeBlocksCompanion Function({
+      Value<String> calendarId,
+      Value<CivilDate> date,
+      Value<String> id,
+      Value<String> typeId,
+      Value<int> startMinute,
+      Value<int> endMinute,
+      Value<int> breakMinutes,
+      Value<String?> note,
+      Value<int> rowid,
+    });
+
+final class $$OvertimeBlocksTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $OvertimeBlocksTable, OvertimeBlockRow> {
+  $$OvertimeBlocksTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $CalendarsTable _calendarIdTable(_$AppDatabase db) =>
+      db.calendars.createAlias('overtime_blocks__calendar_id__calendars__id');
+
+  $$CalendarsTableProcessedTableManager get calendarId {
+    final $_column = $_itemColumn<String>('calendar_id')!;
+
+    final manager = $$CalendarsTableTableManager(
+      $_db,
+      $_db.calendars,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_calendarIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $OvertimeTypesTable _typeIdTable(_$AppDatabase db) => db.overtimeTypes
+      .createAlias('overtime_blocks__type_id__overtime_types__id');
+
+  $$OvertimeTypesTableProcessedTableManager get typeId {
+    final $_column = $_itemColumn<String>('type_id')!;
+
+    final manager = $$OvertimeTypesTableTableManager(
+      $_db,
+      $_db.overtimeTypes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_typeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$OvertimeBlocksTableFilterComposer
+    extends Composer<_$AppDatabase, $OvertimeBlocksTable> {
+  $$OvertimeBlocksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnWithTypeConverterFilters<CivilDate, CivilDate, String> get date =>
+      $composableBuilder(
+        column: $table.date,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startMinute => $composableBuilder(
+    column: $table.startMinute,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get endMinute => $composableBuilder(
+    column: $table.endMinute,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get breakMinutes => $composableBuilder(
+    column: $table.breakMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$CalendarsTableFilterComposer get calendarId {
+    final $$CalendarsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.calendarId,
+      referencedTable: $db.calendars,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CalendarsTableFilterComposer(
+            $db: $db,
+            $table: $db.calendars,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$OvertimeTypesTableFilterComposer get typeId {
+    final $$OvertimeTypesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.typeId,
+      referencedTable: $db.overtimeTypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$OvertimeTypesTableFilterComposer(
+            $db: $db,
+            $table: $db.overtimeTypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$OvertimeBlocksTableOrderingComposer
+    extends Composer<_$AppDatabase, $OvertimeBlocksTable> {
+  $$OvertimeBlocksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get startMinute => $composableBuilder(
+    column: $table.startMinute,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get endMinute => $composableBuilder(
+    column: $table.endMinute,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get breakMinutes => $composableBuilder(
+    column: $table.breakMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$CalendarsTableOrderingComposer get calendarId {
+    final $$CalendarsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.calendarId,
+      referencedTable: $db.calendars,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CalendarsTableOrderingComposer(
+            $db: $db,
+            $table: $db.calendars,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$OvertimeTypesTableOrderingComposer get typeId {
+    final $$OvertimeTypesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.typeId,
+      referencedTable: $db.overtimeTypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$OvertimeTypesTableOrderingComposer(
+            $db: $db,
+            $table: $db.overtimeTypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$OvertimeBlocksTableAnnotationComposer
+    extends Composer<_$AppDatabase, $OvertimeBlocksTable> {
+  $$OvertimeBlocksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumnWithTypeConverter<CivilDate, String> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get startMinute => $composableBuilder(
+    column: $table.startMinute,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get endMinute =>
+      $composableBuilder(column: $table.endMinute, builder: (column) => column);
+
+  GeneratedColumn<int> get breakMinutes => $composableBuilder(
+    column: $table.breakMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+
+  $$CalendarsTableAnnotationComposer get calendarId {
+    final $$CalendarsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.calendarId,
+      referencedTable: $db.calendars,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CalendarsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.calendars,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$OvertimeTypesTableAnnotationComposer get typeId {
+    final $$OvertimeTypesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.typeId,
+      referencedTable: $db.overtimeTypes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$OvertimeTypesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.overtimeTypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$OvertimeBlocksTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $OvertimeBlocksTable,
+          OvertimeBlockRow,
+          $$OvertimeBlocksTableFilterComposer,
+          $$OvertimeBlocksTableOrderingComposer,
+          $$OvertimeBlocksTableAnnotationComposer,
+          $$OvertimeBlocksTableCreateCompanionBuilder,
+          $$OvertimeBlocksTableUpdateCompanionBuilder,
+          (OvertimeBlockRow, $$OvertimeBlocksTableReferences),
+          OvertimeBlockRow,
+          PrefetchHooks Function({bool calendarId, bool typeId})
+        > {
+  $$OvertimeBlocksTableTableManager(
+    _$AppDatabase db,
+    $OvertimeBlocksTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$OvertimeBlocksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$OvertimeBlocksTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$OvertimeBlocksTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> calendarId = const Value.absent(),
+                Value<CivilDate> date = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> typeId = const Value.absent(),
+                Value<int> startMinute = const Value.absent(),
+                Value<int> endMinute = const Value.absent(),
+                Value<int> breakMinutes = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => OvertimeBlocksCompanion(
+                calendarId: calendarId,
+                date: date,
+                id: id,
+                typeId: typeId,
+                startMinute: startMinute,
+                endMinute: endMinute,
+                breakMinutes: breakMinutes,
+                note: note,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String calendarId,
+                required CivilDate date,
+                required String id,
+                required String typeId,
+                required int startMinute,
+                required int endMinute,
+                Value<int> breakMinutes = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => OvertimeBlocksCompanion.insert(
+                calendarId: calendarId,
+                date: date,
+                id: id,
+                typeId: typeId,
+                startMinute: startMinute,
+                endMinute: endMinute,
+                breakMinutes: breakMinutes,
+                note: note,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$OvertimeBlocksTable, OvertimeBlockRow>(table),
+                  $$OvertimeBlocksTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({calendarId = false, typeId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (calendarId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.calendarId,
+                        referencedTable: $$OvertimeBlocksTableReferences
+                            ._calendarIdTable(db),
+                        referencedColumn: $$OvertimeBlocksTableReferences
+                            ._calendarIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+                    if (typeId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.typeId,
+                        referencedTable: $$OvertimeBlocksTableReferences
+                            ._typeIdTable(db),
+                        referencedColumn: $$OvertimeBlocksTableReferences
+                            ._typeIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$OvertimeBlocksTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $OvertimeBlocksTable,
+      OvertimeBlockRow,
+      $$OvertimeBlocksTableFilterComposer,
+      $$OvertimeBlocksTableOrderingComposer,
+      $$OvertimeBlocksTableAnnotationComposer,
+      $$OvertimeBlocksTableCreateCompanionBuilder,
+      $$OvertimeBlocksTableUpdateCompanionBuilder,
+      (OvertimeBlockRow, $$OvertimeBlocksTableReferences),
+      OvertimeBlockRow,
+      PrefetchHooks Function({bool calendarId, bool typeId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -13296,4 +15385,8 @@ class $AppDatabaseManager {
       $$AbsenceBalancesTableTableManager(_db, _db.absenceBalances);
   $$SettingsTableTableManager get settings =>
       $$SettingsTableTableManager(_db, _db.settings);
+  $$OvertimeTypesTableTableManager get overtimeTypes =>
+      $$OvertimeTypesTableTableManager(_db, _db.overtimeTypes);
+  $$OvertimeBlocksTableTableManager get overtimeBlocks =>
+      $$OvertimeBlocksTableTableManager(_db, _db.overtimeBlocks);
 }

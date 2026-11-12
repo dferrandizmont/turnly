@@ -5,6 +5,7 @@ import 'package:cuadrante/core/database/migration_v2_to_v3.dart';
 import 'package:cuadrante/core/database/migration_v3_to_v4.dart';
 import 'package:cuadrante/core/database/migration_v4_to_v5.dart';
 import 'package:cuadrante/core/database/migration_v5_to_v6.dart';
+import 'package:cuadrante/core/database/migration_v6_to_v7.dart';
 import 'package:cuadrante/features/schedule/data/schedule_repository.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
 import 'package:drift/drift.dart' hide isNull, isNotNull;
@@ -13,6 +14,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/v2_database.dart';
 import '../../support/v3_database.dart';
+import '../../support/v6_database.dart';
 import 'generated/schema.dart';
 import 'generated/schema_v3.dart' as v3;
 
@@ -32,6 +34,7 @@ class _AtV4 extends AppDatabase {
       from3To4: migrateFrom3To4,
       from4To5: (m, schema) async => throw StateError('not this far'),
       from5To6: (m, schema) async => throw StateError('not this far'),
+      from6To7: (m, schema) async => throw StateError('not this far'),
     ),
   );
 }
@@ -51,6 +54,7 @@ class _FailingV5 extends AppDatabase {
         afterCreate: () async => throw StateError('boom after the table'),
       ),
       from5To6: migrateFrom5To6,
+      from6To7: migrateFrom6To7,
     ),
   );
 }
@@ -161,12 +165,12 @@ void main() {
     );
     final db = AppDatabase(schema.newConnection());
     addTearDown(db.close);
-    await verifier.migrateAndValidate(db, 6);
-    expect(await _dumpAll(db), before);
+    await verifier.migrateAndValidate(db, 7);
+    expect(await _dumpAll(db), afterV7(before));
     expect(await db.select(db.shiftTypeVersions).get(), isEmpty);
     for (final id in ['main', 'pareja', 'viejo']) {
       final loaded = await ScheduleRepository(db).load(id);
-      final prior = scheduleFromV3Rows(v3Columns, id);
+      final prior = legacyAsBlocks(scheduleFromV3Rows(v3Columns, id));
       expect(
         v2ResolvedDays(loaded.schedule),
         v2ResolvedDays(prior),
@@ -177,7 +181,7 @@ void main() {
     expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
     expect(
       schema.rawDatabase.select('PRAGMA user_version').single.values.single,
-      6,
+      7,
     );
   });
 
@@ -197,8 +201,8 @@ void main() {
     expect(_tableNames(schema), isNot(contains('shift_type_versions')));
     final retried = AppDatabase(schema.newConnection());
     addTearDown(retried.close);
-    await verifier.migrateAndValidate(retried, 6);
-    expect(await _dumpAll(retried), before);
+    await verifier.migrateAndValidate(retried, 7);
+    expect(await _dumpAll(retried), afterV7(before));
   });
 
   test('after migrating, versions are written, read, checked and go with '
@@ -206,7 +210,7 @@ void main() {
     final (:schema, before: _, v3Columns: _) = await seededV4();
     final db = AppDatabase(schema.newConnection());
     addTearDown(db.close);
-    await verifier.migrateAndValidate(db, 6);
+    await verifier.migrateAndValidate(db, 7);
     final repo = ScheduleRepository(db);
     final night = (await repo.load('main')).schedule.shiftTypeById('night')!;
     final history = [

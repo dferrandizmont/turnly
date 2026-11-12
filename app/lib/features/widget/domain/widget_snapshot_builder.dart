@@ -10,6 +10,7 @@ import '../../calendar/application/week_layout.dart';
 import '../../calendar/presentation/shift_format.dart';
 import '../../holidays/domain/holiday.dart';
 import '../../schedule/domain/schedule_domain.dart';
+import '../../summary/domain/month_summary.dart';
 import 'widget_snapshot.dart';
 import 'widget_strings.dart';
 
@@ -96,16 +97,25 @@ class _Builder {
   final _styles = <WidgetStyle>[];
   final _monthIndex = <String, int>{};
   final _months = <WidgetMonth>[];
+  final _extras = <String, List<String>>{};
 
   ResolvedDay _day(CivilDate d) => _resolved.putIfAbsent(d, () {
     final day = schedule.resolve(d);
-    _descriptions[d.toIso()] = strings.describe(d, day, holidays[d]?.name);
+    final extras = _extraLines(day);
+    if (extras.isNotEmpty) _extras[d.toIso()] = extras;
+    _descriptions[d.toIso()] = strings.describe(
+      d,
+      day,
+      holidays[d]?.name,
+      extras: extras,
+    );
     if (day.shifts.any((s) => s.category == ShiftCategory.absence)) {
       _absenceDescriptions[d.toIso()] = strings.describe(
         d,
         day,
         holidays[d]?.name,
         redactAbsence: true,
+        extras: extras,
       );
     }
     return day;
@@ -113,6 +123,19 @@ class _Builder {
 
   DayKind _kindOf(CivilDate d) =>
       _kinds.putIfAbsent(d, () => schedule.resolve(d).kind);
+
+  List<String> _extraLines(ResolvedDay day) {
+    if (day.overtimeMinutes == 0 && day.earlyLeaveMinutes == 0) return const [];
+    final summary = summarizeRange(schedule, day.date, day.date);
+    final legacy = schedule.entries[day.date]?.overtimeMinutes ?? 0;
+    return [
+      if (legacy > 0) strings.overtimeLabel(legacy, null),
+      for (final total in summary.overtimeTypes)
+        strings.overtimeLabel(total.minutes, total.type),
+      if (summary.earlyLeaveMinutes > 0)
+        strings.earlyLeaveLabel(summary.earlyLeaveMinutes),
+    ];
+  }
 
   /// The next day off seen from each day of the timeline (C1); `null` when
   /// none of them has one.
@@ -175,6 +198,11 @@ class _Builder {
       ),
       nextOff: _nextOffs(today, days),
       notes: notes.isEmpty ? null : notes,
+      dayExtras: _extras,
+      stripTotals: {
+        for (var i = 0; i < days; i++)
+          today.addDays(i).toIso(): _stripTotal(today.addDays(i)),
+      },
     );
   }
 
@@ -227,6 +255,18 @@ class _Builder {
           tomorrow,
         ],
       ),
+    );
+  }
+
+  WidgetStripTotal _stripTotal(CivilDate first) {
+    final minutes = summarizeRange(
+      schedule,
+      first,
+      first.addDays(kWidgetStripDays - 1),
+    ).goalCountedMinutes;
+    return WidgetStripTotal(
+      minutes: minutes,
+      label: strings.sevenDayHours(minutes),
     );
   }
 

@@ -277,8 +277,19 @@ Rehacer sigue en Pintar. Debajo, por capas:
 1. **Turnos**: una fila por turno (distintivo de 44 px con `disc` + `ink`, nombre `bodyStrong`, hora y horas que
    cuentan en `body` `textSecondary`, «22:00–06:00 · 8 h») con su **menú** (`…`, 48 dp, «Opciones de Noche»):
    Cambiar, Subir, Bajar y Quitar (subir y bajar solo con dos turnos o más; la primera no sube y la última no baja, con
-   el icono en `disabledContent`). Después, de dónde sale el día en `meta` («Según tu patrón» / «Cambiado a mano») y,
-   si está cambiado a mano, «Volver al patrón» (botón con borde) con lo que da la rotación en `meta`.
+   el icono en `disabledContent`). Después, de dónde sale el día en `meta` («De tu rotación «Correturnos»» /
+   «Cambiado a mano»; en un día sin rotación después de que una terminara, «Tu rotación «Correturnos» terminó el
+   viernes 23 de octubre») y, al final de esa línea (o debajo si no cabe), el menú **«Rotación»** (`day-rotation-menu`:
+   icono de rotaciones, etiqueta en `meta` negrita `accentText` y flecha, 48 dp de alto) con las acciones que tienen
+   sentido ese día (`day_rotation_section.dart`): «Empezar la rotación aquí» (no sale si el día ya es el primero del
+   ciclo), «Último día de esta rotación» (no sale si ya termina ese día) y, en el día sin rotación, «Empezar tu
+   rotación aquí». Cada una pregunta antes con un diálogo que dice qué cambia, con las fechas («El miércoles 21
+   de octubre no tendrá ninguna rotación asignada. Las demás rotaciones mantienen sus fechas.»; si debajo seguía
+   otra rotación, «El miércoles 21 de octubre se aplicará tu rotación «6x4»»). El reinicio con fin aclara la prioridad
+   hasta esa fecha y que las demás siguen fuera del intervalo; la de retomar lleva dentro la pregunta del asistente «¿Qué turno
+   te toca ese día?» (`CycleStartPicker`) cuando el ciclo tiene más de un día. Al confirmar se cierra el detalle y sale
+   un aviso registrado con `showTrackedSnackBar` y «Deshacer» del paso concreto. Si está cambiado a mano, además,
+   «Volver a la rotación» (botón con borde) con «Según tu rotación: …» en `meta`.
 2. **Añadir turno** (botón con borde a todo el ancho) abre la **paleta en la misma hoja**: tarjeta `surfaceRaised`
    radio 16 con borde, título en `bodyStrong` («Añadir turno» en un día vacío, «Doblar con otro turno» si ya tiene uno,
    «Cambiar Noche por…» desde el menú de una fila), botón de cerrar y las fichas cuadradas de 44 px de pintar (con salto
@@ -454,6 +465,36 @@ Textos propuestos en los cinco ARB: Cuadrícula/Quadrícula/Cuadrícula/Sareta/G
 Lista/Llista/Lista/Zerrenda/List; Seleccionar días/Selecciona dies/Seleccionar días/Hautatu egunak/Select days.
 Los avisos y anuncios también están localizados; no se añaden sufijos a variables en euskera.
 
+### Tira del mes (12-nov-2026)
+
+Debajo de los días, en Cuadrícula y al final de la Lista, una tarjeta compacta (`AppCard`, radio 16, `surface` con
+borde, margen `Sp.l` como la tarjeta de hoy, 8 dp por encima) con tres datos del mes en pantalla en `meta` seminegrita
+`textSecondary`, el icono de Resumen delante y una flecha detrás (`month_summary_strip.dart`, `month-strip`):
+
+- **turnos** trabajados («18 turnos»);
+- **horas**: «128 h» o, con objetivo de horas, «128 / 160 h» y lo que falta o sobra («Por completar: 32 h», «8 h de más»),
+  con los mismos números que el Resumen (`period_hours.dart`, `hours_goal.dart`; con día de cierre, el mes de nómina);
+- **próximo libre**: en el mes actual, «Próximo libre: sáb 14, en 2 días» («Hoy libras», «Mañana libras»); en un mes
+  que aún no ha llegado, «Primer libre: sáb 3»; en uno pasado, nada (`off_outlook.dart`).
+
+Tocarla abre el Resumen de ese mes; para el lector es un botón «Resumen del mes: …» con los tres datos enteros.
+**Nunca ocupa más de dos líneas**: los datos van seguidos con « · » y solo se parte entre datos (o entre palabras si
+un dato es más ancho que la tira). Si no caben en dos líneas quita lo que falta del objetivo, o el próximo libre (ya lo
+dice la tarjeta de hoy), o los dos, y al final los turnos.
+
+**No empuja el calendario** (decisión 28: manda la cuadrícula). La tira solo usa la altura que les sobra a las seis
+filas con su mínimo, así que un mes que cabe nunca pasa a desplazarse por ella ni se le encogen las filas. Con lo que
+sobra elige la forma más alta que cabe (`MonthSummaryStrip.layoutFor`): la tarjeta con dos líneas, la tarjeta con una
+(los datos que caben en una), o **una línea sola**, sin tarjeta (4 dp por encima, el mismo texto con su icono y su
+flecha, toda la línea es el botón). Todas las variantes reservan al menos `Sp.touch` (48 dp) de alto para interacción
+y semántica, además del margen superior. Si no sobra ni eso (por ejemplo con la tarjeta de hoy abierta y la pantalla justa),
+la tira no sale: plegar la tarjeta le hace sitio. Donde el mes ya se desplaza (texto grande, pantalla corta) va detrás
+de los días, como tarjeta. No sale al pintar ni al seleccionar días, ni en un mes sin nada que contar.
+
+El objetivo de horas y el día de cierre los lee de `monthStripGoalProvider` y `monthStripClosingDayProvider`
+(`summary_providers.dart`), que viven mientras el mes está en pantalla; los de Resumen siguen leyéndose cada vez que se
+abre. Los refrescan los cambios hechos en Resumen o Ajustes y una restauración.
+
 ## Barra de destinos (B1, opción 1A, 31-oct-2026)
 
 **Mes · Rotación · Agenda · Resumen**, siempre con nombre, en una barra inferior (`NavigationBar` del tema: fondo
@@ -577,6 +618,10 @@ fundido desde el 30 % y un desplazamiento del 6 % de su ancho desde el lado del 
 posterior), en 200 ms; la cabecera y la fila del mes no se mueven. Con «reducir movimiento» el cambio es inmediato.
 
 ## Asistente de patrón y vista anual
+- Bajo la fecha de inicio, en el primer uso y en el asistente, una línea `meta` confirma en vivo «Tu rotación empieza
+  el jueves 12 de noviembre y se repite desde ese día», con `AppDateFormat` y el idioma de la app. En 2 y 2 y 3 y 1,
+  antes del día del ciclo, se elige el turno de trabajo en una `ChoiceGrid` con código, color y horas; cambiarlo
+  actualiza el ciclo y la vista previa.
 - **Asistente de patrón** (`/patron`, tres pasos con una barra de tres segmentos y «Paso 1 de 3»): tarjetas `surface`
   de radio `Rad.row` con el nombre, el ciclo («28 días») y la secuencia como **fichas pequeñas** (`Disc.s`, `disc` +
   `ink` del turno, el código siempre visible). La elegida lleva el borde `todayRing` y un check, no solo color.

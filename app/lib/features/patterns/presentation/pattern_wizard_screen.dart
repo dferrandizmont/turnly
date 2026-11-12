@@ -19,6 +19,7 @@ import '../../schedule/domain/schedule_domain.dart';
 import '../application/pattern_wizard.dart';
 import '../domain/pattern_catalog.dart';
 import 'cycle_start_picker.dart';
+import 'rotation_start_details.dart';
 import 'pattern_builder.dart';
 import 'step_chips.dart';
 import '../../../core/widgets/app_snack_bar.dart';
@@ -254,7 +255,7 @@ class _ChooseStep extends ConsumerWidget {
     final typicalIds = {for (final p in typical) p.id};
     final saved = [
       for (final p in schedule.patterns)
-        if (!presetPatternIds.contains(p.id)) p,
+        if (!isCatalogPatternId(p.id)) p,
     ];
     final byStart = startsWith.isNotEmpty || includes.isEmpty;
     final typicalSaved = [
@@ -542,6 +543,11 @@ class _StartStep extends ConsumerWidget {
     final preset = wizard.presetId == null
         ? null
         : patternPresetById(wizard.presetId!);
+    final paletteIds = ref.watch(
+      scheduleControllerProvider.select(
+        (s) => {for (final t in s.palette) t.id},
+      ),
+    );
 
     final suggested = preset?.suggestedStart;
     final weekdays = {
@@ -566,6 +572,7 @@ class _StartStep extends ConsumerWidget {
             if (picked != null) controller.setStart(picked);
           },
         ),
+        RotationStartConfirmation(start: wizard.start),
         if (suggested != null && wizard.start.weekday != suggested)
           Padding(
             padding: const EdgeInsets.only(top: Sp.s),
@@ -575,6 +582,20 @@ class _StartStep extends ConsumerWidget {
             ),
           ),
         const SizedBox(height: Sp.section),
+        if (preset?.chooseWorkShift ?? false)
+          RotationWorkShiftPicker(
+            shifts: [
+              for (final shift in schedule.shiftTypes)
+                if (shift.category == ShiftCategory.work &&
+                    (paletteIds.contains(shift.id) ||
+                        shift.id == wizard.workShiftId))
+                  shift,
+              if (schedule.shiftTypeById(wizard.workShiftId) == null)
+                shiftTypeForDisplay(schedule, wizard.workShiftId)!,
+            ],
+            selectedId: wizard.workShiftId,
+            onChanged: controller.setWorkShift,
+          ),
         // Same "which day of the cycle" picker as the first-use flow. The
         // preview is left to the last step, which shows it once with the same
         // plan: showing it here too would paint the same two months twice.

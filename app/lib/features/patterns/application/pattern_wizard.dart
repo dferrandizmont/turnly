@@ -23,6 +23,7 @@ class PatternWizardState {
     required this.start,
     this.step = WizardStep.choose,
     this.presetId,
+    this.workShiftId = 'morning',
     this.customId,
     this.building = false,
     this.draft = const [],
@@ -39,6 +40,7 @@ class PatternWizardState {
 
   /// Catalogue preset chosen.
   final String? presetId;
+  final String workShiftId;
 
   /// Pattern saved earlier chosen.
   final String? customId;
@@ -70,6 +72,7 @@ class PatternWizardState {
     WizardStep? step,
     CivilDate? start,
     String? presetId,
+    String? workShiftId,
     String? customId,
     bool clearChoice = false,
     bool? building,
@@ -86,6 +89,7 @@ class PatternWizardState {
     start: start ?? this.start,
     // With [clearChoice] the given ids replace the choice (null = none).
     presetId: clearChoice ? presetId : presetId ?? this.presetId,
+    workShiftId: workShiftId ?? this.workShiftId,
     customId: clearChoice ? customId : customId ?? this.customId,
     building: building ?? this.building,
     draft: draft ?? this.draft,
@@ -109,7 +113,18 @@ class PatternWizardController extends Notifier<PatternWizardState> {
   @override
   PatternWizardState build() {
     final today = CivilDate.fromDateTime(ref.read(clockProvider)());
-    return PatternWizardState(start: args.start ?? today);
+    final shift = args.shiftId == null
+        ? null
+        : ref
+              .read(scheduleControllerProvider)
+              .schedule
+              .shiftTypeById(args.shiftId!);
+    return PatternWizardState(
+      start: args.start ?? today,
+      workShiftId: shift != null && shift.category == ShiftCategory.work
+          ? shift.id
+          : 'morning',
+    );
   }
 
   // ---- step 1: the pattern ------------------------------------------------
@@ -174,6 +189,8 @@ class PatternWizardController extends Notifier<PatternWizardState> {
 
   void setStepOffset(int index) => state = state.copyWith(stepOffset: index);
 
+  void setWorkShift(String id) => state = state.copyWith(workShiftId: id);
+
   // ---- step 3: the end ----------------------------------------------------
 
   void setEndless() => state = state.copyWith(clearUntil: true);
@@ -216,7 +233,11 @@ class PatternWizardController extends Notifier<PatternWizardState> {
       );
     }
     if (s.presetId != null) {
-      return presetPattern(schedule, patternPresetById(s.presetId!));
+      return presetPattern(
+        schedule,
+        patternPresetById(s.presetId!),
+        workShiftId: s.workShiftId,
+      );
     }
     if (s.customId != null) return schedule.patternById(s.customId!);
     return null;

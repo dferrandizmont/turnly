@@ -56,6 +56,49 @@ void main() {
     expect(await loadRoboto(), isTrue, reason: 'Roboto from the Flutter SDK');
   });
 
+  for (final width in [360.0, 412.0]) {
+    for (final scale in _scales) {
+      for (final brightness in Brightness.values) {
+        testWidgets(
+          'Basque planned end date at $width, x$scale, ${brightness.name}',
+          (tester) async {
+            await pumpCalendar(
+              tester,
+              size: _phone(width),
+              textScale: scale,
+              brightness: brightness,
+              clock: () => DateTime(2026, 11, 12),
+              overrides: [
+                initialPreferencesProvider.overrideWithValue(
+                  const Preferences(language: AppLanguage.eu),
+                ),
+              ],
+            );
+            await _go(tester, '/resumen?mes=2026-11');
+            final rest = _key('summary-planned-rest');
+            await tester.ensureVisible(rest);
+            await tester.pumpAndSettle();
+            expect(
+              tester.widget<Text>(rest).data,
+              endsWith('azaroaren 30era arte'),
+            );
+            // Check the changed sentence. Other Basque copy contains
+            // hyphenated compounds that may wrap at their hyphens.
+            final paragraph = tester.renderObject<RenderParagraph>(
+              find.descendant(of: rest, matching: find.byType(RichText)),
+            );
+            expect(
+              wrapsOnlyBetweenWords(paragraph),
+              isTrue,
+              reason: paragraphLines(paragraph).join(' | '),
+            );
+            expect(tester.takeException(), isNull);
+          },
+        );
+      }
+    }
+  }
+
   for (final (language, label, count) in [
     (AppLanguage.es, 'Pluses', '5 turnos'),
     (AppLanguage.ca, 'Plusos', '5 torns'),
@@ -105,6 +148,53 @@ void main() {
       expect(
         tester.widget<Text>(_key('summary-earnings')).data,
         formatMoneyCents(context, 139800),
+      );
+      final rect = tester.getRect(row);
+      for (final element
+          in find
+              .descendant(of: row, matching: find.byType(RichText))
+              .evaluate()) {
+        final paragraph = element.renderObject! as RenderParagraph;
+        expect(paragraph.didExceedMaxLines, isFalse);
+        expect(wrapsOnlyBetweenWords(paragraph), isTrue);
+        final textRect = tester.getRect(find.byWidget(element.widget));
+        expect(textRect.left, greaterThanOrEqualTo(rect.left - 0.5));
+        expect(textRect.right, lessThanOrEqualTo(rect.right + 0.5));
+      }
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  for (final brightness in Brightness.values) {
+    testWidgets('longest streak at 360 dp, text 2.0, $brightness', (
+      tester,
+    ) async {
+      await pumpCalendar(
+        tester,
+        size: _phone(360),
+        textScale: 2.0,
+        brightness: brightness,
+      );
+      final controller = containerOf(tester)
+          .read(scheduleControllerProvider.notifier);
+      for (var day = 1; day <= 31; day++) {
+        controller.setDayShifts(
+          CivilDate(2026, 10, day),
+          day >= 3 && day <= 8 ? ['morning'] : [],
+        );
+      }
+      await tester.pumpAndSettle();
+      await _go(tester, '/resumen?mes=2026-10');
+      final row = _key('summary-streak');
+      await tester.scrollUntilVisible(
+        row,
+        180,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.text('Racha más larga'), findsOneWidget);
+      expect(
+        tester.widget<Text>(_key('summary-streak-value')).data,
+        '6 días seguidos',
       );
       final rect = tester.getRect(row);
       for (final element

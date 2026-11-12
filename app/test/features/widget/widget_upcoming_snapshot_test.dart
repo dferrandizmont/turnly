@@ -73,7 +73,7 @@ Future<void> main() async {
     // Sunday, DST fall-back; even when the month grid starts on Sunday.
     const today = CivilDate(2026, 10, 25);
     final snapshot = _build(today, schedule: Schedule());
-    expect(snapshot.version, 2);
+    expect(snapshot.version, 3);
     expect(snapshot.days, hasLength(60));
     expect(snapshot.firstDate, today.toIso());
     expect(snapshot.displayDays.first.date, '2026-10-19');
@@ -189,7 +189,7 @@ Future<void> main() async {
     },
   );
 
-  test('v2 round trip includes auxiliary content in the hash', () {
+  test('current round trip includes auxiliary content in the hash', () {
     const today = CivilDate(2026, 10, 25);
     final base = _build(today, schedule: Schedule());
     final tail = today.addDays(86);

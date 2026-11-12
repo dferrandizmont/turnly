@@ -12,6 +12,7 @@ import '../../holidays/domain/holiday.dart';
 import '../../holidays/presentation/holiday_names.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import 'holiday_label.dart';
+import 'overtime_format.dart';
 import 'shift_format.dart';
 import 'shift_icon_glyph.dart';
 
@@ -396,6 +397,7 @@ class _DayCellState extends State<DayCell> {
               child: _DayMarks(
                 date: day.date,
                 extras: day.hasExtras,
+                overtimeMinutes: day.overtimeMinutes,
                 note: hasNote,
                 holiday: holiday != null,
                 deviceEvents: deviceEventCount > 0,
@@ -559,6 +561,7 @@ class _DayMarks extends StatelessWidget {
   const _DayMarks({
     required this.date,
     required this.extras,
+    this.overtimeMinutes = 0,
     required this.note,
     required this.holiday,
     required this.deviceEvents,
@@ -571,6 +574,7 @@ class _DayMarks extends StatelessWidget {
 
   final CivilDate date;
   final bool extras;
+  final int overtimeMinutes;
   final bool note;
   final bool holiday;
 
@@ -602,6 +606,48 @@ class _DayMarks extends StatelessWidget {
     final numberWidth = painter.width;
     painter.dispose();
 
+    // The extras mark (A6): «+2 h» with the sum of the day's extra hours
+    // (schema v7), drawn at the height of the row of marks; only an early
+    // leave keeps the small «+».
+    final extraText = overtimeMinutes > 0
+        ? context.l10n.dayCellOvertime(
+            overtimeCellHours(context, overtimeMinutes),
+          )
+        : null;
+    final extraStyle = context.type.cellTime.copyWith(
+      color: color,
+      fontWeight: FontWeight.w700,
+    );
+    var extraWidth = DayCell._extrasIconSize;
+    if (extraText != null) {
+      final measure = TextPainter(
+        text: TextSpan(text: extraText, style: extraStyle),
+        textDirection: TextDirection.ltr,
+        maxLines: 1,
+      )..layout();
+      extraWidth = measure.width * DayCell._extrasIconSize / measure.height;
+      measure.dispose();
+    }
+    Widget extraMark() => extraText == null
+        ? Icon(
+            AppIcons.extras,
+            key: ValueKey('extras-mark-${date.toIso()}'),
+            size: DayCell._extrasIconSize,
+            color: color,
+          )
+        : SizedBox(
+            width: extraWidth,
+            height: DayCell._extrasIconSize,
+            child: FittedBox(
+              child: Text(
+                extraText,
+                key: ValueKey('extras-mark-${date.toIso()}'),
+                maxLines: 1,
+                softWrap: false,
+                style: extraStyle,
+              ),
+            ),
+          );
     final inset = holiday ? Sp.s : Sp.xs;
 
     return LayoutBuilder(
@@ -615,7 +661,7 @@ class _DayMarks extends StatelessWidget {
         final text = noteText;
         if (text != null) {
           final others = [
-            if (extras) DayCell._extrasIconSize,
+            if (extras) extraWidth,
             if (deviceEvents) DayCell._dotSize,
             if (holiday) DayCell._dotSize,
           ];
@@ -632,12 +678,7 @@ class _DayMarks extends StatelessWidget {
                   child: Row(
                     children: [
                       if (extras) ...[
-                        Icon(
-                          AppIcons.extras,
-                          key: ValueKey('extras-mark-${date.toIso()}'),
-                          size: DayCell._extrasIconSize,
-                          color: color,
-                        ),
+                        extraMark(),
                         const SizedBox(width: Sp.xs),
                       ],
                       Flexible(
@@ -686,7 +727,7 @@ class _DayMarks extends StatelessWidget {
         }
 
         final widths = [
-          if (extras) DayCell._extrasIconSize,
+          if (extras) extraWidth,
           if (note) DayCell._noteIconSize,
           if (deviceEvents) DayCell._dotSize,
           if (holiday) DayCell._dotSize,
@@ -712,13 +753,7 @@ class _DayMarks extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (extras)
-                        Icon(
-                          AppIcons.extras,
-                          key: ValueKey('extras-mark-${date.toIso()}'),
-                          size: DayCell._extrasIconSize,
-                          color: color,
-                        ),
+                      if (extras) extraMark(),
                       if (extras && (note || holiday || deviceEvents))
                         const SizedBox(width: Sp.xs),
                       if (note)

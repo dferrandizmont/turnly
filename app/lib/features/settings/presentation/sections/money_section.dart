@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/format/money.dart';
 import '../../../../core/l10n/l10n.dart';
 import '../../../absences/presentation/absence_icons.dart';
+import '../../../calendar/application/schedule_controller.dart';
+import '../../../calendar/presentation/overtime_types_sheet.dart';
 import '../../../summary/application/summary_providers.dart';
 import '../../../summary/domain/overtime_cap.dart';
 import '../../../summary/presentation/pay_icons.dart';
@@ -14,8 +17,9 @@ import '../withholding_sheet.dart';
 
 /// «Horas y dinero» (P9): what the summary needs to turn the hours into an
 /// estimate of the pay. The withholding for the net estimate, the closing day
-/// of the payroll month, the cap of the overtime and the templates of pluses
-/// by sector (propuestas 2 y 8); the rate and the pluses of each shift are in
+/// of the payroll month, the cap of the overtime, the overtime types and the
+/// base hourly rate (schema v7) and the templates of pluses by sector
+/// (propuestas 2 y 8); the rate and the pluses of each shift are in
 /// «Mis turnos», the currency in «Apariencia».
 class MoneySection extends ConsumerWidget {
   const MoneySection({super.key});
@@ -29,6 +33,12 @@ class MoneySection extends ConsumerWidget {
     final rules = ref.watch(payRulesProvider).value;
     final closingDay = rules?.closingDay;
     final cap = rules?.overtimeCap;
+    final baseRate = ref.watch(
+      scheduleControllerProvider.select((s) => s.schedule.baseHourlyRateCents),
+    );
+    final overtimeTypes = ref.watch(
+      scheduleControllerProvider.select((s) => s.schedule.overtimeTypes),
+    );
     return SettingsSection(
       title: l10n.moneySectionTitle,
       children: [
@@ -63,6 +73,27 @@ class MoneySection extends ConsumerWidget {
               ? l10n.overtimeCapValueYear(cap.hours)
               : l10n.overtimeCapValueMonth(cap.hours),
           onTap: () => editOvertimeCap(context, ref),
+        ),
+        // The extra hours (schema v7): their types and the base rate the
+        // types «as the shift» use on a day without a priced shift.
+        SettingsRow(
+          key: const ValueKey('settings-overtime-types'),
+          icon: PayIcons.overtimeCap,
+          title: l10n.overtimeTypesTitle,
+          value: l10n.overtimeTypesCount(
+            overtimeTypes.where((t) => !t.archived).length,
+          ),
+          onTap: () => showOvertimeTypes(context),
+        ),
+        SettingsRow(
+          key: const ValueKey('settings-overtime-base-rate'),
+          icon: AbsenceIcons.money,
+          title: l10n.overtimeBaseRateTitle,
+          subtitle: l10n.overtimeBaseRateHelp,
+          value: baseRate == null
+              ? l10n.overtimeBaseRateNone
+              : formatMoneyCents(context, baseRate),
+          onTap: () => editOvertimeBaseRate(context),
         ),
         SettingsRow(
           key: const ValueKey('settings-pay-template'),

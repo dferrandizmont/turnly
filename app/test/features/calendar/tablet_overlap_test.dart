@@ -113,7 +113,7 @@ void main() {
   });
 
   for (final size in [_tablet, _landscape, _phone]) {
-    for (final scale in [1.0, 2.0]) {
+    for (final scale in [1.0, 1.3, 2.0]) {
       final label = '${size.width}x${size.height}, text $scale';
 
       testWidgets('H-T24-3: keyboard hides Pintar, $label', (tester) async {
@@ -152,53 +152,64 @@ void main() {
       });
 
       if (Adaptive.useSplit(size)) {
-        testWidgets('H-T24-4: all day controls clear Pintar, $label', (
-          tester,
-        ) async {
-          await pumpCalendar(
-            tester,
-            size: size,
-            textScale: scale,
-            prepare: (repository) => repository.saveShiftType(_night12),
-          );
-          await _openDay(tester);
-          await revealDayControl(tester, 'day-add-night12');
-          await openDayMore(tester);
-          final viewport = _key('day-pane-scroll');
-          final fab = tester.getRect(_fab);
-          expect(tester.getRect(viewport).bottom, lessThanOrEqualTo(fab.top));
-          for (final id in [
-            'day-overtime-more',
-            'day-early-more',
-            'day-add-night12',
-          ]) {
-            final control = _key(id);
-            await _atBottom(tester, control);
-            final rect = tester.getRect(control);
-            expect(rect.overlaps(fab), isFalse, reason: '$id: $rect / $fab');
-            expect(rect.bottom, lessThanOrEqualTo(fab.top + 1));
-            expect(control.hitTestable(), findsOneWidget);
-          }
+        for (final brightness in Brightness.values) {
+          testWidgets(
+            'H-T24-4: all day controls clear Pintar, $label, ${brightness.name}',
+            (tester) async {
+              await pumpCalendar(
+                tester,
+                size: size,
+                textScale: scale,
+                brightness: brightness,
+                prepare: (repository) => repository.saveShiftType(_night12),
+              );
+              await _openDay(tester);
+              await revealDayControl(tester, 'day-add-night12');
+              await openDayMore(tester);
+              final viewport = _key('day-pane-scroll');
+              final fab = tester.getRect(_fab);
+              expect(
+                tester.getRect(viewport).bottom,
+                lessThanOrEqualTo(fab.top),
+              );
+              for (final id in [
+                'day-add-overtime',
+                'day-early-more',
+                'day-add-night12',
+              ]) {
+                final control = _key(id);
+                await _atBottom(tester, control);
+                final rect = tester.getRect(control);
+                expect(
+                  rect.overlaps(fab),
+                  isFalse,
+                  reason: '$id: $rect / $fab',
+                );
+                expect(rect.bottom, lessThanOrEqualTo(fab.top + 1));
+                expect(control.hitTestable(), findsOneWidget);
+              }
 
-          // The tip belongs to the other scrolling view of the same pane.
-          containerOf(tester).read(openDayProvider.notifier).close();
-          containerOf(tester).read(onboardingTipProvider.notifier).show();
-          await tester.pumpAndSettle();
-          final understood = _key('onboarding-tip-dismiss');
-          for (var i = 0; i < 20 && understood.evaluate().isEmpty; i++) {
-            await tester.drag(_key('pane-today'), const Offset(0, -150));
-            await tester.pumpAndSettle();
-          }
-          await _atBottom(tester, understood);
-          final rect = tester.getRect(understood);
-          expect(rect.overlaps(fab), isFalse);
-          expect(rect.bottom, lessThanOrEqualTo(fab.top + 1));
-          expect(understood.hitTestable(), findsOneWidget);
-          await tester.tap(understood);
-          await tester.pumpAndSettle();
-          expect(_key('onboarding-tip'), findsNothing);
-          expect(tester.takeException(), isNull);
-        });
+              // The tip belongs to the other scrolling view of the same pane.
+              containerOf(tester).read(openDayProvider.notifier).close();
+              containerOf(tester).read(onboardingTipProvider.notifier).show();
+              await tester.pumpAndSettle();
+              final understood = _key('onboarding-tip-dismiss');
+              for (var i = 0; i < 20 && understood.evaluate().isEmpty; i++) {
+                await tester.drag(_key('pane-today'), const Offset(0, -150));
+                await tester.pumpAndSettle();
+              }
+              await _atBottom(tester, understood);
+              final rect = tester.getRect(understood);
+              expect(rect.overlaps(fab), isFalse);
+              expect(rect.bottom, lessThanOrEqualTo(fab.top + 1));
+              expect(understood.hitTestable(), findsOneWidget);
+              await tester.tap(understood);
+              await tester.pumpAndSettle();
+              expect(_key('onboarding-tip'), findsNothing);
+              expect(tester.takeException(), isNull);
+            },
+          );
+        }
       } else {
         testWidgets('H-T24-4: portrait phone keeps its FAB placement, $label', (
           tester,

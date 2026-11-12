@@ -382,7 +382,16 @@
   "@upcomingTitle": {
     "description": "Título de la lista de los siguientes 7 días bajo la tarjeta de hoy, en el panel derecho de las pantallas anchas."
   },
-  "dayDetailSourcePattern": "Según tu patrón",
+  "dayDetailSourcePattern": "De tu rotación «{name}»",
+  "@dayDetailSourcePattern": {
+    "description": "Detalle del día, bajo los turnos: el día sale de la rotación (con su nombre) y nadie lo ha cambiado a mano.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Correturnos"
+      }
+    }
+  },
   "dayDetailSourceOverride": "Cambiado a mano",
   "dayDetailAdd": "Añadir turno",
   "@dayDetailAdd": {
@@ -392,13 +401,179 @@
   "@dayDetailDouble": {
     "description": "Título de la paleta del detalle del día para añadir un segundo turno a un día que ya tiene uno."
   },
-  "dayDetailReset": "Volver al patrón",
-  "dayDetailPatternGives": "El patrón da: {shifts}",
+  "dayDetailReset": "Volver a la rotación",
+  "dayDetailPatternGives": "Según tu rotación: {shifts}",
   "@dayDetailPatternGives": {
-    "description": "Lo que daría la rotación ese día, bajo «Volver al patrón», p. ej. «El patrón da: Noche 22:00–06:00».",
+    "description": "Lo que daría la rotación ese día, bajo «Volver a la rotación», p. ej. «Según tu rotación: Noche 22:00–06:00».",
     "placeholders": {
       "shifts": {
         "type": "String"
+      }
+    }
+  },
+  "dayRotationEnded": "Tu rotación «{name}» terminó el {date}",
+  "@dayRotationEnded": {
+    "description": "Detalle de un día sin rotación, cuando una rotación terminó antes: de dónde viene el hueco.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Correturnos"
+      },
+      "date": {
+        "type": "String",
+        "example": "jueves 26 de noviembre"
+      }
+    }
+  },
+  "dayRotationMenu": "Rotación",
+  "@dayRotationMenu": {
+    "description": "Botón del detalle del día que abre el menú con las acciones de la rotación."
+  },
+  "dayRotationRestart": "Empezar la rotación aquí",
+  "@dayRotationRestart": {
+    "description": "Menú «Rotación» del detalle del día: la rotación de ese día vuelve a empezar ese día por el primer día del ciclo."
+  },
+  "dayRotationEndHere": "Último día de esta rotación",
+  "@dayRotationEndHere": {
+    "description": "Menú «Rotación» del detalle del día: la rotación termina ese día."
+  },
+  "dayRotationResume": "Empezar tu rotación aquí",
+  "@dayRotationResume": {
+    "description": "Menú «Rotación» del detalle de un día sin rotación: la última rotación que terminó vuelve a aplicarse desde ese día."
+  },
+  "dayRotationRestartTitle": "¿Empezar la rotación aquí?",
+  "@dayRotationRestartTitle": {
+    "description": "Título del diálogo que confirma «Empezar la rotación aquí»."
+  },
+  "dayRotationRestartBody": "Tu rotación «{name}» volverá a empezar el {date}: ese día será el primero del ciclo ({shifts}).",
+  "@dayRotationRestartBody": {
+    "description": "Diálogo de «Empezar la rotación aquí»: qué cambia. {shifts} es lo que da el primer día del ciclo.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Correturnos"
+      },
+      "date": {
+        "type": "String",
+        "example": "viernes 27 de noviembre"
+      },
+      "shifts": {
+        "type": "String",
+        "example": "Mañana 06:00–14:00"
+      }
+    }
+  },
+  "dayRotationEndKeepsOthers": "Las demás rotaciones mantienen sus fechas.",
+  "@dayRotationEndKeepsOthers": {
+    "description": "Terminar una rotación no cambia las fechas de las demás."
+  },
+  "dayRotationRestartOthersUntil": "Esta rotación tendrá prioridad hasta el {date}. Las demás seguirán aplicándose en las fechas que queden fuera de ese intervalo.",
+  "@dayRotationRestartOthersUntil": {
+    "description": "Reinicio con fin: prioridad temporal, sin cambiar las fechas fuera del intervalo.",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "viernes 27 de noviembre"
+      }
+    }
+  },
+  "dayRotationRestartOthers": "Las rotaciones que habías puesto para después de ese día se quitarán.",
+  "@dayRotationRestartOthers": {
+    "description": "Diálogo de «Empezar la rotación aquí», solo si había otras rotaciones puestas para después de ese día."
+  },
+  "dayRotationKeeps": "Los días anteriores y tus cambios a mano no se tocan.",
+  "@dayRotationKeeps": {
+    "description": "Última frase de los diálogos de las acciones de rotación del detalle del día."
+  },
+  "dayRotationStartConfirm": "Empezar aquí",
+  "@dayRotationStartConfirm": {
+    "description": "Botón que confirma «Empezar la rotación aquí» y «Empezar tu rotación aquí»."
+  },
+  "dayRotationStartDone": "La rotación empieza el {date}",
+  "@dayRotationStartDone": {
+    "description": "Aviso, con «Deshacer», tras empezar la rotación en un día desde su detalle.",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "viernes 27 de noviembre"
+      }
+    }
+  },
+  "dayRotationEndTitle": "¿Terminar la rotación este día?",
+  "@dayRotationEndTitle": {
+    "description": "Título del diálogo que confirma «Último día de esta rotación»."
+  },
+  "dayRotationEndBody": "Tu rotación «{name}» terminará el {date}.",
+  "@dayRotationEndBody": {
+    "description": "Diálogo de «Último día de esta rotación»: primera frase.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Correturnos"
+      },
+      "date": {
+        "type": "String",
+        "example": "jueves 26 de noviembre"
+      }
+    }
+  },
+  "dayRotationEndThenNone": "El {date} no tendrá ninguna rotación asignada.",
+  "@dayRotationEndThenNone": {
+    "description": "Diálogo de «Último día de esta rotación»: qué pasa solo el día siguiente cuando no hay otra rotación debajo.",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "viernes 27 de noviembre"
+      }
+    }
+  },
+  "dayRotationEndThenOther": "El {date} se aplicará tu rotación «{name}».",
+  "@dayRotationEndThenOther": {
+    "description": "Diálogo de «Último día de esta rotación»: qué otra rotación se aplica solo el día siguiente (una anterior que seguía debajo).",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "viernes 27 de noviembre"
+      },
+      "name": {
+        "type": "String",
+        "example": "6x4"
+      }
+    }
+  },
+  "dayRotationResumeTitle": "¿Empezar tu rotación aquí?",
+  "@dayRotationResumeTitle": {
+    "description": "Título del diálogo que confirma «Empezar tu rotación aquí»."
+  },
+  "dayRotationResumeBody": "Tu rotación «{name}» se aplicará otra vez desde el {date}, sin fecha de fin.",
+  "@dayRotationResumeBody": {
+    "description": "Diálogo de «Empezar tu rotación aquí» cuando no hay otra rotación después.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Correturnos"
+      },
+      "date": {
+        "type": "String",
+        "example": "lunes 7 de diciembre"
+      }
+    }
+  },
+  "dayRotationResumeBodyUntil": "Tu rotación «{name}» se aplicará otra vez desde el {date} hasta el {until}, el día antes de que empiece la siguiente rotación.",
+  "@dayRotationResumeBodyUntil": {
+    "description": "Diálogo de «Empezar tu rotación aquí» cuando otra rotación empieza más adelante: dura hasta el día anterior.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Correturnos"
+      },
+      "date": {
+        "type": "String",
+        "example": "lunes 7 de diciembre"
+      },
+      "until": {
+        "type": "String",
+        "example": "jueves 31 de diciembre"
       }
     }
   },
@@ -567,6 +742,10 @@
       }
     }
   },
+  "discardChangesTitle": "¿Descartar los cambios?",
+  "discardChangesBody": "Los cambios sin guardar se perderán.",
+  "discardChangesConfirm": "Descartar",
+  "discardChangesKeep": "Seguir editando",
   "shiftTypesDiscardTitle": "¿Descartar los cambios?",
   "shiftTypesDiscardBody": "Lo que has cambiado en este turno no se guardará.",
   "shiftTypesDiscardKeep": "Seguir editando",
@@ -963,7 +1142,7 @@
   "selectionSetShift": "Poner turno…",
   "selectionDouble": "Doblar con…",
   "selectionClear": "Borrar",
-  "selectionReset": "Volver al patrón",
+  "selectionReset": "Volver a la rotación",
   "selectionCopy": "Copiar",
   "selectionCut": "Cortar",
   "selectionPaste": "Pegar",
@@ -3837,11 +4016,11 @@
   "catalogPattern6x4Name": "6 x 4",
   "catalogPattern6x4Description": "6 mañanas y 4 libres",
   "catalogPattern4x4Name": "4 x 4",
-  "catalogPattern4x4Description": "4 días de 12 h y 4 libres",
+  "catalogPattern4x4Description": "4 días de 12 h y 4 libres (4x4 o cuatro y cuatro)",
   "catalogPattern5x2Name": "5 x 2",
   "catalogPattern5x2Description": "5 mañanas y 2 libres (lunes a viernes)",
   "catalogPattern223Name": "2-2-3",
-  "catalogPattern223Description": "Dos días de 12 h, dos libres, tres de 12 h, dos libres, dos de 12 h y tres libres (también 2-2-3-2-2-3)",
+  "catalogPattern223Description": "Dos días de 12 h, dos libres, tres de 12 h, dos libres, dos de 12 h y tres libres (también 2-2-3-2-2-3). También se conoce como Pitman o Panamá.",
   "catalogPatternContinentalName": "Continental",
   "catalogPatternContinentalDescription": "Turno continuo de 28 días con 4 equipos: bloques de 2 y 3 mañanas, tardes y noches, y 7 libres",
   "catalogPatternDupontName": "DuPont",
@@ -3940,6 +4119,87 @@
   },
   "monthNavAgenda": "Agenda",
   "monthNavSummary": "Resumen",
+  "monthStripHoursGoal": "{worked} / {goal}",
+  "@monthStripHoursGoal": {
+    "description": "Tira bajo el mes: horas del mes frente al objetivo de horas, p. ej. «128 / 160 h».",
+    "placeholders": {
+      "worked": {
+        "type": "String",
+        "example": "128"
+      },
+      "goal": {
+        "type": "String",
+        "example": "160 h"
+      }
+    }
+  },
+  "monthStripFacts": "{first} · {second}",
+  "@monthStripFacts": {
+    "description": "Tira bajo el mes: dos datos seguidos en la misma línea.",
+    "placeholders": {
+      "first": {
+        "type": "String",
+        "example": "18 turnos"
+      },
+      "second": {
+        "type": "String",
+        "example": "128 h"
+      }
+    }
+  },
+  "monthStripShort": "Por completar: {hours}",
+  "@monthStripShort": {
+    "description": "Tira bajo el mes: horas que faltan para el objetivo del mes, tras «128 / 160 h».",
+    "placeholders": {
+      "hours": {
+        "type": "String",
+        "example": "32 h"
+      }
+    }
+  },
+  "monthStripOver": "{hours} de más",
+  "@monthStripOver": {
+    "description": "Tira bajo el mes: horas por encima del objetivo del mes, tras «168 / 160 h».",
+    "placeholders": {
+      "hours": {
+        "type": "String",
+        "example": "8 h"
+      }
+    }
+  },
+  "monthStripNextOff": "{days, plural, =1{Próximo libre: {date}, en 1 día} other{Próximo libre: {date}, en {days} días}}",
+  "@monthStripNextOff": {
+    "description": "Tira bajo el mes actual: el próximo día libre y cuántos días faltan (de 2 en adelante; hoy y mañana tienen su propio texto).",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "sáb 14"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "monthStripFirstOff": "Primer libre: {date}",
+  "@monthStripFirstOff": {
+    "description": "Tira bajo un mes que aún no ha llegado: su primer día libre.",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "sáb 3"
+      }
+    }
+  },
+  "monthStripLabel": "Resumen del mes: {facts}",
+  "@monthStripLabel": {
+    "description": "Lo que dice el lector de pantalla de la tira bajo el mes (un botón que abre el resumen de ese mes).",
+    "placeholders": {
+      "facts": {
+        "type": "String",
+        "example": "18 turnos, 128 h, Próximo libre: sáb 14, en 2 días"
+      }
+    }
+  },
   "todayCardCollapse": "Plegar la tarjeta de hoy",
   "@todayCardCollapse": {
     "description": "Botón que reduce la tarjeta de hoy a una línea; se recuerda."
@@ -4680,5 +4940,203 @@
   "resetCleanupWarning": "Algunos datos del sistema no se han podido limpiar.",
   "resetCalendarCleanupWarning": "Algunos eventos del calendario del móvil no se han podido quitar.",
   "backupUiCopyPreReset": "Antes de empezar de cero",
-  "backupUiOriginPreReset": "Copia de justo antes de empezar de cero"
+  "backupUiOriginPreReset": "Copia de justo antes de empezar de cero",
+  "overtimeSheetAdd": "Añadir horas extra",
+  "overtimeSheetEdit": "Editar horas extra",
+  "overtimeTypeLabel": "Tipo",
+  "overtimeManageTypes": "Gestionar tipos",
+  "overtimeAfterShift": "Justo después del turno",
+  "overtimeNextDay": "Acaba al día siguiente",
+  "overtimeQuickLabel": "Duración",
+  "overtimeQuickHours": "+{hours} h",
+  "@overtimeQuickHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "overtimeBreakLabel": "Descanso no pagado (opcional)",
+  "overtimeBreakUnit": "min",
+  "overtimeNoteLabel": "Nota corta (opcional)",
+  "overtimePreviewPriced": "{duration} × {rate} = {amount}",
+  "@overtimePreviewPriced": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "overtimePreviewUnpriced": "{duration}, sin precio",
+  "@overtimePreviewUnpriced": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "overtimeBreakTooLong": "El descanso tiene que ser más corto que el bloque.",
+  "overtimeDayTotal": "Total del día: {hours}",
+  "@overtimeDayTotal": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
+  "overtimeDayTotalMoney": "Total del día: {hours} · {amount}",
+  "@overtimeDayTotalMoney": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "overtimeBaseRateTitle": "Precio base por hora",
+  "overtimeBaseRateHelp": "Lo usan las horas extra «como el turno» en los días sin turno con precio.",
+  "overtimeBaseRateNone": "Sin precio base",
+  "overtimeBaseRateField": "Precio por hora",
+  "overtimeTypesTitle": "Tipos de horas extra",
+  "overtimeTypesHelp": "Cada bloque de horas extra lleva un tipo: cómo se paga y si cuenta para tu objetivo de horas.",
+  "overtimeTypesCount": "{count, plural, =1{1 tipo} other{{count} tipos}}",
+  "@overtimeTypesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "overtimeNewType": "Nuevo tipo",
+  "overtimeEditType": "Editar tipo",
+  "overtimeTypeMoveUp": "Subir {name}",
+  "@overtimeTypeMoveUp": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "overtimeTypeMoveDown": "Bajar {name}",
+  "@overtimeTypeMoveDown": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "overtimeTypeArchive": "Archivar",
+  "overtimeTypeRestore": "Recuperar",
+  "overtimeTypesArchived": "Archivados ({count})",
+  "@overtimeTypesArchived": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "overtimeTypeCounts": "Cuenta para el objetivo",
+  "overtimeTypeNotCounts": "No cuenta para el objetivo",
+  "overtimeRateLabel": "Cómo se paga",
+  "overtimeRateShift": "Como el turno",
+  "overtimeRateMultiplier": "Multiplicador",
+  "overtimeRateFixed": "Precio fijo por hora",
+  "overtimeRateNone": "Sin precio",
+  "overtimeRateMultiplierSummary": "Turno ×{factor}",
+  "@overtimeRateMultiplierSummary": {
+    "placeholders": {
+      "factor": {
+        "type": "String"
+      }
+    }
+  },
+  "overtimeRateFixedSummary": "{amount} la hora",
+  "@overtimeRateFixedSummary": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "overtimeRateShiftHelp": "El precio por hora del turno del día; sin turno con precio, el precio base.",
+  "overtimeMultiplierShortcut": "×{factor}",
+  "@overtimeMultiplierShortcut": {
+    "placeholders": {
+      "factor": {
+        "type": "String"
+      }
+    }
+  },
+  "overtimeMultiplierField": "Otro multiplicador",
+  "overtimeFixedRateField": "Precio por hora",
+  "overtimeCountsForGoal": "Cuenta para mi objetivo de horas",
+  "overtimeTypeNameLabel": "Nombre",
+  "overtimeTypeColorLabel": "Color",
+  "overtimeTypeInvalidName": "Ponle un nombre.",
+  "overtimeTypeInvalidMultiplier": "Escribe un multiplicador entre 0,01 y 100.",
+  "overtimeTypeInvalidRate": "Escribe un precio por hora.",
+  "overtimeTypeOvertime": "Horas extra",
+  "@overtimeTypeOvertime": {
+    "description": "Nombre del tipo de horas extra que viene creado (cuenta para el objetivo)."
+  },
+  "overtimeTypeOtherWork": "Otro trabajo",
+  "@overtimeTypeOtherWork": {
+    "description": "Nombre del tipo de horas extra que viene creado para otro trabajo (no cuenta)."
+  },
+  "dayCellOvertime": "+{hours} h",
+  "@dayCellOvertime": {
+    "description": "Marca de la casilla del día con la suma de las horas extra (cabe en muy poco sitio).",
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
+  "overtimeOnNextDay": "Día siguiente",
+  "overtimeTypeArchiveNamed": "Archivar {name}",
+  "@overtimeOnNextDay": {
+    "description": "Un bloque de horas extra que es la mañana después de un turno que acaba pasada la medianoche."
+  },
+  "@overtimeTypeArchiveNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "catalogPattern2x2Name": "2 y 2",
+  "catalogPattern2x2Description": "2 días de trabajo y 2 libres (2x2). Elige tu turno de trabajo.",
+  "catalogPattern3x1Name": "3 y 1",
+  "catalogPattern3x1Description": "3 días de trabajo y 1 libre (3x1). Elige tu turno de trabajo.",
+  "patternStartConfirmation": "Tu rotación empieza el {date} y se repite desde ese día.",
+  "patternWorkShiftTitle": "¿Qué turno haces los días de trabajo?",
+  "@patternStartConfirmation": {
+    "description": "Confirma el día desde el que se repite la rotación.",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "jueves 12 de noviembre"
+      }
+    }
+  },
+  "summaryLongestStreak": "Racha más larga",
+  "summaryStreakDays": "{count, plural, =1{1 día seguido} other{{count} días seguidos}}",
+  "@summaryStreakDays": {"placeholders": {"count": {"type": "int"}}},
+  "summaryStreakHelp": "La racha cuenta solo los días con algún turno de trabajo dentro del periodo. Los libres, las ausencias y los días vacíos la cortan, aunque tengan horas extra.",
+  "widgetOvertime": "+{duration} extra",
+  "@widgetOvertime": {"placeholders": {"duration": {"type": "String"}}},
+  "widgetOvertimeType": "+{duration} {type}",
+  "@widgetOvertimeType": {"placeholders": {"duration": {"type": "String"}, "type": {"type": "String"}}},
+  "widgetEarlyLeave": "Salí {duration} antes",
+  "@widgetEarlyLeave": {"placeholders": {"duration": {"type": "String"}}},
+  "widgetSevenDayHours": "7 días: {duration}",
+  "@widgetSevenDayHours": {"placeholders": {"duration": {"type": "String"}}}
 }

@@ -58,6 +58,7 @@ class OnboardingState {
     this.municipalityCode,
     this.municipalityName,
     this.presetId,
+    this.workShiftId = 'morning',
     this.byHand = false,
     this.stepOffset = 0,
     this.finishing = false,
@@ -86,6 +87,7 @@ class OnboardingState {
 
   /// Catalogue preset chosen on the rotation screen.
   final String? presetId;
+  final String workShiftId;
 
   /// "Lo pinto a mano": no rotation.
   final bool byHand;
@@ -128,6 +130,7 @@ class OnboardingState {
     bool clearPlace = false,
     bool clearMunicipality = false,
     String? presetId,
+    String? workShiftId,
     bool? byHand,
     bool clearRotation = false,
     CivilDate? start,
@@ -147,6 +150,7 @@ class OnboardingState {
         ? null
         : municipalityName ?? this.municipalityName,
     presetId: clearRotation ? null : presetId ?? this.presetId,
+    workShiftId: workShiftId ?? this.workShiftId,
     byHand: clearRotation ? byHand ?? false : byHand ?? this.byHand,
     start: start ?? this.start,
     stepOffset: stepOffset ?? this.stepOffset,
@@ -302,6 +306,8 @@ class OnboardingController extends Notifier<OnboardingState> {
 
   void setStepOffset(int index) => state = state.copyWith(stepOffset: index);
 
+  void setWorkShift(String id) => state = state.copyWith(workShiftId: id);
+
   // ---- navigation -----------------------------------------------------------
 
   /// Whether the main button of the current stage has something to do. The
@@ -411,7 +417,11 @@ class OnboardingController extends Notifier<OnboardingState> {
   PatternRequest? request(Schedule schedule) {
     final id = state.presetId;
     if (id == null || state.byHand) return null;
-    final pattern = presetPattern(schedule, patternPresetById(id));
+    final pattern = presetPattern(
+      schedule,
+      patternPresetById(id),
+      workShiftId: state.workShiftId,
+    );
     return PatternRequest(
       pattern: pattern,
       from: state.start,

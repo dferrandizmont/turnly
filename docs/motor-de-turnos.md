@@ -216,6 +216,34 @@ vive en `features/calendar/domain/range_editing.dart`.
   dejarla sin días, `deleteRun`); `deleteRun(runId)` la quita entera. Los overrides y las notas no se tocan. No crean
   rotaciones nuevas, así que no usan `nextRunSeq`; deshacer repone la run con su `seq`.
 
+### Rotación desde el día (`calendar/domain/rotation_day.dart`)
+
+Las tres acciones del menú «Rotación» del detalle del día. Funciones puras; cada una es **un paso de deshacer**
+(`ScheduleController.restartRunAt`, `endRunOn` y `resumeRunAt`), los días anteriores no cambian y **los overrides y las
+notas no se tocan** (el parche de días va vacío, salvo el saliente automático). `rotationDayOf(schedule, fecha)` dice
+qué rotación rige el día (la de mayor `seq` que lo cubre, también debajo de un cambio a mano) y qué acciones tienen
+sentido.
+
+El saliente automático de estas acciones protege los overrides originales, también `[]` y `[rest]`, y solo escribe
+dentro del intervalo anunciado (fin incluido): nunca cambia el día posterior ni el inicio de otra rotación.
+Una entrada con solo nota sí puede recibir Saliente, conservando su nota; deshacer restaura la entrada exacta.
+
+- **«Empezar la rotación aquí»** (`planRestartRun`): la rotación que rige el día vuelve a empezar ese día en el paso 0.
+  Es aplicar su mismo patrón desde esa fecha con `planPatternApplication` (el mismo camino que el asistente, con
+  «Saliente automático» y `nextRunSeq`): la rotación se corta en `fecha − 1` y nace una nueva con `seq` = máximo + 1.
+  Si la rotación tenía fin, la nueva conserva ese fin y la antigua también se corta (no se queda entera debajo). No se
+  ofrece si el día ya es el paso 0. Como al aplicar un patrón, la nueva es la más reciente: una rotación posterior que
+  empezaba después de ese día encima de esta deja de aplicarse (sin fin se borra; con fin queda tapada);
+  `restartCoversOtherRuns` lo detecta y el diálogo lo avisa.
+- **«Último día de esta rotación»** (`planEndRunOn`): `planEndRun` con el día siguiente; la rotación acaba ese día
+  (`endDate` incluida). Desde el siguiente rige lo que diga el motor: nada, o una rotación anterior que seguía debajo
+  (una aplicada con fin no corta a la anterior). El plan devuelve cuál (`next`) para que el diálogo lo diga. No se
+  ofrece si ya termina ese día.
+- **«Empezar tu rotación aquí»** (`planResumeRun`): solo en un día sin rotación con alguna terminada antes. Retoma la
+  última que terminó (la de `endDate` más tardía; a igualdad, mayor `seq`) con el paso del ciclo que elija la persona
+  (`stepOffset`, por defecto el primero). Sin fin, salvo que otra rotación empiece más adelante: entonces dura hasta el
+  día anterior (`resumeUntil`) y esa otra no se toca.
+
 ## Clasificación de días y días libres (`day_kind.dart`, `off_outlook.dart`)
 
 Una sola clasificación para todo lo que pregunte «¿libra este día?» (tarjeta de hoy, widget, comparar calendarios).
@@ -273,6 +301,8 @@ opcional como «empieza en lunes»), y `preset.materialize(Map<String clave, Str
 | 12h | 4 | D N12 S L |
 | 6x4 | 10 | M×6 L×4 |
 | 4x4 | 8 | D×4 L×4 |
+| 2x2 | 4 | M×2 L×2 (turno de trabajo elegible) |
+| 3x1 | 4 | M×3 L (turno de trabajo elegible) |
 | 5x2 | 7 | M×5 L×2 (empieza en lunes) |
 | 2-2-3 | 14 | D D L L D D D L L D D L L L |
 | continental | 28 | M M T T N N N L L, M M T T T N N L L, M M M T T N N L L L |
@@ -304,6 +334,11 @@ trabajo de bomberos»: «habituales los turnos de 1-4 o 1-5»); el `24x72` es el
 nombra. Lo que se buscó y no se pudo comprobar está en `docs/competencia-2026-11.md`, §7.
 
 Los turnos Libre de los presets son el tipo L explícito (así se pinta el gris), no un paso vacío.
+
+**2 y 2 (2x2) y 3 y 1 (3x1):** el catálogo muestra Mañana como ejemplo. En el paso de inicio se elige el turno de
+trabajo; la vista previa y la aplicación usan esa misma elección. Se materializa con un id propio para conservar
+las rotaciones ya aplicadas. El catálogo no tiene buscador: los nombres Pitman/Panamá y cuatro y cuatro se incluyen
+en sus descripciones. «Continental» solo nombra aquí el ciclo de 28 días, nunca es un alias del 4x4.
 
 ## Asistente de patrón y saliente automático
 
@@ -354,6 +389,10 @@ calendario activo; `summarizeYearTotals` junta los doce. Definiciones exactas:
   sobre los tramos ajustados por los extras del día (A4).
 - **Días libres:** días con un turno `rest` y sin turno `work` ni ausencia. **Ausencias:** días con algún tipo
   `absence` (y los días de cada tipo por separado).
+- **Desde el esquema v7 las horas extra son bloques** (`DayEntry.overtimeBlocks`, `ResolvedDay.overtimeBlocks`: tipo,
+  inicio, fin, descanso y nota; el bloque es del día en que empieza) con el precio de su tipo; cómo cuentan está en
+  `docs/datos.md`, «Esquema v7». Lo que sigue describe los minutos de antes (`DayEntry.overtimeMinutes`), que solo
+  quedan en datos de antes de v7 y cuentan igual que siempre; «Salí antes» sigue así, pero no recorta un bloque.
 - **Horas extra y salidas anticipadas (A6):** los minutos que el usuario anota en un día (`DayEntry.overtimeMinutes`,
   `earlyLeaveMinutes`, que `Schedule.resolve` expone en `ResolvedDay`) son **del día**, no de un turno, y van al mes de
   ese día. Por día, con `pagado` = minutos pagados de sus turnos `work` con horario:
@@ -393,6 +432,12 @@ calendario activo; `summarizeYearTotals` junta los doce. Definiciones exactas:
     de extra a 10 €/h son 50 céntimos (no 3 x 17).
   - Pantalla: en la tarjeta de horas, las líneas «Horas extra» (`+2 h`, con su importe en el estimado) y «Salidas
     anticipadas» (`−1 h`) solo si el mes las tiene; la tabla del año las suma en su total y lo explica en sus notas.
+- **Racha más larga del periodo (12-nov-2026):** `MonthSummary.longestStreak`, calculada en
+  `summary/domain/work_streak.dart` sobre los días de `summarizeRange`. Usa el mismo `DayKind.work` que
+  `off_outlook`: basta un turno de trabajo, también sin horario o junto a una ausencia. Descanso, ausencia sin
+  trabajo y vacío la cortan, aunque tengan extras. Se recorta a los dos bordes del periodo; los empates conservan
+  la primera racha. Sin días trabajados es `null`. El Resumen (mes, trimestre, año o fechas) y el PDF muestran
+  duración y fechas; la ayuda explica que los extras solos no alargan la racha.
 - Comparación con el mes anterior: diferencia de horas trabajadas.
 - **Trabajadas y previstas (A3, `domain/period_hours.dart`).** El resumen recibe «hoy» (`summaryTodayProvider`, de
   `clockProvider`) y separa las horas del periodo: los días **anteriores a hoy** son trabajadas y **hoy en adelante**,

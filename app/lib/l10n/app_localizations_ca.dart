@@ -295,7 +295,9 @@ class AppLocalizationsCa extends AppLocalizations {
   String get upcomingTitle => 'Pròxims dies';
 
   @override
-  String get dayDetailSourcePattern => 'Segons el teu patró';
+  String dayDetailSourcePattern(String name) {
+    return 'De la teva rotació «$name»';
+  }
 
   @override
   String get dayDetailSourceOverride => 'Canviat a mà';
@@ -307,11 +309,92 @@ class AppLocalizationsCa extends AppLocalizations {
   String get dayDetailDouble => 'Afegeix un segon torn';
 
   @override
-  String get dayDetailReset => 'Torna al patró';
+  String get dayDetailReset => 'Torna a la rotació';
 
   @override
   String dayDetailPatternGives(String shifts) {
-    return 'El patró dona: $shifts';
+    return 'Segons la teva rotació: $shifts';
+  }
+
+  @override
+  String dayRotationEnded(String name, String date) {
+    return 'La teva rotació «$name» va acabar el $date';
+  }
+
+  @override
+  String get dayRotationMenu => 'Rotació';
+
+  @override
+  String get dayRotationRestart => 'Comença la rotació aquí';
+
+  @override
+  String get dayRotationEndHere => 'Últim dia d’aquesta rotació';
+
+  @override
+  String get dayRotationResume => 'Comença la teva rotació aquí';
+
+  @override
+  String get dayRotationRestartTitle => 'Vols començar la rotació aquí?';
+
+  @override
+  String dayRotationRestartBody(String name, String date, String shifts) {
+    return 'La teva rotació «$name» tornarà a començar el $date: aquell dia serà el primer del cicle ($shifts).';
+  }
+
+  @override
+  String get dayRotationEndKeepsOthers =>
+      'Les altres rotacions mantenen les seves dates.';
+
+  @override
+  String dayRotationRestartOthersUntil(String date) {
+    return 'Aquesta rotació tindrà prioritat fins al $date. Les altres es continuaran aplicant en les dates que quedin fora d’aquest interval.';
+  }
+
+  @override
+  String get dayRotationRestartOthers =>
+      'Les rotacions que havies posat per a després d’aquell dia s’eliminaran.';
+
+  @override
+  String get dayRotationKeeps =>
+      'Els dies anteriors i els teus canvis a mà no es toquen.';
+
+  @override
+  String get dayRotationStartConfirm => 'Comença aquí';
+
+  @override
+  String dayRotationStartDone(String date) {
+    return 'La rotació comença el $date';
+  }
+
+  @override
+  String get dayRotationEndTitle => 'Vols acabar la rotació aquest dia?';
+
+  @override
+  String dayRotationEndBody(String name, String date) {
+    return 'La teva rotació «$name» acabarà el $date.';
+  }
+
+  @override
+  String dayRotationEndThenNone(String date) {
+    return 'El dia $date no tindrà cap rotació assignada.';
+  }
+
+  @override
+  String dayRotationEndThenOther(String date, String name) {
+    return 'El $date s’aplicarà la teva rotació «$name».';
+  }
+
+  @override
+  String get dayRotationResumeTitle => 'Vols començar la teva rotació aquí?';
+
+  @override
+  String dayRotationResumeBody(String name, String date) {
+    return 'La teva rotació «$name» es tornarà a aplicar a partir del $date, sense data de final.';
+  }
+
+  @override
+  String dayRotationResumeBodyUntil(String name, String date, String until) {
+    return 'La teva rotació «$name» es tornarà a aplicar del $date al $until, el dia abans que comenci la rotació següent.';
   }
 
   @override
@@ -491,6 +574,18 @@ class AppLocalizationsCa extends AppLocalizations {
   String shiftTypesRestored(String name) {
     return 'S’ha recuperat «$name»';
   }
+
+  @override
+  String get discardChangesTitle => 'Vols descartar els canvis?';
+
+  @override
+  String get discardChangesBody => 'Els canvis sense desar es perdran.';
+
+  @override
+  String get discardChangesConfirm => 'Descarta';
+
+  @override
+  String get discardChangesKeep => 'Continua editant';
 
   @override
   String get shiftTypesDiscardTitle => 'Vols descartar els canvis?';
@@ -1085,7 +1180,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get selectionClear => 'Esborra';
 
   @override
-  String get selectionReset => 'Torna al patró';
+  String get selectionReset => 'Torna a la rotació';
 
   @override
   String get selectionCopy => 'Copia';
@@ -5604,7 +5699,8 @@ class AppLocalizationsCa extends AppLocalizations {
   String get catalogPattern4x4Name => '4 x 4';
 
   @override
-  String get catalogPattern4x4Description => '4 dies de 12 h i 4 lliures';
+  String get catalogPattern4x4Description =>
+      '4 dies de 12 h i 4 lliures (4x4 o quatre i quatre)';
 
   @override
   String get catalogPattern5x2Name => '5 x 2';
@@ -5618,7 +5714,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get catalogPattern223Description =>
-      'Dos dies de 12 h, dos lliures, tres de 12 h, dos lliures, dos de 12 h i tres lliures (també 2-2-3-2-2-3)';
+      'Dos dies de 12 h, dos lliures, tres de 12 h, dos lliures, dos de 12 h i tres lliures (també 2-2-3-2-2-3). També es coneix com a Pitman o Panamà.';
 
   @override
   String get catalogPatternContinentalName => 'Continental';
@@ -5861,6 +5957,47 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get monthNavSummary => 'Resum';
+
+  @override
+  String monthStripHoursGoal(String worked, String goal) {
+    return '$worked / $goal';
+  }
+
+  @override
+  String monthStripFacts(String first, String second) {
+    return '$first · $second';
+  }
+
+  @override
+  String monthStripShort(String hours) {
+    return 'Per completar: $hours';
+  }
+
+  @override
+  String monthStripOver(String hours) {
+    return '$hours de més';
+  }
+
+  @override
+  String monthStripNextOff(String date, int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Pròxim dia lliure: $date, d’aquí a $days dies',
+      one: 'Pròxim dia lliure: $date, d’aquí a 1 dia',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String monthStripFirstOff(String date) {
+    return 'Primer dia lliure: $date';
+  }
+
+  @override
+  String monthStripLabel(String facts) {
+    return 'Resum del mes: $facts';
+  }
 
   @override
   String get todayCardCollapse => 'Plega la targeta d’avui';
@@ -7135,4 +7272,265 @@ class AppLocalizationsCa extends AppLocalizations {
   @override
   String get backupUiOriginPreReset =>
       'Còpia de just abans de començar de zero';
+
+  @override
+  String get overtimeSheetAdd => 'Afegeix hores extra';
+
+  @override
+  String get overtimeSheetEdit => 'Edita les hores extra';
+
+  @override
+  String get overtimeTypeLabel => 'Tipus';
+
+  @override
+  String get overtimeManageTypes => 'Gestiona els tipus';
+
+  @override
+  String get overtimeAfterShift => 'Just després del torn';
+
+  @override
+  String get overtimeNextDay => 'Acaba l’endemà';
+
+  @override
+  String get overtimeQuickLabel => 'Durada';
+
+  @override
+  String overtimeQuickHours(int hours) {
+    return '+$hours h';
+  }
+
+  @override
+  String get overtimeBreakLabel => 'Pausa no pagada (opcional)';
+
+  @override
+  String get overtimeBreakUnit => 'min';
+
+  @override
+  String get overtimeNoteLabel => 'Nota curta (opcional)';
+
+  @override
+  String overtimePreviewPriced(String duration, String rate, String amount) {
+    return '$duration × $rate = $amount';
+  }
+
+  @override
+  String overtimePreviewUnpriced(String duration) {
+    return '$duration, sense preu';
+  }
+
+  @override
+  String get overtimeBreakTooLong =>
+      'La pausa ha de ser més curta que el bloc.';
+
+  @override
+  String overtimeDayTotal(String hours) {
+    return 'Total del dia: $hours';
+  }
+
+  @override
+  String overtimeDayTotalMoney(String hours, String amount) {
+    return 'Total del dia: $hours · $amount';
+  }
+
+  @override
+  String get overtimeBaseRateTitle => 'Preu base per hora';
+
+  @override
+  String get overtimeBaseRateHelp =>
+      'El fan servir les hores extra «com el torn» els dies sense torn amb preu.';
+
+  @override
+  String get overtimeBaseRateNone => 'Sense preu base';
+
+  @override
+  String get overtimeBaseRateField => 'Preu per hora';
+
+  @override
+  String get overtimeTypesTitle => 'Tipus d’hores extra';
+
+  @override
+  String get overtimeTypesHelp =>
+      'Cada bloc d’hores extra té un tipus: com es paga i si compta per al teu objectiu d’hores.';
+
+  @override
+  String overtimeTypesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tipus',
+      one: '1 tipus',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get overtimeNewType => 'Tipus nou';
+
+  @override
+  String get overtimeEditType => 'Edita el tipus';
+
+  @override
+  String overtimeTypeMoveUp(String name) {
+    return 'Puja $name';
+  }
+
+  @override
+  String overtimeTypeMoveDown(String name) {
+    return 'Baixa $name';
+  }
+
+  @override
+  String get overtimeTypeArchive => 'Arxiva';
+
+  @override
+  String get overtimeTypeRestore => 'Recupera';
+
+  @override
+  String overtimeTypesArchived(int count) {
+    return 'Arxivats ($count)';
+  }
+
+  @override
+  String get overtimeTypeCounts => 'Compta per a l’objectiu';
+
+  @override
+  String get overtimeTypeNotCounts => 'No compta per a l’objectiu';
+
+  @override
+  String get overtimeRateLabel => 'Com es paga';
+
+  @override
+  String get overtimeRateShift => 'Com el torn';
+
+  @override
+  String get overtimeRateMultiplier => 'Multiplicador';
+
+  @override
+  String get overtimeRateFixed => 'Preu fix per hora';
+
+  @override
+  String get overtimeRateNone => 'Sense preu';
+
+  @override
+  String overtimeRateMultiplierSummary(String factor) {
+    return 'Torn ×$factor';
+  }
+
+  @override
+  String overtimeRateFixedSummary(String amount) {
+    return '$amount l’hora';
+  }
+
+  @override
+  String get overtimeRateShiftHelp =>
+      'El preu per hora del torn del dia; sense torn amb preu, el preu base.';
+
+  @override
+  String overtimeMultiplierShortcut(String factor) {
+    return '×$factor';
+  }
+
+  @override
+  String get overtimeMultiplierField => 'Un altre multiplicador';
+
+  @override
+  String get overtimeFixedRateField => 'Preu per hora';
+
+  @override
+  String get overtimeCountsForGoal => 'Compta per al meu objectiu d’hores';
+
+  @override
+  String get overtimeTypeNameLabel => 'Nom';
+
+  @override
+  String get overtimeTypeColorLabel => 'Color';
+
+  @override
+  String get overtimeTypeInvalidName => 'Posa-li un nom.';
+
+  @override
+  String get overtimeTypeInvalidMultiplier =>
+      'Escriu un multiplicador entre 0,01 i 100.';
+
+  @override
+  String get overtimeTypeInvalidRate => 'Escriu un preu per hora.';
+
+  @override
+  String get overtimeTypeOvertime => 'Hores extra';
+
+  @override
+  String get overtimeTypeOtherWork => 'Una altra feina';
+
+  @override
+  String dayCellOvertime(String hours) {
+    return '+$hours h';
+  }
+
+  @override
+  String get overtimeOnNextDay => 'L’endemà';
+
+  @override
+  String overtimeTypeArchiveNamed(String name) {
+    return 'Arxiva $name';
+  }
+
+  @override
+  String get catalogPattern2x2Name => '2 i 2';
+
+  @override
+  String get catalogPattern2x2Description =>
+      '2 dies de feina i 2 lliures (2x2). Tria el teu torn de feina.';
+
+  @override
+  String get catalogPattern3x1Name => '3 i 1';
+
+  @override
+  String get catalogPattern3x1Description =>
+      '3 dies de feina i 1 lliure (3x1). Tria el teu torn de feina.';
+
+  @override
+  String patternStartConfirmation(String date) {
+    return 'La teva rotació comença el $date i es repeteix des d’aquell dia.';
+  }
+
+  @override
+  String get patternWorkShiftTitle => 'Quin torn fas els dies de feina?';
+
+  @override
+  String get summaryLongestStreak => 'Ratxa més llarga';
+
+  @override
+  String summaryStreakDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dies seguits',
+      one: '1 dia seguit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get summaryStreakHelp =>
+      'La ratxa compta només els dies amb algun torn de treball dins del període. Els dies lliures, les absències i els dies buits la tallen, encara que tinguin hores extra.';
+
+  @override
+  String widgetOvertime(String duration) {
+    return '+$duration extra';
+  }
+
+  @override
+  String widgetOvertimeType(String duration, String type) {
+    return '+$duration $type';
+  }
+
+  @override
+  String widgetEarlyLeave(String duration) {
+    return 'He sortit $duration abans';
+  }
+
+  @override
+  String widgetSevenDayHours(String duration) {
+    return '7 dies: $duration';
+  }
 }

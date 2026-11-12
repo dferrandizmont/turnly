@@ -37,17 +37,20 @@ List<String> resolvedDayLines(
 ];
 
 /// The reminder, overtime, early leave and extra amount of [entry], or
-/// `null` when it has none of them. The extra amount (schema v6) only appears
-/// when it is not zero, so the lines of older data stay the same.
+/// `null` when it has none of them. The extra amount (schema v6) and the
+/// overtime blocks (schema v7, in order of start and id) only appear when
+/// there are any, so the lines of older data stay the same.
 Map<String, Object?>? _annotations(DayEntry? entry) {
   if (entry == null) return null;
   final overtime = entry.overtimeMinutes ?? 0;
   final early = entry.earlyLeaveMinutes ?? 0;
   final extra = entry.extraAmountCents ?? 0;
+  final blocks = [...entry.overtimeBlocks]..sort(compareOvertimeBlocks);
   if (entry.noteReminderMinute == null &&
       overtime == 0 &&
       early == 0 &&
-      extra == 0) {
+      extra == 0 &&
+      blocks.isEmpty) {
     return null;
   }
   return {
@@ -55,6 +58,11 @@ Map<String, Object?>? _annotations(DayEntry? entry) {
     'overtimeMinutes': entry.overtimeMinutes,
     'earlyLeaveMinutes': entry.earlyLeaveMinutes,
     if (extra != 0) 'extraAmountCents': extra,
+    if (blocks.isNotEmpty)
+      'overtimeBlocks': [
+        for (final b in blocks)
+          [b.id, b.typeId, b.startMinute, b.endMinute, b.breakMinutes, b.note],
+      ],
   };
 }
 

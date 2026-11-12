@@ -4,6 +4,7 @@ import '../../../core/database/app_database.dart';
 import '../../../core/diagnostics/debug_log.dart';
 import '../../shift_types/domain/shift_type_draft.dart';
 import '../domain/schedule_domain.dart';
+import 'overtime_store.dart';
 import 'schedule_mappers.dart';
 import 'schedule_snapshot.dart';
 
@@ -61,11 +62,26 @@ class ScheduleRepository {
     final versionRows = await _db.select(_db.shiftTypeVersions).get();
 
     final records = [for (final row in typeRows) row.toRecord()];
+    // The extra hours (schema v7) are rows of their own; the engine sees
+    // them on the day they start, like the rest of the day's annotations.
+    final overtime = OvertimeStore(_db);
+    final entries = {for (final row in entryRows) row.date: row.toEntry()};
+    final blocksByDay = <CivilDate, List<OvertimeBlock>>{};
+    for (final block in await overtime.blocks(calendarId)) {
+      (blocksByDay[block.date] ??= []).add(block);
+    }
+    for (final MapEntry(key: date, value: blocks) in blocksByDay.entries) {
+      entries[date] = (entries[date] ?? DayEntry(date: date)).copyWith(
+        overtimeBlocks: blocks,
+      );
+    }
     final schedule = Schedule(
+      overtimeTypes: await overtime.types(),
+      baseHourlyRateCents: await overtime.baseRate(),
       shiftTypes: [for (final r in records) r.type],
       patterns: [for (final row in patternRows) row.toPattern()],
       runs: [for (final row in runRows) row.toRun()],
-      entries: {for (final row in entryRows) row.date: row.toEntry()},
+      entries: entries,
       shiftTypeVersions: groupShiftTypeVersions(versionRows),
     );
     return ScheduleSnapshot(
@@ -77,6 +93,26 @@ class ScheduleRepository {
       calendarId: calendarId,
     );
   });
+
+  /// Inserts or updates an overtime type (schema v7). An invalid one throws
+  /// [ArgumentError] without writing.
+  Future<void> saveOvertimeType(OvertimeType type) =>
+      OvertimeStore(_db).saveType(type);
+
+  /// Writes the order of the overtime types: each one's `sortOrder` becomes
+  /// its position in [ids], in one transaction.
+  Future<void> reorderOvertimeTypes(List<String> ids) =>
+      _db.transaction(() async {
+        for (var i = 0; i < ids.length; i++) {
+          await (_db.update(_db.overtimeTypes)
+                ..where((t) => t.id.equals(ids[i])))
+              .write(OvertimeTypesCompanion(sortOrder: Value(i)));
+        }
+      });
+
+  /// Sets the base hourly rate of the extra hours; `null` removes it.
+  Future<void> setBaseHourlyRate(int? cents) =>
+      OvertimeStore(_db).setBaseRate(cents);
 
   /// The `seq` a new run should take: one above the highest of **any**
   /// calendar (`seq` is unique across the whole table, docs/datos.md), so
@@ -137,6 +173,9 @@ class ScheduleRepository {
               after.toCompanion(calendarId: calendarId, updatedAt: now),
             );
       }
+      // The day's extra hours (schema v7) end up exactly as `after` says.
+      await OvertimeStore(_db)
+          .replaceDay(calendarId, date, after?.overtimeBlocks ?? const []);
     }
 
     final runs = change.runsAfter;

@@ -3,14 +3,18 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:cuadrante/features/backup/domain/backup_codec.dart';
+import 'package:cuadrante/features/backup/domain/backup_data.dart';
 import 'package:cuadrante/features/backup/domain/restore_summary.dart';
 import 'package:cuadrante/features/backup/domain/schedule_fingerprint.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
+import 'package:cuadrante/features/summary/domain/month_summary.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'backup_test_support.dart';
 import 'golden_dataset.dart';
 import 'golden_dataset_v3.dart';
+import 'v3_format.dart';
+import '../../support/v6_database.dart' show monthsFacts;
 
 /// Format back-compat for version 3 (release 0.6.0): `golden_v3.cuadrante`
 /// was written once by version 3 of the format and is checked in. Every
@@ -126,14 +130,31 @@ void main() {
     });
 
     test('keeps the same canonical bytes', () {
+      // Rewritten in the form version 3 had: the version 4 writer turns the
+      // overtime minutes into blocks, but the data read is byte for byte the
+      // same.
       expect(
         Uint8List.fromList(gzip.decode(bytes)),
-        codec.encodeJsonBytes(
+        v3JsonBytes(
           buildGoldenBackupDataV3(),
+          appVersion: _appVersion,
+          exportedAt: '2027-01-20T08:15:00Z',
+        ),
+      );
+    });
+
+    test('the version 4 writer gives the same data, with the overtime as '
+        'blocks', () {
+      final data = buildGoldenBackupDataV3();
+      final written = codec.decode(
+        codec.encode(
+          data,
           appVersion: _appVersion,
           exportedAt: goldenV3ExportedAt,
         ),
       );
+      expect(written.schemaVersion, 4);
+      expect(written.data, data.upgradedOvertime());
     });
 
     test('resolves to the same 730 days in every calendar', () {
@@ -161,6 +182,61 @@ void main() {
       expect(counts.settings, recorded['settings']);
     });
 
+    test('restored, every month of every calendar counts the same: money, '
+        'overtime, night and holiday hours and pluses', () async {
+      // The file with pluses per hour on its work shifts (database v6
+      // fields, read by the version 3 reader) and holidays on days with
+      // overtime after a shift.
+      final json = codec.decode(bytes).data.toJson();
+      for (final t in json['shiftTypes']! as List) {
+        final type = t as Map<String, Object?>;
+        if (type['category'] != 'work') continue;
+        type['nightPlusCentsPerHour'] = 150;
+        type['holidayPlusCentsPerHour'] = 275;
+      }
+      // The one case that does not count the same (docs/datos.md, «Cómo
+      // cuentan»): «Salí antes» on a day whose only work is the overtime
+      // (cal-pareja, 2026-03-12: 15 min extra, 5 min early). Before, the
+      // early leave ate into the extra; now it only cuts a shift, and there
+      // is none. Checked apart, then left out of the comparison.
+      final apart = BackupData.fromJson(json).toSchedule('cal-pareja');
+      const day = CivilDate(2026, 3, 12);
+      final apartBlocks = BackupData.fromJson(json)
+          .upgradedOvertime()
+          .toSchedule('cal-pareja');
+      expect(
+        summarizeRange(apartBlocks, day, day).workedMinutes -
+            summarizeRange(apart, day, day).workedMinutes,
+        5,
+      );
+      for (final e in json['dayEntries']! as List) {
+        final entry = e as Map<String, Object?>;
+        if (entry['calendarId'] == 'cal-pareja' &&
+            entry['date'] == '2026-03-12') {
+          entry.remove('earlyLeaveMinutes');
+        }
+      }
+      final old = BackupData.fromJson(json);
+      final holidays = {
+        const CivilDate(2026, 3, 14),
+        const CivilDate(2026, 3, 15),
+        const CivilDate(2026, 12, 25),
+      };
+      final db = openMemoryDatabase();
+      addTearDown(db.close);
+      final repository = makeRepository(db, makeTempDir('golden-v3-sums'));
+      await repository.restore(old);
+      final restored = await repository.readAll();
+      expect(restored.overtimeBlocks, hasLength(3));
+      for (final calendar in old.calendars) {
+        expect(
+          monthsFacts(restored.toSchedule(calendar.id), holidays: holidays),
+          monthsFacts(old.toSchedule(calendar.id), holidays: holidays),
+          reason: calendar.id,
+        );
+      }
+    });
+
     test('restores exactly: same fingerprint, same tables', () async {
       final dir = makeTempDir('golden-v3');
       final db = openMemoryDatabase();
@@ -169,17 +245,36 @@ void main() {
 
       await repository.restore(codec.decode(bytes).data);
 
+      // The overtime minutes come back as blocks (database v7), as the
+      // migration of the database does; everything else is the file.
       final restored = await repository.readAll();
-      expect(restored, buildGoldenBackupDataV3());
-      final recorded = expected['fingerprint']! as Map<String, Object?>;
+      final upgraded = buildGoldenBackupDataV3().upgradedOvertime();
+      expect(restored, upgraded);
+      expect(restored.overtimeBlocks, hasLength(3));
       expect(
-        scheduleFingerprint(restored, from: goldenFrom, to: goldenTo).digest,
-        recorded['digest'],
+        restored.dayEntries.every((e) => e.overtimeMinutes == null),
+        isTrue,
       );
+      expect(
+        scheduleFingerprint(restored, from: goldenFrom, to: goldenTo),
+        scheduleFingerprint(upgraded, from: goldenFrom, to: goldenTo),
+      );
+      // The hours of every day are those the file had.
+      for (final calendar in restored.calendars) {
+        final before = buildGoldenBackupDataV3().toSchedule(calendar.id);
+        final after = restored.toSchedule(calendar.id);
+        for (var d = goldenFrom; !d.isAfter(goldenTo); d = d.addDays(1)) {
+          expect(
+            after.resolve(d).overtimeMinutes,
+            before.resolve(d).overtimeMinutes,
+            reason: '${calendar.id} $d',
+          );
+        }
+      }
 
       final reference = openMemoryDatabase();
       addTearDown(reference.close);
-      await seedDatabase(reference, buildGoldenBackupDataV3());
+      await seedDatabase(reference, upgraded);
       expect(await dumpAllTables(db), await dumpAllTables(reference));
     });
   });

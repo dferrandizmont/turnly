@@ -115,9 +115,9 @@ object WidgetRenderer {
                     kind == WidgetModelBuilder.Kind.TWO_WEEKS ||
                     kind == WidgetModelBuilder.Kind.FOUR_WEEKS,
             )
-            is WidgetContent.Small -> painter.small(content)
-            is WidgetContent.Medium -> painter.medium(content)
-            is WidgetContent.Large -> painter.large(content)
+            is WidgetContent.Small -> painter.small(content, size)
+            is WidgetContent.Medium -> painter.medium(content, size)
+            is WidgetContent.Large -> painter.large(content, size)
             is WidgetContent.Agenda -> painter.agenda(content, size)
             is WidgetContent.TwoWeeks -> painter.twoWeeks(content, size)
             is WidgetContent.FourWeeks -> painter.fourWeeks(content, size)
@@ -143,7 +143,7 @@ object WidgetRenderer {
                     views.setViewVisibility(R.id.content, content)
                     views.setViewVisibility(R.id.tint, content)
                 }
-                WidgetModelBuilder.Kind.MEDIUM -> views.setViewVisibility(R.id.strip, content)
+                WidgetModelBuilder.Kind.MEDIUM -> views.setViewVisibility(R.id.medium_content, content)
                 WidgetModelBuilder.Kind.LARGE -> views.setViewVisibility(R.id.month_content, content)
                 WidgetModelBuilder.Kind.AGENDA -> views.setViewVisibility(R.id.agenda_content, content)
                 WidgetModelBuilder.Kind.TWO_WEEKS -> views.setViewVisibility(R.id.two_weeks_content, content)
@@ -172,7 +172,7 @@ object WidgetRenderer {
 
         // ---- Small ----------------------------------------------------------
 
-        fun small(c: WidgetContent.Small) {
+        fun small(c: WidgetContent.Small, bounds: WidgetRenderPlan.Size) {
             val first = c.shifts.firstOrNull()
             views.setTextViewText(R.id.date, c.dateLabel)
             color(
@@ -182,6 +182,7 @@ object WidgetRenderer {
             )
             views.setTextViewText(R.id.code, c.big)
             val size = when {
+                c.extras.isNotEmpty() -> if (bounds.height < 170 * bounds.fontScale) 14f else 24f
                 c.isEmpty -> 22f
                 c.big.length <= 2 -> 44f
                 c.big.length <= 4 -> 32f
@@ -191,6 +192,25 @@ object WidgetRenderer {
             views.setTextViewText(R.id.detail, c.detail.orEmpty())
             views.setViewVisibility(R.id.detail, if (c.detail == null) View.GONE else View.VISIBLE)
             views.setTextViewText(R.id.tomorrow, c.tomorrow)
+            // Prioritize the day's adjustments at the smallest 2x2 size.
+            val showTomorrow = c.extras.isEmpty() || bounds.height >= 170 * bounds.fontScale
+            views.setViewVisibility(R.id.tomorrow, visible(showTomorrow))
+            val compact = c.extras.isNotEmpty() && bounds.height < 170 * bounds.fontScale
+            val padding = if (compact) 6 else 12
+            views.setViewPadding(R.id.content, dp(14), dp(padding), dp(14), dp(padding))
+            val dateSize = if (compact) 12f else 13f
+            val detailSize = if (compact) 12f else 15f
+            views.setTextViewTextSize(R.id.date, TypedValue.COMPLEX_UNIT_SP, dateSize)
+            views.setTextViewTextSize(R.id.detail, TypedValue.COMPLEX_UNIT_SP, detailSize)
+            val extraLines = WidgetRenderPlan.smallExtraLines(
+                bounds, padding,
+                textHeight(dateSize, bounds.fontScale, fontPadding = true),
+                textHeight(size, bounds.fontScale),
+                if (c.detail == null) 0f else textHeight(detailSize, bounds.fontScale, fontPadding = true),
+                if (showTomorrow) 2 * textHeight(12f, bounds.fontScale, fontPadding = true) else 0f,
+                textHeight(10f, bounds.fontScale), if (compact) 3 else 4,
+            )
+            extras(R.id.day_extras, c.extras, (bounds.width - 28).toFloat(), bounds, extraLines)
 
             if (first != null) {
                 paint(R.id.tint, "setColorFilter", first.colors.tint)
@@ -205,26 +225,31 @@ object WidgetRenderer {
             views.setContentDescription(
                 R.id.widget_root,
                 c.description?.let { "$it. ${c.tomorrow}" }
-                    ?: listOfNotNull(c.dateLabel, c.big, c.detail, c.tomorrow).joinToString(". "),
+                    ?: listOfNotNull(c.dateLabel, c.big, c.detail, c.extras.joinToString(". ").takeIf { it.isNotEmpty() }, c.tomorrow).joinToString(". "),
             )
             open(R.id.widget_root, c.link)
         }
 
         // ---- Medium ---------------------------------------------------------
 
-        fun medium(c: WidgetContent.Medium) {
+        fun medium(c: WidgetContent.Medium, size: WidgetRenderPlan.Size) {
             views.removeAllViews(R.id.strip)
-            for (cell in c.cells) views.addView(R.id.strip, cell(cell))
+            val cellSize = size.copy(height = size.height - 16 -
+                if (c.totalLabel == null) 0 else (16 * size.fontScale).toInt())
+            for (cell in c.cells) views.addView(R.id.strip, cell(cell, cellSize))
+            views.setTextViewText(R.id.strip_total, c.totalLabel.orEmpty())
+            views.setViewVisibility(R.id.strip_total, visible(c.totalLabel != null))
+            color(R.id.strip_total, "setTextColor", R.color.widget_text_secondary)
             open(R.id.widget_root, c.link)
         }
 
-        private fun cell(c: StripCell): RemoteViews {
+        private fun cell(c: StripCell, size: WidgetRenderPlan.Size): RemoteViews {
             val v = RemoteViews(context.packageName, R.layout.widget_strip_cell)
             val p = Painter(context, v)
-            return p.fillCell(c)
+            return p.fillCell(c, size)
         }
 
-        private fun fillCell(c: StripCell): RemoteViews {
+        private fun fillCell(c: StripCell, size: WidgetRenderPlan.Size): RemoteViews {
             views.setTextViewText(R.id.cell_weekday, c.weekdayShort)
             views.setTextViewText(R.id.cell_day, c.dayOfMonth.toString())
             if (c.isHoliday) color(R.id.cell_day, "setTextColor", R.color.widget_holiday)
@@ -236,7 +261,7 @@ object WidgetRenderer {
             val codes = intArrayOf(R.id.cell_code0, R.id.cell_code1, R.id.cell_code2)
             val bands = c.bands.take(codes.size)
             val codeSize = when (bands.size) {
-                0, 1 -> 20f
+                0, 1 -> if (c.extras.isEmpty()) 20f else 13f
                 2 -> 14f
                 else -> 11f
             }
@@ -258,8 +283,11 @@ object WidgetRenderer {
             }
             views.setContentDescription(
                 R.id.cell,
-                c.description ?: (listOf(c.date) + bands.map { it.code }).joinToString(" "),
+                c.description ?: (listOf(c.date) + bands.map { it.code } + c.extras).joinToString(". "),
             )
+            val spare = size.height - 16 - (11 + 15 + codeSize * bands.size) * 1.25f * size.fontScale
+            extras(R.id.cell_extras, c.extras, (size.width - 16) / 7f - 8, size,
+                WidgetRenderPlan.extraLines(spare, size.fontScale, 3))
             open(R.id.cell, c.link)
             return views
         }
@@ -273,7 +301,7 @@ object WidgetRenderer {
          * to be notified, so a draw at midnight with the app closed is the
          * same simple operation as any other.
          */
-        fun large(c: WidgetContent.Large) {
+        fun large(c: WidgetContent.Large, size: WidgetRenderPlan.Size) {
             views.setTextViewText(R.id.month_title, c.title)
             views.setContentDescription(R.id.month_header, c.title)
             open(R.id.month_header, c.link)
@@ -289,13 +317,13 @@ object WidgetRenderer {
             for (row in rows) views.removeAllViews(row)
             c.cells.forEachIndexed { i, cell ->
                 val v = RemoteViews(context.packageName, R.layout.widget_month_cell)
-                views.addView(rows[WidgetDayLogic.rowOf(i)], Painter(context, v).fillMonthCell(cell))
+                views.addView(rows[WidgetDayLogic.rowOf(i)], Painter(context, v).fillMonthCell(cell, size))
             }
             // A tap in the gaps between cells opens the app on today.
             open(R.id.widget_root, WidgetLinks.day(c.date))
         }
 
-        private fun fillMonthCell(c: MonthCell): RemoteViews {
+        private fun fillMonthCell(c: MonthCell, size: WidgetRenderPlan.Size): RemoteViews {
             views.setTextViewText(R.id.mcell_day, c.dayOfMonth.toString())
             val bands = c.shown
             val dayColor = when {
@@ -332,9 +360,14 @@ object WidgetRenderer {
             val description = buildList {
                 add(c.dayOfMonth.toString())
                 addAll(c.bands.map { it.code })
+                addAll(c.extras)
                 if (c.isToday) add(context.getString(R.string.widget_today))
             }
             views.setContentDescription(R.id.mcell, c.description ?: description.joinToString(" "))
+            val cellHeight = (size.height - 16 - 40 * size.fontScale) / 6f
+            val spare = cellHeight - 10 - (10 + codeSize) * 1.3f * size.fontScale
+            extras(R.id.mcell_extras, c.extras, (size.width - 16) / 7f - 6, size,
+                WidgetRenderPlan.extraLines(spare, size.fontScale, 2))
             open(R.id.mcell, c.link)
             return views
         }
@@ -359,7 +392,7 @@ object WidgetRenderer {
                     shift.setTextViewText(R.id.agenda_shift_text, noShift)
                     row.addView(R.id.agenda_shifts, shift)
                 }
-                for (slot in WidgetRenderPlan.agendaSlots(day.shifts, size)) {
+                for (slot in WidgetRenderPlan.agendaSlots(day, size)) {
                     val s = slot.shift
                     val shift = RemoteViews(context.packageName, R.layout.widget_agenda_shift)
                     val sp = Painter(context, shift)
@@ -377,6 +410,7 @@ object WidgetRenderer {
                     sp.paint(R.id.agenda_shift_bar, "setColorFilter", s.colors.bar)
                     row.addView(R.id.agenda_shifts, shift)
                 }
+                p.extras(R.id.agenda_extras, day.extras, (size.width - 96).toFloat(), size, 4)
                 row.setContentDescription(R.id.agenda_row, displayDescription(day, noShift))
                 p.open(R.id.agenda_row, day.link)
                 views.addView(R.id.agenda_content, row)
@@ -393,30 +427,41 @@ object WidgetRenderer {
                 val cellWidth = (size.width - 16) / 7f - 4
                 val dateLabel = "${day.weekdayShort} ${day.dayOfMonth}"
                 cell.setTextViewText(R.id.tw_date, dateLabel)
-                cell.setTextViewTextSize(R.id.tw_date, TypedValue.COMPLEX_UNIT_SP,
-                    fittedSize(dateLabel, 10f, (cellWidth - 4).coerceAtLeast(1f), size.fontScale))
+                val dateSize = fittedSize(dateLabel, 10f, (cellWidth - 4).coerceAtLeast(1f), size.fontScale)
+                cell.setTextViewTextSize(R.id.tw_date, TypedValue.COMPLEX_UNIT_SP, dateSize)
                 p.color(R.id.tw_date, "setTextColor", if (day.isHoliday) R.color.widget_holiday else R.color.widget_text_secondary)
                 cell.setViewVisibility(R.id.tw_ring, visible(day.date == c.date))
                 p.color(R.id.tw_ring, "setColorFilter", R.color.widget_today_ring)
                 cell.setViewVisibility(R.id.tw_note, visible(day.hasNote))
                 cell.removeAllViews(R.id.tw_shifts)
-                for (slot in WidgetRenderPlan.twoWeeksSlots(day.shifts, size)) {
+                val slots = WidgetRenderPlan.twoWeeksSlots(day.shifts, size)
+                val codeSizes = slots.map {
+                    fittedSize(it.code, 13f, (cellWidth - 4).coerceAtLeast(1f), size.fontScale)
+                }
+                val timeCandidates = slots.map {
+                    val time = it.shift.compactTime
+                    time != null && WidgetRenderPlan.timeFits(
+                        measuredWidth(time, 10f, size.fontScale), cellWidth, size, day.shifts.size)
+                }
+                val plan = WidgetRenderPlan.twoWeeksLayout(size,
+                    textHeight(dateSize, size.fontScale),
+                    codeSizes.map { textHeight(it, size.fontScale) }, timeCandidates,
+                    textHeight(10f, size.fontScale), textHeight(10f, size.fontScale))
+                for ((index, slot) in slots.withIndex()) {
                     val s = slot.shift
                     val shift = RemoteViews(context.packageName, R.layout.widget_two_weeks_shift)
                     val sp = Painter(context, shift)
                     shift.setTextViewText(R.id.tw_code, slot.code)
-                    shift.setTextViewTextSize(R.id.tw_code, TypedValue.COMPLEX_UNIT_SP,
-                        fittedSize(slot.code, 13f, (cellWidth - 4).coerceAtLeast(1f), size.fontScale))
+                    shift.setTextViewTextSize(R.id.tw_code, TypedValue.COMPLEX_UNIT_SP, codeSizes[index])
                     sp.paint(R.id.tw_code, "setTextColor", s.colors.ink)
                     sp.paint(R.id.tw_shift_tint, "setColorFilter", s.colors.tint)
                     sp.paint(R.id.tw_bar, "setColorFilter", s.colors.bar)
                     val time = s.compactTime
-                    val measure = Paint().apply { textSize = 10f * size.fontScale }
-                    val fits = time != null && WidgetRenderPlan.timeFits(measure.measureText(time), cellWidth, size, day.shifts.size)
                     shift.setTextViewText(R.id.tw_time, time.orEmpty())
-                    shift.setViewVisibility(R.id.tw_time, visible(fits))
+                    shift.setViewVisibility(R.id.tw_time, visible(plan.showTimes[index]))
                     cell.addView(R.id.tw_shifts, shift)
                 }
+                p.extras(R.id.tw_extras, day.extras, cellWidth - 4, size, plan.extraLines)
                 cell.setContentDescription(R.id.tw_cell, displayDescription(day, c.noShift ?: context.getString(R.string.widget_no_shift)))
                 p.open(R.id.tw_cell, day.link)
                 views.addView(rows[i / 7], cell)
@@ -467,6 +512,11 @@ object WidgetRenderer {
                     sp.paint(R.id.fw_bar, "setColorFilter", s.colors.bar)
                     cell.addView(R.id.fw_shifts, shift)
                 }
+                val spare = (size.height - 16 - 40 * size.fontScale) / 4f - 4 -
+                    (10 + 16 * WidgetRenderPlan.twoWeeksSlots(day.shifts, size).size +
+                        if (day.note == null) 0 else 13) * 1.3f * size.fontScale
+                p.extras(R.id.fw_extras, day.extras, cellWidth - 4, size,
+                    WidgetRenderPlan.extraLines(spare, size.fontScale, 2))
                 cell.setContentDescription(R.id.fw_cell, displayDescription(day, noShift))
                 p.open(R.id.fw_cell, day.link)
                 views.addView(rows[i / 7], cell)
@@ -479,11 +529,33 @@ object WidgetRenderer {
             add(day.dateLabel)
             if (day.shifts.isEmpty()) add(noShift)
             for (s in day.shifts) add(listOfNotNull(s.code, s.name, s.timeLabel).distinct().joinToString(" "))
+            addAll(day.extras)
             if (day.hasNote) add(context.getString(R.string.widget_has_note))
         }.joinToString(". ")
 
+        private fun dp(value: Int): Int = (value * context.resources.displayMetrics.density).toInt()
+
+        private fun extras(id: Int, labels: List<String>, width: Float,
+                           size: WidgetRenderPlan.Size, lines: Int) {
+            val sp = context.resources.getDimension(R.dimen.widget_cell_time_size) /
+                context.resources.displayMetrics.scaledDensity
+            val text = labels.joinToString(" · ")
+            views.setTextViewText(id, WidgetRenderPlan.wholeWordLines(text, width.coerceAtLeast(1f), lines) {
+                measuredWidth(it, sp, size.fontScale)
+            })
+            views.setViewVisibility(id, visible(labels.isNotEmpty() && lines > 0))
+            color(id, "setTextColor", R.color.widget_text_secondary)
+        }
+
         private fun measuredWidth(text: String, sp: Float, scale: Float): Float =
             Paint().apply { textSize = sp * scale; isFakeBoldText = true }.measureText(text)
+
+        /** Round in pixels like TextView, including font padding only where XML does. */
+        private fun textHeight(sp: Float, scale: Float, fontPadding: Boolean = false): Float {
+            val density = context.resources.displayMetrics.density
+            val metrics = Paint().apply { textSize = sp * scale * density }.fontMetricsInt
+            return (if (fontPadding) metrics.bottom - metrics.top else metrics.descent - metrics.ascent) / density
+        }
 
         private fun fittedSize(text: String, sp: Float, width: Float, scale: Float): Float {
             val measured = measuredWidth(text, sp, scale)

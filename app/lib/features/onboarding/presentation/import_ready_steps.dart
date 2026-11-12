@@ -125,10 +125,10 @@ class ReadyStep extends ConsumerWidget {
     var offset = 0;
     var startShifts = '';
     if (state.hasRotation) {
-      final pattern = presetPattern(
-        schedule,
-        patternPresetById(state.presetId!),
-      );
+      final pattern = ref
+          .read(onboardingControllerProvider.notifier)
+          .request(schedule)!
+          .pattern;
       offset = state.stepOffset % pattern.lengthDays;
       final names = [
         for (final id in pattern.steps[offset])

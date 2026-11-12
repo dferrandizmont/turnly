@@ -72,10 +72,10 @@ void main() {
         exportedAt: DateTime.utc(2026, 11, 1),
       );
       final file = codec.decode(bytes);
-      expect(file.schemaVersion, 3);
-      expect(file.data, data);
+      expect(file.schemaVersion, 4);
+      expect(file.data, data.upgradedOvertime());
       await repo.restore(file.data);
-      expect(await repo.readAll(), data);
+      expect(await repo.readAll(), data.upgradedOvertime());
 
       final loaded = (await ScheduleRepository(db).load('main')).schedule;
       expect(loaded.versionsOf('night'), night.toVersions());
@@ -106,7 +106,7 @@ void main() {
       final safety = dir.listSync().whereType<File>().map(
         (f) => codec.decode(f.readAsBytesSync()).data,
       );
-      expect(safety.any((d) => d == data), isTrue);
+      expect(safety.any((d) => d == data.upgradedOvertime()), isTrue);
     },
   );
 

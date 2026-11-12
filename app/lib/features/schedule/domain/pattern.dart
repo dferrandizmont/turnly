@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 
 import 'civil_date.dart';
+import 'overtime.dart';
 import 'shift_type.dart' show maxStoredMoneyCents;
 
 const _listEq = ListEquality<String>();
@@ -112,6 +113,7 @@ class DayEntry {
     this.note,
     this.noteReminderMinute,
     this.overtimeMinutes,
+    this.overtimeBlocks = const [],
     this.earlyLeaveMinutes,
     this.extraAmountCents,
   }) : assert(
@@ -139,7 +141,17 @@ class DayEntry {
   final int? noteReminderMinute;
 
   /// Extra minutes worked this day (>= 0, A6). `null` = none.
+  ///
+  /// The old form of the extra hours: since schema v7 they are
+  /// [overtimeBlocks] and nothing in the app writes this any more. Only data
+  /// from before (a backup of format 3, an unmigrated row) can still carry
+  /// it, and it counts as it always did until it is converted
+  /// (`legacyOvertimeBlock`).
   final int? overtimeMinutes;
+
+  /// The extra hours of the day (schema v7): blocks that start on [date],
+  /// in order of start. Empty = none.
+  final List<OvertimeBlock> overtimeBlocks;
 
   /// Minutes the user left before the end of the shift (>= 0, A6). `null` =
   /// none.
@@ -162,6 +174,7 @@ class DayEntry {
       (note == null || note!.isEmpty) &&
       noteReminderMinute == null &&
       (overtimeMinutes ?? 0) == 0 &&
+      overtimeBlocks.isEmpty &&
       (earlyLeaveMinutes ?? 0) == 0 &&
       (extraAmountCents ?? 0) == 0;
 
@@ -170,6 +183,7 @@ class DayEntry {
     String? note,
     int? noteReminderMinute,
     int? overtimeMinutes,
+    List<OvertimeBlock>? overtimeBlocks,
     int? earlyLeaveMinutes,
     int? extraAmountCents,
     bool clearShiftTypeIds = false,
@@ -180,6 +194,7 @@ class DayEntry {
     bool clearExtraAmount = false,
   }) => DayEntry(
     date: date,
+    overtimeBlocks: overtimeBlocks ?? this.overtimeBlocks,
     shiftTypeIds: clearShiftTypeIds ? null : shiftTypeIds ?? this.shiftTypeIds,
     note: clearNote ? null : note ?? this.note,
     noteReminderMinute: clearNoteReminder
@@ -201,6 +216,7 @@ class DayEntry {
   DayEntry withShiftTypeIds(List<String>? ids) => DayEntry(
     date: date,
     shiftTypeIds: ids,
+    overtimeBlocks: overtimeBlocks,
     note: note,
     noteReminderMinute: noteReminderMinute,
     overtimeMinutes: overtimeMinutes,
@@ -215,6 +231,10 @@ class DayEntry {
       other.note == note &&
       other.noteReminderMinute == noteReminderMinute &&
       other.overtimeMinutes == overtimeMinutes &&
+      const ListEquality<OvertimeBlock>().equals(
+        other.overtimeBlocks,
+        overtimeBlocks,
+      ) &&
       other.earlyLeaveMinutes == earlyLeaveMinutes &&
       other.extraAmountCents == extraAmountCents &&
       (shiftTypeIds == null
@@ -228,6 +248,7 @@ class DayEntry {
     note,
     noteReminderMinute,
     overtimeMinutes,
+    const ListEquality<OvertimeBlock>().hash(overtimeBlocks),
     earlyLeaveMinutes,
     extraAmountCents,
     shiftTypeIds == null ? null : _listEq.hash(shiftTypeIds),
@@ -238,6 +259,7 @@ class DayEntry {
       'DayEntry($date, $shiftTypeIds, $note'
       '${noteReminderMinute == null ? '' : ', reminder $noteReminderMinute'}'
       '${overtimeMinutes == null ? '' : ', overtime $overtimeMinutes'}'
+      '${overtimeBlocks.isEmpty ? '' : ', blocks $overtimeBlocks'}'
       '${earlyLeaveMinutes == null ? '' : ', early $earlyLeaveMinutes'}'
       '${extraAmountCents == null ? '' : ', extra $extraAmountCents'})';
 }

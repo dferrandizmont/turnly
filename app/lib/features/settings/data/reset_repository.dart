@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:drift/drift.dart';
 
 import '../../../core/database/app_database.dart';
+import '../../../core/database/migration_v6_to_v7.dart';
 import '../../calendars/data/calendars_repository.dart';
 import '../../onboarding/data/onboarding_repository.dart';
 import '../../schedule/data/schedule_repository.dart';
@@ -19,6 +20,8 @@ class ResetRepository {
   final DateTime Function() now;
 
   Future<void> clear() => db.transaction(() async {
+    await db.delete(db.overtimeBlocks).go();
+    await db.delete(db.overtimeTypes).go();
     await db.delete(db.noteAttachments).go();
     await db.delete(db.dayTasks).go();
     await db.delete(db.shiftSwaps).go();
@@ -34,6 +37,8 @@ class ResetRepository {
       db.settings,
     )..where((s) => s.key.equals(PreferenceKeys.language).not())).go();
     await CalendarsRepository(db, now: now).ensureMain();
+    // The two built-in overtime types, as in a new database (schema v7).
+    await insertDefaultOvertimeTypes(db);
     await seedIfEmpty(
       ScheduleRepository(db, now: now),
       demo: false,

@@ -19,7 +19,7 @@ void main() {
   });
   tearDownAll(() => AppTypography.debugFamily = null);
 
-  const tall = Size(390, 2600);
+  const tall = Size(390, 3000);
 
   Future<Preferences> stored(AppUnderTest app) =>
       app.real(() => PreferencesRepository(app.database).load());

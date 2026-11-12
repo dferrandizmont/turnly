@@ -57,15 +57,21 @@ class PeriodHours {
 /// [PeriodHours] of the days `[first, last]` of [schedule] on [today]. The
 /// worked minutes of a period are the sum of its days' (each day's shifts
 /// and extras belong to that day), so the split is two [summarizeRange]s.
-/// Neither the holidays nor the night window change the hours.
+/// Neither the holidays nor the night window change the hours. With
+/// [forGoal] only the hours that count for the hours goal are counted: the
+/// overtime types that do not count (schema v7) are left out.
 PeriodHours splitPeriodHours(
   Schedule schedule,
   CivilDate first,
   CivilDate last,
-  CivilDate today,
-) {
-  int worked(CivilDate from, CivilDate to) =>
-      summarizeRange(schedule, from, to).workedMinutes;
+  CivilDate today, {
+  bool forGoal = false,
+}) {
+  int worked(CivilDate from, CivilDate to) {
+    final summary = summarizeRange(schedule, from, to);
+    return forGoal ? summary.goalCountedMinutes : summary.workedMinutes;
+  }
+
   final tense = periodTense(first, last, today);
   return switch (tense) {
     PeriodTense.past => PeriodHours(

@@ -9,11 +9,26 @@
     android:background="@drawable/widget_bg">
 
     <LinearLayout
-        android:id="@+id/strip"
+        android:id="@+id/medium_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:padding="8dp" />
+        android:orientation="vertical"
+        android:padding="@dimen/widget_space_s">
+        <TextView
+            android:id="@+id/strip_total"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/widget_text_secondary"
+            android:textSize="@dimen/widget_caption_size"
+            android:textStyle="bold"
+            android:visibility="gone" />
+        <LinearLayout
+            android:id="@+id/strip"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/stale"

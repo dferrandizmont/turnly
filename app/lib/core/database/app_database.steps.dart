@@ -2199,12 +2199,513 @@ i1.GeneratedColumn<int> _column_79(String aliasedName) =>
       type: i1.DriftSqlType.int,
       $customConstraints: 'NULL',
     );
+
+final class Schema7 extends i0.VersionedSchema {
+  Schema7({required super.database}) : super(version: 7);
+  @override
+  late final List<i1.DatabaseSchemaEntity> entities = [
+    calendars,
+    shiftTypes,
+    shiftTypeVersions,
+    patterns,
+    patternRuns,
+    dayEntries,
+    noteAttachments,
+    dayTasks,
+    shiftSwaps,
+    holidays,
+    absenceBalances,
+    settings,
+    overtimeTypes,
+    overtimeBlocks,
+    idxNoteAttachmentsDay,
+    idxDayTasksDay,
+    idxShiftSwapsDay,
+    idxHolidaysDate,
+  ];
+  late final Shape0 calendars = Shape0(
+    source: i0.VersionedTable(
+      entityName: 'calendars',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_3,
+        _column_4,
+        _column_5,
+        _column_6,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape12 shiftTypes = Shape12(
+    source: i0.VersionedTable(
+      entityName: 'shift_types',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'CHECK((start_minute IS NULL)=(end_minute IS NULL))',
+        'CHECK((segment2_start_minute IS NULL)=(segment2_duration_minutes IS NULL))',
+        'CHECK(segment2_start_minute IS NULL OR start_minute IS NOT NULL)',
+        'CHECK(segment2_start_minute IS NULL OR segment2_start_minute BETWEEN 0 AND 1439)',
+        'CHECK(segment2_duration_minutes IS NULL OR segment2_duration_minutes BETWEEN 1 AND 1440)',
+      ],
+      columns: [
+        _column_0,
+        _column_7,
+        _column_1,
+        _column_2,
+        _column_8,
+        _column_9,
+        _column_10,
+        _column_11,
+        _column_12,
+        _column_13,
+        _column_46,
+        _column_34,
+        _column_35,
+        _column_36,
+        _column_37,
+        _column_47,
+        _column_48,
+        _column_49,
+        _column_3,
+        _column_4,
+        _column_5,
+        _column_6,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape13 shiftTypeVersions = Shape13(
+    source: i0.VersionedTable(
+      entityName: 'shift_type_versions',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(shift_type_id, until_date)',
+        'CHECK((start_minute IS NULL)=(end_minute IS NULL))',
+        'CHECK((segment2_start_minute IS NULL)=(segment2_duration_minutes IS NULL))',
+        'CHECK(segment2_start_minute IS NULL OR start_minute IS NOT NULL)',
+        'CHECK(segment2_start_minute IS NULL OR segment2_start_minute BETWEEN 0 AND 1439)',
+        'CHECK(segment2_duration_minutes IS NULL OR segment2_duration_minutes BETWEEN 1 AND 1440)',
+      ],
+      columns: [
+        _column_42,
+        _column_43,
+        _column_8,
+        _column_9,
+        _column_10,
+        _column_44,
+        _column_12,
+        _column_50,
+        _column_46,
+        _column_36,
+        _column_37,
+        _column_48,
+        _column_49,
+        _column_5,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape2 patterns = Shape2(
+    source: i0.VersionedTable(
+      entityName: 'patterns',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)', 'CHECK(steps <> \'[]\')'],
+      columns: [_column_0, _column_1, _column_14, _column_5, _column_6],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape3 patternRuns = Shape3(
+    source: i0.VersionedTable(
+      entityName: 'pattern_runs',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'CHECK(end_date IS NULL OR end_date >= start_date)',
+      ],
+      columns: [
+        _column_0,
+        _column_15,
+        _column_16,
+        _column_17,
+        _column_18,
+        _column_19,
+        _column_20,
+        _column_5,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape14 dayEntries = Shape14(
+    source: i0.VersionedTable(
+      entityName: 'day_entries',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(calendar_id, date)'],
+      columns: [
+        _column_15,
+        _column_21,
+        _column_22,
+        _column_23,
+        _column_6,
+        _column_38,
+        _column_39,
+        _column_40,
+        _column_51,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape15 noteAttachments = Shape15(
+    source: i0.VersionedTable(
+      entityName: 'note_attachments',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'CHECK(kind IN (\'photo\', \'file\', \'sketch\'))',
+        'UNIQUE(relative_path COLLATE NOCASE)',
+        'CHECK(length(id) BETWEEN 1 AND 64)',
+        'CHECK(length(relative_path) BETWEEN 1 AND 512 AND substr(relative_path, 1, 1) NOT IN (\'/\', \'.\') AND instr(relative_path, \'..\') = 0 AND instr(relative_path, char(92)) = 0)',
+        'CHECK(length(mime_type) BETWEEN 1 AND 255)',
+        'CHECK(size_bytes BETWEEN 0 AND 52428800)',
+        'CHECK(length(sha256) = 64)',
+        'CHECK(display_name IS NULL OR length(display_name) BETWEEN 1 AND 255)',
+      ],
+      columns: [
+        _column_0,
+        _column_52,
+        _column_21,
+        _column_53,
+        _column_54,
+        _column_55,
+        _column_56,
+        _column_57,
+        _column_58,
+        _column_59,
+        _column_5,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape16 dayTasks = Shape16(
+    source: i0.VersionedTable(
+      entityName: 'day_tasks',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'CHECK(id <> \'\')',
+        'CHECK(trim(title) <> \'\' AND length(title) <= 500)',
+      ],
+      columns: [
+        _column_0,
+        _column_52,
+        _column_21,
+        _column_60,
+        _column_61,
+        _column_59,
+        _column_5,
+        _column_6,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape17 shiftSwaps = Shape17(
+    source: i0.VersionedTable(
+      entityName: 'shift_swaps',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'CHECK(id <> \'\')',
+        'CHECK(direction IN (\'theyOwe\', \'iOwe\'))',
+        'CHECK(status IN (\'pending\', \'returned\'))',
+        'CHECK(trim(colleague) <> \'\' AND length(colleague) <= 200)',
+        'CHECK(note IS NULL OR length(note) <= 2000)',
+        'CHECK((status = \'returned\')=(closed_at IS NOT NULL))',
+      ],
+      columns: [
+        _column_0,
+        _column_52,
+        _column_21,
+        _column_62,
+        _column_63,
+        _column_64,
+        _column_65,
+        _column_66,
+        _column_67,
+        _column_23,
+        _column_5,
+        _column_6,
+        _column_68,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape5 holidays = Shape5(
+    source: i0.VersionedTable(
+      entityName: 'holidays',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [],
+      columns: [
+        _column_24,
+        _column_21,
+        _column_25,
+        _column_1,
+        _column_26,
+        _column_27,
+        _column_28,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape18 absenceBalances = Shape18(
+    source: i0.VersionedTable(
+      entityName: 'absence_balances',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(year, type)',
+        'CHECK(unit IN (\'day\', \'half\', \'quarter\'))',
+        'CHECK(name IS NULL OR(trim(name) <> \'\' AND length(name) <= 100))',
+        'CHECK((period_start IS NULL)=(period_end IS NULL))',
+        'CHECK(period_end IS NULL OR period_end >= period_start)',
+        'CHECK(carry_over_max_days IS NULL OR(carry_over_max_days >= 0 AND carry_over_max_days * 4 = CAST(carry_over_max_days * 4 AS INTEGER)))',
+        'CHECK(adjustment_days * 4 = CAST(adjustment_days * 4 AS INTEGER))',
+      ],
+      columns: [
+        _column_29,
+        _column_30,
+        _column_31,
+        _column_69,
+        _column_70,
+        _column_71,
+        _column_72,
+        _column_73,
+        _column_74,
+        _column_75,
+        _column_76,
+        _column_77,
+        _column_59,
+        _column_78,
+        _column_79,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape7 settings = Shape7(
+    source: i0.VersionedTable(
+      entityName: 'settings',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY("key")'],
+      columns: [_column_32, _column_33],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape19 overtimeTypes = Shape19(
+    source: i0.VersionedTable(
+      entityName: 'overtime_types',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'CHECK(id <> \'\' AND length(id) <= 64)',
+        'CHECK(name IS NULL OR(trim(name) <> \'\' AND length(name) <= 100))',
+        'CHECK(rate_mode IN (\'shift\', \'multiplier\', \'fixed\', \'none\'))',
+        'CHECK(multiplier_basis_points BETWEEN 1 AND 1000000)',
+        'CHECK(hourly_rate_cents IS NULL OR hourly_rate_cents BETWEEN 0 AND 999999999)',
+        'CHECK(rate_mode <> \'fixed\' OR hourly_rate_cents IS NOT NULL)',
+      ],
+      columns: [
+        _column_0,
+        _column_70,
+        _column_2,
+        _column_80,
+        _column_81,
+        _column_13,
+        _column_82,
+        _column_4,
+        _column_59,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape20 overtimeBlocks = Shape20(
+    source: i0.VersionedTable(
+      entityName: 'overtime_blocks',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(calendar_id, date, id)',
+        'CHECK(id <> \'\' AND length(id) <= 64)',
+        'CHECK(break_minutes >= 0 AND break_minutes <((end_minute - start_minute + 1439)% 1440 + 1))',
+        'CHECK(note IS NULL OR(trim(note) <> \'\' AND length(note) <= 200))',
+      ],
+      columns: [
+        _column_52,
+        _column_21,
+        _column_0,
+        _column_83,
+        _column_84,
+        _column_85,
+        _column_86,
+        _column_23,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  final i1.Index idxNoteAttachmentsDay = i1.Index(
+    'idx_note_attachments_day',
+    'CREATE INDEX idx_note_attachments_day ON note_attachments (calendar_id, date)',
+  );
+  final i1.Index idxDayTasksDay = i1.Index(
+    'idx_day_tasks_day',
+    'CREATE INDEX idx_day_tasks_day ON day_tasks (calendar_id, date)',
+  );
+  final i1.Index idxShiftSwapsDay = i1.Index(
+    'idx_shift_swaps_day',
+    'CREATE INDEX idx_shift_swaps_day ON shift_swaps (calendar_id, date)',
+  );
+  final i1.Index idxHolidaysDate = i1.Index(
+    'idx_holidays_date',
+    'CREATE INDEX idx_holidays_date ON holidays (date)',
+  );
+}
+
+class Shape19 extends i0.VersionedTable {
+  Shape19({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get name =>
+      columnsByName['name']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get colorValue =>
+      columnsByName['color_value']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get rateMode =>
+      columnsByName['rate_mode']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get multiplierBasisPoints =>
+      columnsByName['multiplier_basis_points']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get hourlyRateCents =>
+      columnsByName['hourly_rate_cents']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get countsForGoal =>
+      columnsByName['counts_for_goal']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get archived =>
+      columnsByName['archived']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get sortOrder =>
+      columnsByName['sort_order']! as i1.GeneratedColumn<int>;
+}
+
+i1.GeneratedColumn<String> _column_80(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'rate_mode',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<int> _column_81(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'multiplier_basis_points',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL DEFAULT 10000',
+      defaultValue: const i1.CustomExpression('10000'),
+    );
+i1.GeneratedColumn<int> _column_82(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'counts_for_goal',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL CHECK (counts_for_goal IN (0, 1))',
+    );
+
+class Shape20 extends i0.VersionedTable {
+  Shape20({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get calendarId =>
+      columnsByName['calendar_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get date =>
+      columnsByName['date']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get typeId =>
+      columnsByName['type_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get startMinute =>
+      columnsByName['start_minute']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get endMinute =>
+      columnsByName['end_minute']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get breakMinutes =>
+      columnsByName['break_minutes']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get note =>
+      columnsByName['note']! as i1.GeneratedColumn<String>;
+}
+
+i1.GeneratedColumn<String> _column_83(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'type_id',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL REFERENCES overtime_types(id)',
+    );
+i1.GeneratedColumn<int> _column_84(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'start_minute',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL CHECK (start_minute BETWEEN 0 AND 1439)',
+    );
+i1.GeneratedColumn<int> _column_85(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'end_minute',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL CHECK (end_minute BETWEEN 0 AND 1439)',
+    );
+i1.GeneratedColumn<int> _column_86(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'break_minutes',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL DEFAULT 0',
+      defaultValue: const i1.CustomExpression('0'),
+    );
 i0.MigrationStepWithVersion migrationSteps({
   required Future<void> Function(i1.Migrator m, Schema2 schema) from1To2,
   required Future<void> Function(i1.Migrator m, Schema3 schema) from2To3,
   required Future<void> Function(i1.Migrator m, Schema4 schema) from3To4,
   required Future<void> Function(i1.Migrator m, Schema5 schema) from4To5,
   required Future<void> Function(i1.Migrator m, Schema6 schema) from5To6,
+  required Future<void> Function(i1.Migrator m, Schema7 schema) from6To7,
 }) {
   return (currentVersion, database) async {
     switch (currentVersion) {
@@ -2233,6 +2734,11 @@ i0.MigrationStepWithVersion migrationSteps({
         final migrator = i1.Migrator(database, schema);
         await from5To6(migrator, schema);
         return 6;
+      case 6:
+        final schema = Schema7(database: database);
+        final migrator = i1.Migrator(database, schema);
+        await from6To7(migrator, schema);
+        return 7;
       default:
         throw ArgumentError.value('Unknown migration from $currentVersion');
     }
@@ -2245,6 +2751,7 @@ i1.OnUpgrade stepByStep({
   required Future<void> Function(i1.Migrator m, Schema4 schema) from3To4,
   required Future<void> Function(i1.Migrator m, Schema5 schema) from4To5,
   required Future<void> Function(i1.Migrator m, Schema6 schema) from5To6,
+  required Future<void> Function(i1.Migrator m, Schema7 schema) from6To7,
 }) => i0.VersionedSchema.stepByStepHelper(
   step: migrationSteps(
     from1To2: from1To2,
@@ -2252,5 +2759,6 @@ i1.OnUpgrade stepByStep({
     from3To4: from3To4,
     from4To5: from4To5,
     from5To6: from5To6,
+    from6To7: from6To7,
   ),
 );

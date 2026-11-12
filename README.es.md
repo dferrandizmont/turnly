@@ -28,7 +28,7 @@ la app.
 
 <p>
   <a href="https://play.google.com/apps/testing/es.cuadrante.app"><img src="https://img.shields.io/badge/Google_Play-Beta-414141?logo=googleplay&amp;style=for-the-badge" alt="Beta en Google Play"></a>
-  <a href="https://github.com/dferrandizmont/turnly/releases/latest"><img src="https://img.shields.io/badge/Disponible_en-GitHub-181717?logo=github&amp;style=for-the-badge" alt="Disponible en GitHub"></a>
+  <a href="https://github.com/dferrandizmont/turnly/releases"><img src="https://img.shields.io/badge/Disponible_en-GitHub-181717?logo=github&amp;style=for-the-badge" alt="Disponible en GitHub"></a>
   <a href="https://apps.apple.com/es/app/turnly-cuadrante-de-turnos/id6832554552"><img src="https://img.shields.io/badge/App_Store-Descargar-0D96F6?logo=appstore&amp;style=for-the-badge" alt="Disponible en App Store"></a>
 </p>
 
@@ -50,7 +50,7 @@ Si puedes, quédate en la prueba al menos 14 días y úsala de vez en cuando (po
 <details>
 <summary>Instala el APK desde GitHub</summary>
 
-También puedes descargar el APK de la [última versión](https://github.com/dferrandizmont/turnly/releases/latest) e instalarlo a mano (hay que permitir «instalar aplicaciones de origen desconocido»). Desde la 0.8.3 va firmado con la misma clave que la versión de Google Play, así que puedes pasar de una a otra sin desinstalar y sin perder nada; Android solo no deja volver a una versión más antigua. Si instalaste Turnly desde Google Play antes de la 0.8.3, desinstálala una vez (exporta antes una copia desde la app: `.turnly`; las versiones anteriores la guardan como `.cuadrante`).
+También puedes descargar el APK de la [última versión](https://github.com/dferrandizmont/turnly/releases) e instalarlo a mano (hay que permitir «instalar aplicaciones de origen desconocido»). Desde la 0.8.3 va firmado con la misma clave que la versión de Google Play, así que puedes pasar de una a otra sin desinstalar y sin perder nada; Android solo no deja volver a una versión más antigua. Si instalaste Turnly desde Google Play antes de la 0.8.3, desinstálala una vez (exporta antes una copia desde la app: `.turnly`; las versiones anteriores la guardan como `.cuadrante`).
 
 </details>
 
@@ -86,16 +86,19 @@ por [tests de Flutter](app/test/store/), también [en inglés](README.md#screens
 - **Mes, rotación, agenda y resumen.** Barra inferior (Mes · Rotación · Agenda ·
   Resumen) y tarjeta de hoy plegable con el próximo turno, el próximo día libre y
   la racha. Cada turno lleva color, código y horario, en cuadrícula o lista, con
-  vista anual y notas por día.
+  vista anual y notas por día. Bajo el mes, una tira con sus turnos, horas frente
+  al objetivo y próximo libre; tócala para abrir el resumen de ese mes.
 - **Pintar turnos y rotaciones.** Toca o arrastra para seleccionar varios días,
   doblar, copiar y pegar, deshacer y rehacer; asistente de rotaciones con vista
-  previa: correturnos, 24/72, 4×4, 6×4, 5×2, 2-2-3 y patrones propios. Tipos de
-  turno, colores, iconos y horarios editables.
+  previa: correturnos, 24/72, 4×4, 6×4, 5×2, 2-2-3, «2 y 2», «3 y 1» y patrones
+  propios. En las dos nuevas eliges el turno de trabajo. Tipos de turno, colores,
+  iconos y horarios editables.
 - **Festivos por país.** España con sus comunidades y municipios, y 21 países más
   (Portugal, Brasil, Latinoamérica, Europa, Estados Unidos y Canadá), todo sin
   conexión, además de los que añadas tú.
 - **Alarmas, widgets y no molestar.** Alarma por tipo de turno, recordatorios de
-  notas y widgets de Android, incluido uno de cuatro semanas. En Android,
+  notas y widgets de Android, incluido uno de cuatro semanas. Muestran extras y
+  salidas anticipadas; el de siete días suma las horas. En Android,
   «Silenciar el móvil en mis turnos» lo silencia mientras trabajas. La puntualidad
   depende de los permisos y las restricciones del sistema. En iPhone también hay
   widgets, en la pantalla de inicio y en la de bloqueo.
@@ -105,14 +108,18 @@ por [tests de Flutter](app/test/store/), también [en inglés](README.md#screens
   restauración». Informes en PDF y CSV de un mes o de las fechas que quieras,
   «Mantener al día» para seguir tus turnos en el calendario del móvil, e
   importación desde LRHSoft, `.ics`, CSV y el calendario del móvil.
-- **Horas, dinero y permisos.** Horas trabajadas, nocturnas y festivas, extras y
-  salidas anticipadas; pluses de noche y de festivo por hora; estimación bruta y
+- **Horas, dinero y permisos.** Horas trabajadas, nocturnas y festivas, salidas
+  anticipadas y extras por bloques, con tipos y tarifa; eliges si cada tipo cuenta
+  para el objetivo de horas. El Resumen y el PDF muestran tu racha más larga de
+  días trabajados seguidos. Pluses de noche y de festivo por hora; estimación bruta y
   neta con la retención que pongas. Saldos de vacaciones y permisos por año y tipo,
   con los días arrastrados y los que te quedan.
 
 <details>
 <summary>Más funciones</summary>
 
+- **Rotación desde el día.** Inicia, termina o retoma tu rotación desde el detalle
+  de un día, con explicación de lo que cambia y opción de deshacer.
 - **Libro de cambios.** Anota un turno que cedas o recibas de un compañero, mira
   su balance («Me debe 2 turnos», «Le debo 1 turno»), el estado y los turnos de
   cada cambio, y aplícalo al calendario con un solo deshacer.
@@ -153,6 +160,7 @@ datos van al destino que elijas. El archivo de copia `.turnly` no está cifrado.
 
 ## Novedades
 
+- **0.10.0 (12-nov-2026):** horas extra por bloques con tipos y tarifa, y acciones de rotación desde el día. Tira del mes con el próximo libre, racha más larga en el Resumen, widgets de Android con extras y total de siete días, y rotaciones «2 y 2» / «3 y 1».
 - **1.0.0 (10-nov-2026):** primera versión en la App Store, para iPhone. Android sigue en pruebas en Google Play.
 
 Lo que cambia en cada versión está en [CHANGELOG.md](CHANGELOG.md) y en las

@@ -279,7 +279,7 @@ void main() {
       'a newer version (R6)': (
         gzipEnvelope({
           'format': 'cuadrante',
-          'schemaVersion': 4,
+          'schemaVersion': 5,
           'appVersion': '9.9.9',
           'exportedAt': '2030-01-01T00:00:00Z',
           'data': {'calendars': <Object?>[]},
@@ -635,10 +635,7 @@ void main() {
       await tester.pump();
       await tester.tap(key('restore-confirm'));
       await pumpIo(tester, until: key('restore-done'));
-      expect(
-        find.textContaining('no incluye 2 adjuntos'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('no incluye 2 adjuntos'), findsOneWidget);
       // The usual text is still there.
       expect(find.textContaining('Antes de cambiar nada'), findsOneWidget);
     });

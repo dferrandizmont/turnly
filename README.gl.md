@@ -27,7 +27,7 @@ Todas as funcións dispoñibles están abertas, sen Pro nin compras dentro da ap
 
 <p>
   <a href="https://play.google.com/apps/testing/es.cuadrante.app"><img src="https://img.shields.io/badge/Google_Play-Beta-414141?logo=googleplay&amp;style=for-the-badge" alt="Beta en Google Play"></a>
-  <a href="https://github.com/dferrandizmont/turnly/releases/latest"><img src="https://img.shields.io/badge/Dispo%C3%B1ible_en-GitHub-181717?logo=github&amp;style=for-the-badge" alt="Dispoñible en GitHub"></a>
+  <a href="https://github.com/dferrandizmont/turnly/releases"><img src="https://img.shields.io/badge/Dispo%C3%B1ible_en-GitHub-181717?logo=github&amp;style=for-the-badge" alt="Dispoñible en GitHub"></a>
   <a href="https://apps.apple.com/es/app/turnly-cuadrante-de-turnos/id6832554552"><img src="https://img.shields.io/badge/App_Store-Descargar-0D96F6?logo=appstore&amp;style=for-the-badge" alt="Dispoñible na App Store"></a>
 </p>
 
@@ -49,7 +49,7 @@ Se podes, quédate na proba polo menos 14 días e úsaa de cando en vez (por exe
 <details>
 <summary>Instala o APK desde GitHub</summary>
 
-Tamén podes descargar o APK da [última versión](https://github.com/dferrandizmont/turnly/releases/latest) e instalalo á man (hai que permitir «instalar aplicacións de orixe descoñecida»). Desde a 0.8.3 vai asinado coa mesma clave que a versión de Google Play, así que podes pasar dunha á outra sen desinstalar e sen perder nada; Android só non deixa volver a unha versión máis antiga. Se instalaches Turnly desde Google Play antes da 0.8.3, desinstálaa unha vez (exporta antes unha copia desde a app: `.turnly`; as versións anteriores gárdana como `.cuadrante`).
+Tamén podes descargar o APK da [última versión](https://github.com/dferrandizmont/turnly/releases) e instalalo á man (hai que permitir «instalar aplicacións de orixe descoñecida»). Desde a 0.8.3 vai asinado coa mesma clave que a versión de Google Play, así que podes pasar dunha á outra sen desinstalar e sen perder nada; Android só non deixa volver a unha versión máis antiga. Se instalaches Turnly desde Google Play antes da 0.8.3, desinstálaa unha vez (exporta antes unha copia desde a app: `.turnly`; as versións anteriores gárdana como `.cuadrante`).
 
 </details>
 
@@ -85,16 +85,19 @@ por [tests de Flutter](app/test/store/), tamén [en castelán](README.es.md#capt
 - **Mes, rotación, axenda e resumo.** Barra inferior (Mes · Rotación · Axenda ·
   Resumo) e tarxeta de hoxe pregable coa próxima quenda, o próximo día libre e a
   racha. Cada quenda leva cor, código e horario, en cuadrícula ou lista, con
-  vista anual e notas por día.
+  vista anual e notas por día. Baixo o mes, unha tira coas quendas, horas fronte
+  ao obxectivo e próximo día libre; tócaa para abrir o resumo dese mes.
 - **Pintar quendas e rotacións.** Toca ou arrasta para seleccionar varios días,
   dobrar, copiar e pegar, desfacer e refacer; asistente de rotacións con vista
-  previa: quendas rotativas, 24/72, 4×4, 6×4, 5×2, 2-2-3 e patróns propios.
+  previa: quendas rotativas, 24/72, 4×4, 6×4, 5×2, 2-2-3, «2 e 2», «3 e 1» e patróns
+  propios. Nas dúas novas escolles a quenda de traballo.
   Tipos de quenda, cores, iconas e horarios editables.
 - **Festivos por país.** España coas súas comunidades e municipios, e 21 países
   máis (Portugal, Brasil, Latinoamérica, Europa, Estados Unidos e Canadá), todo
   sen conexión, ademais dos que engadas ti.
 - **Alarmas, widgets e non molestar.** Alarma por tipo de quenda, recordatorios
-  de notas e widgets de Android, incluído un de catro semanas. En Android,
+  de notas e widgets de Android, incluído un de catro semanas. Mostran extras e
+  saídas anticipadas; o de sete días suma as horas. En Android,
   «Silenciar o móbil nas miñas quendas» silénciao mentres traballas. A
   puntualidade depende dos permisos e das restricións do sistema. No iPhone tamén
   hai widgets, na pantalla de inicio e na de bloqueo.
@@ -104,14 +107,18 @@ por [tests de Flutter](app/test/store/), tamén [en castelán](README.es.md#capt
   restauración». Informes en PDF e CSV dun mes ou das datas que queiras, «Manter
   ao día» para seguir as túas quendas no calendario do móbil, e importación
   desde LRHSoft, `.ics`, CSV e o calendario do móbil.
-- **Horas, diñeiro e permisos.** Horas traballadas, nocturnas e festivas, extras
-  e saídas anticipadas; pluses de noite e de festivo por hora; estimación bruta e
+- **Horas, diñeiro e permisos.** Horas traballadas, nocturnas e festivas, saídas
+  anticipadas e extras por bloques, con tipos e tarifa; escolles se cada tipo conta
+  para o obxectivo de horas. O Resumo e o PDF mostran a racha máis longa de días
+  traballados seguidos. Pluses de noite e de festivo por hora; estimación bruta e
   neta coa retención que poñas. Saldos de vacacións e permisos por ano e tipo,
   cos días arrastrados e os que che quedan.
 
 <details>
 <summary>Máis funcións</summary>
 
+- **Rotación desde o día.** Inicia, remata ou retoma a rotación desde o detalle
+  dun día, cunha explicación do que cambia e a opción de desfacer.
 - **Libro de cambios.** Anota unha quenda que cedas ou recibas dun compañeiro,
   mira o seu balance («Débeme 2 quendas», «Débolle 1 quenda»), o estado e as
   quendas de cada cambio, e aplícao ao calendario cun só desfacer.
@@ -152,6 +159,7 @@ datos van ao destino que escollas. O ficheiro de copia `.turnly` non está cifra
 
 ## Novidades
 
+- **0.10.0 (12-nov-2026):** horas extra por bloques con tipos e tarifa, e accións de rotación desde o día. Tira do mes co próximo día libre, racha máis longa no Resumo, widgets de Android con extras e total de sete días, e rotacións «2 e 2» / «3 e 1».
 - **1.0.0 (10-nov-2026):** primeira versión na App Store, para iPhone. Android segue en probas en Google Play.
 
 O que cambia en cada versión está no [CHANGELOG.md](CHANGELOG.md) e nas

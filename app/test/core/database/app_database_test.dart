@@ -439,7 +439,7 @@ void main() {
       raw.select('PRAGMA user_version').single.values.single,
       AppDatabase.latestSchemaVersion,
     );
-    expect(AppDatabase.latestSchemaVersion, 6);
+    expect(AppDatabase.latestSchemaVersion, 7);
     // A fresh install needs no backup.
     expect(
       Directory(p.join(dir.path, backupsDirectoryName)).existsSync(),

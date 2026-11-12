@@ -92,19 +92,24 @@ Future<void> _shifts(QaContext qa) async {
   expect(idsOn(app.schedule, _oct24), 'rest');
 
   await _open(t, _oct24);
-  // Add a second shift from the palette.
+  // Since 0.8.9, a work shift replaces a lone Libre (bae14466).
   await _tap(t, 'day-add-guard24');
-  expect(idsOn(_state(t).schedule, _oct24), 'rest+guard24');
+  expect(idsOn(_state(t).schedule, _oct24), 'guard24');
   await app.flushWrites();
-  expect((await app.storedDay(_oct24))?.shiftTypeIds, ['rest', 'guard24']);
-  await qa.shot('doblado');
+  expect((await app.storedDay(_oct24))?.shiftTypeIds, ['guard24']);
 
-  // Move it first, then drop the Libre.
-  await _tap(t, 'day-up-1');
+  // Explicitly add Libre back: keep testing two rows, order and removal.
+  await _tap(t, 'day-add-rest');
   expect(idsOn(_state(t).schedule, _oct24), 'guard24+rest');
   await app.flushWrites();
   expect((await app.storedDay(_oct24))?.shiftTypeIds, ['guard24', 'rest']);
-  await _tap(t, 'day-remove-1');
+  await qa.shot('doblado');
+
+  await _tap(t, 'day-up-1');
+  expect(idsOn(_state(t).schedule, _oct24), 'rest+guard24');
+  await app.flushWrites();
+  expect((await app.storedDay(_oct24))?.shiftTypeIds, ['rest', 'guard24']);
+  await _tap(t, 'day-remove-0');
   expect(idsOn(_state(t).schedule, _oct24), 'guard24');
   await app.flushWrites();
   expect((await app.storedDay(_oct24))?.shiftTypeIds, ['guard24']);
@@ -113,18 +118,26 @@ Future<void> _shifts(QaContext qa) async {
   expect(inCell(_oct24, find.text('L')), findsNothing);
   final edited = await app.dumpSchedule();
 
-  // Three edits are three undo steps, and the database follows each one.
-  await _undoFromMonth(t, times: 2);
+  // Four edits, four undo steps, with the stored rows checked at each step.
+  await _undoFromMonth(t);
   expect(idsOn(app.schedule, _oct24), 'rest+guard24');
   await app.flushWrites();
   expect((await app.storedDay(_oct24))?.shiftTypeIds, ['rest', 'guard24']);
+  await _undoFromMonth(t);
+  expect(idsOn(app.schedule, _oct24), 'guard24+rest');
+  await app.flushWrites();
+  expect((await app.storedDay(_oct24))?.shiftTypeIds, ['guard24', 'rest']);
+  await _undoFromMonth(t);
+  expect(idsOn(app.schedule, _oct24), 'guard24');
+  await app.flushWrites();
+  expect((await app.storedDay(_oct24))?.shiftTypeIds, ['guard24']);
   await _undoFromMonth(t);
   expect(idsOn(app.schedule, _oct24), 'rest');
   await app.flushWrites();
   expect(await app.dumpSchedule(), original, reason: 'BD como al principio');
   expect(await app.storedDay(_oct24), isNull);
 
-  await _redoFromMonth(t, times: 3);
+  await _redoFromMonth(t, times: 4);
   expect(idsOn(app.schedule, _oct24), 'guard24');
   await app.flushWrites();
   expect(await app.dumpSchedule(), edited, reason: 'rehacer vuelve al final');
@@ -141,11 +154,11 @@ Future<void> _reset(QaContext qa) async {
 
   await _open(t, _oct21);
   expect(find.text('Cambiado a mano'), findsOneWidget);
-  expect(find.text('El patrón da: Noche 22:00–06:00'), findsOneWidget);
+  expect(find.text('Según tu rotación: Noche 22:00–06:00'), findsOneWidget);
   await qa.shot('con_excepcion');
   await _tap(t, 'day-reset');
   expect(_k('day-reset'), findsNothing);
-  expect(find.text('Según tu patrón'), findsOneWidget);
+  expect(find.text('De tu rotación «Correturnos»'), findsOneWidget);
   await _close(t);
 
   expect(idsOn(app.schedule, _oct21), 'night');
@@ -359,7 +372,7 @@ Future<void> _undoChain(QaContext qa) async {
   await _close(t);
   await app.flushWrites();
   dumps.add(await app.dumpSchedule());
-  expect(idsOn(app.schedule, _oct24), 'rest+guard24');
+  expect(idsOn(app.schedule, _oct24), 'guard24');
   expect(app.schedule.resolve(_oct24).note, 'Guardia');
 
   // 3. Rename a shift type in the middle of the history.
@@ -389,7 +402,7 @@ Future<void> _undoChain(QaContext qa) async {
   final undo = find.byKey(const ValueKey('undo'));
   await t.tapAndSettle(undo);
   expect(app.schedule.resolve(_oct24).note, isNull);
-  expect(idsOn(app.schedule, _oct24), 'rest+guard24');
+  expect(idsOn(app.schedule, _oct24), 'guard24');
   await t.tapAndSettle(undo);
   expect(idsOn(app.schedule, _oct24), 'rest');
   await app.flushWrites();
@@ -412,7 +425,7 @@ Future<void> _undoChain(QaContext qa) async {
     await t.tapAndSettle(redo);
   }
   await exitPaintMode(t);
-  expect(idsOn(app.schedule, _oct24), 'rest+guard24');
+  expect(idsOn(app.schedule, _oct24), 'guard24');
   expect(idsOn(app.schedule, _oct30), 'afternoon');
   await app.flushWrites();
   expect(await app.dumpSchedule(), renamed(dumps.last));

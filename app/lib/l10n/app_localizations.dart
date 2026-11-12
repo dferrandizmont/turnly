@@ -536,11 +536,11 @@ abstract class AppLocalizations {
   /// **'Próximos días'**
   String get upcomingTitle;
 
-  /// No description provided for @dayDetailSourcePattern.
+  /// Detalle del día, bajo los turnos: el día sale de la rotación (con su nombre) y nadie lo ha cambiado a mano.
   ///
   /// In es, this message translates to:
-  /// **'Según tu patrón'**
-  String get dayDetailSourcePattern;
+  /// **'De tu rotación «{name}»'**
+  String dayDetailSourcePattern(String name);
 
   /// No description provided for @dayDetailSourceOverride.
   ///
@@ -563,14 +563,134 @@ abstract class AppLocalizations {
   /// No description provided for @dayDetailReset.
   ///
   /// In es, this message translates to:
-  /// **'Volver al patrón'**
+  /// **'Volver a la rotación'**
   String get dayDetailReset;
 
-  /// Lo que daría la rotación ese día, bajo «Volver al patrón», p. ej. «El patrón da: Noche 22:00–06:00».
+  /// Lo que daría la rotación ese día, bajo «Volver a la rotación», p. ej. «Según tu rotación: Noche 22:00–06:00».
   ///
   /// In es, this message translates to:
-  /// **'El patrón da: {shifts}'**
+  /// **'Según tu rotación: {shifts}'**
   String dayDetailPatternGives(String shifts);
+
+  /// Detalle de un día sin rotación, cuando una rotación terminó antes: de dónde viene el hueco.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu rotación «{name}» terminó el {date}'**
+  String dayRotationEnded(String name, String date);
+
+  /// Botón del detalle del día que abre el menú con las acciones de la rotación.
+  ///
+  /// In es, this message translates to:
+  /// **'Rotación'**
+  String get dayRotationMenu;
+
+  /// Menú «Rotación» del detalle del día: la rotación de ese día vuelve a empezar ese día por el primer día del ciclo.
+  ///
+  /// In es, this message translates to:
+  /// **'Empezar la rotación aquí'**
+  String get dayRotationRestart;
+
+  /// Menú «Rotación» del detalle del día: la rotación termina ese día.
+  ///
+  /// In es, this message translates to:
+  /// **'Último día de esta rotación'**
+  String get dayRotationEndHere;
+
+  /// Menú «Rotación» del detalle de un día sin rotación: la última rotación que terminó vuelve a aplicarse desde ese día.
+  ///
+  /// In es, this message translates to:
+  /// **'Empezar tu rotación aquí'**
+  String get dayRotationResume;
+
+  /// Título del diálogo que confirma «Empezar la rotación aquí».
+  ///
+  /// In es, this message translates to:
+  /// **'¿Empezar la rotación aquí?'**
+  String get dayRotationRestartTitle;
+
+  /// Diálogo de «Empezar la rotación aquí»: qué cambia. {shifts} es lo que da el primer día del ciclo.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu rotación «{name}» volverá a empezar el {date}: ese día será el primero del ciclo ({shifts}).'**
+  String dayRotationRestartBody(String name, String date, String shifts);
+
+  /// Terminar una rotación no cambia las fechas de las demás.
+  ///
+  /// In es, this message translates to:
+  /// **'Las demás rotaciones mantienen sus fechas.'**
+  String get dayRotationEndKeepsOthers;
+
+  /// Reinicio con fin: prioridad temporal, sin cambiar las fechas fuera del intervalo.
+  ///
+  /// In es, this message translates to:
+  /// **'Esta rotación tendrá prioridad hasta el {date}. Las demás seguirán aplicándose en las fechas que queden fuera de ese intervalo.'**
+  String dayRotationRestartOthersUntil(String date);
+
+  /// Diálogo de «Empezar la rotación aquí», solo si había otras rotaciones puestas para después de ese día.
+  ///
+  /// In es, this message translates to:
+  /// **'Las rotaciones que habías puesto para después de ese día se quitarán.'**
+  String get dayRotationRestartOthers;
+
+  /// Última frase de los diálogos de las acciones de rotación del detalle del día.
+  ///
+  /// In es, this message translates to:
+  /// **'Los días anteriores y tus cambios a mano no se tocan.'**
+  String get dayRotationKeeps;
+
+  /// Botón que confirma «Empezar la rotación aquí» y «Empezar tu rotación aquí».
+  ///
+  /// In es, this message translates to:
+  /// **'Empezar aquí'**
+  String get dayRotationStartConfirm;
+
+  /// Aviso, con «Deshacer», tras empezar la rotación en un día desde su detalle.
+  ///
+  /// In es, this message translates to:
+  /// **'La rotación empieza el {date}'**
+  String dayRotationStartDone(String date);
+
+  /// Título del diálogo que confirma «Último día de esta rotación».
+  ///
+  /// In es, this message translates to:
+  /// **'¿Terminar la rotación este día?'**
+  String get dayRotationEndTitle;
+
+  /// Diálogo de «Último día de esta rotación»: primera frase.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu rotación «{name}» terminará el {date}.'**
+  String dayRotationEndBody(String name, String date);
+
+  /// Diálogo de «Último día de esta rotación»: qué pasa solo el día siguiente cuando no hay otra rotación debajo.
+  ///
+  /// In es, this message translates to:
+  /// **'El {date} no tendrá ninguna rotación asignada.'**
+  String dayRotationEndThenNone(String date);
+
+  /// Diálogo de «Último día de esta rotación»: qué otra rotación se aplica solo el día siguiente (una anterior que seguía debajo).
+  ///
+  /// In es, this message translates to:
+  /// **'El {date} se aplicará tu rotación «{name}».'**
+  String dayRotationEndThenOther(String date, String name);
+
+  /// Título del diálogo que confirma «Empezar tu rotación aquí».
+  ///
+  /// In es, this message translates to:
+  /// **'¿Empezar tu rotación aquí?'**
+  String get dayRotationResumeTitle;
+
+  /// Diálogo de «Empezar tu rotación aquí» cuando no hay otra rotación después.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu rotación «{name}» se aplicará otra vez desde el {date}, sin fecha de fin.'**
+  String dayRotationResumeBody(String name, String date);
+
+  /// Diálogo de «Empezar tu rotación aquí» cuando otra rotación empieza más adelante: dura hasta el día anterior.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu rotación «{name}» se aplicará otra vez desde el {date} hasta el {until}, el día antes de que empiece la siguiente rotación.'**
+  String dayRotationResumeBodyUntil(String name, String date, String until);
 
   /// No description provided for @dayDetailNoteHint.
   ///
@@ -871,6 +991,30 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'«{name}» recuperado'**
   String shiftTypesRestored(String name);
+
+  /// No description provided for @discardChangesTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Descartar los cambios?'**
+  String get discardChangesTitle;
+
+  /// No description provided for @discardChangesBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Los cambios sin guardar se perderán.'**
+  String get discardChangesBody;
+
+  /// No description provided for @discardChangesConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Descartar'**
+  String get discardChangesConfirm;
+
+  /// No description provided for @discardChangesKeep.
+  ///
+  /// In es, this message translates to:
+  /// **'Seguir editando'**
+  String get discardChangesKeep;
 
   /// No description provided for @shiftTypesDiscardTitle.
   ///
@@ -1900,7 +2044,7 @@ abstract class AppLocalizations {
   /// No description provided for @selectionReset.
   ///
   /// In es, this message translates to:
-  /// **'Volver al patrón'**
+  /// **'Volver a la rotación'**
   String get selectionReset;
 
   /// No description provided for @selectionCopy.
@@ -8845,7 +8989,7 @@ abstract class AppLocalizations {
   /// No description provided for @catalogPattern4x4Description.
   ///
   /// In es, this message translates to:
-  /// **'4 días de 12 h y 4 libres'**
+  /// **'4 días de 12 h y 4 libres (4x4 o cuatro y cuatro)'**
   String get catalogPattern4x4Description;
 
   /// No description provided for @catalogPattern5x2Name.
@@ -8869,7 +9013,7 @@ abstract class AppLocalizations {
   /// No description provided for @catalogPattern223Description.
   ///
   /// In es, this message translates to:
-  /// **'Dos días de 12 h, dos libres, tres de 12 h, dos libres, dos de 12 h y tres libres (también 2-2-3-2-2-3)'**
+  /// **'Dos días de 12 h, dos libres, tres de 12 h, dos libres, dos de 12 h y tres libres (también 2-2-3-2-2-3). También se conoce como Pitman o Panamá.'**
   String get catalogPattern223Description;
 
   /// No description provided for @catalogPatternContinentalName.
@@ -9321,6 +9465,48 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Resumen'**
   String get monthNavSummary;
+
+  /// Tira bajo el mes: horas del mes frente al objetivo de horas, p. ej. «128 / 160 h».
+  ///
+  /// In es, this message translates to:
+  /// **'{worked} / {goal}'**
+  String monthStripHoursGoal(String worked, String goal);
+
+  /// Tira bajo el mes: dos datos seguidos en la misma línea.
+  ///
+  /// In es, this message translates to:
+  /// **'{first} · {second}'**
+  String monthStripFacts(String first, String second);
+
+  /// Tira bajo el mes: horas que faltan para el objetivo del mes, tras «128 / 160 h».
+  ///
+  /// In es, this message translates to:
+  /// **'Por completar: {hours}'**
+  String monthStripShort(String hours);
+
+  /// Tira bajo el mes: horas por encima del objetivo del mes, tras «168 / 160 h».
+  ///
+  /// In es, this message translates to:
+  /// **'{hours} de más'**
+  String monthStripOver(String hours);
+
+  /// Tira bajo el mes actual: el próximo día libre y cuántos días faltan (de 2 en adelante; hoy y mañana tienen su propio texto).
+  ///
+  /// In es, this message translates to:
+  /// **'{days, plural, =1{Próximo libre: {date}, en 1 día} other{Próximo libre: {date}, en {days} días}}'**
+  String monthStripNextOff(String date, int days);
+
+  /// Tira bajo un mes que aún no ha llegado: su primer día libre.
+  ///
+  /// In es, this message translates to:
+  /// **'Primer libre: {date}'**
+  String monthStripFirstOff(String date);
+
+  /// Lo que dice el lector de pantalla de la tira bajo el mes (un botón que abre el resumen de ese mes).
+  ///
+  /// In es, this message translates to:
+  /// **'Resumen del mes: {facts}'**
+  String monthStripLabel(String facts);
 
   /// Botón que reduce la tarjeta de hoy a una línea; se recuerda.
   ///
@@ -11407,6 +11593,408 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Copia de justo antes de empezar de cero'**
   String get backupUiOriginPreReset;
+
+  /// No description provided for @overtimeSheetAdd.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir horas extra'**
+  String get overtimeSheetAdd;
+
+  /// No description provided for @overtimeSheetEdit.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar horas extra'**
+  String get overtimeSheetEdit;
+
+  /// No description provided for @overtimeTypeLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Tipo'**
+  String get overtimeTypeLabel;
+
+  /// No description provided for @overtimeManageTypes.
+  ///
+  /// In es, this message translates to:
+  /// **'Gestionar tipos'**
+  String get overtimeManageTypes;
+
+  /// No description provided for @overtimeAfterShift.
+  ///
+  /// In es, this message translates to:
+  /// **'Justo después del turno'**
+  String get overtimeAfterShift;
+
+  /// No description provided for @overtimeNextDay.
+  ///
+  /// In es, this message translates to:
+  /// **'Acaba al día siguiente'**
+  String get overtimeNextDay;
+
+  /// No description provided for @overtimeQuickLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Duración'**
+  String get overtimeQuickLabel;
+
+  /// No description provided for @overtimeQuickHours.
+  ///
+  /// In es, this message translates to:
+  /// **'+{hours} h'**
+  String overtimeQuickHours(int hours);
+
+  /// No description provided for @overtimeBreakLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Descanso no pagado (opcional)'**
+  String get overtimeBreakLabel;
+
+  /// No description provided for @overtimeBreakUnit.
+  ///
+  /// In es, this message translates to:
+  /// **'min'**
+  String get overtimeBreakUnit;
+
+  /// No description provided for @overtimeNoteLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Nota corta (opcional)'**
+  String get overtimeNoteLabel;
+
+  /// No description provided for @overtimePreviewPriced.
+  ///
+  /// In es, this message translates to:
+  /// **'{duration} × {rate} = {amount}'**
+  String overtimePreviewPriced(String duration, String rate, String amount);
+
+  /// No description provided for @overtimePreviewUnpriced.
+  ///
+  /// In es, this message translates to:
+  /// **'{duration}, sin precio'**
+  String overtimePreviewUnpriced(String duration);
+
+  /// No description provided for @overtimeBreakTooLong.
+  ///
+  /// In es, this message translates to:
+  /// **'El descanso tiene que ser más corto que el bloque.'**
+  String get overtimeBreakTooLong;
+
+  /// No description provided for @overtimeDayTotal.
+  ///
+  /// In es, this message translates to:
+  /// **'Total del día: {hours}'**
+  String overtimeDayTotal(String hours);
+
+  /// No description provided for @overtimeDayTotalMoney.
+  ///
+  /// In es, this message translates to:
+  /// **'Total del día: {hours} · {amount}'**
+  String overtimeDayTotalMoney(String hours, String amount);
+
+  /// No description provided for @overtimeBaseRateTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Precio base por hora'**
+  String get overtimeBaseRateTitle;
+
+  /// No description provided for @overtimeBaseRateHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Lo usan las horas extra «como el turno» en los días sin turno con precio.'**
+  String get overtimeBaseRateHelp;
+
+  /// No description provided for @overtimeBaseRateNone.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin precio base'**
+  String get overtimeBaseRateNone;
+
+  /// No description provided for @overtimeBaseRateField.
+  ///
+  /// In es, this message translates to:
+  /// **'Precio por hora'**
+  String get overtimeBaseRateField;
+
+  /// No description provided for @overtimeTypesTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tipos de horas extra'**
+  String get overtimeTypesTitle;
+
+  /// No description provided for @overtimeTypesHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Cada bloque de horas extra lleva un tipo: cómo se paga y si cuenta para tu objetivo de horas.'**
+  String get overtimeTypesHelp;
+
+  /// No description provided for @overtimeTypesCount.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 tipo} other{{count} tipos}}'**
+  String overtimeTypesCount(int count);
+
+  /// No description provided for @overtimeNewType.
+  ///
+  /// In es, this message translates to:
+  /// **'Nuevo tipo'**
+  String get overtimeNewType;
+
+  /// No description provided for @overtimeEditType.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar tipo'**
+  String get overtimeEditType;
+
+  /// No description provided for @overtimeTypeMoveUp.
+  ///
+  /// In es, this message translates to:
+  /// **'Subir {name}'**
+  String overtimeTypeMoveUp(String name);
+
+  /// No description provided for @overtimeTypeMoveDown.
+  ///
+  /// In es, this message translates to:
+  /// **'Bajar {name}'**
+  String overtimeTypeMoveDown(String name);
+
+  /// No description provided for @overtimeTypeArchive.
+  ///
+  /// In es, this message translates to:
+  /// **'Archivar'**
+  String get overtimeTypeArchive;
+
+  /// No description provided for @overtimeTypeRestore.
+  ///
+  /// In es, this message translates to:
+  /// **'Recuperar'**
+  String get overtimeTypeRestore;
+
+  /// No description provided for @overtimeTypesArchived.
+  ///
+  /// In es, this message translates to:
+  /// **'Archivados ({count})'**
+  String overtimeTypesArchived(int count);
+
+  /// No description provided for @overtimeTypeCounts.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuenta para el objetivo'**
+  String get overtimeTypeCounts;
+
+  /// No description provided for @overtimeTypeNotCounts.
+  ///
+  /// In es, this message translates to:
+  /// **'No cuenta para el objetivo'**
+  String get overtimeTypeNotCounts;
+
+  /// No description provided for @overtimeRateLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Cómo se paga'**
+  String get overtimeRateLabel;
+
+  /// No description provided for @overtimeRateShift.
+  ///
+  /// In es, this message translates to:
+  /// **'Como el turno'**
+  String get overtimeRateShift;
+
+  /// No description provided for @overtimeRateMultiplier.
+  ///
+  /// In es, this message translates to:
+  /// **'Multiplicador'**
+  String get overtimeRateMultiplier;
+
+  /// No description provided for @overtimeRateFixed.
+  ///
+  /// In es, this message translates to:
+  /// **'Precio fijo por hora'**
+  String get overtimeRateFixed;
+
+  /// No description provided for @overtimeRateNone.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin precio'**
+  String get overtimeRateNone;
+
+  /// No description provided for @overtimeRateMultiplierSummary.
+  ///
+  /// In es, this message translates to:
+  /// **'Turno ×{factor}'**
+  String overtimeRateMultiplierSummary(String factor);
+
+  /// No description provided for @overtimeRateFixedSummary.
+  ///
+  /// In es, this message translates to:
+  /// **'{amount} la hora'**
+  String overtimeRateFixedSummary(String amount);
+
+  /// No description provided for @overtimeRateShiftHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'El precio por hora del turno del día; sin turno con precio, el precio base.'**
+  String get overtimeRateShiftHelp;
+
+  /// No description provided for @overtimeMultiplierShortcut.
+  ///
+  /// In es, this message translates to:
+  /// **'×{factor}'**
+  String overtimeMultiplierShortcut(String factor);
+
+  /// No description provided for @overtimeMultiplierField.
+  ///
+  /// In es, this message translates to:
+  /// **'Otro multiplicador'**
+  String get overtimeMultiplierField;
+
+  /// No description provided for @overtimeFixedRateField.
+  ///
+  /// In es, this message translates to:
+  /// **'Precio por hora'**
+  String get overtimeFixedRateField;
+
+  /// No description provided for @overtimeCountsForGoal.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuenta para mi objetivo de horas'**
+  String get overtimeCountsForGoal;
+
+  /// No description provided for @overtimeTypeNameLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre'**
+  String get overtimeTypeNameLabel;
+
+  /// No description provided for @overtimeTypeColorLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Color'**
+  String get overtimeTypeColorLabel;
+
+  /// No description provided for @overtimeTypeInvalidName.
+  ///
+  /// In es, this message translates to:
+  /// **'Ponle un nombre.'**
+  String get overtimeTypeInvalidName;
+
+  /// No description provided for @overtimeTypeInvalidMultiplier.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe un multiplicador entre 0,01 y 100.'**
+  String get overtimeTypeInvalidMultiplier;
+
+  /// No description provided for @overtimeTypeInvalidRate.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe un precio por hora.'**
+  String get overtimeTypeInvalidRate;
+
+  /// Nombre del tipo de horas extra que viene creado (cuenta para el objetivo).
+  ///
+  /// In es, this message translates to:
+  /// **'Horas extra'**
+  String get overtimeTypeOvertime;
+
+  /// Nombre del tipo de horas extra que viene creado para otro trabajo (no cuenta).
+  ///
+  /// In es, this message translates to:
+  /// **'Otro trabajo'**
+  String get overtimeTypeOtherWork;
+
+  /// Marca de la casilla del día con la suma de las horas extra (cabe en muy poco sitio).
+  ///
+  /// In es, this message translates to:
+  /// **'+{hours} h'**
+  String dayCellOvertime(String hours);
+
+  /// Un bloque de horas extra que es la mañana después de un turno que acaba pasada la medianoche.
+  ///
+  /// In es, this message translates to:
+  /// **'Día siguiente'**
+  String get overtimeOnNextDay;
+
+  /// No description provided for @overtimeTypeArchiveNamed.
+  ///
+  /// In es, this message translates to:
+  /// **'Archivar {name}'**
+  String overtimeTypeArchiveNamed(String name);
+
+  /// No description provided for @catalogPattern2x2Name.
+  ///
+  /// In es, this message translates to:
+  /// **'2 y 2'**
+  String get catalogPattern2x2Name;
+
+  /// No description provided for @catalogPattern2x2Description.
+  ///
+  /// In es, this message translates to:
+  /// **'2 días de trabajo y 2 libres (2x2). Elige tu turno de trabajo.'**
+  String get catalogPattern2x2Description;
+
+  /// No description provided for @catalogPattern3x1Name.
+  ///
+  /// In es, this message translates to:
+  /// **'3 y 1'**
+  String get catalogPattern3x1Name;
+
+  /// No description provided for @catalogPattern3x1Description.
+  ///
+  /// In es, this message translates to:
+  /// **'3 días de trabajo y 1 libre (3x1). Elige tu turno de trabajo.'**
+  String get catalogPattern3x1Description;
+
+  /// Confirma el día desde el que se repite la rotación.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu rotación empieza el {date} y se repite desde ese día.'**
+  String patternStartConfirmation(String date);
+
+  /// No description provided for @patternWorkShiftTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Qué turno haces los días de trabajo?'**
+  String get patternWorkShiftTitle;
+
+  /// No description provided for @summaryLongestStreak.
+  ///
+  /// In es, this message translates to:
+  /// **'Racha más larga'**
+  String get summaryLongestStreak;
+
+  /// No description provided for @summaryStreakDays.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 día seguido} other{{count} días seguidos}}'**
+  String summaryStreakDays(int count);
+
+  /// No description provided for @summaryStreakHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'La racha cuenta solo los días con algún turno de trabajo dentro del periodo. Los libres, las ausencias y los días vacíos la cortan, aunque tengan horas extra.'**
+  String get summaryStreakHelp;
+
+  /// No description provided for @widgetOvertime.
+  ///
+  /// In es, this message translates to:
+  /// **'+{duration} extra'**
+  String widgetOvertime(String duration);
+
+  /// No description provided for @widgetOvertimeType.
+  ///
+  /// In es, this message translates to:
+  /// **'+{duration} {type}'**
+  String widgetOvertimeType(String duration, String type);
+
+  /// No description provided for @widgetEarlyLeave.
+  ///
+  /// In es, this message translates to:
+  /// **'Salí {duration} antes'**
+  String widgetEarlyLeave(String duration);
+
+  /// No description provided for @widgetSevenDayHours.
+  ///
+  /// In es, this message translates to:
+  /// **'7 días: {duration}'**
+  String widgetSevenDayHours(String duration);
 }
 
 class _AppLocalizationsDelegate

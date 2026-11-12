@@ -11,6 +11,7 @@ import 'package:path/path.dart' as p;
 import '../../drift/app_database/generated/schema_v3.dart' as v3;
 import '../../support/test_storage.dart';
 import '../../support/v3_database.dart';
+import '../../support/v6_database.dart';
 
 void main() {
   late Directory dir;
@@ -40,12 +41,12 @@ void main() {
   }
 
   test(
-    'real v3 file gets a complete v3 safety copy before reaching v6',
+    'real v3 file gets a complete v3 safety copy before reaching v7',
     () async {
       expect(readUserVersion(file), 3);
       final db = await open();
-      expect(readUserVersion(file), 6);
-      expect(await dumpV3Columns(db), before);
+      expect(readUserVersion(file), 7);
+      expect(await dumpV3Columns(db), afterV7(before));
       expect(
         (await db.select(db.shiftTypes).get()).every(
           (t) => t.fixedPlusCents == null,
@@ -54,7 +55,7 @@ void main() {
       );
       await db.close();
 
-      expect(backupNames(), ['pre-v3-a-v6-20261102-083015.sqlite']);
+      expect(backupNames(), ['pre-v3-a-v7-20261102-083015.sqlite']);
       final copy = File(p.join(backups.path, backupNames().single));
       expect(readUserVersion(copy), 3);
       final asV3 = v3.DatabaseAtV3(NativeDatabase(copy));
@@ -85,8 +86,8 @@ void main() {
       );
       final loaded = await ScheduleRepository(second).load('main');
       expect(loaded.schedule.shiftTypeById('night')!.fixedPlusCents, 3000);
-      expect(backupNames(), ['pre-v3-a-v6-20261102-083015.sqlite']);
-      expect(readUserVersion(file), 6);
+      expect(backupNames(), ['pre-v3-a-v7-20261102-083015.sqlite']);
+      expect(readUserVersion(file), 7);
       await second.close();
     },
   );

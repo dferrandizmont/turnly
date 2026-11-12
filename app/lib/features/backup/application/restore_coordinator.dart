@@ -12,6 +12,7 @@ import '../../notes/presentation/attachment_history.dart';
 import '../../onboarding/application/onboarding_providers.dart';
 import '../../patterns/application/post_night_provider.dart';
 import '../../settings/application/preferences_controller.dart';
+import '../../summary/application/summary_providers.dart';
 import '../../swaps/application/swaps_controller.dart';
 import '../../widget/application/widget_providers.dart';
 import '../../widget/domain/widget_sync_planner.dart';
@@ -66,6 +67,9 @@ class RestoreCoordinator {
       reloadHolidays: ref.read(holidayControllerProvider.notifier).reload,
       reloadCalendars: () async {
         ref.invalidate(calendarsControllerProvider);
+        // The hours goal and the closing day travel in the backup, and the
+        // strip under the month keeps its copy alive: read it again.
+        refreshMonthStripRules(ref);
         // The appearance preferences travel in the backup too.
         await ref.read(preferencesProvider.notifier).reload();
       },

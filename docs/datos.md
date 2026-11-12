@@ -522,10 +522,119 @@ de arranque con archivo real (`test/core/database/upgrade_from_v*_test.dart`).
 **Copia de seguridad:** el formato sigue en la versión 3 con claves opcionales, y los adjuntos viajan en un
 contenedor (`docs/copia-de-seguridad.md`, «Esquema v6»).
 
+## Esquema v7: horas extra en bloques con tipo, horario y precio — hecho
+
+Motivo: una hora extra era solo un número de minutos por día (`day_entries.overtime_minutes`), colocado después del
+último turno y pagado al precio de ese turno. Ahora es un **bloque** con su tipo, su horario y su precio (lo que ofrece
+ShiftGrid 1.8, gratis). «Salí antes» (`early_leave_minutes`) no cambia.
+
+| Tabla | Cambio | Detalle |
+|---|---|---|
+| `overtime_types` (nueva) | `id` TEXT PK, `name` TEXT NULL, `color_value`, `rate_mode` (`shift`/`multiplier`/`fixed`/`none`), `multiplier_basis_points` = 10000, `hourly_rate_cents` NULL, `counts_for_goal`, `archived` = false, `sort_order` = 0 | Los tipos de horas extra (`OvertimeType`), comunes a todos los calendarios como los tipos de turno. CHECK: id de 1 a 64; nombre NULL o no en blanco y hasta 100 (`maxOvertimeTypeNameLength`); modo cerrado; multiplicador de 1 a 1 000 000 puntos básicos (×0,0001 a ×100); precio de 0 a 999 999 999; `fixed` exige precio. `name` NULL = un tipo de fábrica sin renombrar: la app lo muestra en su idioma («Horas extra», «Overtime»…). |
+| `overtime_blocks` (nueva) | `calendar_id` → `calendars.id` (cascada), `date`, `id`, `type_id` → `overtime_types.id` (sin cascada), `start_minute`, `end_minute` (0-1439), `break_minutes` = 0, `note` NULL; PK (`calendar_id`, `date`, `id`) | Un bloque de horas extra de un día (`OvertimeBlock`). Fin ≤ inicio = acaba al día siguiente (igual = 24 h); el bloque es del día en que empieza y no sale en el siguiente. CHECK: id de 1 a 64; descanso ≥ 0 y menor que la duración; nota NULL o no en blanco y hasta 200 (`maxOvertimeNoteLength`). La clave lleva la fecha porque copiar y pegar un día lleva sus bloques, con el mismo id, a otros días. |
+| `day_entries` | `overtime_minutes` | **Deja de usarse**: el paso a v7 lo vacía (NULL) y nada lo vuelve a escribir. La columna se conserva (ver «Decisiones»). |
+| `settings` | `summary.baseHourlyRateCents` | Precio base por hora (JSON entero, unidad menor de la moneda; ausente = ninguno): lo usan los tipos «como el turno» y «multiplicador» en un día sin turno con precio. Viaja en la copia con el resto de `settings`. |
+
+Una base de datos nueva (y «Empezar de cero») tiene **dos tipos de fábrica**: «Horas extra» (`overtime`: como el
+turno, ×1, cuenta para el objetivo; así las horas extra migradas valen lo mismo que antes y el recargo lo pone cada uno
+en el tipo, según su convenio) y «Otro trabajo» (`other-work`: sin precio, no cuenta). El paso a v7 los escribe como
+literales SQL congelados (`insertDefaultOvertimeTypes`), no desde `defaultOvertimeTypes`. Se crean, editan,
+archivan y reordenan (Ajustes › Horas y dinero › Tipos de horas extra, o desde la hoja de un bloque); un tipo **nunca se
+borra** (como los tipos de turno): archivado, sus bloques lo siguen usando, y la clave foránea impide borrar uno en uso.
+El último tipo activo no se puede archivar.
+
+### Dominio y motor
+- `features/schedule/domain/overtime.dart`: `OvertimeType`, `OvertimeBlock` (con `problem`, las mismas reglas que las
+  tablas y la copia), `overtimeRateUnits` (precio por hora en puntos básicos de la unidad menor, sin `double`),
+  `overtimeAmountCents`, `lastWorkEndMinute` y `legacyOvertimeBlock` (la conversión de los minutos de antes).
+- `DayEntry.overtimeBlocks` y `ResolvedDay.overtimeBlocks`: los bloques del día, por inicio. `ResolvedDay.overtimeMinutes`
+  sigue: los minutos pagados de los bloques (más los minutos de antes si los hubiera), así que la casilla, la lista del
+  mes, la accesibilidad y el widget no cambian de contrato. `Schedule.overtimeTypes` (sin base de datos, los dos de
+  fábrica) y `Schedule.baseHourlyRateCents`.
+- `ScheduleRepository.load` añade los bloques a la entrada de su día (un día con solo bloques tiene entrada); `apply`
+  deja los bloques de cada día del parche exactamente como dice `after` (`OvertimeStore.replaceDay`). Un día cuyo único
+  contenido son bloques guarda una fila de `day_entries` vacía, como uno con solo un aviso.
+- El controlador: `setOvertimeBlocks` (un paso de deshacer), `saveOvertimeType`, `reorderOvertimeTypes`,
+  `setBaseHourlyRate`. Copiar, pegar, repetir, duplicar y cortar con «Incluir notas» llevan los bloques como la nota;
+  «Borrar el día por completo» los quita.
+
+### Cómo cuentan (`month_summary.dart`)
+- Cada bloque es un tramo en su propio reloj (inicio, fin y minutos pagados = duración − descanso). Con un corte de
+  reloj («llevas ganado») solo cuenta la parte ya trabajada, como un turno.
+- Precio: «como el turno» = el precio por hora del primer turno de trabajo con horario del día con precio (el de los
+  minutos de antes); sin él, el precio base;
+  sin los dos no vale nada y cuenta en `extrasWithoutRateMinutes`. «Multiplicador» = ese mismo precio × el factor.
+  «Precio fijo» = el suyo, también en un día libre. «Sin precio» no vale nada y no avisa. Se redondea **una vez por
+  tipo** (medio hacia arriba): `MonthSummary.overtimeTypes` (`OvertimeTypeTotal`: minutos e importe de cada tipo).
+- Suman a `workedMinutes`, `overtimeMinutes`, las horas nocturnas y las de festivo.
+- **Un bloque «como el turno» o «multiplicador» es el turno que sigue**, como las horas extra de antes: toma del último
+  turno con horario del día su `nightOverride` y sus pluses por hora (nocturno y festivo), que se suman al tipo de ese
+  turno, y si cae en festivo ese turno cuenta como trabajado en festivo (`holidayShifts`). Uno de «precio fijo» o «sin
+  precio» es otro trabajo: sin pluses ni `nightOverride` del turno, y en festivo no es un turno trabajado en festivo.
+- **La mañana después** (`overtimeStartAbs`): tras un turno que acaba pasada la medianoche (22:00–06:00), un bloque que
+  empieza entre ese fin y el inicio del turno cuenta en D+1 (horas nocturnas, festivo de D+1), como colocaban los
+  minutos de antes, solo si está más cerca del fin del turno que de su inicio: `inicioBloque − finTurno ≤ inicioTurno −
+  finBloque` (06:00–08:00 va a D+1; 18:00–21:00 es antes del turno y se queda en D; en el punto medio, D+1). Solo
+  entonces la hoja y el detalle dicen «Día siguiente». Sigue siendo del día D (resumen, mes de nómina).
+- «Salí antes» recorta los turnos (y los minutos de antes), **nunca un bloque**: un bloque tiene su propio horario. Con
+  horas extra pegadas al turno, antes la salida anticipada recortaba primero la extra (el tramo que acababa más tarde) y
+  ahora recorta el final del turno: las horas y el dinero son los mismos, pero un turno que acaba a las 22:00 con una
+  extra nocturna y «Salí antes» de 30 min cuenta ahora 30 min de nocturnidad más que antes (la extra entera es de noche
+  y se recorta la parte de día del turno). Si la salida anticipada es mayor que el turno, antes podía comerse la extra;
+  ahora no pasa del turno.
+- El objetivo de horas (`goalCountedMinutes`, `splitPeriodHours(forGoal: true)`, la bolsa de horas) y el tope de horas
+  extra (`cappedOvertimeMinutes`) solo cuentan los tipos que cuentan para el objetivo.
+
+### El paso v6 → v7 (código real)
+`app/lib/core/database/migration_v6_to_v7.dart`, en **una transacción** (si algo falla, el archivo queda en v6 tal cual):
+
+1. Vuelca todas las columnas de v6 de las 12 tablas (las de `day_entries` sin `overtime_minutes`), ordenadas por su
+   clave.
+2. Crea `overtime_types` (con los dos tipos de fábrica, SQL literal) y `overtime_blocks`.
+3. Reconstruye, con SQL literal sobre las columnas de v6, el calendario de cada uno (tipos con sus versiones, patrones,
+   rotaciones y excepciones) y convierte el `overtime_minutes` de cada día en un bloque de «Horas extra» que empieza
+   cuando acaba su último turno de trabajo con horario (a las **08:00** si no tiene: misma duración y sin horas
+   nocturnas que antes no había) y dura esos minutos (id `legacy-AAAA-MM-DD`, sin descanso ni nota). La regla está
+   congelada en el paso (no llama a `legacyOvertimeBlock`). Un valor de más de 1440 (el CHECK solo impedía
+   negativos) pasa a 1440, que es lo que la app siempre leyó. Un turno de noche que acaba a las 06:00 del día siguiente
+   da un bloque de las 06:00 en el mismo día, que el resumen cuenta la mañana después (`overtimeStartAbs`): minutos,
+   nocturnidad, festivo, pluses y precio son los de antes.
+4. Vacía `overtime_minutes`.
+5. Comprueba que todo lo volcado es igual, que hay un bloque por cada día que tenía minutos y con esos minutos, que la
+   columna está vacía, que están los dos tipos y que `PRAGMA foreign_key_check` no devuelve nada; si no, lanza y se
+   deshace.
+
+Lo que cambia al migrar: nada en el resumen de cada mes (horas, importe, horas extra, nocturnas, festivo y pluses; hay
+prueba de equivalencia del `MonthSummary` entero), salvo dos casos: un día **sin turno** con horas extra que es
+**festivo** suma ahora sus «horas en festivo» (antes no tenían reloj; desde las 08:00 sí), y un día con «Salí antes»
+junto a horas extra (ver «Cómo cuentan»). La copia previa sigue siendo
+una por destino (`pre-v6-a-v7-<fecha>.sqlite`, o `pre-v1…v5-a-v7-…`). Volcado
+`app/drift_schemas/app_database/drift_schema_v7.json`.
+
+Pruebas: `test/drift/app_database/migration_v6_to_v7_test.dart` (archivo v6 real: la instalación v3 llevada a v6 por
+la cadena publicada, con días de minutos extra con turno, con turno de noche, sin turno y de más de un día,
+`test/support/v6_database.dart`: todo lo demás igual, un bloque por día con sus minutos y la hora de inicio de la
+regla, las horas de cada día iguales que con los minutos de antes, también con las claves foráneas activas; el paso que
+falla deja el v6 exacto y el siguiente arranque migra; escribir y leer tipos y bloques, los CHECK, la clave foránea de
+un tipo en uso y la cascada al borrar un calendario). Las pruebas de cada paso anterior llegan ahora hasta v7
+(`afterV7` y `legacyAsBlocks` dicen qué cambia el último paso).
+
+### Decisiones
+- **La columna `overtime_minutes` se queda (vacía).** Quitarla obliga a reconstruir `day_entries`, la tabla con más
+  datos del usuario, sin ganar nada: el paso ya la vacía y comprueba que queda vacía, ningún código la vuelve a
+  escribir, y los pasos publicados y los lectores de copias anteriores siguen leyéndola. `DayEntry.overtimeMinutes`
+  también sigue, solo para los datos de antes de v7 (una copia de formato 3 antes de convertirla): el resumen la cuenta
+  como siempre.
+- **Nombres de fábrica sin guardar** (`name` NULL), para que «Horas extra» salga en el idioma de la app; al renombrarlo
+  se guarda el nombre del usuario.
+- **Tabla propia y no JSON en `day_entries`**, pero viajan con el día por el motor (deshacer, copiar, pegar, huella)
+  como el importe extra: un bloque es una anotación del día.
+
 ## Migraciones
-- `schemaVersion` es 6 (la 1 fue la de las versiones 0.1.0 y 0.2.0; la 2, la de 0.3.0 a 0.5.0; la 3 añadió los
+- `schemaVersion` es 7 (la 1 fue la de las versiones 0.1.0 y 0.2.0; la 2, la de 0.3.0 a 0.5.0; la 3 añadió los
   campos de paridad de la 0.6.0; la 4, el plus fijo; la 5, las versiones de un tipo; la 6, la base de las funciones
-  de pago que damos gratis: adjuntos, tareas, cambios, saldos, lugar, pluses por hora e importe por día). Esquemas guardados con
+  de pago que damos gratis: adjuntos, tareas, cambios, saldos, lugar, pluses por hora e importe por día; la 7, las
+  horas extra en bloques con tipo, horario y precio). Esquemas guardados con
   `dart run drift_dev make-migrations` (configurado en `build.yaml`, carpeta `app/drift_schemas/`), que también
   genera las pruebas de migración y los pasos (`stepByStep`). Cada versión nueva: subir `schemaVersion`, ejecutar
   `make-migrations`, escribir el paso (en su propio archivo, como `migration_v1_to_v2.dart`, dentro de una

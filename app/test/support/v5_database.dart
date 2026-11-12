@@ -23,6 +23,7 @@ class AppDatabaseAtV5 extends AppDatabase {
       from3To4: migrateFrom3To4,
       from4To5: migrateFrom4To5,
       from5To6: (m, schema) async => throw StateError('not this far'),
+      from6To7: (m, schema) async => throw StateError('not this far'),
     ),
   );
 }

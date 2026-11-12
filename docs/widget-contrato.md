@@ -17,7 +17,7 @@ resuelto, igual que en la app.
 | Clave | `cuadrante.widget.snapshot` (`kWidgetSnapshotKey`) |
 | Almacén | `UserDefaults(suiteName: "group.es.cuadrante.app")`, valor `String` con el JSON |
 | `kind` del widget (iOS) | `CuadranteWidget` (`kWidgetIosKind`): un solo `kind` con las seis familias |
-| Versión del JSON | `v = 2` (`kWidgetSnapshotVersion`); lectores Dart y Android compatibles con v1 |
+| Versión del JSON | Android: `v = 3` (`kWidgetSnapshotVersion`); iOS: **v2 temporal** hasta adaptar y verificar Swift. Lectores Dart y Android compatibles con v1 y v2 |
 | Escribe | solo la app (`WidgetPublisher.publish`, luego recarga las líneas de tiempo) |
 | Lee | solo la extensión; nunca escribe |
 
@@ -30,19 +30,26 @@ caducada, lo cual es correcto (la app nueva traerá también la extensión nueva
 > tamaño y de claves) y que el Swift del Mac decodifica con esa forma; cambiar ese esquema sin subir `v` no está permitido.
 > Esto se distingue de las extensiones opcionales en la raíz, como `descriptions`: los lectores antiguos ignoran
 > esas extensiones y los nuevos admiten su ausencia, sin cambiar los objetos del esquema base ni exigir otra versión.
-> El widget sigue enseñando color, código y hora, y sin horas extra. Si se decide enseñarlo, va con
-> la siguiente versión incompatible (ahora `v = 3`) y las dos mitades (Dart y Swift) a la vez. La v2 de agenda y
-> dos semanas mantiene las bandas y turnos sin iconos.
+> La v3 añade las horas extra como textos por fecha, sin añadir iconos ni cambiar el horario base.
+> Dart y Android están actualizados; la adaptación de Swift queda pendiente en `docs/mac-ios.md` §4.1
+> por encargo del 12-nov-2026 y es **bloqueante antes del siguiente candidato iOS**. Para conservar los widgets,
+> `syncWidget` selecciona v2 en iOS antes de comparar y escribir el snapshot: omite `dayExtras` y `stripTotals`
+> y recalcula el hash; Android conserva v3. **Al adaptar y verificar Swift en el Mac se retira esta excepción**
+> (`syncWidget` y `WidgetSnapshot.asV2`, con sus pruebas), junto con estas notas.
 
-## 2. Esquema JSON v2 (con lectura de v1)
+## 2. Esquema JSON v3 (con lectura de v1 y v2)
 
-La v2 conserva sin cambios todas las claves y los 60 días de la v1 y añade `noShift` y `displayDays` en la raíz.
+La v3 conserva todos los objetos base de v2 y añade `dayExtras` y `stripTotals` en la raíz.
+Los lectores Dart y Android aceptan v1, v2 y v3; recodificar una v1/v2 conserva su JSON y hash sin añadir campos v3.
+Una versión desconocida se trata como caducada. El planificador republica al abrir una versión anterior.
+
+Historial: la v2 conserva sin cambios todas las claves y los 60 días de la v1 y añade `noShift` y `displayDays` en la raíz.
 No añade campos por día a las familias anteriores. Las extensiones opcionales de la raíz —`descriptions`
 (accesibilidad, 26-oct), `nextOff` (próximo libre, C1) y `notes` (texto de las notas, UW, 2-nov)— se comparten por
 fecha, se añaden sin subir `v` y los lectores antiguos las ignoran, así que un snapshot anterior sigue siendo válido y
 los nuevos admiten su ausencia. Dart y Android leen ambas versiones; una versión desconocida
 da el aviso de caducado. El planificador republica una v1 al abrir la app porque su versión ya no es la actual.
-El futuro lector Swift debe aceptar 1 y 2 y puede ignorar estos dos campos nuevos para sus seis familias.
+El lector Swift debe aceptar 1, 2 y 3; la adaptación de v3 está pendiente en `docs/mac-ios.md` §4.1.
 Un lector antiguo que solo admita v1 muestra el aviso hasta actualizarse; nunca interpreta la v2 como otro día.
 
 Convenciones: claves en `camelCase`; **todas las claves del esquema base están siempre presentes** y las que pueden no tener valor
@@ -54,7 +61,7 @@ salida es determinista.
 
 | Clave | Tipo | Significado |
 |---|---|---|
-| `v` | int | Versión del esquema (2; también se lee 1) |
+| `v` | int | Versión del esquema (3; también se leen 1 y 2) |
 | `generatedAt` | string | Instante de generación, ISO 8601 en UTC (`2026-10-19T08:30:00.000Z`). Informativo |
 | `contentHash` | string | SHA-256 hex del contenido (todo menos `generatedAt` y él mismo). Lo usa la app para saber si hay que republicar; el Swift lo ignora |
 | `timeZone` | string | Id IANA (`Europe/Madrid`) de la zona cuyas medianoches abren cada día de la línea de tiempo |
@@ -66,8 +73,50 @@ salida es determinista.
 | `styles` | [Style] | Tabla de colores compartida por tira y cuadrícula (las bandas apuntan aquí por índice) |
 | `months` | [Month] | Cuadrículas de mes (1 a 3), compartidas por los días de ese mes |
 | `days` | [Day] ×60 | **Exactamente 60 fechas consecutivas** desde `firstDate`. `days[i].date = firstDate + i` |
-| `noShift` | string | Solo v2: texto localizado del día sin turno (`Sin turno`) |
-| `displayDays` | [DisplayDay] | Solo v2: días auxiliares consecutivos desde el lunes de la semana de `firstDate` hasta `lastDate + 27`, ambos incluidos (87–93 días con la línea de tiempo de 60) |
+| `noShift` | string | Desde v2: texto localizado del día sin turno (`Sin turno`) |
+| `displayDays` | [DisplayDay] | Desde v2: días auxiliares consecutivos desde el lunes de la semana de `firstDate` hasta `lastDate + 27`, ambos incluidos (87–93 días con la línea de tiempo de 60) |
+| `dayExtras` | {fecha: [string]} | Desde v3: etiquetas de extras y salida anticipada, separadas del horario base |
+| `stripTotals` | {fecha: {minutes: int, label: string}} | Desde v3: total de los siete días que empiezan en cada entrada |
+
+### Campos de v3: horas extra y total de siete días (12-nov-2026)
+
+Ambas claves están **siempre presentes en v3** (objetos vacíos cuando no hay datos); no existen en v1/v2.
+Van incluidas en `contentHash`. Las claves de `Day`, `Small`, `Medium`, turnos y bandas no cambian.
+
+```json
+"dayExtras": {
+  "2026-11-03": ["+2 h extra", "Salí 1 h antes"],
+  "2026-11-04": ["+2 h Otro trabajo"]
+},
+"stripTotals": {
+  "2026-11-03": {"minutes": 2160, "label": "7 días: 36 h"}
+}
+```
+
+- `dayExtras`: fecha ISO → lista ordenada de etiquetas localizadas. Cubre todas las fechas resueltas
+  (línea de tiempo, tiras, meses y rango auxiliar). Sin entrada = sin ajustes. Los minutos antiguos van primero;
+  después, los bloques agrupados por tipo con su **duración pagada**, descontando el descanso; al final,
+  «Salí … antes» con los minutos **aplicados** del Resumen. La salida nunca recorta bloques.
+  «Horas extra» sin renombrar usa «+2 h extra»; los demás tipos llevan su nombre localizado o personalizado.
+  No viajan notas de bloques ni tarifas: el widget no las necesita. **El horario base conserva sus horas.**
+- `stripTotals`: una entrada por cada fecha de `days`; `minutes` es `summarizeRange(schedule, fecha, fecha + 6)`
+  `.goalCountedMinutes`: turnos + extras que cuentan para este trabajo − salida aplicada. «Otro trabajo» y
+  cualquier tipo con `countsForGoal = false` se ven en su fecha, pero no suman aquí. El último día también tiene
+  siete días reales del motor, aunque sus seis siguientes queden fuera de la vigencia. Horas nocturnas, turnos
+  partidos, descansos pagados y cruces de mes siguen las reglas del Resumen. La etiqueta siempre dice
+  **«7 días: …»** (no es una semana natural fija); se recalcula para cada entrada de medianoche.
+- Las frases completas de `descriptions.days` y `descriptions.absences` incluyen los ajustes, conservando
+  la anonimización de ausencias existente. Android usa estas lecturas en todas las familias.
+- Android muestra las etiquetas en el pequeño, agenda y celdas de tira/mes/dos/cuatro semanas. En espacios
+  estrechos envuelve o abrevia **entre palabras completas**, con una elipsis separada; nunca «Da…». El texto
+  accesible conserva todas las etiquetas. Las cuadrículas reservan primero fecha, códigos, horarios visibles,
+  barras y márgenes; si no queda altura
+  para una línea completa de ajustes, estos siguen en la lectura accesible. En el pequeño mínimo se priorizan los ajustes frente a la línea de mañana
+  (esta sigue en la lectura accesible); la altura restante, medida con la tipografía y escala utilizadas,
+  limita los ajustes a líneas completas. La agenda reserva altura para los ajustes antes de elegir sus filas.
+  La cabecera de la tira muestra el total y desaparece al leer v1/v2 (no se inventa un cero).
+- Swift/WidgetKit: **pendiente del Mac**, incluidas aceptación de v3 y presentación de ajustes/total en las familias
+  donde quepan. No debe calcular minutos ni traducir; lee estos mismos textos. Ver `docs/mac-ios.md` §4.1.
 
 ### Extensión opcional `descriptions` (v2, compatible con snapshots anteriores)
 
@@ -296,6 +345,8 @@ siete celdas y `days` sesenta días.)
 **116.396 bytes (~114 KB)** en v1; 126.403 bytes con un día doble con nota cada 3 días. V2 añade los días auxiliares
 (hasta `lastDate + 27`, que dan servicio también al widget de cuatro semanas) y la extensión `notes`: **161.982 bytes**
 con la rotación simple y **178.708 bytes** con los días dobles y notas cada 3 días (medido el 2-nov).
+V3 añade los totales de siete días: **165.253 bytes** simple y **181.979 bytes** con días dobles/notas
+(medido el 12-nov); hay además una prueba de tamaño con bloques y salida anticipada en los 60 días.
 Los días auxiliares y las notas están incluidos en la prueba de tamaño y en `contentHash`. Límite del contrato: **200 KB** (`kWidgetSnapshotMaxBytes`,
 comprobado con `assert` al codificar y con una prueba).
 
@@ -344,6 +395,9 @@ como `DayCell` en la app. Día sin turno: celda vacía de superficie, sin barra,
 
 Disparadores (`WidgetSyncTrigger`) y comprobación (`WidgetSyncPlanner`): la app construye una instantánea nueva, la
 compara con la publicada y solo escribe si hace falta.
+La selección temporal de v2 en iOS se hace en `syncWidget` **antes** de esta comparación y de la escritura;
+el planificador compara la versión y el hash de esa representación. Así una apertura posterior no vuelve
+a publicar por comparar el v2 guardado con el v3 del constructor. Android compara y publica v3.
 
 | Disparador | Espera | Siempre recarga líneas de tiempo |
 |---|---|---|
@@ -371,13 +425,16 @@ cambio de fecha o de zona detectado por una mirada al reloj cada minuto. Siempre
 
 ## 6. Política del `TimelineProvider` (Swift, en el Mac)
 
+El pseudocódigo describe el lector v3 que debe adaptar y verificar el Mac **antes del siguiente candidato iOS**.
+Hasta entonces `syncWidget` sigue escribiendo v2 en iOS; al verificar Swift se retira esa excepción (sección 1).
+
 **Una entrada por día, a las 00:00, 60 días.** El widget cambia de día solo, sin depender de que el sistema lo
 refresque ni de que se abra la app.
 
 ```
 getTimeline(in:completion:)
   snapshot = decode(UserDefaults(suiteName: "group.es.cuadrante.app").string(forKey: "cuadrante.widget.snapshot"))
-  si falta, no decodifica o v no es 1 ni 2:
+  si falta, no decodifica o v no es 1 ni 2 ni 3:
       entries = [ .stale(date: now) ]            // textos locales de la extensión
       policy  = .after(now + 1 h)
   si no:
@@ -477,7 +534,7 @@ y mismo aviso de caducado. Código en `app/android/app/src/main/kotlin/es/cuadra
 | `CuadranteAgendaWidgetProvider` (4×2, redimensionable) | «Próximos días»: hoy y los siguientes, hasta 14 días; filas completas según el espacio y tamaño de texto del lanzador. Fecha, ficha de color, código, horario e indicador de nota; tocar una fila abre ese día. |
 | `CuadranteTwoWeeksWidgetProvider` (4×2) | «Dos semanas»: 2 filas de 7 días desde el lunes de la semana actual, incluso con domingo como inicio del mes en Ajustes. Día, color, código y hora compacta cuando cabe; cada celda abre su día. |
 | `CuadranteFourWeeksWidgetProvider` (4×4) | «Cuatro semanas»: 4 filas de 7 días desde el lunes de la semana actual (28 días, igual de lunes aunque el mes empiece en domingo). Cabecera con el próximo libre de hoy cuando se conoce (extensión `nextOff`), número del día, el código y la barra de cada turno (hasta **2**, con `+N`), y debajo la **primera línea de la nota** o el clip cuando la nota no viaja; hoy con anillo y festivo en rojo. Cada celda abre su día. |
-| `WidgetModelBuilder` | Lee el JSON y devuelve lo que se pinta (o el aviso). Nunca lanza: JSON ausente, roto, versión distinta de 1 y 2 o un día incompleto dan el aviso. |
+| `WidgetModelBuilder` | Lee el JSON y devuelve lo que se pinta (o el aviso). Nunca lanza: JSON ausente, roto, versión distinta de 1, 2 y 3 o un día incompleto dan el aviso. |
 | `WidgetRenderer` | `RemoteViews` (los seis widgets). Colores del JSON; en Android 12+ con `setColorInt(claro, oscuro)`, así que el cambio de tema no necesita redibujar; antes se elige por `uiMode` al dibujar. **Todo dibujo fija la visibilidad del
 aviso «Abre Turnly» y del contenido** (`WidgetRenderPlan`): el lanzador reaplica el `RemoteViews` sobre las vistas que ya
 tiene si el layout es el mismo, y lo que dejó el dibujo anterior (aviso visible, contenido oculto) se queda si el nuevo no lo

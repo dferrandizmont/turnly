@@ -82,16 +82,16 @@ Future<void> _nurse(QaContext qa) async {
   final tap = _Taps(t);
   expect(_title(t), '¿Cómo empiezas tu cuadrante?');
   await tap(_key('onboarding-path-rotation'), reason: 'Usar una rotación');
+  expect(_title(t), '¿Dónde trabajas?');
+  await tap(_key('onboarding-region'));
+  await tap(find.text('Comunidad de Madrid'));
+  await tap(_key('onboarding-next'));
   expect(_title(t), '¿Cómo es tu rotación?');
+  await tap(_key('onboarding-profession-nursing'), reason: 'Enfermería');
   await tap(_key('onboarding-pattern-12h'));
   await tap(_key('onboarding-next'));
   expect(_title(t), '¿Cuándo empiezas?');
-  await tap(_key('onboarding-offset-1'), reason: 'día 2 del ciclo');
-  await tap(_key('onboarding-next'));
-  expect(_title(t), '¿Dónde trabajas?');
-  await tap(_key('onboarding-profession-nursing'), reason: 'Enfermería');
-  await tap(_key('onboarding-region'));
-  await tap(find.text('Comunidad de Madrid'));
+  await tap(_key('onboarding-shift-night12'), reason: 'día 2 del ciclo');
   await tap(_key('onboarding-next'));
   expect(_title(t), 'Listo');
   await tap(_key('onboarding-next'), reason: 'Ver mi calendario');
@@ -141,7 +141,11 @@ Future<void> _skip(QaContext qa) async {
 
   // Back works too: into a way, back to the question, then another way.
   await t.tapAndSettle(_key('onboarding-path-rotation'));
+  expect(_title(t), '¿Dónde trabajas?');
+  await t.tapAndSettle(_key('onboarding-skip'));
   expect(_title(t), '¿Cómo es tu rotación?');
+  await t.tapAndSettle(_key('onboarding-back'));
+  expect(_title(t), '¿Dónde trabajas?');
   await t.tapAndSettle(_key('onboarding-back'));
   expect(_title(t), '¿Cómo empiezas tu cuadrante?');
   await t.tapAndSettle(_key('onboarding-path-import'));

@@ -4,7 +4,8 @@
 /// an agreement can set another number, so the user types it.
 ///
 /// The overtime counted is the one noted on the days
-/// ([MonthSummary.overtimeMinutes]): the minutes the user wrote down as
+/// ([MonthSummary.cappedOvertimeMinutes]: without the overtime types that
+/// do not count for the goal, schema v7): the minutes the user wrote down as
 /// «horas extra», not the hours above the goal.
 library;
 

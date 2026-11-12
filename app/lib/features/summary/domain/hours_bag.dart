@@ -107,7 +107,13 @@ CivilDate? firstMonthWithData(Schedule schedule) {
 /// nothing, so an old note does not drag the hours bag back years.
 bool _hasWorkedMinutes(Schedule schedule, CivilDate date) {
   final day = schedule.resolve(date);
-  if (day.overtimeMinutes > 0) return true;
+  // Old overtime minutes, or a block of a type that counts for the goal.
+  if ((schedule.entries[date]?.overtimeMinutes ?? 0) > 0 ||
+      day.overtimeBlocks.any(
+        (b) => schedule.overtimeTypeById(b.typeId)?.countsForGoal ?? false,
+      )) {
+    return true;
+  }
   for (final shift in day.shifts) {
     if (shift.category == ShiftCategory.work && shift.hasTimes) return true;
   }
@@ -145,7 +151,7 @@ HoursBalance hoursBalance(
       holidays: holidays,
       window: window,
       closingDay: closingDay,
-    ).workedMinutes;
+    ).goalCountedMinutes;
     target += goalMinutesForMonthOf(goal, month);
     month = month.addDays(month.daysInMonth);
   }

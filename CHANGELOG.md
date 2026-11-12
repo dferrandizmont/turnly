@@ -10,6 +10,19 @@ at once, so they can skip numbers.
 
 ## Unreleased
 
+## 0.10.0 · 2026-11-12
+
+Overtime the way you really work it, rotation changes from any day, and more at a glance.
+
+- **Overtime by blocks.** Add overtime to any day with a start and an end (it can run past midnight), an unpaid break and a note, as many blocks as you need. Right after a shift, "Right after the shift" and +1 h … +4 h set it in one tap. Your existing overtime is kept as it was and pays the same.
+- **Overtime types.** "Overtime" and "Other job" come ready; create your own. Each type is paid as the shift, with a multiplier, at a fixed hourly rate or not at all, and decides whether it counts toward your hours goal. New base hourly rate in Settings › Hours and money for days without a priced shift.
+- **Day total.** The day detail lists its overtime and shows the day's total hours and pay; the calendar cell shows "+2 h".
+- **Rotation from the day.** In the day detail: "Start the rotation here", "Last day of this rotation" and, on an empty day after a rotation ends, "Start your rotation here". Each one explains what will change and can be undone. The detail also says where a shift comes from: your rotation or changed by hand.
+- **Month strip.** Under the month: its shifts, your hours against your goal and your next day off. Tap it to open that month's summary.
+- **Longest run.** The summary and the PDF report show your longest run of days worked in a row.
+- **Widgets.** Android widgets show overtime and early leave next to your shift, and the seven-day widget adds up its hours.
+- **New rotations.** "2 and 2" and "3 and 1" with the work shift you choose; familiar names (Pitman, Panama, DuPont) in the catalogue, and a plain sentence confirming when your rotation starts.
+
 ## 1.0.0 · 2026-11-10
 
 First version on the App Store, for iPhone, with everything up to 0.9.7. Android stays in Google Play's closed testing on the 0.9 line for now.

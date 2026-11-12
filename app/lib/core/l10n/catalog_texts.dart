@@ -71,6 +71,14 @@ CatalogTexts catalogTextsFrom(AppLocalizations l10n) => CatalogTexts(
       name: l10n.catalogPattern4x4Name,
       description: l10n.catalogPattern4x4Description,
     ),
+    '2x2': (
+      name: l10n.catalogPattern2x2Name,
+      description: l10n.catalogPattern2x2Description,
+    ),
+    '3x1': (
+      name: l10n.catalogPattern3x1Name,
+      description: l10n.catalogPattern3x1Description,
+    ),
     '5x2': (
       name: l10n.catalogPattern5x2Name,
       description: l10n.catalogPattern5x2Description,

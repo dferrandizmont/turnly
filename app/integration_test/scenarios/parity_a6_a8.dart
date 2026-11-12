@@ -72,6 +72,13 @@ Future<List<Map<String, Object?>>> _storedExtras(QaApp app, CivilDate d) =>
       "FROM day_entries WHERE date = '${d.toIso()}'",
     );
 
+Future<List<Map<String, Object?>>> _storedBlocks(QaApp app, CivilDate d) =>
+    app.query(
+      'SELECT id, type_id, start_minute, end_minute, break_minutes, note '
+      "FROM overtime_blocks WHERE date = '${d.toIso()}' "
+      "AND calendar_id = 'main' ORDER BY start_minute",
+    );
+
 // ---- Q96 -------------------------------------------------------------------
 
 const qaDayExtras = QaScenario(
@@ -84,35 +91,53 @@ Future<void> _dayExtras(QaContext qa) async {
   final t = qa.tester;
   final app = await QaApp.open(qa);
   expect(await _storedExtras(app, _oct26), isEmpty);
+  expect(await _storedBlocks(app, _oct26), isEmpty);
   expect(_k('extras-mark-2026-10-26'), findsNothing);
 
   await _openDay(t, _oct26);
   await t.ensureVisible(_k('day-extras'));
   expect(find.text('HORAS EXTRA / SALÍ ANTES'), findsOneWidget);
-  expect(_text(t, 'day-overtime-value'), 'Ninguna');
-
-  // 6 taps of 15 min = 1 h 30; 2 taps = 30 min.
-  await _steps(t, 'day-overtime-more', 6);
-  await _steps(t, 'day-early-more', 2);
-  expect(_text(t, 'day-overtime-value'), '1 h 30 min');
-  expect(_text(t, 'day-early-value'), '30 min');
-  await _quiet(t);
+  expect(_text(t, 'day-early-value'), 'Ninguna');
+  await t.tapAndSettle(_k('day-add-overtime'));
+  expect(_k('overtime-sheet'), findsOneWidget);
+  expect(find.text('Justo después del turno'), findsOneWidget);
+  final shiftEnd = lastWorkEndMinute(app.schedule.resolve(_oct26))! % 1440;
+  await t.tapAndSettle(_k('overtime-type-$overtimeTypeId'));
+  await t.tapAndSettle(_k('overtime-quick-2'));
+  expect(_text(t, 'overtime-preview'), startsWith('2 h'));
+  await t.tapAndSettle(_k('overtime-save'));
+  expect(_k('overtime-sheet'), findsNothing);
+  final block = app.schedule.entries[_oct26]!.overtimeBlocks.single;
+  expect(block.typeId, overtimeTypeId);
+  expect(block.startMinute, shiftEnd);
+  expect(block.endMinute, (shiftEnd + 120) % 1440);
+  expect(block.paidMinutes, 120);
+  expect(_text(t, 'day-overtime-duration-${block.id}'), '2 h');
   await qa.shot('seccion');
 
   await app.flushWrites();
   final rows = await _storedExtras(app, _oct26);
+  // Blocks have their own table; the day's row has no legacy minutes or
+  // shift override, so the shift still comes from the rotation.
   expect(rows, hasLength(1));
-  expect(rows.single['overtime_minutes'], 90);
-  expect(rows.single['early_leave_minutes'], 30);
-  expect(
-    rows.single['shift_type_ids'],
-    isNull,
-    reason: 'el turno sigue siendo el del patrón',
-  );
+  expect(rows.single['overtime_minutes'], isNull);
+  expect(rows.single['early_leave_minutes'], isNull);
+  expect(rows.single['shift_type_ids'], isNull);
+  expect(await _storedBlocks(app, _oct26), [
+    {
+      'id': block.id,
+      'type_id': overtimeTypeId,
+      'start_minute': shiftEnd,
+      'end_minute': (shiftEnd + 120) % 1440,
+      'break_minutes': 0,
+      'note': null,
+    },
+  ]);
   expect(idsOn(app.schedule, _oct26), 'morning');
 
   await _closeDay(t);
-  expect(_k('extras-mark-2026-10-26'), findsOneWidget, reason: 'marca «+»');
+  expect(_text(t, 'extras-mark-2026-10-26'), '+2 h');
+  expect(inCell(_oct26, find.text('M')), findsOneWidget);
   await qa.shot('mes');
 
   // Everything was ONE undo step.
@@ -121,9 +146,43 @@ Future<void> _dayExtras(QaContext qa) async {
   await exitPaintMode(t);
   await app.flushWrites();
   expect(await _storedExtras(app, _oct26), isEmpty);
+  expect(await _storedBlocks(app, _oct26), isEmpty);
+  expect(app.schedule.resolve(_oct26).overtimeBlocks, isEmpty);
+  expect(app.scheduleState.canUndo, isFalse, reason: 'un solo paso');
+  expect(idsOn(app.schedule, _oct26), 'morning');
   expect(_k('extras-mark-2026-10-26'), findsNothing);
 
-  // Taking the values away again with «-» removes the row.
+  // Redo restores the same block and mark; deleting it is one step too.
+  await enterPaintMode(t);
+  await t.tapAndSettle(_k('redo'));
+  await exitPaintMode(t);
+  await app.flushWrites();
+  expect((await _storedBlocks(app, _oct26)).single['id'], block.id);
+  expect(_text(t, 'extras-mark-2026-10-26'), '+2 h');
+  await _openDay(t, _oct26);
+  await t.tapAndSettle(_k('day-overtime-${block.id}'));
+  await t.tapAndSettle(_k('overtime-delete'));
+  await app.flushWrites();
+  expect(await _storedBlocks(app, _oct26), isEmpty);
+  await _closeDay(t);
+  expect(_k('extras-mark-2026-10-26'), findsNothing);
+
+  // Early leave still uses the stepper: a burst is a separate undo step.
+  await _openDay(t, _oct26);
+  await _steps(t, 'day-early-more', 2);
+  await _quiet(t);
+  expect(_text(t, 'day-early-value'), '30 min');
+  await app.flushWrites();
+  expect((await _storedExtras(app, _oct26)).single['early_leave_minutes'], 30);
+  await _closeDay(t);
+  await enterPaintMode(t);
+  await t.tapAndSettle(_k('undo'));
+  await exitPaintMode(t);
+  await app.flushWrites();
+  expect(await _storedExtras(app, _oct26), isEmpty);
+  expect(_k('extras-mark-2026-10-26'), findsNothing);
+
+  // Taking the early leave away again with «−» removes the row.
   await _openDay(t, _oct26);
   await _steps(t, 'day-early-more', 4);
   await _quiet(t);

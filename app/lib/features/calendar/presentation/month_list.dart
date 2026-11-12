@@ -211,6 +211,10 @@ class _ListDaySnapshot {
       day.stepIndex == other.day.stepIndex &&
       day.note == other.day.note &&
       day.overtimeMinutes == other.day.overtimeMinutes &&
+      const ListEquality<OvertimeBlock>().equals(
+        day.overtimeBlocks,
+        other.day.overtimeBlocks,
+      ) &&
       day.earlyLeaveMinutes == other.day.earlyLeaveMinutes;
 
   @override
@@ -222,6 +226,7 @@ class _ListDaySnapshot {
     day.stepIndex,
     day.note,
     day.overtimeMinutes,
+    const ListEquality<OvertimeBlock>().hash(day.overtimeBlocks),
     day.earlyLeaveMinutes,
   );
 }
@@ -309,7 +314,8 @@ class _MonthListDayState extends State<MonthListDay> {
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(Rad.row),
       side: BorderSide(
-        color: widget.selected || widget.opened || _showFocusRing || widget.isToday
+        color:
+            widget.selected || widget.opened || _showFocusRing || widget.isToday
             ? colors.todayRing
             : colors.border,
         width: widget.selected ? Sp.selectedBorder : Sp.ring,

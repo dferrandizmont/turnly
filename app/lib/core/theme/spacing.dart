@@ -32,6 +32,10 @@ class Sp {
   /// Notices keep their action close to the message on wide windows.
   static const double snackBarMaxWidth = 560;
 
+  /// Dialogs with content that lays itself out from the available width.
+  static const double dialogMinWidth = 280;
+  static const double dialogMaxWidth = 560;
+
   /// Extended paint button and the space separating it from content.
   static const double fabHeight = 56;
   static const double fabClearance = fabHeight + l;

@@ -122,11 +122,16 @@ class ChoicePill extends StatelessWidget {
                       Stack(
                         clipBehavior: Clip.none,
                         children: [
-                          leading!,
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              top: IconSize.inline,
+                            ),
+                            child: leading!,
+                          ),
                           if (selected)
                             Positioned(
                               right: -Sp.xs,
-                              top: -Sp.xs,
+                              top: 0,
                               child: DecoratedBox(
                                 key: const ValueKey('choice-pill-check'),
                                 decoration: BoxDecoration(

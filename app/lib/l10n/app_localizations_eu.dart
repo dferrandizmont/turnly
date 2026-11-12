@@ -295,7 +295,9 @@ class AppLocalizationsEu extends AppLocalizations {
   String get upcomingTitle => 'Hurrengo egunak';
 
   @override
-  String get dayDetailSourcePattern => 'Zure ereduaren arabera';
+  String dayDetailSourcePattern(String name) {
+    return 'Zure txandaketatik: «$name»';
+  }
 
   @override
   String get dayDetailSourceOverride => 'Eskuz aldatua';
@@ -307,11 +309,92 @@ class AppLocalizationsEu extends AppLocalizations {
   String get dayDetailDouble => 'Gehitu bigarren txanda';
 
   @override
-  String get dayDetailReset => 'Itzuli eredura';
+  String get dayDetailReset => 'Itzuli txandaketara';
 
   @override
   String dayDetailPatternGives(String shifts) {
-    return 'Ereduaren arabera: $shifts';
+    return 'Zure txandaketaren arabera: $shifts';
+  }
+
+  @override
+  String dayRotationEnded(String name, String date) {
+    return 'Zure «$name» txandaketa amaitu zen: $date';
+  }
+
+  @override
+  String get dayRotationMenu => 'Txandaketa';
+
+  @override
+  String get dayRotationRestart => 'Hasi txandaketa hemen';
+
+  @override
+  String get dayRotationEndHere => 'Txandaketa honen azken eguna';
+
+  @override
+  String get dayRotationResume => 'Hasi zure txandaketa hemen';
+
+  @override
+  String get dayRotationRestartTitle => 'Txandaketa hemen hasi nahi duzu?';
+
+  @override
+  String dayRotationRestartBody(String name, String date, String shifts) {
+    return 'Zure «$name» txandaketa berriro hasiko da egun honetan: $date. Zikloaren lehen eguna izango da ($shifts).';
+  }
+
+  @override
+  String get dayRotationEndKeepsOthers =>
+      'Gainerako txandaketek beren datak mantenduko dituzte.';
+
+  @override
+  String dayRotationRestartOthersUntil(String date) {
+    return 'Txandaketa honek lehentasuna izango du egun hau barne: $date. Tarte horretatik kanpoko datetan gainerako txandaketak aplikatuko dira.';
+  }
+
+  @override
+  String get dayRotationRestartOthers =>
+      'Egun horren ondorenerako jarrita zenituen txandaketak kenduko dira.';
+
+  @override
+  String get dayRotationKeeps =>
+      'Aurreko egunak eta eskuz egindako aldaketak ez dira ukitzen.';
+
+  @override
+  String get dayRotationStartConfirm => 'Hasi hemen';
+
+  @override
+  String dayRotationStartDone(String date) {
+    return 'Txandaketaren hasiera: $date';
+  }
+
+  @override
+  String get dayRotationEndTitle => 'Txandaketa egun honetan amaitu nahi duzu?';
+
+  @override
+  String dayRotationEndBody(String name, String date) {
+    return 'Zure «$name» txandaketa egun honetan amaituko da: $date.';
+  }
+
+  @override
+  String dayRotationEndThenNone(String date) {
+    return 'Egun horrek ez du txandaketarik izango: $date.';
+  }
+
+  @override
+  String dayRotationEndThenOther(String date, String name) {
+    return 'Egun horretan zure «$name» txandaketa aplikatuko da: $date.';
+  }
+
+  @override
+  String get dayRotationResumeTitle => 'Zure txandaketa hemen hasi nahi duzu?';
+
+  @override
+  String dayRotationResumeBody(String name, String date) {
+    return 'Zure «$name» txandaketa berriro aplikatuko da, amaiera-datarik gabe. Hasiera: $date.';
+  }
+
+  @override
+  String dayRotationResumeBodyUntil(String name, String date, String until) {
+    return 'Zure «$name» txandaketa berriro aplikatuko da hurrengo txandaketa hasi aurreko egunera arte. Hasiera: $date. Amaiera: $until.';
   }
 
   @override
@@ -491,6 +574,18 @@ class AppLocalizationsEu extends AppLocalizations {
   String shiftTypesRestored(String name) {
     return '«$name» berreskuratu da';
   }
+
+  @override
+  String get discardChangesTitle => 'Aldaketak baztertu nahi dituzu?';
+
+  @override
+  String get discardChangesBody => 'Gorde gabeko aldaketak galduko dira.';
+
+  @override
+  String get discardChangesConfirm => 'Baztertu';
+
+  @override
+  String get discardChangesKeep => 'Jarraitu editatzen';
 
   @override
   String get shiftTypesDiscardTitle => 'Aldaketak baztertu nahi dituzu?';
@@ -1087,7 +1182,7 @@ class AppLocalizationsEu extends AppLocalizations {
   String get selectionClear => 'Ezabatu';
 
   @override
-  String get selectionReset => 'Itzuli eredura';
+  String get selectionReset => 'Itzuli txandaketara';
 
   @override
   String get selectionCopy => 'Kopiatu';
@@ -2423,7 +2518,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String summaryHowPlannedRest(String hours, String date) {
-    return 'eta $hours aurreikusita, $date arte';
+    return 'eta $hours aurreikusita $date arte';
   }
 
   @override
@@ -5618,7 +5713,8 @@ class AppLocalizationsEu extends AppLocalizations {
   String get catalogPattern4x4Name => '4 x 4';
 
   @override
-  String get catalogPattern4x4Description => '12 orduko 4 egun eta 4 libre';
+  String get catalogPattern4x4Description =>
+      '12 orduko 4 egun eta 4 libre (4x4 edo lau eta lau)';
 
   @override
   String get catalogPattern5x2Name => '5 x 2';
@@ -5632,7 +5728,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get catalogPattern223Description =>
-      '12 orduko bi egun, bi libre, 12 orduko hiru, bi libre, 12 orduko bi eta hiru libre (2-2-3-2-2-3 ere bai)';
+      '12 orduko bi egun, bi libre, 12 orduko hiru, bi libre, 12 orduko bi eta hiru libre (2-2-3-2-2-3 ere bai). Pitman edo Panama izenez ere ezagutzen da.';
 
   @override
   String get catalogPatternContinentalName => 'Kontinentala';
@@ -5873,6 +5969,47 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get monthNavSummary => 'Laburpena';
+
+  @override
+  String monthStripHoursGoal(String worked, String goal) {
+    return '$worked / $goal';
+  }
+
+  @override
+  String monthStripFacts(String first, String second) {
+    return '$first · $second';
+  }
+
+  @override
+  String monthStripShort(String hours) {
+    return 'Falta dena: $hours';
+  }
+
+  @override
+  String monthStripOver(String hours) {
+    return 'soberan: $hours';
+  }
+
+  @override
+  String monthStripNextOff(String date, int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Hurrengo egun librea: $date, $days egun barru',
+      one: 'Hurrengo egun librea: $date, egun 1 barru',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String monthStripFirstOff(String date) {
+    return 'Lehen egun librea: $date';
+  }
+
+  @override
+  String monthStripLabel(String facts) {
+    return 'Hilaren laburpena: $facts';
+  }
 
   @override
   String get todayCardCollapse => 'Tolestu gaurko txartela';
@@ -7147,4 +7284,259 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get backupUiOriginPreReset => 'Berriro hasi aurretik egindako kopia';
+
+  @override
+  String get overtimeSheetAdd => 'Gehitu aparteko orduak';
+
+  @override
+  String get overtimeSheetEdit => 'Editatu aparteko orduak';
+
+  @override
+  String get overtimeTypeLabel => 'Mota';
+
+  @override
+  String get overtimeManageTypes => 'Kudeatu motak';
+
+  @override
+  String get overtimeAfterShift => 'Txanda amaitu eta berehala';
+
+  @override
+  String get overtimeNextDay => 'Hurrengo egunean amaitzen da';
+
+  @override
+  String get overtimeQuickLabel => 'Iraupena';
+
+  @override
+  String overtimeQuickHours(int hours) {
+    return '+$hours h';
+  }
+
+  @override
+  String get overtimeBreakLabel => 'Ordaindu gabeko etenaldia (aukerakoa)';
+
+  @override
+  String get overtimeBreakUnit => 'min';
+
+  @override
+  String get overtimeNoteLabel => 'Ohar laburra (aukerakoa)';
+
+  @override
+  String overtimePreviewPriced(String duration, String rate, String amount) {
+    return '$duration × $rate = $amount';
+  }
+
+  @override
+  String overtimePreviewUnpriced(String duration) {
+    return '$duration, preziorik gabe';
+  }
+
+  @override
+  String get overtimeBreakTooLong =>
+      'Etenaldiak blokea baino laburragoa izan behar du.';
+
+  @override
+  String overtimeDayTotal(String hours) {
+    return 'Egunean guztira: $hours';
+  }
+
+  @override
+  String overtimeDayTotalMoney(String hours, String amount) {
+    return 'Egunean guztira: $hours · $amount';
+  }
+
+  @override
+  String get overtimeBaseRateTitle => 'Orduko oinarrizko prezioa';
+
+  @override
+  String get overtimeBaseRateHelp =>
+      '«Txanda bezala» ordaintzen diren aparteko orduek erabiltzen dute, preziodun txandarik gabeko egunetan.';
+
+  @override
+  String get overtimeBaseRateNone => 'Oinarrizko preziorik ez';
+
+  @override
+  String get overtimeBaseRateField => 'Orduko prezioa';
+
+  @override
+  String get overtimeTypesTitle => 'Aparteko orduen motak';
+
+  @override
+  String get overtimeTypesHelp =>
+      'Aparteko orduen bloke bakoitzak mota bat du: nola ordaintzen den eta zure ordu-helbururako zenbatzen den ala ez.';
+
+  @override
+  String overtimeTypesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mota',
+      one: 'Mota 1',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get overtimeNewType => 'Mota berria';
+
+  @override
+  String get overtimeEditType => 'Editatu mota';
+
+  @override
+  String overtimeTypeMoveUp(String name) {
+    return 'Igo: $name';
+  }
+
+  @override
+  String overtimeTypeMoveDown(String name) {
+    return 'Jaitsi: $name';
+  }
+
+  @override
+  String get overtimeTypeArchive => 'Artxibatu';
+
+  @override
+  String get overtimeTypeRestore => 'Berreskuratu';
+
+  @override
+  String overtimeTypesArchived(int count) {
+    return 'Artxibatuak ($count)';
+  }
+
+  @override
+  String get overtimeTypeCounts => 'Helbururako zenbatzen da';
+
+  @override
+  String get overtimeTypeNotCounts => 'Ez da helbururako zenbatzen';
+
+  @override
+  String get overtimeRateLabel => 'Nola ordaintzen den';
+
+  @override
+  String get overtimeRateShift => 'Txanda bezala';
+
+  @override
+  String get overtimeRateMultiplier => 'Biderkatzailea';
+
+  @override
+  String get overtimeRateFixed => 'Orduko prezio finkoa';
+
+  @override
+  String get overtimeRateNone => 'Preziorik gabe';
+
+  @override
+  String overtimeRateMultiplierSummary(String factor) {
+    return 'Txanda ×$factor';
+  }
+
+  @override
+  String overtimeRateFixedSummary(String amount) {
+    return '$amount orduko';
+  }
+
+  @override
+  String get overtimeRateShiftHelp =>
+      'Eguneko txandaren orduko prezioa; preziodun txandarik ez badago, oinarrizko prezioa.';
+
+  @override
+  String overtimeMultiplierShortcut(String factor) {
+    return '×$factor';
+  }
+
+  @override
+  String get overtimeMultiplierField => 'Beste biderkatzaile bat';
+
+  @override
+  String get overtimeFixedRateField => 'Orduko prezioa';
+
+  @override
+  String get overtimeCountsForGoal => 'Nire ordu-helbururako zenbatzen da';
+
+  @override
+  String get overtimeTypeNameLabel => 'Izena';
+
+  @override
+  String get overtimeTypeColorLabel => 'Kolorea';
+
+  @override
+  String get overtimeTypeInvalidName => 'Jarri izen bat.';
+
+  @override
+  String get overtimeTypeInvalidMultiplier =>
+      'Idatzi 0,01 eta 100 arteko biderkatzaile bat.';
+
+  @override
+  String get overtimeTypeInvalidRate => 'Idatzi orduko prezio bat.';
+
+  @override
+  String get overtimeTypeOvertime => 'Aparteko orduak';
+
+  @override
+  String get overtimeTypeOtherWork => 'Beste lan bat';
+
+  @override
+  String dayCellOvertime(String hours) {
+    return '+$hours h';
+  }
+
+  @override
+  String get overtimeOnNextDay => 'Hurrengo egunean';
+
+  @override
+  String overtimeTypeArchiveNamed(String name) {
+    return 'Artxibatu: $name';
+  }
+
+  @override
+  String get catalogPattern2x2Name => '2 eta 2';
+
+  @override
+  String get catalogPattern2x2Description =>
+      '2 lanegun eta 2 libre (2x2). Aukeratu zure laneko txanda.';
+
+  @override
+  String get catalogPattern3x1Name => '3 eta 1';
+
+  @override
+  String get catalogPattern3x1Description =>
+      '3 lanegun eta egun libre 1 (3x1). Aukeratu zure laneko txanda.';
+
+  @override
+  String patternStartConfirmation(String date) {
+    return 'Zure txandaketa egun honetan hasten da: $date. Egun horretatik aurrera errepikatzen da.';
+  }
+
+  @override
+  String get patternWorkShiftTitle => 'Zein txanda egiten duzu lanegunetan?';
+
+  @override
+  String get summaryLongestStreak => 'Boladarik luzeena';
+
+  @override
+  String summaryStreakDays(int count) {
+    return '$count egun jarraian';
+  }
+
+  @override
+  String get summaryStreakHelp =>
+      'Boladak aldiko lan-txanda duten egunak bakarrik zenbatzen ditu. Egun libreek, absentziek eta egun hutsek bolada eteten dute, aparteko orduak izan arren.';
+
+  @override
+  String widgetOvertime(String duration) {
+    return 'Aparteko orduak: +$duration';
+  }
+
+  @override
+  String widgetOvertimeType(String duration, String type) {
+    return '$type: +$duration';
+  }
+
+  @override
+  String widgetEarlyLeave(String duration) {
+    return '$duration lehenago atera naiz';
+  }
+
+  @override
+  String widgetSevenDayHours(String duration) {
+    return '7 egun: $duration';
+  }
 }

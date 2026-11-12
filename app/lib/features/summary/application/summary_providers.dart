@@ -29,6 +29,29 @@ final payRulesStoreProvider = Provider<PayRulesStore>(
   (ref) => PayRulesStore(ref.watch(appDatabaseProvider)),
 );
 
+/// The hours goal and the closing day of the month as the strip under the
+/// month needs them (`calendar/application/month_strip.dart`). The month
+/// screen keeps them alive, so they are providers of their own:
+/// [hoursGoalProvider] and [payRulesProvider] stay auto dispose and are
+/// still read again each time the summary opens. Their controllers refresh
+/// these after each write, and a restore does too ([refreshMonthStripRules]).
+/// A failed read is not tried again: the strip just shows no goal.
+final monthStripGoalProvider = FutureProvider<HoursGoal?>(
+  (ref) => ref.watch(hoursGoalStoreProvider).load(),
+  retry: (_, _) => null,
+);
+
+final monthStripClosingDayProvider = FutureProvider<int?>(
+  (ref) async => (await ref.watch(payRulesStoreProvider).load()).closingDay,
+  retry: (_, _) => null,
+);
+
+/// Reads the goal and the closing day of the strip again (after a restore).
+void refreshMonthStripRules(Ref ref) {
+  ref.invalidate(monthStripGoalProvider);
+  ref.invalidate(monthStripClosingDayProvider);
+}
+
 /// The payroll rules (propuesta 8): the closing day of the month and the cap
 /// of the overtime. Read again each time the summary opens (auto dispose), so
 /// a restored backup shows its rules.
@@ -41,6 +64,7 @@ class PayRulesController extends AsyncNotifier<PayRules> {
   /// Sets the closing day (`null` = the calendar month).
   Future<void> setClosingDay(int? day) async {
     await ref.read(payRulesStoreProvider).setClosingDay(day);
+    ref.invalidate(monthStripClosingDayProvider);
     state = AsyncData(
       PayRules(closingDay: day, overtimeCap: _current.overtimeCap),
     );
@@ -128,16 +152,20 @@ final yearTotalsProvider = Provider.autoDispose.family<YearTotals, int>((
 /// yearly cap counts).
 final overtimeCapStatusProvider = Provider.autoDispose
     .family<OvertimeCapStatus?, OvertimeCapQuery>((ref, query) {
-      final cap = ref.watch(payRulesProvider.select((r) => r.value?.overtimeCap));
+      final cap = ref.watch(
+        payRulesProvider.select((r) => r.value?.overtimeCap),
+      );
       if (cap == null) return null;
       final month = query.month;
       final int used;
       switch (cap.period) {
         case OvertimeCapPeriod.month:
           if (month == null) return null;
-          used = ref.watch(monthSummaryProvider(month)).overtimeMinutes;
+          used = ref.watch(monthSummaryProvider(month)).cappedOvertimeMinutes;
         case OvertimeCapPeriod.year:
-          used = ref.watch(yearTotalsProvider(query.year)).overtimeMinutes;
+          used = ref
+              .watch(yearTotalsProvider(query.year))
+              .cappedOvertimeMinutes;
       }
       return OvertimeCapStatus(cap: cap, usedMinutes: used);
     });
@@ -183,6 +211,22 @@ final periodHoursProvider = Provider.autoDispose
       );
     });
 
+/// Like [periodHoursProvider], with only the hours that count for the hours
+/// goal (the overtime types that do not count are left out, schema v7).
+final goalPeriodHoursProvider = Provider.autoDispose
+    .family<PeriodHours, SummaryRange>((ref, range) {
+      final schedule = ref.watch(
+        scheduleControllerProvider.select((s) => s.schedule),
+      );
+      return splitPeriodHours(
+        schedule,
+        range.from,
+        range.to,
+        ref.watch(summaryTodayProvider),
+        forGoal: true,
+      );
+    });
+
 /// Where the hours goal is kept (tests override it).
 final hoursGoalStoreProvider = Provider<HoursGoalStore>(
   (ref) => HoursGoalStore(ref.watch(appDatabaseProvider)),
@@ -211,6 +255,7 @@ class HoursGoalController extends AsyncNotifier<HoursGoal?> {
       await store.saveSince(CivilDate.fromDateTime(ref.read(clockProvider)()));
       ref.invalidate(hoursGoalSinceProvider);
     }
+    ref.invalidate(monthStripGoalProvider);
     state = AsyncData(goal);
   }
 
@@ -218,6 +263,7 @@ class HoursGoalController extends AsyncNotifier<HoursGoal?> {
   Future<void> clear() async {
     await ref.read(hoursGoalStoreProvider).clear();
     ref.invalidate(hoursGoalSinceProvider);
+    ref.invalidate(monthStripGoalProvider);
     state = const AsyncData(null);
   }
 }

@@ -5,6 +5,7 @@ import 'package:cuadrante/core/database/migration_v2_to_v3.dart';
 import 'package:cuadrante/core/database/migration_v3_to_v4.dart';
 import 'package:cuadrante/core/database/migration_v4_to_v5.dart';
 import 'package:cuadrante/core/database/migration_v5_to_v6.dart';
+import 'package:cuadrante/core/database/migration_v6_to_v7.dart';
 import 'package:cuadrante/features/schedule/data/schedule_repository.dart';
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift_dev/api/migrations_native.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/v2_database.dart';
 import '../../support/v3_database.dart';
+import '../../support/v6_database.dart';
 import 'generated/schema.dart';
 import 'generated/schema_v3.dart' as v3;
 
@@ -30,6 +32,7 @@ class _FailingMigrationDatabase extends AppDatabase {
       ),
       from4To5: migrateFrom4To5,
       from5To6: migrateFrom5To6,
+      from6To7: migrateFrom6To7,
     ),
   );
 }
@@ -72,14 +75,14 @@ void main() {
       );
       final db = AppDatabase(schema.newConnection());
       addTearDown(db.close);
-      await verifier.migrateAndValidate(db, 6);
-      expect(await dumpV3Columns(db), before);
+      await verifier.migrateAndValidate(db, 7);
+      expect(await dumpV3Columns(db), afterV7(before));
       final types = await db.select(db.shiftTypes).get();
       expect(types, hasLength(8));
       expect(types.every((t) => t.fixedPlusCents == null), isTrue);
       for (final id in ['main', 'pareja', 'viejo']) {
         final loaded = await ScheduleRepository(db).load(id);
-        final prior = scheduleFromV3Rows(before, id);
+        final prior = legacyAsBlocks(scheduleFromV3Rows(before, id));
         expect(
           v2ResolvedDays(loaded.schedule),
           v2ResolvedDays(prior),
@@ -96,7 +99,7 @@ void main() {
       expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
       expect(
         schema.rawDatabase.select('PRAGMA user_version').single.values.single,
-        6,
+        7,
       );
     },
   );
@@ -105,7 +108,7 @@ void main() {
     final (:schema, before: _) = await seededV3();
     final db = AppDatabase(schema.newConnection());
     addTearDown(db.close);
-    await verifier.migrateAndValidate(db, 6);
+    await verifier.migrateAndValidate(db, 7);
     final repo = ScheduleRepository(db);
     final night = (await repo.load('main')).schedule.shiftTypeById('night')!;
     for (final cents in [3000, 0, 999999]) {
@@ -159,8 +162,8 @@ void main() {
       await old.close();
       final retried = AppDatabase(schema.newConnection());
       addTearDown(retried.close);
-      await verifier.migrateAndValidate(retried, 6);
-      expect(await dumpV3Columns(retried), before);
+      await verifier.migrateAndValidate(retried, 7);
+      expect(await dumpV3Columns(retried), afterV7(before));
     },
   );
 }

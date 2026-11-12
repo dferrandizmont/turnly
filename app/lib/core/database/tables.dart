@@ -6,11 +6,12 @@ import 'package:drift/drift.dart';
 
 import '../../features/absences/domain/absence_balance.dart';
 import '../../features/notes/domain/note_attachment.dart';
+import '../../features/schedule/domain/overtime.dart';
 import '../../features/schedule/domain/shift_type.dart';
 import '../../features/swaps/domain/shift_swap.dart';
 import 'converters.dart';
 
-/// Schema v6 (see docs/datos.md). Calendar dates are ISO text, timestamps are
+/// Schema v7 (see docs/datos.md). Calendar dates are ISO text, timestamps are
 /// milliseconds since the epoch (UTC), id lists are JSON text.
 ///
 /// The row classes are called `*Row` so they never collide with the engine
@@ -223,7 +224,10 @@ class DayEntries extends Table {
   IntColumn get noteReminderMinute =>
       integer().nullable().check(noteReminderMinute.isBetweenValues(0, 1439))();
 
-  /// Extra minutes worked this day (>= 0). Added in schema v3.
+  /// Extra minutes worked this day (>= 0). Added in schema v3; since schema
+  /// v7 the extra hours are blocks ([OvertimeBlocks]): the step to v7 turns
+  /// every value into a block and leaves the column NULL, and nothing writes
+  /// it again (kept so the older steps and backups stay as they were).
   IntColumn get overtimeMinutes =>
       integer().nullable().check(overtimeMinutes.isBiggerOrEqualValue(0))();
 
@@ -442,4 +446,74 @@ class Settings extends Table {
 
   @override
   Set<Column<Object>>? get primaryKey => {key};
+}
+
+/// A kind of extra hours: «Horas extra», «Otro trabajo» or one of the user's
+/// (`OvertimeType`). Shared by every calendar, like the shift types; one in
+/// use is archived, never deleted. Added in schema v7.
+// 64, 100, 1000000 and 999999999 = maxOvertimeIdLength,
+// maxOvertimeTypeNameLength, maxMultiplierBasisPoints and
+// maxStoredMoneyCents (literal: a published schema must not move with them).
+@DataClassName('OvertimeTypeRow')
+class OvertimeTypes extends Table {
+  TextColumn get id => text()();
+
+  /// NULL = a built-in type the user has not renamed (shown in the app's
+  /// language).
+  TextColumn get name => text().nullable()();
+  IntColumn get colorValue => integer()();
+  TextColumn get rateMode => textEnum<OvertimeRateMode>()();
+  IntColumn get multiplierBasisPoints =>
+      integer().withDefault(const Constant(10000))();
+  IntColumn get hourlyRateCents => integer().nullable()();
+  BoolColumn get countsForGoal => boolean()();
+  BoolColumn get archived => boolean().withDefault(const Constant(false))();
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+
+  @override
+  Set<Column<Object>>? get primaryKey => {id};
+
+  @override
+  List<String> get customConstraints => [
+    "CHECK (id <> '' AND length(id) <= 64)",
+    "CHECK (name IS NULL OR (trim(name) <> '' AND length(name) <= 100))",
+    "CHECK (rate_mode IN ('shift', 'multiplier', 'fixed', 'none'))",
+    'CHECK (multiplier_basis_points BETWEEN 1 AND 1000000)',
+    'CHECK (hourly_rate_cents IS NULL OR '
+        'hourly_rate_cents BETWEEN 0 AND 999999999)',
+    "CHECK (rate_mode <> 'fixed' OR hourly_rate_cents IS NOT NULL)",
+  ];
+}
+
+/// A stretch of extra hours of one day (`OvertimeBlock`): its type, start
+/// and end on the clock (end not after start = the next day; the block still
+/// belongs to [date]), an unpaid break and a short note. Several per day.
+/// Added in schema v7.
+// 64 and 200 = maxOvertimeIdLength and maxOvertimeNoteLength (literal).
+@DataClassName('OvertimeBlockRow')
+class OvertimeBlocks extends Table {
+  TextColumn get calendarId =>
+      text().references(Calendars, #id, onDelete: KeyAction.cascade)();
+  TextColumn get date => text().map(const CivilDateConverter())();
+  TextColumn get id => text()();
+
+  /// A type in use cannot be deleted (no cascade): it is archived.
+  TextColumn get typeId => text().references(OvertimeTypes, #id)();
+  IntColumn get startMinute =>
+      integer().check(startMinute.isBetweenValues(0, 1439))();
+  IntColumn get endMinute =>
+      integer().check(endMinute.isBetweenValues(0, 1439))();
+  IntColumn get breakMinutes => integer().withDefault(const Constant(0))();
+  TextColumn get note => text().nullable()();
+
+  @override
+  Set<Column<Object>>? get primaryKey => {calendarId, date, id};
+
+  @override
+  List<String> get customConstraints => [
+    "CHECK (id <> '' AND length(id) <= 64)",
+    'CHECK (break_minutes >= 0 AND break_minutes < '
+        '((end_minute - start_minute + 1439) % 1440 + 1))',
+    "CHECK (note IS NULL OR (trim(note) <> '' AND length(note) <= 200))",
+  ];
 }

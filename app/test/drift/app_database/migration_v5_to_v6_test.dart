@@ -5,6 +5,7 @@ import 'package:cuadrante/core/database/migration_v2_to_v3.dart';
 import 'package:cuadrante/core/database/migration_v3_to_v4.dart';
 import 'package:cuadrante/core/database/migration_v4_to_v5.dart';
 import 'package:cuadrante/core/database/migration_v5_to_v6.dart';
+import 'package:cuadrante/core/database/migration_v6_to_v7.dart';
 import 'package:cuadrante/features/absences/data/absence_balances_repository.dart';
 import 'package:cuadrante/features/absences/domain/absence_balance.dart';
 import 'package:cuadrante/features/notes/data/day_tasks_repository.dart';
@@ -22,6 +23,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../support/v2_database.dart';
 import '../../support/v3_database.dart';
 import '../../support/v5_database.dart';
+import '../../support/v6_database.dart';
 import 'generated/schema.dart';
 import 'generated/schema_v3.dart' as v3;
 
@@ -40,6 +42,7 @@ class _FailingV6 extends AppDatabase {
         schema,
         afterChanges: () async => throw StateError('boom after the changes'),
       ),
+      from6To7: migrateFrom6To7,
     ),
   );
 }
@@ -122,7 +125,7 @@ void main() {
     required Map<String, List<Map<String, Object?>>> v3Columns,
     required Map<String, List<ShiftTypeVersion>> versions,
   }) async {
-    expect(await dumpV5Columns(db), before);
+    expect(await dumpV5Columns(db), afterV7(before));
     final added = await db
         .customSelect(
           'SELECT '
@@ -156,7 +159,7 @@ void main() {
     }
     for (final id in ['main', 'pareja', 'viejo']) {
       final loaded = await ScheduleRepository(db).load(id);
-      final prior = scheduleFromV3Rows(v3Columns, id);
+      final prior = legacyAsBlocks(scheduleFromV3Rows(v3Columns, id));
       expect(
         v2ResolvedDays(loaded.schedule),
         v2ResolvedDays(prior),
@@ -173,31 +176,37 @@ void main() {
           allowedDays: row['allowed_days']! as double,
         ),
     ]);
-    expect(balances.map((b) => b.type), containsAll(['vacaciones', 'moscosos']));
+    expect(
+      balances.map((b) => b.type),
+      containsAll(['vacaciones', 'moscosos']),
+    );
     expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
   }
 
-  test('v5 to v6 keeps every row and value, the new columns and tables '
-      'start empty and the 730 days of every calendar resolve as before', () async {
-    final (:schema, :before, :v3Columns, :versions) = await seededV5();
-    expect(before['shift_type_versions'], hasLength(2));
-    // The v2 seed has two balances; the v5 extras add two more.
-    expect(before['absence_balances'], hasLength(4));
-    for (final table in _v6Tables) {
-      expect(_tableNames(schema), isNot(contains(table)));
-    }
-    final db = AppDatabase(schema.newConnection());
-    addTearDown(db.close);
-    await verifier.migrateAndValidate(db, 6);
-    await expectUntouched(
-      db,
-      before: before,
-      v3Columns: v3Columns,
-      versions: versions,
-    );
-    expect(_userVersion(schema), 6);
-    expect(_tableNames(schema), containsAll(_v6Tables));
-  });
+  test(
+    'v5 to v6 keeps every row and value, the new columns and tables '
+    'start empty and the 730 days of every calendar resolve as before',
+    () async {
+      final (:schema, :before, :v3Columns, :versions) = await seededV5();
+      expect(before['shift_type_versions'], hasLength(2));
+      // The v2 seed has two balances; the v5 extras add two more.
+      expect(before['absence_balances'], hasLength(4));
+      for (final table in _v6Tables) {
+        expect(_tableNames(schema), isNot(contains(table)));
+      }
+      final db = AppDatabase(schema.newConnection());
+      addTearDown(db.close);
+      await verifier.migrateAndValidate(db, 7);
+      await expectUntouched(
+        db,
+        before: before,
+        v3Columns: v3Columns,
+        versions: versions,
+      );
+      expect(_userVersion(schema), 7);
+      expect(_tableNames(schema), containsAll(_v6Tables));
+    },
+  );
 
   test('with foreign keys on during the upgrade, rebuilding shift_types '
       'does not cascade into its versions', () async {
@@ -209,7 +218,7 @@ void main() {
     );
     final db = AppDatabase(schema.newConnection());
     addTearDown(db.close);
-    await verifier.migrateAndValidate(db, 6);
+    await verifier.migrateAndValidate(db, 7);
     await expectUntouched(
       db,
       before: before,
@@ -246,7 +255,7 @@ void main() {
 
     final retried = AppDatabase(schema.newConnection());
     addTearDown(retried.close);
-    await verifier.migrateAndValidate(retried, 6);
+    await verifier.migrateAndValidate(retried, 7);
     await expectUntouched(
       retried,
       before: before,
@@ -260,7 +269,7 @@ void main() {
     final (:schema, before: _, v3Columns: _, versions: _) = await seededV5();
     final db = AppDatabase(schema.newConnection());
     addTearDown(db.close);
-    await verifier.migrateAndValidate(db, 6);
+    await verifier.migrateAndValidate(db, 7);
 
     // Shift types: place and pluses, also in the versions; old money cap
     // raised.
@@ -291,9 +300,8 @@ void main() {
         patch: EntriesPatch({
           day: EntryChange(
             (await repo.load('main')).schedule.entries[day],
-            (await repo.load('main')).schedule.entries[day]!.copyWith(
-              extraAmountCents: -1550,
-            ),
+            (await repo.load('main')).schedule.entries[day]!
+                .copyWith(extraAmountCents: -1550),
           ),
         }),
       ),
@@ -388,9 +396,8 @@ void main() {
     }
     // Same day and file path cannot be shared by two attachments.
     await expectLater(
-      NoteAttachmentsRepository(
-        db,
-      ).save(_copyAttachment(attachment, id: 'att-2')),
+      NoteAttachmentsRepository(db)
+          .save(_copyAttachment(attachment, id: 'att-2')),
       throwsA(anything),
     );
   });
@@ -411,7 +418,7 @@ void main() {
     final (:schema, before: _, v3Columns: _, versions: _) = await seededV5();
     final db = AppDatabase(schema.newConnection());
     addTearDown(db.close);
-    await verifier.migrateAndValidate(db, 6);
+    await verifier.migrateAndValidate(db, 7);
     const day = CivilDate(2026, 10, 19);
     await db.customStatement(
       'INSERT INTO calendars (id, name, color_value, sort_order, archived, '

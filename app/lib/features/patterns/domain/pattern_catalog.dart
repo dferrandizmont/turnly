@@ -10,7 +10,7 @@ const Map<PatternGroup, List<String>> patternGroupPresets = {
   PatternGroup.police: ['pn-2-2-2-6', '6x4', '4x4'],
   PatternGroup.firefighters: ['24x72', 'guard-1-4'],
   PatternGroup.industry: ['correturnos', 'continental', 'dupont', '5x2'],
-  PatternGroup.security: ['2-2-3'],
+  PatternGroup.security: ['2-2-3', '2x2', '3x1'],
 };
 
 /// Presets that belong to no group of [patternGroupPresets].
@@ -71,11 +71,52 @@ bool containsShift(List<List<String>> steps, String shiftTypeId) =>
     steps.any((step) => step.contains(shiftTypeId));
 
 /// Pattern of the catalogue [preset], as stored when it already exists in
-/// [schedule] (the same id) and built from its template keys otherwise.
-Pattern presetPattern(Schedule schedule, PatternPreset preset) =>
-    schedule.patternById(preset.id) ??
-    preset.materialize({for (final k in preset.templateKeys) k: k});
+/// [schedule] (the same id) and built from its template keys otherwise. A
+/// preset with a chosen work shift gets one deterministic id per shift
+/// (`2x2-night`), so applying it again reuses the stored pattern.
+Pattern presetPattern(
+  Schedule schedule,
+  PatternPreset preset, {
+  String? workShiftId,
+}) {
+  if (preset.chooseWorkShift && workShiftId != null) {
+    final id = '${preset.id}-$workShiftId';
+    final stored = schedule.patternById(id);
+    if (stored != null) return stored;
+    final shift = shiftTypeForDisplay(schedule, workShiftId)?.name;
+    return preset.materialize(
+      {
+        for (final k in preset.templateKeys)
+          k: k == 'morning' ? workShiftId : k,
+      },
+      id: id,
+      name: '${preset.name} · ${shift ?? workShiftId}',
+    );
+  }
+  return schedule.patternById(preset.id) ??
+      preset.materialize({for (final k in preset.templateKeys) k: k});
+}
 
 /// Ids of the catalogue patterns (a stored pattern with one of these ids is
 /// not "custom").
 Set<String> get presetPatternIds => {for (final p in patternPresets) p.id};
+
+/// Whether [id] is a catalogue pattern: a preset's own id or the id of one
+/// of its work-shift variants (`2x2-night`).
+bool isCatalogPatternId(String id) =>
+    presetPatternIds.contains(id) ||
+    patternPresets.any((p) => p.chooseWorkShift && id.startsWith('${p.id}-'));
+
+/// Name of [pattern] to show: a catalogue variant is named from the preset
+/// and the shift in the app's current language; any other keeps its name.
+String patternDisplayName(Schedule schedule, Pattern pattern) {
+  for (final p in patternPresets) {
+    if (!p.chooseWorkShift) continue;
+    final prefix = '${p.id}-';
+    if (!pattern.id.startsWith(prefix)) continue;
+    final shiftId = pattern.id.substring(prefix.length);
+    final shift = shiftTypeForDisplay(schedule, shiftId)?.name;
+    if (shift != null) return '${p.name} · $shift';
+  }
+  return pattern.name;
+}

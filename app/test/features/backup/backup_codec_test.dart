@@ -59,7 +59,7 @@ void main() {
         'checksum',
       });
       expect(env['format'], 'cuadrante');
-      expect(env['schemaVersion'], 3);
+      expect(env['schemaVersion'], 4);
       expect(env['appVersion'], '1.2.3');
       expect(env['exportedAt'], '2026-11-10T09:30:15Z');
       expect(env['checksum'], BackupCodec.checksumOf(data));
@@ -91,7 +91,7 @@ void main() {
     test('decodes what it encodes', () {
       final file = codec.decode(encode());
       expect(file.data, data);
-      expect(file.schemaVersion, 3);
+      expect(file.schemaVersion, 4);
       expect(file.appVersion, '1.2.3');
       expect(file.exportedAt, at);
       expect(file.exportedAt.isUtc, isTrue);
@@ -252,8 +252,8 @@ void main() {
     });
 
     test('is rejected with the versions involved', () {
-      final e = thrown<NewerFormatVersion>(() => codec.decode(future(4)));
-      expect(e.found, 4);
+      final e = thrown<NewerFormatVersion>(() => codec.decode(future(5)));
+      expect(e.found, 5);
       expect(e.supported, BackupCodec.supportedSchemaVersion);
       expect(e.message, contains('v4'));
     });
@@ -648,12 +648,12 @@ void main() {
       );
     });
 
-    test('a version 1 file is exported again as version 3', () {
+    test('a version 1 file is exported again as version 4', () {
       final file = codec.decode(v1File(data, exportedAt: exportedText));
       final again = codec.decode(
         codec.encode(file.data, appVersion: '0.3.0', exportedAt: at),
       );
-      expect(again.schemaVersion, 3);
+      expect(again.schemaVersion, 4);
       expect(again.data, file.data);
     });
 
@@ -880,8 +880,9 @@ void main() {
       );
     });
 
-    test('the writer is version 3 and a version 4 file is "newer"', () {
-      expect(BackupCodec.supportedSchemaVersion, 3);
+    test('the writer is version 4 and a version 5 file is "newer"', () {
+      // Version 4 (database v7): the extra hours are blocks.
+      expect(BackupCodec.supportedSchemaVersion, 4);
     });
   });
 

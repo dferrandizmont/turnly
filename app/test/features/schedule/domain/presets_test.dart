@@ -46,6 +46,8 @@ void main() {
         '12h',
         '6x4',
         '4x4',
+        '2x2',
+        '3x1',
         '5x2',
         '2-2-3',
         'continental',
@@ -85,6 +87,8 @@ void main() {
       ('12h', 4, 2, 2),
       ('6x4', 10, 6, 4),
       ('4x4', 8, 4, 4),
+      ('2x2', 4, 2, 2),
+      ('3x1', 4, 3, 1),
       ('5x2', 7, 5, 2),
       ('2-2-3', 14, 7, 7),
       ('continental', 28, 21, 7),
@@ -207,6 +211,31 @@ void main() {
         codesOf(presetSchedule('4x4', jan1), jan1, 9),
         'D D D D L L L L D',
       );
+    });
+
+    test('2x2 and 3x1 have exact work/rest sequences', () {
+      expect(
+        codesOf(presetSchedule('2x2', jan1), jan1, 9),
+        'M M L L M M L L M',
+      );
+      expect(
+        codesOf(presetSchedule('3x1', jan1), jan1, 9),
+        'M M M L M M M L M',
+      );
+      for (final id in ['2x2', '3x1']) {
+        expect(patternPresetById(id).chooseWorkShift, isTrue);
+      }
+    });
+
+    test('familiar names describe the correct rotation', () {
+      expect(patternPresetById('2-2-3').description, contains('Pitman'));
+      expect(patternPresetById('2-2-3').description, contains('Panamá'));
+      expect(patternPresetById('4x4').description, contains('cuatro y cuatro'));
+      expect(
+        patternPresetById('4x4').description,
+        isNot(contains('Continental')),
+      );
+      expect(patternPresetById('dupont').name, 'DuPont');
     });
 
     test('5x2 from Monday', () {

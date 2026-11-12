@@ -751,9 +751,9 @@ void main() {
         await repository.restore(smallData());
         final copy = File(p.join(safety.path, fileNames(safety).single));
         final decoded = const BackupCodec().decode(await copy.readAsBytes());
-        expect(decoded.data, before);
+        expect(decoded.data, before.upgradedOvertime());
         await repository.restore(decoded.data);
-        expect(await repository.readAll(), before);
+        expect(await repository.readAll(), before.upgradedOvertime());
       },
     );
 
@@ -1000,7 +1000,7 @@ void main() {
 
       final newer = gzipEnvelope({
         'format': 'cuadrante',
-        'schemaVersion': 4,
+        'schemaVersion': 5,
         'data': <String, Object?>{},
         'checksum': 'x',
       });

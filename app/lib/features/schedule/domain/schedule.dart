@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 
 import 'civil_date.dart';
+import 'overtime.dart';
 import 'pattern.dart';
 import 'shift_type.dart';
 import 'shift_type_history.dart';
@@ -16,6 +17,7 @@ class ResolvedDay {
     this.stepIndex,
     this.note,
     this.overtimeMinutes = 0,
+    this.overtimeBlocks = const [],
     this.earlyLeaveMinutes = 0,
   });
 
@@ -29,9 +31,16 @@ class ResolvedDay {
   final int? stepIndex;
   final String? note;
 
-  /// Extra minutes worked this day (docs/paridad.md, A6); 0 = none. They
-  /// belong to the day, not to a shift, and are kept whatever the shifts are.
+  /// Extra minutes worked this day (docs/paridad.md, A6); 0 = none: the
+  /// paid minutes of [overtimeBlocks] plus the old minutes of the day, if
+  /// any (`DayEntry.overtimeMinutes`, only in data from before schema v7).
+  /// They belong to the day, not to a shift, and are kept whatever the
+  /// shifts are.
   final int overtimeMinutes;
+
+  /// The extra hours of the day (schema v7), by start: the blocks that START
+  /// on it (one that runs past midnight is not on the next day).
+  final List<OvertimeBlock> overtimeBlocks;
 
   /// Minutes the user left before the end of the day's shifts (A6); 0 = none.
   final int earlyLeaveMinutes;
@@ -48,6 +57,8 @@ class ResolvedDay {
 class Schedule {
   Schedule({
     Iterable<ShiftType> shiftTypes = const [],
+    this.overtimeTypes = defaultOvertimeTypes,
+    this.baseHourlyRateCents,
     Iterable<Pattern> patterns = const [],
     Iterable<PatternRun> runs = const [],
     Map<CivilDate, DayEntry> entries = const {},
@@ -63,6 +74,18 @@ class Schedule {
        });
 
   final List<ShiftType> shiftTypes;
+
+  /// The overtime types (schema v7), archived ones too, in their order.
+  /// Without a database (tests, demo) the two built-in ones.
+  final List<OvertimeType> overtimeTypes;
+
+  /// The hourly rate the overtime types «as the shift» use on a day without a
+  /// priced shift (schema v7); `null` = none.
+  final int? baseHourlyRateCents;
+
+  /// The overtime type [id], archived or not; `null` when unknown.
+  OvertimeType? overtimeTypeById(String id) =>
+      overtimeTypes.firstWhereOrNull((t) => t.id == id);
   final List<Pattern> patterns;
   final List<PatternRun> runs;
   final Map<CivilDate, DayEntry> entries;
@@ -155,7 +178,8 @@ class Schedule {
       shifts: _lookup(ids, d),
       source: DaySource.override,
       note: entry!.note,
-      overtimeMinutes: entry.overtimeMinutes ?? 0,
+      overtimeMinutes: _overtimeOf(entry),
+      overtimeBlocks: entry.overtimeBlocks,
       earlyLeaveMinutes: entry.earlyLeaveMinutes ?? 0,
     );
   }
@@ -173,12 +197,19 @@ class Schedule {
 
   Schedule copyWith({
     Iterable<ShiftType>? shiftTypes,
+    List<OvertimeType>? overtimeTypes,
+    int? baseHourlyRateCents,
+    bool clearBaseHourlyRate = false,
     Iterable<Pattern>? patterns,
     Iterable<PatternRun>? runs,
     Map<CivilDate, DayEntry>? entries,
     Map<String, List<ShiftTypeVersion>>? shiftTypeVersions,
   }) => Schedule(
     shiftTypes: shiftTypes ?? this.shiftTypes,
+    overtimeTypes: overtimeTypes ?? this.overtimeTypes,
+    baseHourlyRateCents: clearBaseHourlyRate
+        ? null
+        : baseHourlyRateCents ?? this.baseHourlyRateCents,
     patterns: patterns ?? this.patterns,
     runs: runs ?? this.runs,
     entries: entries ?? this.entries,
@@ -187,7 +218,8 @@ class Schedule {
 
   ResolvedDay _fromPattern(CivilDate d, DayEntry? entry) {
     final note = entry?.note;
-    final overtime = entry?.overtimeMinutes ?? 0;
+    final blocks = entry?.overtimeBlocks ?? const <OvertimeBlock>[];
+    final overtime = entry == null ? 0 : _overtimeOf(entry);
     final earlyLeave = entry?.earlyLeaveMinutes ?? 0;
     for (final (run, pattern) in _activeRuns) {
       if (!run.covers(d)) continue;
@@ -200,6 +232,7 @@ class Schedule {
         stepIndex: step,
         note: note,
         overtimeMinutes: overtime,
+        overtimeBlocks: blocks,
         earlyLeaveMinutes: earlyLeave,
       );
     }
@@ -207,9 +240,15 @@ class Schedule {
       date: d,
       note: note,
       overtimeMinutes: overtime,
+      overtimeBlocks: blocks,
       earlyLeaveMinutes: earlyLeave,
     );
   }
+
+  static int _overtimeOf(DayEntry entry) => entry.overtimeBlocks.fold(
+    entry.overtimeMinutes ?? 0,
+    (sum, b) => sum + b.paidMinutes,
+  );
 
   /// The types of [ids] with the terms they had on [day]. Unknown ids
   /// (deleted types) are skipped.

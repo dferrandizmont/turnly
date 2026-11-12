@@ -14,8 +14,9 @@ const String kWidgetAppGroupId = 'group.es.cuadrante.app';
 /// `kind` of the iOS widget (one kind, six families).
 const String kWidgetIosKind = 'CuadranteWidget';
 
-/// Version of the JSON the native side reads. Bump on breaking changes.
-const int kWidgetSnapshotVersion = 2;
+/// Current JSON contract. Bump on breaking changes. `syncWidget` temporarily
+/// publishes v2 on iOS until WidgetKit's v3 reader is verified on the Mac.
+const int kWidgetSnapshotVersion = 3;
 
 /// Days of the timeline: today and the 59 following ones.
 const int kWidgetDays = 60;
@@ -655,9 +656,18 @@ class WidgetSnapshot {
     this.descriptions,
     Map<String, WidgetNextOff>? nextOff,
     Map<String, String>? notes,
+    Map<String, List<String>>? dayExtras,
+    Map<String, WidgetStripTotal>? stripTotals,
     String? contentHash,
     this.version = kWidgetSnapshotVersion,
   }) : nextOff = nextOff == null ? null : Map.unmodifiable(nextOff),
+       dayExtras = dayExtras == null
+           ? null
+           : Map.unmodifiable({
+               for (final e in dayExtras.entries)
+                 e.key: List<String>.unmodifiable(e.value),
+             }),
+       stripTotals = stripTotals == null ? null : Map.unmodifiable(stripTotals),
        notes = notes == null ? null : Map.unmodifiable(notes),
        weekdayHeaders = List.unmodifiable(weekdayHeaders),
        styles = List.unmodifiable(styles),
@@ -668,7 +678,7 @@ class WidgetSnapshot {
 
   factory WidgetSnapshot.fromJson(Map<String, Object?> j) {
     final version = _int(j, 'v');
-    if (version != 1 && version != kWidgetSnapshotVersion) {
+    if (version < 1 || version > kWidgetSnapshotVersion) {
       throw FormatException('Unsupported widget snapshot version $version');
     }
     return WidgetSnapshot(
@@ -691,6 +701,20 @@ class WidgetSnapshot {
           ? _list(j, 'displayDays', WidgetDisplayDay.fromJson)
           : const [],
       noShift: version >= 2 ? _str(j, 'noShift') : '',
+      dayExtras: version >= 3
+          ? {
+              for (final e in _map(j, 'dayExtras').entries)
+                e.key: (e.value! as List).cast<String>(),
+            }
+          : null,
+      stripTotals: version >= 3
+          ? {
+              for (final e in _map(j, 'stripTotals').entries)
+                e.key: WidgetStripTotal.fromJson(
+                  (e.value! as Map).cast<String, Object?>(),
+                ),
+            }
+          : null,
       descriptions: j['descriptions'] == null
           ? null
           : WidgetDescriptions.fromJson(_map(j, 'descriptions')),
@@ -773,7 +797,37 @@ class WidgetSnapshot {
   /// are left out. `null` (absent from the JSON) when none is known.
   final Map<String, String>? notes;
 
+  /// v3: localized extra-hour lines by date, without changing base times.
+  final Map<String, List<String>>? dayExtras;
+
+  /// v3: hours counting for this job over each entry's seven displayed days.
+  final Map<String, WidgetStripTotal>? stripTotals;
+
   final String? _storedHash;
+
+  /// Temporary compatibility for WidgetKit's v1/v2 reader. Remove this
+  /// downgrade once the Mac has adapted and verified all families for v3.
+  WidgetSnapshot asV2() => version <= 2
+      ? this
+      : WidgetSnapshot(
+          version: 2,
+          generatedAt: generatedAt,
+          timeZone: timeZone,
+          locale: locale,
+          firstDate: firstDate,
+          lastDate: lastDate,
+          staleTitle: staleTitle,
+          staleBody: staleBody,
+          weekdayHeaders: weekdayHeaders,
+          styles: styles,
+          months: months,
+          days: days,
+          displayDays: displayDays,
+          noShift: noShift,
+          descriptions: descriptions,
+          nextOff: nextOff,
+          notes: notes,
+        );
 
   /// SHA-256 (hex) of the content: everything except [generatedAt] and the
   /// hash itself. Equal schedules give equal hashes.
@@ -818,6 +872,12 @@ class WidgetSnapshot {
     if (notes != null) 'notes': notes,
     if (version >= 2) 'noShift': noShift,
     if (version >= 2) 'displayDays': [for (final d in displayDays) d.toJson()],
+    if (version >= 3) 'dayExtras': dayExtras ?? <String, List<String>>{},
+    if (version >= 3)
+      'stripTotals': {
+        for (final e in (stripTotals ?? <String, WidgetStripTotal>{}).entries)
+          e.key: e.value.toJson(),
+      },
   };
 
   /// Key order is fixed, so the same snapshot always encodes to the same text.
@@ -841,6 +901,18 @@ class WidgetSnapshot {
     );
     return text;
   }
+}
+
+class WidgetStripTotal {
+  const WidgetStripTotal({required this.minutes, required this.label});
+
+  factory WidgetStripTotal.fromJson(Map<String, Object?> j) =>
+      WidgetStripTotal(minutes: _int(j, 'minutes'), label: _str(j, 'label'));
+
+  final int minutes;
+  final String label;
+
+  Map<String, Object?> toJson() => {'minutes': minutes, 'label': label};
 }
 
 // Strict readers: a wrong type throws, and decode turns it into a

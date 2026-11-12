@@ -232,13 +232,13 @@ void main() {
       final bytes = codec.encode(data, appVersion: 'test', exportedAt: at);
       expect(bytes.take(2), [0x1f, 0x8b], reason: 'no files: plain gzip');
       final file = codec.decode(bytes);
-      expect(file.schemaVersion, 3);
-      expect(file.data, data);
+      expect(file.schemaVersion, 4);
+      expect(file.data, data.upgradedOvertime());
       expect(file.attachmentFiles, isEmpty);
 
       final repo = makeRepository(db, dir);
       await repo.restore(file.data);
-      expect(await repo.readAll(), data);
+      expect(await repo.readAll(), data.upgradedOvertime());
       final schedule = (await ScheduleRepository(db).load('main')).schedule;
       final night = schedule.shiftTypeById('night')!;
       expect(night.location, 'UCI, planta 3');
@@ -260,11 +260,14 @@ void main() {
 
       // A restore over it keeps it all in the safety copy.
       await repo.restore(buildGoldenBackupDataV3());
-      expect(await repo.readAll(), buildGoldenBackupDataV3());
+      expect(
+        await repo.readAll(),
+        buildGoldenBackupDataV3().upgradedOvertime(),
+      );
       final safety = dir.listSync().whereType<File>().map(
         (f) => codec.decode(f.readAsBytesSync()).data,
       );
-      expect(safety.any((d) => d == data), isTrue);
+      expect(safety.any((d) => d == data.upgradedOvertime()), isTrue);
     });
 
     test('data without v6 values writes no v6 key: the golden bytes, '
@@ -326,7 +329,7 @@ void main() {
       stripped.validate();
       // And the schema version is the one it knows.
       final bytes = codec.encode(data, appVersion: 'test', exportedAt: at);
-      expect(readEnvelope(bytes)['schemaVersion'], 3);
+      expect(readEnvelope(bytes)['schemaVersion'], 4);
     });
 
     test('a balance from before v6 writes only its three keys', () {
@@ -752,10 +755,10 @@ void main() {
       // The inner file is a normal plain `.turnly`.
       final inner = archive.find(BackupContainer.backupName)!.readBytes()!;
       expect(inner.take(2), [0x1f, 0x8b]);
-      expect(readEnvelope(inner)['schemaVersion'], 3);
+      expect(readEnvelope(inner)['schemaVersion'], 4);
 
       final file = codec.decode(bytes);
-      expect(file.data, data);
+      expect(file.data, data.upgradedOvertime());
       expect(file.attachmentFiles.keys.toSet(), {'att-photo', 'att-pdf'});
       expect(file.attachmentFiles['att-photo'], _photo);
       expect(file.attachmentFiles['att-pdf'], _pdf);

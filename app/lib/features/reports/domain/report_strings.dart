@@ -1,3 +1,5 @@
+import '../../schedule/domain/overtime.dart';
+
 /// The words and formats of a report, resolved before it is rendered, so the
 /// PDF and CSV writers need neither a `BuildContext` nor the localizations
 /// (and a test builds them without a widget tree). `reportStringsFor`
@@ -38,6 +40,10 @@ class ReportStrings {
     required this.colNote,
     this.colExtra,
     this.extrasAmount,
+    this.overtimeTypeOvertime,
+    this.overtimeTypeOtherWork,
+    required this.longestStreak,
+    required this.streakDays,
     required this.weekdayShort,
     required this.weekdayLong,
     required this.date,
@@ -109,6 +115,23 @@ class ReportStrings {
   /// Label of the line of the PDF totals with the extra money of the days
   /// (P9). `null` = the line is not written.
   final String? extrasAmount;
+
+  /// The names of the two built-in overtime types (schema v7) the user has
+  /// not renamed; `null` = [overtime].
+  final String? overtimeTypeOvertime;
+  final String? overtimeTypeOtherWork;
+
+  final String longestStreak;
+  final String Function(int days) streakDays;
+
+  /// The name of an overtime type: the user's, or the app's for a built-in
+  /// one.
+  String overtimeTypeName(OvertimeType type) =>
+      type.name ??
+      (type.id == otherWorkTypeId
+          ? overtimeTypeOtherWork
+          : overtimeTypeOvertime) ??
+      overtime;
 
   /// ISO weekday (1 = Monday .. 7 = Sunday) as «lun» / «lunes».
   final String Function(int weekday) weekdayShort;

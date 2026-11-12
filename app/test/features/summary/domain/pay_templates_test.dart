@@ -43,14 +43,15 @@ void main() {
     test('bring no amount and say which pluses each sector has', () {
       for (final template in payTemplates) {
         final types = [_morning, _night, _guard];
-        expect(
-          startingAmounts(template, types).values.toSet(),
-          {0},
-          reason: '${template.kind}',
-        );
+        expect(startingAmounts(template, types).values.toSet(), {
+          0,
+        }, reason: '${template.kind}');
       }
       final health = payTemplateOf(PayTemplateKind.publicHealth);
-      expect(health.concepts.map((c) => c.slot).toSet(), PlusSlot.values.toSet());
+      expect(
+        health.concepts.map((c) => c.slot).toSet(),
+        PlusSlot.values.toSet(),
+      );
       expect(health.annualHours, isNull);
       expect(payTemplateOf(PayTemplateKind.firefighters).annualHours, isNull);
       // The only figure: the annual hours of the national agreement.
@@ -84,22 +85,37 @@ void main() {
       const night = PlusConcept(PlusSlot.nightPerHour, PlusTarget.allWork);
       // 08:00-15:00 and 15:00-22:00 never touch 22:00-06:00.
       expect(night.appliesTo(_morning), isFalse);
-      expect(night.appliesTo(_work('A', start: 15 * _h, end: 22 * _h)), isFalse);
+      expect(
+        night.appliesTo(_work('A', start: 15 * _h, end: 22 * _h)),
+        isFalse,
+      );
       // One minute inside the window is enough.
-      expect(night.appliesTo(_work('B', start: 15 * _h, end: 22 * _h + 1)), isTrue);
+      expect(
+        night.appliesTo(_work('B', start: 15 * _h, end: 22 * _h + 1)),
+        isTrue,
+      );
       expect(night.appliesTo(_work('C', start: 5 * _h, end: 13 * _h)), isTrue);
       expect(night.appliesTo(_night), isTrue);
       expect(night.appliesTo(_guard), isTrue);
       // The night override of the type wins, like in the summary.
-      final forcedNight = _work('D', start: 8 * _h, end: 15 * _h)
-          .copyWith(nightOverride: true);
-      final forcedDay = _work('E', start: 22 * _h, end: 6 * _h)
-          .copyWith(nightOverride: false);
+      final forcedNight = _work(
+        'D',
+        start: 8 * _h,
+        end: 15 * _h,
+      ).copyWith(nightOverride: true);
+      final forcedDay = _work(
+        'E',
+        start: 22 * _h,
+        end: 6 * _h,
+      ).copyWith(nightOverride: false);
       expect(night.appliesTo(forcedNight), isTrue);
       expect(night.appliesTo(forcedDay), isFalse);
       // A split shift counts when any of its segments does.
-      final split = _work('S', start: 8 * _h, end: 12 * _h)
-          .copyWith(segment2StartMinute: 20 * _h, segment2DurationMinutes: 4 * _h);
+      final split = _work(
+        'S',
+        start: 8 * _h,
+        end: 12 * _h,
+      ).copyWith(segment2StartMinute: 20 * _h, segment2DurationMinutes: 4 * _h);
       expect(night.appliesTo(split), isTrue);
     });
   });
@@ -224,7 +240,9 @@ void main() {
     MonthSummary summarize(CivilDate day, ShiftType guard) => summarizeRange(
       Schedule(
         shiftTypes: [guard],
-        entries: {day: DayEntry(date: day, shiftTypeIds: const ['G'])},
+        entries: {
+          day: DayEntry(date: day, shiftTypeIds: const ['G']),
+        },
       ),
       day,
       day,
@@ -271,8 +289,10 @@ void main() {
         },
         selected: {'G'},
       ).single;
-      expect(summarize(christmas, applied).earningsCents,
-          summarize(christmas, guard).earningsCents);
+      expect(
+        summarize(christmas, applied).earningsCents,
+        summarize(christmas, guard).earningsCents,
+      );
     });
   });
 }

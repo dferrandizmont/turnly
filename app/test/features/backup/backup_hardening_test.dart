@@ -154,10 +154,10 @@ void main() {
         expect(rows['morning']!.alarmSound, settings);
         expect(rows['split']!.alarmSound, media);
         // The rest of the backup came through.
-        expect(
-          (await repo.readAll()).dayEntries,
-          buildGoldenBackupDataV3().dayEntries,
-        );
+        // (its overtime minutes as blocks, database v7).
+        final upgraded = buildGoldenBackupDataV3().upgradedOvertime();
+        expect((await repo.readAll()).dayEntries, upgraded.dayEntries);
+        expect((await repo.readAll()).overtimeBlocks, upgraded.overtimeBlocks);
       },
     );
 

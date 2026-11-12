@@ -47,6 +47,16 @@ class AppDateFormat {
     _ => '${weekdayShort(d)} ${d.day} ${monthShort(d)}',
   };
 
+  /// End date in «planned until …». Basque needs the full month and the
+  /// day declined before «arte»; a suffix on the ARB placeholder cannot
+  /// handle the different endings of the spoken numerals.
+  String plannedUntilDate(DateTime d) {
+    if (_lang != 'eu') return shortDate(d);
+    const takesEra = {1, 5, 10, 15, 21, 25, 30};
+    final ending = takesEra.contains(d.day) ? 'era' : 'ra';
+    return '${_basqueMonths[d.month - 1]}ren ${d.day}$ending';
+  }
+
   /// "oct", "sep": the short month name, three letters and no dot.
   String monthShort(DateTime d) {
     final table = _monthsShort[_lang];

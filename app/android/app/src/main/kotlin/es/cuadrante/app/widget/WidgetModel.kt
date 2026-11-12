@@ -39,6 +39,7 @@ data class DisplayDay(
     val hasNote: Boolean,
     val shifts: List<DisplayShift>,
     val description: String? = null,
+    val extras: List<String> = emptyList(),
     /** First line of the note ([WidgetContent.FourWeeks]); null when none. */
     val note: String? = null,
 ) {
@@ -55,6 +56,7 @@ data class StripCell(
     val hasNote: Boolean,
     val bands: List<Band>,
     val description: String? = null,
+    val extras: List<String> = emptyList(),
 ) {
     val link: String get() = WidgetLinks.day(date)
 }
@@ -69,6 +71,7 @@ data class MonthCell(
     val hasNote: Boolean,
     val bands: List<Band>,
     val description: String? = null,
+    val extras: List<String> = emptyList(),
 ) {
     /** The shifts the cell has room for ([WidgetDayLogic.MAX_CELL_BANDS]). */
     val shown: List<Band> get() = bands.take(WidgetDayLogic.MAX_CELL_BANDS)
@@ -118,12 +121,13 @@ sealed interface WidgetContent {
         val tomorrow: String,
         val shifts: List<Band>,
         val description: String? = null,
+    val extras: List<String> = emptyList(),
     ) : WidgetContent {
         val link: String get() = WidgetLinks.day(date)
     }
 
     /** 4x2: the strip of seven days from today. */
-    data class Medium(val date: String, val cells: List<StripCell>) : WidgetContent {
+    data class Medium(val date: String, val cells: List<StripCell>, val totalLabel: String? = null) : WidgetContent {
         val link: String get() = WidgetLinks.day(date)
     }
 
@@ -167,7 +171,7 @@ object WidgetLinks {
  * missing key never throws; the result is the "open the app" message.
  */
 object WidgetModelBuilder {
-    const val SUPPORTED_VERSION = 2
+    const val SUPPORTED_VERSION = 3
 
     /** Longest note line the widgets show (the Dart side cuts at the same length). */
     const val NOTE_MAX_CHARS = 120
@@ -237,7 +241,12 @@ object WidgetModelBuilder {
     private fun parse(json: String?): JSONObject? {
         if (json.isNullOrEmpty()) return null
         return try {
-            JSONObject(json).takeIf { it.optInt("v", -1) in 1..SUPPORTED_VERSION }
+            JSONObject(json).takeIf { it.optInt("v", -1) in 1..SUPPORTED_VERSION }?.also {
+                if (it.getInt("v") >= 3) {
+                    it.getJSONObject("dayExtras")
+                    it.getJSONObject("stripTotals")
+                }
+            }
         } catch (_: JSONException) {
             null
         }
@@ -274,7 +283,8 @@ object WidgetModelBuilder {
                 d.getBoolean("hasNote") && !absent, parsed,
                 description(root, iso, iso == today.toString(), auxiliary = true),
                 // The text of a note never names a health day, even in a forged payload.
-                note = if (absent) null else cappedNote(notes?.optStringOrNull(iso)))
+                note = if (absent) null else cappedNote(notes?.optStringOrNull(iso)),
+                extras = extras(root, iso))
         }
     }
 
@@ -286,6 +296,7 @@ object WidgetModelBuilder {
             dateLabel = day.getString("dateLabel"),
             isHoliday = day.optBoolean("isHoliday"),
             description = description(root, day.getString("date"), true),
+            extras = extras(root, day.getString("date")),
             big = small.getString("big"),
             isEmpty = small.optBoolean("isEmpty"),
             detail = small.optStringOrNull("detail"),
@@ -302,11 +313,15 @@ object WidgetModelBuilder {
         val cells = day.getJSONObject("medium").getJSONArray("cells")
         return WidgetContent.Medium(
             date = day.getString("date"),
+            totalLabel = if (root.getInt("v") >= 3)
+                root.getJSONObject("stripTotals").getJSONObject(day.getString("date")).getString("label")
+                else null,
             cells = List(cells.length()) { i ->
                 val c = cells.getJSONObject(i)
                 val bands = c.getJSONArray("bands")
                 StripCell(
                     date = c.getString("date"),
+                    extras = extras(root, c.getString("date")),
                     weekdayShort = c.getString("weekdayShort"),
                     dayOfMonth = c.getInt("dayOfMonth"),
                     isToday = c.optBoolean("isToday"),
@@ -356,6 +371,7 @@ object WidgetModelBuilder {
                 val bands = c.getJSONArray("bands")
                 MonthCell(
                     date = c.getString("date"),
+                    extras = extras(root, c.getString("date")),
                     dayOfMonth = c.getInt("dayOfMonth"),
                     inMonth = inMonth,
                     isToday = i == todayCell,
@@ -395,6 +411,11 @@ object WidgetModelBuilder {
         val label = redacted ?: texts.optJSONObject("days")?.optStringOrNull(date) ?: return null
         val today = if (isToday) texts.optStringOrNull("today") else null
         return listOfNotNull(today, label).joinToString(". ")
+    }
+
+    private fun extras(root: JSONObject, date: String): List<String> {
+        val lines = root.optJSONObject("dayExtras")?.optJSONArray(date) ?: return emptyList()
+        return List(lines.length()) { lines.getString(it) }
     }
 
     private fun JSONObject.optStringOrNull(name: String): String? =

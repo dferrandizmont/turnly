@@ -6,7 +6,9 @@ import '../../../l10n/app_localizations.dart';
 import '../../calendar/application/off_outlook.dart';
 import '../../calendar/presentation/off_outlook_text.dart';
 import '../../calendar/presentation/shift_format.dart';
+import '../../calendar/presentation/overtime_format.dart';
 import '../../schedule/domain/schedule_domain.dart';
+import '../../summary/presentation/summary_format.dart';
 
 /// Already-localized texts the widget snapshot needs. The caller fills them
 /// from the app's localizations. Spoken descriptions reuse the app's phrases
@@ -60,6 +62,19 @@ class WidgetStrings {
 
   String get todayLabel => _l10n.daySemanticsToday;
 
+  String overtimeLabel(int minutes, OvertimeType? type) {
+    final duration = formatHours(_l10n, minutes);
+    return type == null || (type.id == overtimeTypeId && type.name == null)
+        ? _l10n.widgetOvertime(duration)
+        : _l10n.widgetOvertimeType(duration, overtimeTypeName(_l10n, type));
+  }
+
+  String earlyLeaveLabel(int minutes) =>
+      _l10n.widgetEarlyLeave(formatHours(_l10n, minutes));
+
+  String sevenDayHours(int minutes) =>
+      _l10n.widgetSevenDayHours(formatHours(_l10n, minutes));
+
   /// «Libras el jueves 5» / «Mañana libras» / «Hoy libras; vuelves el lunes 9»
   /// for the optional `nextOff` extension; `null` when no day off is known.
   String? nextOffLabel(OffOutlook outlook) =>
@@ -70,6 +85,7 @@ class WidgetStrings {
     ResolvedDay day,
     String? holidayName, {
     bool redactAbsence = false,
+    List<String> extras = const [],
   }) {
     final l10n = _l10n;
     final format = AppDateFormat(locale, hour12);
@@ -90,6 +106,7 @@ class WidgetStrings {
         else
           shift.spoken(l10n, format),
       if (holidayName != null) l10n.daySemanticsHoliday(holidayName),
+      ...extras,
       if (!private && day.note != null && day.note!.isNotEmpty)
         l10n.daySemanticsNote,
     ].join('. ');

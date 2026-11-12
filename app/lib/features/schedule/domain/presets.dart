@@ -192,6 +192,7 @@ class PatternPreset {
     required String description,
     required this.steps,
     this.suggestedStart,
+    this.chooseWorkShift = false,
   }) : spanishName = name,
        spanishDescription = description;
 
@@ -212,6 +213,9 @@ class PatternPreset {
 
   /// Weekday the cycle should start on (1 = Monday ... 7 = Sunday), if any.
   final int? suggestedStart;
+
+  /// The person can replace the morning template with their work shift.
+  final bool chooseWorkShift;
 
   int get lengthDays => steps.length;
 
@@ -285,8 +289,24 @@ final patternPresets = <PatternPreset>[
   PatternPreset(
     id: '4x4',
     name: '4 x 4',
-    description: '4 días de 12 h y 4 libres',
+    description: '4 días de 12 h y 4 libres (4x4 o cuatro y cuatro)',
     steps: _seq('D4 L4'),
+  ),
+  PatternPreset(
+    id: '2x2',
+    name: '2 y 2',
+    description:
+        '2 días de trabajo y 2 libres (2x2). Elige tu turno de trabajo.',
+    steps: _seq('M2 L2'),
+    chooseWorkShift: true,
+  ),
+  PatternPreset(
+    id: '3x1',
+    name: '3 y 1',
+    description:
+        '3 días de trabajo y 1 libre (3x1). Elige tu turno de trabajo.',
+    steps: _seq('M3 L'),
+    chooseWorkShift: true,
   ),
   PatternPreset(
     id: '5x2',
@@ -303,7 +323,8 @@ final patternPresets = <PatternPreset>[
     name: '2-2-3',
     description:
         'Dos días de 12 h, dos libres, tres de 12 h, dos libres, '
-        'dos de 12 h y tres libres (también 2-2-3-2-2-3)',
+        'dos de 12 h y tres libres (también 2-2-3-2-2-3). '
+        'También se conoce como Pitman o Panamá.',
     steps: _seq('D2 L2 D3 L2 D2 L3'),
   ),
   // Continental: continuous cover with 4 crews (equipos) on 8 h M/T/N, a

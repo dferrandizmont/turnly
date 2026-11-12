@@ -35,14 +35,15 @@ class HowAmIDoingCard extends ConsumerWidget {
     final l10n = context.l10n;
     final colors = context.colors;
     final type = context.type;
-    final hours = ref.watch(periodHoursProvider(range));
     final goalValue = ref.watch(hoursGoalProvider);
+    final hours = ref.watch(periodHoursProvider(range));
     final goal = goalValue.value;
+    // The goal only counts the overtime types that count for it.
     final progress = goal == null
         ? null
         : GoalProgress(
             targetMinutes: goalMinutesFor(span, goal, range),
-            hours: hours,
+            hours: ref.watch(goalPeriodHoursProvider(range)),
           );
 
     final tense = hours.tense;
@@ -55,8 +56,9 @@ class HowAmIDoingCard extends ConsumerWidget {
       PeriodTense.future => l10n.summaryHowPlanned,
     };
     final big = formatHours(l10n, bigMinutes);
-    final lastDay = AppDateFormat.of(context)
-        .shortDate(DateTime(range.to.year, range.to.month, range.to.day));
+    final lastDay = AppDateFormat.of(
+      context,
+    ).plannedUntilDate(DateTime(range.to.year, range.to.month, range.to.day));
 
     final legend = <_LegendItem>[
       if (tense != PeriodTense.future)

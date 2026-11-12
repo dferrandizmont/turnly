@@ -149,47 +149,67 @@ void main() {
         return copies;
       }
 
-      test(
-        'makes the safety copy first, then removes the calendar and its days',
-        () async {
-          final copies = useCopy((_) async => entry);
-          final c = await calendars().create(name: 'Prueba', colorValue: 7);
-          await container
-              .read(scheduleRepositoryProvider)
-              .apply(
-                c.id,
-                ScheduleChange(
-                  patch: EntriesPatch({
-                    _today: EntryChange(
-                      null,
-                      DayEntry(date: _today, shiftTypeIds: const ['night']),
+      test('makes the safety copy first, then removes the calendar and its days', () async {
+        final copies = useCopy((_) async => entry);
+        final c = await calendars().create(name: 'Prueba', colorValue: 7);
+        await container
+            .read(scheduleRepositoryProvider)
+            .apply(
+              c.id,
+              ScheduleChange(
+                patch: EntriesPatch({
+                  _today: EntryChange(
+                    null,
+                    DayEntry(
+                      date: _today,
+                      shiftTypeIds: const ['night'],
+                      overtimeBlocks: [
+                        OvertimeBlock(
+                          id: 'x',
+                          date: _today,
+                          typeId: overtimeTypeId,
+                          startMinute: 360,
+                          endMinute: 420,
+                        ),
+                      ],
                     ),
-                  }),
-                ),
-              );
-          await calendars().archive(c.id);
+                  ),
+                }),
+              ),
+            );
+        await calendars().archive(c.id);
+        // With foreign keys off the cascade would not run: the delete must
+        // take the blocks of extra hours itself.
+        await storage.database.customStatement('PRAGMA foreign_keys = OFF');
 
-          await calendars().deleteArchived(c.id);
+        await calendars().deleteArchived(c.id);
+        final blocks = await storage.database
+            .customSelect(
+              'SELECT COUNT(*) AS n FROM overtime_blocks WHERE calendar_id = ?',
+              variables: [Variable.withString(c.id)],
+            )
+            .getSingle();
+        expect(blocks.read<int>('n'), 0);
+        await storage.database.customStatement('PRAGMA foreign_keys = ON');
 
-          // The copy still had the calendar in it.
-          expect(copies, [
-            ['main', c.id],
-          ]);
-          final s = await calendarsState();
-          expect(s.calendars.map((x) => x.id), ['main']);
-          expect(s.archived, isEmpty);
-          final left = await storage.database
-              .customSelect(
-                'SELECT COUNT(*) AS n FROM day_entries WHERE calendar_id = ?',
-                variables: [Variable.withString(c.id)],
-              )
-              .getSingle();
-          expect(left.read<int>('n'), 0);
-          // The widget and the alarms keep following a calendar that exists.
-          expect(s.primaryId, 'main');
-          expect(scheduleState().calendarId, 'main');
-        },
-      );
+        // The copy still had the calendar in it.
+        expect(copies, [
+          ['main', c.id],
+        ]);
+        final s = await calendarsState();
+        expect(s.calendars.map((x) => x.id), ['main']);
+        expect(s.archived, isEmpty);
+        final left = await storage.database
+            .customSelect(
+              'SELECT COUNT(*) AS n FROM day_entries WHERE calendar_id = ?',
+              variables: [Variable.withString(c.id)],
+            )
+            .getSingle();
+        expect(left.read<int>('n'), 0);
+        // The widget and the alarms keep following a calendar that exists.
+        expect(s.primaryId, 'main');
+        expect(scheduleState().calendarId, 'main');
+      });
 
       test('without a safety copy nothing is deleted', () async {
         useCopy((_) async => throw StateError('disk full'));

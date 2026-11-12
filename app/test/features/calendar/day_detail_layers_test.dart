@@ -87,7 +87,7 @@ void main() {
       // In «Más opciones»: extras, own holiday, reminder, duplicate, clear.
       for (final key in [
         'day-extras',
-        'day-overtime-more',
+        'day-add-overtime',
         'day-early-more',
         'day-holiday-switch',
         'day-reminder-add',
@@ -267,18 +267,18 @@ void main() {
       expect(scheduleOf(tester).resolve(_oct24).note, isNull);
     });
 
-    testWidgets('the extra hours, even while still settling', (tester) async {
+    testWidgets('the early leave, even while still settling', (tester) async {
       await pumpCalendar(tester);
       await _open(tester, _oct26);
-      await tapDayControl(tester, 'day-overtime-more');
+      await tapDayControl(tester, 'day-early-more');
       await tester.pump(DayExtrasSection.settle + const Duration(seconds: 1));
       await tester.pumpAndSettle();
-      expect(scheduleOf(tester).entries[_oct26]?.overtimeMinutes, 15);
-      await tester.tap(_key('day-overtime-more'));
+      expect(scheduleOf(tester).entries[_oct26]?.earlyLeaveMinutes, 15);
+      await tester.tap(_key('day-early-more'));
       await tester.pump(); // not written yet
       await tester.ensureVisible(_key('day-undo'));
       await _undo(tester);
-      expect(scheduleOf(tester).entries[_oct26]?.overtimeMinutes, 15);
+      expect(scheduleOf(tester).entries[_oct26]?.earlyLeaveMinutes, 15);
       await _undo(tester);
       expect(scheduleOf(tester).entries[_oct26], isNull);
     });

@@ -176,6 +176,56 @@ void main() {
       expect(summary.nightPlusCents, 450);
     });
 
+    test('the same with the extra hours as a block (schema v7): «as the '
+        'shift» takes its plus, a fixed rate does not', () {
+      Schedule withBlock(String type) =>
+          _schedule(
+            [
+              _type(
+                'N',
+                start: 20 * 60,
+                end: 23 * 60,
+                rate: 1000,
+                nightPlus: 150,
+              ),
+            ],
+            [
+              DayEntry(
+                date: const CivilDate(2026, 10, 1),
+                shiftTypeIds: const ['N'],
+                overtimeBlocks: [
+                  OvertimeBlock(
+                    id: 'b',
+                    date: const CivilDate(2026, 10, 1),
+                    typeId: type,
+                    startMinute: 23 * 60,
+                    endMinute: 60,
+                  ),
+                ],
+              ),
+            ],
+          ).copyWith(
+            overtimeTypes: [
+              ...defaultOvertimeTypes,
+              const OvertimeType(
+                id: 'fixed',
+                name: 'Otra',
+                colorValue: 0xFF000000,
+                rateMode: OvertimeRateMode.fixed,
+                hourlyRateCents: 1000,
+              ),
+            ],
+          );
+      final asShift = summarizeMonth(withBlock(overtimeTypeId), _first);
+      expect(asShift.workedMinutes, 300);
+      expect(asShift.nightMinutes, 180);
+      expect(asShift.nightPlusCents, 450);
+      expect(asShift.overtimeCents, 2000);
+      final fixed = summarizeMonth(withBlock('fixed'), _first);
+      expect(fixed.nightMinutes, 180);
+      expect(fixed.nightPlusCents, 150);
+    });
+
     test('is not paid on a rest or an absence', () {
       final schedule = _schedule(
         [

@@ -56,6 +56,16 @@
             android:textSize="15sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/day_extras"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:gravity="center"
+            android:textSize="@dimen/widget_cell_time_size"
+            android:textColor="@color/widget_text_secondary"
+            android:visibility="gone" />
+
         <!-- Spacer (RemoteViews may not inflate a bare View). -->
         <FrameLayout
             android:layout_width="match_parent"

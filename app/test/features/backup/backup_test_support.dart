@@ -152,6 +152,38 @@ Future<void> seedDatabase(
         SettingsCompanion.insert(key: s.key, value: s.value),
       );
     }
+    // Database v7: a fresh database has the two built-in overtime types;
+    // data that brings its own replaces them.
+    if (data.overtimeTypes.isNotEmpty) {
+      b.deleteAll(db.overtimeTypes);
+      b.insertAll(db.overtimeTypes, [
+        for (final t in data.overtimeTypes)
+          OvertimeTypesCompanion.insert(
+            id: t.id,
+            name: Value(t.name),
+            colorValue: t.colorValue,
+            rateMode: t.rateMode,
+            multiplierBasisPoints: Value(t.multiplierBasisPoints),
+            hourlyRateCents: Value(t.hourlyRateCents),
+            countsForGoal: t.countsForGoal,
+            archived: Value(t.archived),
+            sortOrder: Value(t.sortOrder),
+          ),
+      ]);
+    }
+    b.insertAll(db.overtimeBlocks, [
+      for (final o in data.overtimeBlocks)
+        OvertimeBlocksCompanion.insert(
+          calendarId: o.calendarId,
+          date: o.date,
+          id: o.id,
+          typeId: o.typeId,
+          startMinute: o.startMinute,
+          endMinute: o.endMinute,
+          breakMinutes: Value(o.breakMinutes),
+          note: Value(o.note),
+        ),
+    ]);
   });
 }
 
@@ -183,9 +215,15 @@ Future<Map<String, List<Map<String, Object?>>>> dumpAllTables(
     'shift_type_versions': await rows(
       'SELECT * FROM shift_type_versions ORDER BY shift_type_id, until_date',
     ),
-    'note_attachments': await rows('SELECT * FROM note_attachments ORDER BY id'),
+    'note_attachments': await rows(
+      'SELECT * FROM note_attachments ORDER BY id',
+    ),
     'day_tasks': await rows('SELECT * FROM day_tasks ORDER BY id'),
     'shift_swaps': await rows('SELECT * FROM shift_swaps ORDER BY id'),
+    'overtime_types': await rows('SELECT * FROM overtime_types ORDER BY id'),
+    'overtime_blocks': await rows(
+      'SELECT * FROM overtime_blocks ORDER BY calendar_id, date, id',
+    ),
   };
 }
 

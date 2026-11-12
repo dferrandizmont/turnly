@@ -48,12 +48,13 @@ ordenadas en todos los niveles, sin espacios ni saltos de línea), de modo que l
             "holidays": [], "absenceBalances": [], "settings": {} },
   "exportedAt": "2026-11-10T09:00:00Z",
   "format": "cuadrante",
-  "schemaVersion": 3
+  "schemaVersion": 4
 }
 ```
 
-La app escribe siempre la versión 3 (desde la 0.6.0). Los archivos de las versiones 0.1.0 y 0.2.0 son de la
-versión 1, los de la 0.3.0 a la 0.5.0 de la versión 2, y se siguen leyendo (ver «Versiones»).
+La app escribe siempre la versión 4 (desde la base de datos v7, las horas extra en bloques; ver «Versión 4»). Los
+archivos de las versiones 0.1.0 y 0.2.0 son de la versión 1, los de la 0.3.0 a la 0.5.0 de la versión 2, los de la
+0.6.0 a la 1.0 de la versión 3, y se siguen leyendo (ver «Versiones»).
 
 | Campo | Tipo | Significado |
 |---|---|---|
@@ -344,6 +345,43 @@ Se escribe una línea en el registro de depuración por cada fila y no se toca n
 idempotente y nunca bloquea el arranque: si falla, se registra y la app sigue. Prueba:
 `test/features/schedule/data/shift_code_repair_test.dart`.
 
+### Versión 4 (base de datos v7): las horas extra en bloques
+
+Las horas extra dejan de ser minutos por día y pasan a ser bloques con tipo, horario y precio (`docs/datos.md`,
+«Esquema v7»). `data` gana dos claves, y `dayEntries[].overtimeMinutes` ya no se escribe nunca:
+
+| Clave | Campos | Orden |
+|---|---|---|
+| `overtimeTypes` | `id, name (null = tipo de fábrica sin renombrar), colorValue, rateMode (shift/multiplier/fixed/none), multiplierBasisPoints, hourlyRateCents, countsForGoal, archived, sortOrder` | por `id` |
+| `overtimeBlocks` | `calendarId, date, id, typeId, startMinute, endMinute, breakMinutes, note` | por (`calendarId`, `date`, `id`) |
+
+El precio base por hora viaja en `settings` (`summary.baseHourlyRateCents`), como el resto de ajustes.
+
+- **Se sube la versión** por la misma razón que la 3: una app que solo conoce la 3 leería el archivo, ignoraría
+  `overtimeBlocks` y, al restaurar, **perdería las horas extra sin avisar**. Con `schemaVersion` 4 ve
+  `NewerFormatVersion` y no toca nada.
+- **Sin nada que contar, nada que escribir.** Los dos tipos de fábrica sin tocar y sin bloques son lo que tiene toda base
+  de datos: `readAll` los deja fuera y `restore` los vuelve a poner si la copia no trae tipos. Así unos datos que nunca
+  usaron las horas extra dan el mismo JSON, la misma suma de control y la misma huella que antes. Con cualquier bloque,
+  o con un tipo cambiado, se escriben los dos arrays enteros.
+- **Lo que comprueba la lectura** (`validate`): tipos válidos (`OvertimeType.problem`) y sin ids repetidos; bloques
+  válidos (`OvertimeBlock.problem`: horas de 0 a 1439, descanso menor que la duración, nota hasta 200), sin repetir
+  (`calendarId`, `date`, `id`), de un calendario y de un tipo que están en el archivo. Si no, `CorruptBackup`.
+- **Una copia antigua se convierte igual que la base de datos.** `BackupData.upgradedOvertime` pasa los
+  `overtimeMinutes` de cada día a un bloque de «Horas extra» (como el turno, ×1: vale lo mismo que antes) desde el
+  final del último turno con horario de ese día (o las 08:00), con los dos tipos de fábrica si no hay tipos: lo usan `restore`, «Probar restauración» y el escritor (una
+  copia de seguridad hecha con datos antiguos ya sale en la versión 4). Los lectores de las versiones 1 a 3 no
+  convierten nada: lo leído es exactamente el archivo, así que los dorados siguen dando su suma de control, sus bytes
+  canónicos y su huella. Un archivo v4 con `overtimeMinutes` (no lo escribe nadie) no se rechaza: se convierte igual.
+- **La huella** añade a la línea de un día sus bloques (id, tipo, inicio, fin, descanso y nota, por inicio) solo si
+  tiene alguno: las líneas de los datos sin bloques no cambian.
+- **La copia previa a restaurar** se comprueba contra lo actual ya convertido.
+
+Pruebas: `overtime_backup_test.dart` (ida y vuelta de tipos, bloques y precio base por códec, base de datos y «Probar
+restauración»; datos sin horas extra iguales que antes; archivos con bloques imposibles; una copia v3 con minutos que se
+restaura como bloques con la misma regla que la migración y las mismas horas cada día; reescribirla da un v4) y
+`golden_v3_fixture_test.dart` (el dorado v3 se lee igual; restaurado, sus tres días de horas extra son bloques).
+
 ## 2. Versiones: reglas que no se rompen
 
 `schemaVersion` cuenta cambios **incompatibles** del formato. Dentro de una misma versión se puede:
@@ -374,9 +412,11 @@ de perder datos en silencio** (apartado 1, «Por qué se sube la versión»). En
      suma de control ya cubrió el archivo tal como se escribió). Restaurar un v2 deja la base de datos como la
      dejaba antes, con las columnas nuevas vacías.
    - **Leer un v3 (`_decodeV3`, `BackupData.fromJson`):** lo de la v2 más los campos de la v3, todos opcionales
-     (clave ausente = `null`).
-2. El escritor escribe solo la versión más reciente (`supportedSchemaVersion` = 3). Nada vuelve a escribir un v1 ni
-   un v2. (Las pruebas reconstruyen esas formas a mano: `test/features/backup/v1_format.dart` y `v2_format.dart`.)
+     (clave ausente = `null`). `overtimeTypes` y `overtimeBlocks` se ignoran aunque vengan.
+   - **Leer un v4 (`_decodeV4`, `BackupData.fromJson(readOvertime: true)`):** lo de la v3 más los tipos y bloques de
+     horas extra (ver «Versión 4»).
+2. El escritor escribe solo la versión más reciente (`supportedSchemaVersion` = 4, desde la base de datos v7). Nada
+   vuelve a escribir un v1, un v2 ni un v3. (Las pruebas reconstruyen esas formas a mano: `test/features/backup/v1_format.dart` y `v2_format.dart`.)
 3. Una app vieja ante un archivo de **versión de formato superior** dice que el archivo viene de una versión más reciente (`NewerFormatVersion`) y
    no toca nada. La pantalla debe proponer actualizar la app.
 4. El archivo de referencia `app/test/fixtures/golden_backup/golden_v1.cuadrante` se queda para siempre y se añade
@@ -576,6 +616,14 @@ aparece en Archivos › iCloud Drive › Turnly cuando `Info.plist` declara `NSU
   calendarios). Generador: `test/features/backup/golden_dataset_v3.dart` (`buildGoldenBackupDataV3()`). Regenerar
   (solo si se versiona el formato a propósito):
   `flutter test test/features/backup/golden_v3_fixture_test.dart --dart-define=REGENERATE_GOLDEN=true`.
+  Desde la versión 4 su prueba de «mismos bytes» los compara con la forma v3 (`v3_format.dart`): el escritor de
+  ahora convierte sus horas extra en bloques. Restaurado, sus tres días de horas extra son bloques.
+- `golden_v4.cuadrante` + `golden_v4.expected.json` (base de datos v7): los datos de v3 con sus horas extra en
+  bloques, «Horas extra» renombrado, un tipo propio de precio fijo archivado y otro con multiplicador ×1,75, bloques
+  que cruzan la medianoche, con descanso y nota, dos en el mismo día y uno en el segundo calendario, y un precio base.
+  Generador: `test/features/backup/golden_dataset_v4.dart` (`buildGoldenBackupDataV4()`). Regenerar (solo si se
+  versiona el formato a propósito):
+  `flutter test test/features/backup/golden_v4_fixture_test.dart --dart-define=REGENERATE_GOLDEN=true`.
 
 El estado de pago no es un dato de la base de datos y queda fuera del conjunto (no hay compras: R9 sale de la
 matriz); las alarmas configuradas están representadas por su clave en `settings`. Eso incluye el **aviso de pausa**

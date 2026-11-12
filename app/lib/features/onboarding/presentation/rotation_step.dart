@@ -9,6 +9,7 @@ import '../../../core/widgets/app_card.dart';
 import '../../calendar/application/schedule_controller.dart';
 import '../../patterns/domain/pattern_catalog.dart';
 import '../../patterns/presentation/cycle_start_picker.dart';
+import '../../patterns/presentation/rotation_start_details.dart';
 import '../../patterns/presentation/pattern_wizard_screen.dart'
     show PatternCard, PatternDateTile, patternFullDate, pickPatternDate;
 import '../../schedule/domain/schedule_domain.dart';
@@ -136,7 +137,7 @@ class StartStep extends ConsumerWidget {
     final id = state.presetId;
     if (id == null) return const SizedBox.shrink();
     final preset = patternPresetById(id);
-    final pattern = presetPattern(schedule, preset);
+    final pattern = controller.request(schedule)!.pattern;
     final start = state.start;
 
     final suggested = preset.suggestedStart;
@@ -167,6 +168,7 @@ class StartStep extends ConsumerWidget {
             if (picked != null) controller.setStart(picked);
           },
         ),
+        RotationStartConfirmation(start: start),
         if (suggested != null && start.weekday != suggested)
           Padding(
             padding: const EdgeInsets.only(top: Sp.s),
@@ -176,6 +178,16 @@ class StartStep extends ConsumerWidget {
             ),
           ),
         const SizedBox(height: Sp.section),
+        if (preset.chooseWorkShift)
+          RotationWorkShiftPicker(
+            shifts: [
+              for (final t in shiftTemplates)
+                if (t.category == ShiftCategory.work)
+                  shiftTypeForFirstUse(schedule, t.key)!,
+            ],
+            selectedId: state.workShiftId,
+            onChanged: controller.setWorkShift,
+          ),
         // The same picker and live preview as the pattern wizard: the factory
         // catalogue talks the app's language from the first frame.
         CycleStartPicker(

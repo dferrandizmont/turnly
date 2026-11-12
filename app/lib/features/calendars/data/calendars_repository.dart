@@ -160,14 +160,19 @@ class CalendarsRepository {
   /// Deletes an archived calendar for good, with everything that belongs
   /// only to it: its rotations, days (override, note, reminder, overtime),
   /// attachment rows, tasks, swaps and the balances of absences that count
-  /// only its days. Shift types, patterns and the other calendars are not
-  /// touched. The files of the attachments are left for the sweep of the
+  /// only its days, and its blocks of extra hours (schema v7). Shift types,
+  /// patterns, overtime types and the other calendars are not touched. The files of the attachments are left for the sweep of the
   /// attachment store, which removes whatever no row points at.
   ///
   /// Throws as [requireDeletable] does. Take a safety copy first: this
   /// cannot be undone.
   Future<void> deleteArchived(String id) => _db.transaction(() async {
     await requireDeletable(id);
+    // The foreign key cascades too; deleting them here does not depend on
+    // `PRAGMA foreign_keys`.
+    await (_db.delete(
+      _db.overtimeBlocks,
+    )..where((t) => t.calendarId.equals(id))).go();
     await (_db.delete(
       _db.noteAttachments,
     )..where((t) => t.calendarId.equals(id))).go();

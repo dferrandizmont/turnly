@@ -137,7 +137,10 @@ pw.Widget _header(String title, String period) => pw.Container(
               ),
             ),
             pw.SizedBox(height: 2),
-            pw.Text(period, style: const pw.TextStyle(fontSize: 11, color: _muted)),
+            pw.Text(
+              period,
+              style: const pw.TextStyle(fontSize: 11, color: _muted),
+            ),
           ],
         ),
       ),
@@ -249,9 +252,7 @@ List<pw.Widget> _monthBlock(
       ..add(pw.SizedBox(height: 6))
       ..add(
         pw.Text(
-          '${s.holidaysTitle}: ${[
-            for (final h in monthHolidays) '${s.dayMonth(h.date.month, h.date.day)} ${h.name}',
-          ].join(' · ')}',
+          '${s.holidaysTitle}: ${[for (final h in monthHolidays) '${s.dayMonth(h.date.month, h.date.day)} ${h.name}'].join(' · ')}',
           style: const pw.TextStyle(fontSize: 8, color: _muted),
         ),
       );
@@ -292,10 +293,7 @@ pw.Widget _dayCell(ReportDay? day, double width, ReportStrings s) {
                 color: day.isHoliday ? _holiday : _ink,
               ),
             ),
-            if (day.isHoliday) ...[
-              pw.SizedBox(width: 3),
-              _holidayDot(),
-            ],
+            if (day.isHoliday) ...[pw.SizedBox(width: 3), _holidayDot()],
           ],
         ),
         pw.SizedBox(height: 1.5),
@@ -480,6 +478,18 @@ List<pw.Widget> _totalsBlock(ReportModel model, ReportStrings s) {
   if (summary.overtimeMinutes > 0) {
     rows.add((s.overtime, s.hours(summary.overtimeMinutes)));
   }
+  // By overtime type (schema v7), when there is more than one kind.
+  if (summary.overtimeTypes.length > 1 ||
+      (summary.overtimeTypes.length == 1 &&
+          summary.overtimeTypes.single.minutes != summary.overtimeMinutes)) {
+    for (final t in summary.overtimeTypes) {
+      final money = model.options.includeEarnings ? t.amountCents : null;
+      rows.add((
+        s.overtimeTypeName(t.type),
+        [s.hours(t.minutes), if (money != null) s.money(money)].join(' · '),
+      ));
+    }
+  }
   if (summary.earlyLeaveMinutes > 0) {
     rows.add((s.earlyLeave, s.hours(summary.earlyLeaveMinutes)));
   }
@@ -497,8 +507,19 @@ List<pw.Widget> _totalsBlock(ReportModel model, ReportStrings s) {
   }
 
   final columnWidth = (PdfPageFormat.a4.width - 2 * _margin - 24) / 2;
+  final streak = summary.longestStreak;
   return [
     _sectionTitle(s.totalsTitle),
+    if (streak != null)
+      pw.Padding(
+        padding: const pw.EdgeInsets.only(bottom: 6),
+        child: pw.Text(
+          '${s.longestStreak}: ${s.streakDays(streak.days)} '
+          '(${s.date(streak.from.year, streak.from.month, streak.from.day)} – '
+          '${s.date(streak.to.year, streak.to.month, streak.to.day)})',
+          style: const pw.TextStyle(fontSize: 9, color: _ink),
+        ),
+      ),
     pw.Wrap(
       spacing: 24,
       runSpacing: 4,

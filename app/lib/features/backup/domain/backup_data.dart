@@ -635,6 +635,21 @@ class BackupDayEntry extends _Value {
   final int? extraAmountCents;
   final int updatedAt;
 
+  /// The same day without the old overtime minutes (once they are a block,
+  /// [BackupData.upgradedOvertime]).
+  BackupDayEntry withoutOvertimeMinutes() => overtimeMinutes == null
+      ? this
+      : BackupDayEntry(
+          date: date,
+          updatedAt: updatedAt,
+          calendarId: calendarId,
+          shiftTypeIds: shiftTypeIds,
+          note: note,
+          noteReminderMinute: noteReminderMinute,
+          earlyLeaveMinutes: earlyLeaveMinutes,
+          extraAmountCents: extraAmountCents,
+        );
+
   DayEntry toEntry() => DayEntry(
     date: date,
     shiftTypeIds: shiftTypeIds,
@@ -1204,6 +1219,180 @@ class BackupShiftSwap extends _Value {
 
 const _holidayScopes = {'national', 'regional', 'local'};
 
+/// An `overtime_types` row (format version 4, database v7).
+class BackupOvertimeType extends _Value {
+  const BackupOvertimeType({
+    required this.id,
+    this.name,
+    required this.colorValue,
+    required this.rateMode,
+    required this.multiplierBasisPoints,
+    this.hourlyRateCents,
+    required this.countsForGoal,
+    this.archived = false,
+    this.sortOrder = 0,
+  });
+
+  factory BackupOvertimeType.fromJson(Map<String, Object?> json) {
+    final r = _JsonReader(json, 'overtimeType');
+    return BackupOvertimeType(
+      id: r.string('id'),
+      name: r.stringOrNull('name'),
+      colorValue: r.integer('colorValue'),
+      rateMode: r.enumValue('rateMode', OvertimeRateMode.values),
+      multiplierBasisPoints: r.integer('multiplierBasisPoints'),
+      hourlyRateCents: r.integerOrNull('hourlyRateCents'),
+      countsForGoal: r.boolean('countsForGoal'),
+      archived: r.boolean('archived'),
+      sortOrder: r.integer('sortOrder'),
+    );
+  }
+
+  factory BackupOvertimeType.of(OvertimeType t) => BackupOvertimeType(
+    id: t.id,
+    name: t.name,
+    colorValue: t.colorValue,
+    rateMode: t.rateMode,
+    multiplierBasisPoints: t.multiplierBasisPoints,
+    hourlyRateCents: t.hourlyRateCents,
+    countsForGoal: t.countsForGoal,
+    archived: t.archived,
+    sortOrder: t.sortOrder,
+  );
+
+  final String id;
+
+  /// `null` = a built-in type the user has not renamed.
+  final String? name;
+  final int colorValue;
+  final OvertimeRateMode rateMode;
+  final int multiplierBasisPoints;
+  final int? hourlyRateCents;
+  final bool countsForGoal;
+  final bool archived;
+  final int sortOrder;
+
+  OvertimeType toType() => OvertimeType(
+    id: id,
+    name: name,
+    colorValue: colorValue,
+    rateMode: rateMode,
+    multiplierBasisPoints: multiplierBasisPoints,
+    hourlyRateCents: hourlyRateCents,
+    countsForGoal: countsForGoal,
+    archived: archived,
+    sortOrder: sortOrder,
+  );
+
+  Map<String, Object?> toJson() => {
+    'id': id,
+    'name': name,
+    'colorValue': colorValue,
+    'rateMode': rateMode.name,
+    'multiplierBasisPoints': multiplierBasisPoints,
+    'hourlyRateCents': hourlyRateCents,
+    'countsForGoal': countsForGoal,
+    'archived': archived,
+    'sortOrder': sortOrder,
+  };
+
+  @override
+  List<Object?> get props => [
+    id,
+    name,
+    colorValue,
+    rateMode,
+    multiplierBasisPoints,
+    hourlyRateCents,
+    countsForGoal,
+    archived,
+    sortOrder,
+  ];
+}
+
+/// An `overtime_blocks` row (format version 4, database v7): a stretch of
+/// extra hours of one day of a calendar.
+class BackupOvertimeBlock extends _Value {
+  const BackupOvertimeBlock({
+    required this.calendarId,
+    required this.date,
+    required this.id,
+    required this.typeId,
+    required this.startMinute,
+    required this.endMinute,
+    this.breakMinutes = 0,
+    this.note,
+  });
+
+  factory BackupOvertimeBlock.fromJson(Map<String, Object?> json) {
+    final r = _JsonReader(json, 'overtimeBlock');
+    return BackupOvertimeBlock(
+      calendarId: r.string('calendarId'),
+      date: r.date('date'),
+      id: r.string('id'),
+      typeId: r.string('typeId'),
+      startMinute: r.integer('startMinute'),
+      endMinute: r.integer('endMinute'),
+      breakMinutes: r.integer('breakMinutes'),
+      note: r.stringOrNull('note'),
+    );
+  }
+
+  factory BackupOvertimeBlock.of(String calendarId, OvertimeBlock b) =>
+      BackupOvertimeBlock(
+        calendarId: calendarId,
+        date: b.date,
+        id: b.id,
+        typeId: b.typeId,
+        startMinute: b.startMinute,
+        endMinute: b.endMinute,
+        breakMinutes: b.breakMinutes,
+        note: b.note,
+      );
+
+  final String calendarId;
+  final CivilDate date;
+  final String id;
+  final String typeId;
+  final int startMinute;
+  final int endMinute;
+  final int breakMinutes;
+  final String? note;
+
+  OvertimeBlock toBlock() => OvertimeBlock(
+    id: id,
+    date: date,
+    typeId: typeId,
+    startMinute: startMinute,
+    endMinute: endMinute,
+    breakMinutes: breakMinutes,
+    note: note,
+  );
+
+  Map<String, Object?> toJson() => {
+    'calendarId': calendarId,
+    'date': date.toIso(),
+    'id': id,
+    'typeId': typeId,
+    'startMinute': startMinute,
+    'endMinute': endMinute,
+    'breakMinutes': breakMinutes,
+    'note': note,
+  };
+
+  @override
+  List<Object?> get props => [
+    calendarId,
+    date,
+    id,
+    typeId,
+    startMinute,
+    endMinute,
+    breakMinutes,
+    note,
+  ];
+}
+
 /// Everything the user owns in the database, as the `.cuadrante` file holds it.
 ///
 /// The lists are normalised on construction, so equal data compares equal and
@@ -1230,6 +1419,8 @@ class BackupData {
     Iterable<BackupNoteAttachment> noteAttachments = const [],
     Iterable<BackupDayTask> dayTasks = const [],
     Iterable<BackupShiftSwap> shiftSwaps = const [],
+    Iterable<BackupOvertimeType> overtimeTypes = const [],
+    Iterable<BackupOvertimeBlock> overtimeBlocks = const [],
   }) : calendars = List.unmodifiable(
          (calendars ?? const [BackupCalendar.defaultMain()]).toList()
            ..sort((a, b) => a.id.compareTo(b.id)),
@@ -1265,6 +1456,17 @@ class BackupData {
        ),
        shiftSwaps = List.unmodifiable(
          shiftSwaps.toList()..sort((a, b) => a.id.compareTo(b.id)),
+       ),
+       overtimeTypes = List.unmodifiable(
+         overtimeTypes.toList()..sort((a, b) => a.id.compareTo(b.id)),
+       ),
+       overtimeBlocks = List.unmodifiable(
+         overtimeBlocks.toList()..sort((a, b) {
+           final byCalendar = a.calendarId.compareTo(b.calendarId);
+           if (byCalendar != 0) return byCalendar;
+           final byDate = a.date.compareTo(b.date);
+           return byDate != 0 ? byDate : a.id.compareTo(b.id);
+         }),
        );
 
   /// Parses the `data` object of a **version 1** file (no calendars): every
@@ -1343,12 +1545,17 @@ class BackupData {
     );
   }
 
-  /// Parses the `data` object of a **version 3** file (the current one).
-  /// Throws [FormatException] on anything unexpected; the codec turns that
-  /// into `CorruptBackup`. Unknown keys are ignored (forward compatibility).
+  /// Parses the `data` object of a **version 3 or 4** file. Throws
+  /// [FormatException] on anything unexpected; the codec turns that into
+  /// `CorruptBackup`. Unknown keys are ignored (forward compatibility).
   /// `noteAttachments`, `dayTasks` and `shiftSwaps` (database v6) are
-  /// optional: absent = none.
-  factory BackupData.fromJson(Map<String, Object?> json) {
+  /// optional: absent = none. [readOvertime] is true for version 4, which
+  /// adds `overtimeTypes` and `overtimeBlocks` (database v7); the version 3
+  /// reader ignores them even if present.
+  factory BackupData.fromJson(
+    Map<String, Object?> json, {
+    bool readOvertime = false,
+  }) {
     final r = _JsonReader(json, 'data');
     List<T> optional<T>(String key, T Function(Map<String, Object?>) parse) =>
         json[key] == null ? <T>[] : r.objects(key, parse);
@@ -1359,6 +1566,12 @@ class BackupData {
       ),
       dayTasks: optional('dayTasks', BackupDayTask.fromJson),
       shiftSwaps: optional('shiftSwaps', BackupShiftSwap.fromJson),
+      overtimeTypes: readOvertime
+          ? optional('overtimeTypes', BackupOvertimeType.fromJson)
+          : const [],
+      overtimeBlocks: readOvertime
+          ? optional('overtimeBlocks', BackupOvertimeBlock.fromJson)
+          : const [],
       calendars: r.objects('calendars', BackupCalendar.fromJson),
       shiftTypes: r.objects('shiftTypes', BackupShiftType.fromJson),
       patterns: r.objects('patterns', BackupPattern.fromJson),
@@ -1391,6 +1604,15 @@ class BackupData {
   final List<BackupDayTask> dayTasks;
   final List<BackupShiftSwap> shiftSwaps;
 
+  /// Database v7 (format version 4): the overtime types, sorted by id, and
+  /// the blocks of every calendar, by calendar, day and id. None of them =
+  /// the two built-in types, untouched and unused (what every database
+  /// starts with: `BackupRepository` leaves them out and restores them), so
+  /// data that never used the extra hours gives the bytes, checksum and
+  /// fingerprint it always did. Written only when there is any.
+  final List<BackupOvertimeType> overtimeTypes;
+  final List<BackupOvertimeBlock> overtimeBlocks;
+
   Map<String, Object?> toJson() => {
     'calendars': [for (final c in calendars) c.toJson()],
     'shiftTypes': [for (final t in shiftTypes) t.toJson()],
@@ -1405,26 +1627,119 @@ class BackupData {
     if (dayTasks.isNotEmpty) 'dayTasks': [for (final t in dayTasks) t.toJson()],
     if (shiftSwaps.isNotEmpty)
       'shiftSwaps': [for (final s in shiftSwaps) s.toJson()],
+    if (overtimeTypes.isNotEmpty || overtimeBlocks.isNotEmpty) ...{
+      'overtimeTypes': [for (final t in overtimeTypes) t.toJson()],
+      'overtimeBlocks': [for (final b in overtimeBlocks) b.toJson()],
+    },
   };
 
-  /// The engine view of one calendar (what it would show): the shift types
-  /// and patterns are common, the runs and days are those of [calendarId].
-  Schedule toSchedule([String calendarId = mainCalendarId]) => Schedule(
-    shiftTypes: [for (final t in shiftTypes) t.toShiftType()],
-    shiftTypeVersions: {
-      for (final t in shiftTypes)
-        if (t.pastVersions.isNotEmpty) t.id: t.toVersions(),
-    },
-    patterns: [for (final p in patterns) p.toPattern()],
-    runs: [
-      for (final r in patternRuns)
-        if (r.calendarId == calendarId) r.toRun(),
-    ],
-    entries: {
+  /// The engine view of one calendar (what it would show): the shift types,
+  /// patterns and overtime types are common, the runs, days and overtime
+  /// blocks are those of [calendarId]. Without overtime types (a file older
+  /// than format 4) it has the built-in ones.
+  Schedule toSchedule([String calendarId = mainCalendarId]) {
+    final entries = <CivilDate, DayEntry>{
       for (final e in dayEntries)
         if (e.calendarId == calendarId) e.date: e.toEntry(),
-    },
-  );
+    };
+    final blocks = <CivilDate, List<OvertimeBlock>>{};
+    for (final b in overtimeBlocks) {
+      if (b.calendarId == calendarId) (blocks[b.date] ??= []).add(b.toBlock());
+    }
+    for (final MapEntry(key: date, value: dayBlocks) in blocks.entries) {
+      entries[date] = (entries[date] ?? DayEntry(date: date)).copyWith(
+        overtimeBlocks: dayBlocks..sort(compareOvertimeBlocks),
+      );
+    }
+    final types = [...overtimeTypes]
+      ..sort((a, b) {
+        final byOrder = a.sortOrder.compareTo(b.sortOrder);
+        return byOrder != 0 ? byOrder : a.id.compareTo(b.id);
+      });
+    return Schedule(
+      shiftTypes: [for (final t in shiftTypes) t.toShiftType()],
+      shiftTypeVersions: {
+        for (final t in shiftTypes)
+          if (t.pastVersions.isNotEmpty) t.id: t.toVersions(),
+      },
+      patterns: [for (final p in patterns) p.toPattern()],
+      runs: [
+        for (final r in patternRuns)
+          if (r.calendarId == calendarId) r.toRun(),
+      ],
+      entries: entries,
+      overtimeTypes: types.isEmpty
+          ? defaultOvertimeTypes
+          : [for (final t in types) t.toType()],
+      baseHourlyRateCents: parseBaseHourlyRate(settings[baseHourlyRateKey]),
+    );
+  }
+
+  /// This data in the form of database v7 (format version 4): the old
+  /// overtime minutes of each day (`BackupDayEntry.overtimeMinutes`, format 3
+  /// and before) become one block of «Horas extra», exactly as the step to
+  /// schema v7 does with the database (`legacyOvertimeBlock`: from the end of
+  /// the day's last work shift, or 00:00, for those minutes), with the
+  /// built-in overtime types when there are none. Restoring and writing go
+  /// through it; the readers of the old formats do not, so the golden files
+  /// keep reading as they always did. Returns `this` when there is nothing to
+  /// convert (no types and no blocks = the two built-in types, untouched).
+  BackupData upgradedOvertime() {
+    if (!dayEntries.any((e) => e.overtimeMinutes != null)) return this;
+    final types = overtimeTypes.isEmpty
+        ? [for (final t in defaultOvertimeTypes) BackupOvertimeType.of(t)]
+        : [...overtimeTypes];
+    final needsOvertimeType = dayEntries.any(
+      (e) => (e.overtimeMinutes ?? 0) > 0,
+    );
+    if (needsOvertimeType && !types.any((t) => t.id == overtimeTypeId)) {
+      final last = types.fold(-1, (n, t) => t.sortOrder > n ? t.sortOrder : n);
+      types.add(
+        BackupOvertimeType.of(
+          defaultOvertimeTypes.first.copyWith(sortOrder: last + 1),
+        ),
+      );
+    }
+    final schedules = <String, Schedule>{};
+    final taken = {
+      for (final b in overtimeBlocks) (b.calendarId, b.date, b.id),
+    };
+    final blocks = [...overtimeBlocks];
+    for (final e in dayEntries) {
+      final minutes = e.overtimeMinutes ?? 0;
+      if (minutes <= 0) continue;
+      final schedule = schedules[e.calendarId] ??= toSchedule(e.calendarId);
+      var block = legacyOvertimeBlock(
+        schedule.resolve(e.date),
+        minutes.clamp(1, maxDayExtraMinutes),
+      );
+      if (taken.contains((e.calendarId, e.date, block.id))) {
+        block = OvertimeBlock(
+          id: '${block.id}-old',
+          date: block.date,
+          typeId: block.typeId,
+          startMinute: block.startMinute,
+          endMinute: block.endMinute,
+        );
+      }
+      blocks.add(BackupOvertimeBlock.of(e.calendarId, block));
+    }
+    return BackupData(
+      calendars: calendars,
+      shiftTypes: shiftTypes,
+      patterns: patterns,
+      patternRuns: patternRuns,
+      dayEntries: [for (final e in dayEntries) e.withoutOvertimeMinutes()],
+      holidays: holidays,
+      absenceBalances: absenceBalances,
+      settings: settings,
+      noteAttachments: noteAttachments,
+      dayTasks: dayTasks,
+      shiftSwaps: shiftSwaps,
+      overtimeTypes: types,
+      overtimeBlocks: blocks,
+    );
+  }
 
   /// How many shift types carry an alarm sound that is not a system one
   /// ([isSystemAlarmSound]).
@@ -1451,6 +1766,8 @@ class BackupData {
       ],
       dayTasks: dayTasks,
       shiftSwaps: shiftSwaps,
+      overtimeTypes: overtimeTypes,
+      overtimeBlocks: overtimeBlocks,
     );
   }
 
@@ -1479,6 +1796,8 @@ class BackupData {
       noteAttachments: noteAttachments,
       dayTasks: dayTasks,
       shiftSwaps: shiftSwaps,
+      overtimeTypes: overtimeTypes,
+      overtimeBlocks: overtimeBlocks,
     );
   }
 
@@ -1730,6 +2049,35 @@ class BackupData {
       final problem = s.toSwap().problem;
       if (problem != null) fail('Swap "${s.id}" is invalid ($problem)');
     }
+
+    // Database v7: the same rules as the tables (`OvertimeType.problem`,
+    // `OvertimeBlock.problem`) and their foreign keys.
+    final overtimeTypeIds = <String>{};
+    for (final t in overtimeTypes) {
+      if (!overtimeTypeIds.add(t.id)) {
+        fail('Duplicate overtime type id "${t.id}"');
+      }
+      final problem = t.toType().problem;
+      if (problem != null) {
+        fail('Overtime type "${t.id}" is invalid ($problem)');
+      }
+    }
+    final blockKeys = <(String, CivilDate, String)>{};
+    for (final b in overtimeBlocks) {
+      if (!blockKeys.add((b.calendarId, b.date, b.id))) {
+        fail('Duplicate overtime block "${b.id}" on ${b.date}');
+      }
+      if (!calendarIds.contains(b.calendarId)) {
+        fail('Overtime block "${b.id}" points at a missing calendar');
+      }
+      if (!overtimeTypeIds.contains(b.typeId)) {
+        fail('Overtime block "${b.id}" points at a missing type');
+      }
+      final problem = b.toBlock().problem;
+      if (problem != null) {
+        fail('Overtime block "${b.id}" is invalid ($problem)');
+      }
+    }
   }
 
   @override
@@ -1745,7 +2093,9 @@ class BackupData {
       _deepEq.equals(settings, other.settings) &&
       _deepEq.equals(noteAttachments, other.noteAttachments) &&
       _deepEq.equals(dayTasks, other.dayTasks) &&
-      _deepEq.equals(shiftSwaps, other.shiftSwaps);
+      _deepEq.equals(shiftSwaps, other.shiftSwaps) &&
+      _deepEq.equals(overtimeTypes, other.overtimeTypes) &&
+      _deepEq.equals(overtimeBlocks, other.overtimeBlocks);
 
   @override
   int get hashCode => Object.hash(
@@ -1760,6 +2110,8 @@ class BackupData {
     _deepEq.hash(noteAttachments),
     _deepEq.hash(dayTasks),
     _deepEq.hash(shiftSwaps),
+    _deepEq.hash(overtimeTypes),
+    _deepEq.hash(overtimeBlocks),
   );
 }
 

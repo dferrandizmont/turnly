@@ -1,7 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
+import 'package:cuadrante/features/widget/application/widget_sync.dart';
 import 'package:cuadrante/features/widget/data/widget_publisher.dart';
 import 'package:cuadrante/features/widget/domain/widget_snapshot.dart';
+import 'package:cuadrante/features/widget/domain/widget_sync_planner.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Stands for the `home_widget` plugin: records every call in order.
@@ -56,6 +60,64 @@ class FakeHomeWidgetLayer implements HomeWidgetLayer {
 }
 
 void main() {
+  for (final ios in [false, true]) {
+    test(
+      'sync publishes ${ios ? 'v2 on iOS' : 'v3 on Android'} with a valid hash '
+      'and does not republish unchanged content',
+      () async {
+        final source = WidgetSnapshot.decode(
+          File('android/app/src/test/resources/widget_snapshot.json')
+              .readAsStringSync(),
+        );
+        final layer = FakeHomeWidgetLayer();
+        final publisher = HomeWidgetPublisher(layer: layer, ios: ios);
+        Future<WidgetSyncPlan> sync() => syncWidget(
+          publisher: publisher,
+          trigger: WidgetSyncTrigger.appStart,
+          build: () => source,
+          ios: ios,
+        );
+
+        expect((await sync()).republish, isTrue);
+        final stored = (jsonDecode(layer.store[kWidgetSnapshotKey]!) as Map)
+            .cast<String, Object?>();
+        final decoded = WidgetSnapshot.fromJson(stored);
+        expect(decoded.version, ios ? 2 : 3);
+        expect(decoded.computeContentHash(), decoded.contentHash);
+        final expected = source.toJson();
+        if (ios) {
+          expected['v'] = 2;
+          expected.remove('dayExtras');
+          expected.remove('stripTotals');
+          expected['contentHash'] = decoded.contentHash;
+          expect(stored.containsKey('dayExtras'), isFalse);
+          expect(stored.containsKey('stripTotals'), isFalse);
+          expect(decoded.contentHash, isNot(source.contentHash));
+          // Also recover a v3 snapshot left by an earlier build on an iPhone.
+          layer.store[kWidgetSnapshotKey] = source.encode();
+          expect(
+            (await sync()).reasons,
+            contains(WidgetRefreshReason.versionChanged),
+          );
+          expect(
+            WidgetSnapshot.decode(layer.store[kWidgetSnapshotKey]!).version,
+            2,
+          );
+        } else {
+          expect(decoded.dayExtras, isNotEmpty);
+          expect(decoded.stripTotals, isNotEmpty);
+        }
+        expect(stored, expected);
+        layer.calls.clear();
+        final again = await sync();
+        expect(again.republish, isFalse);
+        expect(again.reasons, isEmpty);
+        expect(layer.calls.where((call) => call.startsWith('save:')), isEmpty);
+        expect(again.reloadTimelines, isTrue);
+      },
+    );
+  }
+
   group('Android', () {
     late FakeHomeWidgetLayer layer;
     late HomeWidgetPublisher publisher;

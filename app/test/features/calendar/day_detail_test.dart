@@ -125,7 +125,7 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('Cambio con Marta si sale el turno'), findsOneWidget);
-      expect(find.text('Según tu patrón'), findsOneWidget);
+      expect(find.text('De tu rotación «Correturnos»'), findsOneWidget);
       await closeDay(tester);
 
       await openDay(tester, oct22);
@@ -323,13 +323,13 @@ void main() {
       await pumpCalendar(tester);
       await openDay(tester, oct21);
       expect(_key('day-reset'), findsOneWidget);
-      expect(find.text('El patrón da: Noche 22:00–06:00'), findsOneWidget);
+      expect(find.text('Según tu rotación: Noche 22:00–06:00'), findsOneWidget);
 
       await tapInSheet(tester, 'day-reset');
       expect(schedule(tester).resolve(oct21).shiftIds, ['night']);
       expect(schedule(tester).resolve(oct21).source, DaySource.pattern);
       expect(_key('day-reset'), findsNothing);
-      expect(find.text('Según tu patrón'), findsOneWidget);
+      expect(find.text('De tu rotación «Correturnos»'), findsOneWidget);
       expect(stateOf(tester).canUndo, isTrue);
       await expectStoredIsShown(tester);
       await closeDay(tester);
@@ -346,7 +346,7 @@ void main() {
     ) async {
       await pumpCalendar(tester);
       await openDay(tester, oct22);
-      expect(find.text('El patrón da: Noche 22:00–06:00'), findsOneWidget);
+      expect(find.text('Según tu rotación: Noche 22:00–06:00'), findsOneWidget);
     });
 
     testWidgets('a day without override has no such button', (tester) async {

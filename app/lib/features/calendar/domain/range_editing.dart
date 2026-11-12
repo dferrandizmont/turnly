@@ -16,6 +16,7 @@ class ClipDay {
     this.note,
     this.noteReminderMinute,
     this.overtimeMinutes,
+    this.overtimeBlocks = const [],
     this.earlyLeaveMinutes,
     this.extraAmountCents,
   });
@@ -28,6 +29,7 @@ class ClipDay {
   final String? note;
   final int? noteReminderMinute;
   final int? overtimeMinutes;
+  final List<OvertimeBlock> overtimeBlocks;
   final int? earlyLeaveMinutes;
   final int? extraAmountCents;
 
@@ -36,6 +38,7 @@ class ClipDay {
       note != null ||
       noteReminderMinute != null ||
       overtimeMinutes != null ||
+      overtimeBlocks.isNotEmpty ||
       earlyLeaveMinutes != null ||
       extraAmountCents != null;
 
@@ -46,6 +49,10 @@ class ClipDay {
       other.note == note &&
       other.noteReminderMinute == noteReminderMinute &&
       other.overtimeMinutes == overtimeMinutes &&
+      const ListEquality<OvertimeBlock>().equals(
+        other.overtimeBlocks,
+        overtimeBlocks,
+      ) &&
       other.earlyLeaveMinutes == earlyLeaveMinutes &&
       other.extraAmountCents == extraAmountCents &&
       const ListEquality<String>().equals(other.shiftIds, shiftIds);
@@ -56,6 +63,7 @@ class ClipDay {
     note,
     noteReminderMinute,
     overtimeMinutes,
+    const ListEquality<OvertimeBlock>().hash(overtimeBlocks),
     earlyLeaveMinutes,
     extraAmountCents,
     const ListEquality<String>().hash(shiftIds),
@@ -130,6 +138,7 @@ class DayClipboard {
       shiftIds: day.shiftIds,
       note: note == null || note.trim().isEmpty ? null : note,
       noteReminderMinute: entry?.noteReminderMinute,
+      overtimeBlocks: entry?.overtimeBlocks ?? const [],
       // 0 minutes is the same as nothing.
       overtimeMinutes: overtime == null || overtime == 0 ? null : overtime,
       earlyLeaveMinutes: early == null || early == 0 ? null : early,
@@ -213,6 +222,9 @@ DayEntry withAnnotationsOf(ClipDay day, DayEntry entry) {
     note: note?.trim(),
     noteReminderMinute: day.noteReminderMinute,
     overtimeMinutes: day.overtimeMinutes,
+    overtimeBlocks: day.overtimeBlocks.isEmpty
+        ? null
+        : [for (final b in day.overtimeBlocks) b.onDate(entry.date)],
     earlyLeaveMinutes: day.earlyLeaveMinutes,
     extraAmountCents: day.extraAmountCents,
   );

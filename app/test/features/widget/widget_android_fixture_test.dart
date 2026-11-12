@@ -35,6 +35,19 @@ String _build() {
     ],
     runs: [PatternRun(id: 'r', patternId: 'rot', startDate: _first, seq: 1)],
     entries: {
+      _first: DayEntry(
+        date: _first,
+        earlyLeaveMinutes: 60,
+        overtimeBlocks: [
+          OvertimeBlock(
+            id: 'extra',
+            date: _first,
+            typeId: overtimeTypeId,
+            startMinute: 360,
+            endMinute: 480,
+          ),
+        ],
+      ),
       // A double day with a note, an empty override and a vacation.
       _first.addDays(2): DayEntry(
         date: _first.addDays(2),

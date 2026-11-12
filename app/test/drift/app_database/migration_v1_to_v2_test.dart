@@ -5,6 +5,7 @@ import 'package:cuadrante/core/database/migration_v2_to_v3.dart';
 import 'package:cuadrante/core/database/migration_v3_to_v4.dart';
 import 'package:cuadrante/core/database/migration_v4_to_v5.dart';
 import 'package:cuadrante/core/database/migration_v5_to_v6.dart';
+import 'package:cuadrante/core/database/migration_v6_to_v7.dart';
 import 'package:cuadrante/features/calendars/data/calendars_repository.dart';
 import 'package:cuadrante/features/calendars/domain/calendar.dart';
 import 'package:cuadrante/features/schedule/data/schedule_repository.dart';
@@ -43,6 +44,7 @@ class _FailingMigrationDatabase extends AppDatabase {
       from3To4: migrateFrom3To4,
       from4To5: migrateFrom4To5,
       from5To6: migrateFrom5To6,
+      from6To7: migrateFrom6To7,
     ),
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
@@ -101,7 +103,7 @@ void main() {
     final daysBefore = v1ResolvedDays(scheduleFromV1Rows(before));
 
     final db = AppDatabase(schema.newConnection());
-    await verifier.migrateAndValidate(db, 6);
+    await verifier.migrateAndValidate(db, 7);
 
     // Every column of every v1 table, row by row (holiday ids included).
     expect(await dumpV1Columns(db), before);
@@ -148,7 +150,7 @@ void main() {
     await db.close();
     expect(
       schema.rawDatabase.select('PRAGMA user_version').single.values.single,
-      6,
+      7,
     );
     schema.rawDatabase.close();
   });
@@ -183,7 +185,7 @@ void main() {
     () async {
       final (:schema, before: _) = await seededV1();
       final migrated = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(migrated, 6);
+      await verifier.migrateAndValidate(migrated, 7);
       // A new install: the app creates the file with `onCreate`.
       final fresh = AppDatabase(NativeDatabase.memory());
       Future<Map<String, Object?>> main(AppDatabase db) async {
@@ -216,7 +218,7 @@ void main() {
   test('an empty v1 database migrates too', () async {
     final schema = await verifier.schemaAt(1);
     final db = AppDatabase(schema.newConnection());
-    await verifier.migrateAndValidate(db, 6);
+    await verifier.migrateAndValidate(db, 7);
     expect(await db.select(db.calendars).get(), hasLength(1));
     expect(await db.select(db.patternRuns).get(), isEmpty);
     expect(await db.select(db.dayEntries).get(), isEmpty);
@@ -263,7 +265,7 @@ void main() {
 
     // Next start: the real step runs on that data and keeps all of it.
     final db = AppDatabase(schema.newConnection());
-    await verifier.migrateAndValidate(db, 6);
+    await verifier.migrateAndValidate(db, 7);
     expect(await dumpV1Columns(db), before);
     final loaded = await ScheduleRepository(db).load('main');
     expect(v1ResolvedDays(loaded.schedule), daysBefore);
@@ -275,7 +277,7 @@ void main() {
     () async {
       final (:schema, :before) = await seededV1();
       final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 6);
+      await verifier.migrateAndValidate(db, 7);
 
       final calendars = CalendarsRepository(db);
       final partner = await calendars.create(name: 'Pareja', colorValue: 1);

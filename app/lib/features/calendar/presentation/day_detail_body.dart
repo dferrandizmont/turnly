@@ -25,6 +25,7 @@ import 'day_extra_amount_section.dart';
 import 'day_extras_section.dart';
 import 'day_more_options.dart';
 import 'day_palette_panel.dart';
+import 'day_rotation_section.dart';
 import 'history_feedback.dart';
 import 'holiday_label.dart';
 import 'shift_badge.dart';
@@ -35,7 +36,8 @@ import 'shift_format.dart';
 ///
 /// - the date with «Deshacer» (A7: the latest change to this day);
 /// - one row per shift, each with its menu (change, up, down, remove), what
-///   the day comes from and «Volver al patrón»;
+///   the day comes from with the «Rotación» menu ([DayRotationSection]) and
+///   «Volver al patrón»;
 /// - «Añadir turno», which opens the palette in the same sheet;
 /// - the note, always in sight;
 /// - «Más opciones», folded, saying what it holds: extra hours, own holiday,
@@ -447,7 +449,7 @@ class DayDetailBodyState extends ConsumerState<DayDetailBody>
     final day = schedule.resolve(_date);
     final entry = schedule.entries[_date];
     final reminder = entry?.noteReminderMinute;
-    final overtime = entry?.overtimeMinutes ?? 0;
+    final overtime = day.overtimeMinutes;
     final earlyLeave = entry?.earlyLeaveMinutes ?? 0;
     final extraAmount = entry?.extraAmountCents ?? 0;
     // Anything «Borrar día» would remove: a shift, the note, its reminder,
@@ -552,15 +554,15 @@ class DayDetailBodyState extends ConsumerState<DayDetailBody>
             onMoveDown: () => _move(ids, index, 1),
             onRemove: () => _remove(ids, index),
           ),
-        Text(
-          isOverride
-              ? l10n.dayDetailSourceOverride
-              : l10n.dayDetailSourcePattern,
-          style: type.meta,
-        ),
       ],
+      // Where the day comes from and what can be done with its rotation.
+      DayRotationSection(
+        date: _date,
+        onBeforeAction: commitPending,
+        onClose: widget.onClose,
+      ),
       if (isOverride) ...[
-        const SizedBox(height: Sp.m),
+        const SizedBox(height: Sp.s),
         SecondaryButton(
           key: const ValueKey('day-reset'),
           icon: AppIcons.undo,

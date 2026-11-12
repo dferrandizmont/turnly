@@ -195,7 +195,7 @@ class WidgetModelBuilderTest {
     @Test
     fun missingBrokenOrFutureSnapshotsAreTheMessageNeverACrash() {
         val now = at(19)
-        for (bad in listOf(null, "", "not json", "{}", """{"v":3,"days":[]}""", """{"v":1}""", """{"v":1,"days":[{}]}""")) {
+        for (bad in listOf(null, "", "not json", "{}", """{"v":4,"days":[]}""", """{"v":1}""", """{"v":1,"days":[{}]}""")) {
             for (kind in Kind.values()) {
                 val c = WidgetModelBuilder.build(bad, kind, now, madrid)
                 assertTrue("$bad", c is WidgetContent.Stale)

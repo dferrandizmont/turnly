@@ -57,12 +57,15 @@ class PatternApplication {
 /// next morning turns the next day into Saliente if it would be empty or
 /// Libre ([palette] says whether the Saliente type is still offered; a
 /// missing one is created, an archived one is respected).
+/// [postNightTargetAllowed], when provided, further restricts the dates the
+/// automatic Saliente may change, before any patch is planned.
 PatternApplication planPatternApplication(
   Schedule schedule,
   PatternRequest request, {
   required int seq,
   bool postNightAuto = false,
   Iterable<ShiftType>? palette,
+  bool Function(CivilDate target)? postNightTargetAllowed,
 }) {
   final pattern = request.pattern;
   final newTypes = <ShiftType>[];
@@ -115,7 +118,8 @@ PatternApplication planPatternApplication(
     final last =
         request.until ?? request.from.addDays(postNightHorizonDays - 1);
     final sources = [
-      for (var d = request.from; !d.isAfter(last); d = d.addDays(1)) d,
+      for (var d = request.from; !d.isAfter(last); d = d.addDays(1))
+        if (postNightTargetAllowed?.call(d.addDays(1)) ?? true) d,
     ];
     saliente = postNightDays(result, sources);
     final extra = postNightPatch(result, sources);

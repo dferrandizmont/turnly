@@ -87,14 +87,14 @@ void main() {
   );
 
   group('the format', () {
-    test('the writer says version 3 and keeps the v2 envelope', () {
+    test('the writer says version 4 and keeps the v2 envelope', () {
       final bytes = codec.encode(
         v3(),
         appVersion: '0.6.0',
         exportedAt: goldenV3ExportedAt,
       );
       final env = readEnvelope(bytes);
-      expect(env['schemaVersion'], 3);
+      expect(env['schemaVersion'], 4);
       expect(env.keys.toSet(), {
         'format',
         'schemaVersion',
@@ -103,7 +103,8 @@ void main() {
         'data',
         'checksum',
       });
-      expect(env['checksum'], BackupCodec.checksumOf(v3()));
+      // The overtime minutes go as blocks (database v7).
+      expect(env['checksum'], BackupCodec.checksumOf(v3().upgradedOvertime()));
       expect((env['data']! as Map<String, Object?>).keys.toSet(), {
         'calendars',
         'shiftTypes',
@@ -113,6 +114,8 @@ void main() {
         'holidays',
         'absenceBalances',
         'settings',
+        'overtimeTypes',
+        'overtimeBlocks',
       });
     });
 
@@ -144,8 +147,18 @@ void main() {
       final days = (data['dayEntries']! as List).cast<Map<String, Object?>>();
       final all = days.singleWhere((d) => d['date'] == '2026-03-14');
       expect(all['noteReminderMinute'], 23 * 60 + 59);
-      expect(all['overtimeMinutes'], 30);
+      expect(all.keys, isNot(contains('overtimeMinutes')));
       expect(all['earlyLeaveMinutes'], 15);
+      final blocks = (data['overtimeBlocks']! as List)
+          .cast<Map<String, Object?>>();
+      final block = blocks.singleWhere(
+        (b) => b['calendarId'] == 'main' && b['date'] == '2026-03-14',
+      );
+      expect(block['typeId'], overtimeTypeId);
+      expect(
+        ((block['endMinute']! as int) - (block['startMinute']! as int)) % 1440,
+        30,
+      );
       final plain = days.firstWhere((d) => d['date'] == '2026-01-18');
       expect(plain.keys, isNot(contains('overtimeMinutes')));
     });
@@ -193,8 +206,8 @@ void main() {
       final file = codec.decode(
         codec.encode(v3(), appVersion: 'x', exportedAt: goldenV3ExportedAt),
       );
-      expect(file.schemaVersion, 3);
-      expect(file.data, v3());
+      expect(file.schemaVersion, 4);
+      expect(file.data, v3().upgradedOvertime());
       final split = file.data.shiftTypes
           .singleWhere((t) => t.id == 'split')
           .toShiftType();
@@ -203,7 +216,8 @@ void main() {
       expect(split.segment2Problem, isNull);
       final day = file.data.toSchedule().entries[const CivilDate(2026, 3, 14)]!;
       expect(day.noteReminderMinute, 1439);
-      expect(day.overtimeMinutes, 30);
+      expect(day.overtimeMinutes, isNull);
+      expect(day.overtimeBlocks.single.paidMinutes, 30);
       expect(day.earlyLeaveMinutes, 15);
     });
   });
@@ -340,13 +354,11 @@ void main() {
     test('restoring a version 2 file over annotated data clears them: the '
         'file is the truth', () async {
       await repo.restore(v3());
-      expect(
-        (await repo.readAll()).dayEntries.any((e) => e.overtimeMinutes != null),
-        isTrue,
-      );
+      expect((await repo.readAll()).overtimeBlocks, isNotEmpty);
       await repo.restore(codec.decode(v2File(buildGoldenBackupDataV2())).data);
       final after = await repo.readAll();
       expect(after.dayEntries.any((e) => e.overtimeMinutes != null), isFalse);
+      expect(after.overtimeBlocks, isEmpty);
       expect(after.shiftTypes.any((t) => t.icon != null), isFalse);
     });
   });
@@ -504,7 +516,7 @@ void main() {
     test('database -> file -> database keeps every new field', () async {
       await seedDatabase(db, v3());
       final bytes = await serviceFor(repo, 'store').exportBytes();
-      expect(readEnvelope(bytes)['schemaVersion'], 3);
+      expect(readEnvelope(bytes)['schemaVersion'], 4);
 
       final other = openMemoryDatabase();
       addTearDown(other.close);
@@ -514,16 +526,18 @@ void main() {
       );
       await otherRepo.restore(codec.decode(bytes).data);
 
-      expect(await otherRepo.readAll(), v3());
-      expect(await dumpAllTables(other), await dumpAllTables(db));
-      expect(
-        fingerprint(await otherRepo.readAll()),
-        fingerprint(await repo.readAll()),
-      );
+      // The old overtime minutes come back as blocks (database v7).
+      final upgraded = v3().upgradedOvertime();
+      expect(await otherRepo.readAll(), upgraded);
+      final reference = openMemoryDatabase();
+      addTearDown(reference.close);
+      await seedDatabase(reference, upgraded);
+      expect(await dumpAllTables(other), await dumpAllTables(reference));
+      expect(fingerprint(await otherRepo.readAll()), fingerprint(upgraded));
       // Re-exporting what was restored gives the same data again.
       expect(
         codec.decode(await serviceFor(otherRepo, 'store2').exportBytes()).data,
-        v3(),
+        upgraded,
       );
     });
 
@@ -550,7 +564,19 @@ void main() {
               .getSingle();
       expect(
         (day.noteReminderMinute, day.overtimeMinutes, day.earlyLeaveMinutes),
-        (1439, 30, 15),
+        (1439, null, 15),
+      );
+      // The overtime is a block of «Horas extra» now (database v7).
+      final block =
+          await (db.select(db.overtimeBlocks)
+                ..where((b) => b.calendarId.equals('main'))
+                ..where(
+                  (b) => b.date.equalsValue(const CivilDate(2026, 3, 14)),
+                ))
+              .getSingle();
+      expect(
+        (block.typeId, (block.endMinute - block.startMinute) % 1440),
+        (overtimeTypeId, 30),
       );
     });
 
@@ -564,12 +590,9 @@ void main() {
         final safety = Directory(p.join(dir.path, 'safety'));
         final copy = safety.listSync().whereType<File>().single;
         final decoded = codec.decode(copy.readAsBytesSync());
-        expect(decoded.schemaVersion, 3);
-        expect(decoded.data, before);
-        expect(
-          decoded.data.dayEntries.where((e) => e.overtimeMinutes != null),
-          isNotEmpty,
-        );
+        expect(decoded.schemaVersion, 4);
+        expect(decoded.data, before.upgradedOvertime());
+        expect(decoded.data.overtimeBlocks, isNotEmpty);
       },
     );
 
@@ -655,9 +678,10 @@ void main() {
 
       test('overtime', () async {
         final result = await verifyWithTrigger(
-          'CREATE TRIGGER lose AFTER INSERT ON day_entries '
+          // Since database v7 the overtime is a block.
+          'CREATE TRIGGER lose AFTER INSERT ON overtime_blocks '
           "WHEN NEW.date = '2026-03-12' AND NEW.calendar_id = 'main' "
-          'BEGIN UPDATE day_entries SET overtime_minutes = NULL '
+          'BEGIN DELETE FROM overtime_blocks '
           'WHERE date = NEW.date AND calendar_id = NEW.calendar_id; END',
         );
         expect(result, isA<VerificationMismatch>());

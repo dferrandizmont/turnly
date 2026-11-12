@@ -41,6 +41,7 @@ Uint8List writeReportCsv(ReportModel model, ReportStrings strings) =>
 String reportCsvText(ReportModel model, ReportStrings strings) {
   final d = strings.csvDelimiter;
   final withNotes = model.options.includeNotes;
+  final withOvertime = model.days.any((d) => d.overtimeBlocks.isNotEmpty);
   final withExtra = strings.colExtra != null;
   final out = StringBuffer();
 
@@ -58,6 +59,7 @@ String reportCsvText(ReportModel model, ReportStrings strings) {
     strings.colStart,
     strings.colEnd,
     strings.colHours,
+    if (withOvertime) strings.overtime,
     if (withExtra) strings.colExtra!,
     if (withNotes) strings.colNote,
   ]);
@@ -84,6 +86,10 @@ String reportCsvText(ReportModel model, ReportStrings strings) {
       start == null ? '' : clock24(start),
       end == null ? '' : clock24(end),
       day.isEmpty ? '' : decimalHours(day.workedMinutes, strings.csvDecimal),
+      if (withOvertime)
+        _guard(
+          day.overtimeBlocks.map((o) => _overtimeCell(o, strings)).join(' | '),
+        ),
       if (withExtra)
         day.extraAmountCents == 0 ? '' : strings.money(day.extraAmountCents),
       if (withNotes) _guard(day.note ?? ''),
@@ -91,6 +97,16 @@ String reportCsvText(ReportModel model, ReportStrings strings) {
   }
   return out.toString();
 }
+
+/// One block of extra hours in the CSV (schema v7): «Horas extra
+/// 18:00–20:00 · 2 h · 37,50 € · nota».
+String _overtimeCell(ReportOvertime o, ReportStrings strings) => [
+  '${strings.overtimeTypeName(o.type)} '
+      '${clock24(o.block.startMinute)}–${clock24(o.block.endMinute)}',
+  strings.hours(o.block.paidMinutes),
+  if (o.amountCents case final cents?) strings.money(cents),
+  ?o.block.note,
+].join(' · ');
 
 /// The name of a shift with its place (P9): «Mañana (Hospital)». The place is
 /// free text of the user, so it is written as it is.
@@ -113,7 +129,10 @@ String decimalHours(int minutes, String decimalMark) {
   final whole = cents ~/ 100;
   final frac = cents % 100;
   if (frac == 0) return '$whole';
-  final digits = frac.toString().padLeft(2, '0').replaceFirst(RegExp('0\$'), '');
+  final digits = frac
+      .toString()
+      .padLeft(2, '0')
+      .replaceFirst(RegExp('0\$'), '');
   return '$whole$decimalMark$digits';
 }
 

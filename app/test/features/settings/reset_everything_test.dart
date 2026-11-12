@@ -361,6 +361,7 @@ void main() {
           'shift_types',
           'patterns',
           'settings',
+          'overtime_types',
         }.contains(t.actualTableName),
       )) {
         expect(
@@ -372,6 +373,11 @@ void main() {
       expect((await db.select(db.calendars).get()).single.id, 'main');
       expect(await db.select(db.shiftTypes).get(), isNotEmpty);
       expect(await db.select(db.patterns).get(), isNotEmpty);
+      // The two built-in overtime types, as in a new installation.
+      expect(
+        (await db.select(db.overtimeTypes).get()).map((t) => t.id).toSet(),
+        {'overtime', 'other-work'},
+      );
       final remaining = await preferences.load();
       expect(remaining.language, AppLanguage.ca);
       expect(remaining.themeMode, Preferences.defaults.themeMode);

@@ -60,9 +60,8 @@ void main() {
       expect(raw.trimRight().endsWith('%%EOF'), isTrue);
       expect(_pages(bytes), 1);
       // A4 in points, portrait: 595.28 x 841.89.
-      final box = RegExp(
-        r'/MediaBox\[0 0 ([\d.]+) ([\d.]+)\]',
-      ).firstMatch(raw)!;
+      final box = RegExp(r'/MediaBox\[0 0 ([\d.]+) ([\d.]+)\]')
+          .firstMatch(raw)!;
       expect(double.parse(box.group(1)!), closeTo(595.28, 0.01));
       expect(double.parse(box.group(2)!), closeTo(841.89, 0.01));
     });
@@ -83,6 +82,21 @@ void main() {
       ]) {
         expect(text, contains(word), reason: word);
       }
+    });
+
+    test('includes the longest work streak and its clipped dates', () async {
+      final model = octoberReport();
+      final streak = model.summary.longestStreak!;
+      final text = _asText(await _plainPdf(model));
+      expect(text, contains('Racha más larga: ${streak.days} días seguidos'));
+      expect(
+        text,
+        contains('${streak.from.day}/${streak.from.month}/${streak.from.year}'),
+      );
+      expect(
+        text,
+        contains('${streak.to.day}/${streak.to.month}/${streak.to.year}'),
+      );
     });
 
     test('draws the codes of the shifts and the days of the month', () async {
@@ -208,10 +222,7 @@ void main() {
 
     test('a whole year of 366 days renders, one page per month', () async {
       final model = octoberReport(
-        range: const SummaryRange(
-          CivilDate(2026, 1, 1),
-          CivilDate(2027, 1, 1),
-        ),
+        range: const SummaryRange(CivilDate(2026, 1, 1), CivilDate(2027, 1, 1)),
         options: const ReportOptions(includeNotes: true),
       );
       expect(model.days, hasLength(366));

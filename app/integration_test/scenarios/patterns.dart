@@ -133,8 +133,14 @@ Future<void> _preview(QaContext qa) async {
         .last,
   );
   await t.settle();
+  await t.tapAndSettle(_key('cycle-toggle'));
   await t.tapAndSettle(_key('offset-1'));
   expect(find.text('Ese día te toca: Libre'), findsOneWidget);
+
+  // The preview now belongs to the confirmation step.
+  expect(_key('pattern-preview'), findsNothing);
+  await t.tapAndSettle(_key('pattern-next'));
+  expect(_key('pattern-preview'), findsOneWidget);
 
   // What the preview draws, cell by cell, for the 12 days from the start.
   Future<List<String>> previewCodes() async {
@@ -160,7 +166,6 @@ Future<void> _preview(QaContext qa) async {
   expect(previewed.take(3), ['L', 'L', 'L']);
   expect(previewed[3], 'G');
 
-  await t.tapAndSettle(_key('pattern-next'));
   await t.tapAndSettle(_key('pattern-apply'));
   await app.flushWrites();
 

@@ -21,6 +21,7 @@ import '../../schedule/domain/civil_date.dart';
 import '../../summary/presentation/month_sharing.dart';
 import '../application/open_day.dart';
 import '../application/month_presentation.dart';
+import '../application/month_strip.dart';
 import '../application/paint_controller.dart';
 import '../application/schedule_controller.dart';
 import '../application/selection_controller.dart';
@@ -38,6 +39,7 @@ import 'month_grid.dart';
 import 'month_list.dart';
 import 'month_fit.dart';
 import 'month_presentation_control.dart';
+import 'month_summary_strip.dart';
 import 'paint_bar.dart';
 import 'selection_bar.dart';
 import 'shift_format.dart';
@@ -287,6 +289,7 @@ class _MonthScreenState extends ConsumerState<MonthScreen>
                       bottomRoom: 0,
                       noticeRoom: noticeRoom,
                       ringOpenDay: true,
+                      strip: !editing,
                       minCellHeight: dayCellHeightWithTime(context),
                     ),
                   ),
@@ -353,6 +356,7 @@ class _MonthScreenState extends ConsumerState<MonthScreen>
                 fixedRow: fixedRow,
                 fabShown: !(editing || keyboardUp),
                 noticeRoom: noticeRoom,
+                strip: !editing,
                 // The rows of the grid are tall enough for the code and its
                 // time at the user's text size: the code grows with the text
                 // and the time is never hidden (the screen scrolls when they
@@ -495,7 +499,10 @@ class _MonthScreenState extends ConsumerState<MonthScreen>
   /// never less than [MonthGrid.minHeight] (large text, small screens, a
   /// landscape phone), and then the whole screen scrolls instead of squeezing
   /// the cells. [bottomRoom] is kept free under the grid (the floating
-  /// button).
+  /// button). With [strip] the three facts of the month ([MonthSummaryStrip])
+  /// go right under the days, in the height the grid has to spare: a month
+  /// that fits never scrolls because of it and its rows are never squeezed.
+  /// Where the month scrolls anyway, the strip comes after the days.
   Widget _monthScroll({
     required List<Widget> top,
     required bool painting,
@@ -504,10 +511,13 @@ class _MonthScreenState extends ConsumerState<MonthScreen>
     double fixedRow = Sp.touch,
     bool fabShown = false,
     bool ringOpenDay = false,
+    bool strip = false,
     double minCellHeight = MonthGrid.defaultMinCellHeight,
   }) {
     final listing =
         ref.watch(monthPresentationProvider) == MonthPresentation.list;
+    final month = ref.watch(visibleMonthProvider);
+    final stripData = strip ? ref.watch(monthStripProvider(month)) : null;
     final minGridHeight = listing
         ? minCellHeight * 6
         : _gridMin(minCellHeight, painting: painting, ringOpenDay: ringOpenDay);
@@ -558,28 +568,55 @@ class _MonthScreenState extends ConsumerState<MonthScreen>
           ),
         if (listing) ...[
           SliverToBoxAdapter(child: _withMonthChange(const MonthList())),
+          if (stripData != null)
+            const SliverToBoxAdapter(child: MonthSummaryStrip()),
           SliverToBoxAdapter(child: SizedBox(height: bottomRoom)),
         ] else
           SliverLayoutBuilder(
             builder: (context, box) {
               final rest =
                   box.viewportMainAxisExtent - box.precedingScrollExtent;
+              // The strip takes what the days have to spare and no more:
+              // it neither squeezes the grid nor makes a month that fits
+              // scroll. Where the month scrolls anyway, it goes after it.
+              final spare = rest - minGridHeight - bottomRoom;
+              final stripLayout = stripData == null
+                  ? null
+                  : MonthSummaryStrip.layoutFor(
+                      context,
+                      month,
+                      stripData,
+                      box.crossAxisExtent,
+                      room: spare < -0.5 ? double.infinity : spare,
+                    );
+              final stripHeight = stripLayout?.height ?? 0.0;
+              final grid = Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: MonthScreen._gridInset,
+                ),
+                child: _withMonthChange(
+                  MonthGrid(
+                    ringOpenDay: ringOpenDay,
+                    minCellHeight: minCellHeight,
+                  ),
+                ),
+              );
               return SliverToBoxAdapter(
                 child: SizedBox(
-                  height: math.max(minGridHeight + bottomRoom, rest),
+                  height: math.max(
+                    minGridHeight + stripHeight + bottomRoom,
+                    rest,
+                  ),
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      MonthScreen._gridInset,
-                      0,
-                      MonthScreen._gridInset,
-                      bottomRoom,
-                    ),
-                    child: _withMonthChange(
-                      MonthGrid(
-                        ringOpenDay: ringOpenDay,
-                        minCellHeight: minCellHeight,
-                      ),
-                    ),
+                    padding: EdgeInsets.only(bottom: bottomRoom),
+                    child: stripLayout == null
+                        ? grid
+                        : Column(
+                            children: [
+                              Expanded(child: grid),
+                              MonthSummaryStrip(layout: stripLayout),
+                            ],
+                          ),
                   ),
                 ),
               );

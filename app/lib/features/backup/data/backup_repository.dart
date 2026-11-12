@@ -11,6 +11,7 @@ import '../../device_events/data/device_events_repository.dart'
     show deviceEventsKey;
 import '../../notes/data/attachment_store.dart';
 import '../../notes/domain/note_attachment.dart' show AttachmentFault;
+import '../../schedule/data/overtime_store.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../../settings/domain/preferences.dart' show PreferenceKeys;
 import '../domain/backup_codec.dart';
@@ -190,7 +191,8 @@ class BackupRepository {
       attachmentFiles,
       verified: verified,
     );
-    final safe = _withoutForeignSounds(data);
+    // The old overtime minutes become blocks, as the database migration does.
+    final safe = _withoutForeignSounds(data).upgradedOvertime()..validate();
     final safety = await _writeSafetyCopy();
     final written = await _writeAttachmentFiles(safe, files);
     try {
@@ -422,7 +424,7 @@ class BackupRepository {
       ScheduleFingerprint fingerprint(BackupData data) =>
           scheduleFingerprint(data, from: window.from, to: window.to);
 
-      final data = file.data.sanitized();
+      final data = file.data.sanitized().upgradedOvertime()..validate();
       final expected = fingerprint(data);
       final scratch = _openScratchDatabase();
       final BackupData rebuilt;
@@ -499,7 +501,8 @@ class BackupRepository {
     final persisted = await _readSafetyCopy(file);
     await _runner(() {
       final verified = codec.decode(persisted);
-      if (verified.data != data) {
+      // The writer gives old overtime minutes as blocks (format version 4).
+      if (verified.data != data.upgradedOvertime()) {
         throw const CorruptBackup('Safety copy differs from current data');
       }
     });
@@ -527,218 +530,256 @@ class BackupRepository {
     }
   }
 
-  static Future<BackupData> _readAll(AppDatabase db) =>
-      db.transaction(() async {
-        final calendars = await db.select(db.calendars).get();
-        final types =
-            await (db.select(db.shiftTypes)..orderBy([
-                  (t) => OrderingTerm.asc(t.sortOrder),
-                  (t) => OrderingTerm.asc(t.id),
-                ]))
-                .get();
-        // Insertion order (rowid): patterns have no sort column and the app
-        // shows them in this order.
-        final patterns =
-            await (db.select(db.patterns)..orderBy([
-                  (_) => OrderingTerm.asc(const CustomExpression<int>('rowid')),
-                ]))
-                .get();
-        final runs = await db.select(db.patternRuns).get();
-        final entries = await db.select(db.dayEntries).get();
-        final holidays = await (db.select(
-          db.holidays,
-        )..where((h) => h.source.equals(userHolidaySource))).get();
-        final balances = await db.select(db.absenceBalances).get();
-        final settings = await db.select(db.settings).get();
-        final attachments = await db.select(db.noteAttachments).get();
-        final tasks = await db.select(db.dayTasks).get();
-        final swaps = await db.select(db.shiftSwaps).get();
-        final versionRows = await db.select(db.shiftTypeVersions).get();
-        final versionsByType = <String, List<ShiftTypeVersionRow>>{};
-        for (final v in versionRows) {
-          (versionsByType[v.shiftTypeId] ??= []).add(v);
-        }
+  static Future<BackupData> _readAll(AppDatabase db) => db.transaction(
+    () async {
+      final calendars = await db.select(db.calendars).get();
+      final types =
+          await (db.select(db.shiftTypes)..orderBy([
+                (t) => OrderingTerm.asc(t.sortOrder),
+                (t) => OrderingTerm.asc(t.id),
+              ]))
+              .get();
+      // Insertion order (rowid): patterns have no sort column and the app
+      // shows them in this order.
+      final patterns =
+          await (db.select(db.patterns)..orderBy([
+                (_) => OrderingTerm.asc(const CustomExpression<int>('rowid')),
+              ]))
+              .get();
+      final runs = await db.select(db.patternRuns).get();
+      final entries = await db.select(db.dayEntries).get();
+      final holidays = await (db.select(
+        db.holidays,
+      )..where((h) => h.source.equals(userHolidaySource))).get();
+      final balances = await db.select(db.absenceBalances).get();
+      final settings = await db.select(db.settings).get();
+      final attachments = await db.select(db.noteAttachments).get();
+      final tasks = await db.select(db.dayTasks).get();
+      final swaps = await db.select(db.shiftSwaps).get();
+      final versionRows = await db.select(db.shiftTypeVersions).get();
+      final versionsByType = <String, List<ShiftTypeVersionRow>>{};
+      for (final v in versionRows) {
+        (versionsByType[v.shiftTypeId] ??= []).add(v);
+      }
 
-        return BackupData(
-          calendars: [
-            for (final c in calendars)
-              BackupCalendar(
-                id: c.id,
-                name: c.name,
-                colorValue: c.colorValue,
-                sortOrder: c.sortOrder,
-                archived: c.archived,
-                createdAt: c.createdAt,
-                updatedAt: c.updatedAt,
-              ),
-          ],
-          shiftTypes: [
-            for (final t in types)
-              BackupShiftType(
+      final overtimeTypes = await db.select(db.overtimeTypes).get();
+      final overtimeBlocks = await db.select(db.overtimeBlocks).get();
+      // The two built-in types, untouched and unused, are what every
+      // database has: the backup leaves them out, so data that never used
+      // the extra hours is what it always was (and restores them).
+      final builtInOnly =
+          overtimeBlocks.isEmpty &&
+          overtimeTypes.length == defaultOvertimeTypes.length &&
+          overtimeTypes.every((t) => defaultOvertimeTypes.contains(t.toType()));
+      return BackupData(
+        overtimeTypes: [
+          if (!builtInOnly)
+            for (final t in overtimeTypes)
+              BackupOvertimeType(
                 id: t.id,
-                code: t.code,
                 name: t.name,
                 colorValue: t.colorValue,
-                category: t.category,
-                startMinute: t.startMinute,
-                endMinute: t.endMinute,
-                paidMinutes: t.paidMinutes,
-                nightOverride: t.nightOverride,
+                rateMode: t.rateMode,
+                multiplierBasisPoints: t.multiplierBasisPoints,
                 hourlyRateCents: t.hourlyRateCents,
-                fixedPlusCents: t.fixedPlusCents,
-                icon: ShiftIcon.fromKey(t.icon),
-                alarmSound: t.alarmSound,
-                segment2StartMinute: t.segment2StartMinute,
-                segment2DurationMinutes: t.segment2DurationMinutes,
-                location: t.location,
-                nightPlusCentsPerHour: t.nightPlusCentsPerHour,
-                holidayPlusCentsPerHour: t.holidayPlusCentsPerHour,
-                sortOrder: t.sortOrder,
+                countsForGoal: t.countsForGoal,
                 archived: t.archived,
-                createdAt: t.createdAt,
-                updatedAt: t.updatedAt,
-                pastVersions: [
-                  for (final v in [
-                    ...?versionsByType[t.id],
-                  ]..sort((a, b) => a.untilDate.compareTo(b.untilDate)))
-                    BackupShiftTypeVersion(
-                      until: v.untilDate,
-                      category: v.category,
-                      startMinute: v.startMinute,
-                      endMinute: v.endMinute,
-                      paidMinutes: v.paidMinutes,
-                      nightOverride: v.nightOverride,
-                      hourlyRateCents: v.hourlyRateCents,
-                      fixedPlusCents: v.fixedPlusCents,
-                      segment2StartMinute: v.segment2StartMinute,
-                      segment2DurationMinutes: v.segment2DurationMinutes,
-                      nightPlusCentsPerHour: v.nightPlusCentsPerHour,
-                      holidayPlusCentsPerHour: v.holidayPlusCentsPerHour,
-                      createdAt: v.createdAt,
-                    ),
-                ],
-              ),
-          ],
-          patterns: [
-            for (final r in patterns)
-              BackupPattern(
-                id: r.id,
-                name: r.name,
-                steps: r.steps,
-                createdAt: r.createdAt,
-                updatedAt: r.updatedAt,
-              ),
-          ],
-          patternRuns: [
-            for (final r in runs)
-              BackupPatternRun(
-                id: r.id,
-                calendarId: r.calendarId,
-                patternId: r.patternId,
-                startDate: r.startDate,
-                endDate: r.endDate,
-                stepOffset: r.stepOffset,
-                seq: r.seq,
-                createdAt: r.createdAt,
-              ),
-          ],
-          dayEntries: [
-            for (final e in entries)
-              BackupDayEntry(
-                calendarId: e.calendarId,
-                date: e.date,
-                shiftTypeIds: e.shiftTypeIds,
-                note: e.note,
-                noteReminderMinute: e.noteReminderMinute,
-                overtimeMinutes: e.overtimeMinutes,
-                earlyLeaveMinutes: e.earlyLeaveMinutes,
-                extraAmountCents: e.extraAmountCents,
-                updatedAt: e.updatedAt,
-              ),
-          ],
-          holidays: [
-            for (final h in holidays)
-              BackupHoliday(
-                date: CivilDate.parse(h.date),
-                scope: h.scope,
-                name: h.name,
-                regionCode: h.regionCode,
-                municipalityCode: h.municipalityCode,
-              ),
-          ],
-          absenceBalances: [
-            for (final b in balances)
-              BackupAbsenceBalance(
-                year: b.year,
-                type: b.type,
-                allowedDays: b.allowedDays,
-                calendarId: b.calendarId,
-                name: b.name,
-                periodStart: b.periodStart,
-                periodEnd: b.periodEnd,
-                unit: b.unit,
-                shiftTypeQuarters: b.shiftTypeQuarters ?? const {},
-                carryOver: b.carryOver,
-                carryOverMaxDays: b.carryOverMaxDays,
-                adjustmentDays: b.adjustmentDays,
-                sortOrder: b.sortOrder,
-                createdAt: b.createdAt,
-                updatedAt: b.updatedAt,
-              ),
-          ],
-          settings: {
-            for (final s in settings)
-              if (!isDeviceSetting(s.key)) s.key: s.value,
-          },
-          noteAttachments: [
-            for (final a in attachments)
-              BackupNoteAttachment(
-                id: a.id,
-                calendarId: a.calendarId,
-                date: a.date,
-                kind: a.kind,
-                relativePath: a.relativePath,
-                mimeType: a.mimeType,
-                sizeBytes: a.sizeBytes,
-                sha256: a.sha256,
-                displayName: a.displayName,
-                sortOrder: a.sortOrder,
-                createdAt: a.createdAt,
-              ),
-          ],
-          dayTasks: [
-            for (final t in tasks)
-              BackupDayTask(
-                id: t.id,
-                calendarId: t.calendarId,
-                date: t.date,
-                title: t.title,
-                done: t.done,
                 sortOrder: t.sortOrder,
-                createdAt: t.createdAt,
-                updatedAt: t.updatedAt,
               ),
-          ],
-          shiftSwaps: [
-            for (final s in swaps)
-              BackupShiftSwap(
-                id: s.id,
-                calendarId: s.calendarId,
-                date: s.date,
-                colleague: s.colleague,
-                direction: s.direction,
-                givenShiftTypeIds: s.givenShiftTypeIds,
-                receivedShiftTypeIds: s.receivedShiftTypeIds,
-                returnDate: s.returnDate,
-                status: s.status,
-                note: s.note,
-                createdAt: s.createdAt,
-                updatedAt: s.updatedAt,
-                closedAt: s.closedAt,
-              ),
-          ],
-        );
-      });
+        ],
+        overtimeBlocks: [
+          for (final b in overtimeBlocks)
+            BackupOvertimeBlock(
+              calendarId: b.calendarId,
+              date: b.date,
+              id: b.id,
+              typeId: b.typeId,
+              startMinute: b.startMinute,
+              endMinute: b.endMinute,
+              breakMinutes: b.breakMinutes,
+              note: b.note,
+            ),
+        ],
+        calendars: [
+          for (final c in calendars)
+            BackupCalendar(
+              id: c.id,
+              name: c.name,
+              colorValue: c.colorValue,
+              sortOrder: c.sortOrder,
+              archived: c.archived,
+              createdAt: c.createdAt,
+              updatedAt: c.updatedAt,
+            ),
+        ],
+        shiftTypes: [
+          for (final t in types)
+            BackupShiftType(
+              id: t.id,
+              code: t.code,
+              name: t.name,
+              colorValue: t.colorValue,
+              category: t.category,
+              startMinute: t.startMinute,
+              endMinute: t.endMinute,
+              paidMinutes: t.paidMinutes,
+              nightOverride: t.nightOverride,
+              hourlyRateCents: t.hourlyRateCents,
+              fixedPlusCents: t.fixedPlusCents,
+              icon: ShiftIcon.fromKey(t.icon),
+              alarmSound: t.alarmSound,
+              segment2StartMinute: t.segment2StartMinute,
+              segment2DurationMinutes: t.segment2DurationMinutes,
+              location: t.location,
+              nightPlusCentsPerHour: t.nightPlusCentsPerHour,
+              holidayPlusCentsPerHour: t.holidayPlusCentsPerHour,
+              sortOrder: t.sortOrder,
+              archived: t.archived,
+              createdAt: t.createdAt,
+              updatedAt: t.updatedAt,
+              pastVersions: [
+                for (final v in [
+                  ...?versionsByType[t.id],
+                ]..sort((a, b) => a.untilDate.compareTo(b.untilDate)))
+                  BackupShiftTypeVersion(
+                    until: v.untilDate,
+                    category: v.category,
+                    startMinute: v.startMinute,
+                    endMinute: v.endMinute,
+                    paidMinutes: v.paidMinutes,
+                    nightOverride: v.nightOverride,
+                    hourlyRateCents: v.hourlyRateCents,
+                    fixedPlusCents: v.fixedPlusCents,
+                    segment2StartMinute: v.segment2StartMinute,
+                    segment2DurationMinutes: v.segment2DurationMinutes,
+                    nightPlusCentsPerHour: v.nightPlusCentsPerHour,
+                    holidayPlusCentsPerHour: v.holidayPlusCentsPerHour,
+                    createdAt: v.createdAt,
+                  ),
+              ],
+            ),
+        ],
+        patterns: [
+          for (final r in patterns)
+            BackupPattern(
+              id: r.id,
+              name: r.name,
+              steps: r.steps,
+              createdAt: r.createdAt,
+              updatedAt: r.updatedAt,
+            ),
+        ],
+        patternRuns: [
+          for (final r in runs)
+            BackupPatternRun(
+              id: r.id,
+              calendarId: r.calendarId,
+              patternId: r.patternId,
+              startDate: r.startDate,
+              endDate: r.endDate,
+              stepOffset: r.stepOffset,
+              seq: r.seq,
+              createdAt: r.createdAt,
+            ),
+        ],
+        dayEntries: [
+          for (final e in entries)
+            BackupDayEntry(
+              calendarId: e.calendarId,
+              date: e.date,
+              shiftTypeIds: e.shiftTypeIds,
+              note: e.note,
+              noteReminderMinute: e.noteReminderMinute,
+              overtimeMinutes: e.overtimeMinutes,
+              earlyLeaveMinutes: e.earlyLeaveMinutes,
+              extraAmountCents: e.extraAmountCents,
+              updatedAt: e.updatedAt,
+            ),
+        ],
+        holidays: [
+          for (final h in holidays)
+            BackupHoliday(
+              date: CivilDate.parse(h.date),
+              scope: h.scope,
+              name: h.name,
+              regionCode: h.regionCode,
+              municipalityCode: h.municipalityCode,
+            ),
+        ],
+        absenceBalances: [
+          for (final b in balances)
+            BackupAbsenceBalance(
+              year: b.year,
+              type: b.type,
+              allowedDays: b.allowedDays,
+              calendarId: b.calendarId,
+              name: b.name,
+              periodStart: b.periodStart,
+              periodEnd: b.periodEnd,
+              unit: b.unit,
+              shiftTypeQuarters: b.shiftTypeQuarters ?? const {},
+              carryOver: b.carryOver,
+              carryOverMaxDays: b.carryOverMaxDays,
+              adjustmentDays: b.adjustmentDays,
+              sortOrder: b.sortOrder,
+              createdAt: b.createdAt,
+              updatedAt: b.updatedAt,
+            ),
+        ],
+        settings: {
+          for (final s in settings)
+            if (!isDeviceSetting(s.key)) s.key: s.value,
+        },
+        noteAttachments: [
+          for (final a in attachments)
+            BackupNoteAttachment(
+              id: a.id,
+              calendarId: a.calendarId,
+              date: a.date,
+              kind: a.kind,
+              relativePath: a.relativePath,
+              mimeType: a.mimeType,
+              sizeBytes: a.sizeBytes,
+              sha256: a.sha256,
+              displayName: a.displayName,
+              sortOrder: a.sortOrder,
+              createdAt: a.createdAt,
+            ),
+        ],
+        dayTasks: [
+          for (final t in tasks)
+            BackupDayTask(
+              id: t.id,
+              calendarId: t.calendarId,
+              date: t.date,
+              title: t.title,
+              done: t.done,
+              sortOrder: t.sortOrder,
+              createdAt: t.createdAt,
+              updatedAt: t.updatedAt,
+            ),
+        ],
+        shiftSwaps: [
+          for (final s in swaps)
+            BackupShiftSwap(
+              id: s.id,
+              calendarId: s.calendarId,
+              date: s.date,
+              colleague: s.colleague,
+              direction: s.direction,
+              givenShiftTypeIds: s.givenShiftTypeIds,
+              receivedShiftTypeIds: s.receivedShiftTypeIds,
+              returnDate: s.returnDate,
+              status: s.status,
+              note: s.note,
+              createdAt: s.createdAt,
+              updatedAt: s.updatedAt,
+              closedAt: s.closedAt,
+            ),
+        ],
+      );
+    },
+  );
 
   /// Deletes the user tables and writes [data], in one transaction on [db].
   /// Children before parents when deleting, parents before children when
@@ -750,6 +791,8 @@ class BackupRepository {
           for (final row in await db.select(db.settings).get())
             if (isDeviceSetting(row.key)) row,
         ];
+        await db.delete(db.overtimeBlocks).go();
+        await db.delete(db.overtimeTypes).go();
         await db.delete(db.patternRuns).go();
         await db.delete(db.dayEntries).go();
         await db.delete(db.noteAttachments).go();
@@ -949,6 +992,41 @@ class BackupRepository {
                 SettingsCompanion.insert(key: s.key, value: s.value),
             for (final row in device)
               SettingsCompanion.insert(key: row.key, value: row.value),
+          ]);
+        });
+        // Database v7: types before the blocks that point at them. Data
+        // without types (it never used the extra hours, or an older format)
+        // gets the two built-in ones, like a new database.
+        final overtimeTypes = data.overtimeTypes.isNotEmpty
+            ? data.overtimeTypes
+            : [for (final t in defaultOvertimeTypes) BackupOvertimeType.of(t)];
+        await db.batch((b) {
+          b.insertAll(db.overtimeTypes, [
+            for (final t in overtimeTypes)
+              OvertimeTypesCompanion.insert(
+                id: t.id,
+                name: Value(t.name),
+                colorValue: t.colorValue,
+                rateMode: t.rateMode,
+                multiplierBasisPoints: Value(t.multiplierBasisPoints),
+                hourlyRateCents: Value(t.hourlyRateCents),
+                countsForGoal: t.countsForGoal,
+                archived: Value(t.archived),
+                sortOrder: Value(t.sortOrder),
+              ),
+          ]);
+          b.insertAll(db.overtimeBlocks, [
+            for (final o in data.overtimeBlocks)
+              OvertimeBlocksCompanion.insert(
+                calendarId: o.calendarId,
+                date: o.date,
+                id: o.id,
+                typeId: o.typeId,
+                startMinute: o.startMinute,
+                endMinute: o.endMinute,
+                breakMinutes: Value(o.breakMinutes),
+                note: Value(o.note),
+              ),
           ]);
         });
       });

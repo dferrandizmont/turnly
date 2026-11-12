@@ -193,7 +193,7 @@ void main() {
     tester,
   ) async {
     final handle = tester.ensureSemantics();
-    final app = await AppUnderTest.pump(tester, size: const Size(390, 3600));
+    final app = await AppUnderTest.pump(tester, size: const Size(390, 4000));
     await app.openSettings();
     for (final heading in _groups.keys) {
       expect(

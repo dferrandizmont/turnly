@@ -28,6 +28,7 @@ import '../../settings/application/preferences_controller.dart';
 import '../../settings/presentation/withholding_sheet.dart';
 import '../../year/application/year_providers.dart';
 import '../../year/presentation/year_image.dart';
+import '../../calendar/presentation/overtime_format.dart';
 import '../../calendar/presentation/shift_badge.dart';
 import '../../calendar/presentation/shift_format.dart';
 import '../../schedule/domain/schedule_domain.dart';
@@ -460,6 +461,9 @@ class _YearBody extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final empty = ref.watch(yearTotalsProvider(year).select((t) => t.isEmpty));
     final closingDay = ref.watch(summaryClosingDayProvider);
+    final summary = ref.watch(
+      rangeSummaryProvider(payYearOf(year, closingDay)),
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -470,6 +474,30 @@ class _YearBody extends ConsumerWidget {
           ),
           OvertimeCapCard(query: OvertimeCapQuery.year(year)),
           AbsenceSummaryCard(year: year),
+          if (summary.longestStreak case final streak?)
+            AppCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SummaryStatRow(
+                    id: 'summary-streak',
+                    label: context.l10n.summaryLongestStreak,
+                    value: context.l10n.summaryStreakDays(streak.days),
+                    detail: formatRange(
+                      context.l10n.localeName,
+                      streak.from,
+                      streak.to,
+                    ),
+                  ),
+                  Text(
+                    context.l10n.summaryStreakHelp,
+                    style: context.type.meta.copyWith(
+                      color: context.colors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           const SizedBox(height: Sp.section),
         ],
         YearTable(year: year, onOpenMonth: onOpenMonth),
@@ -829,6 +857,13 @@ class _BreakdownCard extends StatelessWidget {
                 ? l10n.summaryDays(summary.workedDays)
                 : null,
           ),
+          if (summary.longestStreak case final streak?)
+            stat(
+              'summary-streak',
+              l10n.summaryLongestStreak,
+              l10n.summaryStreakDays(streak.days),
+              formatRange(l10n.localeName, streak.from, streak.to),
+            ),
           if (summary.overtimeMinutes > 0)
             stat(
               'summary-overtime',
@@ -840,6 +875,22 @@ class _BreakdownCard extends StatelessWidget {
                     )
                   : null,
             ),
+          // By overtime type (schema v7), when there is more than one kind
+          // of extra hours in the period.
+          if (summary.overtimeTypes.length > 1 ||
+              (summary.overtimeTypes.length == 1 &&
+                  summary.overtimeTypes.single.minutes !=
+                      summary.overtimeMinutes))
+            for (final extra in summary.overtimeTypes)
+              stat(
+                'summary-overtime-${extra.type.id}',
+                overtimeTypeName(l10n, extra.type),
+                formatHours(l10n, extra.minutes),
+                switch (extra.amountCents) {
+                  final cents? => formatMoneyCents(context, cents),
+                  null => l10n.overtimeRateNone,
+                },
+              ),
           if (summary.earlyLeaveMinutes > 0)
             stat(
               'summary-early-leave',
@@ -1263,6 +1314,7 @@ class _Notes extends StatelessWidget {
       range ? l10n.summaryRangeNoteMidnight : l10n.summaryNoteMidnight,
       l10n.summaryNoteNight,
       l10n.summaryNoteDst,
+      l10n.summaryStreakHelp,
       if (summary.shiftsWithoutTimes > 0) l10n.summaryNoteNoTimes,
       if (summary.hasExtras) l10n.summaryNoteExtras,
       if (holidays) l10n.summaryNoteHoliday,

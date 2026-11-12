@@ -66,7 +66,11 @@ void main() {
       final original = await legacy.readAsBytes();
       final pending = await service.inspect(original);
       await service.restore(pending);
-      expect(await makeRepository(db, safety).readAll(), pending.file.data);
+      // Its overtime minutes come back as blocks (database v7).
+      expect(
+        await makeRepository(db, safety).readAll(),
+        pending.file.data.upgradedOvertime(),
+      );
       expect(await legacy.readAsBytes(), original);
       expect(readEnvelope(await service.exportBytes())['format'], 'cuadrante');
       expect(fileNames(safety).single, endsWith('.turnly'));
@@ -187,7 +191,7 @@ void main() {
     test('R6: a file from a newer version', () async {
       final newer = gzipEnvelope({
         'format': 'cuadrante',
-        'schemaVersion': 4,
+        'schemaVersion': 5,
         'appVersion': '4.0.0',
         'exportedAt': '2027-01-01T00:00:00Z',
         'data': {'shiftTypes': 'a different shape'},
@@ -196,8 +200,8 @@ void main() {
       await expectRejectedAndUntouched(
         newer,
         isA<NewerFormatVersion>()
-            .having((e) => e.found, 'found', 4)
-            .having((e) => e.supported, 'supported', 3),
+            .having((e) => e.found, 'found', 5)
+            .having((e) => e.supported, 'supported', 4),
       );
     });
 

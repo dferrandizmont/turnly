@@ -65,11 +65,11 @@ void main() {
   });
 
   test(
-    'opening it migrates to v6 and keeps the copy made just before',
+    'opening it migrates to v7 and keeps the copy made just before',
     () async {
       final db = await open();
 
-      expect(readUserVersion(file), 6);
+      expect(readUserVersion(file), 7);
       expect(await dumpV2Columns(db), before);
       await expectEveryCalendarAsBefore(db);
       final types = await db.select(db.shiftTypes).get();
@@ -80,8 +80,8 @@ void main() {
       );
       await db.close();
 
-      // The copy: pre-v2-a-v6-<stamp>.sqlite, made before the migration.
-      expect(backupNames(), ['pre-v2-a-v6-20261102-083015.sqlite']);
+      // The copy: pre-v2-a-v7-<stamp>.sqlite, made before the migration.
+      expect(backupNames(), ['pre-v2-a-v7-20261102-083015.sqlite']);
       final copy = File(p.join(backups.path, backupNames().single));
       expect(readUserVersion(copy), 2);
 
@@ -106,7 +106,7 @@ void main() {
       final again = AppDatabase(NativeDatabase(restored));
       expect(await dumpV2Columns(again), before);
       await again.close();
-      expect(readUserVersion(restored), 6);
+      expect(readUserVersion(restored), 7);
     },
   );
 
@@ -122,11 +122,11 @@ void main() {
     await second.customSelect('SELECT 1').get();
 
     // No second copy, nothing recreated, nothing changed.
-    expect(backupNames(), ['pre-v2-a-v6-20261102-083015.sqlite']);
+    expect(backupNames(), ['pre-v2-a-v7-20261102-083015.sqlite']);
     expect(await dumpV2Columns(second), afterFirst);
     expect(afterFirst, before);
     await second.close();
-    expect(readUserVersion(file), 6);
+    expect(readUserVersion(file), 7);
   });
 
   test('without the safety copy there is no migration', () async {
@@ -148,10 +148,10 @@ void main() {
   test('a journal left by a crash does not block the start', () async {
     File('${file.path}-journal').writeAsStringSync('leftover');
     final db = await open();
-    expect(readUserVersion(file), 6);
+    expect(readUserVersion(file), 7);
     expect(await dumpV2Columns(db), before);
     await db.close();
-    expect(backupNames(), ['pre-v2-a-v6-20261102-083015.sqlite']);
+    expect(backupNames(), ['pre-v2-a-v7-20261102-083015.sqlite']);
   });
 
   test('a REAL hot journal is recovered before the copy and the migration: '
@@ -182,7 +182,7 @@ void main() {
     journal.writeAsBytesSync(hot);
 
     final opened = await open();
-    expect(readUserVersion(file), 6);
+    expect(readUserVersion(file), 7);
     // What was committed before the "crash", all of it, and none of the rest.
     expect(await dumpV2Columns(opened), before);
     await expectEveryCalendarAsBefore(opened);
@@ -211,20 +211,20 @@ void main() {
     expect(backupNames(), [
       'pre-v1-a-v2-20260201-000000.sqlite',
       'pre-v1-a-v2-20260301-000000.sqlite',
-      'pre-v2-a-v6-20261102-083015.sqlite',
+      'pre-v2-a-v7-20261102-083015.sqlite',
     ]);
   });
 
   test('with the copy of the whole chain already there (an earlier launch '
       'that failed midway) no new copy is made', () async {
     backups.createSync(recursive: true);
-    File(p.join(backups.path, 'pre-v1-a-v6-20261101-000000.sqlite'))
+    File(p.join(backups.path, 'pre-v1-a-v7-20261101-000000.sqlite'))
         .writeAsStringSync('the original v1');
     final db = await open();
     await db.close();
-    expect(backupNames(), ['pre-v1-a-v6-20261101-000000.sqlite']);
+    expect(backupNames(), ['pre-v1-a-v7-20261101-000000.sqlite']);
     expect(
-      File(p.join(backups.path, 'pre-v1-a-v6-20261101-000000.sqlite'))
+      File(p.join(backups.path, 'pre-v1-a-v7-20261101-000000.sqlite'))
           .readAsStringSync(),
       'the original v1',
     );

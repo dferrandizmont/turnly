@@ -90,6 +90,31 @@ class ReportShift {
       genericAbsence == other.genericAbsence;
 }
 
+/// A block of extra hours of a report day (schema v7): the block (its note
+/// only when the options and the day's absences allow notes), its type and
+/// what it earns (only when the report shows money and it is paid).
+class ReportOvertime {
+  const ReportOvertime({
+    required this.block,
+    required this.type,
+    this.amountCents,
+  });
+
+  final OvertimeBlock block;
+  final OvertimeType type;
+  final int? amountCents;
+
+  @override
+  bool operator ==(Object other) =>
+      other is ReportOvertime &&
+      other.block == block &&
+      other.type == type &&
+      other.amountCents == amountCents;
+
+  @override
+  int get hashCode => Object.hash(block, type, amountCents);
+}
+
 /// A day of the report.
 class ReportDay {
   const ReportDay({
@@ -99,6 +124,7 @@ class ReportDay {
     this.note,
     this.workedMinutes = 0,
     this.overtimeMinutes = 0,
+    this.overtimeBlocks = const [],
     this.earlyLeaveMinutes = 0,
     this.extraAmountCents = 0,
   });
@@ -116,6 +142,9 @@ class ReportDay {
   /// Paid minutes of the day (shifts and extras, [MonthSummary] definition).
   final int workedMinutes;
   final int overtimeMinutes;
+
+  /// The day's blocks of extra hours, by start (schema v7).
+  final List<ReportOvertime> overtimeBlocks;
   final int earlyLeaveMinutes;
 
   /// Extra money of the day (P9, fila 26: diets, mileage, a bonus; negative
@@ -247,8 +276,12 @@ ReportModel buildReport({
     }
 
     String? note;
-    if (options.includeNotes &&
-        (!hasAbsence || mode == ReportAbsenceMode.detailed)) {
+    // The notes of the day (and of its extra hours) only when the options
+    // and the day's absences allow them.
+    final notesShown =
+        options.includeNotes &&
+        (!hasAbsence || mode == ReportAbsenceMode.detailed);
+    if (notesShown) {
       final text = _cleanNote(resolved.note);
       if (text.isNotEmpty) note = text;
     }
@@ -265,6 +298,24 @@ ReportModel buildReport({
         note: note,
         workedMinutes: worked,
         overtimeMinutes: resolved.overtimeMinutes,
+        overtimeBlocks: [
+          for (final b in resolved.overtimeBlocks)
+            if (schedule.overtimeTypeById(b.typeId) case final type?)
+              ReportOvertime(
+                block: notesShown || b.note == null
+                    ? b
+                    : b.copyWith(clearNote: true),
+                type: type,
+                amountCents: options.includeEarnings
+                    ? overtimeAmountCents(
+                        b,
+                        type,
+                        resolved,
+                        schedule.baseHourlyRateCents,
+                      )
+                    : null,
+              ),
+        ],
         earlyLeaveMinutes: resolved.earlyLeaveMinutes,
         // The extra money of the day (P9): diets, mileage, a bonus.
         extraAmountCents: schedule.entries[date]?.extraAmountCents ?? 0,

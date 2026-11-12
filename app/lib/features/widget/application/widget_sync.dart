@@ -1,3 +1,7 @@
+import 'dart:io' show Platform;
+
+import 'package:flutter/foundation.dart';
+
 import '../../schedule/domain/civil_date.dart';
 import '../data/widget_publisher.dart';
 import '../domain/widget_snapshot.dart';
@@ -13,8 +17,15 @@ Future<WidgetSyncPlan> syncWidget({
   required WidgetPublisher publisher,
   required WidgetSyncTrigger trigger,
   required WidgetSnapshot Function() build,
+  bool? ios,
 }) async {
-  final fresh = build();
+  final snapshot = build();
+  // Keep iPhones functional until the Mac verifies WidgetKit's v3 reader.
+  // Select before comparing as well as writing, so v2 does not republish
+  // forever with a v3 hash/version.
+  final fresh = (ios ?? (!kIsWeb && Platform.isIOS))
+      ? snapshot.asV2()
+      : snapshot;
   final published = WidgetSnapshotHeader.tryParse(
     await publisher.readPublished(),
   );
@@ -24,6 +35,7 @@ Future<WidgetSyncPlan> syncWidget({
     today: CivilDate.parse(fresh.firstDate),
     timeZone: fresh.timeZone,
     contentHash: fresh.contentHash,
+    version: fresh.version,
   );
   if (plan.republish) {
     await publisher.publish(fresh.encode());

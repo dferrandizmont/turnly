@@ -16,6 +16,7 @@ import '../../schedule/data/schedule_snapshot.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../../shift_types/domain/shift_color_presets.dart';
 import '../domain/range_editing.dart';
+import '../domain/rotation_day.dart';
 
 /// Current schedule plus what the undo history allows.
 class ScheduleState {
@@ -901,10 +902,101 @@ class ScheduleController extends Notifier<ScheduleState> {
     return change;
   }
 
+  // ---- Extra hours (schema v7, docs/datos.md «Esquema v7») ---------------
+
+  /// Inserts or updates the overtime type [type] (shared by every
+  /// calendar). Not part of the undo history, like a shift type. Throws
+  /// [ArgumentError] for an invalid one, without changing anything.
+  void saveOvertimeType(OvertimeType type) {
+    if (!ref.mounted) return;
+    if (type.problem case final problem?) {
+      throw ArgumentError.value(type, 'type', 'invalid $problem');
+    }
+    final types = [
+      for (final t in state.schedule.overtimeTypes)
+        if (t.id != type.id) t,
+      type,
+    ]..sort(_byOvertimeOrder);
+    _emit(state.schedule.copyWith(overtimeTypes: types));
+    _enqueueTask((repository) => repository.saveOvertimeType(type));
+  }
+
+  /// Puts the overtime types in the order of [ids] (every type, archived
+  /// ones too; unknown ids are ignored and missing types go last).
+  void reorderOvertimeTypes(List<String> ids) {
+    if (!ref.mounted) return;
+    final byId = {for (final t in state.schedule.overtimeTypes) t.id: t};
+    final order = [
+      for (final id in ids)
+        if (byId.containsKey(id)) id,
+      for (final t in state.schedule.overtimeTypes)
+        if (!ids.contains(t.id)) t.id,
+    ];
+    final types = [
+      for (final (i, id) in order.indexed) byId[id]!.copyWith(sortOrder: i),
+    ];
+    _emit(state.schedule.copyWith(overtimeTypes: types));
+    _enqueueTask((repository) => repository.reorderOvertimeTypes(order));
+  }
+
+  /// Sets the base hourly rate of the extra hours (minor unit of the
+  /// currency; `null` removes it, more than [maxStoredMoneyCents] is
+  /// refused).
+  void setBaseHourlyRate(int? cents) {
+    if (!ref.mounted) return;
+    if (cents != null && (cents < 0 || cents > maxStoredMoneyCents)) {
+      throw ArgumentError.value(cents, 'cents', 'out of range');
+    }
+    _emit(
+      state.schedule.copyWith(
+        baseHourlyRateCents: cents,
+        clearBaseHourlyRate: cents == null,
+      ),
+    );
+    _enqueueTask((repository) => repository.setBaseHourlyRate(cents));
+  }
+
+  /// Replaces the overtime blocks of [date] with [blocks] (in order of
+  /// start): one undo step; shifts, note and the rest of the day stay. Old
+  /// overtime minutes of the day, if any, go (the blocks replace them).
+  /// Throws [ArgumentError] for a block that is invalid, of another day or
+  /// of an unknown type. Returns the step, or `null` when nothing changed.
+  ScheduleChange? setOvertimeBlocks(
+    CivilDate date,
+    List<OvertimeBlock> blocks,
+  ) {
+    if (!ref.mounted) return null;
+    if (strokeActive) endStroke();
+    for (final b in blocks) {
+      if (b.problem != null ||
+          b.date != date ||
+          state.schedule.overtimeTypeById(b.typeId) == null) {
+        throw ArgumentError.value(b, 'blocks', 'invalid block');
+      }
+    }
+    final before = state.schedule.entries[date] ?? DayEntry(date: date);
+    final sorted = [...blocks]..sort(compareOvertimeBlocks);
+    return _editEntries({
+      date: before.copyWith(
+        overtimeBlocks: List<OvertimeBlock>.unmodifiable(sorted),
+        clearOvertime: true,
+      ),
+    });
+  }
+
+  static int _byOvertimeOrder(OvertimeType a, OvertimeType b) {
+    final byOrder = a.sortOrder.compareTo(b.sortOrder);
+    return byOrder != 0 ? byOrder : a.id.compareTo(b.id);
+  }
+
   /// Sets the overtime and the early leave of [date], in minutes (docs/
   /// paridad.md, A6). `null` leaves that value as it is; 0 (or less) clears
   /// it; more than [maxDayExtraMinutes] is cut to it. One undo step, shifts,
   /// note and reminder stay. Returns the step, or `null` when nothing changed.
+  ///
+  /// The overtime minutes are the form of the extra hours before schema v7:
+  /// the app now writes blocks ([setOvertimeBlocks]) and only the early leave
+  /// goes through here; the minutes stay for the data that still has them.
   ScheduleChange? setDayExtras(
     CivilDate date, {
     int? overtimeMinutes,
@@ -962,7 +1054,61 @@ class ScheduleController extends Notifier<ScheduleState> {
   /// created together with the change. Returns the undo step (for
   /// [undoIfLast]), or `null` when nothing was applied (the calendar was
   /// switched while waiting).
-  Future<ScheduleChange?> applyPatternRun(PatternRequest request) async {
+  Future<ScheduleChange?> applyPatternRun(PatternRequest request) =>
+      _applyRunPlan(
+        (schedule, seq) => planPatternApplication(
+          schedule,
+          request,
+          seq: seq,
+          postNightAuto: ref.read(postNightAutoProvider),
+          palette: state.palette,
+        ),
+      );
+
+  /// «Empezar la rotación aquí» of the day detail: the rotation that rules
+  /// [date] starts over on it, as ONE undoable step ([planRestartRun]: the
+  /// same as applying its pattern from [date]). Returns the undo step, or
+  /// `null` when nothing was applied (no rotation on [date], [date] already
+  /// is the first day of the cycle, or the calendar was switched meanwhile).
+  Future<ScheduleChange?> restartRunAt(CivilDate date) => _applyRunPlan(
+    (schedule, seq) => planRestartRun(
+      schedule,
+      date,
+      seq: seq,
+      postNightAuto: ref.read(postNightAutoProvider),
+      palette: state.palette,
+    ),
+  );
+
+  /// «Empezar tu rotación aquí» of the day detail: on a day without rotation,
+  /// the last one that ended before [date] applies again from [date], with
+  /// [stepOffset] as the day of the cycle that falls on it, as ONE undoable
+  /// step ([planResumeRun]). Returns the undo step, or `null` when nothing
+  /// was applied.
+  Future<ScheduleChange?> resumeRunAt(CivilDate date, {int stepOffset = 0}) =>
+      _applyRunPlan(
+        (schedule, seq) => planResumeRun(
+          schedule,
+          date,
+          seq: seq,
+          stepOffset: stepOffset,
+          postNightAuto: ref.read(postNightAutoProvider),
+          palette: state.palette,
+        ),
+      );
+
+  /// «Último día de esta rotación» of the day detail: the rotation that rules
+  /// [date] ends on it ([planEndRunOn]). Manual days stay. Returns the undo
+  /// step, or `null` when no rotation rules [date] or it already ends there.
+  ScheduleChange? endRunOn(CivilDate date) =>
+      _commitRunChange((schedule) => planEndRunOn(schedule, date)?.change);
+
+  /// Applies what [plan] gives for the schedule as it is once the next run
+  /// `seq` is known, as ONE undoable step. `null` when [plan] has nothing to
+  /// apply or the calendar was switched while waiting.
+  Future<ScheduleChange?> _applyRunPlan(
+    PatternApplication? Function(Schedule schedule, int seq) plan,
+  ) async {
     if (strokeActive) endStroke();
     final calendarId = state.calendarId;
     // Runs still queued are not in the database yet: wait for them, so the
@@ -970,21 +1116,16 @@ class ScheduleController extends Notifier<ScheduleState> {
     await pendingWrites;
     final seq = await ref.read(scheduleRepositoryProvider).nextRunSeq();
     if (!ref.mounted || state.calendarId != calendarId) return null;
-    final plan = planPatternApplication(
-      state.schedule,
-      request,
-      seq: seq,
-      postNightAuto: ref.read(postNightAutoProvider),
-      palette: state.palette,
-    );
-    _undo.push(plan.change);
-    _emit(plan.schedule, newTypes: plan.newTypes);
+    final planned = plan(state.schedule, seq);
+    if (planned == null) return null;
+    _undo.push(planned.change);
+    _emit(planned.schedule, newTypes: planned.newTypes);
     _enqueueWrite(
-      plan.change,
-      newTypes: plan.newTypes,
-      newPattern: plan.newPattern,
+      planned.change,
+      newTypes: planned.newTypes,
+      newPattern: planned.newPattern,
     );
-    return plan.change.isEmpty ? null : plan.change;
+    return planned.change.isEmpty ? null : planned.change;
   }
 
   /// Applies a change computed against the CURRENT schedule by [plan] (the
@@ -1098,6 +1239,7 @@ class ScheduleController extends Notifier<ScheduleState> {
         clearNote: day.note != null,
         clearNoteReminder: day.noteReminderMinute != null,
         clearOvertime: day.overtimeMinutes != null,
+        overtimeBlocks: const [],
         clearEarlyLeave: day.earlyLeaveMinutes != null,
         clearExtraAmount: day.extraAmountCents != null,
       );
