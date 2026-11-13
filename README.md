@@ -155,6 +155,7 @@ you choose. The `.turnly` backup file is not encrypted.
 
 ## What's new
 
+- **1.1.0 (13 Nov 2026):** the iPhone gets everything from 0.10.0: overtime by blocks, rotation actions from the day, the month strip, your longest work run and the new rotations. iPhone widgets show overtime and a seven-day hours total.
 - **0.10.0 (12 Nov 2026):** overtime by blocks with types and rates, and rotation actions from the day. A month strip with your next day off, longest work run in Summary, Android widgets with overtime and a seven-day hours total, and “2 and 2” / “3 and 1” rotations.
 - **1.0.0 (10 Nov 2026):** first version on the App Store, for iPhone. Android stays in Google Play testing.
 

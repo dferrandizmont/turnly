@@ -167,6 +167,7 @@ dago zifratuta.
 
 ## Berriak
 
+- **1.1.0 (2026-11-13):** iPhoneak 0.10.0ko guztia jasotzen du: aparteko orduak blokeka, txandaketarako ekintzak egunetik, hilabetearen azpiko zerrenda, lan-boladarik luzeena eta txandaketa berriak. iPhoneko widgetek aparteko orduak eta zazpi eguneko guztizkoa erakusten dituzte.
 - **0.10.0 (2026-11-12):** aparteko orduak blokeka, motekin eta tarifarekin, eta txandaketarako ekintzak egunetik. Hilabetearen azpiko zerrenda hurrengo egun librearekin, lan-boladarik luzeena Laburpenean, aparteko orduak eta zazpi eguneko guztizkoa Android widgetetan, eta «2 eta 2» / «3 eta 1» txandaketak.
 - **1.0.0 (2026-11-10):** lehen bertsioa App Store-n, iPhonerako. Androidek Google Playko probetan jarraitzen du.
 

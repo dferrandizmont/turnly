@@ -10,6 +10,12 @@ at once, so they can skip numbers.
 
 ## Unreleased
 
+## 1.1.0 · 2026-11-13
+
+iPhone update (App Store build 3) with everything from 0.9.8 and 0.10.0: overtime by blocks with types and rates, rotation changes from any day, the strip under the month, your longest run of days worked, the "2 and 2" and "3 and 1" rotations and the clearer job list on first use. Your existing data and overtime carry over unchanged.
+
+- **Widgets on iPhone.** The widgets show your overtime and early leave next to your shift, and the seven-day widget adds up its hours (already the case on Android).
+
 ## 0.10.0 · 2026-11-12
 
 Overtime the way you really work it, rotation changes from any day, and more at a glance.

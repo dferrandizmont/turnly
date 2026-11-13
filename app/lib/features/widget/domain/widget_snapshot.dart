@@ -14,8 +14,8 @@ const String kWidgetAppGroupId = 'group.es.cuadrante.app';
 /// `kind` of the iOS widget (one kind, six families).
 const String kWidgetIosKind = 'CuadranteWidget';
 
-/// Current JSON contract. Bump on breaking changes. `syncWidget` temporarily
-/// publishes v2 on iOS until WidgetKit's v3 reader is verified on the Mac.
+/// Current JSON contract. Bump on breaking changes. Published as is on iOS
+/// and Android; both readers also accept v1 and v2.
 const int kWidgetSnapshotVersion = 3;
 
 /// Days of the timeline: today and the 59 following ones.
@@ -804,30 +804,6 @@ class WidgetSnapshot {
   final Map<String, WidgetStripTotal>? stripTotals;
 
   final String? _storedHash;
-
-  /// Temporary compatibility for WidgetKit's v1/v2 reader. Remove this
-  /// downgrade once the Mac has adapted and verified all families for v3.
-  WidgetSnapshot asV2() => version <= 2
-      ? this
-      : WidgetSnapshot(
-          version: 2,
-          generatedAt: generatedAt,
-          timeZone: timeZone,
-          locale: locale,
-          firstDate: firstDate,
-          lastDate: lastDate,
-          staleTitle: staleTitle,
-          staleBody: staleBody,
-          weekdayHeaders: weekdayHeaders,
-          styles: styles,
-          months: months,
-          days: days,
-          displayDays: displayDays,
-          noShift: noShift,
-          descriptions: descriptions,
-          nextOff: nextOff,
-          notes: notes,
-        );
 
   /// SHA-256 (hex) of the content: everything except [generatedAt] and the
   /// hash itself. Equal schedules give equal hashes.

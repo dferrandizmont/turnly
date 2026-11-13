@@ -17,7 +17,7 @@ resuelto, igual que en la app.
 | Clave | `cuadrante.widget.snapshot` (`kWidgetSnapshotKey`) |
 | Almacén | `UserDefaults(suiteName: "group.es.cuadrante.app")`, valor `String` con el JSON |
 | `kind` del widget (iOS) | `CuadranteWidget` (`kWidgetIosKind`): un solo `kind` con las seis familias |
-| Versión del JSON | Android: `v = 3` (`kWidgetSnapshotVersion`); iOS: **v2 temporal** hasta adaptar y verificar Swift. Lectores Dart y Android compatibles con v1 y v2 |
+| Versión del JSON | Android: `v = 3` (`kWidgetSnapshotVersion`); iOS: `v = 3` también (13-nov-2026); lectores Dart, Android y Swift compatibles con v1, v2 y v3 |
 | Escribe | solo la app (`WidgetPublisher.publish`, luego recarga las líneas de tiempo) |
 | Lee | solo la extensión; nunca escribe |
 
@@ -31,11 +31,9 @@ caducada, lo cual es correcto (la app nueva traerá también la extensión nueva
 > Esto se distingue de las extensiones opcionales en la raíz, como `descriptions`: los lectores antiguos ignoran
 > esas extensiones y los nuevos admiten su ausencia, sin cambiar los objetos del esquema base ni exigir otra versión.
 > La v3 añade las horas extra como textos por fecha, sin añadir iconos ni cambiar el horario base.
-> Dart y Android están actualizados; la adaptación de Swift queda pendiente en `docs/mac-ios.md` §4.1
-> por encargo del 12-nov-2026 y es **bloqueante antes del siguiente candidato iOS**. Para conservar los widgets,
-> `syncWidget` selecciona v2 en iOS antes de comparar y escribir el snapshot: omite `dayExtras` y `stripTotals`
-> y recalcula el hash; Android conserva v3. **Al adaptar y verificar Swift en el Mac se retira esta excepción**
-> (`syncWidget` y `WidgetSnapshot.asV2`, con sus pruebas), junto con estas notas.
+> Dart, Android y Swift están actualizados (13-nov-2026): iOS publica v3 como Android; la selección temporal
+> de v2 (`syncWidget`, `WidgetSnapshot.asV2`) se retiró. **Falta comprobar el lector Swift en el iPhone**
+> (`docs/mac-ios.md` §4.1).
 
 ## 2. Esquema JSON v3 (con lectura de v1 y v2)
 
@@ -49,7 +47,7 @@ No añade campos por día a las familias anteriores. Las extensiones opcionales 
 fecha, se añaden sin subir `v` y los lectores antiguos las ignoran, así que un snapshot anterior sigue siendo válido y
 los nuevos admiten su ausencia. Dart y Android leen ambas versiones; una versión desconocida
 da el aviso de caducado. El planificador republica una v1 al abrir la app porque su versión ya no es la actual.
-El lector Swift debe aceptar 1, 2 y 3; la adaptación de v3 está pendiente en `docs/mac-ios.md` §4.1.
+El lector Swift acepta 1, 2 y 3 (`WidgetSnapshot.swift`, `widgetSnapshotVersions`); la comprobación de v3 en el iPhone sigue pendiente en `docs/mac-ios.md` §4.1.
 Un lector antiguo que solo admita v1 muestra el aviso hasta actualizarse; nunca interpreta la v2 como otro día.
 
 Convenciones: claves en `camelCase`; **todas las claves del esquema base están siempre presentes** y las que pueden no tener valor
@@ -115,8 +113,25 @@ Van incluidas en `contentHash`. Las claves de `Day`, `Small`, `Medium`, turnos y
   (esta sigue en la lectura accesible); la altura restante, medida con la tipografía y escala utilizadas,
   limita los ajustes a líneas completas. La agenda reserva altura para los ajustes antes de elegir sus filas.
   La cabecera de la tira muestra el total y desaparece al leer v1/v2 (no se inventa un cero).
-- Swift/WidgetKit: **pendiente del Mac**, incluidas aceptación de v3 y presentación de ajustes/total en las familias
-  donde quepan. No debe calcular minutos ni traducir; lee estos mismos textos. Ver `docs/mac-ios.md` §4.1.
+- Swift/WidgetKit (hecho el 13-nov-2026, **pendiente de comprobar en el iPhone**): `WidgetSnapshot.swift` acepta v1, v2
+  y v3 y lee `dayExtras` y `stripTotals` de forma tolerante (ausentes o dañados = sin ajustes ni total; nunca se
+  inventa un cero). No calcula minutos ni traduce; pinta estos mismos textos. **Pequeño:** los ajustes bajo la hora,
+  con la misma prioridad que en Android (la línea de mañana cae antes que los ajustes, luego se compacta el código y la
+  hora, y al final se recortan líneas completas). **Mediano:** «7 días: …» sobre la tira (`stripTotals[primer día
+  visible].label`) y los ajustes en cada celda mientras quepan líneas completas. **Grande:** sin texto de
+  ajustes en la cuadrícula (la celda no tiene altura para ello; siguen en la lectura accesible). **Límite de
+  WidgetKit:** cada línea de tiempo (60 entradas) se archiva con sus vistas y el sistema rechaza más de ~10 MB
+  (`too large timeline archive`, QA 1.1.0: 47,9 MB el grande y 10,57 MB el mediano, ambos con `GeometryReader` por celda);
+  por eso las vistas **no usan `GeometryReader` ni `ViewThatFits`**: el constructor de entradas recibe el tamaño del widget del
+  proveedor y la disposición sale de aritmética fija (`WidgetLayout`). Las palabras no se parten: las
+  etiquetas se empaquetan en líneas de palabras completas que nunca superan el ancho; una palabra que no cabe sola no
+  se dibuja y la línea anterior acaba en « …» (como `wholeWordLines` de Android). Las **pantallas de bloqueo**
+  conservan `lock.*` sin cambios (no llevan ajustes, como Android no tiene equivalente); su lectura accesible ya
+  incluye los ajustes porque sale de `descriptions`. La lectura accesible no se duplica: solo si falta
+  `descriptions` se añaden las etiquetas a mano. Privacidad: las celdas de una fecha con ausencia (o desconocida con
+  bandas o ajustes) siguen `privacySensitive`, y el total de la tira se oculta si cualquiera de sus días lo es, o si tiene bandas o ajustes y su fecha no está
+  entre las clasificadas por el snapshot (falla cerrado, igual que las celdas). Ver
+  `docs/mac-ios.md` §4.1.
 
 ### Extensión opcional `descriptions` (v2, compatible con snapshots anteriores)
 
@@ -395,9 +410,8 @@ como `DayCell` en la app. Día sin turno: celda vacía de superficie, sin barra,
 
 Disparadores (`WidgetSyncTrigger`) y comprobación (`WidgetSyncPlanner`): la app construye una instantánea nueva, la
 compara con la publicada y solo escribe si hace falta.
-La selección temporal de v2 en iOS se hace en `syncWidget` **antes** de esta comparación y de la escritura;
-el planificador compara la versión y el hash de esa representación. Así una apertura posterior no vuelve
-a publicar por comparar el v2 guardado con el v3 del constructor. Android compara y publica v3.
+`syncWidget` compara y publica el mismo v3 en iOS y Android. Un v2 que dejó una compilación anterior en un iPhone se
+republica solo como v3 por el cambio de versión.
 
 | Disparador | Espera | Siempre recarga líneas de tiempo |
 |---|---|---|
@@ -425,11 +439,30 @@ cambio de fecha o de zona detectado por una mirada al reloj cada minuto. Siempre
 
 ## 6. Política del `TimelineProvider` (Swift, en el Mac)
 
-El pseudocódigo describe el lector v3 que debe adaptar y verificar el Mac **antes del siguiente candidato iOS**.
-Hasta entonces `syncWidget` sigue escribiendo v2 en iOS; al verificar Swift se retira esa excepción (sección 1).
+El pseudocódigo describe el lector v3 (Swift adaptado el 13-nov-2026; falta la comprobación en el iPhone,
+`docs/mac-ios.md` §4.1). `syncWidget` ya escribe v3 en iOS.
 
-**Una entrada por día, a las 00:00, 60 días.** El widget cambia de día solo, sin depender de que el sistema lo
-refresque ni de que se abra la app.
+**Una entrada por día, a las 00:00. Datos: 60 días; entradas: una ventana por familia.** El widget cambia de día
+solo, sin depender de que se abra la app. WidgetKit rechaza una línea de tiempo cuyo archivo pasa de ~10 MiB
+(`too large timeline archive`) y el archivo crece con las celdas de las vistas (QA 1.1.0: con la vista que cargaba el snapshot entero en cada entrada, el grande falló con 21 entradas,
+15 551 336 B en el iPhone XR con datos reales, unos 740 KB por entrada, y con 61 entradas llegó a 47,9 MB; el
+mediano falló con 61 y funcionó con 31). **Regla: una entrada lleva solo la porción precalculada que su familia
+dibuja**, nunca el snapshot decodificado, sus mapas de fechas ni los conjuntos con que se clasifican: son modelos
+pequeños (`SmallModel`, `MediumModel`, `LargeModel`, `LockModel` en `WidgetSnapshot.swift`) con primitivos y textos
+cortos (códigos, colores ARGB, etiquetas ya empaquetadas en líneas, `sensitive`, frase accesible), que construye
+`EntryBuilder` durante una sola llamada del proveedor. Las vistas solo reciben esos modelos. Presupuesto por entrada
+(modelo codificado, medido con los fixtures de Android): pequeño ≈ 0,6 KB, bloqueo ≈ 0,4 KB, mediano ≈ 1,7 KB, grande
+≈ 8 KB (las 42 frases accesibles son lo mayor). Ventanas por familia (`CuadranteProvider.maxEntries`): pequeño y
+pantalla de bloqueo, **todas** las entradas (hasta 60 + la de caducidad); mediano, **31**; grande, **8**. El
+archivo de WidgetKit incluye además el árbol de vistas renderizado de cada entrada: por eso tampoco se usan
+`GeometryReader` ni `ViewThatFits` y el grande se mantiene corto; el tamaño real se comprueba en el iPhone (log de
+`chronod`). Si la ventana no llega al último día, la política es `.after` la fecha de la entrada que queda
+**2 días** antes del final de la ventana: el proveedor reconstruye la siguiente ventana desde el JSON que ya tiene
+(sus 60 días de datos), sin abrir la app. El margen de 2 días hace que un refresco tardío del sistema siga mostrando
+el día correcto; si el sistema no concede el refresco, el widget se queda en el último día de la ventana hasta que se
+conceda (o se abra la app, que lo recarga siempre). Pasado el último día del JSON, sigue el aviso de caducado igual
+que antes. Las compilaciones DEBUG escriben en el log (`subsystem es.cuadrante.app`, categoría `widget`) los bytes de
+los modelos de cada línea de tiempo y la hora de generación del snapshot leído (nunca textos del usuario ni totales).
 
 ```
 getTimeline(in:completion:)
@@ -444,10 +477,15 @@ getTimeline(in:completion:)
       si no existe (antes de firstDate o después de lastDate):
           entries = [ .stale(date: now) ]; policy = .after(now + 1 h)
       si existe:
+          limite = 60 (pequeño, bloqueo) | 31 (mediano) | 8 (grande)
           entries = [ .day(days[i], date: now) ]                                  // el día actual, ya
-                  + [ .day(days[k], date: cal.startOfDay(de days[k].date)) para k en i+1 ... 59 ]
-                  + [ .stale(date: cal.startOfDay(de lastDate + 1 día)) ]         // entrada final de caducidad
-          policy  = .after(fecha de la entrada .stale)
+                  + [ .day(days[k], date: cal.startOfDay(de days[k].date)) para k en i+1 ... 59,
+                      hasta tener `limite` entradas ]
+          si quedan días sin cubrir (ventana cortada):
+              policy = .after(fecha de entries[n - 3])                            // la siguiente ventana, sin la app
+          si no:
+              entries += [ .stale(date: cal.startOfDay(de lastDate + 1 día)) ]    // entrada final de caducidad
+              policy  = .after(fecha de la entrada .stale)
 ```
 
 Reglas:
@@ -457,7 +495,9 @@ Reglas:
 2. Las entradas se ordenan por fecha ascendente; la primera tiene fecha `now` (no la medianoche pasada).
 3. `startOfDay` se calcula con el calendario de `timeZone`, no sumando 86.400 s: los días de cambio de hora duran 23
    o 25 h, y se cubren con fechas civiles. Las pruebas Dart fijan que 2026-10-25 y 2027-03-28 no saltan ni duplican día.
-4. Total: hasta 61 entradas (60 días + la de caducidad). No hay que recortar.
+4. Total: hasta 61 entradas (60 días + la de caducidad) en pequeño y bloqueo; 31 en el mediano y 8 en el grande,
+   por el límite del archivo de WidgetKit (arriba). Los cambios de día en el límite de una ventana caen en la
+   medianoche de su entrada, como en cualquier otra; la ventana siguiente empieza en el día de hoy del reloj.
 5. La extensión **no escribe** en el contenedor y no calcula turnos.
 6. Tras `reloadAllTimelines()` (la app lo pide al abrir, al reanudar, tras ediciones y en cambios de día o zona), el
    proveedor reconstruye las entradas desde el JSON nuevo.

@@ -62,7 +62,7 @@ class FakeHomeWidgetLayer implements HomeWidgetLayer {
 void main() {
   for (final ios in [false, true]) {
     test(
-      'sync publishes ${ios ? 'v2 on iOS' : 'v3 on Android'} with a valid hash '
+      'sync publishes v3 on ${ios ? 'iOS' : 'Android'} with a valid hash '
       'and does not republish unchanged content',
       () async {
         final source = WidgetSnapshot.decode(
@@ -75,39 +75,18 @@ void main() {
           publisher: publisher,
           trigger: WidgetSyncTrigger.appStart,
           build: () => source,
-          ios: ios,
         );
 
         expect((await sync()).republish, isTrue);
         final stored = (jsonDecode(layer.store[kWidgetSnapshotKey]!) as Map)
             .cast<String, Object?>();
         final decoded = WidgetSnapshot.fromJson(stored);
-        expect(decoded.version, ios ? 2 : 3);
+        expect(decoded.version, 3);
         expect(decoded.computeContentHash(), decoded.contentHash);
-        final expected = source.toJson();
-        if (ios) {
-          expected['v'] = 2;
-          expected.remove('dayExtras');
-          expected.remove('stripTotals');
-          expected['contentHash'] = decoded.contentHash;
-          expect(stored.containsKey('dayExtras'), isFalse);
-          expect(stored.containsKey('stripTotals'), isFalse);
-          expect(decoded.contentHash, isNot(source.contentHash));
-          // Also recover a v3 snapshot left by an earlier build on an iPhone.
-          layer.store[kWidgetSnapshotKey] = source.encode();
-          expect(
-            (await sync()).reasons,
-            contains(WidgetRefreshReason.versionChanged),
-          );
-          expect(
-            WidgetSnapshot.decode(layer.store[kWidgetSnapshotKey]!).version,
-            2,
-          );
-        } else {
-          expect(decoded.dayExtras, isNotEmpty);
-          expect(decoded.stripTotals, isNotEmpty);
-        }
-        expect(stored, expected);
+        expect(decoded.contentHash, source.contentHash);
+        expect(decoded.dayExtras, isNotEmpty);
+        expect(decoded.stripTotals, isNotEmpty);
+        expect(stored, source.toJson());
         layer.calls.clear();
         final again = await sync();
         expect(again.republish, isFalse);

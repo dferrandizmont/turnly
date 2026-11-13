@@ -160,6 +160,7 @@ datos van al destino que elijas. El archivo de copia `.turnly` no está cifrado.
 
 ## Novedades
 
+- **1.1.0 (13-nov-2026):** el iPhone recibe todo lo de la 0.10.0: horas extra por bloques, acciones de rotación desde el día, la tira del mes, tu racha más larga y las rotaciones nuevas. Los widgets de iPhone muestran las horas extra y el total de siete días.
 - **0.10.0 (12-nov-2026):** horas extra por bloques con tipos y tarifa, y acciones de rotación desde el día. Tira del mes con el próximo libre, racha más larga en el Resumen, widgets de Android con extras y total de siete días, y rotaciones «2 y 2» / «3 y 1».
 - **1.0.0 (10-nov-2026):** primera versión en la App Store, para iPhone. Android sigue en pruebas en Google Play.
 
