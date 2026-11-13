@@ -3,7 +3,7 @@
 # Colaborar en Turnly
 
 Turnly es gratuita, sin cuentas, anuncios ni compras. El código Flutter está en
-`app/`; el alcance está en [turnos-spec.md](turnos-spec.md) y los contratos en
+`app/`; el alcance está en el [README](README.es.md) y los contratos en
 `docs/`. Explica el problema, el comportamiento esperado y cómo lo has comprobado.
 Para cambios de interfaz o de alcance, acuerda primero la propuesta en una issue.
 No adjuntes cuadrantes personales: usa datos sintéticos.
