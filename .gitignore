@@ -9,7 +9,7 @@ Thumbs.db
 .env*
 !*.example
 
-# Claude Code worktrees
+# Local worktrees
 .claude/worktrees/
 
 # Capturas locales del emulador
