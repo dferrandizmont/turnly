@@ -13,6 +13,7 @@ import '../../calendars/application/calendars_controller.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../domain/ics_events.dart';
 import '../domain/ics_writer.dart';
+import '../../../core/platform/share_origin.dart';
 
 bool _zonesLoaded = false;
 
@@ -50,7 +51,10 @@ final icsTimeZoneProvider = Provider<Future<tz.Location> Function()>(
 typedef IcsFileSender = Future<void> Function(File file);
 
 Future<void> _shareIcs(File file) => SharePlus.instance.share(
-  ShareParams(files: [XFile(file.path, mimeType: 'text/calendar')]),
+  ShareParams(
+    files: [XFile(file.path, mimeType: 'text/calendar')],
+    sharePositionOrigin: shareOrigin(),
+  ),
 );
 
 final icsFileSenderProvider = Provider<IcsFileSender>((ref) => _shareIcs);

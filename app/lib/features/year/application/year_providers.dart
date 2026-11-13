@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../calendar/application/visible_month.dart';
+import '../../../core/platform/share_origin.dart';
 
 /// The year shown by the annual view: the one of the month on screen when it
 /// is opened, then wherever the arrows take it.
@@ -46,6 +47,7 @@ Future<void> shareYearImage(
     ShareParams(
       files: [XFile(file.path, mimeType: 'image/png')],
       subject: subject,
+      sharePositionOrigin: shareOrigin(),
     ),
   );
 }

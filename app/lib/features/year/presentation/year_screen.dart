@@ -21,6 +21,7 @@ import '../application/year_providers.dart';
 import '../../settings/application/preferences_controller.dart';
 import 'year_image.dart';
 import '../../../core/widgets/app_snack_bar.dart';
+import '../../../core/platform/share_origin.dart';
 
 /// Vista anual (turnos-spec.md section 4, screen 5): the 12 months as a heat
 /// map of shifts (3 x 4 on a phone), the shifts of the year with their day
@@ -93,11 +94,18 @@ class _YearScreenState extends ConsumerState<YearScreen> {
         context,
         title: Text(l10n.yearTitle),
         actions: [
-          IconButton(
-            key: const ValueKey('year-share'),
-            tooltip: l10n.yearShare,
-            icon: Icon(AppIcons.share),
-            onPressed: _sharing ? null : () => _share(year),
+          Builder(
+            builder: (buttonContext) => IconButton(
+              key: const ValueKey('year-share'),
+              tooltip: l10n.yearShare,
+              icon: Icon(AppIcons.share),
+              onPressed: _sharing
+                  ? null
+                  : () {
+                      rememberShareOrigin(buttonContext);
+                      _share(year);
+                    },
+            ),
           ),
         ],
       ),

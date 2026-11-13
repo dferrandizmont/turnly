@@ -159,7 +159,7 @@ dades van a la destinació que triïs. El fitxer de còpia `.turnly` no està xi
 
 ## Novetats
 
-- **1.1.0 (13-nov-2026):** l’iPhone rep tot el de la 0.10.0: hores extra per blocs, accions de rotació des del dia, la franja del mes, la teva ratxa més llarga i les rotacions noves. Els widgets d’iPhone mostren les hores extra i el total de set dies.
+- **1.1.0 (13-nov-2026):** ara també a l’iPad. L’iPhone i l’iPad reben tot el de la 0.10.0: hores extra per blocs, accions de rotació des del dia, la franja del mes, la teva ratxa més llarga i les rotacions noves. Els widgets d’iPhone mostren les hores extra i el total de set dies.
 - **0.10.0 (12-nov-2026):** hores extra per blocs amb tipus i tarifa, i accions de rotació des del dia. Franja del mes amb el proper dia lliure, ratxa més llarga al Resum, widgets d’Android amb extres i total de set dies, i rotacions «2 i 2» / «3 i 1».
 - **1.0.0 (10-nov-2026):** primera versió a l’App Store, per a iPhone. Android continua en proves a Google Play.
 

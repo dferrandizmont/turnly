@@ -32,6 +32,7 @@ import '../domain/icloud_errors.dart';
 import 'auto_backup_runner.dart';
 import 'backup_models.dart';
 import 'backup_service.dart';
+import '../../../core/platform/share_origin.dart';
 
 // ---- where things live --------------------------------------------------
 
@@ -571,7 +572,10 @@ final exportCacheSweepProvider = FutureProvider<void>((ref) async {
 typedef ExportFileSender = Future<void> Function(File file);
 
 Future<void> _shareWithSystem(File file) => SharePlus.instance.share(
-  ShareParams(files: [XFile(file.path, mimeType: 'application/octet-stream')]),
+  ShareParams(
+    files: [XFile(file.path, mimeType: 'application/octet-stream')],
+    sharePositionOrigin: shareOrigin(),
+  ),
 );
 
 final exportFileSenderProvider = Provider<ExportFileSender>(

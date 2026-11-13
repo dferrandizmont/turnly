@@ -23,11 +23,14 @@ import '../application/share_link_controller.dart';
 import '../data/share_link_api.dart';
 import '../domain/share_feed.dart';
 import 'share_link_icons.dart';
+import '../../../core/platform/share_origin.dart';
 
 /// Shares the text of the link with the system sheet. Tests override it.
 final shareLinkTextSenderProvider = Provider<Future<void> Function(String)>(
   (ref) =>
-      (text) => SharePlus.instance.share(ShareParams(text: text)),
+      (text) => SharePlus.instance.share(
+        ShareParams(text: text, sharePositionOrigin: shareOrigin()),
+      ),
 );
 
 /// «Compartir por enlace» (`/ajustes/compartir`, docs/compartir.md): publish
@@ -262,12 +265,17 @@ class _Published extends ConsumerWidget {
               ),
               const SizedBox(width: Sp.m),
               Expanded(
-                child: SecondaryButton(
-                  key: const ValueKey('share-share'),
-                  icon: AppIcons.share,
-                  label: l10n.shareLinkShare,
-                  onPressed: () => ref.read(shareLinkTextSenderProvider)(
-                    l10n.shareLinkShareText(url.toString()),
+                child: Builder(
+                  builder: (buttonContext) => SecondaryButton(
+                    key: const ValueKey('share-share'),
+                    icon: AppIcons.share,
+                    label: l10n.shareLinkShare,
+                    onPressed: () {
+                      rememberShareOrigin(buttonContext);
+                      ref.read(shareLinkTextSenderProvider)(
+                        l10n.shareLinkShareText(url.toString()),
+                      );
+                    },
                   ),
                 ),
               ),

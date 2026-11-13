@@ -30,6 +30,7 @@ import 'backup_format.dart';
 import 'folder_backup_section.dart';
 import 'verification_result_card.dart';
 import '../../../core/widgets/app_snack_bar.dart';
+import '../../../core/platform/share_origin.dart';
 
 /// Ajustes › Copia de seguridad (`/ajustes/copia`): how safe the schedule is
 /// (when and where the last copy is, checked, honest warnings; a drawing
@@ -210,11 +211,16 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
               const SizedBox(height: Sp.l),
               // B9: the copy that saves you is the one outside the phone, so
               // it is the main action; the copy on the phone comes second.
-              PrimaryButton(
-                key: const ValueKey('backup-export'),
-                label: l10n.backupUiSaveOutside,
-                icon: AppIcons.share,
-                onPressed: _export,
+              Builder(
+                builder: (buttonContext) => PrimaryButton(
+                  key: const ValueKey('backup-export'),
+                  label: l10n.backupUiSaveOutside,
+                  icon: AppIcons.share,
+                  onPressed: () {
+                    rememberShareOrigin(buttonContext);
+                    _export();
+                  },
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(Sp.xs, Sp.s, Sp.xs, Sp.m),

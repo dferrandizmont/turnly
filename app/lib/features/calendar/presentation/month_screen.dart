@@ -46,6 +46,7 @@ import 'shift_format.dart';
 import 'today_card.dart';
 import '../../reports/presentation/report_share_button.dart';
 import '../../../core/widgets/app_snack_bar.dart';
+import '../../../core/platform/share_origin.dart';
 
 /// Home (`docs/diseno.md`): the date and settings, the "today" card (it folds
 /// to one line), the month title with Grid/List and its arrows, the weekday
@@ -820,14 +821,18 @@ class _DateHeader extends ConsumerWidget {
     final l10n = context.l10n;
     final colors = context.colors;
     return [
-      IconButton(
-        key: const ValueKey('share-month'),
-        tooltip: l10n.shareMonthTooltip,
-        icon: Icon(AppIcons.share, color: colors.textMuted),
-        onPressed: sharing
-            ? null
-            : () =>
-                  shareMonthImage(context, ref, ref.read(visibleMonthProvider)),
+      Builder(
+        builder: (buttonContext) => IconButton(
+          key: const ValueKey('share-month'),
+          tooltip: l10n.shareMonthTooltip,
+          icon: Icon(AppIcons.share, color: colors.textMuted),
+          onPressed: sharing
+              ? null
+              : () {
+                  rememberShareOrigin(buttonContext);
+                  shareMonthImage(context, ref, ref.read(visibleMonthProvider));
+                },
+        ),
       ),
       ReportShareButton(month: month),
       IconButton(

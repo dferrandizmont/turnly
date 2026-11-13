@@ -21,6 +21,7 @@ import '../application/report_providers.dart';
 import '../domain/report_options.dart';
 import 'report_icons.dart';
 import 'report_strings_l10n.dart';
+import '../../../core/platform/share_origin.dart';
 
 /// Opens the report sheet: choose the period (a month or any dates), the
 /// format (PDF or CSV) and what goes in, then create and share the file.
@@ -319,12 +320,17 @@ class _ReportSheetState extends ConsumerState<ReportSheet> {
           ),
         ),
         const SizedBox(height: Sp.xl),
-        PrimaryButton(
-          key: const ValueKey('report-create'),
-          label: l10n.reportCreate,
-          icon: AppIcons.share,
-          loading: busy,
-          onPressed: _create,
+        Builder(
+          builder: (buttonContext) => PrimaryButton(
+            key: const ValueKey('report-create'),
+            label: l10n.reportCreate,
+            icon: AppIcons.share,
+            loading: busy,
+            onPressed: () {
+              rememberShareOrigin(buttonContext);
+              _create();
+            },
+          ),
         ),
       ],
     );

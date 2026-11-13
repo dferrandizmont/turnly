@@ -9,6 +9,7 @@ import '../../import/presentation/import_format.dart';
 import '../../import/presentation/import_icons.dart';
 import '../application/export_controller.dart';
 import '../application/ics_export.dart';
+import '../../../core/platform/share_origin.dart';
 
 /// «Guardar como archivo .ics» on the export screen: the same dates and
 /// switches as the export to the phone calendar, written to a file the
@@ -51,7 +52,8 @@ class IcsFileExportCard extends ConsumerWidget {
               style: type.meta.copyWith(color: colors.textMuted),
             ),
             const SizedBox(height: Sp.l),
-            SecondaryButton(
+            Builder(
+              builder: (buttonContext) => SecondaryButton(
               key: const ValueKey('ics-file-button'),
               icon: ImportIcons.icsFile,
               label: running
@@ -59,16 +61,20 @@ class IcsFileExportCard extends ConsumerWidget {
                   : l10n.calExportIcsButton,
               onPressed: running || export.running
                   ? null
-                  : () => ref
-                        .read(icsFileControllerProvider.notifier)
-                        .export(
-                          IcsFileRequest(
-                            from: export.from,
-                            to: export.to,
-                            includeRest: export.includeRest,
-                            includeAbsences: export.includeAbsences,
-                          ),
-                        ),
+                  : () {
+                      rememberShareOrigin(buttonContext);
+                      ref
+                          .read(icsFileControllerProvider.notifier)
+                          .export(
+                            IcsFileRequest(
+                              from: export.from,
+                              to: export.to,
+                              includeRest: export.includeRest,
+                              includeAbsences: export.includeAbsences,
+                            ),
+                          );
+                    },
+            ),
             ),
             if (status == IcsFileStatus.failed) ...[
               const SizedBox(height: Sp.s),

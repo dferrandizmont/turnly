@@ -17,6 +17,7 @@ import '../data/report_fonts.dart';
 import '../domain/report_model.dart';
 import '../domain/report_options.dart';
 import '../domain/report_strings.dart';
+import '../../../core/platform/share_origin.dart';
 
 /// The two files a report can be.
 enum ReportFormat { pdf, csv }
@@ -49,6 +50,7 @@ final reportSenderProvider = Provider<ReportSender>(
         ShareParams(
           files: [XFile(file.path, mimeType: mimeType)],
           subject: subject,
+          sharePositionOrigin: shareOrigin(),
         ),
       ),
     );

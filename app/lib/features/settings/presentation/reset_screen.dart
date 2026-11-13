@@ -21,6 +21,7 @@ import '../application/reset_providers.dart';
 import '../application/reset_everything.dart';
 import '../application/reset_notice.dart';
 import 'settings_widgets.dart';
+import '../../../core/platform/share_origin.dart';
 
 class ResetScreen extends ConsumerStatefulWidget {
   const ResetScreen({super.key});
@@ -217,10 +218,17 @@ class _ResetScreenState extends ConsumerState<ResetScreen> {
                   ],
                   const SizedBox(height: Sp.m),
                   if (copy != null)
-                    SecondaryButton(
-                      key: const ValueKey('reset-share'),
-                      label: l10n.resetShare,
-                      onPressed: _busy ? null : _share,
+                    Builder(
+                      builder: (buttonContext) => SecondaryButton(
+                        key: const ValueKey('reset-share'),
+                        label: l10n.resetShare,
+                        onPressed: _busy
+                            ? null
+                            : () {
+                                rememberShareOrigin(buttonContext);
+                                _share();
+                              },
+                      ),
                     ),
                   if (copy == null && !_busy)
                     SecondaryButton(

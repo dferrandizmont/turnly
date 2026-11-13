@@ -46,6 +46,7 @@ import 'overtime_cap_card.dart';
 import 'summary_format.dart';
 import 'summary_stat_row.dart';
 import 'year_table.dart';
+import '../../../core/platform/share_origin.dart';
 
 /// "Resumen del mes" (free, `docs/roadmap.md`): per shift type the days, the
 /// hours, the night hours and the estimated pay; the totals, the rest days,
@@ -235,26 +236,36 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
         title: Text(l10n.summaryTitle),
         actions: [
           if (_period == _Period.month)
-            IconButton(
-              key: const ValueKey('summary-share'),
-              tooltip: l10n.shareMonthTooltip,
-              icon: Icon(AppIcons.share),
-              onPressed: sharing
-                  ? null
-                  : () => shareMonthImage(context, ref, _month),
+            Builder(
+              builder: (buttonContext) => IconButton(
+                key: const ValueKey('summary-share'),
+                tooltip: l10n.shareMonthTooltip,
+                icon: Icon(AppIcons.share),
+                onPressed: sharing
+                    ? null
+                    : () {
+                        rememberShareOrigin(buttonContext);
+                        shareMonthImage(context, ref, _month);
+                      },
+              ),
             ),
           // PDF or CSV of the month or any dates (features/reports).
           if (_period != _Period.year) ReportShareButton(month: _month),
           // The same picture as the annual view's (H-T08-5). «Fechas…» has
           // none: a free range is not a calendar page.
           if (_period == _Period.year)
-            IconButton(
-              key: const ValueKey('summary-share'),
-              tooltip: l10n.yearShare,
-              icon: Icon(AppIcons.share),
-              onPressed: sharing || _sharingYear
-                  ? null
-                  : () => _shareYear(_month.year),
+            Builder(
+              builder: (buttonContext) => IconButton(
+                key: const ValueKey('summary-share'),
+                tooltip: l10n.yearShare,
+                icon: Icon(AppIcons.share),
+                onPressed: sharing || _sharingYear
+                    ? null
+                    : () {
+                        rememberShareOrigin(buttonContext);
+                        _shareYear(_month.year);
+                      },
+              ),
             ),
         ],
       ),
