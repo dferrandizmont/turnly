@@ -167,9 +167,9 @@ dago zifratuta.
 
 ## Berriak
 
+- **0.11.1 (2026-11-15):** Androiden: «Erakutsi oharra hilabetean» aktibatuta, mugikorrak oharraren lehen lerroa idazten du orain eguneko laukian, bertikalean eta horizontalean, klipa bakarrik erakutsi beharrean.
 - **0.11.0 (2026-11-15):** Androiden: sortu txandaketa luzeak blokeka («Goiza × 21»), asteetarako lasterbideekin, «Errepikatu» aukerarekin eta «Asteak txandako» txantiloiarekin. Zikloko eguna zenbakidun zerrendan aukera dezakezu, hilabete osoak aurrebistan ikusi eta ereduak kopia gisa editatu; aplikazioak dendan balorazio bat ere eska diezazuke.
 - **1.1.0 (2026-11-13):** orain iPadean ere bai. iPhoneak eta iPadak 0.10.0ko guztia jasotzen dute: aparteko orduak blokeka, txandaketarako ekintzak egunetik, hilabetearen azpiko zerrenda, lan-boladarik luzeena eta txandaketa berriak. iPhoneko widgetek aparteko orduak eta zazpi eguneko guztizkoa erakusten dituzte.
-- **0.10.0 (2026-11-12):** aparteko orduak blokeka, motekin eta tarifarekin, eta txandaketarako ekintzak egunetik. Hilabetearen azpiko zerrenda hurrengo egun librearekin, lan-boladarik luzeena Laburpenean, aparteko orduak eta zazpi eguneko guztizkoa Android widgetetan, eta «2 eta 2» / «3 eta 1» txandaketak.
 
 Zer aldatu den bertsio bakoitzean [CHANGELOG.md](CHANGELOG.md) eta
 [argitalpenetan](https://github.com/dferrandizmont/turnly/releases) dago.
