@@ -17,6 +17,9 @@ import '../../../core/widgets/adaptive.dart';
 import '../../../core/widgets/motion_size.dart';
 import '../../../core/widgets/page_body.dart';
 import '../../patterns/presentation/pattern_pick_banner.dart';
+import '../../device_events/application/device_events_providers.dart';
+import '../../holidays/application/holidays_provider.dart';
+import '../../holidays/domain/holiday.dart';
 import '../../schedule/domain/civil_date.dart';
 import '../../summary/presentation/month_sharing.dart';
 import '../application/open_day.dart';
@@ -85,7 +88,12 @@ class _MonthScreenState extends ConsumerState<MonthScreen>
     with SingleTickerProviderStateMixin {
   final _monthScrollController = ScrollController();
   double? _gridMinHeight;
-  (CivilDate, int, bool)? _gridLayout;
+  (CivilDate, int, bool, bool, int)? _gridLayout;
+
+  /// The width the grid of days got in the last layout (the cells take a
+  /// seventh of it): the paint sheet is sized before the month is laid out and
+  /// needs the rows the cells will really have.
+  double? _gridWidth;
 
   // What the month needs besides its rows, measured while it is laid out, so
   // the paint sheet can be given exactly what is left (decision 28).
@@ -102,6 +110,17 @@ class _MonthScreenState extends ConsumerState<MonthScreen>
   void _onPinned(Size size) {
     if (mounted && _changed(_pinnedHeight, size.height)) {
       setState(() => _pinnedHeight = size.height);
+    }
+  }
+
+  void _onGridWidth(double width) {
+    if (mounted && _changed(_gridWidth, width)) {
+      // Reported while the tree is laying out.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _changed(_gridWidth, width)) {
+          setState(() => _gridWidth = width);
+        }
+      });
     }
   }
 
@@ -441,34 +460,75 @@ class _MonthScreenState extends ConsumerState<MonthScreen>
   /// The height of the six rows of the grid at their minimum (the weeks with
   /// stacked shifts are taller), remembered while a stroke is open so the
   /// scroll extent stays stable under the finger.
-  double _gridMin(
+  ///
+  /// Everything it watches is read now, while the screen builds; the width the
+  /// grid gets is only known when it is laid out, so the answer is a function
+  /// of that width.
+  double Function(double gridWidth) _gridMin(
     double minCellHeight, {
     required bool painting,
     required bool ringOpenDay,
   }) {
     final month = ref.watch(visibleMonthProvider);
     final weekStart = ref.watch(preferencesProvider.select((p) => p.weekStart));
+    final weekNumbers = ref.watch(
+      preferencesProvider.select((p) => p.weekNumbers),
+    );
+    final showNoteInMonth = ref.watch(
+      preferencesProvider.select((p) => p.showNoteInMonth),
+    );
     final start = monthGridStart(month, weekStart);
-    final layout = (month, weekStart, ringOpenDay);
-    if (_gridLayout != layout) {
-      _gridLayout = layout;
-      _gridMinHeight = null;
-    }
     final (schedule, strokeEmpty) = ref.watch(
       scheduleControllerProvider.select(
         (s) => (s.schedule, s.strokeDays.isEmpty),
       ),
     );
-    // Keep the outer scroll extent stable too: shrinking it can move the
-    // grid under the finger or replace its gesture layer with a scroller.
-    if (!painting || strokeEmpty || _gridMinHeight == null) {
-      _gridMinHeight = monthGridMinimumRowHeights(
-        context,
-        schedule.resolveRange(start, start.addDays(41)),
-        minCellHeight: minCellHeight,
-      ).reduce((a, b) => a + b);
-    }
-    return _gridMinHeight!;
+    // The marks that share the row of the day number decide whether a note
+    // fits beside it, so they are read like the grid reads them.
+    final holidays = showNoteInMonth
+        ? ref.watch(holidaysProvider)
+        : const <CivilDate, Holiday>{};
+    final deviceEvents = showNoteInMonth
+        ? ref.watch(deviceEventMonthProvider(month)).value
+        : null;
+    final deviceEventCounts = {
+      for (final entry in (deviceEvents?.days ?? const {}).entries)
+        entry.key: entry.value.count,
+    };
+    return (gridWidth) {
+      // The cells take a seventh of the grid, after the column of week
+      // numbers: the same width the grid works out, so the rows measured here
+      // are the rows it lays out.
+      final cellWidth =
+          (gridWidth - (weekNumbers ? MonthGrid.weekNumberWidth : 0)) / 7;
+      final layout = (
+        month,
+        weekStart,
+        ringOpenDay,
+        showNoteInMonth,
+        // Half a dp apart is the same grid (the paint sheet works with the
+        // width of the last layout).
+        (cellWidth * 2).round(),
+      );
+      if (_gridLayout != layout) {
+        _gridLayout = layout;
+        _gridMinHeight = null;
+      }
+      // Keep the outer scroll extent stable too: shrinking it can move the
+      // grid under the finger or replace its gesture layer with a scroller.
+      if (!painting || strokeEmpty || _gridMinHeight == null) {
+        _gridMinHeight = monthGridMinimumRowHeights(
+          context,
+          schedule.resolveRange(start, start.addDays(41)),
+          minCellHeight: minCellHeight,
+          showNoteInMonth: showNoteInMonth,
+          cellWidth: cellWidth,
+          holidays: holidays,
+          deviceEventCounts: deviceEventCounts,
+        ).reduce((a, b) => a + b);
+      }
+      return _gridMinHeight!;
+    };
   }
 
   /// The most height the paint sheet can have so that the month keeps all its
@@ -479,11 +539,17 @@ class _MonthScreenState extends ConsumerState<MonthScreen>
     final listing =
         ref.watch(monthPresentationProvider) == MonthPresentation.list;
     if (listing || !monthRowPinned(context)) return null;
-    final grid = _gridMin(
-      dayCellHeightWithTime(context),
-      painting: true,
-      ringOpenDay: false,
-    );
+    final grid =
+        _gridMin(
+          dayCellHeightWithTime(context),
+          painting: true,
+          ringOpenDay: false,
+          // Until the first layout, the width a phone column gives the grid.
+        )(
+          _gridWidth ??
+              math.min(MediaQuery.sizeOf(context).width, Sp.maxContentWidth) -
+                  2 * MonthScreen._gridInset,
+        );
     // Until the first measure the usual heights stand in for it.
     final pinned =
         _pinnedHeight ?? MonthFit.monthRow + MonthFit.weekdayRow(context);
@@ -518,10 +584,10 @@ class _MonthScreenState extends ConsumerState<MonthScreen>
     final listing =
         ref.watch(monthPresentationProvider) == MonthPresentation.list;
     final month = ref.watch(visibleMonthProvider);
-    final stripData = strip ? ref.watch(monthStripProvider(month)) : null;
-    final minGridHeight = listing
-        ? minCellHeight * 6
+    final gridMin = listing
+        ? null
         : _gridMin(minCellHeight, painting: painting, ringOpenDay: ringOpenDay);
+    final stripData = strip ? ref.watch(monthStripProvider(month)) : null;
     // The row of the month (title, Grid/List, arrows) and the weekdays stay
     // pinned while the days scroll under them, so the two presentations are
     // always within reach (decision D); what is above them (date, card, tip)
@@ -575,6 +641,12 @@ class _MonthScreenState extends ConsumerState<MonthScreen>
         ] else
           SliverLayoutBuilder(
             builder: (context, box) {
+              // The grid gets the width of the viewport less its side
+              // padding: the rows are measured at that width.
+              final gridWidth =
+                  box.crossAxisExtent - 2 * MonthScreen._gridInset;
+              _onGridWidth(gridWidth);
+              final minGridHeight = gridMin!(gridWidth);
               final rest =
                   box.viewportMainAxisExtent - box.precedingScrollExtent;
               // The strip takes what the days have to spare and no more:

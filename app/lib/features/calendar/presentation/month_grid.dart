@@ -39,12 +39,24 @@ const double _maxCellAspect = 1.5;
 /// Horizontal fling speed (dp/s) that changes the month.
 const double _swipeVelocity = 300;
 
-/// Only weeks containing stacked shifts grow. Gesture geometry and the outer
-/// scroll extent use these same measured minima.
+/// Only weeks containing stacked shifts, or a note that has to be written on
+/// a line of its own, grow. Gesture geometry and the outer scroll extent use
+/// these same measured minima.
+///
+/// With «Ver la nota en el mes» on ([showNoteInMonth]) a day whose note does
+/// not fit beside its number at the width of the cells ([cellWidth], the gap
+/// between cells included) needs the room of that line under its code and
+/// time ([dayCellMinimumHeight]); the row takes the tallest day of the week,
+/// never one line per note. [holidays] and [deviceEventCounts] are the marks
+/// that share the row of the number, as the grid draws them.
 List<double> monthGridMinimumRowHeights(
   BuildContext context,
   List<ResolvedDay> days, {
   required double minCellHeight,
+  bool showNoteInMonth = false,
+  double cellWidth = 0,
+  Map<CivilDate, Holiday> holidays = const {},
+  Map<CivilDate, int> deviceEventCounts = const {},
 }) => [
   for (var row = 0; row < _rows; row++)
     days
@@ -52,8 +64,17 @@ List<double> monthGridMinimumRowHeights(
         .take(_columns)
         .fold<double>(
           minCellHeight,
-          (height, day) =>
-              math.max(height, dayCellHeightForShifts(context, day.shifts)),
+          (height, day) => math.max(
+            height,
+            dayCellMinimumHeight(
+              context,
+              day,
+              showNoteInMonth: showNoteInMonth,
+              cellWidth: cellWidth,
+              holiday: holidays.containsKey(day.date),
+              deviceEvents: (deviceEventCounts[day.date] ?? 0) > 0,
+            ),
+          ),
         ),
 ];
 
@@ -320,6 +341,10 @@ class _MonthGridState extends ConsumerState<MonthGrid> {
           context,
           days,
           minCellHeight: widget.minCellHeight,
+          showNoteInMonth: showNoteInMonth,
+          cellWidth: cellWidth,
+          holidays: holidays,
+          deviceEventCounts: _deviceEventCounts,
         );
         final extra =
             math.max(0.0, box.maxHeight - minima.reduce((a, b) => a + b)) /

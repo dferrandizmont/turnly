@@ -10,6 +10,12 @@ at once, so they can skip numbers.
 
 ## Unreleased
 
+## 0.11.1 · 2026-11-15
+
+Android test build: notes now show in the month on phones.
+
+- Fixed: with "Show the note in the month" on, phones (portrait and landscape) now write the first line of the note at the bottom of the day instead of only showing the clip; weeks with a note grow a little so the shift keeps its size.
+
 ## 0.11.0 · 2026-11-14
 
 Android test build: build long rotations in blocks, use the "Weeks per shift" template, choose your cycle day and preview whole months, edit patterns as copies and remove unused ones, plus everything from 0.10.1 (store review prompt, "Rate Turnly" in Settings, large-text and amount-field fixes).

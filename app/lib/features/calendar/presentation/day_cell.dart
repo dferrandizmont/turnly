@@ -160,9 +160,10 @@ class DayCell extends StatefulWidget {
   static const double _dotSize = 6;
   static const double _extrasIconSize = 11;
 
-  /// Room the note text needs to be worth drawing in a cell instead of its
-  /// clip (UX · Extras visuales). Below it the clip of always stays.
-  static const double _minNoteTextWidth = 28;
+  /// Room the note text needs beside the day number (about seven characters).
+  /// Below it the first line goes on its own line at the bottom of the cell,
+  /// where the whole width holds more of it (UX · Extras visuales).
+  static const double _minNoteTextWidth = 44;
 
   @override
   State<DayCell> createState() => _DayCellState();
@@ -229,6 +230,85 @@ class _DayCellState extends State<DayCell> {
 
   @override
   Widget build(BuildContext context) {
+    // «Ver la nota en el mes»: where the first line of the note goes depends
+    // on the room of the cell, so it is only measured when there is a line.
+    final hasNoteText =
+        widget.showNoteInMonth &&
+        widget.day.note != null &&
+        widget.day.note!.isNotEmpty;
+    if (!hasNoteText) return _buildCell(context, _NoteSpot.clip);
+    return LayoutBuilder(
+      builder: (context, box) =>
+          _buildCell(context, _noteSpot(context, box.biggest)),
+    );
+  }
+
+  /// Where the note of the day is drawn when «Ver la nota en el mes» is on:
+  /// in the row of marks beside the day number when the room the number
+  /// leaves holds the text; otherwise on a line of its own at the bottom of
+  /// the cell, over the whole width. The month grid gives the rows of such
+  /// days the room of that line ([dayCellMinimumHeight]), so the code and the
+  /// time keep their size; the clip of always stays only where even that room
+  /// is missing. [size] is the room the cell gets, with the gap between cells
+  /// included.
+  _NoteSpot _noteSpot(BuildContext context, Size size) {
+    final DayCell(:day, :holiday, :deviceEventCount) = widget;
+    if (!size.width.isFinite || !size.height.isFinite) return _NoteSpot.clip;
+    final type = context.type;
+    final scaler = MediaQuery.textScalerOf(context);
+    final body = Size(size.width - Sp.cellGap, size.height - Sp.cellGap);
+
+    if (!dayNeedsBottomNoteLine(
+      context,
+      day,
+      showNoteInMonth: widget.showNoteInMonth,
+      cellWidth: size.width,
+      holiday: holiday != null,
+      deviceEvents: deviceEventCount > 0,
+    )) {
+      return _NoteSpot.top;
+    }
+
+    // The line at the bottom takes its own height from the cell; what is left
+    // must still hold the day number, the bar and, for every band, the code
+    // (down to the smallest size the cell draws it at) and its time.
+    final number = textHeight(type.cellDay, scaler) + Sp.xs + Sp.hair;
+    var needed = number + textHeight(type.cellTime, scaler);
+    if (day.shifts.isNotEmpty) {
+      final overflow = day.shifts.length > _maxCellBands;
+      final visible = overflow ? _maxCellBands - 1 : day.shifts.length;
+      final codeStyle = day.shifts.length > 1
+          ? type.cellCodeMulti
+          : type.cellCode;
+      final minCode = textHeight(
+        codeStyle.copyWith(
+          fontSize: math.min(
+            AppTypography.cellCodeMinSize,
+            codeStyle.fontSize!,
+          ),
+        ),
+        scaler,
+      );
+      final minTime = textHeight(
+        type.cellTime.copyWith(
+          fontSize: math.min(
+            AppTypography.cellTimeMinSize,
+            type.cellTime.fontSize!,
+          ),
+        ),
+        scaler,
+      );
+      needed += Sp.bar;
+      for (var i = 0; i < visible; i++) {
+        needed += minCode + (day.shifts[i].hasTimes ? minTime : 0);
+      }
+      if (overflow) needed += minCode;
+      // The first band's number row is the `number` already counted.
+    }
+    return body.height >= needed ? _NoteSpot.bottom : _NoteSpot.clip;
+  }
+
+  Widget _buildCell(BuildContext context, _NoteSpot noteSpot) {
     final DayCell(
       :day,
       :holiday,
@@ -257,8 +337,6 @@ class _DayCellState extends State<DayCell> {
         : day.shifts.length;
     final hiddenShifts = day.shifts.length - visibleShifts;
     final bands = visibleShifts + (hiddenShifts > 0 ? 1 : 0);
-    // Each band takes the share of the cell it needs (see [_bandHeights]).
-    final bandFlex = _bandFlex(context, day.shifts);
     final lead = swatches.isEmpty
         ? ShiftSwatch.none(brightness, outOfMonth: !inMonth)
         : swatches.first;
@@ -268,6 +346,18 @@ class _DayCellState extends State<DayCell> {
     final noteText = showNoteInMonth && hasNote
         ? _firstNoteLine(day.note!)
         : null;
+    final noteAtBottom = noteSpot == _NoteSpot.bottom && noteText != null;
+    // The clip marks the note unless its text is written at the bottom (when
+    // the top row cannot hold the text after all, the clip is its fallback).
+    final noteClip = hasNote && noteSpot != _NoteSpot.bottom;
+    // The line at the bottom of the cell; the last band keeps its room.
+    final noteLineHeight = noteAtBottom ? noteLineHeightOf(context) : 0.0;
+    // Each band takes the share of the cell it needs (see [_bandHeights]).
+    final bandFlex = _bandFlex(
+      context,
+      day.shifts,
+      extraBottom: noteLineHeight,
+    );
     final radius = Rad.cellRadius;
 
     // The background of the cell: the tint of the shift, its disc (a bit
@@ -290,6 +380,22 @@ class _DayCellState extends State<DayCell> {
       colors.textMuted,
       background: background,
     );
+
+    // The line of the note at the bottom sits in the last band: its colour is
+    // the muted one made legible on that band's own background.
+    final lastBandBackground = hiddenShifts > 0
+        ? colors.surfaceMuted
+        : swatches.isEmpty
+        ? background
+        : (painted || (selected && inMonth)
+              ? swatches[visibleShifts - 1].disc
+              : swatches[visibleShifts - 1].tint);
+    final noteLineColor = hiddenShifts > 0
+        ? colors.textMuted
+        : (swatches.isEmpty ? lead : swatches[visibleShifts - 1]).legible(
+            colors.textMuted,
+            background: lastBandBackground,
+          );
 
     // Room kept free at the top of the first band for the day number.
     final numberReserve = textHeight(type.cellDay, scaler) + Sp.xs + Sp.hair;
@@ -334,7 +440,9 @@ class _DayCellState extends State<DayCell> {
                       selected: selected && inMonth,
                       compact: multi,
                       topReserve: i == 0 ? numberReserve : 0,
-                      bottomReserve: i == bands - 1 ? Sp.bar : 0,
+                      bottomReserve: i == bands - 1
+                          ? Sp.bar + noteLineHeight
+                          : 0,
                     ),
                   ),
                 if (hiddenShifts > 0)
@@ -343,7 +451,7 @@ class _DayCellState extends State<DayCell> {
                     child: _OverflowBand(
                       date: day.date,
                       count: hiddenShifts,
-                      bottomReserve: Sp.bar,
+                      bottomReserve: Sp.bar + noteLineHeight,
                     ),
                   ),
               ],
@@ -360,6 +468,22 @@ class _DayCellState extends State<DayCell> {
                   for (final s in swatches)
                     Expanded(child: ColoredBox(color: s.bar)),
                 ],
+              ),
+            ),
+          if (noteAtBottom)
+            Positioned(
+              left: cellContentInset,
+              right: cellContentInset,
+              bottom: swatches.isEmpty ? 0 : Sp.bar,
+              height: noteLineHeight,
+              child: Text(
+                noteText,
+                key: ValueKey('note-text-${day.date.toIso()}'),
+                maxLines: 1,
+                softWrap: false,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: type.cellTime.copyWith(color: noteLineColor),
               ),
             ),
           Positioned(
@@ -390,7 +514,7 @@ class _DayCellState extends State<DayCell> {
           // first band keeps room for the number row, so none of them can
           // ever land on the code or the time.
           if (holiday != null ||
-              hasNote ||
+              noteClip ||
               day.hasExtras ||
               deviceEventCount > 0)
             Positioned.fill(
@@ -398,13 +522,13 @@ class _DayCellState extends State<DayCell> {
                 date: day.date,
                 extras: day.hasExtras,
                 overtimeMinutes: day.overtimeMinutes,
-                note: hasNote,
+                note: noteClip,
                 holiday: holiday != null,
                 deviceEvents: deviceEventCount > 0,
                 isToday: isToday,
                 color: secondaryColor,
                 dotColor: colors.holiday,
-                noteText: noteText,
+                noteText: noteSpot == _NoteSpot.top ? noteText : null,
                 deviceColor: lead.legible(
                   colors.accentText,
                   background: background,
@@ -532,11 +656,23 @@ List<double> _bandHeights(BuildContext context, List<ShiftType> shifts) {
 /// needs ([_bandHeights]), so a cell that is exactly as tall as the sum gives
 /// every band its room and one that is taller (a row stretched by another day
 /// of the week) gives them all a bit more.
-List<int> _bandFlex(BuildContext context, List<ShiftType> shifts) {
+///
+/// [extraBottom] is the height of the line of the note written at the bottom
+/// of the cell (see [_NoteSpot.bottom]): the last band gives it its room.
+List<int> _bandFlex(
+  BuildContext context,
+  List<ShiftType> shifts, {
+  double extraBottom = 0,
+}) {
   if (shifts.length < 2) return const [1];
+  final heights = _bandHeights(context, shifts);
   return [
-    for (final height in _bandHeights(context, shifts))
-      math.max(1, (height * 100).round()),
+    for (var i = 0; i < heights.length; i++)
+      math.max(
+        1,
+        ((heights[i] + (i == heights.length - 1 ? extraBottom : 0)) * 100)
+            .round(),
+      ),
   ];
 }
 
@@ -548,6 +684,168 @@ double dayCellHeightForShifts(BuildContext context, List<ShiftType> shifts) {
   if (shifts.length < 2) return dayCellHeightWithTime(context);
   final sum = _bandHeights(context, shifts).fold<double>(0, (a, b) => a + b);
   return math.max(dayCellHeightWithTime(context), sum + Sp.cellGap);
+}
+
+/// The height of the line of the note at the bottom of a cell: one line of
+/// the time's style at the user's text size, measured like every other line
+/// of the cell.
+double noteLineHeightOf(BuildContext context) =>
+    textHeight(context.type.cellTime, MediaQuery.textScalerOf(context));
+
+/// Whether the note of [day] needs the line of its own at the bottom of the
+/// cell: «Ver la nota en el mes» is on, the day has a note and its text does
+/// not fit in the row of marks beside the day number, given the real inner
+/// width of the cell ([cellWidth], the gap between cells included), the number,
+/// the holiday dot, the extras and the dot of the appointments of the phone.
+///
+/// It does not depend on the height of the cell, so the cell and the month
+/// grid always agree: the cell writes the note at the bottom when this is true
+/// and the grid ([monthGridMinimumRowHeights]) gives its row the room of the
+/// line. The number is measured in the bold weight of today, the widest, so a
+/// cell that is today never needs the line when this says it does not.
+bool dayNeedsBottomNoteLine(
+  BuildContext context,
+  ResolvedDay day, {
+  required bool showNoteInMonth,
+  required double cellWidth,
+  bool holiday = false,
+  bool deviceEvents = false,
+}) {
+  final note = day.note;
+  if (!showNoteInMonth || note == null || note.isEmpty) return false;
+  if (!cellWidth.isFinite) return false;
+  final extra = _extraMetrics(
+    context,
+    day.overtimeMinutes,
+    context.colors.textMuted,
+  );
+  return !_noteFitsTopRow(
+    width: cellWidth - Sp.cellGap,
+    holiday: holiday,
+    numberWidth: _numberWidth(context, day.date, true),
+    extras: day.hasExtras,
+    extraWidth: extra.width,
+    deviceEvents: deviceEvents,
+  );
+}
+
+/// The least height the row of [day] needs: what its shifts take
+/// ([dayCellHeightForShifts]) plus, when the note has to be written on a line
+/// of its own ([dayNeedsBottomNoteLine]), that line. A day without shifts has
+/// room to spare for it. Rows take the tallest of their days, never one line
+/// per note.
+double dayCellMinimumHeight(
+  BuildContext context,
+  ResolvedDay day, {
+  required bool showNoteInMonth,
+  required double cellWidth,
+  bool holiday = false,
+  bool deviceEvents = false,
+}) {
+  final base = dayCellHeightForShifts(context, day.shifts);
+  if (day.shifts.isEmpty ||
+      !dayNeedsBottomNoteLine(
+        context,
+        day,
+        showNoteInMonth: showNoteInMonth,
+        cellWidth: cellWidth,
+        holiday: holiday,
+        deviceEvents: deviceEvents,
+      )) {
+    return base;
+  }
+  return base + noteLineHeightOf(context);
+}
+
+/// Where the first line of the note goes with «Ver la nota en el mes» on.
+enum _NoteSpot {
+  /// In the row of marks beside the day number (wide cells).
+  top,
+
+  /// On a line of its own at the bottom of the cell, over its whole width
+  /// (a phone in portrait: the number leaves no room beside it).
+  bottom,
+
+  /// The clip of always: the cell has no room for the text.
+  clip,
+}
+
+/// The width of the day number of a cell at the user's text size.
+double _numberWidth(BuildContext context, CivilDate date, bool isToday) {
+  final numberStyle = context.type.cellDay.copyWith(
+    fontWeight: isToday ? FontWeight.w900 : null,
+  );
+  final painter = TextPainter(
+    text: TextSpan(text: '${date.day}', style: numberStyle),
+    textDirection: TextDirection.ltr,
+    textScaler: MediaQuery.textScalerOf(context),
+    maxLines: 1,
+  )..layout();
+  final width = painter.width;
+  painter.dispose();
+  return width;
+}
+
+/// The extras mark of a cell: the text («+2 h», `null` for an early leave,
+/// which keeps the small plus), its style, the size it is drawn at in the row
+/// of marks and the font size before the row shrinks.
+({String? text, TextStyle style, double width, double height, double font})
+_extraMetrics(BuildContext context, int overtimeMinutes, Color color) {
+  final text = overtimeMinutes > 0
+      ? overtimeCellText(context, overtimeMinutes)
+      : null;
+  final style = context.type.cellTime.copyWith(
+    color: color,
+    fontWeight: FontWeight.w700,
+  );
+  var width = DayCell._extrasIconSize;
+  var height = DayCell._extrasIconSize;
+  var font = 0.0;
+  if (text != null) {
+    final measure = TextPainter(
+      text: TextSpan(text: text, style: style),
+      textDirection: TextDirection.ltr,
+      maxLines: 1,
+    )..layout();
+    // Fitted to the height of the row of marks, but never drawn under the
+    // smallest size the cell draws its time at (8 dp): 11 dp of height
+    // gave about 7 pt (1.1.0 QA, F12).
+    final fontSize = style.fontSize!;
+    final share = math.max(
+      DayCell._extrasIconSize / measure.height,
+      AppTypography.cellTimeMinSize / fontSize,
+    );
+    height = measure.height * share;
+    width = measure.width * share;
+    font = fontSize * share;
+    measure.dispose();
+  }
+  return (text: text, style: style, width: width, height: height, font: font);
+}
+
+/// Whether the room the day number leaves in the row of marks holds the text
+/// of the note at a legible size ([DayCell._minNoteTextWidth]), next to the
+/// other marks of the day.
+bool _noteFitsTopRow({
+  required double width,
+  required bool holiday,
+  required double numberWidth,
+  required bool extras,
+  required double extraWidth,
+  required bool deviceEvents,
+}) {
+  final inset = holiday ? Sp.s : Sp.xs;
+  // Number: 8 dp from the left edge, then a gap before the marks.
+  final free = width - inset - Sp.s - numberWidth - Sp.xs;
+  final others = [
+    if (extras) extraWidth,
+    if (deviceEvents) DayCell._dotSize,
+    if (holiday) DayCell._dotSize,
+  ];
+  final othersRoom =
+      others.fold<double>(0, (a, b) => a + b) +
+      (others.isEmpty ? 0 : others.length * Sp.xs);
+  return free - othersRoom >= DayCell._minNoteTextWidth;
 }
 
 /// The marks of a day, in one row at the top right (opposite the day number):
@@ -594,51 +892,22 @@ class _DayMarks extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final numberStyle = context.type.cellDay.copyWith(
-      fontWeight: isToday ? FontWeight.w900 : null,
-    );
-    final painter = TextPainter(
-      text: TextSpan(text: '${date.day}', style: numberStyle),
-      textDirection: TextDirection.ltr,
-      textScaler: MediaQuery.textScalerOf(context),
-      maxLines: 1,
-    )..layout();
-    final numberWidth = painter.width;
-    painter.dispose();
+    final numberWidth = _numberWidth(context, date, isToday);
 
     // The extras mark (A6): «+2 h» with the sum of the day's extra hours
     // (schema v7), drawn at the height of the row of marks; only an early
     // leave keeps the small «+».
-    final extraText = overtimeMinutes > 0
-        ? overtimeCellText(context, overtimeMinutes)
-        : null;
-    final extraStyle = context.type.cellTime.copyWith(
-      color: color,
-      fontWeight: FontWeight.w700,
+    final (
+      text: extraText,
+      style: extraStyle,
+      width: extraWidth,
+      height: extraHeight,
+      font: extraFont,
+    ) = _extraMetrics(
+      context,
+      overtimeMinutes,
+      color,
     );
-    var extraWidth = DayCell._extrasIconSize;
-    var extraHeight = DayCell._extrasIconSize;
-    // The size the text of the mark is drawn at before the row shrinks.
-    var extraFont = 0.0;
-    if (extraText != null) {
-      final measure = TextPainter(
-        text: TextSpan(text: extraText, style: extraStyle),
-        textDirection: TextDirection.ltr,
-        maxLines: 1,
-      )..layout();
-      // Fitted to the height of the row of marks, but never drawn under the
-      // smallest size the cell draws its time at (8 dp): 11 dp of height
-      // gave about 7 pt (1.1.0 QA, F12).
-      final fontSize = extraStyle.fontSize!;
-      final share = math.max(
-        DayCell._extrasIconSize / measure.height,
-        AppTypography.cellTimeMinSize / fontSize,
-      );
-      extraHeight = measure.height * share;
-      extraWidth = measure.width * share;
-      extraFont = fontSize * share;
-      measure.dispose();
-    }
     // The hours as text, or (when they do not fit beside the number at a
     // legible size) the small plus: the amount is in the spoken label and the
     // detail of the day.
@@ -674,15 +943,14 @@ class _DayMarks extends StatelessWidget {
         // size. Otherwise the clip of always is drawn.
         final text = noteText;
         if (text != null) {
-          final others = [
-            if (extras) extraWidth,
-            if (deviceEvents) DayCell._dotSize,
-            if (holiday) DayCell._dotSize,
-          ];
-          final othersRoom =
-              others.fold<double>(0, (a, b) => a + b) +
-              (others.isEmpty ? 0 : others.length * Sp.xs);
-          if (free - othersRoom >= DayCell._minNoteTextWidth) {
+          if (_noteFitsTopRow(
+            width: box.maxWidth,
+            holiday: holiday,
+            numberWidth: numberWidth,
+            extras: extras,
+            extraWidth: extraWidth,
+            deviceEvents: deviceEvents,
+          )) {
             return Padding(
               padding: EdgeInsets.only(top: Sp.xs, right: inset),
               child: Align(
