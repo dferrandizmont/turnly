@@ -25,6 +25,9 @@ class AppLocalizationsGl extends AppLocalizations {
   String get save => 'Gardar';
 
   @override
+  String get keyboardDone => 'Feito';
+
+  @override
   String get undo => 'Desfacer';
 
   @override
@@ -574,6 +577,9 @@ class AppLocalizationsGl extends AppLocalizations {
   String shiftTypesRestored(String name) {
     return '«$name» recuperada';
   }
+
+  @override
+  String get patternDiscardTitle => 'Queres descartar a secuencia?';
 
   @override
   String get discardChangesTitle => 'Queres descartar os cambios?';
@@ -3015,11 +3021,11 @@ class AppLocalizationsGl extends AppLocalizations {
       'Preme «Pintar» no calendario, escolle unha quenda abaixo e toca os días ou pasa o dedo por eles. Para baleirar un día usa «Borrar». Cada trazo pódese desfacer e refacer coas frechas da barra. Preme «Feito» cando remates.\n\nSe tocas un día sen estar pintando ábrese o seu detalle: aí cambias a quenda, engades unha nota ou volves ao patrón. Se mantés premido un día comezas a escoller varios á vez: podes poñerlles quenda, copialos, cortalos e pegalos, ou repetir unha semana.';
 
   @override
-  String get faqPatternQ => 'Como aplico unha rotación e que é o desfase?';
+  String get faqPatternQ => 'Como creo e aplico un patrón?';
 
   @override
   String get faqPatternA =>
-      'No modo pintar preme o botón «Patrón» e segue os pasos: escolle a túa rotación (ou crea a túa), o día en que comezas e ata cando se repite.\n\nO desfase é o punto do ciclo no que estás o día de inicio. Se ese día che toca a noite, no paso «En que día do ciclo estás ese día?» tocas a noite e o resto axústase só. Os días que xa cambiaches a man respéctanse ou substitúense, como prefiras. Para rematar ou quitar unha rotación vai a Configuración › As miñas rotacións.';
+      'En modo pintar preme «Patrón» e escolle unha rotación. En «Crear o meu» engades bloques dunha quenda e cambias cantos días dura cada un; «Repetir» copia desde un bloque ata o último. O construtor admite ata 371 días. En Industria, «Semanas por quenda» permite escoller a orde, as semanas de cada quenda e se libras as fins de semana.\n\nEscolle a data de inicio e toca na tira o día do ciclo que che toca. Debaixo ves meses completos ata completar o ciclo. No último paso escolles ata cando e se respectas ou substitúes os cambios á man; a vista previa actualízase.\n\n«Editar» abre unha copia de calquera patrón: «Gardar como patrón novo» conserva o orixinal e as súas rotacións. Podes quitar un patrón propio se ningunha rotación o usa. Para terminar ou quitar unha rotación vai a Configuración › As miñas rotacións.';
 
   @override
   String get faqDoubleQ => 'Como dobro unha quenda?';
@@ -3098,6 +3104,13 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get settingsEmailCopied => 'Correo copiado';
+
+  @override
+  String get settingsRateTitle => 'Valorar Turnly';
+
+  @override
+  String get settingsRateSubtitle =>
+      'Unha recensión axuda a que outras persoas a atopen';
 
   @override
   String get settingsAboutTitle => 'Acerca de';
@@ -4588,6 +4601,9 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get backupUiPreviewTypes => 'Tipos de quenda';
+
+  @override
+  String get backupUiPreviewOvertime => 'Bloques de horas extra';
 
   @override
   String get backupUiPreviewRange => 'Datas';
@@ -7455,6 +7471,11 @@ class AppLocalizationsGl extends AppLocalizations {
   String get overtimeTypeInvalidRate => 'Escribe un prezo por hora.';
 
   @override
+  String overtimeRateOutOfRange(String max) {
+    return 'Escribe un prezo por hora entre 0 e $max.';
+  }
+
+  @override
   String get overtimeTypeOvertime => 'Horas extra';
 
   @override
@@ -7463,6 +7484,11 @@ class AppLocalizationsGl extends AppLocalizations {
   @override
   String dayCellOvertime(String hours) {
     return '+$hours h';
+  }
+
+  @override
+  String dayCellOvertimeClock(String time) {
+    return '+$time';
   }
 
   @override
@@ -7532,4 +7558,206 @@ class AppLocalizationsGl extends AppLocalizations {
   String widgetSevenDayHours(String duration) {
     return '7 días: $duration';
   }
+
+  @override
+  String patternCopyName(String name, int number) {
+    return '$name ($number)';
+  }
+
+  @override
+  String get patternCycleLimit => 'O ciclo pode ter ata 371 días.';
+
+  @override
+  String get patternBlocksHelp =>
+      'Toca unha quenda para engadir un bloque; toca o bloque para cambiar os días.';
+
+  @override
+  String patternWeeks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count semanas',
+      one: '1 semana',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String patternDuration(String days, String weeks) {
+    return '$days · $weeks';
+  }
+
+  @override
+  String patternBlockTitle(String name, String days) {
+    return '$name × $days';
+  }
+
+  @override
+  String get patternOtherNumber => 'Outro número';
+
+  @override
+  String get patternConsecutiveDays => 'Días seguidos';
+
+  @override
+  String get patternDayLess => 'Un día menos';
+
+  @override
+  String get patternDayMore => 'Un día máis';
+
+  @override
+  String get patternBlockUp => 'Subir';
+
+  @override
+  String get patternBlockDown => 'Baixar';
+
+  @override
+  String get patternBlockDuplicate => 'Duplicar';
+
+  @override
+  String get patternBlockSplit => 'Partir';
+
+  @override
+  String get patternBlockSplitAfter => 'Partir despois destes días';
+
+  @override
+  String get patternBlockRemove => 'Quitar';
+
+  @override
+  String get patternRepeatFrom => 'Repetir desde aquí…';
+
+  @override
+  String get patternRepeatHelp =>
+      'Desde este bloque ata o último. Engádense copias como bloques normais.';
+
+  @override
+  String patternRepeatTotal(int count, String days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count veces en total',
+      one: '1 vez en total',
+    );
+    return '$_temp0 · $days';
+  }
+
+  @override
+  String get patternRepeatConfirm => 'Repetir';
+
+  @override
+  String get patternRepeatLess => 'Unha vez menos';
+
+  @override
+  String get patternRepeatMore => 'Unha vez máis';
+
+  @override
+  String get patternAddBlock => 'Engadir un bloque';
+
+  @override
+  String get patternChangeShift => 'Cambiar a quenda';
+
+  @override
+  String get patternYourCycle => 'O teu ciclo';
+
+  @override
+  String patternShowWeeks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Ver as $count semanas',
+      one: 'Ver a semana completa',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get patternCollapseCycle => 'Pregar o ciclo';
+
+  @override
+  String patternCycleDayLabel(int day, int total, String shifts) {
+    return 'Día $day de $total, $shifts';
+  }
+
+  @override
+  String get patternCyclePickHelp =>
+      'Escolle o día do ciclo que che toca na data de inicio.';
+
+  @override
+  String patternNumberRange(int max) {
+    return 'Escribe un número entre 1 e $max.';
+  }
+
+  @override
+  String get patternWeeksTitle => 'Semanas por quenda';
+
+  @override
+  String get patternWeeksHint =>
+      'Varias semanas seguidas de cada quenda, con ou sen fins de semana libres.';
+
+  @override
+  String get patternWeeksOrder => 'Quendas e orde';
+
+  @override
+  String get patternWeeksOrderHelp =>
+      'Toca as quendas na orde en que as fas. Toca outra vez para quitar unha.';
+
+  @override
+  String patternWeeksPosition(int position) {
+    return 'Orde: $position';
+  }
+
+  @override
+  String get patternWeeksEach => 'Semanas de cada quenda';
+
+  @override
+  String get patternWeeksDays => 'Que días traballas';
+
+  @override
+  String get patternWeeksAllDays => 'Todos os días';
+
+  @override
+  String get patternWeeksWeekdays => 'De luns a venres';
+
+  @override
+  String get patternWeekLess => 'Unha semana menos';
+
+  @override
+  String get patternWeekMore => 'Unha semana máis';
+
+  @override
+  String get patternAdjustByHand => 'Axustar á man';
+
+  @override
+  String get patternEdit => 'Editar';
+
+  @override
+  String get patternSaveAsNew => 'Gardar como patrón novo';
+
+  @override
+  String patternRemoveTitle(String name) {
+    return 'Quitar «$name»?';
+  }
+
+  @override
+  String get patternRemoveHint => 'Quitarase dos teus patróns gardados.';
+
+  @override
+  String get patternUsedHint =>
+      'Unha rotación usa este patrón. Podes editalo como copia.';
+
+  @override
+  String get patternRemoveUnavailable =>
+      'Non se quitou. Pode estar en uso noutro calendario ou pode que non se puidese gardar.';
+
+  @override
+  String get patternManualChange => 'Cambio á man';
+
+  @override
+  String get patternRemove => 'Quitar';
+
+  @override
+  String get patternCycleScrollable =>
+      'A tira do ciclo desprázase horizontalmente';
+
+  @override
+  String get patternDurationShortcuts => 'Atallos de duración';
 }

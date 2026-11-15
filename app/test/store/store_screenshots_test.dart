@@ -26,6 +26,8 @@ import 'package:cuadrante/features/onboarding/application/onboarding_providers.d
     show initialOnboardingProvider;
 import 'package:cuadrante/features/onboarding/data/onboarding_repository.dart';
 import 'package:cuadrante/features/patterns/application/pattern_wizard.dart';
+import 'package:cuadrante/features/patterns/domain/pattern_blocks.dart';
+import 'package:cuadrante/features/patterns/presentation/step_chips.dart';
 import 'package:cuadrante/features/widget/data/widget_publisher.dart';
 import 'package:cuadrante/features/widget/presentation/add_widget_row.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
@@ -47,6 +49,7 @@ import 'readme_render_support.dart';
 
 final _now = DateTime(2026, 12, 24, 18);
 const _month = CivilDate(2026, 12, 1);
+const _rotationStart = CivilDate(2027, 2, 1);
 const _logical = Size(412, 940);
 const _targetName = String.fromEnvironment(
   'STORE_TARGET',
@@ -194,6 +197,7 @@ void main() {
           }
           tester.platformDispatcher.localesTestValue = [Locale(language)];
           tester.platformDispatcher.localeTestValue = Locale(language);
+          tester.platformDispatcher.textScaleFactorTestValue = 1;
           addTearDown(tester.view.reset);
           addTearDown(tester.platformDispatcher.clearAllTestValues);
           debugPhoneLocales = [Locale(language)];
@@ -448,18 +452,25 @@ void main() {
                 paint.enter();
                 paint.selectShift('night');
               case 3:
-                router.push('${AppRoutes.pattern}?inicio=2026-12-01');
+                router.push(
+                  '${AppRoutes.pattern}?inicio=${_rotationStart.toIso()}',
+                );
                 await tester.pumpAndSettle();
                 final wizard = container.read(
-                  patternWizardProvider((start: _month, shiftId: null))
+                  patternWizardProvider((start: _rotationStart, shiftId: null))
                       .notifier,
                 );
-                wizard.selectPreset('continental');
-                wizard.next();
-                // Step 2: the start day and which day of the cycle it is
-                // (0.8.4), here day 2.
-                wizard.setStepOffset(1);
+                wizard.startBuilding();
+                expect(
+                  wizard.replaceBlocks([
+                    for (final id in ['morning', 'night', 'afternoon'])
+                      PatternBlock(shiftIds: [id], days: 21),
+                  ]),
+                  isTrue,
+                );
+                wizard.showBlock(null);
                 await tester.pumpAndSettle();
+                await _frameRotationBuilder(tester);
               case 4:
                 router.push(AppRoutes.summaryFor(_month));
               case 5:
@@ -475,9 +486,8 @@ void main() {
                 router.push(AppRoutes.settingsAbsences);
                 await tester.pumpAndSettle();
                 await tester.runAsync(
-                  () => container.read(
-                    absenceBalancesProvider(_now.year).future,
-                  ),
+                  () =>
+                      container.read(absenceBalancesProvider(_now.year).future),
                 );
               case 7:
                 router.push(AppRoutes.swaps);
@@ -543,6 +553,61 @@ void main() {
       );
     }
   }
+}
+
+/// Keep the duration and all three closed blocks above the fixed palette.
+/// Give the strip the remaining space, without cutting text or cycle cells.
+Future<void> _frameRotationBuilder(WidgetTester tester) async {
+  final length = find.byKey(const ValueKey('builder-length'));
+  await tester.ensureVisible(length);
+  final position = Scrollable.of(tester.element(length)).position;
+  final scroll = find.byKey(const ValueKey('pattern-step-choose'));
+  final viewport = tester.getRect(scroll);
+  final lengthRect = tester.getRect(length);
+  final blocks = [
+    for (var i = 0; i < 3; i++)
+      tester.getRect(find.byKey(ValueKey('builder-block-$i'))),
+  ];
+  final content = [
+    for (final type in [Text, StepChip])
+      for (final element
+          in find
+              .descendant(of: scroll, matching: find.byType(type))
+              .evaluate())
+        if (element.renderObject case final RenderBox box when box.attached)
+          MatrixUtils.transformRect(
+            box.getTransformTo(null),
+            Offset.zero & box.size,
+          ),
+  ];
+  final maxDelta = lengthRect.top - viewport.top;
+  final minDelta = math.max(
+    -position.pixels,
+    blocks.last.bottom - viewport.bottom,
+  );
+  for (var delta = maxDelta; delta >= minDelta; delta--) {
+    final cutsContent = content.any((rect) {
+      final shifted = rect.shift(Offset(0, -delta));
+      return (shifted.top < viewport.top - .01 &&
+              shifted.bottom > viewport.top + .01) ||
+          (shifted.top < viewport.bottom - .01 &&
+              shifted.bottom > viewport.bottom + .01);
+    });
+    if (cutsContent) continue;
+    position.jumpTo(position.pixels + delta);
+    await tester.pumpAndSettle();
+    expect(tester.getRect(length).top, greaterThanOrEqualTo(viewport.top));
+    for (var i = 0; i < 3; i++) {
+      final block = tester.getRect(find.byKey(ValueKey('builder-block-$i')));
+      expect(block.top, greaterThanOrEqualTo(viewport.top));
+      expect(block.bottom, lessThanOrEqualTo(viewport.bottom));
+    }
+    return;
+  }
+  fail(
+    'The rotation shot must show the duration and all three closed blocks '
+    'without cutting text or cycle cells at the scrolling edges',
+  );
 }
 
 /// Scrolls the biggest vertical list by the smallest amount (up to 160 dp)

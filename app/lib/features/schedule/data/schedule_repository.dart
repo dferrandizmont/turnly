@@ -2,6 +2,8 @@ import 'package:drift/drift.dart';
 
 import '../../../core/database/app_database.dart';
 import '../../../core/diagnostics/debug_log.dart';
+import '../../patterns/domain/new_pattern.dart';
+import '../../patterns/domain/pattern_catalog.dart';
 import '../../shift_types/domain/shift_type_draft.dart';
 import '../domain/schedule_domain.dart';
 import 'overtime_store.dart';
@@ -373,6 +375,53 @@ class ScheduleRepository {
           ),
         );
   }
+
+  /// Includes ended rotations and inactive/archived calendars.
+  Future<Set<String>> usedPatternIds() async {
+    final query = _db.selectOnly(_db.patternRuns, distinct: true)
+      ..addColumns([_db.patternRuns.patternId]);
+    return {
+      for (final row in await query.get()) row.read(_db.patternRuns.patternId)!,
+    };
+  }
+
+  /// Catalogue entries cannot be removed. Check ALL runs, including archived
+  /// calendars and runs that have ended, in the same transaction as deletion.
+  Future<bool> deletePatternIfUnused(String id) => _db.transaction(() async {
+    if (isCatalogPatternId(id)) return false;
+    final used =
+        await (_db.select(_db.patternRuns)
+              ..where((run) => run.patternId.equals(id))
+              ..limit(1))
+            .getSingleOrNull();
+    if (used != null) return false;
+    return await (_db.delete(
+          _db.patterns,
+        )..where((p) => p.id.equals(id))).go() >
+        0;
+  });
+
+  /// Saves a separate pattern, never upserts the original. Name selection and
+  /// insertion are atomic; [copyName] comes from the caller's ARB formatter.
+  Future<Pattern> saveAsNewPattern({
+    required List<List<String>> steps,
+    required String name,
+    required String Function(String name, int number) copyName,
+  }) => _db.transaction(() async {
+    final stored = await _db.select(_db.patterns).get();
+    final pattern = createNewPattern(
+      steps: steps,
+      name: name,
+      existingNames: stored.map((p) => p.name),
+      copyName: copyName,
+    );
+    // A UUID collision must fail, never update an existing pattern.
+    final now = _nowMillis;
+    await _db
+        .into(_db.patterns)
+        .insert(pattern.toCompanion(createdAt: now, updatedAt: now));
+    return pattern;
+  });
 
   Future<int> _nextSortOrder() async {
     final max = _db.shiftTypes.sortOrder.max();

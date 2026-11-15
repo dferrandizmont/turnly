@@ -82,6 +82,11 @@ class DayDetailBodyState extends ConsumerState<DayDetailBody>
   /// in it takes only what it needs, and the month stays in sight above it.
   static const double maxHeightFactor = 0.88;
 
+  /// The most the date heading grows with the reader's text size: the long
+  /// date wraps between words at any width of a phone, and the pinned header
+  /// stays a small part of the sheet.
+  static const double dateTitleMaxScale = 1.5;
+
   late final ScheduleController _schedule;
   late final NoteDraftController _draft;
   final _note = TextEditingController();
@@ -492,9 +497,18 @@ class DayDetailBodyState extends ConsumerState<DayDetailBody>
         if (!widget.inline)
           Semantics(
             header: true,
-            child: Text(
-              capitalize(format.longDate(date)),
-              style: type.headline,
+            // The date is a heading, not body text: past x1.5 it would take
+            // a third of the screen and break inside its words (iOS AX3,
+            // 1.1.0 QA F2). The content below keeps the reader's full size.
+            child: MediaQuery.withClampedTextScaling(
+              maxScaleFactor: dateTitleMaxScale,
+              child: Text(
+                capitalize(format.longDate(date)),
+                style: type.headline,
+                softWrap: true,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ),
         if (holiday != null) ...[

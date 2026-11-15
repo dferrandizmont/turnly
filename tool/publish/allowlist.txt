@@ -897,7 +897,6 @@ docs/legal/politica-privacidad.md
 docs/motor-de-turnos.md
 docs/privacy.en.md
 docs/privacy.md
-docs/qa.md
 docs/readme/ca/01-mes.png
 docs/readme/ca/02-lista.png
 docs/readme/ca/03-pintar.png
@@ -963,9 +962,6 @@ docs/readme/gl/10-primer-uso.png
 docs/readme/gl/11-widgets.png
 docs/readme/gl/header.png
 docs/readme/gl/icon-512.png
-docs/tienda/app-store.md
-docs/tienda/capturas.md
-docs/tienda/google-play.md
 docs/widget-contrato.md
 tool/icon/apply_icons.sh
 tool/icon/apply_splash.sh
@@ -994,7 +990,6 @@ tool/qa/single_activity_check.sh
 tool/qa/ui.dart
 tool/qa/widget_android.sh
 tool/store/LEEME.md
-turnos-spec.md
 web/assets/fonts/Manrope-Variable-latin-ext.woff2
 web/assets/fonts/Manrope-Variable-latin.woff2
 web/assets/fonts/OFL.txt

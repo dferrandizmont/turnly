@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -15,6 +18,7 @@ import '../../../core/widgets/value_row.dart';
 import '../../calendar/application/schedule_controller.dart';
 import '../../calendar/application/visible_month.dart';
 import '../../calendar/presentation/shift_format.dart';
+import '../../review/application/review_providers.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../application/pattern_wizard.dart';
 import '../domain/pattern_catalog.dart';
@@ -22,14 +26,15 @@ import 'cycle_start_picker.dart';
 import 'rotation_start_details.dart';
 import 'pattern_builder.dart';
 import 'step_chips.dart';
+import 'weeks_per_shift_editor.dart';
 import '../../../core/widgets/app_snack_bar.dart';
 
 /// "Asistente de patrón" (turnos-spec.md section 4, screen 3): 1) choose a
 /// preset or build your own, 2) start day and the day of the cycle you are
 /// on, 3) the end and what to do with the days changed by hand. The result
-/// is previewed live (two months, the same cell as the month screen) and
+/// is previewed live (whole months covering the cycle) and
 /// applied as ONE undoable step.
-class PatternWizardScreen extends ConsumerWidget {
+class PatternWizardScreen extends ConsumerStatefulWidget {
   const PatternWizardScreen({super.key, this.start, this.shiftId});
 
   /// Day to start on (the one tapped after a long press on a puck).
@@ -38,88 +43,178 @@ class PatternWizardScreen extends ConsumerWidget {
   /// Shift of the puck that was long-pressed: its typical patterns go first.
   final String? shiftId;
 
-  PatternWizardArgs get _args => (start: start, shiftId: shiftId);
+  @override
+  ConsumerState<PatternWizardScreen> createState() =>
+      _PatternWizardScreenState();
+}
+
+class _PatternWizardScreenState extends ConsumerState<PatternWizardScreen> {
+  PatternWizardArgs get _args => (start: widget.start, shiftId: widget.shiftId);
+  bool _confirming = false;
+  Timer? _tapTimer;
+  Completer<void>? _tapsSettled;
+
+  void _restartTapTimer() {
+    if (_tapsSettled == null) return;
+    _tapTimer?.cancel();
+    _tapTimer = Timer(kDoubleTapTimeout, () => _tapsSettled?.complete());
+  }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void dispose() {
+    _tapTimer?.cancel();
+    if (_tapsSettled?.isCompleted == false) _tapsSettled!.complete();
+    super.dispose();
+  }
+
+  Future<void> _leave() async {
+    final controller = ref.read(patternWizardProvider(_args).notifier);
+    if (_confirming || ref.read(patternWizardProvider(_args)).applying) return;
+    _confirming = true;
+    final discard = await confirmDiscardSequence(context, controller);
+    if (mounted && discard) Navigator.pop(context);
+    _confirming = false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = context.l10n;
     final provider = patternWizardProvider(_args);
     final wizard = ref.watch(provider);
     final controller = ref.read(provider.notifier);
     final last = wizard.step == WizardStep.end;
+    final savingCopy =
+        wizard.step == WizardStep.choose &&
+        wizard.building &&
+        wizard.editingCopy;
+    final nextLabel = savingCopy
+        ? l10n.patternSaveAsNew
+        : last
+        ? l10n.patternApply
+        : l10n.patternNext;
 
-    return Scaffold(
-      appBar: ContentAppBar.adaptive(context, title: Text(l10n.patternTitle)),
-      body: PageBody(
-        child: Column(
-          children: [
-            _StepIndicator(step: wizard.step),
-            Expanded(
-              child: SingleChildScrollView(
-                key: ValueKey('pattern-step-${wizard.step.name}'),
-                padding: const EdgeInsets.fromLTRB(
-                  Sp.page,
-                  Sp.s,
-                  Sp.page,
-                  Sp.section,
-                ),
-                child: switch (wizard.step) {
-                  WizardStep.choose => _ChooseStep(args: _args),
-                  WizardStep.start => _StartStep(args: _args),
-                  WizardStep.end => _EndStep(args: _args),
-                },
+    return PopScope(
+      canPop: !wizard.applying && !controller.hasDraftChanges,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop && ModalRoute.of(context)?.isCurrent == true) _leave();
+      },
+      child: Listener(
+        behavior: HitTestBehavior.opaque,
+        onPointerDown: (_) => _restartTapTimer(),
+        child: AbsorbPointer(
+          absorbing: wizard.applying,
+          child: Scaffold(
+            appBar: ContentAppBar.adaptive(
+              context,
+              title: Text(l10n.patternTitle),
+            ),
+            body: PageBody(
+              child: Column(
+                children: [
+                  if (!(wizard.step == WizardStep.choose && wizard.building))
+                    _StepIndicator(step: wizard.step),
+                  Expanded(
+                    child: wizard.step == WizardStep.choose && wizard.building
+                        ? PatternBuilderViewport(
+                            args: _args,
+                            header: _StepIndicator(step: wizard.step),
+                          )
+                        : SingleChildScrollView(
+                            key: ValueKey('pattern-step-${wizard.step.name}'),
+                            padding: const EdgeInsets.fromLTRB(
+                              Sp.page,
+                              Sp.s,
+                              Sp.page,
+                              Sp.section,
+                            ),
+                            child: switch (wizard.step) {
+                              WizardStep.choose => _ChooseStep(args: _args),
+                              WizardStep.start => _StartStep(args: _args),
+                              WizardStep.end => _EndStep(args: _args),
+                            },
+                          ),
+                  ),
+                ],
               ),
             ),
-            SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  Sp.page,
-                  Sp.s,
-                  Sp.page,
-                  Sp.m,
-                ),
-                // «Atrás» next to «Siguiente», or one under the other when
-                // the words do not fit side by side («Atr / ás» at x2.0 on
-                // 320 dp, H-T06-3); then the main action is on top.
-                child: AdaptiveButtonRow(
-                  gap: Sp.m,
-                  primaryFirstWhenStacked: true,
-                  items: [
-                    if (wizard.step != WizardStep.choose)
-                      ButtonRowItem(
-                        label: l10n.patternBack,
-                        child: SecondaryButton(
-                          key: const ValueKey('pattern-back'),
-                          label: l10n.patternBack,
-                          onPressed: wizard.applying ? null : controller.back,
-                        ),
+            bottomNavigationBar: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                PageBody(
+                  child: SafeArea(
+                    top: false,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        Sp.page,
+                        Sp.s,
+                        Sp.page,
+                        Sp.m,
                       ),
-                    ButtonRowItem(
-                      flex: 2,
-                      label: last ? l10n.patternApply : l10n.patternNext,
-                      child: PrimaryButton(
-                        key: ValueKey(last ? 'pattern-apply' : 'pattern-next'),
-                        label: last ? l10n.patternApply : l10n.patternNext,
-                        loading: wizard.applying,
-                        onPressed: !wizard.hasChoice
-                            ? null
-                            : last
-                            ? () => _apply(context, ref)
-                            : controller.next,
+                      // «Atrás» next to «Siguiente», or one under the other when
+                      // the words do not fit side by side («Atr / ás» at x2.0 on
+                      // 320 dp, H-T06-3); then the main action is on top.
+                      child: AdaptiveButtonRow(
+                        gap: Sp.m,
+                        primaryFirstWhenStacked: true,
+                        items: [
+                          if (wizard.step != WizardStep.choose)
+                            ButtonRowItem(
+                              label: l10n.patternBack,
+                              child: SecondaryButton(
+                                key: const ValueKey('pattern-back'),
+                                label: l10n.patternBack,
+                                onPressed: wizard.applying
+                                    ? null
+                                    : controller.back,
+                              ),
+                            ),
+                          ButtonRowItem(
+                            flex: 2,
+                            label: nextLabel,
+                            child: PrimaryButton(
+                              key: ValueKey(
+                                last ? 'pattern-apply' : 'pattern-next',
+                              ),
+                              label: nextLabel,
+                              loading: wizard.applying,
+                              onPressed: wizard.applying || !wizard.hasChoice
+                                  ? null
+                                  : savingCopy
+                                  ? () async {
+                                      final saved = await controller.saveCopy(
+                                        fallbackName:
+                                            l10n.patternBuilderDefaultName,
+                                        copyName: l10n.patternCopyName,
+                                      );
+                                      if (!saved && context.mounted) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                              appSnackBar(
+                                                content: Text(l10n.saveFailed),
+                                              ),
+                                            );
+                                      }
+                                    }
+                                  : last
+                                  ? _apply
+                                  : controller.next,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Future<void> _apply(BuildContext context, WidgetRef ref) async {
+  Future<void> _apply() async {
+    if (ref.read(patternWizardProvider(_args)).applying) return;
     final l10n = context.l10n;
     final messenger = ScaffoldMessenger.of(context);
     final router = GoRouter.of(context);
@@ -127,6 +222,7 @@ class PatternWizardScreen extends ConsumerWidget {
     final day = ref.read(provider).start;
     final schedule = ref.read(scheduleControllerProvider.notifier);
     final month = ref.read(visibleMonthProvider.notifier);
+    final review = ref.read(reviewServiceProvider);
     final step = await ref
         .read(provider.notifier)
         .apply(fallbackName: l10n.patternBuilderDefaultName);
@@ -137,8 +233,18 @@ class PatternWizardScreen extends ConsumerWidget {
         ..showSnackBar(appSnackBar(content: Text(l10n.patternApplyFailed)));
       return;
     }
+    // Keep consuming the whole burst on this route. Showing Undo immediately
+    // would let the remaining taps land on the next screen at the same place.
+    _tapsSettled = Completer<void>();
+    _restartTapTimer();
+    await _tapsSettled!.future;
+    _tapsSettled = null;
+    if (!mounted) return;
     month.goTo(day);
     router.pop();
+    // A rotation applied from the wizard (never the first-use flow, which has
+    // its own step) is a success moment for the store review.
+    unawaited(review.maybeAskAfterSuccess());
     messenger
       ..hideCurrentSnackBar()
       ..showSnackBar(
@@ -230,26 +336,29 @@ class _ChooseStep extends ConsumerWidget {
     final provider = patternWizardProvider(args);
     final wizard = ref.watch(provider);
     if (wizard.building) return PatternBuilder(args: args);
+    if (wizard.weeksTemplate) return WeeksPerShiftEditor(args: args);
     final controller = ref.read(provider.notifier);
     final schedule = ref.watch(
       scheduleControllerProvider.select((s) => s.schedule),
     );
+    final usedIds = ref.watch(usedPatternIdsProvider).value;
 
     final shiftId = args.shiftId;
     final shiftName = shiftId == null
         ? null
         : schedule.shiftTypeById(shiftId)?.name;
     // Patterns that begin with the shift of the puck; when none does, the
-    // ones that at least include it.
+    // ones that at least include it. Keep Correturnos under Industry beside
+    // its configurable weeks template.
     final startsWith = <PatternPreset>[
       if (shiftId != null)
         for (final p in patternPresets)
-          if (startsWithShift(p.steps, shiftId)) p,
+          if (p.id != 'correturnos' && startsWithShift(p.steps, shiftId)) p,
     ];
     final includes = <PatternPreset>[
       if (shiftId != null && startsWith.isEmpty)
         for (final p in patternPresets)
-          if (containsShift(p.steps, shiftId)) p,
+          if (p.id != 'correturnos' && containsShift(p.steps, shiftId)) p,
     ];
     final typical = startsWith.isNotEmpty ? startsWith : includes;
     final typicalIds = {for (final p in typical) p.id};
@@ -279,6 +388,9 @@ class _ChooseStep extends ConsumerWidget {
       schedule: schedule,
       selected: wizard.presetId == p.id,
       onTap: () => controller.selectPreset(p.id),
+      onEdit: () => controller.editAsCopy(
+        presetPattern(schedule, p, workShiftId: wizard.workShiftId),
+      ),
     );
 
     Widget savedCard(Pattern p) => PatternCard(
@@ -289,6 +401,11 @@ class _ChooseStep extends ConsumerWidget {
       schedule: schedule,
       selected: wizard.customId == p.id,
       onTap: () => controller.selectCustom(p.id),
+      onEdit: () => controller.editAsCopy(p),
+      onRemove: usedIds == null || usedIds.contains(p.id)
+          ? null
+          : () => _remove(context, ref, p),
+      inUse: usedIds?.contains(p.id) ?? false,
     );
 
     final groupLabels = {
@@ -336,6 +453,23 @@ class _ChooseStep extends ConsumerWidget {
     }
     for (final entry in patternGroupPresets.entries) {
       section(groupLabels[entry.key]!, [
+        if (entry.key == PatternGroup.industry)
+          AppCard(
+            key: const ValueKey('pattern-card-$weeksPerShiftTemplateId'),
+            semanticLabel:
+                '${l10n.patternWeeksTitle}, ${l10n.patternWeeksHint}',
+            onTap: () => controller.startWeeksTemplate(l10n.patternWeeksTitle),
+            child: ValueRow(
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.patternWeeksTitle, style: type.bodyStrong),
+                  Text(l10n.patternWeeksHint, style: type.meta),
+                ],
+              ),
+              trailing: Icon(AppIcons.chevronRight, size: IconSize.inline),
+            ),
+          ),
         for (final id in entry.value)
           if (!typicalIds.contains(id)) presetCard(patternPresetById(id)),
       ]);
@@ -396,6 +530,47 @@ class _ChooseStep extends ConsumerWidget {
       ],
     );
   }
+
+  Future<void> _remove(
+    BuildContext context,
+    WidgetRef ref,
+    Pattern pattern,
+  ) async {
+    final l10n = context.l10n;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        scrollable: true,
+        title: Text(l10n.patternRemoveTitle(pattern.name)),
+        content: Text(l10n.patternRemoveHint),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            key: const ValueKey('pattern-remove-confirm'),
+            style: TextButton.styleFrom(foregroundColor: context.colors.danger),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.patternRemove),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+    final wizard = ref.read(patternWizardProvider(args).notifier);
+    final removed = await ref
+        .read(scheduleControllerProvider.notifier)
+        .deletePatternIfUnused(pattern.id);
+    if (!context.mounted) return;
+    if (removed) {
+      wizard.forgetCustom(pattern.id);
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(appSnackBar(content: Text(l10n.patternRemoveUnavailable)));
+    }
+  }
 }
 
 /// A pattern to pick: name, length, a line about it and its days as chips.
@@ -409,6 +584,9 @@ class PatternCard extends StatelessWidget {
     required this.selected,
     required this.onTap,
     this.shiftOf,
+    this.onEdit,
+    this.onRemove,
+    this.inUse = false,
   });
 
   final String name;
@@ -417,6 +595,9 @@ class PatternCard extends StatelessWidget {
   final Schedule schedule;
   final bool selected;
   final VoidCallback onTap;
+  final VoidCallback? onEdit;
+  final VoidCallback? onRemove;
+  final bool inUse;
 
   /// Resolves a shift id to the type to draw for the chips; the first-use
   /// flow passes [shiftTypeForFirstUse] so a factory type talks the app's
@@ -452,6 +633,21 @@ class PatternCard extends StatelessWidget {
           ],
           const SizedBox(height: Sp.m),
           SequenceChips(steps: steps, schedule: schedule, shiftOf: shiftOf),
+          if (onEdit != null || onRemove != null)
+            Wrap(
+              spacing: Sp.s,
+              children: [
+                if (onEdit != null)
+                  TextButton(onPressed: onEdit, child: Text(l10n.patternEdit)),
+                if (onRemove != null)
+                  TextButton(
+                    onPressed: onRemove,
+                    style: TextButton.styleFrom(foregroundColor: colors.danger),
+                    child: Text(l10n.patternRemove),
+                  ),
+              ],
+            ),
+          if (inUse) Text(l10n.patternUsedHint, style: type.meta),
         ],
       ),
     );
@@ -596,9 +792,7 @@ class _StartStep extends ConsumerWidget {
             selectedId: wizard.workShiftId,
             onChanged: controller.setWorkShift,
           ),
-        // Same "which day of the cycle" picker as the first-use flow. The
-        // preview is left to the last step, which shows it once with the same
-        // plan: showing it here too would paint the same two months twice.
+        // The numbered strip and whole months share the planner used to apply.
         CycleStartPicker(
           steps: pattern.steps,
           shiftOf: (id) => shiftTypeForDisplay(schedule, id),
@@ -607,6 +801,14 @@ class _StartStep extends ConsumerWidget {
           start: wizard.start,
           plan: ref.watch(patternPreviewProvider(args)),
           showPreview: false,
+        ),
+        const SizedBox(height: Sp.section),
+        PatternMonthPreview(
+          key: const ValueKey('pattern-preview'),
+          start: wizard.start,
+          cycleDays: pattern.lengthDays,
+          markOverrides: true,
+          plan: ref.watch(patternPreviewProvider(args)),
         ),
       ],
     );
@@ -691,6 +893,10 @@ class _EndStep extends ConsumerWidget {
         PatternMonthPreview(
           key: const ValueKey('pattern-preview'),
           start: wizard.start,
+          cycleDays: controller
+              .chosenPattern(ref.watch(scheduleControllerProvider).schedule)
+              ?.lengthDays,
+          markOverrides: true,
           plan: ref.watch(patternPreviewProvider(args)),
         ),
       ],

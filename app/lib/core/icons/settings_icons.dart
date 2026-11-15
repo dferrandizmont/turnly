@@ -65,6 +65,9 @@ class SettingsIcons {
       _pick(CupertinoIcons.hand_raised, Symbols.privacy_tip_rounded);
   static IconData get about => _pick(CupertinoIcons.info, Symbols.info_rounded);
 
+  /// "Valorar Turnly": the store page, to leave a review.
+  static IconData get rate => _pick(CupertinoIcons.star, Symbols.star_rounded);
+
   /// Opens a menu or a sheet (the calendar pill).
   static IconData get expand =>
       _pick(CupertinoIcons.chevron_down, Symbols.expand_more_rounded);

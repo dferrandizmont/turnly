@@ -1,3 +1,4 @@
+import 'package:cuadrante/core/theme/theme_context.dart';
 import 'package:cuadrante/features/calendar/application/schedule_controller.dart';
 import 'package:cuadrante/features/calendar/presentation/day_extras_section.dart';
 import 'package:cuadrante/features/calendars/domain/calendar.dart';
@@ -6,6 +7,7 @@ import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/real_font.dart';
 import 'day_sheet_finders.dart';
 import 'harness.dart';
 
@@ -82,6 +84,14 @@ Future<void> _openAddSheet(WidgetTester tester) async {
 }
 
 void main() {
+  // The hours of the cell are drawn as text only where they fit beside the
+  // number at 8 dp or more: that is measured with a phone's font, not with
+  // the test font, which is twice as wide.
+  setUpAll(() async {
+    expect(await loadRoboto(), isTrue, reason: 'Roboto from the Flutter SDK');
+  });
+  tearDownAll(() => AppTypography.debugFamily = null);
+
   group('the section', () {
     testWidgets('is in the day detail: «Añadir horas extra» and «Salí antes» '
         'at «Ninguna»', (tester) async {
@@ -378,7 +388,8 @@ void main() {
   group('the cell', () {
     testWidgets('a day with extra hours shows their sum, «+2 h», and says '
         'them; a plain day has no mark', (tester) async {
-      await pumpCalendar(tester);
+      // 430 dp: wide enough for «+2:30» beside the number at a legible size.
+      await pumpCalendar(tester, size: const Size(430, 900));
       expect(_key('extras-mark-2026-10-26'), findsNothing);
 
       _controller(tester).setOvertimeBlocks(_oct26, [
@@ -389,7 +400,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(_key('extras-mark-2026-10-26'), findsOneWidget);
-      expect(_text(tester, 'extras-mark-2026-10-26'), '+2,5 h');
+      expect(_text(tester, 'extras-mark-2026-10-26'), '+2:30');
       expect(_key('extras-mark-2026-10-27'), findsNothing);
       final label = tester.getSemantics(cell(_oct26)).label;
       expect(label, contains('horas extra: 2 h 30 min'));

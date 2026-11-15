@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,6 +14,7 @@ import '../../../../core/router.dart';
 import '../../../../core/theme/theme_context.dart';
 import '../../../../core/widgets/app_sheet.dart';
 import '../../../../core/widgets/buttons.dart';
+import '../../../review/application/review_providers.dart';
 import '../settings_widgets.dart';
 import '../../../../core/widgets/app_snack_bar.dart';
 
@@ -64,6 +67,14 @@ class HelpSection extends ConsumerWidget {
           title: l10n.settingsAboutTitle,
           value: version,
           onTap: () => _showAbout(context, ref),
+        ),
+        SettingsRow(
+          key: const ValueKey('settings-rate'),
+          icon: SettingsIcons.rate,
+          title: l10n.settingsRateTitle,
+          subtitle: l10n.settingsRateSubtitle,
+          onTap: () =>
+              unawaited(ref.read(reviewServiceProvider).openStoreListing()),
         ),
       ],
     );

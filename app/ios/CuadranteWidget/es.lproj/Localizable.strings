@@ -1,0 +1,13 @@
+/* Only what the widget shows before (or without) a snapshot: every other text
+   comes localized in the JSON (docs/widget-contrato.md). Same texts as the app
+   (app_es.arb) and the Android widget (res/values/widget_*strings.xml). */
+"widget_name" = "Turnly";
+"widget_description" = "El widget siempre muestra el día de hoy, aunque no abras la app.";
+"widget_empty_title" = "Turnly";
+"widget_empty_body" = "Abre Turnly para ver tus turnos";
+/* Gallery sample only (no snapshot yet): the start of «Mañana: T 14–22». */
+"widget_sample_tomorrow" = "Mañana";
+/* Gallery sample only: v3 overtime, early-leave and seven-day total labels. */
+"widget_sample_overtime" = "+2 h extra";
+"widget_sample_early_leave" = "Salí 1 h antes";
+"widget_sample_seven_days" = "7 días: 40 h";

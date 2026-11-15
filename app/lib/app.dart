@@ -15,6 +15,7 @@ import 'features/backup/presentation/backup_host.dart';
 import 'features/calendar_export/presentation/calendar_sync_host.dart';
 import 'features/dnd/application/dnd_providers.dart';
 import 'features/device_events/presentation/device_events_host.dart';
+import 'features/review/presentation/review_host.dart';
 import 'features/settings/application/preferences_controller.dart';
 import 'features/settings/presentation/formats_host.dart';
 import 'features/share_link/presentation/share_link_host.dart';
@@ -70,20 +71,22 @@ class CuadranteApp extends ConsumerWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       debugShowCheckedModeBanner: false,
-      builder: (context, child) => FormatsHost(
-        child: CatalogTextsHost(
-          child: BackupHost(
-            child: AlarmsHost(
-              child: CalendarSyncHost(
-                child: DeviceEventsHost(
-                  child: WidgetHost(
-                    child: ShareLinkHost(
-                      child: AnnotatedRegion<SystemUiOverlayStyle>(
-                        value: AppTheme.overlayStyle(
-                          Theme.of(context).brightness,
-                        ),
-                        child: AppSnackBarLayout(
-                          child: child ?? const SizedBox.shrink(),
+      builder: (context, child) => ReviewHost(
+        child: FormatsHost(
+          child: CatalogTextsHost(
+            child: BackupHost(
+              child: AlarmsHost(
+                child: CalendarSyncHost(
+                  child: DeviceEventsHost(
+                    child: WidgetHost(
+                      child: ShareLinkHost(
+                        child: AnnotatedRegion<SystemUiOverlayStyle>(
+                          value: AppTheme.overlayStyle(
+                            Theme.of(context).brightness,
+                          ),
+                          child: AppSnackBarLayout(
+                            child: child ?? const SizedBox.shrink(),
+                          ),
                         ),
                       ),
                     ),

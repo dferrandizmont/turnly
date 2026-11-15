@@ -3,26 +3,113 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/format/app_date_format.dart';
 import '../../../core/format/text_measure.dart';
+import '../../../core/format/text_wrap.dart';
 import '../../../core/icons/app_icons.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme_context.dart';
+import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/app_snack_bar.dart';
+import '../../../core/widgets/confirm_dialog.dart';
 import '../../../core/widgets/labeled_field.dart';
-import '../../../core/widgets/section_header.dart';
 import '../../calendar/application/schedule_controller.dart';
 import '../../calendar/presentation/shift_format.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../application/pattern_wizard.dart';
+import '../domain/pattern_blocks.dart';
 import '../domain/pattern_catalog.dart';
-import 'step_chips.dart';
+import 'cycle_strip.dart';
+import 'pattern_block_editor.dart';
 
-/// "Crear el mío": the sequence builder. Tapping a shift adds a day to the
-/// cycle (or, with "Varios turnos en un día", one more shift to the last
-/// day); the chips show the cycle so far.
-class PatternBuilder extends ConsumerStatefulWidget {
-  const PatternBuilder({super.key, required this.args});
-
+/// Keeps the palette below the scrolling blocks. With little vertical room the
+/// palette joins the page so large text still leaves the sequence reachable.
+class PatternBuilderViewport extends ConsumerWidget {
+  const PatternBuilderViewport({super.key, required this.args, this.header});
   final PatternWizardArgs args;
+  final Widget? header;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final palette = ref.watch(
+      scheduleControllerProvider.select((s) => s.palette),
+    );
+    final full = ref.watch(
+      patternWizardProvider(args)
+          .select((s) => s.draft.length >= maxPatternCycleDays),
+    );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final regular = _PaletteLayout.of(
+          context,
+          palette,
+          constraints.maxWidth - Sp.page * 2 - Sp.m,
+        );
+        final compact = constraints.maxHeight < regular.height + Sp.touch * 4;
+        final layout = compact
+            ? _PaletteLayout.of(
+                context,
+                palette,
+                constraints.maxWidth - Sp.page * 2 - Sp.m,
+                compact: true,
+              )
+            : regular;
+        final heading = TextPainter(
+          text: TextSpan(
+            text: [
+              if (full) context.l10n.patternCycleLimit,
+              context.l10n.patternAddBlock,
+            ].join('\n'),
+            style: effectiveTextStyle(context, context.type.meta),
+          ),
+          textDirection: Directionality.of(context),
+          textScaler: MediaQuery.textScalerOf(context),
+        )..layout(maxWidth: constraints.maxWidth - Sp.page * 2);
+        final paletteHeight = layout.height + heading.height.ceilToDouble();
+        heading.dispose();
+        final fixed = constraints.maxHeight >= paletteHeight + Sp.touch * 4;
+        return Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                key: const ValueKey('pattern-step-choose'),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ?header,
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        Sp.page,
+                        Sp.s,
+                        Sp.page,
+                        Sp.section,
+                      ),
+                      child: PatternBuilder(args: args, showPalette: !fixed),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if (fixed)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: Sp.page),
+                child: PatternBuilderPalette(args: args, compact: compact),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class PatternBuilder extends ConsumerStatefulWidget {
+  const PatternBuilder({
+    super.key,
+    required this.args,
+    this.showPalette = true,
+  });
+  final PatternWizardArgs args;
+  final bool showPalette;
 
   @override
   ConsumerState<PatternBuilder> createState() => _PatternBuilderState();
@@ -30,7 +117,7 @@ class PatternBuilder extends ConsumerStatefulWidget {
 
 class _PatternBuilderState extends ConsumerState<PatternBuilder> {
   late final TextEditingController _name;
-
+  bool _confirming = false;
   @override
   void initState() {
     super.initState();
@@ -48,38 +135,26 @@ class _PatternBuilderState extends ConsumerState<PatternBuilder> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final colors = context.colors;
-    final type = context.type;
-    final provider = patternWizardProvider(widget.args);
-    final wizard = ref.watch(provider);
-    final controller = ref.read(provider.notifier);
+    final wizard = ref.watch(patternWizardProvider(widget.args));
+    final controller = ref.read(patternWizardProvider(widget.args).notifier);
     final schedule = ref.watch(
       scheduleControllerProvider.select((s) => s.schedule),
     );
-    final palette = ref.watch(
-      scheduleControllerProvider.select((s) => s.palette),
-    );
-    // Names wrap between words under the puck, so each puck is as wide as the
-    // longest word of any name.
-    final puckWidth = palette.fold<double>(
-      _BuilderPuck.minWidth,
-      (widest, shift) => math.max(
-        widest,
-        longestWordWidth(context, shift.name, type.caption) + 2 * Sp.xs,
-      ),
-    );
-
+    ShiftType? shiftOf(String id) => shiftTypeForDisplay(schedule, id);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: TextButton.icon(
-            key: const ValueKey('builder-back'),
-            onPressed: controller.stopBuilding,
-            icon: Icon(AppIcons.back, size: IconSize.button),
-            label: Text(l10n.patternBuilderBack),
-          ),
+        TextButton.icon(
+          key: const ValueKey('builder-back'),
+          onPressed: () async {
+            if (_confirming) return;
+            _confirming = true;
+            final discard = await confirmDiscardSequence(context, controller);
+            if (mounted && discard) controller.stopBuilding();
+            _confirming = false;
+          },
+          icon: Icon(AppIcons.back, size: IconSize.button),
+          label: Text(l10n.patternBuilderBack),
         ),
         LabeledField(
           label: l10n.patternBuilderName,
@@ -96,236 +171,368 @@ class _PatternBuilderState extends ConsumerState<PatternBuilder> {
           ),
         ),
         const SizedBox(height: Sp.section),
-        SectionHeader(
-          l10n.patternBuilderSequence,
-          trailing: Text(
-            l10n.patternCycleDays(wizard.draft.length),
-            key: const ValueKey('builder-length'),
-            style: type.meta,
-          ),
+        Text(l10n.patternBuilderSequence, style: context.type.bodyStrong),
+        Text(
+          patternDuration(context, wizard.draft.length),
+          key: const ValueKey('builder-length'),
+          style: context.type.meta,
         ),
+        const SizedBox(height: Sp.m),
         if (wizard.draft.isEmpty)
-          Text(
-            l10n.patternBuilderEmpty,
-            style: type.body.copyWith(color: colors.textMuted),
-          )
-        else
-          Wrap(
-            key: const ValueKey('builder-sequence'),
-            spacing: Sp.xs,
-            runSpacing: Sp.xs,
-            children: [
-              for (final (i, step) in wizard.draft.indexed)
-                StepChip(
-                  key: ValueKey('builder-step-$i'),
-                  size: Disc.m,
-                  shifts: [
-                    for (final id in step) ?shiftTypeForDisplay(schedule, id),
-                  ],
-                  caption: '${i + 1}',
-                ),
-            ],
-          ),
-        const SizedBox(height: Sp.l),
-        Row(
-          children: [
-            Expanded(
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: _BuilderChip(
-                    key: const ValueKey('builder-same-day'),
-                    label: l10n.patternBuilderSameDay,
-                    selected: wizard.sameDay,
-                    onTap: () => controller.setSameDay(!wizard.sameDay),
+          Text(l10n.patternBlocksHelp, style: context.type.meta),
+        for (final (i, block) in wizard.blocks.indexed)
+          Padding(
+            padding: const EdgeInsets.only(bottom: Sp.s),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AppCard(
+                  expanded: wizard.openBlock == i,
+                  key: ValueKey('builder-block-$i'),
+                  semanticLabel: l10n.patternBlockTitle(
+                    block.shiftIds.isEmpty
+                        ? l10n.calendarNoShift
+                        : block.shiftIds
+                              .map((id) => shiftOf(id)?.name ?? id)
+                              .join(' + '),
+                    l10n.patternCycleDays(block.days),
+                  ),
+                  selected: wizard.openBlock == i,
+                  borderColor: wizard.openBlock == i
+                      ? context.colors.todayRing
+                      : null,
+                  onTap: () => controller.toggleBlock(i),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: Sp.touch),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.patternBlockTitle(
+                            block.shiftIds.isEmpty
+                                ? l10n.calendarNoShift
+                                : block.shiftIds
+                                      .map((id) => shiftOf(id)?.name ?? id)
+                                      .join(' + '),
+                            l10n.patternCycleDays(block.days),
+                          ),
+                          style: context.type.bodyStrong,
+                        ),
+                        for (final id in block.shiftIds)
+                          if (shiftOf(id) case final shift?)
+                            PatternShiftLabel(shift: shift),
+                        Text(
+                          patternDuration(context, block.days),
+                          style: context.type.meta,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
+                if (wizard.openBlock == i)
+                  PatternBlockControls(args: widget.args, index: i),
+              ],
             ),
+          ),
+        Wrap(
+          spacing: Sp.s,
+          runSpacing: Sp.xs,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
             IconButton(
-              key: const ValueKey('builder-remove-last'),
-              tooltip: l10n.patternBuilderRemoveLast,
+              key: const ValueKey('builder-undo'),
+              tooltip: l10n.undo,
+              onPressed: wizard.canUndoDraft ? controller.undoDraft : null,
               icon: Icon(AppIcons.undo),
-              onPressed: wizard.draft.isEmpty ? null : controller.removeLast,
             ),
             IconButton(
               key: const ValueKey('builder-clear'),
               tooltip: l10n.patternBuilderClear,
-              icon: Icon(AppIcons.erase),
               onPressed: wizard.draft.isEmpty ? null : controller.clearDraft,
+              icon: Icon(AppIcons.erase),
             ),
           ],
         ),
-        // What the chip does is not obvious: a tap adds a day, except with
-        // the chip on, when it adds to the last one (H-T06-4).
-        if (wizard.sameDay)
-          Padding(
-            padding: const EdgeInsets.only(top: Sp.xs),
-            child: Text(
-              l10n.patternBuilderSameDayHint,
-              key: const ValueKey('builder-same-day-hint'),
-              style: type.meta,
-            ),
+        if (wizard.draft.isNotEmpty) ...[
+          const SizedBox(height: Sp.m),
+          Text(l10n.patternYourCycle, style: context.type.bodyStrong),
+          CycleStrip(
+            steps: wizard.draft,
+            shiftOf: shiftOf,
+            keyPrefix: 'builder-cycle-',
           ),
-        const SizedBox(height: Sp.s),
-        // All the shifts in sight, wrapping onto as many lines as needed: a
-        // row that scrolled sideways cut «Vac» at the edge with nothing to
-        // say there was more (H-T06-5).
-        Wrap(
-          crossAxisAlignment: WrapCrossAlignment.start,
-          children: [
-            for (final shift in palette)
-              _BuilderPuck(
-                key: ValueKey('builder-add-${shift.id}'),
-                shift: shift,
-                width: puckWidth,
-                onTap: () => controller.appendShift(shift.id),
+        ],
+        if (widget.showPalette) ...[
+          const SizedBox(height: Sp.l),
+          PatternBuilderPalette(args: widget.args, scrollable: false),
+        ],
+      ],
+    );
+  }
+}
+
+class _PaletteLayout {
+  const _PaletteLayout(this.columns, this.rowHeight, this.rows);
+  final int columns;
+  final double rowHeight;
+  final int rows;
+  double get height => rowHeight * rows + Sp.m;
+  static _PaletteLayout of(
+    BuildContext context,
+    List<ShiftType> palette,
+    double width, {
+    bool compact = false,
+  }) {
+    final style = context.type.caption;
+    final format = AppDateFormat.of(context);
+    final minWidth = palette.fold<double>(
+      Sp.touch * 2,
+      (value, s) => math.max(
+        value,
+        math.max(
+              longestWordWidth(context, s.name, style),
+              (s.timeRange(format) ?? context.l10n.summaryNoTimes)
+                  .split(' · ')
+                  .fold<double>(
+                    0,
+                    (width, time) =>
+                        math.max(width, textWidth(context, time, style)),
+                  ),
+            ) +
+            Sp.l,
+      ),
+    );
+    final columns = compact
+        ? 1
+        : math.max(1, math.min(4, (width / minWidth).floor()));
+    final cellWidth =
+        width / columns - Sp.s - (compact ? Disc.toolPuck + Sp.s : 0);
+    final lines = palette.fold<int>(
+      1,
+      (value, s) => math.max(
+        value,
+        textLineCount(context, s.name, style, cellWidth) +
+            textLineCount(
+              context,
+              keepTimeRangesTogether(
+                s.timeRange(format) ?? context.l10n.summaryNoTimes,
               ),
-          ],
+              style,
+              cellWidth,
+            ),
+      ),
+    );
+    final rowHeight =
+        (compact ? 0 : Disc.toolPuck) +
+        Sp.l +
+        lines *
+            MediaQuery.textScalerOf(context).scale(style.fontSize!) *
+            (style.height ?? 1);
+    return _PaletteLayout(
+      columns,
+      math.max(Sp.touch, rowHeight),
+      compact ? 1 : 2,
+    );
+  }
+}
+
+/// At most two rows, with an explicit vertical scrollbar when more shifts fit
+/// below. The height is measured at the reader's actual font size.
+class PatternBuilderPalette extends ConsumerStatefulWidget {
+  const PatternBuilderPalette({
+    super.key,
+    required this.args,
+    this.compact = false,
+    this.scrollable = true,
+  });
+  final PatternWizardArgs args;
+  final bool compact;
+  final bool scrollable;
+  @override
+  ConsumerState<PatternBuilderPalette> createState() =>
+      _PatternBuilderPaletteState();
+}
+
+class _PatternBuilderPaletteState extends ConsumerState<PatternBuilderPalette> {
+  final _scroll = ScrollController();
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final wizard = ref.watch(patternWizardProvider(widget.args));
+    final controller = ref.read(patternWizardProvider(widget.args).notifier);
+    final palette = ref.watch(
+      scheduleControllerProvider.select((s) => s.palette),
+    );
+    final full = wizard.draft.length >= maxPatternCycleDays;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (full) Text(l10n.patternCycleLimit, style: context.type.meta),
+        Text(l10n.patternAddBlock, style: context.type.meta),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final layout = _PaletteLayout.of(
+              context,
+              palette,
+              constraints.maxWidth - Sp.m,
+              compact: widget.compact,
+            );
+            final tiles = Wrap(
+              runSpacing: Sp.xs,
+              children: [
+                for (final shift in palette)
+                  Builder(
+                    builder: (context) {
+                      final swatch = shift.swatch(context.colors.brightness);
+                      final VoidCallback? addBlock = full
+                          ? null
+                          : () {
+                              if (!controller.appendShift(shift.id)) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  appSnackBar(
+                                    content: Text(l10n.patternCycleLimit),
+                                  ),
+                                );
+                              }
+                            };
+                      final labelStyle = context.type.caption.copyWith(
+                        color: full ? context.colors.disabledContent : null,
+                      );
+                      final badge = Container(
+                        width: Disc.toolPuck,
+                        height: Disc.toolPuck,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: full
+                              ? context.colors.surfaceRaised
+                              : swatch.disc,
+                          borderRadius: Rad.squareRadius(Disc.toolPuck),
+                        ),
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            shift.code,
+                            style: context.type.bodyStrong.copyWith(
+                              color: full
+                                  ? context.colors.disabledContent
+                                  : swatch.ink,
+                            ),
+                          ),
+                        ),
+                      );
+                      final labels = Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: widget.compact
+                            ? CrossAxisAlignment.start
+                            : CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            shift.name,
+                            style: labelStyle,
+                            textAlign: widget.compact
+                                ? TextAlign.start
+                                : TextAlign.center,
+                          ),
+                          Text(
+                            keepTimeRangesTogether(
+                              shift.timeRange(AppDateFormat.of(context)) ??
+                                  l10n.summaryNoTimes,
+                            ),
+                            style: labelStyle,
+                            textAlign: widget.compact
+                                ? TextAlign.start
+                                : TextAlign.center,
+                          ),
+                        ],
+                      );
+                      return SizedBox(
+                        width: (constraints.maxWidth - Sp.m) / layout.columns,
+                        height: layout.rowHeight,
+                        child: Semantics(
+                          button: true,
+                          enabled: !full,
+                          onTap: addBlock,
+                          label: l10n.patternBuilderAdd(
+                            shift.nameWithTimes(
+                              l10n,
+                              AppDateFormat.of(context),
+                            ),
+                          ),
+                          excludeSemantics: true,
+                          child: InkWell(
+                            key: ValueKey('builder-add-${shift.id}'),
+                            borderRadius: Rad.inputRadius,
+                            onTap: addBlock,
+                            child: widget.compact
+                                ? Row(
+                                    children: [
+                                      badge,
+                                      const SizedBox(width: Sp.s),
+                                      Expanded(child: labels),
+                                    ],
+                                  )
+                                : Column(
+                                    children: [
+                                      badge,
+                                      const SizedBox(height: Sp.xs),
+                                      labels,
+                                    ],
+                                  ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+              ],
+            );
+            if (!widget.scrollable) {
+              return Padding(
+                key: const ValueKey('builder-palette'),
+                padding: const EdgeInsets.only(right: Sp.m),
+                child: tiles,
+              );
+            }
+            return SizedBox(
+              height: layout.height,
+              child: Scrollbar(
+                controller: _scroll,
+                thumbVisibility: true,
+                child: SingleChildScrollView(
+                  key: const ValueKey('builder-palette'),
+                  controller: _scroll,
+                  padding: const EdgeInsets.only(right: Sp.m),
+                  child: tiles,
+                ),
+              ),
+            );
+          },
         ),
       ],
     );
   }
 }
 
-/// A round shift to tap, like the pucks of paint mode.
-class _BuilderPuck extends StatelessWidget {
-  const _BuilderPuck({
-    super.key,
-    required this.shift,
-    required this.width,
-    required this.onTap,
-  });
-
-  final ShiftType shift;
-  final double width;
-  final VoidCallback onTap;
-
-  static const double minWidth = Disc.puck + 2 * Sp.s;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final colors = context.colors;
-    final swatch = shift.swatch(colors.brightness);
-    return Semantics(
-      container: true,
-      button: true,
-      excludeSemantics: true,
-      label: l10n.patternBuilderAdd(shift.name),
-      onTap: onTap,
-      child: InkWell(
-        customBorder: RoundedRectangleBorder(borderRadius: Rad.inputRadius),
-        onTap: onTap,
-        child: SizedBox(
-          width: width,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: Sp.s),
-              SizedBox.square(
-                dimension: Disc.puck,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: swatch.disc,
-                    borderRadius: Rad.squareRadius(Disc.puck),
-                  ),
-                  child: Center(
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Padding(
-                        padding: const EdgeInsets.all(Sp.s),
-                        child: Text(
-                          shift.code,
-                          maxLines: 1,
-                          style: context.type.headline.copyWith(
-                            color: swatch.ink,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: Sp.s),
-              Text(
-                shift.name,
-                textAlign: TextAlign.center,
-                style: context.type.caption.copyWith(color: colors.textMuted),
-              ),
-              const SizedBox(height: Sp.xs),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// A bordered toggle chip ("Varios turnos en un día"): on, it gets a check
-/// and the ring border (not colour alone).
-class _BuilderChip extends StatelessWidget {
-  const _BuilderChip({
-    super.key,
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    final shape = RoundedRectangleBorder(
-      borderRadius: Rad.chipSmallRadius,
-      side: BorderSide(
-        color: selected ? colors.todayRing : colors.borderStrong,
-        width: selected ? Sp.ring : 1,
-      ),
-    );
-    return Semantics(
-      container: true,
-      button: true,
-      toggled: selected,
-      excludeSemantics: true,
-      label: label,
-      onTap: onTap,
-      child: Material(
-        color: selected ? colors.surfaceRaised : Colors.transparent,
-        shape: shape,
-        child: InkWell(
-          customBorder: shape,
-          onTap: onTap,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: Sp.touch),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: Sp.l),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    selected ? AppIcons.check : AppIcons.add,
-                    size: IconSize.inline,
-                    color: colors.textPrimary,
-                  ),
-                  const SizedBox(width: Sp.s),
-                  Text(
-                    label,
-                    style: context.type.body.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+/// Shared by system/app-bar Back and the builder's return to the catalogue.
+Future<bool> confirmDiscardSequence(
+  BuildContext context,
+  PatternWizardController controller,
+) async {
+  if (!controller.hasDraftChanges) return true;
+  FocusScope.of(context).unfocus();
+  final l10n = context.l10n;
+  return showConfirmDialog(
+    context,
+    title: l10n.patternDiscardTitle,
+    confirmLabel: l10n.discardChangesConfirm,
+    cancelLabel: l10n.discardChangesKeep,
+    destructive: true,
+    scrollable: true,
+  );
 }

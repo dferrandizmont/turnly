@@ -610,25 +610,39 @@ class _DayMarks extends StatelessWidget {
     // (schema v7), drawn at the height of the row of marks; only an early
     // leave keeps the small «+».
     final extraText = overtimeMinutes > 0
-        ? context.l10n.dayCellOvertime(
-            overtimeCellHours(context, overtimeMinutes),
-          )
+        ? overtimeCellText(context, overtimeMinutes)
         : null;
     final extraStyle = context.type.cellTime.copyWith(
       color: color,
       fontWeight: FontWeight.w700,
     );
     var extraWidth = DayCell._extrasIconSize;
+    var extraHeight = DayCell._extrasIconSize;
+    // The size the text of the mark is drawn at before the row shrinks.
+    var extraFont = 0.0;
     if (extraText != null) {
       final measure = TextPainter(
         text: TextSpan(text: extraText, style: extraStyle),
         textDirection: TextDirection.ltr,
         maxLines: 1,
       )..layout();
-      extraWidth = measure.width * DayCell._extrasIconSize / measure.height;
+      // Fitted to the height of the row of marks, but never drawn under the
+      // smallest size the cell draws its time at (8 dp): 11 dp of height
+      // gave about 7 pt (1.1.0 QA, F12).
+      final fontSize = extraStyle.fontSize!;
+      final share = math.max(
+        DayCell._extrasIconSize / measure.height,
+        AppTypography.cellTimeMinSize / fontSize,
+      );
+      extraHeight = measure.height * share;
+      extraWidth = measure.width * share;
+      extraFont = fontSize * share;
       measure.dispose();
     }
-    Widget extraMark() => extraText == null
+    // The hours as text, or (when they do not fit beside the number at a
+    // legible size) the small plus: the amount is in the spoken label and the
+    // detail of the day.
+    Widget extraMark({required bool asText}) => extraText == null || !asText
         ? Icon(
             AppIcons.extras,
             key: ValueKey('extras-mark-${date.toIso()}'),
@@ -637,7 +651,7 @@ class _DayMarks extends StatelessWidget {
           )
         : SizedBox(
             width: extraWidth,
-            height: DayCell._extrasIconSize,
+            height: extraHeight,
             child: FittedBox(
               child: Text(
                 extraText,
@@ -678,7 +692,7 @@ class _DayMarks extends StatelessWidget {
                   child: Row(
                     children: [
                       if (extras) ...[
-                        extraMark(),
+                        extraMark(asText: true),
                         const SizedBox(width: Sp.xs),
                       ],
                       Flexible(
@@ -726,34 +740,61 @@ class _DayMarks extends StatelessWidget {
           }
         }
 
-        final widths = [
-          if (extras) extraWidth,
-          if (note) DayCell._noteIconSize,
-          if (deviceEvents) DayCell._dotSize,
-          if (holiday) DayCell._dotSize,
-        ];
-        final natural =
-            widths.fold<double>(0, (a, b) => a + b) +
-            (widths.length - 1) * Sp.xs;
-        final width = math
-            .max(free, natural * 0.6)
-            .clamp(0.0, box.maxWidth - inset);
+        // The hours of the extras are drawn as text only where they fit beside
+        // the number at a legible size (never under the smallest size of a
+        // time in a cell, 8 dp, and never over the room of the number). Where
+        // they do not, with the clip of the note and the dots next to them,
+        // they become the small plus; the amount is in the spoken label and in
+        // the detail of the day.
+        double naturalOf({required bool asText}) {
+          final widths = [
+            if (extras)
+              (extraText != null && asText)
+                  ? extraWidth
+                  : DayCell._extrasIconSize,
+            if (note) DayCell._noteIconSize,
+            if (deviceEvents) DayCell._dotSize,
+            if (holiday) DayCell._dotSize,
+          ];
+          return widths.fold<double>(0, (x, y) => x + y) +
+              (widths.length - 1) * Sp.xs;
+        }
+
+        final minTextScale = extraText == null
+            ? 0.6
+            : math.min(1.0, AppTypography.cellTimeMinSize / extraFont);
+        // The gap before the marks (4 dp) may give up half of itself.
+        final room = free + Sp.hair;
+        final showText =
+            extraText != null &&
+            naturalOf(asText: true) * minTextScale <= room + 0.01;
+        final natural = naturalOf(asText: showText);
+        // The row shrinks to what the number leaves. With the hours as text
+        // that is all it takes. Otherwise it may go down to 60 % of its size
+        // and take a bit more room than the number leaves in a cell too
+        // narrow for anything else: the plus and the dots stay seen.
+        final width = showText
+            ? math.min(natural, room).clamp(0.0, box.maxWidth - inset)
+            : math.max(free, natural * 0.6).clamp(0.0, box.maxWidth - inset);
+        final rowHeight = showText
+            ? math.max(DayCell._noteIconSize, extraHeight)
+            : DayCell._noteIconSize;
         return Padding(
           padding: EdgeInsets.only(top: Sp.xs + Sp.hair, right: inset),
           child: Align(
             alignment: Alignment.topRight,
             child: SizedBox(
               width: width,
-              height: DayCell._noteIconSize,
+              height: rowHeight,
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.centerRight,
                 child: SizedBox(
-                  height: DayCell._noteIconSize,
+                  height: rowHeight,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (extras) extraMark(),
+                      if (extras) extraMark(asText: showText),
                       if (extras && (note || holiday || deviceEvents))
                         const SizedBox(width: Sp.xs),
                       if (note)

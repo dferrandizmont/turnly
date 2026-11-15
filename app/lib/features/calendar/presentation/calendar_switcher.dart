@@ -19,10 +19,14 @@ import '../../../core/widgets/app_snack_bar.dart';
 /// of the calendar on screen. Only there when the user has two or more
 /// calendars; a tap opens the sheet to switch (or to manage them).
 class CalendarSwitcher extends ConsumerWidget {
-  const CalendarSwitcher({super.key});
+  const CalendarSwitcher({super.key, this.widest = maxWidth});
 
   /// The pill never grows past this; a longer name is cut with an ellipsis.
   static const double maxWidth = 160;
+
+  /// The widest this pill gets: [maxWidth], or the whole line when the month
+  /// header gives it one of its own (large text).
+  final double widest;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -40,7 +44,7 @@ class CalendarSwitcher extends ConsumerWidget {
     final l10n = context.l10n;
 
     return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: maxWidth),
+      constraints: BoxConstraints(maxWidth: widest),
       child: Semantics(
         button: true,
         label: l10n.calendarsSwitcherLabel(active.name),

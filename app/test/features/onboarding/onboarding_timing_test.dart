@@ -30,7 +30,7 @@ void main() {
     await app.tap(key('onboarding-profession-nursing')); // 5: asked first
     await app.tap(key('onboarding-pattern-12h')); // 6
     await app.tap(key('onboarding-next')); // 7
-    await app.tap(key('onboarding-shift-night12')); // 8: the night of the cycle
+    await app.tap(key('onboarding-offset-1')); // 8: the night of the cycle
     await app.tap(key('onboarding-next')); // 9: "Continuar" (writes)
     await app.tap(key('onboarding-next')); // 10: "Ver mi calendario"
 

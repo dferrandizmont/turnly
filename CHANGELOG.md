@@ -10,6 +10,30 @@ at once, so they can skip numbers.
 
 ## Unreleased
 
+## 0.11.0 · 2026-11-14
+
+Android test build: build long rotations in blocks, use the "Weeks per shift" template, choose your cycle day and preview whole months, edit patterns as copies and remove unused ones, plus everything from 0.10.1 (store review prompt, "Rate Turnly" in Settings, large-text and amount-field fixes).
+
+- Added: build long rotations with editable blocks, duration shortcuts, repeat and undo, choose the start day from the numbered cycle strip, and confirm before discarding an edited sequence.
+- Added: "Weeks per shift" in Industry, with tap-to-order shifts, 1–8 weeks each and optional weekends off aligned to the start date.
+- Added: whole-month previews covering a complete cycle in the start step, refreshed when the end date or manual changes change in the last step.
+- Added: edit saved and catalogue patterns as a new copy, preserving existing rotations, and remove custom patterns unused by any calendar.
+- Changed: the pattern builder supports up to 371 days (53 weeks); imported and restored patterns keep their original length.
+
+- Fixed: the pattern builder keeps the shift palette in place for the first taps, and the wizard preview scrolls fully above its bottom buttons, including with large text on small screens.
+
+## 0.10.1 · 2026-11-13
+
+Android test build: Turnly can ask for a review in the store, and fixes for large text, number fields, the hourly rate and the overtime marks found in the iOS 1.1.0 test.
+
+- Added: Turnly may ask for a store review after you apply a rotation or finish a paint session that changed days, at most once per version and never during first use or right after a restore or an import; "Rate Turnly" in Settings › Help opens the store page.
+- **Large text.** The date at the top of a day no longer breaks inside its words or takes the screen, so "Add overtime" stays reachable; the month header (date, calendar name, Grid/List) stays compact and the calendar name keeps a line of its own.
+- **Number pads.** The break and hourly-rate fields get a "Done" bar above the keyboard, and tapping an empty part of the sheet closes the pad.
+- **Hourly rate.** Leading zeros are dropped as you type, you cannot type more than the highest rate, a pasted amount with thousands marks (1.234,56) is read correctly or refused, and the message names the range.
+- **Restore.** The preview now lists the overtime blocks the copy brings back.
+- **Settings.** A short label like "Quant a" no longer wraps beside its value, and a title with a long help is no longer squeezed into a narrow column.
+- **Month cell and PDF.** Overtime with minutes reads "+3:45" instead of "+3.8 h", always at a readable size: where it does not fit beside the day number the cell keeps the small plus. The PDF month shows each day's overtime in its cell.
+
 ## 1.1.0 · 2026-11-13
 
 iPhone and iPad update (App Store build 4) with everything from 0.9.8 and 0.10.0: overtime by blocks with types and rates, rotation changes from any day, the strip under the month, your longest run of days worked, the "2 and 2" and "3 and 1" rotations and the clearer job list on first use. Your existing data and overtime carry over unchanged.

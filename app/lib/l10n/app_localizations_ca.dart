@@ -25,6 +25,9 @@ class AppLocalizationsCa extends AppLocalizations {
   String get save => 'Desa';
 
   @override
+  String get keyboardDone => 'Fet';
+
+  @override
   String get undo => 'Desfés';
 
   @override
@@ -574,6 +577,9 @@ class AppLocalizationsCa extends AppLocalizations {
   String shiftTypesRestored(String name) {
     return 'S’ha recuperat «$name»';
   }
+
+  @override
+  String get patternDiscardTitle => 'Vols descartar la seqüència?';
 
   @override
   String get discardChangesTitle => 'Vols descartar els canvis?';
@@ -3015,11 +3021,11 @@ class AppLocalizationsCa extends AppLocalizations {
       'Toca «Pinta» al calendari, tria un torn a baix i toca els dies o passa-hi el dit per sobre. Per buidar un dia fes servir «Esborra». Cada traç es pot desfer i refer amb les fletxes de la barra. Toca «Fet» quan acabis.\n\nSi toques un dia sense estar pintant, se n’obre el detall: allà canvies el torn, hi afegeixes una nota o tornes al patró. Si mantens premut un dia, comences a triar-ne diversos alhora: els pots posar torn, copiar, retallar i enganxar, o repetir una setmana.';
 
   @override
-  String get faqPatternQ => 'Com aplico una rotació i què és el desfasament?';
+  String get faqPatternQ => 'Com creo i aplico un patró?';
 
   @override
   String get faqPatternA =>
-      'En mode pintar toca el botó «Patró» i segueix els passos: tria la teva rotació (o crea la teva), el dia que comences i fins quan es repeteix.\n\nEl desfasament és el punt del cicle on ets el dia d’inici. Si aquell dia et toca nit, al pas «En quin dia del cicle ets aquell dia?» toques la nit i la resta s’ajusta sola. Els dies que ja vas canviar a mà es respecten o se substitueixen, com prefereixis. Per acabar o treure una rotació, ves a Configuració › Les meves rotacions.';
+      'En mode pintar prem «Patró» i tria una rotació. A «Crea el meu» afegeixes blocs d’un torn i canvies quants dies dura cadascun; «Repeteix» copia des d’un bloc fins a l’últim. El constructor admet fins a 371 dies. A Indústria, «Setmanes per torn» permet triar l’ordre, les setmanes de cada torn i si tens els caps de setmana lliures.\n\nTria la data d’inici i toca a la tira el dia del cicle que et toca. A sota veus mesos complets fins a completar el cicle. A l’últim pas tries fins quan i si respectes o substitueixes els canvis a mà; la vista prèvia s’actualitza.\n\n«Edita» obre una còpia de qualsevol patró: «Desa com a patró nou» conserva l’original i les seves rotacions. Pots treure un patró propi si cap rotació el fa servir. Per acabar o treure una rotació ves a Configuració › Les meves rotacions.';
 
   @override
   String get faqDoubleQ => 'Com doblo un torn?';
@@ -3098,6 +3104,13 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get settingsEmailCopied => 'S’ha copiat el correu';
+
+  @override
+  String get settingsRateTitle => 'Valora Turnly';
+
+  @override
+  String get settingsRateSubtitle =>
+      'Una ressenya ajuda que altres persones la trobin';
 
   @override
   String get settingsAboutTitle => 'Quant a';
@@ -4592,6 +4605,9 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get backupUiPreviewTypes => 'Tipus de torn';
+
+  @override
+  String get backupUiPreviewOvertime => 'Blocs d’hores extra';
 
   @override
   String get backupUiPreviewRange => 'Dates';
@@ -7456,6 +7472,11 @@ class AppLocalizationsCa extends AppLocalizations {
   String get overtimeTypeInvalidRate => 'Escriu un preu per hora.';
 
   @override
+  String overtimeRateOutOfRange(String max) {
+    return 'Escriu un preu per hora entre 0 i $max.';
+  }
+
+  @override
   String get overtimeTypeOvertime => 'Hores extra';
 
   @override
@@ -7464,6 +7485,11 @@ class AppLocalizationsCa extends AppLocalizations {
   @override
   String dayCellOvertime(String hours) {
     return '+$hours h';
+  }
+
+  @override
+  String dayCellOvertimeClock(String time) {
+    return '+$time';
   }
 
   @override
@@ -7533,4 +7559,206 @@ class AppLocalizationsCa extends AppLocalizations {
   String widgetSevenDayHours(String duration) {
     return '7 dies: $duration';
   }
+
+  @override
+  String patternCopyName(String name, int number) {
+    return '$name ($number)';
+  }
+
+  @override
+  String get patternCycleLimit => 'El cicle pot tenir fins a 371 dies.';
+
+  @override
+  String get patternBlocksHelp =>
+      'Toca un torn per afegir un bloc; toca el bloc per canviar els dies.';
+
+  @override
+  String patternWeeks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count setmanes',
+      one: '1 setmana',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String patternDuration(String days, String weeks) {
+    return '$days · $weeks';
+  }
+
+  @override
+  String patternBlockTitle(String name, String days) {
+    return '$name × $days';
+  }
+
+  @override
+  String get patternOtherNumber => 'Un altre nombre';
+
+  @override
+  String get patternConsecutiveDays => 'Dies seguits';
+
+  @override
+  String get patternDayLess => 'Un dia menys';
+
+  @override
+  String get patternDayMore => 'Un dia més';
+
+  @override
+  String get patternBlockUp => 'Puja';
+
+  @override
+  String get patternBlockDown => 'Baixa';
+
+  @override
+  String get patternBlockDuplicate => 'Duplica';
+
+  @override
+  String get patternBlockSplit => 'Parteix';
+
+  @override
+  String get patternBlockSplitAfter => 'Parteix després d’aquests dies';
+
+  @override
+  String get patternBlockRemove => 'Treu';
+
+  @override
+  String get patternRepeatFrom => 'Repeteix des d’aquí…';
+
+  @override
+  String get patternRepeatHelp =>
+      'Des d’aquest bloc fins a l’últim. S’afegeixen còpies com a blocs normals.';
+
+  @override
+  String patternRepeatTotal(int count, String days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count vegades en total',
+      one: '1 vegada en total',
+    );
+    return '$_temp0 · $days';
+  }
+
+  @override
+  String get patternRepeatConfirm => 'Repeteix';
+
+  @override
+  String get patternRepeatLess => 'Una vegada menys';
+
+  @override
+  String get patternRepeatMore => 'Una vegada més';
+
+  @override
+  String get patternAddBlock => 'Afegeix un bloc';
+
+  @override
+  String get patternChangeShift => 'Canvia el torn';
+
+  @override
+  String get patternYourCycle => 'El teu cicle';
+
+  @override
+  String patternShowWeeks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Mostra les $count setmanes',
+      one: 'Mostra la setmana completa',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get patternCollapseCycle => 'Plega el cicle';
+
+  @override
+  String patternCycleDayLabel(int day, int total, String shifts) {
+    return 'Dia $day de $total, $shifts';
+  }
+
+  @override
+  String get patternCyclePickHelp =>
+      'Tria el dia del cicle que et toca en la data d’inici.';
+
+  @override
+  String patternNumberRange(int max) {
+    return 'Escriu un nombre entre 1 i $max.';
+  }
+
+  @override
+  String get patternWeeksTitle => 'Setmanes per torn';
+
+  @override
+  String get patternWeeksHint =>
+      'Diverses setmanes seguides de cada torn, amb caps de setmana lliures o sense.';
+
+  @override
+  String get patternWeeksOrder => 'Torns i ordre';
+
+  @override
+  String get patternWeeksOrderHelp =>
+      'Toca els torns en l’ordre en què els fas. Torna a tocar per treure’n un.';
+
+  @override
+  String patternWeeksPosition(int position) {
+    return 'Ordre: $position';
+  }
+
+  @override
+  String get patternWeeksEach => 'Setmanes de cada torn';
+
+  @override
+  String get patternWeeksDays => 'Quins dies treballes';
+
+  @override
+  String get patternWeeksAllDays => 'Tots els dies';
+
+  @override
+  String get patternWeeksWeekdays => 'De dilluns a divendres';
+
+  @override
+  String get patternWeekLess => 'Una setmana menys';
+
+  @override
+  String get patternWeekMore => 'Una setmana més';
+
+  @override
+  String get patternAdjustByHand => 'Ajusta a mà';
+
+  @override
+  String get patternEdit => 'Edita';
+
+  @override
+  String get patternSaveAsNew => 'Desa com a patró nou';
+
+  @override
+  String patternRemoveTitle(String name) {
+    return 'Vols treure «$name»?';
+  }
+
+  @override
+  String get patternRemoveHint => 'Es traurà dels teus patrons desats.';
+
+  @override
+  String get patternUsedHint =>
+      'Una rotació fa servir aquest patró. El pots editar com a còpia.';
+
+  @override
+  String get patternRemoveUnavailable =>
+      'No s’ha tret. Pot estar en ús en un altre calendari o potser no s’ha pogut desar.';
+
+  @override
+  String get patternManualChange => 'Canvi a mà';
+
+  @override
+  String get patternRemove => 'Treu';
+
+  @override
+  String get patternCycleScrollable =>
+      'La tira del cicle es desplaça horitzontalment';
+
+  @override
+  String get patternDurationShortcuts => 'Dreceres de durada';
 }

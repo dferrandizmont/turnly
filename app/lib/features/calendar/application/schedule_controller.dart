@@ -151,6 +151,12 @@ class ScheduleController extends Notifier<ScheduleState> {
 
   bool get strokeActive => _strokeBase != null;
 
+  /// How many strokes closed with at least one day changed since the app
+  /// started. Paint mode compares it on entering and leaving to know whether
+  /// the session changed anything.
+  int get changedStrokes => _changedStrokes;
+  int _changedStrokes = 0;
+
   /// Completes when every write queued so far has finished (or failed and
   /// been recovered). For tests and orderly shutdown.
   Future<void> get pendingWrites => _queue;
@@ -195,6 +201,7 @@ class ScheduleController extends Notifier<ScheduleState> {
     _strokeBase = null;
     _strokeTool = null;
     _strokeDays.clear();
+    if (!plan.change.isEmpty) _changedStrokes++;
     _undo.push(plan.change);
     _emit(plan.schedule, newTypes: plan.newTypes);
     _enqueueWrite(plan.change, newTypes: plan.newTypes);
@@ -1044,6 +1051,62 @@ class ScheduleController extends Notifier<ScheduleState> {
 
   // ---- Patterns and automatic saliente (docs/motor-de-turnos.md) ----------
   // Everything below belongs to the pattern wizard / "Saliente automático".
+
+  /// Pattern library writes share the schedule's serial queue. A failed or
+  /// discarded write returns null/false and follows the usual recovery path.
+  Future<Pattern?> saveAsNewPattern({
+    required List<List<String>> steps,
+    required String name,
+    required String Function(String name, int number) copyName,
+  }) async {
+    if (strokeActive) endStroke();
+    Pattern? saved;
+    // Freeze the draft before waiting behind any earlier writes.
+    final draft = [for (final step in steps) List<String>.of(step)];
+    _enqueueTask((repository) async {
+      final pattern = await repository.saveAsNewPattern(
+        steps: draft,
+        name: name,
+        copyName: copyName,
+      );
+      if (!ref.mounted) return;
+      state = state.copyWith(
+        schedule: state.schedule.copyWith(
+          patterns: [...state.schedule.patterns, pattern],
+        ),
+      );
+      saved = pattern;
+    });
+    await pendingWrites;
+    return saved;
+  }
+
+  Future<bool> deletePatternIfUnused(String id) async {
+    if (strokeActive) endStroke();
+    var deleted = false;
+    _enqueueTask((repository) async {
+      if (state.schedule.runs.any((run) => run.patternId == id)) return;
+      if (!await repository.deletePatternIfUnused(id)) return;
+      if (!ref.mounted) return;
+      // An undo of a removed run could otherwise refer to the deleted pattern.
+      _undo.clear();
+      _noteStep = null;
+      _noteStepDate = null;
+      state = state.copyWith(
+        schedule: state.schedule.copyWith(
+          patterns: [
+            for (final p in state.schedule.patterns)
+              if (p.id != id) p,
+          ],
+        ),
+        canUndo: false,
+        canRedo: false,
+      );
+      deleted = true;
+    });
+    await pendingWrites;
+    return deleted;
+  }
 
   /// Applies a pattern as ONE undoable step (new run, runs cut or deleted,
   /// overrides replaced when asked, automatic saliente when it is on).

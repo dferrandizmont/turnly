@@ -1,19 +1,17 @@
+import 'dart:ui' show Tristate;
+
 import 'package:cuadrante/core/bootstrap/bootstrap.dart';
-import 'package:cuadrante/core/l10n/catalog_texts.dart';
 import 'package:cuadrante/core/theme/app_theme.dart';
-import 'package:cuadrante/core/widgets/choice_grid.dart';
-import 'package:cuadrante/core/widgets/choice_pill.dart';
 import 'package:cuadrante/features/patterns/presentation/cycle_start_picker.dart';
+import 'package:cuadrante/features/patterns/presentation/cycle_strip.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
 import 'package:cuadrante/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../support/real_font.dart';
 import '../../support/text_lines.dart';
 
-/// The shared "which day of the cycle" picker on its own, without the whole
-/// app: the labels of «ese turno se repite», the tap that keeps the choice,
-/// the empty cycle and the first-use texts of the catalogue.
 ShiftType? _shiftOf(String id) {
   for (final template in shiftTemplates) {
     if (template.key == id) return template.toShiftType(id);
@@ -26,11 +24,12 @@ Future<void> _pump(
   required List<List<String>> steps,
   int offset = 0,
   Locale locale = const Locale('es'),
+  bool dark = false,
   ValueChanged<int>? onOffsetChanged,
 }) async {
   await tester.pumpWidget(
     MaterialApp(
-      theme: AppTheme.light(),
+      theme: dark ? AppTheme.dark() : AppTheme.light(),
       locale: locale,
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -43,6 +42,7 @@ Future<void> _pump(
             onOffsetChanged: onOffsetChanged ?? (_) {},
             start: const CivilDate(2026, 10, 19),
             plan: null,
+            showPreview: false,
           ),
         ),
       ),
@@ -51,200 +51,201 @@ Future<void> _pump(
   await tester.pumpAndSettle();
 }
 
+Finder _key(String key) => find.byKey(ValueKey(key));
+
 void main() {
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
     await initializeLocale();
+    expect(await loadRoboto(), isTrue);
   });
 
-  testWidgets('a cycle with no days draws nothing, it does not divide by '
-      'zero', (tester) async {
-    await _pump(tester, steps: const <List<String>>[]);
+  testWidgets('empty cycle draws nothing', (tester) async {
+    await _pump(tester, steps: const []);
+    expect(find.byType(CycleStrip), findsNothing);
     expect(tester.takeException(), isNull);
-    expect(find.byType(CycleStartPicker), findsOneWidget);
   });
 
-  testWidgets('tapping the shift already chosen keeps the cycle day', (
+  testWidgets(
+    'all 63 days are visible; day 22 chooses offset 21 with full semantics',
+    (tester) async {
+      final semantics = tester.ensureSemantics();
+      final calls = <int>[];
+      await _pump(
+        tester,
+        steps: [
+          for (var i = 0; i < 21; i++) ['morning'],
+          for (var i = 0; i < 21; i++) ['night'],
+          for (var i = 0; i < 21; i++) ['afternoon'],
+        ],
+        offset: 21,
+        onOffsetChanged: calls.add,
+      );
+      expect(_key('offset-62'), findsOneWidget);
+      expect(_key('cycle-toggle'), findsNothing);
+      await tester.ensureVisible(_key('offset-21'));
+      await tester.tap(_key('offset-21'));
+      await tester.pumpAndSettle();
+      expect(calls, [21]);
+      final node = tester.getSemantics(_key('offset-21'));
+      expect(node.label, 'Día 22 de 63, Noche, 22:00–06:00');
+      expect(
+        node.getSemanticsData().flagsCollection.isSelected,
+        Tristate.isTrue,
+      );
+      expect(_key('shift-night'), findsNothing);
+      semantics.dispose();
+    },
+  );
+
+  testWidgets('folds after 12 rows and expands all 53 weeks', (tester) async {
+    await _pump(tester, steps: List.generate(371, (_) => ['morning']));
+    expect(_key('offset-83'), findsOneWidget);
+    expect(_key('offset-84'), findsNothing);
+    expect(find.text('Ver las 53 semanas'), findsOneWidget);
+    await tester.ensureVisible(_key('cycle-toggle'));
+    await tester.tap(_key('cycle-toggle'));
+    await tester.pumpAndSettle();
+    expect(_key('offset-370'), findsOneWidget);
+    await tester.ensureVisible(_key('cycle-toggle'));
+    await tester.tap(_key('cycle-toggle'));
+    await tester.pumpAndSettle();
+    expect(_key('offset-84'), findsNothing);
+  });
+
+  testWidgets('empty and multiple shifts stay distinct and accessible', (
     tester,
   ) async {
-    final calls = <int>[];
-    await _pump(
-      tester,
-      steps: patternPresetById('continental').steps,
-      // Day 10 of the cycle (offset 9) is a Mañana, the first day of its
-      // second run.
-      offset: 9,
-      onOffsetChanged: calls.add,
-    );
-
-    // The shift is already chosen: the tap must not move the day.
-    await tester.tap(find.byKey(const ValueKey('shift-morning')));
-    await tester.pumpAndSettle();
-    expect(calls, isEmpty);
-
-    // Another shift does move it, to its first day (the first Noche).
-    await tester.tap(find.byKey(const ValueKey('shift-night')));
-    await tester.pumpAndSettle();
-    expect(calls, [4]);
-  });
-
-  testWidgets('a run whose previous day is empty is labelled without '
-      '«después de»', (tester) async {
+    final semantics = tester.ensureSemantics();
     await _pump(
       tester,
       steps: [
-        <String>[],
-        ['morning'],
-        ['morning'],
-        <String>[],
-        ['morning'],
-      ],
-      offset: 1,
-    );
-
-    // Two Mañana runs, each preceded by an empty day: the plain label, with
-    // no dangling «después de » and no shift claimed before it.
-    expect(find.text('Tanda 1 · Día 1 de 2'), findsOneWidget);
-    expect(find.text('Tanda 2 · Mañana'), findsOneWidget);
-    final labels = [
-      for (final pill in tester.widgetList<ChoicePill>(find.byType(ChoicePill)))
-        pill.label,
-    ];
-    expect(labels.any((l) => l.contains('después de')), isFalse);
-  });
-
-  testWidgets('tapping a shift that shares the day selects the tapped one', (
-    tester,
-  ) async {
-    await _pump(
-      tester,
-      steps: [
+        [],
+        ['rest'],
         ['morning', 'night'],
-        ['afternoon'],
       ],
     );
-    // The first shift of the day is selected at first.
-    expect(
-      tester
-          .widget<ChoicePill>(find.byKey(const ValueKey('shift-morning')))
-          .selected,
-      isTrue,
-    );
-
-    // Noche shares that day (its only one), so the offset does not move; even
-    // so, the tapped pill must be the selected one.
-    await tester.tap(find.byKey(const ValueKey('shift-night')));
-    await tester.pumpAndSettle();
-    expect(
-      tester
-          .widget<ChoicePill>(find.byKey(const ValueKey('shift-night')))
-          .selected,
-      isTrue,
-    );
-    expect(
-      tester
-          .widget<ChoicePill>(find.byKey(const ValueKey('shift-morning')))
-          .selected,
-      isFalse,
-    );
-  });
-
-  testWidgets('Basque keeps the ordinal as its own phrase, never glued to '
-      'the display', (tester) async {
-    final previous = catalogTexts;
-    addTearDown(() => catalogTexts = previous);
-    catalogTexts = catalogTextsFrom(lookupAppLocalizations(const Locale('eu')));
-    await _pump(
-      tester,
-      steps: patternPresetById('continental').steps,
-      locale: const Locale('eu'),
-    );
-    // The ordinal is «1. eguna», a whole phrase the message inserts on its
-    // own; the run number leads the label.
-    expect(
-      find.text('1. sorta · 1. eguna, guztira 2 · Aurrekoa: Libre'),
-      findsOneWidget,
-    );
-  });
-
-  testWidgets('English ordinal select renders', (tester) async {
-    final previous = catalogTexts;
-    addTearDown(() => catalogTexts = previous);
-    catalogTexts = catalogTextsFrom(lookupAppLocalizations(const Locale('en')));
-    await _pump(
-      tester,
-      steps: patternPresetById('continental').steps,
-      offset: 1,
-      locale: const Locale('en'),
-    );
-    expect(find.text('Run 1 · Day 2 of 2, after Off'), findsOneWidget);
-  });
-
-  testWidgets('Catalan ordinal select renders', (tester) async {
-    final previous = catalogTexts;
-    addTearDown(() => catalogTexts = previous);
-    catalogTexts = catalogTextsFrom(lookupAppLocalizations(const Locale('ca')));
-    await _pump(
-      tester,
-      steps: patternPresetById('continental').steps,
-      offset: 1,
-      locale: const Locale('ca'),
-    );
-    expect(
-      find.text('Tanda 1 · Dia 2 de 2, després de Lliure'),
-      findsOneWidget,
-    );
-  });
-
-  Future<List<Rect>> pumpAt(
-    WidgetTester tester, {
-    required Size size,
-    double textScale = 1,
-  }) async {
-    tester.view.physicalSize = size;
-    tester.view.devicePixelRatio = 1;
-    tester.platformDispatcher.textScaleFactorTestValue = textScale;
-    addTearDown(tester.view.reset);
-    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
-    await _pump(tester, steps: patternPresetById('continental').steps);
-    final pills = find.byType(ChoicePill);
-    return [for (var i = 0; i < 4; i++) tester.getRect(pills.at(i))];
-  }
-
-  // The test font is much wider than the app's (every glyph a square), so
-  // the phone here is wider than the 360 dp one that gets two columns.
-  testWidgets('on a phone the shift choices go two by two, aligned', (
-    tester,
-  ) async {
-    final rects = await pumpAt(tester, size: const Size(480, 900));
-    expect(rects[0].width, moreOrLessEquals(rects[1].width));
-    expect(rects[0].top, moreOrLessEquals(rects[1].top));
-    expect(rects[0].height, moreOrLessEquals(rects[1].height));
-    expect(rects[1].left, greaterThan(rects[0].right));
-    expect(rects[0].left, moreOrLessEquals(rects[2].left));
-    expect(rects[1].left, moreOrLessEquals(rects[3].left));
-    expect(rects[2].top, greaterThan(rects[0].bottom));
-    expect(brokenParagraphs(tester), isEmpty);
-    expect(tester.takeException(), isNull);
+    expect(tester.getSemantics(_key('offset-0')).label, contains('Sin turno'));
+    expect(tester.getSemantics(_key('offset-1')).label, contains('Libre'));
+    final label = tester.getSemantics(_key('offset-2')).label;
+    expect(label, contains('Mañana'));
+    expect(label, contains('Noche'));
+    expect(label, contains('22:00–06:00'));
+    semantics.dispose();
   });
 
   for (final (size, scale) in [
-    (const Size(320, 900), 1.3),
-    (const Size(420, 900), 2.0),
-    (const Size(760, 1000), 2.0),
-    (const Size(1200, 800), 1.0),
+    (const Size(320, 568), 2.0),
+    (const Size(390, 844), 1.0),
+    (const Size(1024, 768), 2.0),
   ]) {
-    testWidgets('no word breaks in the choices at ${size.width} dp, text '
-        '$scale', (tester) async {
-      await pumpAt(tester, size: size, textScale: scale);
-      expect(brokenParagraphs(tester), isEmpty);
-      expect(tester.takeException(), isNull);
-    });
+    for (final dark in [false, true]) {
+      testWidgets(
+        'seven columns and touch targets at $size x$scale, dark $dark',
+        (tester) async {
+          tester.view.physicalSize = size;
+          tester.view.devicePixelRatio = 1;
+          tester.platformDispatcher.textScaleFactorTestValue = scale;
+          addTearDown(tester.view.reset);
+          addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+          await _pump(
+            tester,
+            steps: List.generate(63, (_) => ['night']),
+            dark: dark,
+          );
+          for (var i = 0; i < 7; i++) {
+            final rect = tester.getRect(_key('offset-$i'));
+            expect(rect.width, greaterThanOrEqualTo(48));
+            expect(rect.height, greaterThanOrEqualTo(48));
+            expect(rect.top, tester.getRect(_key('offset-0')).top);
+          }
+          expect(
+            tester.getRect(_key('offset-7')).top,
+            greaterThan(tester.getRect(_key('offset-0')).bottom),
+          );
+          await tester.ensureVisible(_key('offset-21'));
+          expect(brokenParagraphs(tester), isEmpty);
+          expect(tester.takeException(), isNull);
+        },
+      );
+    }
   }
 
-  test('the grid fits one to three columns', () {
-    expect(ChoiceGrid.columnsFor(320, 150), 2);
-    expect(ChoiceGrid.columnsFor(320, 200), 1);
-    expect(ChoiceGrid.columnsFor(2000, 150), 3);
-  });
+  for (final scale in [1.0, 2.0]) {
+    testWidgets(
+      'selected cycle column scrolls into view initially and on changes x$scale',
+      (tester) async {
+        tester.view.physicalSize = const Size(320, 568);
+        tester.view.devicePixelRatio = 1;
+        tester.platformDispatcher.textScaleFactorTestValue = scale;
+        addTearDown(tester.view.reset);
+        addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+        final semantics = tester.ensureSemantics();
+        for (final offset in [6, 7, 13, 0]) {
+          await _pump(
+            tester,
+            steps: List.generate(21, (_) => ['night']),
+            offset: offset,
+          );
+          final rect = tester.getRect(_key('offset-$offset'));
+          expect(rect.left, greaterThanOrEqualTo(0));
+          expect(rect.right, lessThanOrEqualTo(320));
+          expect(_key('offset-$offset').hitTestable(), findsOneWidget);
+          expect(
+            find.bySemanticsLabel(
+              'La tira del ciclo se desplaza horizontalmente',
+            ),
+            findsOneWidget,
+          );
+          expect(tester.takeException(), isNull);
+        }
+        semantics.dispose();
+      },
+    );
+  }
+
+  const phrases = {
+    'es': [
+      ('1 día', '1 semana', '1 vez en total', 'Ver la semana completa'),
+      ('3 días', '3 semanas', '3 veces en total', 'Ver las 3 semanas'),
+      ('53 días', '53 semanas', '53 veces en total', 'Ver las 53 semanas'),
+    ],
+    'ca': [
+      ('1 dia', '1 setmana', '1 vegada en total', 'Mostra la setmana completa'),
+      ('3 dies', '3 setmanes', '3 vegades en total', 'Mostra les 3 setmanes'),
+      (
+        '53 dies',
+        '53 setmanes',
+        '53 vegades en total',
+        'Mostra les 53 setmanes',
+      ),
+    ],
+    'gl': [
+      ('1 día', '1 semana', '1 vez en total', 'Ver a semana completa'),
+      ('3 días', '3 semanas', '3 veces en total', 'Ver as 3 semanas'),
+      ('53 días', '53 semanas', '53 veces en total', 'Ver as 53 semanas'),
+    ],
+    'eu': [
+      ('Egun 1', '1 aste', 'Guztira 1 aldiz', 'Ikusi aste osoa'),
+      ('3 egun', '3 aste', 'Guztira 3 aldiz', 'Ikusi aste guztiak: 3'),
+      ('53 egun', '53 aste', 'Guztira 53 aldiz', 'Ikusi aste guztiak: 53'),
+    ],
+    'en': [
+      ('1 day', '1 week', '1 time in total', 'Show the whole week'),
+      ('3 days', '3 weeks', '3 times in total', 'Show all 3 weeks'),
+      ('53 days', '53 weeks', '53 times in total', 'Show all 53 weeks'),
+    ],
+  };
+  for (final entry in phrases.entries) {
+    test('complete day, week and repetition plurals in ${entry.key}', () {
+      final l10n = lookupAppLocalizations(Locale(entry.key));
+      for (final (i, count) in [1, 3, 53].indexed) {
+        final (days, weeks, times, showWeeks) = entry.value[i];
+        expect(l10n.patternCycleDays(count), days);
+        expect(l10n.patternWeeks(count), weeks);
+        expect(l10n.patternShowWeeks(count), showWeeks);
+        expect(l10n.patternRepeatTotal(count, days), '$times · $days');
+      }
+    });
+  }
 }

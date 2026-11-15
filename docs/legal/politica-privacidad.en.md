@@ -1,6 +1,6 @@
 # Turnly privacy policy
 
-Last updated: 4 November 2026
+Last updated: 13 November 2026
 
 Courtesy translation. The Spanish version ([politica-privacidad.md](politica-privacidad.md)) is the one that
 applies.
@@ -70,8 +70,19 @@ may ring late. It does not ask for location, contacts, photos, camera, microphon
 published Android version has no network permission.
 
 ### Communications
-The app transmits no shifts, identifiers or crash reports. It uses no purchases, ads, analytics or third-party
-services. Errors are handled on the device only.
+The app transmits no shifts, identifiers or crash reports. It uses no purchases, ads or analytics. Errors are handled
+on the device only.
+
+**Store ratings.** Now and then, after you apply a rotation or paint days, Turnly may ask the store (Google Play or the
+App Store) to show you its window to rate the app; the store decides whether to show it. You can also open Turnly's
+store page from Settings › Help › “Rate Turnly”. For this the app uses the Google Play review library on Android and
+the system feature on iPhone and iPad. Turnly only tells the store which app it is: it passes none of your shifts or
+any other data of yours, and does not know whether you rated the app or what you wrote. You write your rating and
+review in the store's window and Google or Apple receives them, with your store account and under their terms. To
+decide when to ask, the app keeps on the phone the day you first opened it, how many days you have opened it, and how
+many times, when and with which version it asked for a rating. These counters are not in the `.turnly` file and Turnly
+sends them to no one; they sit in the app's database, so they only leave the phone inside the system backup, if you
+have it on (see “System backup”).
 
 If you tap "Privacy policy" in Settings › Help, this page opens in your external browser. The browser connects to
 the website; Turnly sends it none of your shifts, notes or absences.
@@ -99,13 +110,14 @@ screenshots with real shifts, notes or absences: made-up data is enough to fix a
 We make no automated decisions and build no profiles about you.
 
 ## 4. Who receives the data
-The app transmits no data to third parties. If you send a support email, the holder receives it at turnly@mainshai.com
+The app transmits no data to third parties. If you rate the app in the store, Google or Apple receives your rating and
+review directly, not us. If you send a support email, the holder receives it at turnly@mainshai.com
 through the mail service you choose. If you export to a synced calendar or have system backup on, the recipient of
 that data is your account provider (Google, Apple or another), on your behalf and under its terms.
 
 ## 5. International transfers
-The app makes no data transfers. External services you decide to use (mail, cloud, synced calendar or the destination
-of an export) are governed by their own terms.
+The app makes no data transfers. External services you decide to use (mail, cloud, synced calendar, the destination
+of an export or the store where you rate the app) are governed by their own terms.
 
 ## 6. Retention
 

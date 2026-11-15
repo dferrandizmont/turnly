@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../review/application/review_providers.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import 'schedule_controller.dart';
 
@@ -71,12 +74,24 @@ class PaintController extends Notifier<PaintState> {
 
   void toggle() => state.active ? exit() : enter();
 
-  void enter() => state = state.copyWith(active: true);
+  int _strokesAtEnter = 0;
 
-  /// Leaves paint mode, closing any stroke still open.
+  void enter() {
+    _strokesAtEnter = ref
+        .read(scheduleControllerProvider.notifier)
+        .changedStrokes;
+    state = state.copyWith(active: true);
+  }
+
+  /// Leaves paint mode, closing any stroke still open. A session that
+  /// changed at least one day is a success moment for the review prompt.
   void exit() {
-    ref.read(scheduleControllerProvider.notifier).endStroke();
+    final schedule = ref.read(scheduleControllerProvider.notifier)..endStroke();
+    final wasActive = state.active;
     state = state.copyWith(active: false);
+    if (wasActive && schedule.changedStrokes > _strokesAtEnter) {
+      unawaited(ref.read(reviewServiceProvider).maybeAskAfterSuccess());
+    }
   }
 
   /// The brush to paint with now (see [PaintState.toolFor]).

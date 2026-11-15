@@ -1,0 +1,5 @@
+// Widget extension build settings. Generated.xcconfig (written by `flutter pub get`)
+// provides FLUTTER_BUILD_NAME / FLUTTER_BUILD_NUMBER, so the extension's
+// CFBundleShortVersionString / CFBundleVersion always match the host app
+// (App Store validation rejects a mismatch).
+#include "../Flutter/Generated.xcconfig"

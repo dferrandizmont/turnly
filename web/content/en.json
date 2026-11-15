@@ -11,7 +11,7 @@
     "Automatic backups you can check with “Test restore” and, on Android, one a day in the folder you choose (Drive, Dropbox, OneDrive…). Import LRHSoft Shifter backups, .ics, CSV or your phone calendar. With “Keep up to date”, your shifts go to your phone calendar; you can also save them as an .ics file.",
     "Worked, night and public holiday hours and early leave by month, quarter, year or any dates, with your hours goal and hours bank. Overtime by blocks, with types and rates; choose whether each type counts toward your goal. Hourly rate plus fixed, night and holiday premiums: estimated gross pay, and net pay with your withholding. Summary and PDF reports show your longest run of days worked in a row. PDF and CSV reports.",
     "Vacation, personal days and leave balances per year, with carried-over days and when they expire. In the swap book you log the shifts you swap with colleagues, see who owes whom and apply them to the calendar.",
-    "Public holidays for Spain, with its regions and many municipalities, and for 21 more countries, all offline, plus your own. Make it yours: time and date format, currency, five accent colors, ready-made palettes for your shifts and a calendar background image."
+    "Public holidays for Spain, with its regions and many municipalities, and for 40 more countries, all offline, plus your own. Make it yours: time and date format, currency, ten accent colors, ready-made palettes for your shifts and a calendar background image."
   ],
   "privacy_summary": [
     "Your shifts, notes and absences are stored only on your phone: there is no account, no server of ours and no analytics.",
@@ -31,8 +31,8 @@
       "answer": "Join the turnly-testers group on Google Groups with your Google account, accept the test at the Google Play link and install the app from the store. It updates itself."
     },
     {
-      "question": "What about iPhone?",
-      "answer": "Yes: Turnly has been on the App Store since 10 November 2026, free, for iPhone with iOS 17 or later."
+      "question": "What about iPhone and iPad?",
+      "answer": "Yes: Turnly has been on the App Store since 10 November 2026, free, for iPhone with iOS 17 or later and, since 1.1.0, also for iPad with iPadOS 17 or later."
     },
     {
       "question": "How do I move Turnly to a new phone?",
@@ -67,12 +67,12 @@
   "theme_light": "Light",
   "theme_dark": "Dark",
   "theme_hint": "Change theme",
-  "download_title": "Android is in testing; iPhone is on the App Store.",
+  "download_title": "Android is in testing; iPhone and iPad are on the App Store.",
   "download_intro": "Light and dark themes. Free, with no account.",
   "download_notes": {
     "play": "Anyone can join: first join the testers group, then accept the test.",
     "apk": "Install it by hand. Since 0.8.3 it has the same signature as the Google Play version: you can switch between them without uninstalling.",
-    "app_store": "Free on the App Store, for iPhone with iOS 17 or later."
+    "app_store": "Free on the App Store, for iPhone and iPad with iOS 17 or later."
   },
   "join_title": "How to join the Google Play test",
   "join_steps": [

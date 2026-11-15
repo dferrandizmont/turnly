@@ -11,6 +11,7 @@ import '../../device_events/data/device_events_repository.dart'
     show deviceEventsKey;
 import '../../notes/data/attachment_store.dart';
 import '../../notes/domain/note_attachment.dart' show AttachmentFault;
+import '../../review/data/review_repository.dart' show reviewSettingPrefix;
 import '../../schedule/data/overtime_store.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../../settings/domain/preferences.dart' show PreferenceKeys;
@@ -55,6 +56,9 @@ bool isDeviceSetting(String key) =>
     // Which phone calendars are shown next to the shifts: their ids belong to
     // the phone that handed them out.
     key == deviceEventsKey ||
+    // The counters of the store-review prompt belong to this install: a
+    // restored copy must not reset them (or bring another phone's).
+    key.startsWith(reviewSettingPrefix) ||
     key == PreferenceKeys.language ||
     key == PreferenceKeys.timeFormat ||
     // The picture behind the month is not in the backup (its file does not

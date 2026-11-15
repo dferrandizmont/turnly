@@ -160,9 +160,9 @@ datos van al destino que elijas. El archivo de copia `.turnly` no está cifrado.
 
 ## Novedades
 
+- **0.11.0 (15-nov-2026):** Android: crea rotaciones largas por bloques («Mañana × 21»), con atajos de semanas, «Repetir» y la plantilla «Semanas por turno». Elige el día del ciclo en una tira numerada, previsualiza meses enteros y edita patrones como copia; la app también puede pedirte una valoración en la tienda.
 - **1.1.0 (13-nov-2026):** ahora también en iPad. El iPhone y el iPad reciben todo lo de la 0.10.0: horas extra por bloques, acciones de rotación desde el día, la tira del mes, tu racha más larga y las rotaciones nuevas. Los widgets de iPhone muestran las horas extra y el total de siete días.
 - **0.10.0 (12-nov-2026):** horas extra por bloques con tipos y tarifa, y acciones de rotación desde el día. Tira del mes con el próximo libre, racha más larga en el Resumen, widgets de Android con extras y total de siete días, y rotaciones «2 y 2» / «3 y 1».
-- **1.0.0 (10-nov-2026):** primera versión en la App Store, para iPhone. Android sigue en pruebas en Google Play.
 
 Lo que cambia en cada versión está en [CHANGELOG.md](CHANGELOG.md) y en las
 [versiones publicadas](https://github.com/dferrandizmont/turnly/releases).

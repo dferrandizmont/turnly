@@ -263,6 +263,41 @@ void main() {
       );
       expect(_asText(await _plainPdf(model)), contains('+2'));
     });
+
+    test(
+      'a day with extra hours shows them in its cell (1.1.0 QA F12)',
+      () async {
+        const day = CivilDate(2026, 10, 7);
+        final schedule = Schedule(
+          shiftTypes: const [morning],
+          entries: {
+            day: const DayEntry(
+              date: day,
+              shiftTypeIds: ['m'],
+              overtimeBlocks: [
+                OvertimeBlock(
+                  id: 'a',
+                  date: day,
+                  typeId: overtimeTypeId,
+                  startMinute: 840,
+                  endMinute: 1065,
+                ),
+              ],
+            ),
+          },
+        );
+        final model = buildReport(
+          schedule: schedule,
+          range: october,
+          calendarName: 'x',
+          holidays: const {},
+          today: const CivilDate(2026, 10, 1),
+        );
+        // 3 h 45 min in the fixture's wording; the totals say it too, but the
+        // cell is the only place with the leading plus.
+        expect(_asText(await _plainPdf(model)), contains('+3 h 45 min'));
+      },
+    );
   });
 
   group('embedded fonts', () {

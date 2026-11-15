@@ -358,6 +358,45 @@ restaura el original exacto). En un patrón sin fin solo se miran los siguientes
 excepción y se guarda una a una). Si el tipo Saliente no existe se crea desde la plantilla; si el usuario lo
 archivó, se respeta y no se añade nada.
 
+### Bloques y semanas por turno (decisión 36, 14-nov-2026)
+
+El catálogo del asistente ofrece **Semanas por turno** en Industria, antes del Correturnos fijo (que conserva su
+secuencia). Los toques eligen los turnos de trabajo y su orden; tocar otra vez quita y renumera. Cada turno admite
+1–8 semanas. Todos los días o lunes a viernes genera la lista plana con `weeksPerShift`; en el segundo caso,
+`weeksPerShiftStepOffset` alinea el ciclo con la fecha real de inicio, también al cambiarla. **Ajustar a mano**
+abre esa misma secuencia en bloques. No se guardan respuestas ni un esquema nuevo.
+
+En el paso 2, bajo la tira, **Así quedará** dibuja meses enteros en vertical desde el mes del inicio hasta el
+último día de un ciclo completo (mínimo uno), sin flechas. Reutiliza `MiniMonth`/`DayCell`, con código, color y
+horario y un lápiz bajo los cambios a mano. El paso 3 repite el componente con el mismo `patternPreviewProvider`:
+cambiar fin o sustituir excepciones actualiza el resultado. El contenido desplazable acaba sobre la barra fija.
+
+**Editar** un patrón propio o del catálogo abre sus días comprimidos en el constructor. **Guardar como patrón
+nuevo** usa `ScheduleController.saveAsNewPattern`, con id nuevo y nombre disponible, y lleva al paso de inicio
+para aplicarlo. El patrón original y sus rotaciones no cambian al guardar. **Quitar** solo aparece si ninguna
+rotación lo usa, ni siquiera terminada o de otro calendario archivado (`usedPatternIds`); el diálogo nombra el
+patrón y `deletePatternIfUnused` comprueba de nuevo el uso al escribir.
+
+`patterns/domain/pattern_blocks.dart` representa los días seguidos iguales como `PatternBlock(shiftIds, days)`
+inmutable; los ids conservan el orden, `[]` es Sin turno y `[idLibre]` es Libre. `compressSteps` y `expandBlocks`
+son inversas al expandir después de comprimir. Las ediciones puras devuelven `PatternBlockEdit`: `blocks` es la
+lista resultante y `exceedsLimit` avisa si se rechazó la operación, conservando el contenido original.
+Fijar días, insertar, quitar, mover, duplicar y partir no fusionan bloques; `splitBlock` parte después de N días
+(1 a duración − 1). `repeatFrom` repite el tramo hasta el final N veces **en total**, como bloques normales.
+El tope `maxPatternCycleDays = 371` se cuenta expandido y es **solo del constructor**; comprimir/expandir, el
+motor, importar y restaurar siguen admitiendo ciclos más largos.
+
+`weeks_per_shift.dart` genera ciclos que empiezan en lunes: turnos en orden, 1–8 semanas por turno, todos los
+días o lunes a viernes con el tipo Libre del calendario los fines de semana. `weeksPerShiftStepOffset(inicio)`
+devuelve `inicio.weekday − 1`: empezar un miércoles usa el paso 2 de la primera semana, sin desplazar los libres.
+Mañana, Tarde y Noche con una semana cada uno y lunes a viernes reproduce el Correturnos existente.
+
+`saveAsNewPattern` crea otro id y propone un nombre libre mediante `patternCopyName` del ARB; nunca modifica
+el patrón de origen. `deletePatternIfUnused` solo quita patrones propios sin ninguna rotación en ningún
+calendario (también archivados y rotaciones terminadas), comprobado en una transacción. El controlador vacía
+el historial local al quitar uno para que deshacer una rotación retirada no recupere referencias huérfanas.
+Sin cambio de esquema ni de copia: esta exporta las filas de patrones que existan.
+
 ## Resumen del mes (gratis, `app/lib/features/summary/`)
 
 `summarizeMonth(schedule, mes, holidays:, window:)` (Dart puro, `domain/month_summary.dart`) cuenta un mes natural del

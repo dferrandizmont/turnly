@@ -105,11 +105,8 @@ class FirstLaunch {
   /// The last step (optional) with nothing chosen before: «Pintar a mano».
   Future<void> toLastStep() => choosePath('paint');
 
-  /// Picks the cycle day [index] in «¿Cuándo empiezas?»: opens the whole-cycle
-  /// grid behind «Ver el ciclo completo» and taps the day. Two taps (the
-  /// grid is the detailed way; the shift chips are the quick one).
+  /// Picks the numbered cycle day directly in the shared strip.
   Future<void> selectCycleDay(int index) async {
-    await tap(key('onboarding-cycle-toggle'));
     await tap(key('onboarding-offset-$index'));
   }
 

@@ -18,6 +18,7 @@ import '../application/schedule_controller.dart';
 import '../application/selection_controller.dart';
 import '../application/visible_month.dart';
 import 'day_cell.dart';
+import 'month_fit.dart';
 import 'month_grid.dart';
 import 'shift_format.dart';
 
@@ -152,84 +153,87 @@ class MonthPresentationControl extends ConsumerWidget {
     final presentation = ref.watch(monthPresentationProvider);
     final inputs = watchListRecommendationInputs(ref);
     final l10n = context.l10n;
-    return LayoutBuilder(
-      builder: (context, box) {
-        final panel =
-            panelWidth ??
-            (box.maxWidth.isFinite
-                ? box.maxWidth
-                : MediaQuery.sizeOf(context).width);
-        final recommended = monthListRecommended(context, inputs, panel);
-        final inOneRow =
-            !box.maxWidth.isFinite ||
-            widthFor(context, recommended: recommended) <= box.maxWidth;
-        final colors = context.colors;
-        final segments = [
-          _Segment(
-            key: const ValueKey('month-presentation-grid'),
-            label: l10n.monthPresentationGrid,
-            selected: presentation == MonthPresentation.grid,
-            onTap: () => _choose(context, ref, MonthPresentation.grid),
-          ),
-          Tooltip(
-            message: recommended
-                ? l10n.monthListRecommended
-                : l10n.monthPresentationList,
-            child: _Segment(
-              key: const ValueKey('month-presentation-list'),
-              label: l10n.monthPresentationList,
-              selected: presentation == MonthPresentation.list,
-              // A dot, not a colour change of the whole control: the list
-              // is suggested, never imposed.
-              badge: recommended
-                  ? Container(
-                      key: const ValueKey('month-list-recommendation'),
-                      width: Sp.cellSegmentDot,
-                      height: Sp.cellSegmentDot,
-                      decoration: BoxDecoration(
-                        // On the filled thumb of dark mode the accent
-                        // would vanish: the dot takes the ink colour there.
-                        color:
-                            presentation == MonthPresentation.list &&
-                                colors.isDark
-                            ? colors.onAccent
-                            : colors.accent,
-                        shape: BoxShape.circle,
-                      ),
-                    )
-                  : null,
-              onTap: () => _choose(context, ref, MonthPresentation.list),
+    return MediaQuery.withClampedTextScaling(
+      maxScaleFactor: MonthFit.headerMaxScale,
+      child: LayoutBuilder(
+        builder: (context, box) {
+          final panel =
+              panelWidth ??
+              (box.maxWidth.isFinite
+                  ? box.maxWidth
+                  : MediaQuery.sizeOf(context).width);
+          final recommended = monthListRecommended(context, inputs, panel);
+          final inOneRow =
+              !box.maxWidth.isFinite ||
+              widthFor(context, recommended: recommended) <= box.maxWidth;
+          final colors = context.colors;
+          final segments = [
+            _Segment(
+              key: const ValueKey('month-presentation-grid'),
+              label: l10n.monthPresentationGrid,
+              selected: presentation == MonthPresentation.grid,
+              onTap: () => _choose(context, ref, MonthPresentation.grid),
             ),
-          ),
-        ];
-        return Stack(
-          children: [
-            // The track, thinner than the touch targets on top of it.
-            Positioned.fill(
-              top: _trackInset,
-              bottom: _trackInset,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: colors.surfaceMuted,
-                  borderRadius: BorderRadius.circular(Rad.inner),
-                  border: Border.all(color: colors.border),
-                ),
+            Tooltip(
+              message: recommended
+                  ? l10n.monthListRecommended
+                  : l10n.monthPresentationList,
+              child: _Segment(
+                key: const ValueKey('month-presentation-list'),
+                label: l10n.monthPresentationList,
+                selected: presentation == MonthPresentation.list,
+                // A dot, not a colour change of the whole control: the list
+                // is suggested, never imposed.
+                badge: recommended
+                    ? Container(
+                        key: const ValueKey('month-list-recommendation'),
+                        width: Sp.cellSegmentDot,
+                        height: Sp.cellSegmentDot,
+                        decoration: BoxDecoration(
+                          // On the filled thumb of dark mode the accent
+                          // would vanish: the dot takes the ink colour there.
+                          color:
+                              presentation == MonthPresentation.list &&
+                                  colors.isDark
+                              ? colors.onAccent
+                              : colors.accent,
+                          shape: BoxShape.circle,
+                        ),
+                      )
+                    : null,
+                onTap: () => _choose(context, ref, MonthPresentation.list),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 1),
-              child: inOneRow
-                  ? Row(mainAxisSize: MainAxisSize.min, children: segments)
-                  : IntrinsicWidth(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: segments,
+          ];
+          return Stack(
+            children: [
+              // The track, thinner than the touch targets on top of it.
+              Positioned.fill(
+                top: _trackInset,
+                bottom: _trackInset,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: colors.surfaceMuted,
+                    borderRadius: BorderRadius.circular(Rad.inner),
+                    border: Border.all(color: colors.border),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 1),
+                child: inOneRow
+                    ? Row(mainAxisSize: MainAxisSize.min, children: segments)
+                    : IntrinsicWidth(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: segments,
+                        ),
                       ),
-                    ),
-            ),
-          ],
-        );
-      },
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }

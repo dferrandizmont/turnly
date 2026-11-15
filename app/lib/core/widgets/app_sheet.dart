@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../l10n/l10n.dart';
 import '../theme/theme_context.dart';
+import 'keyboard_done_bar.dart';
 
 /// The one way to open a bottom sheet: root navigator, scroll-controlled
 /// (tall content and the keyboard never clip it), safe area, max content
@@ -34,6 +35,10 @@ Future<T?> showAppSheet<T>({
 }
 
 /// Standard sheet body: bottom safe area, page gutter, keyboard inset.
+///
+/// Tapping an empty part of the sheet closes the keyboard, and while a
+/// number pad is up (it has no Return key on iOS) a [KeyboardDoneBar] sits
+/// above it (1.1.0 QA, F4). Buttons and fields take their own taps first.
 class AppSheetBody extends StatelessWidget {
   const AppSheetBody({super.key, required this.child});
 
@@ -41,16 +46,43 @@ class AppSheetBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(
-          Sp.page,
-          0,
-          Sp.page,
-          Sp.l + MediaQuery.viewInsetsOf(context).bottom,
-        ),
-        child: child,
+    final inset = MediaQuery.viewInsetsOf(context).bottom;
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: ListenableBuilder(
+        listenable: FocusManager.instance,
+        builder: (context, _) {
+          // Only the sheet on top: one opened from another (the form of a
+          // type over the list) leaves the one below without the bar.
+          final bar =
+              inset > 0 &&
+              (ModalRoute.of(context)?.isCurrent ?? true) &&
+              numberPadHasFocus();
+          return Stack(
+            children: [
+              SafeArea(
+                top: false,
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.fromLTRB(
+                    Sp.page,
+                    0,
+                    Sp.page,
+                    Sp.l + inset + (bar ? KeyboardDoneBar.height : 0),
+                  ),
+                  child: child,
+                ),
+              ),
+              if (bar)
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: inset,
+                  child: const KeyboardDoneBar(),
+                ),
+            ],
+          );
+        },
       ),
     );
   }

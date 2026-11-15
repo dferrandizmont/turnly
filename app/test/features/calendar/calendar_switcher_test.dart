@@ -266,35 +266,36 @@ void main() {
     expect(pill, findsNothing);
   });
 
-  testWidgets('a long name is cut, also with large text on a narrow phone', (
-    tester,
-  ) async {
-    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
-    addTearDown(tester.platformDispatcher.clearAllTestValues);
-    await AppUnderTest.pump(
-      tester,
-      size: const Size(320, 700),
-      prepare: (db) async {
-        await addSecondCalendar(
-          db,
-          name: 'Segundo trabajo en el hospital comarcal',
-        );
-        final calendars = CalendarsRepository(db);
-        await calendars.rename(
-          'main',
-          'Mi cuadrante del turno de noche en urgencias',
-        );
-      },
-    );
-    expect(pill, findsOneWidget);
-    expect(
-      tester.getSize(pill).width,
-      lessThanOrEqualTo(CalendarSwitcher.maxWidth),
-    );
-    expect(tester.takeException(), isNull);
-    await openSheet(tester);
-    expect(tester.takeException(), isNull);
-  });
+  testWidgets(
+    'a long name is cut to the line, also with large text on a narrow phone',
+    (tester) async {
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      addTearDown(tester.platformDispatcher.clearAllTestValues);
+      await AppUnderTest.pump(
+        tester,
+        size: const Size(320, 700),
+        prepare: (db) async {
+          await addSecondCalendar(
+            db,
+            name: 'Segundo trabajo en el hospital comarcal',
+          );
+          final calendars = CalendarsRepository(db);
+          await calendars.rename(
+            'main',
+            'Mi cuadrante del turno de noche en urgencias',
+          );
+        },
+      );
+      expect(pill, findsOneWidget);
+      // From x1.5 the pill has a line of its own under the date (1.1.0 QA
+      // F7): as wide as that line, never beyond the screen.
+      expect(tester.getSize(pill).width, lessThanOrEqualTo(320 - 16 - 4));
+      expect(tester.getRect(pill).left, greaterThanOrEqualTo(0));
+      expect(tester.takeException(), isNull);
+      await openSheet(tester);
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets('dark theme and light both draw the pill without errors', (
     tester,

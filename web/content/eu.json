@@ -11,7 +11,7 @@
     "Babeskopia automatikoak, «Probatu leheneratzea» erabiliz egiazta ditzakezunak, eta, Androiden, egunean bat aukeratzen duzun karpetan (Drive, Dropbox, OneDrive…). Inportatu LRHSoft-en Shifter kopiak, .ics, CSV edo mugikorreko egutegia. «Eguneratuta mantendu» aukerarekin, zure txandak mugikorreko egutegira pasatzen dira; .ics batean ere gorde ditzakezu.",
     "Lan egindako, gaueko eta jaiegunetako orduak eta irteera aurreratuak hilabeteka, hiruhilekoka, urteka edo nahi dituzun datetan, ordu-helburuarekin eta ordu-poltsarekin. Aparteko orduak blokeka, motekin eta tarifarekin; mota bakoitza helbururako zenbatu ala ez aukeratzen duzu. Orduko prezioa eta plus finkoak, gauekoak eta jaiegunekoak: soldata gordinaren eta garbiaren (atxikipenarekin) estimazioa. Laburpenak eta PDF txostenak jarraian lan egindako egunen boladarik luzeena erakusten dute. PDF eta CSV txostenak.",
     "Oporren, norberaren egunen eta baimenen saldoak urteka, aurreko urtetik ekarritako egunekin eta noiz iraungitzen diren. Trukeen liburuan, lankideekin trukatzen dituzun txandak idazten dituzu, nork zor dion nori ikusten duzu eta egutegian aplikatzen dituzu.",
-    "Espainiako jaiegunak, erkidegoetakoak eta udalerri askotakoak barne, eta beste 21 herrialdetakoak, konexiorik gabe, zuk gehitzen dituzunekin batera. Zure gustura: ordu- eta data-formatua, moneta, bost azentu-kolore, zure txandetarako prestatutako paletak eta egutegiaren atzeko irudia."
+    "Espainiako jaiegunak, erkidegoetakoak eta udalerri askotakoak barne, eta beste 40 herrialdetakoak, konexiorik gabe, zuk gehitzen dituzunekin batera. Zure gustura: ordu- eta data-formatua, moneta, hamar azentu-kolore, zure txandetarako prestatutako paletak eta egutegiaren atzeko irudia."
   ],
   "privacy_summary": [
     "Zure txandak, oharrak eta absentziak zure mugikorrean bakarrik gordetzen dira: ez dago konturik, ez zerbitzari propiorik, ez analitikarik.",
@@ -31,8 +31,8 @@
       "answer": "Sartu Google Groups-eko turnly-testers taldean zure Google kontuarekin, onartu proba Google Play-ko estekan eta instalatu aplikazioa dendatik. Bere kabuz eguneratuko da."
     },
     {
-      "question": "Eta iPhonean?",
-      "answer": "Bai: Turnly App Store-n dago 2026ko azaroaren 10etik, doan, iOS 17 edo berriagoa duten iPhoneetarako."
+      "question": "Eta iPhonean eta iPadean?",
+      "answer": "Bai: Turnly App Store-n dago 2026ko azaroaren 10etik, doan, iOS 17 edo berriagoa duten iPhoneetarako, eta 1.1.0 bertsiotik, iPadOS 17 edo berriagoa duten iPadetarako ere bai."
     },
     {
       "question": "Nola eraman dezaket Turnly mugikor berri batera?",
@@ -67,12 +67,12 @@
   "theme_light": "Argia",
   "theme_dark": "Iluna",
   "theme_hint": "Aldatu gaia",
-  "download_title": "Android probetan; iPhone, App Store-n.",
+  "download_title": "Android probetan; iPhone eta iPad, App Store-n.",
   "download_intro": "Modu argia eta iluna. Doan eta konturik gabe.",
   "download_notes": {
     "play": "Edonork eman dezake izena: lehenik testerren taldean sartzen zara, eta gero proba onartzen duzu.",
     "apk": "Eskuz instalatzen da. 0.8.3 bertsiotik aurrera Google Play-ko bertsioaren sinadura bera du: batetik bestera pasa zaitezke desinstalatu gabe.",
-    "app_store": "Doan App Store-n, iOS 17 edo berriagoa duten iPhoneetarako."
+    "app_store": "Doan App Store-n, iOS 17 edo berriagoa duten iPhone eta iPadetarako."
   },
   "join_title": "Nola sartu Google Play-ko proban",
   "join_steps": [

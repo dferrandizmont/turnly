@@ -114,6 +114,17 @@ makes the connection. `PRIVACY_URL` defaults to `https://turnly.mainshai.com/pri
 English uses `PRIVACY_URL_EN` (`https://turnly.mainshai.com/en/privacy/`). Both URLs can be
 overridden with `--dart-define`. Other languages use the authoritative Spanish policy.
 
+## Store ratings (`features/review`)
+The app may ask the store for its rating window (`in_app_review` 2.0.12: on Android the `com.google.android.play:review`
+2.0.2 library with `play-services-base`; on iOS `SKStoreReviewController`) after a rotation is applied or a paint
+session ends, following `ReviewPolicy` (7 days since the first recorded open, 5 days opened, once per version, 90 days between
+requests, 3 at most). “Rate Turnly” (Settings › Help) opens the listing. No data is passed to the plugin (only the app id when opening the listing). The counters (`review.state` in the
+`settings` table: first day, last day and number of days opened, number of requests, day and version of the last one)
+are not in the `.turnly` file (`isDeviceSetting`), but they are in `cuadrante.sqlite`, so they go into the encrypted
+Google backup, device-to-device transfer and the iOS device backup. The store, not the holder, receives the rating.
+Data safety: expected “None” (the user starts the review and Play handles it), **to be confirmed** against Google’s
+disclosure for the Play Core libraries when filling in the form.
+
 ## Store declarations
 - App Store, App Privacy: **no data collected**, no tracking, no in-app purchases (`docs/tienda/app-store.md`).
 - Google Play, Data safety: the app shares nothing automatically and has no ads, analytics or purchases. Reading the

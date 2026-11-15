@@ -11,6 +11,8 @@ import '../../../core/widgets/content_app_bar.dart';
 import '../../../core/widgets/page_body.dart';
 import '../../calendar/application/schedule_controller.dart';
 import '../../calendar/application/visible_month.dart';
+import '../../review/application/review_providers.dart'
+    show reviewQuietProvider;
 import '../application/import_wizard.dart';
 import '../data/import_file_picker.dart';
 import 'import_calendars_step.dart';
@@ -76,6 +78,8 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
         ..showSnackBar(appSnackBar(content: Text(l10n.importApplyFailed)));
       return;
     }
+    // Checking what was imported: no store review for the rest of the session.
+    ref.read(reviewQuietProvider.notifier).set(true);
     month.goTo(outcome.firstDay);
     // The calendar, on the first month imported, with the notice and its
     // «Deshacer» over it: the way to check what the import did, instead of

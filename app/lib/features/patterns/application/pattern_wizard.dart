@@ -1,11 +1,15 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/providers.dart';
+import '../../schedule/application/schedule_providers.dart';
 import '../../calendar/application/schedule_controller.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../domain/pattern_application.dart';
 import '../domain/pattern_catalog.dart';
+import '../domain/pattern_blocks.dart';
+import '../domain/weeks_per_shift.dart';
 import 'post_night_provider.dart';
 
 /// How the wizard is opened: the start day (the one long-pressed in paint
@@ -26,7 +30,16 @@ class PatternWizardState {
     this.workShiftId = 'morning',
     this.customId,
     this.building = false,
+    this.weeksTemplate = false,
+    this.weekShiftIds = const [],
+    this.weekCounts = const [],
+    this.weekMode = WeeksPerShiftMode.allDays,
+    this.editingCopy = false,
+    this.alignWeekdays = false,
     this.draft = const [],
+    this.draftBlocks,
+    this.canUndoDraft = false,
+    this.openBlock,
     this.draftName = '',
     this.sameDay = false,
     this.stepOffset = 0,
@@ -47,9 +60,19 @@ class PatternWizardState {
 
   /// "Crear el mío": the sequence builder is open and [draft] is the choice.
   final bool building;
+  final bool weeksTemplate;
+  final List<String> weekShiftIds;
+  final List<int> weekCounts;
+  final WeeksPerShiftMode weekMode;
+  final bool editingCopy;
+  final bool alignWeekdays;
 
   /// The sequence being built: one list of shift type ids per day.
   final List<List<String>> draft;
+  final List<PatternBlock>? draftBlocks;
+  List<PatternBlock> get blocks => draftBlocks ?? compressSteps(draft);
+  final bool canUndoDraft;
+  final int? openBlock;
   final String draftName;
 
   /// The builder adds the next shift to the last day instead of a new day.
@@ -65,8 +88,9 @@ class PatternWizardState {
   final bool clearOverrides;
   final bool applying;
 
-  bool get hasChoice =>
-      building ? draft.isNotEmpty : presetId != null || customId != null;
+  bool get hasChoice => building || weeksTemplate
+      ? draft.isNotEmpty && draft.length <= maxPatternCycleDays
+      : presetId != null || customId != null;
 
   PatternWizardState copyWith({
     WizardStep? step,
@@ -76,7 +100,17 @@ class PatternWizardState {
     String? customId,
     bool clearChoice = false,
     bool? building,
+    bool? weeksTemplate,
+    List<String>? weekShiftIds,
+    List<int>? weekCounts,
+    WeeksPerShiftMode? weekMode,
+    bool? editingCopy,
+    bool? alignWeekdays,
     List<List<String>>? draft,
+    List<PatternBlock>? draftBlocks,
+    bool? canUndoDraft,
+    int? openBlock,
+    bool closeBlock = false,
     String? draftName,
     bool? sameDay,
     int? stepOffset,
@@ -92,7 +126,16 @@ class PatternWizardState {
     workShiftId: workShiftId ?? this.workShiftId,
     customId: clearChoice ? customId : customId ?? this.customId,
     building: building ?? this.building,
+    weeksTemplate: weeksTemplate ?? this.weeksTemplate,
+    weekShiftIds: weekShiftIds ?? this.weekShiftIds,
+    weekCounts: weekCounts ?? this.weekCounts,
+    weekMode: weekMode ?? this.weekMode,
+    editingCopy: editingCopy ?? this.editingCopy,
+    alignWeekdays: alignWeekdays ?? this.alignWeekdays,
     draft: draft ?? this.draft,
+    draftBlocks: draftBlocks ?? this.draftBlocks,
+    canUndoDraft: canUndoDraft ?? this.canUndoDraft,
+    openBlock: closeBlock ? null : openBlock ?? this.openBlock,
     draftName: draftName ?? this.draftName,
     sameDay: sameDay ?? this.sameDay,
     stepOffset: stepOffset ?? this.stepOffset,
@@ -109,6 +152,35 @@ class PatternWizardController extends Notifier<PatternWizardState> {
 
   // Id the pattern gets if the user builds it here.
   final String _draftId = 'custom-${const Uuid().v4()}';
+  ({List<PatternBlock> blocks, bool alignWeekdays, int stepOffset})? _undoDraft;
+  List<List<String>> _openedDraft = const [];
+  String _openedName = '';
+  List<String> _openedWeekShiftIds = const [];
+  List<int> _openedWeekCounts = const [];
+  WeeksPerShiftMode _openedWeekMode = WeeksPerShiftMode.allDays;
+
+  /// Compare the sequence and template settings with how the editor opened,
+  /// ignoring the open block and undo availability. Keep that baseline when
+  /// switching from the template to blocks; reverting all edits is clean again.
+  bool get hasDraftChanges =>
+      (state.building || state.weeksTemplate) &&
+      (state.draftName != _openedName ||
+          !listEquals(state.weekShiftIds, _openedWeekShiftIds) ||
+          !listEquals(state.weekCounts, _openedWeekCounts) ||
+          state.weekMode != _openedWeekMode ||
+          state.draft.length != _openedDraft.length ||
+          !List.generate(
+            state.draft.length,
+            (i) => listEquals(state.draft[i], _openedDraft[i]),
+          ).every((same) => same));
+
+  void _rememberOpenedDraft() {
+    _openedDraft = [for (final day in state.draft) List<String>.of(day)];
+    _openedName = state.draftName;
+    _openedWeekShiftIds = List<String>.of(state.weekShiftIds);
+    _openedWeekCounts = List<int>.of(state.weekCounts);
+    _openedWeekMode = state.weekMode;
+  }
 
   @override
   PatternWizardState build() {
@@ -133,6 +205,9 @@ class PatternWizardController extends Notifier<PatternWizardState> {
     clearChoice: true,
     presetId: presetId,
     building: false,
+    weeksTemplate: false,
+    editingCopy: false,
+    alignWeekdays: false,
     stepOffset: 0,
   );
 
@@ -140,26 +215,264 @@ class PatternWizardController extends Notifier<PatternWizardState> {
     clearChoice: true,
     customId: patternId,
     building: false,
+    weeksTemplate: false,
+    editingCopy: false,
+    alignWeekdays: false,
     stepOffset: 0,
   );
 
-  void startBuilding() =>
-      state = state.copyWith(clearChoice: true, building: true, stepOffset: 0);
+  void startBuilding() {
+    _rememberOpenedDraft();
+    state = state.copyWith(
+      clearChoice: true,
+      building: true,
+      weeksTemplate: false,
+      editingCopy: false,
+      stepOffset: 0,
+      alignWeekdays: false,
+    );
+  }
 
-  void stopBuilding() => state = state.copyWith(building: false);
+  void stopBuilding() {
+    if (!state.building) {
+      state = state.copyWith(weeksTemplate: false, editingCopy: false);
+      return;
+    }
+    _undoDraft = null;
+    state = state.copyWith(
+      building: false,
+      weeksTemplate: false,
+      editingCopy: false,
+      draft: _openedDraft,
+      draftBlocks: compressSteps(_openedDraft),
+      draftName: _openedName,
+      canUndoDraft: false,
+      closeBlock: true,
+    );
+  }
+
+  void startWeeksTemplate(String name) {
+    _undoDraft = null;
+    state = state.copyWith(
+      clearChoice: true,
+      building: false,
+      weeksTemplate: true,
+      editingCopy: false,
+      draft: const [],
+      draftBlocks: const [],
+      alignWeekdays: false,
+      weekShiftIds: const [],
+      weekCounts: const [],
+      weekMode: WeeksPerShiftMode.allDays,
+      draftName: name,
+      canUndoDraft: false,
+      closeBlock: true,
+      stepOffset: 0,
+    );
+    _rememberOpenedDraft();
+  }
+
+  bool toggleWeekShift(String id) {
+    final ids = [...state.weekShiftIds];
+    final counts = [...state.weekCounts];
+    final index = ids.indexOf(id);
+    if (index < 0) {
+      ids.add(id);
+      counts.add(1);
+    } else {
+      ids.removeAt(index);
+      counts.removeAt(index);
+    }
+    return _setWeeks(ids, counts, state.weekMode);
+  }
+
+  bool setWeekCount(int index, int count) {
+    if (count < 1 || count > 8) return false;
+    final counts = [...state.weekCounts]..[index] = count;
+    return _setWeeks(state.weekShiftIds, counts, state.weekMode);
+  }
+
+  bool setWeekMode(WeeksPerShiftMode mode) =>
+      _setWeeks(state.weekShiftIds, state.weekCounts, mode);
+
+  bool _setWeeks(List<String> ids, List<int> counts, WeeksPerShiftMode mode) {
+    final steps = ids.isEmpty
+        ? <List<String>>[]
+        : weeksPerShift(
+            shiftIds: ids,
+            weeks: counts,
+            mode: mode,
+            restShiftId: 'rest',
+          );
+    if (steps.length > maxPatternCycleDays) return false;
+    state = state.copyWith(
+      weekShiftIds: List.unmodifiable(ids),
+      weekCounts: List.unmodifiable(counts),
+      weekMode: mode,
+      draft: steps,
+      draftBlocks: compressSteps(steps),
+      alignWeekdays: mode == WeeksPerShiftMode.weekdays,
+      stepOffset: mode == WeeksPerShiftMode.weekdays
+          ? weeksPerShiftStepOffset(state.start)
+          : 0,
+    );
+    return true;
+  }
+
+  void adjustWeeksByHand() {
+    state = state.copyWith(
+      weeksTemplate: false,
+      building: true,
+      canUndoDraft: false,
+      closeBlock: true,
+    );
+  }
+
+  /// Start from an independent draft. Neither the source nor its runs change.
+  void editAsCopy(Pattern pattern) {
+    _undoDraft = null;
+    state = state.copyWith(
+      clearChoice: true,
+      building: true,
+      weeksTemplate: false,
+      editingCopy: true,
+      draftName: pattern.name,
+      alignWeekdays: false,
+      draft: [for (final step in pattern.steps) List<String>.of(step)],
+      draftBlocks: compressSteps(pattern.steps),
+      canUndoDraft: false,
+      closeBlock: true,
+      stepOffset: 0,
+    );
+    _rememberOpenedDraft();
+  }
+
+  Future<bool> saveCopy({
+    required String fallbackName,
+    required String Function(String, int) copyName,
+  }) async {
+    if (state.applying ||
+        state.draft.isEmpty ||
+        state.draft.length > maxPatternCycleDays) {
+      return false;
+    }
+    state = state.copyWith(applying: true);
+    try {
+      final saved = await ref
+          .read(scheduleControllerProvider.notifier)
+          .saveAsNewPattern(
+            steps: state.draft,
+            name: state.draftName.trim().isEmpty
+                ? fallbackName
+                : state.draftName,
+            copyName: copyName,
+          );
+      if (!ref.mounted || saved == null) return false;
+      selectCustom(saved.id);
+      next();
+      return true;
+    } finally {
+      if (ref.mounted) state = state.copyWith(applying: false);
+    }
+  }
+
+  void forgetCustom(String id) {
+    if (state.customId == id) {
+      state = state.copyWith(clearChoice: true);
+    }
+  }
 
   void setSameDay(bool value) => state = state.copyWith(sameDay: value);
 
   /// A tap on a shift of the builder: a new day, or (with [sameDay]) one
-  /// more shift on the last day.
-  void appendShift(String shiftTypeId) {
+  /// more shift on the last day. Returns false if the builder limit rejects it.
+  bool appendShift(String shiftTypeId) {
+    if (!state.sameDay) {
+      final blocks = state.blocks;
+      final int index;
+      final PatternBlockEdit edit;
+      if (blocks.isNotEmpty &&
+          blocks.last.shiftIds.length == 1 &&
+          blocks.last.shiftIds.single == shiftTypeId) {
+        index = blocks.length - 1;
+        edit = setBlockDays(blocks, index, blocks.last.days + 1);
+      } else {
+        index = blocks.length;
+        edit = insertBlock(
+          blocks,
+          index,
+          PatternBlock(shiftIds: [shiftTypeId], days: 1),
+        );
+      }
+      if (!editBlocks(edit)) return false;
+      state = state.copyWith(openBlock: index);
+      return true;
+    }
+    if ((!state.sameDay || state.draft.isEmpty) &&
+        state.draft.length >= maxPatternCycleDays) {
+      return false;
+    }
     final draft = [for (final s in state.draft) List<String>.of(s)];
     if (state.sameDay && draft.isNotEmpty) {
       if (!draft.last.contains(shiftTypeId)) draft.last.add(shiftTypeId);
     } else {
       draft.add([shiftTypeId]);
     }
-    state = state.copyWith(draft: draft, stepOffset: 0);
+    return replaceBlocks(compressSteps(draft));
+  }
+
+  /// Keeps block boundaries (including a split) while the saved pattern stays
+  /// the same flat list of days. One accepted operation is one undo step.
+  bool editBlocks(PatternBlockEdit edit) =>
+      !edit.exceedsLimit && replaceBlocks(edit.blocks);
+
+  void toggleBlock(int index) => state = state.copyWith(
+    openBlock: index,
+    closeBlock: state.openBlock == index,
+  );
+
+  void showBlock(int? index) =>
+      state = state.copyWith(openBlock: index, closeBlock: index == null);
+
+  bool replaceBlocks(List<PatternBlock> blocks) {
+    if (exceedsPatternCycleLimit(blocks)) return false;
+    final before = state.blocks;
+    if (before.length == blocks.length &&
+        List.generate(
+          blocks.length,
+          (i) => before[i] == blocks[i],
+        ).every((same) => same)) {
+      return true;
+    }
+    _undoDraft = (
+      blocks: before,
+      alignWeekdays: state.alignWeekdays,
+      stepOffset: state.stepOffset,
+    );
+    state = state.copyWith(
+      draftBlocks: List.unmodifiable(blocks),
+      draft: expandBlocks(blocks),
+      canUndoDraft: true,
+      alignWeekdays: false,
+      stepOffset: 0,
+    );
+    return true;
+  }
+
+  void undoDraft() {
+    final before = _undoDraft;
+    if (before == null) return;
+    _undoDraft = null;
+    state = state.copyWith(
+      draftBlocks: before.blocks,
+      draft: expandBlocks(before.blocks),
+      canUndoDraft: false,
+      closeBlock: true,
+      alignWeekdays: before.alignWeekdays,
+      stepOffset: before.alignWeekdays
+          ? weeksPerShiftStepOffset(state.start)
+          : before.stepOffset,
+    );
   }
 
   /// Takes back the last tap: the last shift of the last day, and the day
@@ -172,10 +485,12 @@ class PatternWizardController extends Notifier<PatternWizardState> {
     } else {
       draft.removeLast();
     }
-    state = state.copyWith(draft: draft, stepOffset: 0);
+    replaceBlocks(compressSteps(draft));
   }
 
-  void clearDraft() => state = state.copyWith(draft: const [], stepOffset: 0);
+  void clearDraft() {
+    if (state.draft.isNotEmpty) replaceBlocks(const []);
+  }
 
   void setName(String name) => state = state.copyWith(draftName: name);
 
@@ -183,6 +498,9 @@ class PatternWizardController extends Notifier<PatternWizardState> {
 
   void setStart(CivilDate date) => state = state.copyWith(
     start: date,
+    stepOffset: state.alignWeekdays
+        ? weeksPerShiftStepOffset(date)
+        : state.stepOffset,
     // An end before the start is no end at all.
     clearUntil: state.until != null && state.until!.isBefore(date),
   );
@@ -223,7 +541,7 @@ class PatternWizardController extends Notifier<PatternWizardState> {
   /// [fallbackName] when the user left the name empty.
   Pattern? chosenPattern(Schedule schedule, {String fallbackName = ''}) {
     final s = state;
-    if (s.building) {
+    if (s.building || s.weeksTemplate) {
       if (s.draft.isEmpty) return null;
       final name = s.draftName.trim();
       return Pattern(
@@ -268,10 +586,15 @@ class PatternWizardController extends Notifier<PatternWizardState> {
     );
     if (request == null) return null;
     state = state.copyWith(applying: true);
+    var applied = false;
     try {
-      return await controller.applyPatternRun(request);
+      final change = await controller.applyPatternRun(request);
+      applied = change != null;
+      return change;
     } finally {
-      if (ref.mounted) state = state.copyWith(applying: false);
+      // A successful apply is terminal: the screen is still consuming the
+      // remaining taps before it closes. Failures can be retried.
+      if (!applied && ref.mounted) state = state.copyWith(applying: false);
     }
   }
 }
@@ -280,6 +603,20 @@ final patternWizardProvider = NotifierProvider.autoDispose
     .family<PatternWizardController, PatternWizardState, PatternWizardArgs>(
       PatternWizardController.new,
     );
+
+/// The library is shared by calendars. Read after queued edits so removal is
+/// offered only for patterns no rotation uses, including archived calendars.
+final usedPatternIdsProvider = FutureProvider.autoDispose<Set<String>>((
+  ref,
+) async {
+  final schedule = ref.watch(scheduleControllerProvider).schedule;
+  final repository = ref.watch(scheduleRepositoryProvider);
+  await ref.read(scheduleControllerProvider.notifier).pendingWrites;
+  return {
+    ...await repository.usedPatternIds(),
+    for (final run in schedule.runs) run.patternId,
+  };
+});
 
 /// What applying the wizard's choices now would do (the live preview), or
 /// `null` while no pattern is chosen. Same planner as the real application.

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Privacy manifest of the app (docs/mac-ios.md 4.6.1). Turnly has no accounts,
+     no server and no analytics: it collects nothing, tracks nothing and sends
+     nothing. Only the required reason APIs the build really uses are declared:
+       - UserDefaults 1C8F.1: home_widget writes the widget snapshot in the App
+         Group (group.es.cuadrante.app), shared by the app and the widget
+         extension; the extension declares the same reason in its own manifest.
+       - FileTimestamp C617.1: the timestamps of the files of the app container
+         (the database, the backups and the attachments) are read to keep the
+         copies up to date.
+     The camera and the photo library are a permission (usage text in
+     InfoPlist.strings), not an API with a required reason. -->
+<plist version="1.0">
+<dict>
+	<key>NSPrivacyTracking</key>
+	<false/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array>
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>1C8F.1</string>
+			</array>
+		</dict>
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>C617.1</string>
+			</array>
+		</dict>
+	</array>
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array/>
+</dict>
+</plist>

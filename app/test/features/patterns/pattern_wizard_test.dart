@@ -165,11 +165,10 @@ void main() {
           ),
           findsOneWidget,
         );
-        await _tap(tester, _key('cycle-toggle'));
         await _tap(tester, _key('offset-1'));
         expect(find.text('Ese día te toca: Libre'), findsOneWidget);
-        // The picker never doubles the preview: it belongs to the last step.
-        expect(_key('pattern-preview'), findsNothing);
+        // The preview is already available under the cycle in step 2.
+        expect(_key('pattern-preview'), findsOneWidget);
 
         // 3: no end, respect my days (the defaults), apply.
         await _tap(tester, _key('pattern-next'));
@@ -191,7 +190,7 @@ void main() {
           300,
           scrollable: find.byType(Scrollable).first,
         );
-        for (var i = 0; i < 12; i++) {
+        for (var i = 0; i < 6; i++) {
           final day = _oct26.addDays(i);
           final codes = expected.resolve(day).shifts.map((s) => s.code);
           expect(
@@ -318,7 +317,6 @@ void main() {
       await _openWizard(tester);
       await _tap(tester, _key('pattern-card-4x4'));
       await _tap(tester, _key('pattern-next'));
-      await _tap(tester, _key('cycle-toggle'));
       await _tap(tester, _key('offset-3'));
       await _tap(tester, _key('pattern-back'));
       expect(find.text('Paso 1 de 3'), findsOneWidget);
@@ -331,24 +329,23 @@ void main() {
       );
     });
 
-    testWidgets('a shift that repeats labels each day by its run', (
+    testWidgets('a repeated shift has every cycle day directly available', (
       tester,
     ) async {
       await _openWizard(tester);
       // 4 x 4: Día 12 h is one run of four days (day 1 is a Día 12 h).
       await _tap(tester, _key('pattern-card-4x4'));
       await _tap(tester, _key('pattern-next'));
-      expect(find.text('Día 2 de 4'), findsOneWidget);
-      // The whole numbered grid stays behind «Ver el ciclo completo».
-      expect(_key('offset-3'), findsNothing);
-      await _tap(tester, _key('occurrence-3'));
+      expect(_key('offset-1'), findsOneWidget);
+      // The whole numbered strip is available immediately.
+      expect(_key('offset-3'), findsOneWidget);
+      await _tap(tester, _key('offset-3'));
       expect(
         find.text(
           keepTimeRangesTogether('Ese día te toca: Día 12 h 08:00–20:00'),
         ),
         findsOneWidget,
       );
-      await _tap(tester, _key('cycle-toggle'));
       expect(_key('offset-3'), findsOneWidget);
     });
 
@@ -382,7 +379,9 @@ void main() {
       await _tap(tester, _key('pattern-create-own'));
       expect(_key('builder-name'), findsOneWidget);
       expect(
-        find.text('Toca los turnos de abajo para ir añadiendo días.'),
+        find.text(
+          'Toca un turno para añadir un bloque; toca el bloque para cambiar los días.',
+        ),
         findsOneWidget,
       );
       // Nothing to continue with yet.
@@ -402,28 +401,19 @@ void main() {
       await _tap(tester, _key('builder-add-morning'));
       await _tap(tester, _key('builder-add-night'));
       expect(find.text('3 días'), findsOneWidget);
-      // "Varios turnos en un día": the Tarde joins the Noche.
-      await _tap(tester, _key('builder-same-day'));
-      await _tap(tester, _key('builder-add-afternoon'));
-      expect(find.text('3 días'), findsOneWidget);
-      await _tap(tester, _key('builder-same-day'));
+      await _tap(tester, _key('block-options'));
+      await _tap(tester, _key('block-same-day'));
+      await _tap(tester, _key('block-add-afternoon'));
       await _tap(tester, _key('builder-add-rest'));
       expect(find.text('4 días'), findsOneWidget);
-
-      // Remove the last (the Libre), then the Tarde of the third day.
-      await _tap(tester, _key('builder-remove-last'));
+      await _tap(tester, _key('builder-undo'));
       expect(find.text('3 días'), findsOneWidget);
-      await _tap(tester, _key('builder-remove-last'));
-      expect(find.text('3 días'), findsOneWidget);
-      await _tap(tester, _key('builder-remove-last'));
-      expect(find.text('2 días'), findsOneWidget);
-      // Clear and start again.
       await _tap(tester, _key('builder-clear'));
       expect(find.text('0 días'), findsOneWidget);
       await _tap(tester, _key('builder-add-night'));
-      await _tap(tester, _key('builder-same-day'));
-      await _tap(tester, _key('builder-add-afternoon'));
-      await _tap(tester, _key('builder-same-day'));
+      await _tap(tester, _key('block-options'));
+      await _tap(tester, _key('block-same-day'));
+      await _tap(tester, _key('block-add-afternoon'));
       await _tap(tester, _key('builder-add-rest'));
       await _tap(tester, _key('builder-add-rest'));
 
@@ -432,7 +422,6 @@ void main() {
 
       await _tap(tester, _key('pattern-next'));
       // Step 2 offers this sequence's days.
-      await _tap(tester, _key('cycle-toggle'));
       expect(_key('offset-0'), findsOneWidget);
       expect(_key('offset-2'), findsOneWidget);
       expect(_key('offset-3'), findsNothing);
@@ -542,7 +531,7 @@ void main() {
         await tester.pumpAndSettle();
         await _tap(tester, cell(_oct24));
         expect(find.text('INCLUYEN NOCHE'), findsOneWidget);
-        final first = tester.getTopLeft(_key('pattern-card-correturnos'));
+        final first = tester.getTopLeft(_key('pattern-card-continental'));
         final later = tester.getTopLeft(_key('pattern-card-24x72'));
         expect(first.dy, lessThan(later.dy));
       },

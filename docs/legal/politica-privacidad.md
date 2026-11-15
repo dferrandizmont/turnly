@@ -1,6 +1,6 @@
 # Política de privacidad de Turnly
 
-Última actualización: 4 de noviembre de 2026
+Última actualización: 13 de noviembre de 2026
 
 Turnly es una app de calendario de turnos para quien trabaja a turnos en España. Es una app independiente: no
 está creada, revisada ni respaldada por ninguna empresa, administración ni sindicato.
@@ -69,8 +69,19 @@ no lo concedes, las alarmas pueden sonar con retraso. No pide ubicación, contac
 general al almacenamiento, y la versión publicada de Android no tiene permiso de red.
 
 ### Comunicaciones
-La app no transmite turnos, identificadores ni informes de errores. No utiliza compras, anuncios, analítica ni
-servicios de terceros. Los errores se manejan solo en el dispositivo.
+La app no transmite turnos, identificadores ni informes de errores. No utiliza compras, anuncios ni analítica. Los
+errores se manejan solo en el dispositivo.
+
+**Valoraciones en la tienda.** De vez en cuando, después de aplicar una rotación o de pintar días, Turnly puede pedirle
+a la tienda (Google Play o la App Store) que te muestre su ventana para valorar la app; la tienda decide si la
+enseña. También puedes abrir la página de Turnly en la tienda desde Ajustes › Ayuda › «Valorar Turnly». Para eso la
+app usa la biblioteca de valoraciones de Google Play en Android y la función del sistema en iPhone y iPad. Turnly solo
+le indica a la tienda de qué app se trata: no le pasa tus turnos ni ningún otro dato tuyo, y no sabe si has valorado
+ni qué has escrito. Tu valoración y tu reseña las escribes en la ventana de la tienda y las recibe Google o Apple, con
+tu cuenta de la tienda y según sus condiciones. Para decidir cuándo preguntar, la app guarda en el móvil qué día la
+abriste por primera vez, cuántos días la has abierto y cuántas veces, cuándo y con qué versión ha pedido la
+valoración. Esos contadores no van en el archivo `.turnly` y Turnly no los envía a nadie; están en la base de datos de
+la app, así que solo salen del móvil dentro de la copia del sistema, si la tienes activada (ver «Copia del sistema»).
 
 Si tocas «Política de privacidad» en Ajustes › Ayuda, se abre esta página en tu navegador externo. Es el navegador
 el que se conecta a la web; Turnly no le envía tus turnos, notas ni ausencias.
@@ -98,14 +109,15 @@ nos escribes, trataremos tu dirección de correo y lo que nos cuentes solo para 
 No tomamos decisiones automatizadas ni elaboramos perfiles sobre ti.
 
 ## 4. Quién recibe los datos
-La app no transmite datos a terceros. Si envías un correo de soporte, lo recibe el titular en turnly@mainshai.com
+La app no transmite datos a terceros. Si valoras la app en la tienda, tu valoración y tu reseña las recibe Google o Apple
+directamente, no nosotros. Si envías un correo de soporte, lo recibe el titular en turnly@mainshai.com
 mediante el servicio de correo que elijas. Si exportas a un calendario sincronizado o tienes activada la copia del
 sistema, quien recibe esos datos es el proveedor de tu cuenta (Google, Apple u otro), en tu nombre y según sus
 condiciones.
 
 ## 5. Transferencias internacionales
 La app no realiza transferencias de datos. Los servicios externos que decidas utilizar (correo, nube, calendario
-sincronizado o destino de una exportación) se rigen por sus propias condiciones.
+sincronizado, destino de una exportación o la tienda en la que valores la app) se rigen por sus propias condiciones.
 
 ## 6. Cuánto tiempo se conservan
 

@@ -17,7 +17,9 @@ import '../theme/theme_context.dart';
 /// **Inline or stacked (H-T11-6).** Side by side is the default. The row
 /// switches to a stacked layout, title on top and value under it (the
 /// chevron stays at the trailing edge, centred), when side by side would
-/// either cut the value (ellipsis) or break a word of the title in two. With
+/// either cut the value (ellipsis) or break a word of the title in two, or
+/// when the title would wrap although it fits whole on a line of its own, or
+/// would be left in a column under half of the row (F11 of the 1.1.0 QA). With
 /// the text scaled to 1.3 or more it is stricter: it stacks as soon as title
 /// and value do not both fit on one line. A title therefore only ever wraps
 /// at spaces, and a value is only ellipsized when it is longer than the whole
@@ -337,7 +339,17 @@ class _RenderValueRow extends RenderBox
       const eps = 0.5;
       final sideBySide = titleFull + _valueGap + valueFull <= available - eps;
       final wordsFit = titleWord + _valueGap + valueFull <= available - eps;
-      stacked = _forceStacked || (_largeText ? !sideBySide : !wordsFit);
+      // Beside the value the title would wrap. That is fine for a long one
+      // that has the room, but not for a short label that would fit on a
+      // line of its own («Quant / a») or for a title squeezed into a narrow
+      // column next to a long value (a 9-line column, 1.1.0 QA F11): both go
+      // under the value's row instead, the title whole.
+      final titleBeside = available - _valueGap - valueFull;
+      final squeezed =
+          !sideBySide &&
+          (titleFull <= available - eps || titleBeside < available * 0.5);
+      stacked =
+          _forceStacked || (_largeText ? !sideBySide : (!wordsFit || squeezed));
       if (stacked) {
         titleSize = layoutChild(
           title,

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/format/app_date_format.dart';
+import '../../../core/icons/app_icons.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../calendar/application/week_layout.dart';
@@ -24,12 +26,16 @@ class MiniMonth extends ConsumerWidget {
     required this.month,
     required this.schedule,
     this.keyPrefix = 'preview',
+    this.markOverrides = false,
+    this.automaticDays = const {},
   });
 
   /// Any day of the month to draw.
   final CivilDate month;
   final Schedule schedule;
   final String keyPrefix;
+  final bool markOverrides;
+  final Set<CivilDate> automaticDays;
 
   /// Height of a row (the smallest the month screen lets a cell shrink to).
   static const double cellHeight = 52;
@@ -50,10 +56,9 @@ class MiniMonth extends ConsumerWidget {
     );
     // The height of a row is the same for every row: it is measured once,
     // not once per cell.
-    final rowHeight = math.max(
-      cellHeight,
-      dayCellHeightWithTime(context),
-    );
+    final rowHeight =
+        math.max(cellHeight, dayCellHeightWithTime(context)) +
+        (markOverrides ? IconSize.inline + Sp.xs : 0);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,7 +80,13 @@ class MiniMonth extends ConsumerWidget {
                 Expanded(
                   child: SizedBox(
                     height: rowHeight,
-                    child: _cell(r * 7 + c - lead, days, holidays, today),
+                    child: _cell(
+                      context,
+                      r * 7 + c - lead,
+                      days,
+                      holidays,
+                      today,
+                    ),
                   ),
                 ),
             ],
@@ -85,6 +96,7 @@ class MiniMonth extends ConsumerWidget {
   }
 
   Widget _cell(
+    BuildContext context,
     int dayIndex,
     List<ResolvedDay> days,
     Map<CivilDate, Holiday> holidays,
@@ -92,12 +104,35 @@ class MiniMonth extends ConsumerWidget {
   ) {
     if (dayIndex < 0 || dayIndex >= days.length) return const SizedBox();
     final day = days[dayIndex];
-    return DayCell(
+    final cell = DayCell(
       key: ValueKey('$keyPrefix-${day.date.toIso()}'),
       day: day,
       holiday: holidays[day.date],
       inMonth: true,
       isToday: day.date == today,
+    );
+    if (!markOverrides) return cell;
+    return Column(
+      children: [
+        Expanded(child: cell),
+        SizedBox(
+          height: IconSize.inline + Sp.xs,
+          child:
+              day.source == DaySource.override &&
+                  !automaticDays.contains(day.date)
+              ? Tooltip(
+                  message: context.l10n.patternManualChange,
+                  child: Icon(
+                    AppIcons.edit,
+                    key: ValueKey('preview-override-${day.date.toIso()}'),
+                    size: IconSize.inline,
+                    color: context.colors.textSecondary,
+                    semanticLabel: context.l10n.patternManualChange,
+                  ),
+                )
+              : null,
+        ),
+      ],
     );
   }
 }

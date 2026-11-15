@@ -762,47 +762,68 @@ class _DateHeader extends ConsumerWidget {
     // "today" card and the grid below.
     return Padding(
       padding: const EdgeInsets.fromLTRB(Sp.l, Sp.xs, Sp.xs, 0),
-      child: LayoutBuilder(
-        builder: (context, box) => Column(
-          children: [
-            if (open != null)
-              Row(
-                children: [
-                  Expanded(child: _DateText(now: displayedDate)),
-                  TextButton(
-                    key: const ValueKey('pane-today-button'),
-                    onPressed: () {
-                      ref.read(openDayProvider.notifier).close();
-                      ref.read(visibleMonthProvider.notifier).today();
-                    },
-                    child: Text(context.l10n.calendarToday),
-                  ),
-                ],
-              ),
-            Row(
+      child: MediaQuery.withClampedTextScaling(
+        maxScaleFactor: MonthFit.headerMaxScale,
+        child: LayoutBuilder(
+          builder: (context, box) {
+            // The header's text stops growing at MonthFit.headerMaxScale; at
+            // that size the calendar switcher goes below the date.
+            final stacked =
+                open == null &&
+                MediaQuery.textScalerOf(context).scale(10) / 10 >=
+                    MonthFit.headerMaxScale;
+            return Column(
               children: [
-                // Takes whatever the switcher and the buttons leave, so they stay
-                // pinned to the trailing edge (a `Flexible` switcher next to an
-                // `Expanded` date would split the free space in two and leave a
-                // hole before the buttons).
-                if (open == null) Expanded(child: _DateText(now: now)),
-                if (open != null) const Spacer(),
-                // Hidden with one calendar. With two its name is ellipsized, and
-                // it never takes more than 55 % of what the buttons leave, so the
-                // date and the switcher fit on a 320 dp phone with large text.
-                ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: math.max(
-                      0,
-                      (box.maxWidth - _buttonsWidth) * 0.55,
+                if (open != null)
+                  Row(
+                    children: [
+                      Expanded(child: _DateText(now: displayedDate)),
+                      TextButton(
+                        key: const ValueKey('pane-today-button'),
+                        onPressed: () {
+                          ref.read(openDayProvider.notifier).close();
+                          ref.read(visibleMonthProvider.notifier).today();
+                        },
+                        child: Text(context.l10n.calendarToday),
+                      ),
+                    ],
+                  ),
+                Row(
+                  children: [
+                    // Takes whatever the switcher and the buttons leave, so they stay
+                    // pinned to the trailing edge (a `Flexible` switcher next to an
+                    // `Expanded` date would split the free space in two and leave a
+                    // hole before the buttons).
+                    if (open == null) Expanded(child: _DateText(now: now)),
+                    if (open != null) const Spacer(),
+                    // Hidden with one calendar. With two its name is ellipsized, and
+                    // it never takes more than 55 % of what the buttons leave, so the
+                    // date and the switcher fit on a 320 dp phone with large text.
+                    if (!stacked)
+                      ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: math.max(
+                            0,
+                            (box.maxWidth - _buttonsWidth) * 0.55,
+                          ),
+                        ),
+                        child: const CalendarSwitcher(),
+                      ),
+                    ..._buttons(context, ref, sharing, month),
+                  ],
+                ),
+                // With big text the switcher has a line of its own, so the date
+                // and the calendar name both fit whole (1.1.0 QA, F7).
+                if (stacked)
+                  Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: CalendarSwitcher(
+                      widest: math.max(0, box.maxWidth - Sp.xs),
                     ),
                   ),
-                  child: const CalendarSwitcher(),
-                ),
-                ..._buttons(context, ref, sharing, month),
               ],
-            ),
-          ],
+            );
+          },
         ),
       ),
     );
@@ -945,171 +966,174 @@ class _MonthNavigation extends ConsumerWidget {
       // (the 24 dp arrow) at `Sp.l` from the edge, flush with the settings
       // gear above, the cards and the grid.
       padding: const EdgeInsets.fromLTRB(Sp.l, Sp.s, Sp.xs, 0),
-      child: LayoutBuilder(
-        builder: (context, box) {
-          final scaler = MediaQuery.textScalerOf(context);
-          final style = context.type.title;
-          // The width the title needs on one line, at the reading size: it is
-          // never shrunk, it goes to two lines or the buttons go below.
-          final needed = textWidth(title, style, scaler);
-          final monthNeeded = textWidth(monthName, style, scaler);
-          // The width the controls need: the four icon buttons (48 dp each)
-          // and the "Hoy" one, which is as wide as its text.
-          final todayWidth = _todayWidth(
-            context,
-            l10n,
-            scaler,
-            withToday: !isCurrentMonth,
-          );
-          // The width of the month panel: this row has `Sp.l` before it and
-          // `Sp.xs` after it.
-          final panel = box.maxWidth + Sp.l + Sp.xs;
-          final secondaryWidth = !withPresentation
-              ? 0.0
-              : math.min(
-                  box.maxWidth,
-                  MonthPresentationControl.widthFor(
-                    context,
-                    recommended: monthListRecommended(context, inputs, panel),
-                  ),
-                );
-          final secondary = <Widget>[
-            if (withPresentation)
-              ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: box.maxWidth),
-                child: MonthPresentationControl(panelWidth: panel),
-              ),
-          ];
-          final primaryWidth = todayWidth + arrows.length * Sp.touch;
-          final room = box.maxWidth - secondaryWidth - primaryWidth;
-          // One line next to the buttons; the month and the year on two lines
-          // when they do not fit; the buttons below when even the month does
-          // not fit (H-T18-7, punto 5 de docs/propuestas-diseno.md).
-          final oneRow = needed <= room;
-          final twoLines = !oneRow && monthNeeded <= room;
-          // Grid/List is the widest control: when it does not fit beside
-          // the title, the title keeps "Hoy" and the arrows and the switch
-          // goes on a line of its own below them, not the whole row.
-          final besideArrows =
-              withPresentation &&
-              !oneRow &&
-              !twoLines &&
-              needed <= box.maxWidth - primaryWidth;
-
-          // The rows of the controls: one row when they fit, two when they
-          // do not (the year and the summary above, "Hoy" and the arrows
-          // below, in the same reading order).
-          final List<List<Widget>> rows;
-          if (secondaryWidth + primaryWidth <= box.maxWidth) {
-            rows = [
-              [...secondary, ...primary],
-            ];
-          } else if (primaryWidth <= box.maxWidth) {
-            rows = [if (secondary.isNotEmpty) secondary, primary];
-          } else {
-            // Not even "Hoy" with the arrows fits: three rows.
-            rows = [
-              if (secondary.isNotEmpty) secondary,
-              if (todayButton != null) [todayButton],
-              arrows,
-            ];
-          }
-
-          final Widget titleText;
-          if (oneRow || besideArrows) {
-            titleText = _fitted(Text(title, style: style));
-          } else if (twoLines) {
-            titleText = _MonthTitleLines(
-              monthName: monthName,
-              year: hasYear ? year : null,
-              style: style,
+      child: MediaQuery.withClampedTextScaling(
+        maxScaleFactor: MonthFit.headerMaxScale,
+        child: LayoutBuilder(
+          builder: (context, box) {
+            final scaler = MediaQuery.textScalerOf(context);
+            final style = context.type.title;
+            // The width the title needs on one line, at the reading size: it is
+            // never shrunk, it goes to two lines or the buttons go below.
+            final needed = textWidth(title, style, scaler);
+            final monthNeeded = textWidth(monthName, style, scaler);
+            // The width the controls need: the four icon buttons (48 dp each)
+            // and the "Hoy" one, which is as wide as its text.
+            final todayWidth = _todayWidth(
+              context,
+              l10n,
+              scaler,
+              withToday: !isCurrentMonth,
             );
-          } else if (needed <= box.maxWidth) {
-            // The buttons go below: the title has the whole width.
-            titleText = _fitted(Text(title, style: style));
-          } else {
-            titleText = _MonthTitleLines(
-              monthName: monthName,
-              year: hasYear ? year : null,
-              style: style,
-              shrink: true,
-            );
-          }
+            // The width of the month panel: this row has `Sp.l` before it and
+            // `Sp.xs` after it.
+            final panel = box.maxWidth + Sp.l + Sp.xs;
+            final secondaryWidth = !withPresentation
+                ? 0.0
+                : math.min(
+                    box.maxWidth,
+                    MonthPresentationControl.widthFor(
+                      context,
+                      recommended: monthListRecommended(context, inputs, panel),
+                    ),
+                  );
+            final secondary = <Widget>[
+              if (withPresentation)
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: box.maxWidth),
+                  child: MonthPresentationControl(panelWidth: panel),
+                ),
+            ];
+            final primaryWidth = todayWidth + arrows.length * Sp.touch;
+            final room = box.maxWidth - secondaryWidth - primaryWidth;
+            // One line next to the buttons; the month and the year on two lines
+            // when they do not fit; the buttons below when even the month does
+            // not fit (H-T18-7, punto 5 de docs/propuestas-diseno.md).
+            final oneRow = needed <= room;
+            final twoLines = !oneRow && monthNeeded <= room;
+            // Grid/List is the widest control: when it does not fit beside
+            // the title, the title keeps "Hoy" and the arrows and the switch
+            // goes on a line of its own below them, not the whole row.
+            final besideArrows =
+                withPresentation &&
+                !oneRow &&
+                !twoLines &&
+                needed <= box.maxWidth - primaryWidth;
 
-          // `open-year`: the entry to the year view, which was an icon of
-          // this row before B1.
-          final titleWidget = KeyedSubtree(
-            key: const ValueKey('open-year'),
-            child: Semantics(
-              header: true,
-              button: true,
-              // «Octubre, elegir mes»: it is a button, not just a heading
-              // (H-T18-7). Tapping the month opens the whole year.
-              label: l10n.calendarPickMonth(title),
-              excludeSemantics: true,
-              onTap: () => context.push(AppRoutes.year),
-              child: InkWell(
-                key: const ValueKey('month-title'),
-                borderRadius: Rad.chipSmallRadius,
+            // The rows of the controls: one row when they fit, two when they
+            // do not (the year and the summary above, "Hoy" and the arrows
+            // below, in the same reading order).
+            final List<List<Widget>> rows;
+            if (secondaryWidth + primaryWidth <= box.maxWidth) {
+              rows = [
+                [...secondary, ...primary],
+              ];
+            } else if (primaryWidth <= box.maxWidth) {
+              rows = [if (secondary.isNotEmpty) secondary, primary];
+            } else {
+              // Not even "Hoy" with the arrows fits: three rows.
+              rows = [
+                if (secondary.isNotEmpty) secondary,
+                if (todayButton != null) [todayButton],
+                arrows,
+              ];
+            }
+
+            final Widget titleText;
+            if (oneRow || besideArrows) {
+              titleText = _fitted(Text(title, style: style));
+            } else if (twoLines) {
+              titleText = _MonthTitleLines(
+                monthName: monthName,
+                year: hasYear ? year : null,
+                style: style,
+              );
+            } else if (needed <= box.maxWidth) {
+              // The buttons go below: the title has the whole width.
+              titleText = _fitted(Text(title, style: style));
+            } else {
+              titleText = _MonthTitleLines(
+                monthName: monthName,
+                year: hasYear ? year : null,
+                style: style,
+                shrink: true,
+              );
+            }
+
+            // `open-year`: the entry to the year view, which was an icon of
+            // this row before B1.
+            final titleWidget = KeyedSubtree(
+              key: const ValueKey('open-year'),
+              child: Semantics(
+                header: true,
+                button: true,
+                // «Octubre, elegir mes»: it is a button, not just a heading
+                // (H-T18-7). Tapping the month opens the whole year.
+                label: l10n.calendarPickMonth(title),
+                excludeSemantics: true,
                 onTap: () => context.push(AppRoutes.year),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(minHeight: Sp.touch),
-                  child: titleText,
+                child: InkWell(
+                  key: const ValueKey('month-title'),
+                  borderRadius: Rad.chipSmallRadius,
+                  onTap: () => context.push(AppRoutes.year),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: Sp.touch),
+                    child: titleText,
+                  ),
                 ),
               ),
-            ),
-          );
-
-          if (oneRow || twoLines) {
-            // The controls are one row here: the title and they fit.
-            return Row(
-              children: [
-                Expanded(child: titleWidget),
-                ...rows.first,
-              ],
             );
-          }
-          if (besideArrows) {
+
+            if (oneRow || twoLines) {
+              // The controls are one row here: the title and they fit.
+              return Row(
+                children: [
+                  Expanded(child: titleWidget),
+                  ...rows.first,
+                ],
+              );
+            }
+            if (besideArrows) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(child: titleWidget),
+                      ...primary,
+                    ],
+                  ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: secondary,
+                    ),
+                  ),
+                ],
+              );
+            }
+            // The title needs the whole width: the controls go below it, in one
+            // row or in two when they do not fit.
             return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Expanded(child: titleWidget),
-                    ...primary,
-                  ],
-                ),
+                titleWidget,
+                const SizedBox(height: Sp.xs),
                 Align(
                   alignment: Alignment.centerRight,
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     mainAxisSize: MainAxisSize.min,
-                    children: secondary,
+                    children: [
+                      for (final row in rows)
+                        Row(mainAxisSize: MainAxisSize.min, children: row),
+                    ],
                   ),
                 ),
               ],
             );
-          }
-          // The title needs the whole width: the controls go below it, in one
-          // row or in two when they do not fit.
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              titleWidget,
-              const SizedBox(height: Sp.xs),
-              Align(
-                alignment: Alignment.centerRight,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    for (final row in rows)
-                      Row(mainAxisSize: MainAxisSize.min, children: row),
-                  ],
-                ),
-              ),
-            ],
-          );
-        },
+          },
+        ),
       ),
     );
   }

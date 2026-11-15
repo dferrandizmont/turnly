@@ -52,7 +52,6 @@ void main() {
       await app.tap(key('onboarding-pattern-12h'));
       await _next(app);
       expect(app.title, '¿Cuándo empiezas?');
-      await app.tap(key('onboarding-cycle-toggle'));
 
       for (var i = 0; i < 4; i++) {
         final cell = find.descendant(
@@ -73,24 +72,8 @@ void main() {
     await app.tap(key('onboarding-pattern-continental'));
     await _next(app);
     expect(app.title, '¿Cuándo empiezas?');
-    // «Mañana» repeats in the cycle: picking it shows one pill per its day.
-    await app.tap(key('onboarding-shift-morning'));
-
-    // The pills the person actually taps on the main path of the step.
     final keys = <ValueKey<String>>[
-      for (final w in tester.widgetList<Widget>(
-        find.byWidgetPredicate(
-          (w) =>
-              w.key is ValueKey<String> &&
-              ((w.key! as ValueKey<String>).value.startsWith(
-                    'onboarding-shift-',
-                  ) ||
-                  (w.key! as ValueKey<String>).value.startsWith(
-                    'onboarding-occurrence-',
-                  )),
-        ),
-      ))
-        w.key! as ValueKey<String>,
+      for (var i = 0; i < 28; i++) ValueKey('onboarding-offset-$i'),
     ];
     expect(keys, isNotEmpty);
     for (final k in keys) {

@@ -19,6 +19,13 @@ import 'today_card.dart';
 class MonthFit {
   const MonthFit._();
 
+  /// The most the text of the header of the month (the date, the calendar
+  /// switcher, the month, Grid/List, «Hoy») grows with the reader's text
+  /// size. Past it the header would take most of the screen and cut names
+  /// (iOS AX3, 1.1.0 QA F7); the grid, the card of today and the rest of the
+  /// screen keep the full size.
+  static const double headerMaxScale = 1.5;
+
   /// The rows of the month grid: always six.
   static const int monthGridRows = 6;
 

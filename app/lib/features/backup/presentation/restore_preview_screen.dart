@@ -443,6 +443,15 @@ class _Preview extends ConsumerWidget {
                 value: '${incoming.shiftTypes}',
                 now: l10n.backupUiPreviewNow('${current.shiftTypes}'),
               ),
+              // Only when either side has some: a file or a phone without
+              // extra hours has nothing to say about them.
+              if (incoming.overtimeBlocks > 0 || current.overtimeBlocks > 0)
+                _Fact(
+                  label: l10n.backupUiPreviewOvertime,
+                  valueKey: 'restore-overtime',
+                  value: '${incoming.overtimeBlocks}',
+                  now: l10n.backupUiPreviewNow('${current.overtimeBlocks}'),
+                ),
               _Fact(
                 label: l10n.backupUiPreviewRange,
                 valueKey: 'restore-range',

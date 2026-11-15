@@ -1,7 +1,6 @@
 import 'package:cuadrante/core/bootstrap/bootstrap.dart';
 import 'package:cuadrante/core/format/text_wrap.dart';
 import 'package:cuadrante/core/icons/app_icons.dart';
-import 'package:cuadrante/core/widgets/choice_pill.dart';
 import 'package:cuadrante/features/backup/presentation/backup_screen.dart';
 import 'package:cuadrante/features/calendar/application/paint_controller.dart';
 import 'package:cuadrante/features/calendar/presentation/month_screen.dart';
@@ -161,7 +160,7 @@ void main() {
           ),
           findsOneWidget,
         );
-        await app.tap(key('onboarding-shift-night12'));
+        await app.tap(key('onboarding-offset-1'));
         expect(
           find.text(
             keepTimeRangesTogether('Ese día te toca: Noche 12 h 20:00–08:00'),
@@ -174,7 +173,7 @@ void main() {
       },
     );
 
-    testWidgets('a shift that repeats asks which of its days', (tester) async {
+    testWidgets('a repeated shift is chosen by its numbered cycle day', (tester) async {
       final app = await FirstLaunch.open(tester);
       await app.chooseRotation();
       await app.tap(key('onboarding-profession-nursing'));
@@ -182,39 +181,9 @@ void main() {
       await _next(app);
       expect(app.title, '¿Cuándo empiezas?');
 
-      // «Mañana» appears several times in the 28-day cycle: after picking it
-      // the picker asks which of its days, one option per day of the run,
-      // labelled by its run (no counting). Its three runs are all after
-      // Libre, so the run number is what tells them apart.
-      await app.tap(key('onboarding-shift-morning'));
-      expect(key('onboarding-occurrence-0'), findsOneWidget);
-      expect(key('onboarding-offset-0'), findsNothing, reason: 'grid hidden');
-      expect(
-        find.text('Tanda 1 · Día 1 de 2, después de Libre'),
-        findsOneWidget,
-      );
-      expect(
-        find.text('Tanda 2 · Día 1 de 2, después de Libre'),
-        findsOneWidget,
-      );
-      expect(
-        find.text('Tanda 3 · Día 1 de 3, después de Libre'),
-        findsOneWidget,
-      );
-      // Every option of the shift has a label of its own: no two pills read
-      // the same.
-      final labels = [
-        for (final pill in tester.widgetList<ChoicePill>(
-          find.byType(ChoicePill),
-        ))
-          if (pill.key is ValueKey<String> &&
-              (pill.key! as ValueKey<String>).value.startsWith(
-                'onboarding-occurrence-',
-              ))
-            pill.label,
-      ];
-      expect(labels.toSet(), hasLength(labels.length));
-      await app.tap(key('onboarding-occurrence-9'));
+      expect(key('onboarding-offset-0'), findsOneWidget);
+      expect(key('onboarding-offset-27'), findsOneWidget);
+      await app.tap(key('onboarding-offset-9'));
       await _next(app); // the start step writes
 
       expect(app.title, 'Listo');
@@ -225,7 +194,7 @@ void main() {
       );
     });
 
-    testWidgets('tapping the shift already chosen keeps the cycle day', (
+    testWidgets('tapping the chosen cycle day keeps the offset', (
       tester,
     ) async {
       final app = await FirstLaunch.open(tester);
@@ -235,12 +204,12 @@ void main() {
 
       // Choose the first day of the second morning run (day 10 of the cycle,
       // offset 9)…
-      await app.tap(key('onboarding-shift-morning'));
-      await app.tap(key('onboarding-occurrence-9'));
+      await app.tap(key('onboarding-offset-9'));
+      await app.tap(key('onboarding-offset-9'));
       expect(app.container.read(onboardingControllerProvider).stepOffset, 9);
       // …and tapping the same shift again must not jump back to its first
       // day (offset 0).
-      await app.tap(key('onboarding-shift-morning'));
+      await app.tap(key('onboarding-offset-9'));
       expect(app.container.read(onboardingControllerProvider).stepOffset, 9);
     });
 
@@ -283,7 +252,7 @@ void main() {
       await app.chooseRotation();
       await app.tap(key('onboarding-pattern-correturnos'));
       await _next(app);
-      await app.tap(key('onboarding-shift-afternoon'));
+      await app.tap(key('onboarding-offset-7'));
 
       final preview = key('onboarding-pattern-preview');
       await tester.ensureVisible(preview);
@@ -819,7 +788,7 @@ void main() {
       await app.tap(key('onboarding-profession-nursing'));
       await app.tap(key('onboarding-pattern-12h'));
       await _next(app);
-      await app.tap(key('onboarding-shift-night12'));
+      await app.tap(key('onboarding-offset-1'));
       await _next(app);
 
       expect(app.title, 'Listo');

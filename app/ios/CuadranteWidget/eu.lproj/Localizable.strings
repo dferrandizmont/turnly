@@ -1,0 +1,10 @@
+/* See es.lproj/Localizable.strings. */
+"widget_name" = "Turnly";
+"widget_description" = "Widgetak beti erakusten du gaurko eguna, aplikazioa ireki ez arren.";
+"widget_empty_title" = "Turnly";
+"widget_empty_body" = "Ireki Turnly zure txandak ikusteko";
+"widget_sample_tomorrow" = "Bihar";
+/* Gallery sample only: v3 overtime, early-leave and seven-day total labels. */
+"widget_sample_overtime" = "Aparteko orduak: +2 h";
+"widget_sample_early_leave" = "1 h lehenago atera naiz";
+"widget_sample_seven_days" = "7 egun: 40 h";

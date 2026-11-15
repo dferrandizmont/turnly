@@ -1,0 +1,10 @@
+/* See es.lproj/Localizable.strings. */
+"widget_name" = "Turnly";
+"widget_description" = "The widget always shows today, even if you don’t open the app.";
+"widget_empty_title" = "Turnly";
+"widget_empty_body" = "Open Turnly to see your shifts";
+"widget_sample_tomorrow" = "Tomorrow";
+/* Gallery sample only: v3 overtime, early-leave and seven-day total labels. */
+"widget_sample_overtime" = "+2 h overtime";
+"widget_sample_early_leave" = "Left 1 h early";
+"widget_sample_seven_days" = "7 days: 40 h";

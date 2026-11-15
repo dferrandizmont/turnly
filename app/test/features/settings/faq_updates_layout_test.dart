@@ -43,7 +43,14 @@ void main() {
         app.container.read(routerProvider).go(AppRoutes.settingsFaq);
         await tester.pumpAndSettle();
 
-        for (final id in ['notes', 'holidays', 'backup', 'import', 'summary']) {
+        for (final id in [
+          'pattern',
+          'notes',
+          'holidays',
+          'backup',
+          'import',
+          'summary',
+        ]) {
           final tile = find.byKey(ValueKey('faq-$id'));
           final header = find.descendant(
             of: tile,

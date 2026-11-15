@@ -142,6 +142,17 @@ hace la conexión. `PRIVACY_URL` apunta por defecto a `https://turnly.mainshai.c
 en inglés se usa `PRIVACY_URL_EN` (`https://turnly.mainshai.com/en/privacy/`). Las dos URL pueden
 cambiarse con `--dart-define`. La web española es la referencia para los demás idiomas.
 
+## Valoraciones en la tienda (`features/review`)
+La app puede pedir a la tienda su ventana de valoración (`in_app_review` 2.0.12: en Android la biblioteca
+`com.google.android.play:review` 2.0.2 con `play-services-base`; en iOS `SKStoreReviewController`) tras aplicar una
+rotación o terminar de pintar, con la política de `ReviewPolicy` (7 días desde la primera apertura registrada, 5 días abiertos, una vez
+por versión, 90 días entre peticiones, 3 como máximo). «Valorar Turnly» (Ajustes › Ayuda) abre la ficha. No se pasa ningún dato al plugin (solo el id de la app al abrir la ficha). Los contadores (`review.state` en la tabla
+`settings`: primer día, último día y número de días abiertos, número de peticiones, día y versión de la última) no
+entran en el `.turnly` (`isDeviceSetting`), pero están en `cuadrante.sqlite`, así que van en la copia cifrada de Google,
+en el traspaso entre móviles y en la copia del dispositivo de iOS. La valoración la recibe la tienda, no el titular.
+Data safety: previsto «Ninguno» (la reseña la inicia el usuario y la gestiona Play), **pendiente de confirmar** con la
+declaración de Google sobre las bibliotecas Play Core al rellenar el formulario.
+
 ## Declaraciones en tiendas
 - App Store, App Privacy: **no se recogen datos**, sin seguimiento ni compras dentro de la app
   (`docs/tienda/app-store.md`).

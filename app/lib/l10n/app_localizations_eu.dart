@@ -25,6 +25,9 @@ class AppLocalizationsEu extends AppLocalizations {
   String get save => 'Gorde';
 
   @override
+  String get keyboardDone => 'Eginda';
+
+  @override
   String get undo => 'Desegin';
 
   @override
@@ -574,6 +577,9 @@ class AppLocalizationsEu extends AppLocalizations {
   String shiftTypesRestored(String name) {
     return '«$name» berreskuratu da';
   }
+
+  @override
+  String get patternDiscardTitle => 'Sekuentzia baztertu nahi duzu?';
 
   @override
   String get discardChangesTitle => 'Aldaketak baztertu nahi dituzu?';
@@ -3018,12 +3024,11 @@ class AppLocalizationsEu extends AppLocalizations {
       'Sakatu «Margotu» egutegian, aukeratu txanda bat behean eta ukitu egunak edo pasatu hatza haien gainetik. Egun bat husteko, erabili «Ezabatu». Trazu bakoitza desegin eta berregin daiteke barrako geziekin. Sakatu «Eginda» amaitzean.\n\nMargotzen ari ez zarela egun bat ukitzen baduzu, haren xehetasunak irekitzen dira: han txanda aldatzen duzu, ohar bat gehitzen duzu edo eredura itzultzen zara. Egun bat sakatuta edukitzen baduzu, batzuk aldi berean aukeratzen hasiko zara: txanda jarri, kopiatu, ebaki eta itsatsi, edo aste bat errepikatu ditzakezu.';
 
   @override
-  String get faqPatternQ =>
-      'Nola aplikatzen dut txandaketa bat, eta zer da desfasea?';
+  String get faqPatternQ => 'Nola sortu eta aplikatu eredu bat?';
 
   @override
   String get faqPatternA =>
-      'Margotze moduan, sakatu «Eredua» botoia eta jarraitu urratsei: aukeratu zure txandaketa (edo sortu zurea), hasten zaren eguna eta noiz arte errepikatzen den.\n\nDesfasea hasierako egunean zikloaren zein puntutan zauden da. Egun horretan gaua egokitzen bazaizu, «Zikloaren zein egunetan zaude egun horretan?» urratsean gaua ukitzen duzu, eta gainerakoa bere kasa egokitzen da. Eskuz aldatu zenituen egunak errespetatu edo ordeztu egiten dira, nahiago duzun bezala. Txandaketa bat amaitzeko edo kentzeko, joan Ezarpenak › Nire txandaketak atalera.';
+      'Margotze moduan, sakatu «Eredua» eta aukeratu txandaketa bat. «Sortu nirea» aukeran, txanda baten blokeak gehitu eta bakoitzaren egun kopurua alda dezakezu; «Errepikatu» aukerak bloke batetik azkenekora kopiatzen du. Eraikitzaileak gehienez 371 egun onartzen ditu. Industrian, «Asteak txandako» aukerak ordena, txanda bakoitzaren asteak eta asteburuak libre izatea aukeratzen uzten du.\n\nAukeratu hasiera eguna eta ukitu dagokizun zikloko eguna zerrendan. Azpian hilabete osoak ikusiko dituzu, zikloa osatu arte. Azken urratsean, amaiera eta eskuzko aldaketak mantentzea edo ordeztea aukeratzen dituzu; aurrebista eguneratu egiten da.\n\n«Editatu» aukerak edozein ereduren kopia irekitzen du: «Eredu berri gisa gorde» aukerak jatorrizkoa eta haren txandaketak mantentzen ditu. Zure eredu bat ken dezakezu txandaketa batek ere erabiltzen ez badu. Txandaketa amaitzeko edo kentzeko, joan Ezarpenak › Nire txandaketak atalera.';
 
   @override
   String get faqDoubleQ => 'Nola bikoizten dut txanda bat?';
@@ -3104,6 +3109,13 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get settingsEmailCopied => 'Helbidea kopiatu da';
+
+  @override
+  String get settingsRateTitle => 'Baloratu Turnly';
+
+  @override
+  String get settingsRateSubtitle =>
+      'Iruzkin batek besteei aplikazioa aurkitzen laguntzen die';
 
   @override
   String get settingsAboutTitle => 'Honi buruz';
@@ -4599,6 +4611,9 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get backupUiPreviewTypes => 'Txanda motak';
+
+  @override
+  String get backupUiPreviewOvertime => 'Aparteko orduen blokeak';
 
   @override
   String get backupUiPreviewRange => 'Datak';
@@ -7468,6 +7483,11 @@ class AppLocalizationsEu extends AppLocalizations {
   String get overtimeTypeInvalidRate => 'Idatzi orduko prezio bat.';
 
   @override
+  String overtimeRateOutOfRange(String max) {
+    return 'Idatzi orduko prezio bat, 0 eta $max artean.';
+  }
+
+  @override
   String get overtimeTypeOvertime => 'Aparteko orduak';
 
   @override
@@ -7476,6 +7496,11 @@ class AppLocalizationsEu extends AppLocalizations {
   @override
   String dayCellOvertime(String hours) {
     return '+$hours h';
+  }
+
+  @override
+  String dayCellOvertimeClock(String time) {
+    return '+$time';
   }
 
   @override
@@ -7539,4 +7564,206 @@ class AppLocalizationsEu extends AppLocalizations {
   String widgetSevenDayHours(String duration) {
     return '7 egun: $duration';
   }
+
+  @override
+  String patternCopyName(String name, int number) {
+    return '$name ($number)';
+  }
+
+  @override
+  String get patternCycleLimit => 'Zikloak gehienez 371 egun izan ditzake.';
+
+  @override
+  String get patternBlocksHelp =>
+      'Ukitu txanda bat bloke bat gehitzeko; ukitu blokea egun kopurua aldatzeko.';
+
+  @override
+  String patternWeeks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count aste',
+      one: '1 aste',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String patternDuration(String days, String weeks) {
+    return '$days · $weeks';
+  }
+
+  @override
+  String patternBlockTitle(String name, String days) {
+    return '$name × $days';
+  }
+
+  @override
+  String get patternOtherNumber => 'Beste zenbaki bat';
+
+  @override
+  String get patternConsecutiveDays => 'Egun jarraian';
+
+  @override
+  String get patternDayLess => 'Egun bat gutxiago';
+
+  @override
+  String get patternDayMore => 'Egun bat gehiago';
+
+  @override
+  String get patternBlockUp => 'Gora';
+
+  @override
+  String get patternBlockDown => 'Behera';
+
+  @override
+  String get patternBlockDuplicate => 'Bikoiztu';
+
+  @override
+  String get patternBlockSplit => 'Zatitu';
+
+  @override
+  String get patternBlockSplitAfter => 'Zatitu egun kopuru honen ondoren';
+
+  @override
+  String get patternBlockRemove => 'Kendu';
+
+  @override
+  String get patternRepeatFrom => 'Errepikatu hemendik…';
+
+  @override
+  String get patternRepeatHelp =>
+      'Bloke honetatik azkenera. Kopiak bloke arrunt gisa gehitzen dira.';
+
+  @override
+  String patternRepeatTotal(int count, String days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Guztira $count aldiz',
+      one: 'Guztira 1 aldiz',
+    );
+    return '$_temp0 · $days';
+  }
+
+  @override
+  String get patternRepeatConfirm => 'Errepikatu';
+
+  @override
+  String get patternRepeatLess => 'Aldi bat gutxiago';
+
+  @override
+  String get patternRepeatMore => 'Aldi bat gehiago';
+
+  @override
+  String get patternAddBlock => 'Gehitu bloke bat';
+
+  @override
+  String get patternChangeShift => 'Aldatu txanda';
+
+  @override
+  String get patternYourCycle => 'Zure zikloa';
+
+  @override
+  String patternShowWeeks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Ikusi aste guztiak: $count',
+      one: 'Ikusi aste osoa',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get patternCollapseCycle => 'Tolestu zikloa';
+
+  @override
+  String patternCycleDayLabel(int day, int total, String shifts) {
+    return 'Zikloko eguna: $day, guztira $total, $shifts';
+  }
+
+  @override
+  String get patternCyclePickHelp =>
+      'Aukeratu hasierako datan dagokizun zikloko eguna.';
+
+  @override
+  String patternNumberRange(int max) {
+    return 'Idatzi zenbaki bat 1 eta $max artean.';
+  }
+
+  @override
+  String get patternWeeksTitle => 'Asteak txandako';
+
+  @override
+  String get patternWeeksHint =>
+      'Hainbat aste jarraian txanda bakoitzean, asteburu libreak izanda edo izan gabe.';
+
+  @override
+  String get patternWeeksOrder => 'Txandak eta ordena';
+
+  @override
+  String get patternWeeksOrderHelp =>
+      'Ukitu txandak egiten dituzun ordenan. Bat kentzeko, ukitu berriro.';
+
+  @override
+  String patternWeeksPosition(int position) {
+    return 'Ordena: $position';
+  }
+
+  @override
+  String get patternWeeksEach => 'Txanda bakoitzaren asteak';
+
+  @override
+  String get patternWeeksDays => 'Zer egunetan lan egiten duzu';
+
+  @override
+  String get patternWeeksAllDays => 'Egunero';
+
+  @override
+  String get patternWeeksWeekdays => 'Astelehenetik ostiralera';
+
+  @override
+  String get patternWeekLess => 'Aste bat gutxiago';
+
+  @override
+  String get patternWeekMore => 'Aste bat gehiago';
+
+  @override
+  String get patternAdjustByHand => 'Eskuz doitu';
+
+  @override
+  String get patternEdit => 'Editatu';
+
+  @override
+  String get patternSaveAsNew => 'Eredu berri gisa gorde';
+
+  @override
+  String patternRemoveTitle(String name) {
+    return 'Eredu hau kendu: $name?';
+  }
+
+  @override
+  String get patternRemoveHint => 'Gordetako ereduetatik kenduko da.';
+
+  @override
+  String get patternUsedHint =>
+      'Txandaketa batek eredu hau erabiltzen du. Kopia gisa edita dezakezu.';
+
+  @override
+  String get patternRemoveUnavailable =>
+      'Ez da kendu. Baliteke beste egutegi batean erabiltzea edo ezin gorde izatea.';
+
+  @override
+  String get patternManualChange => 'Eskuzko aldaketa';
+
+  @override
+  String get patternRemove => 'Kendu';
+
+  @override
+  String get patternCycleScrollable =>
+      'Zikloaren zerrenda horizontalean mugi daiteke';
+
+  @override
+  String get patternDurationShortcuts => 'Iraupenaren lasterbideak';
 }

@@ -41,7 +41,7 @@ del gesto abajo, **sin titular, sin marco y sin tinte de fondo**. Una sola va en
 | `01-mes.png` | 1080 × 2400 | Cuadrícula del mes, tema claro |
 | `02-lista.png` | 1080 × 2400 | Lista del mismo mes |
 | `03-pintar.png` | 1080 × 2400 | Pintar con la paleta |
-| `04-rotaciones.png` | 1080 × 2400 | Asistente: paso del día de inicio y del ciclo (0.8.4) |
+| `04-rotaciones.png` | 1080 × 2400 | Asistente 0.11.0, paso 1: constructor de 63 días · 9 semanas, tres bloques cerrados de 21 días (Mañana, Noche, Tarde) y paleta; texto a escala 1,0. La tira empieza por el día 1 en tablet |
 | `05-horas.png` | 1080 × 2400 | Resumen de horas |
 | `06-festivos.png` | 1080 × 2400 | Festivos: país, comunidad y municipio |
 | `07-mes-oscuro.png` | 1080 × 2400 | Cuadrícula del mes, tema oscuro |
@@ -64,8 +64,20 @@ comunidad y municipio, con los festivos del paquete real de la app.
 
 El test comprueba con el motor **9 turnos, 72 h, 24 h nocturnas y 8 h festivas**
 antes de guardar cada imagen. Sin datos personales, salud ni importes ficticios.
-El asistente usa otro calendario vacío, «Industria» / «Industry», para enseñar
-la rotación Continental sin las excepciones de «Demo».
+El asistente usa otro calendario vacío, «Industria» / «Industry», sin las
+excepciones de «Demo». Su ciclo tiene tres bloques de 21 días: Mañana, Noche,
+Tarde, con las mismas horas que el resto de escenas. El paso 1 muestra los
+tres bloques cerrados, cada uno con color, código, hora y duración, a escala
+de texto 1,0 tanto en móvil (412 dp) como en tablet. El test desplaza el
+constructor hasta dejar la cabecera «63 días · 9 semanas» y los tres bloques
+visibles sobre la paleta fija, sin cortar textos ni celdas en los bordes.
+En móvil se priorizan cabecera, bloques y paleta: la paleta actual reserva dos
+filas y no deja espacio para una fila completa de la tira. En tablet se ve
+también el principio de la tira por el día 1. Mostrarlo en móvil requiere el
+ajuste del constructor de la rama `fix/constructor-horizontal`; este montaje
+no modifica el código de la app.
+En `shots.json`, esta escena usa `fit: true`: Play muestra el teléfono entero
+para conservar también la paleta y el botón «Siguiente».
 Pintar y la vista previa no se guardan: no alteran el resumen de las otras escenas.
 La sexta escena usa Festivos; las de «Vacaciones y permisos» y «Libro de cambios»
 (08 y 09, solo del README) usan esas pantallas reales, con saldos y cambios de ejemplo,
@@ -91,6 +103,43 @@ TZ=Europe/Madrid flutter test --dart-define=GENERATE_STORE=true --dart-define=ST
 | `ios65` | 1242 × 2688 | `app/build/store/ios65/{es,ca,gl,eu,en}/` |
 | `ios63` | 1206 × 2622 | `app/build/store/ios63/{es,ca,gl,eu,en}/` (**obligatorio** en App Store Connect: «iPhone with Dynamic Island, medium display», comprobado el 28-oct-2026) |
 | `tablet` | 1600 × 2560 | `docs/store/tablet/{es,ca,gl,eu,en}/`: pantallas en bruto de una tablet Android en vertical (800 dp, clase Redmi Pad 2 Pro). `store_shots.py docs/store/shots.json` las enmarca en `docs/store/<idioma>/play-tablet7/` (1350 × 2400) y `play-tablet10/` (1800 × 3200) para Play |
+
+Para actualizar Android en Windows, desde `app/`, sin definir `TZ`:
+
+```bash
+sh ~/.agents/scripts/heavy.sh flutter test --dart-define=GENERATE_STORE=true --dart-define=STORE_TARGET=github test/store
+sh ~/.agents/scripts/heavy.sh flutter test --dart-define=GENERATE_STORE=true --dart-define=STORE_TARGET=play test/store/store_screenshots_test.dart
+sh ~/.agents/scripts/heavy.sh flutter test --dart-define=GENERATE_STORE=true --dart-define=STORE_TARGET=tablet test/store/store_screenshots_test.dart
+```
+
+Las composiciones finales de Play salen de los PNG en bruto de GitHub y tablet,
+no de `app/build/store/play/`. Desde la raíz, usa el generador de la skill
+`readme-app`, limitando las tiendas a Android para no regenerar iOS:
+
+```powershell
+$androidShots = @'
+import importlib.util
+import sys
+from pathlib import Path
+sys.dont_write_bytecode = True
+script = Path.home() / '.agents/skills/readme-app/scripts/store_shots.py'
+spec = importlib.util.spec_from_file_location('store_shots', script)
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+module.STORES = {key: value for key, value in module.STORES.items() if key.startswith('play')}
+module.main('docs/store/shots.json', 'fastlane/metadata')
+'@
+python -c $androidShots
+```
+
+Necesita Pillow y la fuente Inter de la skill, sin descargas. Escribe
+`docs/store/<idioma>/{play,play-tablet7,play-tablet10}/` y copias numeradas sin
+huecos en `fastlane/metadata/android/<locale>/images/{phoneScreenshots,sevenInchScreenshots,tenInchScreenshots}/`.
+La rotación queda como `03-rotaciones.png` en Fastlane, porque la selección de
+tienda omite `02-lista.png`. Actualiza también `shots-manifest.json` con los
+sha256; las copias de Fastlane y el manifiesto están ignorados por Git.
+Compara los PNG con los originales y conserva solo los cambios de la escena
+que estés actualizando. Revisa visualmente todas sus variantes antes de subirlas.
 
 El target iOS selecciona controles Flutter de iOS; estos renders **no sustituyen
 la validación del build de iPhone** ni las capturas de widgets nativos. Comprueba

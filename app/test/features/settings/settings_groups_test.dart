@@ -45,6 +45,7 @@ const _groups = {
     'settings-help',
     'settings-privacy',
     'settings-about',
+    'settings-rate',
   ],
 };
 

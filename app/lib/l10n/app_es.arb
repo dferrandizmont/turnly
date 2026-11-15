@@ -8,6 +8,10 @@
   "close": "Cerrar",
   "delete": "Borrar",
   "save": "Guardar",
+  "keyboardDone": "Listo",
+  "@keyboardDone": {
+    "description": "Botón sobre el teclado numérico (en iOS no tiene tecla de intro) que lo cierra."
+  },
   "undo": "Deshacer",
   "redo": "Rehacer",
   "retry": "Reintentar",
@@ -742,6 +746,7 @@
       }
     }
   },
+  "patternDiscardTitle": "¿Descartar la secuencia?",
   "discardChangesTitle": "¿Descartar los cambios?",
   "discardChangesBody": "Los cambios sin guardar se perderán.",
   "discardChangesConfirm": "Descartar",
@@ -2323,8 +2328,8 @@
   "faqContact": "Ayuda y contacto",
   "faqPaintQ": "¿Cómo pinto el mes?",
   "faqPaintA": "Pulsa «Pintar» en el calendario, elige un turno abajo y toca los días o pasa el dedo por ellos. Para vaciar un día usa «Borrar». Cada trazo se puede deshacer y rehacer con las flechas de la barra. Pulsa «Listo» cuando termines.\n\nSi tocas un día sin estar pintando se abre su detalle: ahí cambias el turno, añades una nota o vuelves al patrón. Si mantienes pulsado un día empiezas a elegir varios a la vez: puedes ponerles turno, copiarlos, cortarlos y pegarlos, o repetir una semana.",
-  "faqPatternQ": "¿Cómo aplico una rotación y qué es el desfase?",
-  "faqPatternA": "En modo pintar pulsa el botón «Patrón» y sigue los pasos: elige tu rotación (o crea la tuya), el día en que empiezas y hasta cuándo se repite.\n\nEl desfase es el punto del ciclo en el que estás el día de inicio. Si ese día te toca la noche, en el paso «¿En qué día del ciclo estás ese día?» tocas la noche y el resto se ajusta solo. Los días que ya cambiaste a mano se respetan o se sustituyen, como prefieras. Para terminar o quitar una rotación ve a Ajustes › Mis rotaciones.",
+  "faqPatternQ": "¿Cómo creo y aplico un patrón?",
+  "faqPatternA": "En modo pintar pulsa «Patrón» y elige una rotación. En «Crear el mío» añades bloques de un turno y cambias cuántos días dura cada uno; «Repetir» copia desde un bloque hasta el último. El constructor admite hasta 371 días. En Industria, «Semanas por turno» permite elegir el orden, las semanas de cada turno y si libras los fines de semana.\n\nEl desfase es el punto del ciclo en el que estás. Elige la fecha de inicio y toca en la tira el día del ciclo que te toca. Debajo ves meses completos hasta completar el ciclo. En el último paso eliges hasta cuándo y si respetas o sustituyes los cambios a mano; la vista previa se actualiza.\n\n«Editar» abre una copia de cualquier patrón: «Guardar como patrón nuevo» conserva el original y sus rotaciones. Puedes quitar un patrón propio si ninguna rotación lo usa. Para terminar o quitar una rotación ve a Ajustes › Mis rotaciones.",
   "faqDoubleQ": "¿Cómo doblo un turno?",
   "faqDoubleA": "Doblar es hacer dos turnos el mismo día. Toca el día y, en su detalle, usa «Doblar con otro turno». Si estás pintando, elige el modo «Añadir otro turno» y toca los días. Con varios días elegidos, «Doblar con…» añade el turno a todos.\n\nUn día puede llevar los turnos que necesites y cada uno suma sus horas por separado.",
   "faqPostNightQ": "¿Qué es el saliente automático?",
@@ -2347,6 +2352,14 @@
   "faqSummaryA": "El icono de resumen del calendario enseña los turnos, las horas, las nocturnas y las de festivo del mes, de un año entero o de las fechas que elijas en «Fechas…» (hasta 366 días). Un turno cuenta en el día en que empieza, aunque cruce la medianoche.\n\nPara ver importes, pon el precio por hora y, si lo tienes, el plus fijo por tipo de turno en Ajustes › Mis turnos. La estimación incluye esos pluses fijos, antes de impuestos, en la moneda que elijas en Ajustes › Apariencia. También suma los pluses por hora nocturna y festiva que pongas en cada turno; la retención solo cambia el neto. En Ajustes › Horas y dinero tienes plantillas de pluses por sector, el día de cierre de tu mes de nómina y un tope de horas extra.\n\nEl «Plus por turno» se suma una vez por cada turno trabajado de ese tipo, también si es partido; no depende de las horas. Los descansos y las ausencias no lo suman.",
   "settingsVersionCopied": "Versión copiada",
   "settingsEmailCopied": "Correo copiado",
+  "settingsRateTitle": "Valorar Turnly",
+  "@settingsRateTitle": {
+    "description": "Ajustes › Ayuda: fila que abre la ficha de Turnly en la tienda para dejar una reseña."
+  },
+  "settingsRateSubtitle": "Una reseña ayuda a que otros la encuentren",
+  "@settingsRateSubtitle": {
+    "description": "Subtítulo de la fila «Valorar Turnly»; «la» es la app."
+  },
   "settingsAboutTitle": "Acerca de",
   "settingsAboutVersion": "Versión {version}",
   "@settingsAboutVersion": {
@@ -3256,6 +3269,10 @@
   "backupUiPreviewDays": "Días con turno o nota puestos a mano",
   "backupUiPreviewRuns": "Rotaciones",
   "backupUiPreviewTypes": "Tipos de turno",
+  "backupUiPreviewOvertime": "Bloques de horas extra",
+  "@backupUiPreviewOvertime": {
+    "description": "Línea de «Qué trae» al restaurar una copia: cuántos bloques de horas extra tiene (el número va a su derecha)."
+  },
   "backupUiPreviewRange": "Fechas",
   "backupUiPreviewRangeValue": "Del {from} al {to}",
   "@backupUiPreviewRangeValue": {
@@ -5083,6 +5100,15 @@
   "overtimeTypeInvalidName": "Ponle un nombre.",
   "overtimeTypeInvalidMultiplier": "Escribe un multiplicador entre 0,01 y 100.",
   "overtimeTypeInvalidRate": "Escribe un precio por hora.",
+  "overtimeRateOutOfRange": "Escribe un precio por hora entre 0 y {max}.",
+  "@overtimeRateOutOfRange": {
+    "description": "Error de los campos de precio por hora de las horas extra (vacío, no es un importe o pasa del máximo). {max} es el máximo con su moneda, p. ej. 9.999,99 €.",
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
   "overtimeTypeOvertime": "Horas extra",
   "@overtimeTypeOvertime": {
     "description": "Nombre del tipo de horas extra que viene creado (cuenta para el objetivo)."
@@ -5096,6 +5122,15 @@
     "description": "Marca de la casilla del día con la suma de las horas extra (cabe en muy poco sitio).",
     "placeholders": {
       "hours": {
+        "type": "String"
+      }
+    }
+  },
+  "dayCellOvertimeClock": "+{time}",
+  "@dayCellOvertimeClock": {
+    "description": "Marca de la casilla del día con horas extra que no son horas justas: horas y minutos, como «+3:45» (3 h 45 min). Sin «h» para que quepa a un tamaño legible.",
+    "placeholders": {
+      "time": {
         "type": "String"
       }
     }
@@ -5138,5 +5173,146 @@
   "widgetEarlyLeave": "Salí {duration} antes",
   "@widgetEarlyLeave": {"placeholders": {"duration": {"type": "String"}}},
   "widgetSevenDayHours": "7 días: {duration}",
-  "@widgetSevenDayHours": {"placeholders": {"duration": {"type": "String"}}}
+  "@widgetSevenDayHours": {"placeholders": {"duration": {"type": "String"}}},
+  "patternCopyName": "{name} ({number})",
+  "patternCycleLimit": "El ciclo puede tener hasta 371 días.",
+  "@patternCopyName": {
+    "description": "Nombre propuesto al guardar como patrón nuevo si ya existe el nombre.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "patternBlocksHelp": "Toca un turno para añadir un bloque; toca el bloque para cambiar los días.",
+  "patternWeeks": "{count, plural, =1{1 semana} other{{count} semanas}}",
+  "@patternWeeks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "patternDuration": "{days} · {weeks}",
+  "@patternDuration": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      },
+      "weeks": {
+        "type": "String"
+      }
+    }
+  },
+  "patternBlockTitle": "{name} × {days}",
+  "@patternBlockTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "patternOtherNumber": "Otro número",
+  "patternConsecutiveDays": "Días seguidos",
+  "patternDayLess": "Un día menos",
+  "patternDayMore": "Un día más",
+  "patternBlockUp": "Subir",
+  "patternBlockDown": "Bajar",
+  "patternBlockDuplicate": "Duplicar",
+  "patternBlockSplit": "Partir",
+  "patternBlockSplitAfter": "Partir después de estos días",
+  "patternBlockRemove": "Quitar",
+  "patternRepeatFrom": "Repetir desde aquí…",
+  "patternRepeatHelp": "Desde este bloque hasta el último. Se añaden copias como bloques normales.",
+  "patternRepeatTotal": "{count, plural, =1{1 vez en total} other{{count} veces en total}} · {days}",
+  "@patternRepeatTotal": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "patternRepeatConfirm": "Repetir",
+  "patternRepeatLess": "Una vez menos",
+  "patternRepeatMore": "Una vez más",
+  "patternAddBlock": "Añadir un bloque",
+  "patternChangeShift": "Cambiar el turno",
+  "patternYourCycle": "Tu ciclo",
+  "patternShowWeeks": "{count, plural, =1{Ver la semana completa} other{Ver las {count} semanas}}",
+  "@patternShowWeeks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "patternCollapseCycle": "Plegar el ciclo",
+  "patternCycleDayLabel": "Día {day} de {total}, {shifts}",
+  "@patternCycleDayLabel": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "shifts": {
+        "type": "String"
+      }
+    }
+  },
+  "patternCyclePickHelp": "Elige el día del ciclo que te toca en la fecha de inicio.",
+  "patternNumberRange": "Escribe un número entre 1 y {max}.",
+  "@patternNumberRange": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "patternWeeksTitle": "Semanas por turno",
+  "patternWeeksHint": "Varias semanas seguidas de cada turno, con o sin fines de semana libres.",
+  "patternWeeksOrder": "Turnos y orden",
+  "patternWeeksOrderHelp": "Toca los turnos en el orden en que los haces. Toca otra vez para quitar uno.",
+  "patternWeeksPosition": "Orden: {position}",
+  "patternWeeksEach": "Semanas de cada turno",
+  "patternWeeksDays": "Qué días trabajas",
+  "patternWeeksAllDays": "Todos los días",
+  "patternWeeksWeekdays": "De lunes a viernes",
+  "patternWeekLess": "Una semana menos",
+  "patternWeekMore": "Una semana más",
+  "patternAdjustByHand": "Ajustar a mano",
+  "patternEdit": "Editar",
+  "patternSaveAsNew": "Guardar como patrón nuevo",
+  "patternRemoveTitle": "¿Quitar «{name}»?",
+  "patternRemoveHint": "Se quitará de tus patrones guardados.",
+  "patternUsedHint": "Este patrón lo usa una rotación. Puedes editarlo como copia.",
+  "patternRemoveUnavailable": "No se ha quitado. Puede estar en uso en otro calendario o no haberse podido guardar.",
+  "@patternWeeksPosition": {
+    "placeholders": {
+      "position": {
+        "type": "int"
+      }
+    }
+  },
+  "@patternRemoveTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "patternManualChange": "Cambio a mano",
+  "patternRemove": "Quitar",
+  "patternCycleScrollable": "La tira del ciclo se desplaza horizontalmente",
+  "patternDurationShortcuts": "Atajos de duración"
 }

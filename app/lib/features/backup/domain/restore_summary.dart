@@ -21,6 +21,7 @@ class BackupCounts {
     this.noteAttachments = 0,
     this.dayTasks = 0,
     this.shiftSwaps = 0,
+    this.overtimeBlocks = 0,
   });
 
   factory BackupCounts.of(BackupData data) => BackupCounts(
@@ -35,6 +36,7 @@ class BackupCounts {
     noteAttachments: data.noteAttachments.length,
     dayTasks: data.dayTasks.length,
     shiftSwaps: data.shiftSwaps.length,
+    overtimeBlocks: data.overtimeBlocks.length,
   );
 
   final int calendars;
@@ -53,6 +55,9 @@ class BackupCounts {
   final int dayTasks;
   final int shiftSwaps;
 
+  /// Database v7: blocks of extra hours.
+  final int overtimeBlocks;
+
   @override
   bool operator ==(Object other) =>
       other is BackupCounts &&
@@ -66,7 +71,8 @@ class BackupCounts {
       other.settings == settings &&
       other.noteAttachments == noteAttachments &&
       other.dayTasks == dayTasks &&
-      other.shiftSwaps == shiftSwaps;
+      other.shiftSwaps == shiftSwaps &&
+      other.overtimeBlocks == overtimeBlocks;
 
   @override
   int get hashCode => Object.hash(
@@ -81,6 +87,7 @@ class BackupCounts {
     noteAttachments,
     dayTasks,
     shiftSwaps,
+    overtimeBlocks,
   );
 
   @override
@@ -88,7 +95,7 @@ class BackupCounts {
       'BackupCounts(calendars $calendars, types $shiftTypes, patterns $patterns, runs $patternRuns, '
       'entries $dayEntries, holidays $holidays, balances $absenceBalances, '
       'settings $settings, attachments $noteAttachments, tasks $dayTasks, '
-      'swaps $shiftSwaps)';
+      'swaps $shiftSwaps, overtime $overtimeBlocks)';
 }
 
 /// What restoring a backup would do, for the confirmation screen.

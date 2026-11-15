@@ -122,6 +122,8 @@ alternativa), así que en un móvil de 320 dp con letra ×1,6 un tamaño mayor l
 no desborda (`test/core/theme/cell_text_size_test.dart`). Las filas del mes crecen con él (`dayCellHeightWithTime`
 mide los estilos del tema). Se guarda en `appearance.cellTextSize` (ausente = Normal) y viaja en la copia.
 
+**Letra grande (QA 1.1.0, F2, F7, F12).** Los títulos fijos de arriba tienen un tope de escala para no comerse la pantalla ni partir palabras: la fecha de la hoja del día (`DayDetailBodyState.dateTitleMaxScale`) y la cabecera del mes (fecha, selector de calendario, Cuadrícula/Lista, mes y «Hoy», `MonthFit.headerMaxScale`) llegan como mucho a ×1,5; el resto de la pantalla sigue el tamaño del lector. Desde ×1,5 el selector de calendario va en una línea propia bajo la fecha, con todo su ancho. La marca de horas extra de la casilla se escribe «+2 h» o «+3:45» solo donde cabe junto al número del día a `cellTimeMinSize` (8 dp) o más y sin pisar el número; donde no cabe (con la nota y los puntos al lado, o en una casilla estrecha) queda el «+» pequeño, y la cantidad está en la etiqueta hablada y en el detalle del día; el PDF la pone en la fila del número del día. Los campos con teclado numérico dentro de una hoja (`AppSheetBody`) llevan una barra «Listo» sobre el teclado (en iOS ese teclado no tiene intro) y un toque en un hueco de la hoja lo cierra.
+
 La altura de las líneas de la casilla se **mide**, no se estima: el motor las dibuja en píxeles enteros, así que
 la celda reserva la altura real del número, del código y de la hora (con la letra al 130 %, la línea real mide
 hasta 0,4 dp más de la estimada). Si una celda es más baja que la que reserva la rejilla (la imagen que se

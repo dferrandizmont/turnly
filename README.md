@@ -155,9 +155,9 @@ you choose. The `.turnly` backup file is not encrypted.
 
 ## What's new
 
+- **0.11.0 (15 Nov 2026):** Android: build long rotations in blocks (“Morning × 21”), with week shortcuts, “Repeat” and the “Weeks per shift” template. Choose your cycle day in a numbered strip, preview whole months and edit patterns as copies; the app may also ask you for a store review.
 - **1.1.0 (13 Nov 2026):** now also on iPad. The iPhone and iPad get everything from 0.10.0: overtime by blocks, rotation actions from the day, the month strip, your longest work run and the new rotations. iPhone widgets show overtime and a seven-day hours total.
 - **0.10.0 (12 Nov 2026):** overtime by blocks with types and rates, and rotation actions from the day. A month strip with your next day off, longest work run in Summary, Android widgets with overtime and a seven-day hours total, and “2 and 2” / “3 and 1” rotations.
-- **1.0.0 (10 Nov 2026):** first version on the App Store, for iPhone. Android stays in Google Play testing.
 
 See [CHANGELOG.md](CHANGELOG.md) or the [releases](https://github.com/dferrandizmont/turnly/releases).
 

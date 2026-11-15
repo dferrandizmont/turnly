@@ -18,6 +18,7 @@ class AppCard extends StatelessWidget {
     this.clip = true,
     this.semanticLabel,
     this.selected,
+    this.expanded,
   }) : tinted = false;
 
   /// Soft `surfaceMuted` card without outline: callouts, hints, banners.
@@ -32,7 +33,8 @@ class AppCard extends StatelessWidget {
   }) : tinted = true,
        color = null,
        borderColor = null,
-       selected = null;
+       selected = null,
+       expanded = null;
 
   /// Default card padding.
   static const EdgeInsets defaultPadding = EdgeInsets.all(Sp.l);
@@ -60,6 +62,9 @@ class AppCard extends StatelessWidget {
   /// [semanticLabel]: the state lives on the node that label makes.
   final bool? selected;
 
+  /// Whether this card opens an expanded section.
+  final bool? expanded;
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
@@ -84,6 +89,7 @@ class AppCard extends StatelessWidget {
       label: semanticLabel,
       button: onTap != null,
       selected: selected,
+      expanded: expanded,
       child: card,
     );
   }

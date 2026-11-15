@@ -8,6 +8,7 @@
   "close": "Close",
   "delete": "Delete",
   "save": "Save",
+  "keyboardDone": "Done",
   "undo": "Undo",
   "redo": "Redo",
   "retry": "Try again",
@@ -536,6 +537,7 @@
       }
     }
   },
+  "patternDiscardTitle": "Discard the sequence?",
   "discardChangesTitle": "Discard your changes?",
   "discardChangesBody": "Unsaved changes will be lost.",
   "discardChangesConfirm": "Discard",
@@ -1900,8 +1902,8 @@
   "faqContact": "Help and contact",
   "faqPaintQ": "How do I paint the month?",
   "faqPaintA": "Tap “Paint” on the calendar, choose a shift at the bottom and tap the days or swipe across them. To empty a day, use “Erase”. Every stroke can be undone and redone with the arrows on the bar. Tap “Done” when you finish.\n\nIf you tap a day while you’re not painting, its details open: there you change the shift, add a note or go back to the pattern. If you touch and hold a day you start selecting several at once: you can set their shift, copy, cut and paste them, or repeat a week.",
-  "faqPatternQ": "How do I apply a rotation, and what’s the offset?",
-  "faqPatternA": "In paint mode, tap the “Pattern” button and follow the steps: choose your rotation (or create your own), the day you start and until when it repeats.\n\nThe offset is where in the cycle you are on the start day. If you’re on nights that day, in the step “Which day of the cycle are you on that day?” you tap the night and the rest adjusts itself. Days you’ve already changed by hand are kept or replaced, as you prefer. To end or remove a rotation, go to Settings › My rotations.",
+  "faqPatternQ": "How do I create and apply a pattern?",
+  "faqPatternA": "In paint mode, tap “Pattern” and choose a rotation. In “Create my own”, add shift blocks and change how many days each lasts; “Repeat” copies from a block through the last one. The builder supports up to 371 days. Under Industry, “Weeks per shift” lets you choose the order, weeks on each shift and whether weekends are off.\n\nChoose your start date and tap the cycle day you are on in the strip. Whole months below show a complete cycle. In the last step, choose when it ends and whether to keep or replace manual changes; the preview updates.\n\n“Edit” opens a copy of any pattern: “Save as new pattern” preserves the original and its rotations. You can remove a custom pattern if no rotation uses it. To end or remove a rotation, go to Settings › My rotations.",
   "faqDoubleQ": "How do I work a double shift?",
   "faqDoubleA": "A double is working two shifts on the same day. Tap the day and, in its details, use “Add a second shift”. If you’re painting, choose the “Add another shift” mode and tap the days. With several days selected, “Double with…” adds the shift to all of them.\n\nA day can have as many shifts as you need, and each one adds its own hours.",
   "faqPostNightQ": "What’s the automatic post-night?",
@@ -1924,6 +1926,8 @@
   "faqSummaryA": "The summary icon on the calendar shows the shifts, hours, night hours and public holiday hours of the month, a whole year or the dates you choose in “Dates…” (up to 366 days). A shift counts on the day it starts, even if it crosses midnight.\n\nTo see amounts, set each shift type’s hourly rate and, if you have one, fixed allowance in Settings › My shifts. The estimate includes those fixed allowances, before tax, in the currency you pick in Settings › Appearance. It also adds the night and public holiday premiums per hour you set on each shift; the withholding only changes the net. In Settings › Hours and money you have allowance templates by sector, the closing day of your pay month and an overtime cap.\n\n“Shift allowance” is added once for each worked shift of that type, including split shifts; it does not depend on the hours. Rest days and absences do not add it.",
   "settingsVersionCopied": "Version copied",
   "settingsEmailCopied": "Email copied",
+  "settingsRateTitle": "Rate Turnly",
+  "settingsRateSubtitle": "A review helps others find it",
   "settingsAboutTitle": "About",
   "settingsAboutVersion": "Version {version}",
   "@settingsAboutVersion": {
@@ -2727,6 +2731,7 @@
   "backupUiPreviewDays": "Days with a shift or note set by hand",
   "backupUiPreviewRuns": "Rotations",
   "backupUiPreviewTypes": "Shift types",
+  "backupUiPreviewOvertime": "Overtime blocks",
   "backupUiPreviewRange": "Dates",
   "backupUiPreviewRangeValue": "From {from} to {to}",
   "@backupUiPreviewRangeValue": {
@@ -4025,9 +4030,25 @@
   "overtimeTypeInvalidName": "Give it a name.",
   "overtimeTypeInvalidMultiplier": "Enter a multiplier between 0.01 and 100.",
   "overtimeTypeInvalidRate": "Enter an hourly rate.",
+  "overtimeRateOutOfRange": "Enter an hourly rate between 0 and {max}.",
+  "@overtimeRateOutOfRange": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
   "overtimeTypeOvertime": "Overtime",
   "overtimeTypeOtherWork": "Other job",
   "dayCellOvertime": "+{hours} h",
+  "dayCellOvertimeClock": "+{time}",
+  "@dayCellOvertimeClock": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "overtimeOnNextDay": "Next day",
   "overtimeTypeArchiveNamed": "Archive {name}",
   "catalogPattern2x2Name": "2 on, 2 off",
@@ -4042,5 +4063,57 @@
   "widgetOvertime": "+{duration} overtime",
   "widgetOvertimeType": "+{duration} {type}",
   "widgetEarlyLeave": "Left {duration} early",
-  "widgetSevenDayHours": "7 days: {duration}"
+  "widgetSevenDayHours": "7 days: {duration}",
+  "patternCopyName": "{name} ({number})",
+  "patternCycleLimit": "The cycle can have up to 371 days.",
+  "patternBlocksHelp": "Tap a shift to add a block; tap the block to change the days.",
+  "patternWeeks": "{count, plural, =1{1 week} other{{count} weeks}}",
+  "patternDuration": "{days} · {weeks}",
+  "patternBlockTitle": "{name} × {days}",
+  "patternOtherNumber": "Other number",
+  "patternConsecutiveDays": "Consecutive days",
+  "patternDayLess": "One day less",
+  "patternDayMore": "One day more",
+  "patternBlockUp": "Move up",
+  "patternBlockDown": "Move down",
+  "patternBlockDuplicate": "Duplicate",
+  "patternBlockSplit": "Split",
+  "patternBlockSplitAfter": "Split after this many days",
+  "patternBlockRemove": "Remove",
+  "patternRepeatFrom": "Repeat from here…",
+  "patternRepeatHelp": "From this block to the last. Copies are added as ordinary blocks.",
+  "patternRepeatTotal": "{count, plural, =1{1 time in total} other{{count} times in total}} · {days}",
+  "patternRepeatConfirm": "Repeat",
+  "patternRepeatLess": "One time less",
+  "patternRepeatMore": "One time more",
+  "patternAddBlock": "Add a block",
+  "patternChangeShift": "Change shift",
+  "patternYourCycle": "Your cycle",
+  "patternShowWeeks": "{count, plural, =1{Show the whole week} other{Show all {count} weeks}}",
+  "patternCollapseCycle": "Collapse cycle",
+  "patternCycleDayLabel": "Day {day} of {total}, {shifts}",
+  "patternCyclePickHelp": "Choose the cycle day you are on at the start date.",
+  "patternNumberRange": "Enter a number between 1 and {max}.",
+  "patternWeeksTitle": "Weeks per shift",
+  "patternWeeksHint": "Several weeks in a row on each shift, with or without weekends off.",
+  "patternWeeksOrder": "Shifts and order",
+  "patternWeeksOrderHelp": "Tap shifts in the order you work them. Tap again to remove one.",
+  "patternWeeksPosition": "Order: {position}",
+  "patternWeeksEach": "Weeks on each shift",
+  "patternWeeksDays": "Which days you work",
+  "patternWeeksAllDays": "Every day",
+  "patternWeeksWeekdays": "Monday to Friday",
+  "patternWeekLess": "One week less",
+  "patternWeekMore": "One week more",
+  "patternAdjustByHand": "Adjust by hand",
+  "patternEdit": "Edit",
+  "patternSaveAsNew": "Save as new pattern",
+  "patternRemoveTitle": "Remove “{name}”?",
+  "patternRemoveHint": "It will be removed from your saved patterns.",
+  "patternUsedHint": "A rotation uses this pattern. You can edit it as a copy.",
+  "patternRemoveUnavailable": "It was not removed. It may be in use in another calendar or could not be saved.",
+  "patternManualChange": "Manual change",
+  "patternRemove": "Remove",
+  "patternCycleScrollable": "The cycle strip scrolls horizontally",
+  "patternDurationShortcuts": "Duration shortcuts"
 }

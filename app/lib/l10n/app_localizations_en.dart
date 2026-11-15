@@ -25,6 +25,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get save => 'Save';
 
   @override
+  String get keyboardDone => 'Done';
+
+  @override
   String get undo => 'Undo';
 
   @override
@@ -574,6 +577,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String shiftTypesRestored(String name) {
     return '“$name” restored';
   }
+
+  @override
+  String get patternDiscardTitle => 'Discard the sequence?';
 
   @override
   String get discardChangesTitle => 'Discard your changes?';
@@ -3014,11 +3020,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Tap “Paint” on the calendar, choose a shift at the bottom and tap the days or swipe across them. To empty a day, use “Erase”. Every stroke can be undone and redone with the arrows on the bar. Tap “Done” when you finish.\n\nIf you tap a day while you’re not painting, its details open: there you change the shift, add a note or go back to the pattern. If you touch and hold a day you start selecting several at once: you can set their shift, copy, cut and paste them, or repeat a week.';
 
   @override
-  String get faqPatternQ => 'How do I apply a rotation, and what’s the offset?';
+  String get faqPatternQ => 'How do I create and apply a pattern?';
 
   @override
   String get faqPatternA =>
-      'In paint mode, tap the “Pattern” button and follow the steps: choose your rotation (or create your own), the day you start and until when it repeats.\n\nThe offset is where in the cycle you are on the start day. If you’re on nights that day, in the step “Which day of the cycle are you on that day?” you tap the night and the rest adjusts itself. Days you’ve already changed by hand are kept or replaced, as you prefer. To end or remove a rotation, go to Settings › My rotations.';
+      'In paint mode, tap “Pattern” and choose a rotation. In “Create my own”, add shift blocks and change how many days each lasts; “Repeat” copies from a block through the last one. The builder supports up to 371 days. Under Industry, “Weeks per shift” lets you choose the order, weeks on each shift and whether weekends are off.\n\nChoose your start date and tap the cycle day you are on in the strip. Whole months below show a complete cycle. In the last step, choose when it ends and whether to keep or replace manual changes; the preview updates.\n\n“Edit” opens a copy of any pattern: “Save as new pattern” preserves the original and its rotations. You can remove a custom pattern if no rotation uses it. To end or remove a rotation, go to Settings › My rotations.';
 
   @override
   String get faqDoubleQ => 'How do I work a double shift?';
@@ -3098,6 +3104,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsEmailCopied => 'Email copied';
+
+  @override
+  String get settingsRateTitle => 'Rate Turnly';
+
+  @override
+  String get settingsRateSubtitle => 'A review helps others find it';
 
   @override
   String get settingsAboutTitle => 'About';
@@ -4578,6 +4590,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backupUiPreviewTypes => 'Shift types';
+
+  @override
+  String get backupUiPreviewOvertime => 'Overtime blocks';
 
   @override
   String get backupUiPreviewRange => 'Dates';
@@ -7438,6 +7453,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get overtimeTypeInvalidRate => 'Enter an hourly rate.';
 
   @override
+  String overtimeRateOutOfRange(String max) {
+    return 'Enter an hourly rate between 0 and $max.';
+  }
+
+  @override
   String get overtimeTypeOvertime => 'Overtime';
 
   @override
@@ -7446,6 +7466,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String dayCellOvertime(String hours) {
     return '+$hours h';
+  }
+
+  @override
+  String dayCellOvertimeClock(String time) {
+    return '+$time';
   }
 
   @override
@@ -7515,4 +7540,206 @@ class AppLocalizationsEn extends AppLocalizations {
   String widgetSevenDayHours(String duration) {
     return '7 days: $duration';
   }
+
+  @override
+  String patternCopyName(String name, int number) {
+    return '$name ($number)';
+  }
+
+  @override
+  String get patternCycleLimit => 'The cycle can have up to 371 days.';
+
+  @override
+  String get patternBlocksHelp =>
+      'Tap a shift to add a block; tap the block to change the days.';
+
+  @override
+  String patternWeeks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count weeks',
+      one: '1 week',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String patternDuration(String days, String weeks) {
+    return '$days · $weeks';
+  }
+
+  @override
+  String patternBlockTitle(String name, String days) {
+    return '$name × $days';
+  }
+
+  @override
+  String get patternOtherNumber => 'Other number';
+
+  @override
+  String get patternConsecutiveDays => 'Consecutive days';
+
+  @override
+  String get patternDayLess => 'One day less';
+
+  @override
+  String get patternDayMore => 'One day more';
+
+  @override
+  String get patternBlockUp => 'Move up';
+
+  @override
+  String get patternBlockDown => 'Move down';
+
+  @override
+  String get patternBlockDuplicate => 'Duplicate';
+
+  @override
+  String get patternBlockSplit => 'Split';
+
+  @override
+  String get patternBlockSplitAfter => 'Split after this many days';
+
+  @override
+  String get patternBlockRemove => 'Remove';
+
+  @override
+  String get patternRepeatFrom => 'Repeat from here…';
+
+  @override
+  String get patternRepeatHelp =>
+      'From this block to the last. Copies are added as ordinary blocks.';
+
+  @override
+  String patternRepeatTotal(int count, String days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count times in total',
+      one: '1 time in total',
+    );
+    return '$_temp0 · $days';
+  }
+
+  @override
+  String get patternRepeatConfirm => 'Repeat';
+
+  @override
+  String get patternRepeatLess => 'One time less';
+
+  @override
+  String get patternRepeatMore => 'One time more';
+
+  @override
+  String get patternAddBlock => 'Add a block';
+
+  @override
+  String get patternChangeShift => 'Change shift';
+
+  @override
+  String get patternYourCycle => 'Your cycle';
+
+  @override
+  String patternShowWeeks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Show all $count weeks',
+      one: 'Show the whole week',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get patternCollapseCycle => 'Collapse cycle';
+
+  @override
+  String patternCycleDayLabel(int day, int total, String shifts) {
+    return 'Day $day of $total, $shifts';
+  }
+
+  @override
+  String get patternCyclePickHelp =>
+      'Choose the cycle day you are on at the start date.';
+
+  @override
+  String patternNumberRange(int max) {
+    return 'Enter a number between 1 and $max.';
+  }
+
+  @override
+  String get patternWeeksTitle => 'Weeks per shift';
+
+  @override
+  String get patternWeeksHint =>
+      'Several weeks in a row on each shift, with or without weekends off.';
+
+  @override
+  String get patternWeeksOrder => 'Shifts and order';
+
+  @override
+  String get patternWeeksOrderHelp =>
+      'Tap shifts in the order you work them. Tap again to remove one.';
+
+  @override
+  String patternWeeksPosition(int position) {
+    return 'Order: $position';
+  }
+
+  @override
+  String get patternWeeksEach => 'Weeks on each shift';
+
+  @override
+  String get patternWeeksDays => 'Which days you work';
+
+  @override
+  String get patternWeeksAllDays => 'Every day';
+
+  @override
+  String get patternWeeksWeekdays => 'Monday to Friday';
+
+  @override
+  String get patternWeekLess => 'One week less';
+
+  @override
+  String get patternWeekMore => 'One week more';
+
+  @override
+  String get patternAdjustByHand => 'Adjust by hand';
+
+  @override
+  String get patternEdit => 'Edit';
+
+  @override
+  String get patternSaveAsNew => 'Save as new pattern';
+
+  @override
+  String patternRemoveTitle(String name) {
+    return 'Remove “$name”?';
+  }
+
+  @override
+  String get patternRemoveHint =>
+      'It will be removed from your saved patterns.';
+
+  @override
+  String get patternUsedHint =>
+      'A rotation uses this pattern. You can edit it as a copy.';
+
+  @override
+  String get patternRemoveUnavailable =>
+      'It was not removed. It may be in use in another calendar or could not be saved.';
+
+  @override
+  String get patternManualChange => 'Manual change';
+
+  @override
+  String get patternRemove => 'Remove';
+
+  @override
+  String get patternCycleScrollable => 'The cycle strip scrolls horizontally';
+
+  @override
+  String get patternDurationShortcuts => 'Duration shortcuts';
 }

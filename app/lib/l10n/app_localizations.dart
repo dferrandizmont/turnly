@@ -134,6 +134,12 @@ abstract class AppLocalizations {
   /// **'Guardar'**
   String get save;
 
+  /// Botón sobre el teclado numérico (en iOS no tiene tecla de intro) que lo cierra.
+  ///
+  /// In es, this message translates to:
+  /// **'Listo'**
+  String get keyboardDone;
+
   /// No description provided for @undo.
   ///
   /// In es, this message translates to:
@@ -991,6 +997,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'«{name}» recuperado'**
   String shiftTypesRestored(String name);
+
+  /// No description provided for @patternDiscardTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Descartar la secuencia?'**
+  String get patternDiscardTitle;
 
   /// No description provided for @discardChangesTitle.
   ///
@@ -4990,13 +5002,13 @@ abstract class AppLocalizations {
   /// No description provided for @faqPatternQ.
   ///
   /// In es, this message translates to:
-  /// **'¿Cómo aplico una rotación y qué es el desfase?'**
+  /// **'¿Cómo creo y aplico un patrón?'**
   String get faqPatternQ;
 
   /// No description provided for @faqPatternA.
   ///
   /// In es, this message translates to:
-  /// **'En modo pintar pulsa el botón «Patrón» y sigue los pasos: elige tu rotación (o crea la tuya), el día en que empiezas y hasta cuándo se repite.\n\nEl desfase es el punto del ciclo en el que estás el día de inicio. Si ese día te toca la noche, en el paso «¿En qué día del ciclo estás ese día?» tocas la noche y el resto se ajusta solo. Los días que ya cambiaste a mano se respetan o se sustituyen, como prefieras. Para terminar o quitar una rotación ve a Ajustes › Mis rotaciones.'**
+  /// **'En modo pintar pulsa «Patrón» y elige una rotación. En «Crear el mío» añades bloques de un turno y cambias cuántos días dura cada uno; «Repetir» copia desde un bloque hasta el último. El constructor admite hasta 371 días. En Industria, «Semanas por turno» permite elegir el orden, las semanas de cada turno y si libras los fines de semana.\n\nEl desfase es el punto del ciclo en el que estás. Elige la fecha de inicio y toca en la tira el día del ciclo que te toca. Debajo ves meses completos hasta completar el ciclo. En el último paso eliges hasta cuándo y si respetas o sustituyes los cambios a mano; la vista previa se actualiza.\n\n«Editar» abre una copia de cualquier patrón: «Guardar como patrón nuevo» conserva el original y sus rotaciones. Puedes quitar un patrón propio si ninguna rotación lo usa. Para terminar o quitar una rotación ve a Ajustes › Mis rotaciones.'**
   String get faqPatternA;
 
   /// No description provided for @faqDoubleQ.
@@ -5130,6 +5142,18 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Correo copiado'**
   String get settingsEmailCopied;
+
+  /// Ajustes › Ayuda: fila que abre la ficha de Turnly en la tienda para dejar una reseña.
+  ///
+  /// In es, this message translates to:
+  /// **'Valorar Turnly'**
+  String get settingsRateTitle;
+
+  /// Subtítulo de la fila «Valorar Turnly»; «la» es la app.
+  ///
+  /// In es, this message translates to:
+  /// **'Una reseña ayuda a que otros la encuentren'**
+  String get settingsRateSubtitle;
 
   /// No description provided for @settingsAboutTitle.
   ///
@@ -7152,6 +7176,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Tipos de turno'**
   String get backupUiPreviewTypes;
+
+  /// Línea de «Qué trae» al restaurar una copia: cuántos bloques de horas extra tiene (el número va a su derecha).
+  ///
+  /// In es, this message translates to:
+  /// **'Bloques de horas extra'**
+  String get backupUiPreviewOvertime;
 
   /// No description provided for @backupUiPreviewRange.
   ///
@@ -11888,6 +11918,12 @@ abstract class AppLocalizations {
   /// **'Escribe un precio por hora.'**
   String get overtimeTypeInvalidRate;
 
+  /// Error de los campos de precio por hora de las horas extra (vacío, no es un importe o pasa del máximo). {max} es el máximo con su moneda, p. ej. 9.999,99 €.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe un precio por hora entre 0 y {max}.'**
+  String overtimeRateOutOfRange(String max);
+
   /// Nombre del tipo de horas extra que viene creado (cuenta para el objetivo).
   ///
   /// In es, this message translates to:
@@ -11905,6 +11941,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'+{hours} h'**
   String dayCellOvertime(String hours);
+
+  /// Marca de la casilla del día con horas extra que no son horas justas: horas y minutos, como «+3:45» (3 h 45 min). Sin «h» para que quepa a un tamaño legible.
+  ///
+  /// In es, this message translates to:
+  /// **'+{time}'**
+  String dayCellOvertimeClock(String time);
 
   /// Un bloque de horas extra que es la mañana después de un turno que acaba pasada la medianoche.
   ///
@@ -11995,6 +12037,318 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'7 días: {duration}'**
   String widgetSevenDayHours(String duration);
+
+  /// Nombre propuesto al guardar como patrón nuevo si ya existe el nombre.
+  ///
+  /// In es, this message translates to:
+  /// **'{name} ({number})'**
+  String patternCopyName(String name, int number);
+
+  /// No description provided for @patternCycleLimit.
+  ///
+  /// In es, this message translates to:
+  /// **'El ciclo puede tener hasta 371 días.'**
+  String get patternCycleLimit;
+
+  /// No description provided for @patternBlocksHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Toca un turno para añadir un bloque; toca el bloque para cambiar los días.'**
+  String get patternBlocksHelp;
+
+  /// No description provided for @patternWeeks.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 semana} other{{count} semanas}}'**
+  String patternWeeks(int count);
+
+  /// No description provided for @patternDuration.
+  ///
+  /// In es, this message translates to:
+  /// **'{days} · {weeks}'**
+  String patternDuration(String days, String weeks);
+
+  /// No description provided for @patternBlockTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'{name} × {days}'**
+  String patternBlockTitle(String name, String days);
+
+  /// No description provided for @patternOtherNumber.
+  ///
+  /// In es, this message translates to:
+  /// **'Otro número'**
+  String get patternOtherNumber;
+
+  /// No description provided for @patternConsecutiveDays.
+  ///
+  /// In es, this message translates to:
+  /// **'Días seguidos'**
+  String get patternConsecutiveDays;
+
+  /// No description provided for @patternDayLess.
+  ///
+  /// In es, this message translates to:
+  /// **'Un día menos'**
+  String get patternDayLess;
+
+  /// No description provided for @patternDayMore.
+  ///
+  /// In es, this message translates to:
+  /// **'Un día más'**
+  String get patternDayMore;
+
+  /// No description provided for @patternBlockUp.
+  ///
+  /// In es, this message translates to:
+  /// **'Subir'**
+  String get patternBlockUp;
+
+  /// No description provided for @patternBlockDown.
+  ///
+  /// In es, this message translates to:
+  /// **'Bajar'**
+  String get patternBlockDown;
+
+  /// No description provided for @patternBlockDuplicate.
+  ///
+  /// In es, this message translates to:
+  /// **'Duplicar'**
+  String get patternBlockDuplicate;
+
+  /// No description provided for @patternBlockSplit.
+  ///
+  /// In es, this message translates to:
+  /// **'Partir'**
+  String get patternBlockSplit;
+
+  /// No description provided for @patternBlockSplitAfter.
+  ///
+  /// In es, this message translates to:
+  /// **'Partir después de estos días'**
+  String get patternBlockSplitAfter;
+
+  /// No description provided for @patternBlockRemove.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar'**
+  String get patternBlockRemove;
+
+  /// No description provided for @patternRepeatFrom.
+  ///
+  /// In es, this message translates to:
+  /// **'Repetir desde aquí…'**
+  String get patternRepeatFrom;
+
+  /// No description provided for @patternRepeatHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Desde este bloque hasta el último. Se añaden copias como bloques normales.'**
+  String get patternRepeatHelp;
+
+  /// No description provided for @patternRepeatTotal.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 vez en total} other{{count} veces en total}} · {days}'**
+  String patternRepeatTotal(int count, String days);
+
+  /// No description provided for @patternRepeatConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Repetir'**
+  String get patternRepeatConfirm;
+
+  /// No description provided for @patternRepeatLess.
+  ///
+  /// In es, this message translates to:
+  /// **'Una vez menos'**
+  String get patternRepeatLess;
+
+  /// No description provided for @patternRepeatMore.
+  ///
+  /// In es, this message translates to:
+  /// **'Una vez más'**
+  String get patternRepeatMore;
+
+  /// No description provided for @patternAddBlock.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir un bloque'**
+  String get patternAddBlock;
+
+  /// No description provided for @patternChangeShift.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar el turno'**
+  String get patternChangeShift;
+
+  /// No description provided for @patternYourCycle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu ciclo'**
+  String get patternYourCycle;
+
+  /// No description provided for @patternShowWeeks.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{Ver la semana completa} other{Ver las {count} semanas}}'**
+  String patternShowWeeks(int count);
+
+  /// No description provided for @patternCollapseCycle.
+  ///
+  /// In es, this message translates to:
+  /// **'Plegar el ciclo'**
+  String get patternCollapseCycle;
+
+  /// No description provided for @patternCycleDayLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Día {day} de {total}, {shifts}'**
+  String patternCycleDayLabel(int day, int total, String shifts);
+
+  /// No description provided for @patternCyclePickHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Elige el día del ciclo que te toca en la fecha de inicio.'**
+  String get patternCyclePickHelp;
+
+  /// No description provided for @patternNumberRange.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe un número entre 1 y {max}.'**
+  String patternNumberRange(int max);
+
+  /// No description provided for @patternWeeksTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Semanas por turno'**
+  String get patternWeeksTitle;
+
+  /// No description provided for @patternWeeksHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Varias semanas seguidas de cada turno, con o sin fines de semana libres.'**
+  String get patternWeeksHint;
+
+  /// No description provided for @patternWeeksOrder.
+  ///
+  /// In es, this message translates to:
+  /// **'Turnos y orden'**
+  String get patternWeeksOrder;
+
+  /// No description provided for @patternWeeksOrderHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Toca los turnos en el orden en que los haces. Toca otra vez para quitar uno.'**
+  String get patternWeeksOrderHelp;
+
+  /// No description provided for @patternWeeksPosition.
+  ///
+  /// In es, this message translates to:
+  /// **'Orden: {position}'**
+  String patternWeeksPosition(int position);
+
+  /// No description provided for @patternWeeksEach.
+  ///
+  /// In es, this message translates to:
+  /// **'Semanas de cada turno'**
+  String get patternWeeksEach;
+
+  /// No description provided for @patternWeeksDays.
+  ///
+  /// In es, this message translates to:
+  /// **'Qué días trabajas'**
+  String get patternWeeksDays;
+
+  /// No description provided for @patternWeeksAllDays.
+  ///
+  /// In es, this message translates to:
+  /// **'Todos los días'**
+  String get patternWeeksAllDays;
+
+  /// No description provided for @patternWeeksWeekdays.
+  ///
+  /// In es, this message translates to:
+  /// **'De lunes a viernes'**
+  String get patternWeeksWeekdays;
+
+  /// No description provided for @patternWeekLess.
+  ///
+  /// In es, this message translates to:
+  /// **'Una semana menos'**
+  String get patternWeekLess;
+
+  /// No description provided for @patternWeekMore.
+  ///
+  /// In es, this message translates to:
+  /// **'Una semana más'**
+  String get patternWeekMore;
+
+  /// No description provided for @patternAdjustByHand.
+  ///
+  /// In es, this message translates to:
+  /// **'Ajustar a mano'**
+  String get patternAdjustByHand;
+
+  /// No description provided for @patternEdit.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar'**
+  String get patternEdit;
+
+  /// No description provided for @patternSaveAsNew.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar como patrón nuevo'**
+  String get patternSaveAsNew;
+
+  /// No description provided for @patternRemoveTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Quitar «{name}»?'**
+  String patternRemoveTitle(String name);
+
+  /// No description provided for @patternRemoveHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Se quitará de tus patrones guardados.'**
+  String get patternRemoveHint;
+
+  /// No description provided for @patternUsedHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Este patrón lo usa una rotación. Puedes editarlo como copia.'**
+  String get patternUsedHint;
+
+  /// No description provided for @patternRemoveUnavailable.
+  ///
+  /// In es, this message translates to:
+  /// **'No se ha quitado. Puede estar en uso en otro calendario o no haberse podido guardar.'**
+  String get patternRemoveUnavailable;
+
+  /// No description provided for @patternManualChange.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambio a mano'**
+  String get patternManualChange;
+
+  /// No description provided for @patternRemove.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar'**
+  String get patternRemove;
+
+  /// No description provided for @patternCycleScrollable.
+  ///
+  /// In es, this message translates to:
+  /// **'La tira del ciclo se desplaza horizontalmente'**
+  String get patternCycleScrollable;
+
+  /// No description provided for @patternDurationShortcuts.
+  ///
+  /// In es, this message translates to:
+  /// **'Atajos de duración'**
+  String get patternDurationShortcuts;
 }
 
 class _AppLocalizationsDelegate

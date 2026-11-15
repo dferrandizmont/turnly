@@ -3,6 +3,9 @@ import '../../schedule/domain/schedule_domain.dart';
 /// Who a ready-made pattern is for: the sections of step 1 of the wizard.
 enum PatternGroup { health, police, firefighters, industry, security }
 
+/// Configurable template shown before the fixed Correturnos preset.
+const weeksPerShiftTemplateId = 'weeks-per-shift';
+
 /// Each preset under ONE group, so a card appears once. Order = display
 /// order. (A preset not listed here still shows, under "Otros".)
 const Map<PatternGroup, List<String>> patternGroupPresets = {

@@ -294,6 +294,20 @@ pw.Widget _dayCell(ReportDay? day, double width, ReportStrings s) {
               ),
             ),
             if (day.isHoliday) ...[pw.SizedBox(width: 3), _holidayDot()],
+            // The day's extra hours, flush right in the row of the number
+            // (it costs no height): «+2 h», «+3 h 45 min» (1.1.0 QA, F12).
+            if (day.overtimeMinutes > 0) ...[
+              pw.Spacer(),
+              pw.Text(
+                '+${s.hours(day.overtimeMinutes)}',
+                maxLines: 1,
+                style: pw.TextStyle(
+                  fontSize: 6.5,
+                  fontWeight: pw.FontWeight.bold,
+                  color: _ink,
+                ),
+              ),
+            ],
           ],
         ),
         pw.SizedBox(height: 1.5),

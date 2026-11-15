@@ -1,4 +1,5 @@
 import 'package:cuadrante/core/bootstrap/bootstrap.dart';
+import 'package:cuadrante/core/theme/theme_context.dart';
 import 'package:cuadrante/features/calendar_export/application/device_calendar_providers.dart';
 import 'package:cuadrante/features/device_events/application/device_events.dart';
 import 'package:cuadrante/features/device_events/application/device_events_providers.dart';
@@ -9,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/fake_device_calendar.dart';
+import '../../support/real_font.dart';
 import 'harness.dart';
 
 /// H-T02-3: the plus of overtime / early leave used to be drawn at the bottom
@@ -19,7 +21,13 @@ import 'harness.dart';
 /// it is checked here too, in the whole matrix of sizes, text scales and
 /// themes: it never touches the code, the time or the edge of the cell.
 void main() {
-  setUpAll(initializeLocale);
+  // The widths of the marks are those of a phone: the test font is twice as
+  // wide as Roboto and would make every cell look cramped.
+  setUpAll(() async {
+    await initializeLocale();
+    expect(await loadRoboto(), isTrue, reason: 'Roboto from the Flutter SDK');
+  });
+  tearDownAll(() => AppTypography.debugFamily = null);
 
   // 12 October is a national holiday (dot), the 13th has no mark but extras.
   const holiday = CivilDate(2026, 10, 12);
