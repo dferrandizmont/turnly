@@ -159,6 +159,7 @@ dades van a la destinació que triïs. El fitxer de còpia `.turnly` no està xi
 
 ## Novetats
 
+- **1.2.0 (16-nov-2026):** l’iPhone i l’iPad reben tot el de la 0.10.1, la 0.11.0 i la 0.11.1: la nota al mes a l’iPhone, les rotacions llargues per blocs amb la plantilla «Setmanes per torn», la tira numerada del cicle i els mesos sencers a la previsualització, «Valora Turnly» a Configuració i les correccions amb lletra gran.
 - **0.11.1 (15-nov-2026):** Android: amb «Mostra la nota al mes» activada, el mòbil ja escriu la primera línia de la nota a la casella del dia, en vertical i en horitzontal, en lloc de mostrar només el clip.
 - **0.11.0 (15-nov-2026):** Android: crea rotacions llargues per blocs («Matí × 21»), amb dreceres de setmanes, «Repeteix» i la plantilla «Setmanes per torn». Tria el dia del cicle en una tira numerada, previsualitza mesos sencers i edita patrons com a còpia; l’app també et pot demanar una valoració a la botiga.
 - **1.1.0 (13-nov-2026):** ara també a l’iPad. L’iPhone i l’iPad reben tot el de la 0.10.0: hores extra per blocs, accions de rotació des del dia, la franja del mes, la teva ratxa més llarga i les rotacions noves. Els widgets d’iPhone mostren les hores extra i el total de set dies.

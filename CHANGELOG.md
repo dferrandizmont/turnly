@@ -10,6 +10,14 @@ at once, so they can skip numbers.
 
 ## Unreleased
 
+## 1.2.0 · 2026-11-16
+
+iPhone and iPad update (App Store build 5) with everything from 0.10.1, 0.11.0 and 0.11.1: long rotations built in blocks, the "Weeks per shift" template, choosing your cycle day and previewing whole months, notes shown in the month on iPhone, "Rate Turnly" in Settings and the large-text and number-field fixes found in the 1.1.0 test. Your existing data carries over unchanged.
+
+- **Notes in the month on iPhone.** With "Show the note in the month" on, the first line of each note now shows at the bottom of the day, in portrait and landscape, instead of only a clip.
+- **Long rotations.** Build them in blocks ("Morning × 21"), with duration shortcuts, repeat and undo, up to 371 days; pick the start day from the numbered cycle strip and preview whole months.
+- **Rate Turnly.** Turnly may ask once per version for an App Store review after you apply a rotation or paint days; "Rate Turnly" in Settings › Help opens the App Store page.
+
 ## 0.11.1 · 2026-11-15
 
 Android test build: notes now show in the month on phones.

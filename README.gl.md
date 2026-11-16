@@ -159,6 +159,7 @@ datos van ao destino que escollas. O ficheiro de copia `.turnly` non está cifra
 
 ## Novidades
 
+- **1.2.0 (16-nov-2026):** o iPhone e o iPad reciben todo o da 0.10.1, a 0.11.0 e a 0.11.1: a nota no mes no iPhone, as rotacións longas por bloques co modelo «Semanas por quenda», a tira numerada do ciclo e os meses enteiros na previsualización, «Valorar Turnly» en Configuración e os arranxos con letra grande.
 - **0.11.1 (15-nov-2026):** Android: con «Ver a nota no mes» activada, o móbil xa escribe a primeira liña da nota na casa do día, en vertical e en horizontal, en lugar de amosar só o clip.
 - **0.11.0 (15-nov-2026):** Android: crea rotacións longas por bloques («Mañá × 21»), con atallos de semanas, «Repetir» e o modelo «Semanas por quenda». Escolle o día do ciclo nunha tira numerada, previsualiza meses enteiros e edita patróns como copia; a app tamén pode pedirche unha valoración na tenda.
 - **1.1.0 (13-nov-2026):** agora tamén no iPad. O iPhone e o iPad reciben todo o da 0.10.0: horas extra por bloques, accións de rotación desde o día, a tira do mes, a túa racha máis longa e as rotacións novas. Os widgets de iPhone amosan as horas extra e o total de sete días.
