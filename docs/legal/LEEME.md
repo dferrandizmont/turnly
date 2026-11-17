@@ -45,8 +45,11 @@ Estaban al final de la política y salieron de ella el 30-oct-2026, al publicarl
 del lanzamiento.
 
 Decisiones ya tomadas en el texto, por si quieres cambiarlas: titular Daniel Mont Ferrandiz; correo
-`turnly@mainshai.com` (el de la app desde el 30-oct-2026, reenviado con Cloudflare Email Routing; antes
-`dev@mainshai.com`); conservación de correos «un año desde la última respuesta»; fecha de última actualización la de
+`turnly@mainshai.com` (el de la app desde el 30-oct-2026; antes `dev@mainshai.com`). Desde el 16-nov-2026
+Cloudflare Email Routing lo reenvía a un buzón de Gmail, una copia va a Proton y las respuestas salen por Brevo, con su
+píxel de apertura y sus enlaces de clic en modo anónimo: la política lo cuenta en «Si nos escribes», «Quién recibe los datos» y
+«Transferencias internacionales», y si el titular cambia de proveedor o quita el píxel, hay que cambiar esos tres apartados y «Cuánto tiempo se conservan»; conservación de correos «como máximo un año desde el último mensaje de la conversación», con una limpieza cada tres meses que borra lo que cumpliría el año antes de la siguiente (plazo común a todas las apps desde el
+16-nov-2026); fecha de última actualización la de
 la redacción. No se publica el NIF: el RGPD pide identificar al responsable y un contacto, y una app gratuita sin
 actividad económica no está obligada a darlo por la LSSI.
 

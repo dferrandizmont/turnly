@@ -23,6 +23,7 @@ class CycleStartPicker extends StatefulWidget {
     required this.plan,
     this.keyPrefix = '',
     this.showPreview = true,
+    this.fadeColor,
   });
 
   final List<List<String>> steps;
@@ -44,6 +45,10 @@ class CycleStartPicker extends StatefulWidget {
   /// Whether the live month preview is drawn under the picker. The wizard
   /// supplies its own preview with the chosen cycle's length.
   final bool showPreview;
+
+  /// The surface the picker sits on, for the fades of the strip (see
+  /// [CycleStrip.fadeColor]); the page background by default.
+  final Color? fadeColor;
 
   @override
   State<CycleStartPicker> createState() => _CycleStartPickerState();
@@ -73,6 +78,7 @@ class _CycleStartPickerState extends State<CycleStartPicker> {
           offset: offset,
           onOffsetChanged: widget.onOffsetChanged,
           keyPrefix: widget.keyPrefix,
+          fadeColor: widget.fadeColor,
         ),
         const SizedBox(height: Sp.m),
         Semantics(

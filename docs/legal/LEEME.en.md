@@ -43,5 +43,5 @@ redirect to the new website.
 ## Notes for the holder
 They used to sit at the end of the Spanish policy and moved here on 30-Oct-2026, when the policy went to the new
 website. See the Spanish [LEEME.md](LEEME.md#notas-para-el-titular): support email `turnly@mainshai.com` (formerly
-`dev@mainshai.com`), email retention of one year after the last reply, no tax ID published, and decision 13 of
+`dev@mainshai.com`), email retention of at most one year after the last message of the conversation, with a clean-up every three months that deletes whatever would turn one year old before the next clean-up, no tax ID published, and decision 13 of
 `docs/preguntas.md` still pending.

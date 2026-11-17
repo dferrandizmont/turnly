@@ -2,14 +2,15 @@
   "name": "Turnly",
   "title": "Turnly · Zure txandak, begi-kolpe batean",
   "description": "Txanden egutegi doakoa eta kode irekikoa, Espainian txandaka lan egiten dutenentzat. Pro bertsiorik, iragarkirik, konturik eta konexiorik gabe.",
-  "intro": "Txanden egutegia Espainian txandaka lan egiten dutenentzat (osasungintza, polizia, suhiltzaileak, industria, ostalaritza edo beste edozein sektore): antolatu goizak, arratsaldeak, gauak, guardiak, gau-ondokoak eta egun libreak, eta ikusi zure hurrengo txanda begi-kolpe batean. Dena doakoa da, Pro bertsiorik, iragarkirik eta konturik gabe, eta mugikorrez aldatzean zure txandak eramaten dituzu, ezer berriro ordaindu gabe.",
+  "intro": "Txanden egutegia Espainian txandaka lan egiten dutenentzat (osasungintza, polizia, suhiltzaileak, industria, ostalaritza edo beste edozein sektore): antolatu goizak, arratsaldeak, gauak, guardiak, gau-ondokoak eta egun libreak, eta ikusi zure hurrengo txanda begi-kolpe batean.",
+  "hero_cta": "Deskargatu doan",
   "key_facts": "Dena doan, Pro bertsiorik gabe · Iragarkirik gabe · Konturik gabe · Konexiorik gabe dabil · Kode irekia · Bost hizkuntza",
   "features": [
-    "Gaurko txartela, hurrengo txandarekin, hurrengo egun librearekin eta lan-boladarekin. Hilabetea saretan edo zerrendan, agenda eta urtea; mugikorreko egutegiko hitzorduak txanden ondoan ikusten dira. Eguneko oharrak, argazki, fitxategi eta zereginekin. Alderatu sei egutegi arte eta ikusi zein egunetan zaudeten libre aldi berean. Hilabetearen azpiko zerrendan, txandak, orduak helburuarekin alderatuta eta hurrengo egun librea; ukitu hilabeteko laburpena irekitzeko.",
-    "Ukitu edo arrastatu hainbat egun margotzeko, eta «Gehitu beste txanda bat» erabiliz, jarri txanda bat baino gehiago egun berean. Kopiatu, itsatsi, desegin eta berregin. Txandaketen laguntzailea aurrebistarekin: txanda birakariak, 24/72, 4×4, 6×4, 5×2, 2-2-3, «2 eta 2», «3 eta 1» edo zure eredua, tokatzen zaizun zikloko egunetik hasita. Bi berrietan laneko txanda zuk aukeratzen duzu. Egun baten xehetasunetan, txandaketa hasteko, amaitzeko edo berriz hasteko aukerak dituzu; aukera bakoitzak zer aldatuko den azaltzen du, eta aldaketa desegin dezakezu.",
-    "Abisu bat txanda mota bakoitzeko: iratzargailu gisa jotzen du eta hilabeteko tartearekin programatzen da. Oharren gogorarazpenak ere bai. Androiden, sei widget (gaur, astea, hilabetea, agenda, bi aste eta lau aste) eta «Isildu mugikorra nire txandetan», txanda amaitzean soinua itzultzen duena. Android widgetek aparteko orduak eta irteera aurreratuak erakusten dituzte; zazpi egunekoak orduak batzen ditu.",
+    "Zure hurrengo txanda eta hurrengo egun librea gaurko txartelan; hilabetea saretan edo zerrendan, agenda eta urtea, mugikorreko egutegiko hitzorduak zure txanden ondoan. Oharrak argazki eta zereginekin, eta gehienez sei egutegi, zein egunetan zaudeten libre aldi berean ikusteko.",
+    "Ukitu edo arrastatu hainbat egun margotzeko, jarri txanda bat baino gehiago egun berean eta desegin nahi duzuna. Txandaketen laguntzaileak zure txandaketa aurrebistarekin aplikatzen du: txanda birakariak, 24/72, 4×4, 6×4, 5×2, 2-2-3, «2 eta 2», «3 eta 1» edo zure eredua, tokatzen zaizun zikloko egunetik hasita.",
+    "Txanda mota bakoitzeko abisuak eta oharren gogorarazpenak 30 egun lehenago programatzen dira. Androiden, txandaren abisuak iratzargailu batek bezala jotzen du. iPhonean eta iPadean, premiazko jakinarazpena da, eta ez du soinurik egiten modu isilean; gehienez 60 abisu egon daitezke zain, eta aplikazioa irekitzean berritzen dira. Androiden, gainera, sei widget (gaur, astea, hilabetea, agenda, bi aste eta lau aste) eta «Isildu mugikorra nire txandetan», txanda amaitzean soinua itzultzen duena.",
     "Babeskopia automatikoak, «Probatu leheneratzea» erabiliz egiazta ditzakezunak, eta, Androiden, egunean bat aukeratzen duzun karpetan (Drive, Dropbox, OneDrive…). Inportatu LRHSoft-en Shifter kopiak, .ics, CSV edo mugikorreko egutegia. «Eguneratuta mantendu» aukerarekin, zure txandak mugikorreko egutegira pasatzen dira; .ics batean ere gorde ditzakezu.",
-    "Lan egindako, gaueko eta jaiegunetako orduak eta irteera aurreratuak hilabeteka, hiruhilekoka, urteka edo nahi dituzun datetan, ordu-helburuarekin eta ordu-poltsarekin. Aparteko orduak blokeka, motekin eta tarifarekin; mota bakoitza helbururako zenbatu ala ez aukeratzen duzu. Orduko prezioa eta plus finkoak, gauekoak eta jaiegunekoak: soldata gordinaren eta garbiaren (atxikipenarekin) estimazioa. Laburpenak eta PDF txostenak jarraian lan egindako egunen boladarik luzeena erakusten dute. PDF eta CSV txostenak.",
+    "Lan egindako, gaueko, jaiegunetako eta aparteko orduak zure ordu-helburuarekin eta ordu-poltsarekin alderatuta, hilabeteka, hiruhilekoka, urteka edo nahi dituzun datetan. Soldata gordinaren eta garbiaren estimazioa, zure orduko prezioa, plusak eta atxikipena kontuan hartuz. PDF eta CSV txostenak.",
     "Oporren, norberaren egunen eta baimenen saldoak urteka, aurreko urtetik ekarritako egunekin eta noiz iraungitzen diren. Trukeen liburuan, lankideekin trukatzen dituzun txandak idazten dituzu, nork zor dion nori ikusten duzu eta egutegian aplikatzen dituzu.",
     "Espainiako jaiegunak, erkidegoetakoak eta udalerri askotakoak barne, eta beste 40 herrialdetakoak, konexiorik gabe, zuk gehitzen dituzunekin batera. Zure gustura: ordu- eta data-formatua, moneta, hamar azentu-kolore, zure txandetarako prestatutako paletak eta egutegiaren atzeko irudia."
   ],
@@ -28,7 +29,7 @@
     },
     {
       "question": "Nola eman dezaket izena Google Play-ko proban?",
-      "answer": "Sartu Google Groups-eko turnly-testers taldean zure Google kontuarekin, onartu proba Google Play-ko estekan eta instalatu aplikazioa dendatik. Bere kabuz eguneratuko da."
+      "answer": "Sartu Google Groups-eko turnly-testers proba-taldean zure Google kontuarekin, onartu proba Google Play-ko estekan eta instalatu aplikazioa dendatik. Bere kabuz eguneratuko da."
     },
     {
       "question": "Eta iPhonean eta iPadean?",
@@ -36,65 +37,134 @@
     },
     {
       "question": "Nola eraman dezaket Turnly mugikor berri batera?",
-      "answer": "Lau modu dituzu, eta guztiak doakoak dira. Zuzenean pasatzea: mugikor berria konfiguratzean, kopiatu bertara zaharraren aplikazioak eta datuak kable edo wifi bidez; Turnly ere haiekin pasatzen da. Google-ren babeskopia: Androiden babeskopia aktibatuta badago eta pantailaren blokeoa (PINa, eredua edo pasahitza) baduzu, Androidek Turnly zifratuta gordetzen du zure Google kontuan, eta mugikor berria kontu berarekin konfiguratzean berreskuratzen du (Android 9 edo berriagoa). Pantailaren blokeorik gabe, Turnly ez da kopia horretan sartzen. .turnly fitxategia: Ezarpenak › Babeskopia atalean, «Esportatu fitxategia» edo «Gorde gailuan»; eraman mugikor berrira eta ireki, edo erabili «Inportatu fitxategia». Kopia automatikoa karpeta batean (Android): egunean kopia bat uzten du aukeratzen duzun karpetan; karpeta hori zure hodeian badago edo mugikor berrira pasatzen baduzu, inportatu azkena. Fitxategiarekin edo karpetarekin, kopiak zer duen ikusten duzu aurretik, eta ez da ezer ordezkatzen zuk berretsi arte. Aplikazioaren barruan geratzen diren kopiak galdu egiten dira beste kopiarik gabe desinstalatzen baduzu."
+      "answer": [
+        "Modurik errazena: zure mugikor zaharrean, ireki Ezarpenak › Babeskopia eta sakatu «Gorde kopia bat Turnly-tik kanpo». Gorde .turnly fitxategia eta eraman mugikor berrira; han instalatu Turnly eta ireki fitxategia edo erabili «Inportatu fitxategia». Kopiak zer duen ikusiko duzu, eta ez da ezer ordezkatzen zuk berretsi arte.",
+        "Beste moduak, guztiak doakoak: Android berri bat konfiguratzean, aplikazioak eta datuak zuzenean transferitzea kable edo wifi bidez, edo Google-ren babeskopia (Android 9 edo berriagoa, babeskopia aktibatuta eta pantailaren blokeoarekin: PINa, eredua edo pasahitza); Androiden, gainera, eguneko kopia automatikoa aukeratzen duzun karpetan, hortik inportatzen duzu azkena; iPhonean, iCloud-ekoa edo ordenagailuko kopia.",
+        "Aplikazioaren barruan geratzen diren kopiak galdu egiten dira desinstalatzen baduzu."
+      ]
     },
     {
       "question": "Eta hutsetik hasi nahi badut?",
       "answer": "Ezarpenak atalean, «Dena ezabatu eta hutsetik hasi» aukerak zure egutegiak, oharrak, absentziak eta ezarpenak ezabatzen ditu (hizkuntza bakarrik gordetzen du), eta lehen erabilerara itzultzen zaitu. Aurretik, babeskopia bat gordetzen du, leheneratu edo beste leku batera eraman dezakezuna."
     }
   ],
-  "licence_text": "Kodea: MIT · Edukia: CC BY-SA 4.0",
+  "licence_text": "Lizentzia: MIT · Edukia: CC BY-SA 4.0",
   "screenshot_alts": {
     "01-mes": "Margotutako hilabetea eta hurrengo txandaren txartela",
+    "01-mes-oscuro": "Margotutako hilabetea eta hurrengo txandaren txartela",
     "02-lista": "Hilabete bera Zerrenda ikuspegian, kode eta ordutegi osoekin",
+    "02-lista-oscuro": "Hilabete bera Zerrenda ikuspegian, kode eta ordutegi osoekin",
     "03-pintar": "Margotze modua, txanden paletarekin",
+    "03-pintar-oscuro": "Margotze modua, txanden paletarekin",
     "04-rotaciones": "Txandaketen laguntzailea: zikloko zein egunetan hasten zaren, aplikatu aurretik",
+    "04-rotaciones-oscuro": "Txandaketen laguntzailea: zikloko zein egunetan hasten zaren, aplikatu aurretik",
     "05-horas": "Lan egindako orduen, gaueko orduen eta jaiegunetako orduen hileko laburpena",
+    "05-horas-oscuro": "Lan egindako orduen, gaueko orduen eta jaiegunetako orduen hileko laburpena",
     "06-festivos": "Jaiegunak herrialdeka, erkidegoka eta udalerrika",
-    "07-mes-oscuro": "Hilabete bera gai ilunarekin",
+    "06-festivos-oscuro": "Jaiegunak herrialdeka, erkidegoka eta udalerrika",
     "08-vacaciones": "Oporren eta baimenen saldoak, gelditzen diren egunekin eta eramandakoekin",
+    "08-vacaciones-oscuro": "Oporren eta baimenen saldoak, gelditzen diren egunekin eta eramandakoekin",
     "09-cambios": "Trukeen liburua, lankide bakoitzaren balantzearekin eta truke bakoitzeko txandekin",
+    "09-cambios-oscuro": "Trukeen liburua, lankide bakoitzaren balantzearekin eta truke bakoitzeko txandekin",
     "10-primer-uso": "Lehen erabileraren lehen pantaila, hiru bidekin: inportatu, txandaketa bat erabili edo eskuz margotu",
-    "11-widgets": "«Gehitu widgeta» galeria zure benetako txandekin: txikia, agenda, ertaina eta gehiago"
+    "10-primer-uso-oscuro": "Lehen erabileraren lehen pantaila, hiru bidekin: inportatu, txandaketa bat erabili edo eskuz margotu",
+    "11-widgets": "«Gehitu widgeta» galeria zure benetako txandekin: txikia, agenda, ertaina eta gehiago",
+    "11-widgets-oscuro": "«Gehitu widgeta» galeria zure benetako txandekin: txikia, agenda, ertaina eta gehiago"
   },
-  "privacy_date": "2026-11-04",
+  "privacy_date": "2026-11-17",
   "kicker": "Txanden egutegia",
   "tagline": "Zure txandak, begi-kolpe batean.",
   "chip": "Dena doan: Pro bertsiorik, iragarkirik eta konturik gabe.",
   "nav_label": "Atalak",
   "theme_label": "Gaia",
-  "theme_system": "Sistema",
-  "theme_light": "Argia",
   "theme_dark": "Iluna",
   "theme_hint": "Aldatu gaia",
-  "download_title": "Android probetan; iPhone eta iPad, App Store-n.",
+  "anim": {
+    "month": "Abendua",
+    "weekdays": [
+      "A",
+      "A",
+      "A",
+      "O",
+      "O",
+      "L",
+      "I"
+    ],
+    "shifts": {
+      "m": {
+        "code": "Goi",
+        "name": "Goiza"
+      },
+      "t": {
+        "code": "Arr",
+        "name": "Arratsaldea"
+      },
+      "n": {
+        "code": "Gau",
+        "name": "Gaua"
+      },
+      "l": {
+        "code": "L",
+        "name": "Libre"
+      },
+      "s": {
+        "code": "GO",
+        "name": "Gau-ondokoa"
+      }
+    },
+    "sequence": "Zure sekuentzia",
+    "cycle_days": "{n} egun",
+    "tonight": "Gaur gauean",
+    "starts_in": "{duration} barru hasiko da",
+    "widget_day": "og. 24",
+    "widget_tomorrow": "Bihar",
+    "off_on": "Hurrengo egun librea: larunbata 26",
+    "unit_h": "h",
+    "hours": {
+      "m": "06–14",
+      "t": "14–22",
+      "n": "22–06"
+    },
+    "night_range": "22:00–06:00"
+  },
+  "download_title": "App Store-n, iPhone eta iPadetarako; Android, probetan.",
   "download_intro": "Modu argia eta iluna. Doan eta konturik gabe.",
   "download_notes": {
-    "play": "Edonork eman dezake izena: lehenik testerren taldean sartzen zara, eta gero proba onartzen duzu.",
+    "play": "Edonork eman dezake izena hiru pausotan:",
     "apk": "Eskuz instalatzen da. 0.8.3 bertsiotik aurrera Google Play-ko bertsioaren sinadura bera du: batetik bestera pasa zaitezke desinstalatu gabe.",
     "app_store": "Doan App Store-n, iOS 17 edo berriagoa duten iPhone eta iPadetarako."
   },
-  "join_title": "Nola sartu Google Play-ko proban",
-  "join_steps": [
-    {
-      "text": "Sartu testerren taldean",
-      "link_text": "turnly-testers",
-      "href": "https://groups.google.com/g/turnly-testers",
-      "after": ". Zure Google kontuarekin, sakatu taldean sartzeko botoia."
-    },
-    {
-      "text": "Onartu proba mugikorretik edo ordenagailutik:",
-      "link_text": "play.google.com/apps/testing/es.cuadrante.app",
-      "href": "https://play.google.com/apps/testing/es.cuadrante.app",
-      "after": "."
-    },
-    {
-      "text": "Instalatu aplikazioa Google Play-tik. Bere kabuz eguneratuko da."
-    }
-  ],
   "screenshots_title": "Benetako pantailak",
   "screenshots_intro": "Datu asmatuekin, modu argian eta ilunean.",
-  "features_title": "Dena irekita, Pro bertsiorik eta erosketarik gabe",
+  "screenshots_nav": "Aukeratu pantaila bat",
+  "screenshots_prev": "Aurreko pantaila",
+  "screenshots_next": "Hurrengo pantaila",
+  "screenshots_position": "Pantaila: {n} / {total}. {title}",
+  "screenshot_captions": {
+    "01-mes": "Hilabetea",
+    "02-lista": "Zerrenda",
+    "03-pintar": "Margotu",
+    "04-rotaciones": "Aplikatu eredua",
+    "05-horas": "Laburpena",
+    "06-festivos": "Jaiegunak",
+    "08-vacaciones": "Oporrak eta baimenak",
+    "09-cambios": "Trukeen liburua",
+    "10-primer-uso": "Ongi etorri",
+    "11-widgets": "Gehitu widgeta"
+  },
+  "screenshot_details": {
+    "01-mes": "Kontsultatu hileko txandak, kolore, kode eta ordutegiekin. Gaurko txartelean hurrengo txanda noiz hasten den eta noiz duzun libre ikus dezakezu.",
+    "02-lista": "Aldatu Zerrenda ikuspegira hilabete bera egunez egun ikusteko. Txanda bakoitzaren izena, kodea eta ordutegi osoa ikus ditzakezu, baita aparteko orduak ere.",
+    "03-pintar": "Aukeratu txanda bat paletan, eta ukitu egunak edo arrastatu hatza haien gainean margotzeko. Txanda aldatu, beste bat gehitu edo azken trazua desegin dezakezu.",
+    "04-rotaciones": "Berrikusi zure zikloko bloke bakoitzaren txandak, ordutegiak eta iraupena. Aurrera egin aurretik blokeak gehi ditzakezu.",
+    "05-horas": "Kontsultatu hilean lan egindako eta aurreikusitako orduak, gauekoak eta jaiegunetakoak bereizita. Ordu-helburua ere ezar dezakezu.",
+    "06-festivos": "Aukeratu herrialdea, erkidegoa eta udalerria urte bakoitzeko jaiegunak ikusteko. Tokiko jaiegun bat gehitu edo mugikorreko egutegitik ekar ditzakezu.",
+    "08-vacaciones": "Ikusi zenbat egun geratzen zaizkizun eta zenbat dituzun hartuta edo planifikatuta. Aurreko urtetik ekarritako egunak eta iraungitze-data berrikusi edo saldoak editatu.",
+    "09-cambios": "Idatzi lankideekin egindako txanda-trukeak eta begiratu nork nori zor dizkion txandak. Truke bakoitzean emandako edo jasotako txandak eta egoera ikus ditzakezu.",
+    "10-primer-uso": "Aukeratu nola hasi zure txanden egutegia: inportatu txandak, erabili txandaketa bat edo margotu eskuz. Babeskopia bat ere berreskura dezakezu.",
+    "11-widgets": "Alderatu widgetak zure benetako txandekin eta aukeratu Androiden hasierako pantailan gehitzeko bat: gaur eta bihar, agenda edo hainbat egun."
+  },
+  "features_title": "Antolatu zure txandak eta egin zure kontuak",
   "features_intro": "Txanda bakoitzak kolorea, kodea eta ordutegia ditu, eta ez dago inoiz kolorearen mende bakarrik.",
   "feature_titles": [
     "Hilabetea, agenda eta urtea",

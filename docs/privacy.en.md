@@ -107,6 +107,10 @@ which are not part of the system backup. Only this app's widgets read it.
 "Help and contact" (Settings) shows the support address to **copy**; the app does not open mail.
 The address is **turnly@mainshai.com**, defined in `kSupportEmail`
 (`app/lib/core/config.dart`); the build can override it with `--dart-define=SUPPORT_EMAIL=...`.
+Mail circuit (outside the app, since 16 Nov 2026): Cloudflare Email Routing receives and forwards to a Gmail mailbox,
+where mail is read and answered; a Gmail filter keeps a copy in Proton; replies go out through Brevo's SMTP, which
+adds an open pixel and rewrites links (anonymous tracking on; it cannot be removed on the free plan). The policy
+covers it under “If you write to us”, “Who receives the data” and “International transfers”.
 "Open-source licences" opens Flutter's licence page, offline.
 "Privacy policy" (Settings › Help) opens the website in the **external browser**, only when tapped, through the
 official `url_launcher` plugin. It sends no roster data and adds no `INTERNET` permission to the app: the browser

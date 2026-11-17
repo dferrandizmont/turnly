@@ -2,14 +2,15 @@
   "name": "Turnly",
   "title": "Turnly · Your shifts at a glance",
   "description": "A free, open-source shift calendar for people who work shifts in Spain. No Pro, no ads, no account, and it works offline.",
-  "intro": "A shift calendar for people who work shifts in Spain (healthcare, police, firefighters, industry, hospitality or any other sector): set up mornings, afternoons, nights, on-call shifts, post-night days and days off, and see your next shift at a glance. Everything is free, with no Pro version, ads or account, and when you change phones your shifts come with you without paying anything again.",
+  "intro": "A shift calendar for people who work shifts in Spain (healthcare, police, firefighters, industry, hospitality or any other sector): set up mornings, afternoons, nights, on-call shifts, post-night days and days off, and see your next shift at a glance.",
+  "hero_cta": "Download for free",
   "key_facts": "All free, no Pro · No ads · No account · Works offline · Open source · Five languages",
   "features": [
-    "A Today card with your next shift, next day off and work streak. The month as a grid or list, the agenda and the year, with your phone calendar events next to your shifts. Daily notes with photos, files and tasks. Compare up to six calendars to see the days you are all off. A strip under the month shows its shifts, hours against your goal and next day off; tap it for that month’s summary.",
-    "Tap or drag to paint several days and, with “Add another shift”, put more than one on the same day. Copy, paste, undo and redo. A rotation wizard with a preview: rotating shifts, 24/72, 4×4, 6×4, 5×2, 2-2-3, “2 and 2”, “3 and 1” or your own pattern, starting from the day of the cycle you are on. Choose the work shift for the two new rotations. From the details for a selected day, you can start, end or resume your rotation, with an explanation of what changes and the option to undo the change.",
-    "An alarm per shift type that rings like an alarm clock and is scheduled a month ahead, plus note reminders. On Android, six widgets (today, week, month, agenda, two and four weeks) and “Silence the phone on my shifts”, which brings the sound back when they end. Android widgets show overtime and early leave; the seven-day widget totals its hours.",
+    "Your next shift and your next day off on the today card; the month as a grid or list, the agenda and the year, with your phone calendar events next to your shifts. Notes with photos and tasks, and up to six calendars to see the days you are all off.",
+    "Tap or drag to paint several days, put more than one shift on the same day and undo whatever you want. The rotation wizard applies yours with a preview: rotating shifts, 24/72, 4×4, 6×4, 5×2, 2-2-3, “2 and 2”, “3 and 1” or your own pattern, starting from the day of the cycle you are on.",
+    "Alerts by shift type and note reminders, scheduled 30 days ahead. On Android, the shift alert rings like an alarm clock. On iPhone and iPad it is a time-sensitive notification that does not ring when Silent Mode is on; up to 60 alerts can be pending, and they are renewed when you open the app. On Android, there are also six widgets (today, week, month, agenda, two and four weeks) and “Silence the phone on my shifts”, which brings the sound back when they end.",
     "Automatic backups you can check with “Test restore” and, on Android, one a day in the folder you choose (Drive, Dropbox, OneDrive…). Import LRHSoft Shifter backups, .ics, CSV or your phone calendar. With “Keep up to date”, your shifts go to your phone calendar; you can also save them as an .ics file.",
-    "Worked, night and public holiday hours and early leave by month, quarter, year or any dates, with your hours goal and hours bank. Overtime by blocks, with types and rates; choose whether each type counts toward your goal. Hourly rate plus fixed, night and holiday premiums: estimated gross pay, and net pay with your withholding. Summary and PDF reports show your longest run of days worked in a row. PDF and CSV reports.",
+    "Worked, night, public holiday and overtime hours against your goal and your hours bank, by month, quarter, year or any dates you like. Estimated gross and net pay with your hourly rate, your premiums and your withholding. PDF and CSV reports.",
     "Vacation, personal days and leave balances per year, with carried-over days and when they expire. In the swap book you log the shifts you swap with colleagues, see who owes whom and apply them to the calendar.",
     "Public holidays for Spain, with its regions and many municipalities, and for 40 more countries, all offline, plus your own. Make it yours: time and date format, currency, ten accent colors, ready-made palettes for your shifts and a calendar background image."
   ],
@@ -28,7 +29,7 @@
     },
     {
       "question": "How do I join the Google Play test?",
-      "answer": "Join the turnly-testers group on Google Groups with your Google account, accept the test at the Google Play link and install the app from the store. It updates itself."
+      "answer": "Join the turnly-testers test group on Google Groups with your Google account, accept the test at the Google Play link and install the app from the store. It updates itself."
     },
     {
       "question": "What about iPhone and iPad?",
@@ -36,66 +37,135 @@
     },
     {
       "question": "How do I move Turnly to a new phone?",
-      "answer": "There are four ways, and all of them are free. Direct transfer: when you set up the new phone, copy the apps and data from the old one by cable or Wi-Fi; Turnly moves with them. Google backup: with Android backup turned on and a screen lock (PIN, pattern or password), Android stores Turnly encrypted in your Google account and brings it back when you set up the new phone with the same account (Android 9 or later). Without a screen lock, Turnly is left out of that backup. A .turnly file: in Settings › Backup, use “Export file” or “Save to device”; take it to the new phone and open it, or use “Import file”. Automatic backup to a folder (Android): it leaves one copy a day in the folder you choose; if that folder is in your cloud or you move it to the new phone, import the latest one. With the file or the folder, you first see what the backup contains, and nothing is replaced until you confirm it. Backups that stay inside the app are lost if you uninstall it without another copy."
+      "answer": [
+        "The easiest way: on the old phone, open Settings › Backup and tap “Save a backup outside Turnly”. Save the .turnly file and take it to the new phone; there, install Turnly and open the file or tap “Import file”. You see what the backup contains and nothing is replaced until you confirm it.",
+        "Other ways, all of them free: when you set up a new Android, the direct transfer of apps and data by cable or Wi-Fi, or the Google backup (Android 9 or later, with backup turned on and a screen lock: PIN, pattern or password); on Android, also the automatic daily copy in the folder you choose, from which you import the latest one; on iPhone, the iCloud or computer backup.",
+        "Copies that only stay inside the app are lost if you uninstall it."
+      ]
     },
     {
       "question": "What if I want to start over?",
       "answer": "In Settings, “Delete everything and start over” deletes your calendars, notes, absences and settings (only the language is kept) and takes you back to the first run. First, it saves a backup you can restore or keep somewhere else."
     }
   ],
-  "licence_text": "Code MIT · Content CC BY-SA 4.0",
+  "licence_text": "MIT License · Content CC BY-SA 4.0",
   "screenshot_alts": {
     "01-mes": "Painted month and next shift card",
+    "01-mes-oscuro": "Painted month and next shift card",
     "02-lista": "The same month in List view, with shift codes and full times",
+    "02-lista-oscuro": "The same month in List view, with shift codes and full times",
     "03-pintar": "Paint mode with the shift palette",
+    "03-pintar-oscuro": "Paint mode with the shift palette",
     "04-rotaciones": "Rotation wizard: the day of the cycle you start on, before applying",
+    "04-rotaciones-oscuro": "Rotation wizard: the day of the cycle you start on, before applying",
     "05-horas": "Monthly summary of worked, night and public holiday hours",
+    "05-horas-oscuro": "Monthly summary of worked, night and public holiday hours",
     "06-festivos": "Public holidays by country, region and town",
-    "07-mes-oscuro": "The same month in the dark theme",
+    "06-festivos-oscuro": "Public holidays by country, region and town",
     "08-vacaciones": "Vacation and leave balances, with the days left and the ones carried over",
+    "08-vacaciones-oscuro": "Vacation and leave balances, with the days left and the ones carried over",
     "09-cambios": "Swap book with each colleague's balance and the shifts of every change",
-    "10-primer-uso": "First screen of the first run, with three ways in: import, use a rotation or paint by hand",
-    "11-widgets": "The «Add widget» gallery with your real shifts: small, agenda, medium and more"
+    "09-cambios-oscuro": "Swap book with each colleague's balance and the shifts of every change",
+    "10-primer-uso": "Welcome screen: import your shifts, use a rotation or paint them manually",
+    "10-primer-uso-oscuro": "Welcome screen: import your shifts, use a rotation or paint them manually",
+    "11-widgets": "The «Add widget» gallery with your real shifts: small, agenda, medium and more",
+    "11-widgets-oscuro": "The «Add widget» gallery with your real shifts: small, agenda, medium and more"
   },
-  "privacy_date": "2026-11-04",
+  "privacy_date": "2026-11-17",
   "kicker": "Shift calendar",
   "tagline": "Your shifts at a glance.",
   "chip": "All free: no Pro, no ads and no account.",
   "nav_label": "Sections",
   "theme_label": "Theme",
-  "theme_system": "System",
-  "theme_light": "Light",
   "theme_dark": "Dark",
   "theme_hint": "Change theme",
-  "download_title": "Android is in testing; iPhone and iPad are on the App Store.",
+  "anim": {
+    "month": "December",
+    "weekdays": [
+      "M",
+      "T",
+      "W",
+      "T",
+      "F",
+      "S",
+      "S"
+    ],
+    "shifts": {
+      "m": {
+        "code": "M",
+        "name": "Morning"
+      },
+      "t": {
+        "code": "A",
+        "name": "Afternoon"
+      },
+      "n": {
+        "code": "N",
+        "name": "Night"
+      },
+      "l": {
+        "code": "O",
+        "name": "Off"
+      },
+      "s": {
+        "code": "PN",
+        "name": "Post-night"
+      }
+    },
+    "sequence": "Your sequence",
+    "cycle_days": "{n} days",
+    "tonight": "Tonight",
+    "starts_in": "Starts in {duration}",
+    "widget_day": "Thu 24",
+    "widget_tomorrow": "Tomorrow",
+    "off_on": "Next day off: Saturday 26",
+    "unit_h": "h",
+    "hours": {
+      "m": "06–14",
+      "t": "14–22",
+      "n": "22–06"
+    },
+    "night_range": "22:00–06:00"
+  },
+  "download_title": "On the App Store for iPhone and iPad; Android, in testing.",
   "download_intro": "Light and dark themes. Free, with no account.",
   "download_notes": {
-    "play": "Anyone can join: first join the testers group, then accept the test.",
+    "play": "Anyone can join in three steps:",
     "apk": "Install it by hand. Since 0.8.3 it has the same signature as the Google Play version: you can switch between them without uninstalling.",
     "app_store": "Free on the App Store, for iPhone and iPad with iOS 17 or later."
   },
-  "join_title": "How to join the Google Play test",
-  "join_steps": [
-    {
-      "text": "Join the testers group",
-      "link_text": "turnly-testers",
-      "href": "https://groups.google.com/g/turnly-testers",
-      "after": " with your Google account."
-    },
-    {
-      "text": "Accept the test on your phone or computer:",
-      "link_text": "play.google.com/apps/testing/es.cuadrante.app",
-      "href": "https://play.google.com/apps/testing/es.cuadrante.app",
-      "after": "."
-    },
-    {
-      "text": "Install the app from Google Play. It updates itself."
-    }
-  ],
   "screenshots_title": "Real screens",
   "screenshots_intro": "With made-up data, in light and dark.",
-  "features_title": "Everything included, no Pro tier or purchases",
-  "features_intro": "Every shift shows its colour, code and times, and never relies on colour alone.",
+  "screenshots_nav": "Choose a screen",
+  "screenshots_prev": "Previous screen",
+  "screenshots_next": "Next screen",
+  "screenshots_position": "Screen {n} of {total}: {title}",
+  "screenshot_captions": {
+    "01-mes": "Month",
+    "02-lista": "List",
+    "03-pintar": "Paint",
+    "04-rotaciones": "Apply pattern",
+    "05-horas": "Summary",
+    "06-festivos": "Public holidays",
+    "08-vacaciones": "Vacation and leave",
+    "09-cambios": "Swap book",
+    "10-primer-uso": "Welcome",
+    "11-widgets": "Add widget"
+  },
+  "screenshot_details": {
+    "01-mes": "Check your shifts for the month by color, code, and time. Today’s card shows when your next shift starts and when you have time off.",
+    "02-lista": "Switch to List to go through the same month day by day. You can see each shift’s name and code, full start and end times, and overtime.",
+    "03-pintar": "Pick a shift from the palette, then tap or drag across days to paint them. You can change a shift, add another, or undo your last stroke.",
+    "04-rotaciones": "Review the shifts, times, and length of each block in your cycle. You can add blocks before moving on.",
+    "05-horas": "See how many hours you’ve worked and have planned this month, including night and public holiday hours. You can also set an hours goal.",
+    "06-festivos": "Choose your country, region, and town to check each year’s public holidays. You can add a local holiday or import holidays from your phone’s calendar.",
+    "08-vacaciones": "Check how many days you have left, used, and planned. Review days carried over from last year and when they expire, or edit your balances.",
+    "09-cambios": "Log shift swaps with coworkers and check who owes shifts to whom. Each swap shows the shifts you give or receive and whether it is still pending.",
+    "10-primer-uso": "Choose how to start your schedule: import your shifts, use a rotation, or paint by hand. You can also restore a backup.",
+    "11-widgets": "Compare widgets showing your actual shifts and choose one for your Android home screen: today and tomorrow, an agenda, or several days."
+  },
+  "features_title": "Organize your shifts and track your hours and pay",
+  "features_intro": "Every shift shows its color, code and times, and never relies on color alone.",
   "feature_titles": [
     "Month, agenda and year",
     "Painting shifts and rotations",

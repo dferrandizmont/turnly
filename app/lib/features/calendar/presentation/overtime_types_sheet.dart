@@ -241,6 +241,7 @@ class _OvertimeTypeFormState extends ConsumerState<OvertimeTypeForm> {
   bool _nameInvalid = false;
   bool _multiplierInvalid = false;
   bool _rateInvalid = false;
+  bool _rateAtMax = false;
   late final (String, String, String, OvertimeRateMode, bool, int) _initial;
 
   (String, String, String, OvertimeRateMode, bool, int) get _values =>
@@ -469,15 +470,27 @@ class _OvertimeTypeFormState extends ConsumerState<OvertimeTypeForm> {
                 ),
                 textInputAction: TextInputAction.done,
                 inputFormatters: [
-                  MoneyInputFormatter(decimals: currencyDecimalsOf(context)),
+                  MoneyInputFormatter(
+                    decimals: currencyDecimalsOf(context),
+                    onAtLimit: () {
+                      if (!_rateAtMax) setState(() => _rateAtMax = true);
+                    },
+                  ),
                 ],
                 decoration: InputDecoration(
                   suffixText: currencySymbolOf(context),
+                  helperText: _rateAtMax ? rateAtMaxMessage(context) : null,
+                  helperMaxLines: 3,
                   errorText: _rateInvalid ? rateRangeMessage(context) : null,
                   errorMaxLines: 3,
                 ),
                 onChanged: (_) {
-                  if (_rateInvalid) setState(() => _rateInvalid = false);
+                  if (_rateInvalid || _rateAtMax) {
+                    setState(() {
+                      _rateInvalid = false;
+                      _rateAtMax = false;
+                    });
+                  }
                 },
               ),
             ),
@@ -522,6 +535,7 @@ class _OvertimeBaseRateSheetState extends ConsumerState<OvertimeBaseRateSheet> {
   final _field = TextEditingController();
   bool _started = false;
   bool _invalid = false;
+  bool _atMax = false;
 
   @override
   void didChangeDependencies() {
@@ -584,16 +598,28 @@ class _OvertimeBaseRateSheetState extends ConsumerState<OvertimeBaseRateSheet> {
             ),
             textInputAction: TextInputAction.done,
             inputFormatters: [
-              MoneyInputFormatter(decimals: currencyDecimalsOf(context)),
+              MoneyInputFormatter(
+                decimals: currencyDecimalsOf(context),
+                onAtLimit: () {
+                  if (!_atMax) setState(() => _atMax = true);
+                },
+              ),
             ],
             decoration: InputDecoration(
               hintText: l10n.overtimeBaseRateNone,
               suffixText: currencySymbolOf(context),
+              helperText: _atMax ? rateAtMaxMessage(context) : null,
+              helperMaxLines: 3,
               errorText: _invalid ? rateRangeMessage(context) : null,
               errorMaxLines: 3,
             ),
             onChanged: (_) {
-              if (_invalid) setState(() => _invalid = false);
+              if (_invalid || _atMax) {
+                setState(() {
+                  _invalid = false;
+                  _atMax = false;
+                });
+              }
             },
             onSubmitted: (_) => _save(),
           ),

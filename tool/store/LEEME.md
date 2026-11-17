@@ -31,8 +31,8 @@ Salidas versionadas en **`docs/readme/<idioma>/`** para los cinco idiomas de la 
 (`es`, `ca`, `gl`, `eu`, `en`), trece por idioma. Las capturas son **pantallas en bruto
 del móvil, como las de Ink Lab**: 1080 × 2400 (412 dp de ancho a 1080/412), tema claro,
 con barra de estado de Android (10:00, wifi, 3G, cobertura y batería llenas) y píldora
-del gesto abajo, **sin titular, sin marco y sin tinte de fondo**. Una sola va en oscuro
-(`07-mes-oscuro.png`). Las dibuja el destino `github` (el predeterminado de `STORE_TARGET`):
+del gesto abajo, **sin titular, sin marco y sin tinte de fondo**. `07-mes-oscuro.png` va en oscuro en el README, y cada
+captura tiene además su gemela oscura `NN-nombre-oscuro.png` para la web. Las dibuja el destino `github` (el predeterminado de `STORE_TARGET`):
 
 | Archivo | Tamaño | Contenido |
 |---|---|---|
@@ -49,6 +49,7 @@ del gesto abajo, **sin titular, sin marco y sin tinte de fondo**. Una sola va en
 | `09-cambios.png` | 1080 × 2400 | Libro de cambios: balance con los compañeros |
 | `10-primer-uso.png` | 1080 × 2400 | Primer uso: los tres caminos (importar, rotación, pintar) |
 | `11-widgets.png` | 1080 × 2400 | Galería «Añadir widget» con los turnos de la muestra |
+| `NN-nombre-oscuro.png` | 1080 × 2400 | La misma escena de cada captura (01–06 y 08–11) en tema oscuro, para la web en oscuro |
 
 En las pantallas largas (`05-horas`, `06-festivos`) el test desplaza la lista lo mínimo
 para que ningún texto quede bajo la píldora del gesto. PNG RGB de 8 bits, opacos y sin metadatos. El escritor comprueba las dimensiones

@@ -20,9 +20,14 @@ import '../../schedule/domain/shift_type.dart' show maxHourlyRateCents;
 /// A paste may also carry grouping marks («1.234,56», «1,234.56», «1 234»):
 /// it is read when the marks are unambiguous and refused otherwise.
 class MoneyInputFormatter extends TextInputFormatter {
-  const MoneyInputFormatter({this.decimals = 2});
+  const MoneyInputFormatter({this.decimals = 2, this.onAtLimit});
 
   final int decimals;
+
+  /// Called when an edit that only adds digits (or the separator) is refused
+  /// because the amount is already as long as it can be, so the screen can
+  /// say so instead of leaving the keys looking dead (1.2.0 QA, iPhone F5).
+  final VoidCallback? onAtLimit;
 
   /// The digits before the separator the highest amount has.
   int get maxIntegerDigits =>
@@ -47,6 +52,10 @@ class MoneyInputFormatter extends TextInputFormatter {
           selection: TextSelection.collapsed(offset: pasted.length),
         );
       }
+    }
+    if (newValue.text.length > oldValue.text.length &&
+        RegExp(r'^[0-9]*[.,]?[0-9]*$').hasMatch(newValue.text)) {
+      onAtLimit?.call();
     }
     return oldValue;
   }

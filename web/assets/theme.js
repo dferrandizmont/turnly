@@ -1,62 +1,80 @@
-/* Turnly web: theme toggle with three states, system -> light -> dark -> system. Loaded in <head> without defer so
-   the saved theme is applied before the first paint. «System» is no saved choice at all: the page follows
-   prefers-color-scheme (CSS) and nothing is kept in localStorage. «Light» and «dark» are kept in localStorage
-   («turnly-theme» = «light» | «dark»), never in a cookie, and are not sent anywhere. Without JS the toggle stays
-   hidden and the page follows the system. */
+/* Turnly web: light or dark, with the same sun/moon toggle as the other sites. Loaded in <head> without defer so
+   the theme is on <html> before the first paint. With no saved choice the page follows the system
+   (prefers-color-scheme) and changes with it. The button [data-theme-toggle] comes hidden in the HTML and only
+   shows with this file; it is a toggle (aria-pressed = dark is on). If the chosen theme is the one the system
+   already has, the saved choice is dropped, so going back to the system theme is going back to automatic.
+   The only thing kept is «turnly-theme» = «light» | «dark» in localStorage (never a cookie, never sent
+   anywhere), always inside try/catch. Without JS the toggle stays hidden and the page follows the system. */
 (function () {
   "use strict";
   var KEY = "turnly-theme";
-  var ORDER = [null, "light", "dark"];
   var root = document.documentElement;
+  var media = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
 
-  function valid(value) {
-    return value === "light" || value === "dark" ? value : null;
+  function stored() {
+    try {
+      var value = window.localStorage.getItem(KEY);
+      return value === "light" || value === "dark" ? value : null;
+    } catch (e) { return null; }
   }
-  function read() {
-    try { return valid(window.localStorage.getItem(KEY)); } catch (e) { return null; }
-  }
-  function save(value) {
+  function store(value) {
     try {
       if (value) window.localStorage.setItem(KEY, value);
       else window.localStorage.removeItem(KEY);
     } catch (e) { /* storage blocked: applies to this page only */ }
   }
-  function apply(value) {
-    if (value) root.setAttribute("data-theme", value);
-    else root.removeAttribute("data-theme");
+  function system() {
+    return media && media.matches ? "dark" : "light";
   }
+
+  var choice = stored();
   function current() {
-    return valid(root.getAttribute("data-theme"));
+    return choice || system();
   }
-
-  apply(read());
-
-  function connect() {
-    var button = document.querySelector("[data-theme-toggle]");
-    if (!button) return;
-    var text = button.querySelector("[data-theme-text]");
-    var labels = {
-      system: button.getAttribute("data-text-system"),
-      light: button.getAttribute("data-text-light"),
-      dark: button.getAttribute("data-text-dark")
-    };
-    // The visible text is the accessible name, so the active theme is always announced.
-    function sync() {
-      if (text) text.textContent = labels[current() || "system"];
+  function apply() {
+    var theme = current();
+    root.setAttribute("data-theme", theme);
+    var buttons = document.querySelectorAll("[data-theme-toggle]");
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
     }
-    button.addEventListener("click", function () {
-      var next = ORDER[(ORDER.indexOf(current()) + 1) % ORDER.length];
-      apply(next);
-      save(next);
-      sync();
-    });
-    window.addEventListener("storage", function (event) {
-      if (event.key === KEY || event.key === null) { apply(read()); sync(); }
-    });
-    sync();
-    button.hidden = false;
+  }
+  apply();
+
+  function onSystemChange() {
+    if (!choice) apply();
+  }
+  if (media) {
+    if (media.addEventListener) media.addEventListener("change", onSystemChange);
+    else if (media.addListener) media.addListener(onSystemChange);
+  }
+  window.addEventListener("storage", function (event) {
+    if (event.key !== KEY && event.key !== null) return;
+    choice = stored();
+    apply();
+  });
+
+  function toggle() {
+    var next = current() === "dark" ? "light" : "dark";
+    choice = next === system() ? null : next;
+    store(choice);
+    /* On a press (not on load) the colours fade for ~400 ms: styles.css transitions them while .theme-anim is on. */
+    if (!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches)) {
+      root.classList.add("theme-anim");
+      window.clearTimeout(toggle.timer);
+      toggle.timer = window.setTimeout(function () { root.classList.remove("theme-anim"); }, 420);
+    }
+    apply();
   }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", connect);
-  else connect();
+  function wire() {
+    var buttons = document.querySelectorAll("[data-theme-toggle]");
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].hidden = false;
+      buttons[i].addEventListener("click", toggle);
+    }
+    apply();
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", wire);
+  else wire();
 })();

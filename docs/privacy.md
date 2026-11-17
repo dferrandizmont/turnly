@@ -135,6 +135,10 @@ Android, que no entran en la copia del sistema. Solo lo leen los widgets de esta
 «Ayuda y contacto» (Ajustes) enseña la dirección de soporte para **copiarla**; la app no abre el correo.
 La dirección es **turnly@mainshai.com**, definida en `kSupportEmail`
 (`app/lib/core/config.dart`); el build puede sustituirla con `--dart-define=SUPPORT_EMAIL=...`.
+Circuito del correo (fuera de la app, desde el 16-nov-2026): Cloudflare Email Routing recibe y reenvía a un buzón de
+Gmail, donde se lee y se responde; un filtro de Gmail deja una copia en Proton; las respuestas salen por el SMTP de
+Brevo, que añade un píxel de apertura y reescribe los enlaces (seguimiento anónimo activado; no se puede quitar en el
+plan gratuito). La política lo cuenta en «Si nos escribes», «Quién recibe los datos» y «Transferencias».
 «Licencias de código abierto» abre la página de licencias de Flutter, sin conexión.
 «Política de privacidad» (Ajustes › Ayuda) abre la web en el **navegador externo**, solo al tocar la fila, mediante
 el plugin oficial `url_launcher`. No envía datos del cuadrante ni añade permiso `INTERNET` a la app: el navegador

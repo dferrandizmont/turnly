@@ -36,6 +36,12 @@ class TodayCard extends ConsumerStatefulWidget {
     this.foldByDefault = false,
   });
 
+  /// The most the text of the card grows with the reader's text size. Past it
+  /// the open card took about 70 % of the first screen at the largest
+  /// accessibility size and pushed the grid off it (iOS AX3, 1.2.0 QA F3);
+  /// the grid keeps the full size.
+  static const double maxTextScale = 1.6;
+
   /// Shows the fold button and honours the remembered fold.
   final bool collapsible;
 
@@ -49,7 +55,8 @@ class TodayCard extends ConsumerStatefulWidget {
   /// off with the fold button. Kept here, next to the layout it mirrors.
   static double openHeightEstimate(BuildContext context) {
     final type = context.type;
-    final scaler = MediaQuery.textScalerOf(context);
+    final scaler = MediaQuery.textScalerOf(context)
+        .clamp(maxScaleFactor: maxTextScale);
     double line(TextStyle style) => textHeight(style, scaler);
     final chip = line(type.body) + 2 * Sp.xs;
     return Sp.xs + // the margin above the card
@@ -471,7 +478,13 @@ class _TodayCardState extends ConsumerState<TodayCard>
             borderRadius: Rad.cardRadius,
             child: Stack(
               children: [
-                MotionSize(child: content),
+                MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    textScaler: MediaQuery.textScalerOf(context)
+                        .clamp(maxScaleFactor: TodayCard.maxTextScale),
+                  ),
+                  child: MotionSize(child: content),
+                ),
                 Positioned(
                   left: 0,
                   right: 0,

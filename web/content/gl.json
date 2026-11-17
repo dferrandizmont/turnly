@@ -2,14 +2,15 @@
   "name": "Turnly",
   "title": "Turnly · As túas quendas, dunha ollada",
   "description": "Calendario de quendas gratuíto e de código aberto para quen traballa a quendas en España. Sen Pro, sen anuncios, sen conta e sen conexión.",
-  "intro": "Calendario de quendas para quen traballa a quendas en España (sanidade, policía, bombeiros, industria, hostalaría ou calquera outro sector): organiza mañás, tardes, noites, gardas, saíntes e días libres, e consulta a túa próxima quenda dunha ollada. Todo é gratis, sen versión Pro, anuncios nin conta, e cando cambias de móbil levas as túas quendas contigo sen volver pagar nada.",
+  "intro": "Calendario de quendas para quen traballa a quendas en España (sanidade, policía, bombeiros, industria, hostalaría ou calquera outro sector): organiza mañás, tardes, noites, gardas, saíntes e días libres, e consulta a túa próxima quenda dunha ollada.",
+  "hero_cta": "Descargar gratis",
   "key_facts": "Todo gratis, sen Pro · Sen anuncios · Sen conta · Funciona sen conexión · Código aberto · Cinco idiomas",
   "features": [
-    "Tarxeta de hoxe coa próxima quenda, o próximo día libre e a racha. O mes en cuadrícula ou lista, a axenda e o ano, coas citas do calendario do móbil xunto ás túas quendas. Notas por día con fotos, ficheiros e tarefas. Compara ata seis calendarios e mira que días tedes libres á vez. Baixo o mes, unha tira coas quendas, horas fronte ao obxectivo e próximo día libre; tócaa para abrir o resumo dese mes.",
-    "Toca ou arrastra para pintar varios días e, con «Engadir outra quenda», pon máis dunha no mesmo día. Copia, pega, desfai e refai. Asistente de rotacións con vista previa: quendas rotativas, 24/72, 4×4, 6×4, 5×2, 2-2-3, «2 e 2», «3 e 1» ou o teu propio patrón, desde o día do ciclo que che toque. Nas dúas novas escolles a quenda de traballo. Desde o detalle dun día podes iniciar, rematar ou retomar a rotación, cunha explicación dos cambios e a opción de desfacer.",
-    "Un aviso por tipo de quenda que soa como un espertador e prográmase cun mes de marxe, e recordatorios de notas. En Android, seis widgets (hoxe, semana, mes, axenda, dúas e catro semanas) e «Silenciar o móbil nas miñas quendas», que lle devolve o son ao remataren. Os widgets de Android mostran extras e saídas anticipadas; o de sete días suma as horas.",
+    "A túa próxima quenda e o próximo día libre na tarxeta de hoxe; o mes en cuadrícula ou lista, a axenda e o ano, coas citas do calendario do móbil xunto ás túas quendas. Notas con fotos e tarefas, e ata seis calendarios para ver que días tedes libres á vez.",
+    "Toca ou arrastra para pintar varios días, pon máis dunha quenda no mesmo día e desfai o que queiras. O asistente de rotacións aplica a túa con vista previa: quendas rotativas, 24/72, 4×4, 6×4, 5×2, 2-2-3, «2 e 2», «3 e 1» ou o teu propio patrón, desde o día do ciclo que che toque.",
+    "Avisos por tipo de quenda e recordatorios de notas, programados con 30 días de marxe. En Android, o aviso de quenda soa como un espertador. No iPhone e no iPad é unha notificación urxente que non soa co modo silencioso; caben ata 60 avisos pendentes e renóvanse ao abrir a app. En Android, ademais, seis widgets (hoxe, semana, mes, axenda, dúas e catro semanas) e «Silenciar o móbil nas miñas quendas», que lle devolve o son ao remataren.",
     "Copias automáticas que comprobas con «Probar restauración» e, en Android, unha ao día no cartafol que escollas (Drive, Dropbox, OneDrive…). Importa copias de Shifter de LRHSoft, .ics, CSV ou o calendario do móbil. Con «Manter ao día», as túas quendas pasan ao calendario do móbil; tamén podes gardalas nun .ics.",
-    "Horas traballadas, nocturnas e festivas e saídas anticipadas por mes, trimestre, ano ou as datas que queiras, co teu obxectivo e a bolsa de horas. Extras por bloques, con tipos e tarifa; escolles se cada tipo conta para o obxectivo. Prezo por hora e pluses fixos, de noite e de festivo: soldo bruto estimado e neto coa túa retención. O Resumo e o informe PDF mostran a racha máis longa de días traballados seguidos. Informes en PDF e CSV.",
+    "Horas traballadas, nocturnas, festivas e extra fronte ao teu obxectivo e á túa bolsa de horas, por mes, trimestre, ano ou as datas que queiras. Soldo bruto e neto estimado co teu prezo por hora, os teus pluses e a túa retención. Informes en PDF e CSV.",
     "Saldos de vacacións, días de libre disposición e permisos por ano, cos días arrastrados e cando caducan. No libro de cambios apuntas as quendas que cambias cos compañeiros, ves quen lle debe a quen e aplícalas ao calendario.",
     "Festivos de España, coas comunidades e moitos municipios, e de 40 países máis, sen conexión e cos que engadas ti. Ao teu gusto: formato de hora e de data, moeda, dez cores de acento, paletas preparadas para as túas quendas e imaxe de fondo do calendario."
   ],
@@ -28,7 +29,7 @@
     },
     {
       "question": "Como me apunto á proba de Google Play?",
-      "answer": "Únete ao grupo turnly-testers en Google Groups coa túa conta de Google, acepta a proba na ligazón de Google Play e instala a app desde a tenda. Actualizarase soa."
+      "answer": "Únete ao grupo de probas turnly-testers en Google Groups coa túa conta de Google, acepta a proba na ligazón de Google Play e instala a app desde a tenda. Actualizarase soa."
     },
     {
       "question": "E no iPhone e no iPad?",
@@ -36,65 +37,134 @@
     },
     {
       "question": "Como paso Turnly a un móbil novo?",
-      "answer": "Tes catro maneiras, e todas son de balde. Paso directo: cando configuras o móbil novo, copia nel as apps e os datos do vello por cable ou wifi; Turnly pasa con elas. Copia de Google: coa copia de seguranza de Android activada e un bloqueo de pantalla (PIN, padrón ou contrasinal), Android garda Turnly cifrado na túa conta de Google e recupérao cando configuras o móbil novo coa mesma conta (Android 9 ou posterior). Sen bloqueo de pantalla, Turnly non entra nesa copia. Ficheiro .turnly: en Configuración › Copia de seguranza, «Exportar ficheiro» ou «Gardar no dispositivo»; lévao ao móbil novo e ábreo, ou usa «Importar ficheiro». Copia automática nun cartafol (Android): deixa unha copia cada día no cartafol que escollas; se ese cartafol está na túa nube ou o pasas ao móbil novo, importa a última. Co ficheiro ou o cartafol, antes ves que contén a copia e non se substitúe nada sen que o confirmes. As copias que quedan dentro da app pérdense se a desinstalas sen outra copia."
+      "answer": [
+        "O máis sinxelo: no móbil antigo, abre Configuración › Copia de seguranza e preme «Gardar unha copia fóra de Turnly». Garda o ficheiro .turnly e lévao ao móbil novo; alí instala Turnly e abre o ficheiro ou preme «Importar ficheiro». Verás que contén a copia e non se substitúe nada sen que o confirmes.",
+        "Outras formas, todas de balde: ao configurar un Android novo, o paso directo de apps e datos por cable ou wifi, ou a copia de Google (Android 9 ou posterior, coa copia de seguranza activada e un bloqueo de pantalla: PIN, padrón ou contrasinal); en Android, tamén a copia automática diaria no cartafol que escollas, do que importas a última; no iPhone, a copia de iCloud ou a do ordenador.",
+        "As copias que só están dentro da app pérdense se a desinstalas."
+      ]
     },
     {
       "question": "E se quero comezar de cero?",
       "answer": "En Configuración, «Borrar todo e comezar de cero» borra os teus calendarios, notas, ausencias e axustes (só conserva o idioma) e lévate ao primeiro uso. Antes garda unha copia de seguranza que podes restaurar ou levar a outro sitio."
     }
   ],
-  "licence_text": "Código MIT · Contido CC BY-SA 4.0",
+  "licence_text": "Licenza MIT · Contido CC BY-SA 4.0",
   "screenshot_alts": {
     "01-mes": "Mes pintado e tarxeta da próxima quenda",
+    "01-mes-oscuro": "Mes pintado e tarxeta da próxima quenda",
     "02-lista": "O mesmo mes en vista Lista, con códigos e horarios completos",
+    "02-lista-oscuro": "O mesmo mes en vista Lista, con códigos e horarios completos",
     "03-pintar": "Modo pintar coa paleta de quendas",
+    "03-pintar-oscuro": "Modo pintar coa paleta de quendas",
     "04-rotaciones": "Asistente de rotacións: o día do ciclo no que comezas, antes de aplicar",
+    "04-rotaciones-oscuro": "Asistente de rotacións: o día do ciclo no que comezas, antes de aplicar",
     "05-horas": "Resumo mensual de horas traballadas, nocturnas e festivas",
+    "05-horas-oscuro": "Resumo mensual de horas traballadas, nocturnas e festivas",
     "06-festivos": "Festivos por país, comunidade e concello",
-    "07-mes-oscuro": "O mesmo mes co tema escuro",
+    "06-festivos-oscuro": "Festivos por país, comunidade e concello",
     "08-vacaciones": "Saldos de vacacións e permisos, cos días que quedan e os arrastrados",
+    "08-vacaciones-oscuro": "Saldos de vacacións e permisos, cos días que quedan e os arrastrados",
     "09-cambios": "Libro de cambios co balance de cada compañeiro e as quendas de cada cambio",
+    "09-cambios-oscuro": "Libro de cambios co balance de cada compañeiro e as quendas de cada cambio",
     "10-primer-uso": "Primeira pantalla do primeiro uso, con tres camiños: importar, usar unha rotación ou pintar a man",
-    "11-widgets": "Galería «Engadir widget» coas túas quendas reais: pequeno, axenda, mediano e máis"
+    "10-primer-uso-oscuro": "Primeira pantalla do primeiro uso, con tres camiños: importar, usar unha rotación ou pintar a man",
+    "11-widgets": "Galería «Engadir widget» coas túas quendas reais: pequeno, axenda, mediano e máis",
+    "11-widgets-oscuro": "Galería «Engadir widget» coas túas quendas reais: pequeno, axenda, mediano e máis"
   },
-  "privacy_date": "2026-11-04",
+  "privacy_date": "2026-11-17",
   "kicker": "Calendario de quendas",
   "tagline": "As túas quendas, dunha ollada.",
   "chip": "Todo gratis: sen Pro, sen anuncios e sen conta.",
   "nav_label": "Seccións",
   "theme_label": "Tema",
-  "theme_system": "Sistema",
-  "theme_light": "Claro",
   "theme_dark": "Escuro",
   "theme_hint": "Cambiar o tema",
-  "download_title": "Android en probas; iPhone e iPad, na App Store.",
+  "anim": {
+    "month": "Decembro",
+    "weekdays": [
+      "L",
+      "M",
+      "M",
+      "X",
+      "V",
+      "S",
+      "D"
+    ],
+    "shifts": {
+      "m": {
+        "code": "M",
+        "name": "Mañá"
+      },
+      "t": {
+        "code": "T",
+        "name": "Tarde"
+      },
+      "n": {
+        "code": "N",
+        "name": "Noite"
+      },
+      "l": {
+        "code": "L",
+        "name": "Libre"
+      },
+      "s": {
+        "code": "S",
+        "name": "Saínte"
+      }
+    },
+    "sequence": "A túa secuencia",
+    "cycle_days": "{n} días",
+    "tonight": "Esta noite",
+    "starts_in": "Comeza en {duration}",
+    "widget_day": "xov. 24",
+    "widget_tomorrow": "Mañá",
+    "off_on": "Tes libre o sábado 26",
+    "unit_h": "h",
+    "hours": {
+      "m": "06–14",
+      "t": "14–22",
+      "n": "22–06"
+    },
+    "night_range": "22:00–06:00"
+  },
+  "download_title": "Na App Store para iPhone e iPad; Android, en probas.",
   "download_intro": "Modo claro e escuro. Gratis e sen conta.",
   "download_notes": {
-    "play": "Calquera pode apuntarse: primeiro entras no grupo de testers e despois aceptas a proba.",
+    "play": "Calquera pode apuntarse en tres pasos:",
     "apk": "Instálalo á man. Desde a 0.8.3 leva a mesma sinatura que a versión de Google Play: podes pasar dunha á outra sen desinstalar.",
     "app_store": "De balde na App Store, para iPhone e iPad con iOS 17 ou posterior."
   },
-  "join_title": "Como unirte á proba de Google Play",
-  "join_steps": [
-    {
-      "text": "Únete ao grupo de testers",
-      "link_text": "turnly-testers",
-      "href": "https://groups.google.com/g/turnly-testers",
-      "after": ". Coa túa conta de Google, preme «Unirse ao grupo»."
-    },
-    {
-      "text": "Acepta a proba desde o móbil ou o ordenador:",
-      "link_text": "play.google.com/apps/testing/es.cuadrante.app",
-      "href": "https://play.google.com/apps/testing/es.cuadrante.app",
-      "after": "."
-    },
-    {
-      "text": "Instala a app desde Google Play. Actualizarase soa."
-    }
-  ],
   "screenshots_title": "Pantallas reais",
   "screenshots_intro": "Con datos ficticios, en claro e en escuro.",
-  "features_title": "Todo aberto, sen Pro nin compras",
+  "screenshots_nav": "Escolle unha pantalla",
+  "screenshots_prev": "Pantalla anterior",
+  "screenshots_next": "Pantalla seguinte",
+  "screenshots_position": "Pantalla {n} de {total}: {title}",
+  "screenshot_captions": {
+    "01-mes": "Mes",
+    "02-lista": "Lista",
+    "03-pintar": "Pintar",
+    "04-rotaciones": "Aplicar patrón",
+    "05-horas": "Resumo",
+    "06-festivos": "Festivos",
+    "08-vacaciones": "Vacacións e permisos",
+    "09-cambios": "Libro de cambios",
+    "10-primer-uso": "Benvida",
+    "11-widgets": "Engadir widget"
+  },
+  "screenshot_details": {
+    "01-mes": "Consulta as túas quendas do mes por cor, código e horario. A tarxeta de hoxe diche cando comeza a próxima quenda e cando libras.",
+    "02-lista": "Cambia a Lista para percorrer o mesmo mes día a día. Ves o nome e o código de cada quenda, o horario completo e as horas extra.",
+    "03-pintar": "Escolle unha quenda da paleta e toca ou arrastra polos días para pintalos. Podes cambiar a quenda, engadir outra ou desfacer o último trazo.",
+    "04-rotaciones": "Revisa as quendas, os horarios e a duración de cada bloque do teu ciclo. Podes engadir bloques antes de continuar.",
+    "05-horas": "Consulta as horas traballadas e previstas do mes, co detalle das horas nocturnas e en festivo. Tamén podes fixar un obxectivo de horas.",
+    "06-festivos": "Escolle o país, a comunidade e o concello para consultar os festivos de cada ano. Podes engadir un festivo local ou traelos do calendario do móbil.",
+    "08-vacaciones": "Consulta cantos días che quedan, cantos gozaches e cantos tes planificados. Revisa os días arrastrados e cando caducan, ou edita os teus saldos.",
+    "09-cambios": "Anota cambios de quenda cos compañeiros e consulta quen debe quendas a quen. Cada cambio mostra as quendas que cedes ou recibes e se segue pendente.",
+    "10-primer-uso": "Escolle como comezar o teu cadro de quendas: importa as quendas, usa unha rotación ou pinta a man. Tamén podes recuperar unha copia de seguranza.",
+    "11-widgets": "Compara os widgets coas túas quendas reais e escolle cal engadir á pantalla de inicio de Android: hoxe e mañá, axenda ou varios días."
+  },
+  "features_title": "Organiza as túas quendas e fai as contas",
   "features_intro": "Cada quenda leva cor, código e horario, e nunca depende só da cor.",
   "feature_titles": [
     "Mes, axenda e ano",

@@ -155,6 +155,7 @@ you choose. The `.turnly` backup file is not encrypted.
 
 ## What's new
 
+- **1.2.1 (17 Nov 2026):** iPhone and iPad: fixes for very large text (the rotation builder, the “Today” card, the keyboard’s “Done” bar, question titles, the note in the month), the iOS time wheel for overtime, a clearer “Your cycle” strip and a warning when an hourly rate hits its maximum.
 - **1.2.0 (16 Nov 2026):** iPhone and iPad get everything from 0.10.1, 0.11.0 and 0.11.1: notes in the month on iPhone, long rotations in blocks with the “Weeks per shift” template, the numbered cycle strip and whole-month previews, “Rate Turnly” in Settings and the large-text fixes.
 - **0.11.1 (15 Nov 2026):** Android: with “Show the note in the month” on, phones now write the first line of the note in the day’s box, in portrait and landscape, instead of only the clip.
 - **0.11.0 (15 Nov 2026):** Android: build long rotations in blocks (“Morning × 21”), with week shortcuts, “Repeat” and the “Weeks per shift” template. Choose your cycle day in a numbered strip, preview whole months and edit patterns as copies; the app may also ask you for a store review.

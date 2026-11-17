@@ -305,6 +305,80 @@ void main() {
     }
   }
 
+  for (final (size, scale) in [
+    (const Size(390, 844), 1.0),
+    (const Size(320, 640), 1.0),
+    (const Size(414, 896), 3.1),
+  ]) {
+    testWidgets(
+      'a block just added is scrolled fully above the palette at $size x$scale',
+      (tester) async {
+        await _openWizard(tester, size: size, scale: scale);
+        await _tap(tester, 'pattern-create-own');
+        for (final id in [
+          'morning',
+          'afternoon',
+          'night',
+          'morning',
+          'afternoon',
+          'night',
+        ]) {
+          await _tap(tester, 'builder-add-$id');
+          await tester.pumpAndSettle();
+          final viewport = tester.getRect(_key('pattern-step-choose'));
+          final fixed = find
+              .descendant(
+                of: _key('pattern-step-choose'),
+                matching: _key('builder-palette'),
+              )
+              .evaluate()
+              .isEmpty;
+          for (final key in [
+            'block-minus',
+            'block-plus',
+            'block-other-number',
+          ]) {
+            final rect = tester.getRect(_key(key));
+            expect(
+              rect.top,
+              greaterThanOrEqualTo(viewport.top - 0.5),
+              reason: '$key above the viewport after adding $id',
+            );
+            expect(
+              rect.bottom,
+              lessThanOrEqualTo(viewport.bottom + 0.5),
+              reason: '$key below the viewport after adding $id',
+            );
+            if (fixed) {
+              expect(
+                rect.bottom,
+                lessThanOrEqualTo(
+                  tester.getRect(_key('builder-palette')).top + 0.5,
+                ),
+                reason: '$key under the pinned palette',
+              );
+            }
+          }
+        }
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
+  testWidgets('at the largest text the palette joins the page', (tester) async {
+    await _openWizard(tester, size: const Size(414, 896), scale: 3.1);
+    await _tap(tester, 'pattern-create-own');
+    // Not pinned under the sequence: it scrolls with the blocks.
+    expect(
+      find.descendant(
+        of: _key('pattern-step-choose'),
+        matching: _key('builder-palette'),
+      ),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('M N T for three weeks each takes six taps and gives 63 days', (
     tester,
   ) async {
@@ -404,6 +478,9 @@ void main() {
         await _tap(tester, 'builder-block-0');
         await _tap(tester, 'block-options');
         await _tap(tester, 'block-repeat');
+        // The «Más» sheet is gone while the dialog is open (iPad QA F3).
+        expect(_key('block-up'), findsNothing);
+        expect(_key('repeat-confirm'), findsOneWidget);
         await _tap(tester, 'repeat-plus');
         await _tap(tester, 'repeat-plus');
         expect(find.text('3 veces en total · 63 días'), findsOneWidget);
@@ -435,8 +512,7 @@ void main() {
         await tester.tap(find.text('Cancelar'));
         await tester.pumpAndSettle();
         expect(find.text('Cerrar'), findsNothing);
-        await tester.binding.handlePopRoute();
-        await tester.pumpAndSettle();
+        expect(_key('block-up'), findsNothing);
 
         controller.replaceBlocks([
           PatternBlock(shiftIds: ['morning'], days: maxPatternCycleDays),

@@ -4046,6 +4046,7 @@
   "widgetSevenDayHours": "7 egun: {duration}",
   "keyboardDone": "Eginda",
   "overtimeRateOutOfRange": "Idatzi orduko prezio bat, 0 eta {max} artean.",
+  "overtimeRateAtMax": "Gehieneko prezioa {max} da.",
   "backupUiPreviewOvertime": "Aparteko orduen blokeak",
   "dayCellOvertimeClock": "+{time}",
   "settingsRateTitle": "Baloratu Turnly",

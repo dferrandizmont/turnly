@@ -1,50 +1,62 @@
 {% extends 'base/layout.html.j2' %}
-{#- The policy is published whole and in order. Its own title becomes the page h1, its "last updated" line
-    the date stamp (wrapped in <time>), and its numbered sections get anchors for the index. -#}
+{#- The policy is published whole and in order. Its own title becomes the page h1, its "last updated" line the date stamp
+    (wrapped in <time>) and its numbered sections get the index.
+    The generator (sitegen/privacy.py) lowers the policy's headings so that the page can have an h1: policy # -> h2, ## -> h3,
+    ### -> h4, each with an id «policy-…». Here the title goes up to the page h1, the numbered sections to h2 (keeping their
+    ids, which the index links to) and their subsections to h3, so there is no jump from h1 to h3. Tables come wrapped by
+    the generator (div.table-wrap). The DOM follows the visual order: kicker, title, date, notice, mobile index, text, with
+    the side index (desktop) first, so no CSS `order` is needed. `sitegen check` ignores the notice, any <details> and
+    nav.privacy-toc when it looks for the policy text, so they can sit between the date and the text. -#}
+{#- One level up for what the generator lowered inside a numbered section (h4 -> h3, h5 -> h4, h6 -> h5). Arguments are
+    marked safe because Markup.replace would otherwise escape them. -#}
+{% macro up(html) %}{{ html.replace('<h4' | safe, '<h3' | safe).replace('</h4>' | safe, '</h3>' | safe).replace('<h5' | safe, '<h4' | safe).replace('</h5>' | safe, '</h4>' | safe).replace('<h6' | safe, '<h5' | safe).replace('</h6>' | safe, '</h5>' | safe) }}{% endmacro %}
 {% block content %}
 {#- A policy that links to another policy's Markdown file points to that policy's page on the site instead. -#}
 {%- set ns = namespace(html=policy_html) -%}
 {%- for code, path in site.privacy.items() if code in site.languages -%}
   {%- set ns.html = ns.html.replace(('href="' ~ path.split('/')[-1] ~ '"') | safe, ('href="' ~ route(code, true) ~ '"') | safe) -%}
 {%- endfor -%}
-{%- set sections = ns.html.split('<h3>') -%}
+{%- set sections = ns.html.split('<h3 id="' | safe) -%}
 {%- set head = sections[0] -%}
-{%- set titled = head.lstrip().startswith('<h2>') and '</h2>' in head -%}
+{%- set titled = head.lstrip().startswith('<h2') and '</h2>' in head -%}
 {%- if titled -%}
-  {%- set title_parts = head.lstrip()[4:].split('</h2>', 1) -%}
+  {%- set title_parts = head.lstrip().split('>' | safe, 1)[1].split('</h2>' | safe, 1) -%}
   {%- set after_title = title_parts[1].lstrip() -%}
   {%- set stamped = after_title.startswith('<p>') and '</p>' in after_title -%}
-  {%- if stamped -%}{%- set stamp_parts = after_title[3:].split('</p>', 1) -%}{%- endif -%}
+  {%- if stamped -%}{%- set stamp_parts = after_title[3:].split('</p>' | safe, 1) -%}{%- endif -%}
 {%- endif -%}
 {%- set toc = [] -%}
-{%- for part in sections[1:] -%}{%- set _ = toc.append(part.split('</h3>', 1)[0] | striptags) -%}{%- endfor -%}
+{%- for part in sections[1:] -%}{%- set _ = toc.append({'id': part.split('"' | safe, 1)[0], 'title': part.split('>' | safe, 1)[1].split('</h3>' | safe, 1)[0] | striptags}) -%}{%- endfor -%}
+{#- lang of the title and the date: the policy's own when they are its text, the page's when they are ours. -#}
+{%- set head_lang = policy_lang if titled else lang -%}
 <div class="wrap doc">
-{% if toc %}<nav class="side" aria-label="{{ c.toc_aria }}">
+{% if toc %}<nav class="side privacy-toc" aria-label="{{ c.toc_aria }}">
 <p class="label">{{ c.toc_label }}</p>
-<ol class="idx">{% for label in toc %}<li><a href="#s{{ loop.index }}">{{ label }}</a></li>{% endfor %}</ol>
+<ol class="idx" lang="{{ policy_lang }}">{% for item in toc %}<li><a href="#{{ item.id }}">{{ item.title }}</a></li>{% endfor %}</ol>
 </nav>{% endif %}
 <div class="doc-main">
 <p class="label doc-kicker">{{ t.privacy }}</p>
+{% if titled %}<h1 class="h1 doc-title" lang="{{ head_lang }}">{{ title_parts[0] }}</h1>
+{% if stamped %}<p class="stamp" lang="{{ head_lang }}"><time datetime="{{ c.privacy_date }}">{{ stamp_parts[0] }}</time></p>
+{% else %}<p class="stamp">{{ t.privacy_version }} <time datetime="{{ c.privacy_date }}">{{ c.privacy_date }}</time></p>
+{% endif %}{% else %}<h1 class="h1 doc-title">{{ t.privacy_full }}</h1>
+<p class="stamp">{{ t.privacy_version }} <time datetime="{{ c.privacy_date }}">{{ c.privacy_date }}</time></p>
+{% endif %}
 {% if policy_lang != lang %}<aside class="notice">
 <p class="label">{{ c.fallback_label }}</p>
 <p><strong class="privacy-fallback">{{ t.privacy_fallback.format(language=t.languages_inline[policy_lang]) }}</strong> {{ c.fallback_text }}</p>
 </aside>{% endif %}
 {% if toc %}<details class="idx-m">
 <summary>{{ c.toc_label }} · {{ c.toc_count.format(count=toc | length) }}</summary>
-<ol class="idx">{% for label in toc %}<li><a href="#s{{ loop.index }}">{{ label }}</a></li>{% endfor %}</ol>
+<ol class="idx" lang="{{ policy_lang }}">{% for item in toc %}<li><a href="#{{ item.id }}">{{ item.title }}</a></li>{% endfor %}</ol>
 </details>{% endif %}
 <article class="pol" lang="{{ policy_lang }}">
-{% if titled %}<h1 class="h1 doc-title">{{ title_parts[0] }}</h1>
-{% if stamped %}<p class="stamp"><time datetime="{{ c.privacy_date }}">{{ stamp_parts[0] }}</time></p>
-<div class="doc-gap" aria-hidden="true"></div>
-{{ stamp_parts[1] }}{% else %}<p class="stamp">{{ t.privacy_version }} <time datetime="{{ c.privacy_date }}">{{ c.privacy_date }}</time></p>
-<div class="doc-gap" aria-hidden="true"></div>
-{{ title_parts[1] }}{% endif %}
-{% else %}<h1 class="h1 doc-title">{{ t.privacy_full }}</h1>
-<p class="stamp">{{ t.privacy_version }} <time datetime="{{ c.privacy_date }}">{{ c.privacy_date }}</time></p>
-<div class="doc-gap" aria-hidden="true"></div>
-{{ head }}{% endif %}
-{% for part in sections[1:] %}<h3 id="s{{ loop.index }}">{{ part }}{% endfor %}
+{%- if titled %}
+{{ up(stamp_parts[1] if stamped else title_parts[1]) }}
+{%- else %}
+{{ up(head) }}
+{%- endif %}
+{% for part in sections[1:] %}<h2 id="{{ up(part.replace('</h3>' | safe, '</h2>' | safe, 1)) }}{% endfor %}
 </article>
 </div>
 </div>

@@ -7477,6 +7477,11 @@ class AppLocalizationsCa extends AppLocalizations {
   }
 
   @override
+  String overtimeRateAtMax(String max) {
+    return 'El màxim és $max.';
+  }
+
+  @override
   String get overtimeTypeOvertime => 'Hores extra';
 
   @override

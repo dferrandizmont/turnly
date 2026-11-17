@@ -5109,6 +5109,15 @@
       }
     }
   },
+  "overtimeRateAtMax": "El máximo es {max}.",
+  "@overtimeRateAtMax": {
+    "description": "Aviso bajo el campo de precio por hora cuando ya no caben más cifras. {max} es el máximo con su moneda, p. ej. 9.999,99 €.",
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
   "overtimeTypeOvertime": "Horas extra",
   "@overtimeTypeOvertime": {
     "description": "Nombre del tipo de horas extra que viene creado (cuenta para el objetivo)."

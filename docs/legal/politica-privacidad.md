@@ -1,6 +1,6 @@
 # Política de privacidad de Turnly
 
-Última actualización: 13 de noviembre de 2026
+Última actualización: 17 de noviembre de 2026 · versión 2026-11-17
 
 Turnly es una app de calendario de turnos para quien trabaja a turnos en España. Es una app independiente: no
 está creada, revisada ni respaldada por ninguna empresa, administración ni sindicato.
@@ -8,7 +8,8 @@ está creada, revisada ni respaldada por ninguna empresa, administración ni sin
 Resumen: **no tienes cuenta, no hay servidor propio y tus turnos se quedan en tu móvil.** La app es totalmente
 gratuita y de código abierto, y no envía datos ni informes de errores a nadie. Lo único que puede sacar tus datos del
 móvil son las copias de seguridad de tu cuenta de Google o de Apple y los archivos o calendarios que tú decidas
-exportar, y eso lo controlas tú.
+exportar, y eso lo controlas tú. Si nos escribes por correo, en ese correo intervienen los proveedores que se
+explican en «Si nos escribes».
 
 ## 1. Responsable del tratamiento
 
@@ -87,16 +88,46 @@ Si tocas «Política de privacidad» en Ajustes › Ayuda, se abre esta página 
 el que se conecta a la web; Turnly no le envía tus turnos, notas ni ausencias.
 
 ### Datos que NO se tratan
-- No pedimos ni guardamos nombre, correo, teléfono, DNI, fecha de nacimiento ni datos de tu empresa.
-- No hay analítica, ni anuncios, ni publicidad personalizada, ni rastreo entre apps.
+- La app no pide ni guarda nombre, correo, teléfono, DNI, fecha de nacimiento ni datos de tu empresa.
+- En la app y en la web no hay analítica, ni anuncios, ni publicidad personalizada, ni rastreo entre apps. El correo
+  de soporte tiene su propio apartado («Si nos escribes»).
 - No accedemos a tu ubicación, contactos, fotos, cámara ni micrófono.
 - No recibimos tus turnos, tus notas, tus ausencias ni tus horas.
 
 ### Si nos escribes
 «Ayuda y contacto» (Ajustes) te enseña la dirección de soporte para que la copies y nos escribas desde tu propia app
-de correo, con la versión de la app si quieres adjuntarla. La app no abre el correo ni envía nada por sí misma. Si
-nos escribes, trataremos tu dirección de correo y lo que nos cuentes solo para responderte. No nos mandes copias
-`.turnly` o `.cuadrante` ni capturas con turnos, notas o ausencias reales: para un fallo nos basta con datos inventados.
+de correo, con la versión de la app si quieres adjuntarla. La app no abre el correo ni envía nada por sí misma. No
+nos mandes copias `.turnly` o `.cuadrante` ni capturas con turnos, notas o ausencias reales: para un fallo nos basta
+con datos inventados.
+
+Si escribes a turnly@mainshai.com (o a dev@mainshai.com, la dirección de las primeras versiones), usamos tu dirección
+de correo, tu nombre si lo pones y lo que nos cuentes, solo para contestarte y resolver lo que nos preguntas. Por el
+camino intervienen estos proveedores:
+
+- **Cloudflare** (Cloudflare, Inc., Estados Unidos) recibe el mensaje en nuestro dominio y lo reenvía al momento. No
+  guarda el mensaje, pero sí un registro técnico del reenvío (remitente, destinatario, asunto, fecha y resultado). Lo
+  conserva durante el plazo que fija su servicio, que no hemos podido confirmar, igual que las opciones para borrarlo;
+  si nos pides la supresión, trasladaremos también la solicitud a Cloudflare y te informaremos del resultado. Cloudflare trata el correo también
+  en Estados Unidos.
+- **Google** (Gmail; Google Ireland Limited) es el buzón donde leemos tu mensaje, te respondemos y guardamos la
+  conversación. Google puede tratar estos datos también en Estados Unidos.
+- **Proton** (Proton AG, Suiza) guarda una copia de los mensajes que recibimos, como respaldo. Desde ahí no
+  respondemos.
+- **Brevo** (Sendinblue SAS, que opera como Brevo, Francia) envía nuestras respuestas, por lo que trata su contenido,
+  y guarda un registro de cada envío (destinatario, asunto, fecha y si se entregó) y una copia de la respuesta (que
+  puede incluir tu mensaje, si va citado debajo). Además, Brevo añade a cada respuesta una imagen invisible (un píxel)
+  que registra si la abres, y cambia los enlaces por otros suyos que registran si los pulsas. No podemos quitarlo en el
+  plan que usamos, así que tenemos activado el seguimiento anónimo de Brevo: según Brevo, cuenta las aperturas y los
+  clics sin asociarlos a tu dirección de correo. Aun así, al cargar la imagen o pulsar un enlace, tu programa de correo
+  se conecta a los servidores de Brevo, que reciben datos técnicos como tu dirección IP. Nosotros no consultamos ni
+  usamos esa información. Si prefieres evitarlo, bloquea las imágenes externas en tu programa de correo y no abras los
+  enlaces de la respuesta. Tampoco sirve copiarlos y pegarlos en el navegador, porque siguen pasando por Brevo: para ir
+  a una página, escribe tú su dirección. La respuesta se lee igual.
+
+Guardamos la conversación en Gmail, la copia en Proton y la copia y el registro de envío en Brevo como máximo un año
+desde el último mensaje de la conversación, salvo que necesitemos conservarlos más tiempo para atender una
+reclamación. Hacemos una limpieza cada tres meses y en cada una borramos lo que cumpliría el año antes de la siguiente. Si dejamos de usar alguno de esos servicios, borramos lo que haya en él. Si nos pides que borremos
+tus mensajes antes, los borramos de los tres sitios.
 
 ## 3. Para qué y con qué base jurídica
 
@@ -104,27 +135,46 @@ nos escribes, trataremos tu dirección de correo y lo que nos cuentes solo para 
 |---|---|---|
 | Turnos, notas, ausencias y ajustes en tu móvil | Que lleves tu cuadrante, tus horas y tus alarmas | No los recibimos: se quedan en tu dispositivo, bajo tu control |
 | Copias de seguridad y exportaciones | Que no pierdas tus datos y puedas cambiar de móvil | Las haces tú; los servicios que uses (Google, Apple, tu nube) tienen sus propias condiciones |
-| Correos de soporte | Responder a tu consulta | Tu solicitud y nuestro interés legítimo en atenderla (art. 6.1.f) |
+| Correos de soporte | Responder a tu consulta y guardar la conversación durante el plazo de «Cuánto tiempo se conservan» | Tu solicitud y nuestro interés legítimo en atenderla (art. 6.1.f) |
 
 No tomamos decisiones automatizadas ni elaboramos perfiles sobre ti.
 
 ## 4. Quién recibe los datos
 La app no transmite datos a terceros. Si valoras la app en la tienda, tu valoración y tu reseña las recibe Google o Apple
-directamente, no nosotros. Si envías un correo de soporte, lo recibe el titular en turnly@mainshai.com
-mediante el servicio de correo que elijas. Si exportas a un calendario sincronizado o tienes activada la copia del
-sistema, quien recibe esos datos es el proveedor de tu cuenta (Google, Apple u otro), en tu nombre y según sus
+directamente, no nosotros. Si exportas a un calendario sincronizado o tienes activada la copia del sistema, quien
+recibe esos datos es el proveedor de tu cuenta (Google, Apple u otro), en tu nombre y según sus condiciones.
+
+Si nos escribes, el correo de soporte pasa por estos proveedores (detalle en «Si nos escribes»):
+
+| Proveedor | Para qué | Dónde |
+|---|---|---|
+| Cloudflare, Inc. | Recibir y reenviar el correo de soporte; registro técnico del reenvío | EE. UU. |
+| Google Ireland Limited (Gmail) | Buzón del correo de soporte | Irlanda; Google LLC puede tratar datos en EE. UU. |
+| Proton AG | Copia de respaldo del correo recibido | Suiza |
+| Sendinblue SAS (Brevo), RCS París 498 019 298 | Enviar las respuestas; registro de envío y copia de la respuesta (como máximo un año desde el último mensaje, con limpieza trimestral); píxel de apertura y enlaces de clic, con el seguimiento anónimo de Brevo activado | UE (Francia) |
+
+Usamos una cuenta de Gmail normal, sin contrato de encargo con Google: Google trata esos correos según sus propias
 condiciones.
 
 ## 5. Transferencias internacionales
-La app no realiza transferencias de datos. Los servicios externos que decidas utilizar (correo, nube, calendario
+La app no realiza transferencias de datos. Los servicios externos que decidas utilizar (tu correo, nube, calendario
 sincronizado, destino de una exportación o la tienda en la que valores la app) se rigen por sus propias condiciones.
+
+En el correo de soporte, Cloudflare y Google pueden tratar datos en Estados Unidos. Cloudflare, Inc. y Google LLC
+están adheridas al Marco de Privacidad de Datos UE-EE. UU. (decisión de adecuación de la Comisión Europea de 10 de
+julio de 2023); el acuerdo de tratamiento de datos de Cloudflare incluye además cláusulas contractuales tipo. Proton
+está en Suiza, país con decisión de adecuación de la Comisión Europea. Brevo es una empresa francesa y, según su
+documentación, aloja los datos en la Unión Europea.
 
 ## 6. Cuánto tiempo se conservan
 
 - **Datos en tu móvil:** hasta que desinstales la app o borres sus datos desde los ajustes del sistema (y, en su
   caso, de las copias de seguridad de tu cuenta y de los archivos que hayas exportado).
-- **Correos de soporte:** el tiempo necesario para atender tu consulta y, como máximo, un año desde la última
-  respuesta.
+- **Correos de soporte:** como máximo un año desde el último mensaje de la conversación, en Gmail, en Proton y en
+  Brevo, con una limpieza cada tres meses, salvo que necesitemos conservarlos más tiempo para atender una reclamación.
+  Antes, si nos lo pides (detalle en «Si nos escribes»). Cloudflare conserva su registro técnico del reenvío durante el
+  plazo que fija su servicio, que no hemos podido confirmar; si nos pides la supresión, le trasladaremos también la
+  solicitud y te informaremos del resultado.
 
 ## 7. Tus derechos
 
@@ -149,7 +199,7 @@ Turnly solo se hace cifrada con tu bloqueo de pantalla. El código es público y
 
 ## 10. Cambios en esta política
 
-Si cambia lo que hace la app con los datos, actualizaremos esta página y la fecha de arriba. Si el cambio es
+Si cambia lo que hacemos con los datos, en la app o en el correo de soporte, actualizaremos esta página y la fecha de arriba. Si el cambio es
 importante (por ejemplo, si algún día se añadiera una copia en iCloud o cualquier función que envíe datos, que solo
 se activaría con tu consentimiento), te lo indicaremos también dentro de la app.
 

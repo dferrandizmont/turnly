@@ -169,7 +169,7 @@ void main() {
     }
   }
 
-  testWidgets('on, wide cell: the first line is written beside the number', (
+  testWidgets('on, wide cell: the first line is at the bottom, as on a phone', (
     tester,
   ) async {
     await pumpCalendar(
@@ -184,9 +184,28 @@ void main() {
     expect(tester.widget<Text>(noteText()).data, 'Compra y farmacia');
     // The clip of always gives way to the text.
     expect(cellClip(), findsNothing);
-    // Beside the day number: in the top half of the cell.
+    // The same place as on a phone (iPad QA F4): the foot of the cell, not
+    // beside the day number.
     final box = tester.getRect(cell(noted));
-    expect(tester.getCenter(noteText()).dy, lessThan(box.center.dy));
+    expect(tester.getCenter(noteText()).dy, greaterThan(box.center.dy));
+    expectNoteLineClear(tester, noted, code: 'M', time: '06');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('on, wide cell in landscape: the note is still at the foot', (
+    tester,
+  ) async {
+    await pumpCalendar(
+      tester,
+      size: const Size(1200, 800),
+      prepare: prepare,
+      overrides: withNote(true),
+    );
+    await revealCell(tester, noted);
+
+    expect(noteText(), findsOneWidget);
+    final box = tester.getRect(cell(noted));
+    expect(tester.getCenter(noteText()).dy, greaterThan(box.center.dy));
     expect(tester.takeException(), isNull);
   });
 
@@ -421,6 +440,28 @@ void main() {
     expect(cellClip(), findsNothing);
     expectSameCode(tester, noted, neighbour, 'M');
     expectNoteLineClear(tester, noted, code: 'M', time: '06');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('on, phone, text x3: the note line keeps to x1.3', (
+    tester,
+  ) async {
+    await pumpCalendar(
+      tester,
+      textScale: 3.0,
+      prepare: prepare,
+      overrides: withNote(true),
+    );
+    await revealCell(tester, noted);
+
+    final text = noteText();
+    if (text.evaluate().isNotEmpty) {
+      // A few letters show, not «Q…» (iPhone QA F9).
+      final scaler = tester.widget<Text>(text).textScaler!;
+      expect(scaler.scale(10), lessThanOrEqualTo(13.01));
+    } else {
+      expect(cellClip(), findsOneWidget);
+    }
     expect(tester.takeException(), isNull);
   });
 

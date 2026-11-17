@@ -4038,6 +4038,14 @@
       }
     }
   },
+  "overtimeRateAtMax": "The highest rate is {max}.",
+  "@overtimeRateAtMax": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
   "overtimeTypeOvertime": "Overtime",
   "overtimeTypeOtherWork": "Other job",
   "dayCellOvertime": "+{hours} h",

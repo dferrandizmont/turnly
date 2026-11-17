@@ -2,14 +2,15 @@
   "name": "Turnly",
   "title": "Turnly · Tus turnos, de un vistazo",
   "description": "Calendario de turnos gratuito y de código abierto para quienes trabajan a turnos en España. Sin Pro, sin anuncios, sin cuenta y sin conexión.",
-  "intro": "Calendario de turnos para quienes trabajan a turnos en España (sanidad, policía, bomberos, industria, hostelería o cualquier otro sector): organiza mañanas, tardes, noches, guardias, salientes y días libres, y consulta tu próximo turno de un vistazo. Todo es gratis, sin versión Pro, anuncios ni cuenta, y al cambiar de móvil te llevas tus turnos sin volver a pagar nada.",
+  "intro": "Calendario para quienes trabajan a turnos en España (sanidad, policía, bomberos, industria, hostelería o cualquier otro sector): organiza mañanas, tardes, noches, guardias, salientes y días libres, y consulta tu próximo turno de un vistazo.",
+  "hero_cta": "Descargar gratis",
   "key_facts": "Todo gratis, sin Pro · Sin anuncios · Sin cuenta · Funciona sin conexión · Código abierto · Cinco idiomas",
   "features": [
-    "Tarjeta de hoy con el próximo turno, el próximo día libre y la racha. El mes en cuadrícula o lista, la agenda y el año, con las citas del calendario del móvil junto a tus turnos. Notas por día con fotos, archivos y tareas. Compara hasta seis calendarios y mira qué días libráis a la vez. Bajo el mes, una tira con sus turnos, horas frente al objetivo y próximo libre; tócala para abrir el resumen de ese mes.",
-    "Toca o arrastra para pintar varios días y, con «Añadir otro turno», pon más de uno en el mismo día. Copia, pega, deshaz y rehaz. Asistente de rotaciones con vista previa: correturnos, 24/72, 4×4, 6×4, 5×2, 2-2-3, «2 y 2», «3 y 1» o tu propio patrón, desde el día del ciclo que te toque. En las dos nuevas eliges el turno de trabajo. Desde el detalle de un día puedes iniciar, terminar o retomar tu rotación, con explicación de los cambios y opción de deshacer.",
-    "Un aviso por tipo de turno que suena como un despertador y se programa con un mes de margen, y recordatorios de notas. En Android, seis widgets (hoy, semana, mes, agenda, dos y cuatro semanas) y «Silenciar el móvil en mis turnos», que le devuelve el sonido al acabar. Los widgets de Android muestran extras y salidas anticipadas; el de siete días suma las horas.",
+    "Tu próximo turno y tu próximo día libre en la tarjeta de hoy; el mes en cuadrícula o lista, la agenda y el año, con las citas del calendario del móvil junto a tus turnos. Notas con fotos y tareas, y hasta seis calendarios para ver qué días libráis a la vez.",
+    "Toca o arrastra para pintar varios días, pon más de un turno en el mismo día y deshaz lo que quieras. El asistente de rotaciones aplica la tuya con vista previa: correturnos, 24/72, 4×4, 6×4, 5×2, 2-2-3, «2 y 2», «3 y 1» o tu propio patrón, desde el día del ciclo que te toque.",
+    "Avisos por tipo de turno y recordatorios de notas, programados con 30 días de margen. En Android, el aviso de turno suena como un despertador. En iPhone y iPad es una notificación urgente que no suena con el modo silencio; caben hasta 60 avisos pendientes y se renuevan al abrir la app. En Android, además, seis widgets (hoy, semana, mes, agenda, dos y cuatro semanas) y «Silenciar el móvil en mis turnos», que le devuelve el sonido al acabar.",
     "Copias automáticas que compruebas con «Probar restauración» y, en Android, una al día en la carpeta que elijas (Drive, Dropbox, OneDrive…). Importa copias de Shifter de LRHSoft, .ics, CSV o el calendario del móvil. Con «Mantener al día», tus turnos pasan al calendario del móvil; también puedes guardarlos en un .ics.",
-    "Horas trabajadas, nocturnas y festivas y salidas anticipadas por mes, trimestre, año o las fechas que quieras, con tu objetivo y tu bolsa de horas. Extras por bloques, con tipos y tarifa; eliges si cada tipo cuenta para el objetivo. Precio por hora y pluses fijos, de noche y de festivo: sueldo bruto estimado y neto con tu retención. El Resumen y el informe PDF muestran tu racha más larga de días trabajados seguidos. Informes en PDF y CSV.",
+    "Horas trabajadas, nocturnas, festivas y extra frente a tu objetivo y tu bolsa de horas, por mes, trimestre, año o las fechas que quieras. Sueldo bruto y neto estimado con tu precio por hora, tus pluses y tu retención. Informes en PDF y CSV.",
     "Saldos de vacaciones, moscosos y permisos por año, con los días arrastrados y cuándo caducan. En el libro de cambios apuntas los turnos que cambias con tus compañeros, ves quién debe a quién y los aplicas al calendario.",
     "Festivos de España, con sus comunidades y muchos municipios, y de 40 países más, sin conexión y con los que añadas tú. A tu gusto: formato de hora y de fecha, moneda, diez colores de acento, paletas preparadas para tus turnos e imagen de fondo del calendario."
   ],
@@ -28,7 +29,7 @@
     },
     {
       "question": "¿Cómo me apunto a la prueba de Google Play?",
-      "answer": "Únete al grupo turnly-testers en Google Groups con tu cuenta de Google, acepta la prueba en el enlace de Google Play e instala la app desde la tienda. Se actualizará sola."
+      "answer": "Únete al grupo de pruebas turnly-testers en Google Groups con tu cuenta de Google, acepta la prueba en el enlace de Google Play e instala la app desde la tienda. Se actualizará sola."
     },
     {
       "question": "¿Y en iPhone y iPad?",
@@ -36,65 +37,134 @@
     },
     {
       "question": "¿Cómo paso Turnly a un móvil nuevo?",
-      "answer": "Tienes cuatro formas, y todas son gratis. Paso directo: al configurar el móvil nuevo, copia en él las apps y los datos del viejo por cable o wifi; Turnly pasa con ellas. Copia de Google: con la copia de seguridad de Android activada y un bloqueo de pantalla (PIN, patrón o contraseña), Android guarda Turnly cifrado en tu cuenta de Google y lo recupera al configurar el móvil nuevo con la misma cuenta (Android 9 o posterior). Sin bloqueo de pantalla, Turnly no entra en esa copia. Archivo .turnly: en Ajustes › Copia de seguridad, «Exportar archivo» o «Guardar en el dispositivo»; llévalo al móvil nuevo y ábrelo, o usa «Importar archivo». Copia automática en una carpeta (Android): deja una copia al día en la carpeta que elijas; si esa carpeta está en tu nube o la pasas al móvil nuevo, importa la última. Con el archivo o la carpeta, antes ves qué contiene la copia y nada se sustituye sin que lo confirmes. Las copias que se quedan dentro de la app se pierden si la desinstalas sin otra copia."
+      "answer": [
+        "Lo más sencillo: en el móvil antiguo, abre Ajustes › Copia de seguridad y pulsa «Guardar una copia fuera de Turnly». Guarda el archivo .turnly y llévalo al móvil nuevo; allí instala Turnly y abre el archivo o pulsa «Importar archivo». Verás qué contiene la copia y nada se sustituye sin que lo confirmes.",
+        "Otras formas, todas gratis: al configurar un Android nuevo, el paso directo de apps y datos por cable o wifi, o la copia de Google (Android 9 o posterior, con la copia de seguridad activada y un bloqueo de pantalla: PIN, patrón o contraseña); en Android, también la copia automática diaria en la carpeta que elijas, de la que importas la última; en iPhone, la copia de iCloud o la del ordenador.",
+        "Las copias que solo están dentro de la app se pierden al desinstalarla."
+      ]
     },
     {
       "question": "¿Y si quiero empezar de cero?",
       "answer": "En Ajustes, «Borrar todo y empezar de cero» borra tus calendarios, notas, ausencias y ajustes (solo conserva el idioma) y te lleva al primer uso. Antes guarda una copia de seguridad que puedes restaurar o llevarte a otro sitio."
     }
   ],
-  "licence_text": "Código MIT · Contenido CC BY-SA 4.0",
+  "licence_text": "Licencia MIT · Contenido CC BY-SA 4.0",
   "screenshot_alts": {
     "01-mes": "Mes pintado y tarjeta del próximo turno",
+    "01-mes-oscuro": "Mes pintado y tarjeta del próximo turno",
     "02-lista": "El mismo mes en vista Lista, con códigos y horarios completos",
+    "02-lista-oscuro": "El mismo mes en vista Lista, con códigos y horarios completos",
     "03-pintar": "Modo pintar con la paleta de turnos",
+    "03-pintar-oscuro": "Modo pintar con la paleta de turnos",
     "04-rotaciones": "Asistente de rotaciones: el día del ciclo en el que empiezas, antes de aplicar",
+    "04-rotaciones-oscuro": "Asistente de rotaciones: el día del ciclo en el que empiezas, antes de aplicar",
     "05-horas": "Resumen mensual de horas trabajadas, nocturnas y festivas",
+    "05-horas-oscuro": "Resumen mensual de horas trabajadas, nocturnas y festivas",
     "06-festivos": "Festivos por país, comunidad y municipio",
-    "07-mes-oscuro": "El mismo mes con el tema oscuro",
+    "06-festivos-oscuro": "Festivos por país, comunidad y municipio",
     "08-vacaciones": "Saldos de vacaciones y permisos, con los días que quedan y los arrastrados",
+    "08-vacaciones-oscuro": "Saldos de vacaciones y permisos, con los días que quedan y los arrastrados",
     "09-cambios": "Libro de cambios con el balance de cada compañero y los turnos de cada cambio",
+    "09-cambios-oscuro": "Libro de cambios con el balance de cada compañero y los turnos de cada cambio",
     "10-primer-uso": "Primera pantalla del primer uso, con tres caminos: importar, usar una rotación o pintar a mano",
-    "11-widgets": "Galería «Añadir widget» con tus turnos reales: pequeño, agenda, mediano y más"
+    "10-primer-uso-oscuro": "Primera pantalla del primer uso, con tres caminos: importar, usar una rotación o pintar a mano",
+    "11-widgets": "Galería «Añadir widget» con tus turnos reales: pequeño, agenda, mediano y más",
+    "11-widgets-oscuro": "Galería «Añadir widget» con tus turnos reales: pequeño, agenda, mediano y más"
   },
-  "privacy_date": "2026-11-04",
+  "privacy_date": "2026-11-17",
   "kicker": "Calendario de turnos",
   "tagline": "Tus turnos, de un vistazo.",
   "chip": "Todo gratis: sin Pro, sin anuncios y sin cuenta.",
   "nav_label": "Secciones",
   "theme_label": "Tema",
-  "theme_system": "Sistema",
-  "theme_light": "Claro",
   "theme_dark": "Oscuro",
   "theme_hint": "Cambiar tema",
-  "download_title": "Android en pruebas; iPhone y iPad, en la App Store.",
+  "anim": {
+    "month": "Diciembre",
+    "weekdays": [
+      "L",
+      "M",
+      "X",
+      "J",
+      "V",
+      "S",
+      "D"
+    ],
+    "shifts": {
+      "m": {
+        "code": "M",
+        "name": "Mañana"
+      },
+      "t": {
+        "code": "T",
+        "name": "Tarde"
+      },
+      "n": {
+        "code": "N",
+        "name": "Noche"
+      },
+      "l": {
+        "code": "L",
+        "name": "Libre"
+      },
+      "s": {
+        "code": "S",
+        "name": "Saliente"
+      }
+    },
+    "sequence": "Tu secuencia",
+    "cycle_days": "{n} días",
+    "tonight": "Esta noche",
+    "starts_in": "Empieza en {duration}",
+    "widget_day": "jue 24",
+    "widget_tomorrow": "Mañana",
+    "off_on": "Libras el sábado 26",
+    "unit_h": "h",
+    "hours": {
+      "m": "06–14",
+      "t": "14–22",
+      "n": "22–06"
+    },
+    "night_range": "22:00–06:00"
+  },
+  "download_title": "En la App Store para iPhone y iPad; Android, en pruebas.",
   "download_intro": "Modo claro y oscuro. Gratis y sin cuenta.",
   "download_notes": {
-    "play": "Cualquiera puede apuntarse: primero te unes al grupo de testers y después aceptas la prueba.",
+    "play": "Cualquiera puede apuntarse en tres pasos:",
     "apk": "Lo instalas a mano. Desde la 0.8.3 lleva la misma firma que la versión de Google Play: puedes pasar de una a otra sin desinstalar.",
     "app_store": "Gratis en la App Store, para iPhone y iPad con iOS 17 o posterior."
   },
-  "join_title": "Cómo unirte a la prueba de Google Play",
-  "join_steps": [
-    {
-      "text": "Únete al grupo de testers",
-      "link_text": "turnly-testers",
-      "href": "https://groups.google.com/g/turnly-testers",
-      "after": ". Con tu cuenta de Google, pulsa «Unirse al grupo»."
-    },
-    {
-      "text": "Acepta la prueba desde el móvil o el ordenador:",
-      "link_text": "play.google.com/apps/testing/es.cuadrante.app",
-      "href": "https://play.google.com/apps/testing/es.cuadrante.app",
-      "after": "."
-    },
-    {
-      "text": "Instala la app desde Google Play. Se actualizará sola."
-    }
-  ],
   "screenshots_title": "Pantallas reales",
   "screenshots_intro": "Con datos ficticios, en claro y en oscuro.",
-  "features_title": "Todo abierto, sin Pro ni compras",
+  "screenshots_nav": "Elige una pantalla",
+  "screenshots_prev": "Pantalla anterior",
+  "screenshots_next": "Pantalla siguiente",
+  "screenshots_position": "Pantalla {n} de {total}: {title}",
+  "screenshot_captions": {
+    "01-mes": "Mes",
+    "02-lista": "Lista",
+    "03-pintar": "Pintar",
+    "04-rotaciones": "Aplicar patrón",
+    "05-horas": "Resumen",
+    "06-festivos": "Festivos",
+    "08-vacaciones": "Vacaciones y permisos",
+    "09-cambios": "Libro de cambios",
+    "10-primer-uso": "Bienvenida",
+    "11-widgets": "Añadir widget"
+  },
+  "screenshot_details": {
+    "01-mes": "Consulta tus turnos del mes por color, código y horario. La tarjeta de hoy te dice cuándo empieza tu próximo turno y cuándo libras.",
+    "02-lista": "Cambia a Lista para recorrer el mismo mes día a día. Ves el nombre y el código de cada turno, su horario completo y las horas extra.",
+    "03-pintar": "Elige un turno de la paleta y toca o arrastra por los días para pintarlos. Puedes cambiar el turno, añadir otro o deshacer el último trazo.",
+    "04-rotaciones": "Revisa los turnos, los horarios y la duración de cada bloque de tu ciclo. Puedes añadir bloques antes de continuar.",
+    "05-horas": "Consulta las horas trabajadas y previstas del mes, con el desglose de nocturnas y horas en festivo. También puedes fijar un objetivo de horas.",
+    "06-festivos": "Elige tu país, comunidad y municipio para consultar los festivos de cada año. Puedes añadir un festivo local o traerlos del calendario del móvil.",
+    "08-vacaciones": "Consulta cuántos días te quedan, cuántos has disfrutado y cuántos tienes planificados. Revisa los días arrastrados y su caducidad, o edita tus saldos.",
+    "09-cambios": "Anota cambios de turno con tus compañeros y consulta quién debe turnos a quién. Cada cambio muestra los turnos que cedes o recibes y si sigue pendiente.",
+    "10-primer-uso": "Elige cómo empezar tu cuadrante: importar tus turnos, usar una rotación o pintar a mano. También puedes recuperar una copia de seguridad.",
+    "11-widgets": "Compara los widgets con tus turnos reales y elige el que quieres añadir a la pantalla de inicio de Android: hoy y mañana, agenda o varios días."
+  },
+  "features_title": "Organiza tus turnos y lleva las cuentas",
   "features_intro": "Cada turno lleva color, código y horario, y nunca depende solo del color.",
   "feature_titles": [
     "Mes, agenda y año",

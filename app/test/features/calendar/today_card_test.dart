@@ -161,6 +161,24 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(find.text('Empieza en 3 h 40 min'), findsOneWidget);
     });
+
+    testWidgets('at the largest text the card text stops growing at x1.6', (
+      tester,
+    ) async {
+      // iOS AX3 (1.2.0 QA, iPhone F3): the open card took about 70 % of the
+      // first screen.
+      await pumpCalendar(
+        tester,
+        textScale: 3.1,
+        size: const Size(414, 896),
+        clock: () => DateTime(2026, 10, 19, 18, 20),
+      );
+      expect(tester.takeException(), isNull);
+      final chip = find.text('Empieza en 3 h 40 min');
+      expect(chip, findsOneWidget);
+      final scaler = MediaQuery.textScalerOf(tester.element(chip));
+      expect(scaler.scale(10), closeTo(16, 0.01));
+    });
   });
 
   group('day cell', () {

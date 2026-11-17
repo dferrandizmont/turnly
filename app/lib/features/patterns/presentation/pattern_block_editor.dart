@@ -145,17 +145,24 @@ class _BlockActions extends ConsumerWidget {
       scheduleControllerProvider.select((s) => s.palette),
     );
     final l10n = context.l10n;
-    void apply(PatternBlockEdit edit, {int? openIndex}) {
+    // Taken now: after the sheet closes its own context is gone.
+    final messenger = ScaffoldMessenger.of(context);
+    void apply(
+      PatternBlockEdit edit, {
+      int? openIndex,
+      bool closeSheet = true,
+    }) {
       if (!controller.editBlocks(edit)) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(appSnackBar(content: Text(l10n.patternCycleLimit)));
+        messenger.showSnackBar(
+          appSnackBar(content: Text(l10n.patternCycleLimit)),
+        );
       } else {
         controller.showBlock(
           edit.blocks.isEmpty
               ? null
               : (openIndex ?? index).clamp(0, edit.blocks.length - 1),
         );
-        Navigator.pop(context);
+        if (closeSheet) Navigator.pop(context);
       }
     }
 
@@ -294,12 +301,18 @@ class _BlockActions extends ConsumerWidget {
         _ActionRow(
           key: const ValueKey('block-repeat'),
           onTap: () async {
+            // The sheet closes first: it stayed dimmed behind the dialog until
+            // the dialog was answered (1.2.0 QA, iPad F3). The navigator's own
+            // context outlives the sheet.
+            final navigator = Navigator.of(context);
+            final dialogContext = navigator.context;
+            navigator.pop();
             final times = await showDialog<int>(
-              context: context,
+              context: dialogContext,
               builder: (_) => _RepeatDialog(blocks: blocks, index: index),
             );
-            if (times != null && times > 1 && context.mounted) {
-              apply(repeatFrom(blocks, index, times));
+            if (times != null && times > 1) {
+              apply(repeatFrom(blocks, index, times), closeSheet: false);
             }
           },
           label: l10n.patternRepeatFrom,

@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../l10n/l10n.dart';
@@ -39,10 +42,79 @@ Future<T?> showAppSheet<T>({
 /// Tapping an empty part of the sheet closes the keyboard, and while a
 /// number pad is up (it has no Return key on iOS) a [KeyboardDoneBar] sits
 /// above it (1.1.0 QA, F4). Buttons and fields take their own taps first.
-class AppSheetBody extends StatelessWidget {
+/// The field being typed in is scrolled above the pad and the bar, so the
+/// person never types blind (1.2.0 QA, iPhone F5).
+class AppSheetBody extends StatefulWidget {
   const AppSheetBody({super.key, required this.child});
 
   final Widget child;
+
+  @override
+  State<AppSheetBody> createState() => _AppSheetBodyState();
+}
+
+class _AppSheetBodyState extends State<AppSheetBody> {
+  bool _hadBar = false;
+  BuildContext? _revealed;
+  Timer? _settle;
+
+  @override
+  void dispose() {
+    _settle?.cancel();
+    super.dispose();
+  }
+
+  /// Brings the focused field into view once the bar has made room for
+  /// itself, and again when the keyboard has finished rising.
+  void _reveal(bool bar) {
+    final field = FocusManager.instance.primaryFocus?.context;
+    final fresh = bar && (!_hadBar || !identical(field, _revealed));
+    _hadBar = bar;
+    if (!bar) {
+      _revealed = null;
+      _settle?.cancel();
+      return;
+    }
+    if (!fresh) return;
+    _revealed = field;
+    void show() {
+      final ctx = FocusManager.instance.primaryFocus?.context;
+      if (!mounted || ctx == null || !ctx.mounted) return;
+      final box = ctx.findRenderObject();
+      final scrollable = Scrollable.maybeOf(ctx);
+      if (box is! RenderBox || !box.attached || scrollable == null) return;
+      // The sheet reaches under the keyboard and the Done bar: what is
+      // visible ends above both, with a line of room for a helper or error.
+      final media = MediaQuery.of(context);
+      final visibleBottom =
+          media.size.height -
+          media.viewInsets.bottom -
+          KeyboardDoneBar.height -
+          Sp.xxl;
+      final top = box.localToGlobal(Offset.zero).dy;
+      final bottom = top + box.size.height;
+      var delta = bottom - visibleBottom;
+      if (delta <= 0) return;
+      // Never push the field itself off the top.
+      delta = math.min(delta, top - media.padding.top - Sp.xl);
+      if (delta <= 0) return;
+      final position = scrollable.position;
+      final target = (position.pixels + delta).clamp(
+        position.minScrollExtent,
+        position.maxScrollExtent,
+      );
+      // Reduce motion: the page jumps instead of gliding.
+      if (MediaQuery.disableAnimationsOf(context)) {
+        position.jumpTo(target);
+      } else {
+        position.animateTo(target, duration: Motion.state, curve: Motion.curve);
+      }
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => show());
+    _settle?.cancel();
+    _settle = Timer(const Duration(milliseconds: 400), show);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +131,7 @@ class AppSheetBody extends StatelessWidget {
               inset > 0 &&
               (ModalRoute.of(context)?.isCurrent ?? true) &&
               numberPadHasFocus();
+          _reveal(bar);
           return Stack(
             children: [
               SafeArea(
@@ -70,7 +143,7 @@ class AppSheetBody extends StatelessWidget {
                     Sp.page,
                     Sp.l + inset + (bar ? KeyboardDoneBar.height : 0),
                   ),
-                  child: child,
+                  child: widget.child,
                 ),
               ),
               if (bar)

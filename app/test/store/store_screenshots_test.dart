@@ -88,6 +88,18 @@ const _shots = [
   ('09-cambios', 7, false, true),
   ('10-primer-uso', 8, false, true),
   ('11-widgets', 9, false, true),
+  // Dark twin of each README shot, for the web in dark mode (`-oscuro`).
+  // `07-mes-oscuro` stays as the README's own dark shot.
+  ('01-mes-oscuro', 0, true, false),
+  ('02-lista-oscuro', 1, true, false),
+  ('03-pintar-oscuro', 2, true, false),
+  ('04-rotaciones-oscuro', 3, true, false),
+  ('05-horas-oscuro', 4, true, false),
+  ('06-festivos-oscuro', 5, true, false),
+  ('08-vacaciones-oscuro', 6, true, true),
+  ('09-cambios-oscuro', 7, true, true),
+  ('10-primer-uso-oscuro', 8, true, true),
+  ('11-widgets-oscuro', 9, true, true),
 ];
 // One caption per shot, in the order of [_shots]. Vocabulary from
 // docs/glosario-idiomas.md; ca, gl and eu are pending native review.

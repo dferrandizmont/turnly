@@ -47,6 +47,12 @@ int? parseMultiplier(String text) {
 String rateRangeMessage(BuildContext context) => context.l10n
     .overtimeRateOutOfRange(formatMoneyCents(context, maxHourlyRateCents));
 
+/// «El máximo es 9.999,99 €»: what the rate fields say when the number pad
+/// has no more room (the extra digits are refused, never cut).
+String rateAtMaxMessage(BuildContext context) => context.l10n.overtimeRateAtMax(
+  formatMoneyCents(context, maxHourlyRateCents),
+);
+
 /// The smallest multiplier the form takes: x0,01.
 const int minTypedMultiplierBasisPoints = 100;
 

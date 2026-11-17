@@ -37,9 +37,16 @@
   --v-bar: #30A46C; --v-ink: #1D7A4F; --v-disc: #DAEFE5;
   --s-bar: #8E7CE6; --s-disc: #EBE7FB;
   --l-disc: #F5F5F7;
+  /* Cell tint (10 % of the bar over surface) and the lilac ink of «Saliente», as the app derives them; holiday red. */
+  --m-tint: #FEF6E9; --t-tint: #FEF0EC; --n-tint: #EDEDFA; --s-tint: #F4F2FC; --s-ink: #6A55C8; --hol: #C4262C;
   /* Direction B «Tarjeta de hoy»: swatch 3, chip 6, cell 8, control 10, card 14, screenshot 10. */
   --r-swatch: 3px; --r-chip: 6px; --r-cell: 8px; --r-ctl: 10px; --r-card: 14px; --r-shot: 10px;
+  /* Motion curve «soft»: no overshoot (this page never bounces). cubic-bezier where linear() does not exist. */
+  --soft: cubic-bezier(.25, .8, .35, 1);
   --font: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@supports (transition-timing-function: linear(0, 1)) {
+  :root { --soft: linear(0, 0.06, 0.18, 0.317, 0.451, 0.57, 0.671, 0.752, 0.817, 0.867, 0.904, 0.932, 0.953, 0.967, 0.978, 0.985, 0.99, 0.994, 0.996, 0.998, 0.999, 0.999, 1); }
 }
 /* Dark theme: chosen in the header (data-theme, assets/theme.js) or, with no choice saved, from the system.
    The two blocks below must hold the same values. */
@@ -58,6 +65,7 @@
   --v-bar: #4CC38A; --v-ink: #4CC38A; --v-disc: #24463A;
   --s-bar: #9D8CF0; --s-disc: #3B3657;
   --l-disc: #1E1E25;
+  --m-tint: #342B21; --t-tint: #362526; --n-tint: #212239; --s-tint: #282639; --s-ink: #B3A7F5; --hol: #FF6369;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -74,6 +82,7 @@
     --v-bar: #4CC38A; --v-ink: #4CC38A; --v-disc: #24463A;
     --s-bar: #9D8CF0; --s-disc: #3B3657;
     --l-disc: #1E1E25;
+    --m-tint: #342B21; --t-tint: #362526; --n-tint: #212239; --s-tint: #282639; --s-ink: #B3A7F5; --hol: #FF6369;
   }
 }
 
@@ -119,6 +128,12 @@ img { max-width: 100%; }
 .s-t { --bar: var(--t-bar); --ink: var(--t-ink); --disc: var(--t-disc); }
 .s-n { --bar: var(--n-bar); --ink: var(--n-ink); --disc: var(--n-disc); }
 .s-v { --bar: var(--v-bar); --ink: var(--v-ink); --disc: var(--v-disc); }
+/* The app's cells: tint behind the code, bar underneath. «Libre» has no tint and a neutral bar; «Saliente» is lilac. */
+.s-m { --tint: var(--m-tint); }
+.s-t { --tint: var(--t-tint); }
+.s-n { --tint: var(--n-tint); }
+.s-s { --bar: var(--s-bar); --ink: var(--s-ink); --disc: var(--s-disc); --tint: var(--s-tint); }
+.s-l { --bar: var(--border-strong); --ink: var(--muted); --disc: var(--l-disc); --tint: var(--surface); }
 
 /* Cabecera */
 .top-in { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; min-height: 84px; }
@@ -144,20 +159,20 @@ img { max-width: 100%; }
 }
 .langs a:hover { color: var(--text); }
 .langs a[aria-current="page"] { color: var(--on-accent); background: var(--accent); font-weight: 800; }
-/* Theme toggle: same height as the language switcher. Hidden in the HTML; assets/theme.js shows it. It cycles
-   system -> light -> dark -> system. Its visible text names the theme in use (it is also its accessible name) and
-   the icon follows data-theme on <html>: monitor with no choice, sun for light, moon for dark. */
+/* Theme toggle: the same sun and moon toggle as Gift Huddle and Ink Lab, at the height of the language switcher.
+   Hidden in the HTML; assets/theme.js shows it. It toggles light and dark (aria-pressed = dark is on). The two icons
+   sit on top of each other and the one for the theme in use fades and turns in (no overshoot). */
 .theme-btn {
-  display: flex; align-items: center; justify-content: center; gap: 8px; flex: none; min-width: 52px; height: 52px;
-  padding: 0 14px; background: var(--surface); color: var(--text); border: 1px solid var(--control-border);
-  border-radius: var(--r-ctl); font: inherit; font-weight: 700; font-size: 15px; line-height: 1.2; cursor: pointer;
+  position: relative; display: grid; place-items: center; flex: none; width: 52px; height: 52px; padding: 0;
+  background: var(--surface); color: var(--text); border: 1px solid var(--control-border);
+  border-radius: var(--r-ctl); cursor: pointer;
 }
 .theme-btn[hidden] { display: none; }
 .theme-btn:hover { background: var(--raised); }
-.theme-btn .i-sun, .theme-btn .i-moon { display: none; }
-:root[data-theme="light"] .theme-btn .i-sun { display: block; }
-:root[data-theme="dark"] .theme-btn .i-moon { display: block; }
-:root[data-theme] .theme-btn .i-auto { display: none; }
+.theme-btn .i { grid-area: 1 / 1; transition: opacity .3s var(--soft), transform .525s var(--soft), scale .375s var(--soft); }
+.theme-btn:active .i { scale: .88; }
+.theme-btn .i-moon, :root[data-theme="dark"] .theme-btn .i-sun { opacity: 0; transform: rotate(-70deg) scale(.6); }
+:root[data-theme="dark"] .theme-btn .i-moon { opacity: 1; transform: none; }
 
 /* Botones */
 .btn {
@@ -166,23 +181,26 @@ img { max-width: 100%; }
   font-weight: 800; font-size: 15px; line-height: 1.3; text-align: center; text-decoration: none;
 }
 a.btn:hover { background: var(--text); color: var(--bg); }
-.btn-off { border-style: dashed; border-color: var(--control-border); color: var(--muted); }
+/* The one filled button of the page (the hero's): the app's primary button, accent with its own ink (>= 4.5:1 in both themes). */
+.btn-primary { min-height: 52px; padding: 10px 28px; font-size: 17px; background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+a.btn-primary:hover { background: var(--text); border-color: var(--text); color: var(--bg); }
 
 /* Portada: tarjeta de hoy */
 .today {
   position: relative; margin-top: 12px;
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card);
   box-shadow: inset 0 -6px 0 var(--n-bar);
-  padding: 48px 48px 56px; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 56px; align-items: center;
+  padding: 48px 48px 56px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 56px; align-items: center;
 }
 .t-head { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
 .t-icon { width: 56px; height: 56px; border-radius: var(--r-ctl); display: block; flex: none; }
-.h1 { font-size: clamp(40px, 3.6vw + 26px, 68px); line-height: 1; font-weight: 800; letter-spacing: -0.035em; margin: 0; }
+.h1 { font-size: clamp(40px, 2.4vw + 26px, 60px); line-height: 1; font-weight: 800; letter-spacing: -0.035em; margin: 0; }
 .chip {
-  display: inline-block; margin: 24px 0 20px; padding: 8px 16px; border-radius: var(--r-ctl);
-  background: var(--hl); color: var(--on-hl); font-weight: 800; font-size: 20px; line-height: 1.4;
+  display: inline-block; margin: 24px 0 20px; padding: 6px 14px; border-radius: var(--r-chip);
+  background: var(--hl); color: var(--on-hl); font-weight: 800; font-size: 18px; line-height: 1.4;
 }
 .lede { margin: 0; color: var(--text2); max-width: 600px; font-size: 18px; }
+.cta { margin: 24px 0 0; }
 .keys {
   list-style: none; margin: 22px 0 0; padding: 18px 0 0; border-top: 1px solid var(--border);
   display: flex; flex-wrap: wrap; gap: 6px 18px;
@@ -199,7 +217,7 @@ a.btn:hover { background: var(--text); color: var(--bg); }
 .k-v { background: var(--v-disc); box-shadow: inset 0 -3px 0 var(--v-bar); }
 .k-s { background: var(--s-disc); box-shadow: inset 0 -3px 0 var(--s-bar); }
 .t-shot { margin: 0; width: 300px; border-radius: var(--r-shot); overflow: hidden; border: 1px solid var(--border-strong); }
-.t-shot img, .gallery img { display: block; width: 100%; height: auto; }
+.t-shot img { display: block; width: 100%; height: auto; }
 /* Hero screenshot: one picture per theme; only the one for the theme in use is shown (the dark one is lazy, so a
    hidden one is not downloaded). */
 .t-shot picture { display: block; }
@@ -217,45 +235,124 @@ a.btn:hover { background: var(--text); color: var(--bg); }
 
 /* Descargas */
 .rows { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); padding: 4px 28px; }
-.row { display: grid; grid-template-columns: 240px minmax(0, 1fr) 340px; gap: 28px; align-items: center; padding: 24px 0; }
+.row {
+  display: grid; grid-template-columns: 240px minmax(0, 1fr) 340px; grid-template-areas: "title info act";
+  gap: 28px; align-items: start; padding: 24px 0;
+}
 .row + .row { border-top: 1px solid var(--border); }
+.r-title { grid-area: title; }
+.r-info { grid-area: info; }
+.r-act { grid-area: act; }
 .row h3 { margin: 2px 0 0; font-size: 22px; line-height: 1.25; font-weight: 800; letter-spacing: -0.01em; }
-.state {
-  display: inline-block; margin-bottom: 6px; padding: 2px 10px; border-radius: var(--r-chip);
-  background: var(--raised); color: var(--text); border: 1px solid var(--border-strong);
-  font-size: 13px; font-weight: 800;
-}
 .desc { margin: 0; color: var(--text2); font-size: 15px; }
-.join { margin-top: 20px; }
-.join summary {
-  display: inline-flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer;
-  font-weight: 800; color: var(--text); border-radius: var(--r-ctl); list-style: none;
+/* The common closed-test steps (ol.closed-test-steps) under Google Play's note: visible numbering, links in the accent. */
+.closed-test-steps { margin: 12px 0 0; padding-left: 22px; color: var(--text2); font-size: 15px; }
+.closed-test-steps li { margin: 2px 0; padding-left: 4px; }
+.closed-test-steps li::marker { color: var(--accent); font-weight: 800; }
+.closed-test-steps a { display: inline-flex; align-items: center; min-height: 44px; padding-block: 8px; overflow-wrap: anywhere; }
+/* The action of each row (common macro `download`). The APK is a text button with its state after the name. The two
+   stores are Apple's and Google's own badges, unaltered, one black image for both themes, with the translated state under
+   it inside the same link. Clear space of a quarter of the badge height; Google's PNG has its own transparent margin, so it
+   is 250/168 times taller and pulled in with a negative margin to look as tall as Apple's (see docs/contrato.md). */
+.download-link {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 8px 20px;
+  border: 1.5px solid var(--text); border-radius: var(--r-ctl); color: var(--text); background: transparent;
+  font-weight: 800; font-size: 15px; line-height: 1.3; text-align: center; text-decoration: none;
+  transition: transform .375s var(--soft), border-color .15s, background-color .15s, color .15s;
 }
-.join summary::-webkit-details-marker { display: none; }
-.join summary::before {
-  content: ""; width: 8px; height: 8px; flex: none; margin: 0 4px 0 2px;
-  border-right: 2px solid var(--accent); border-bottom: 2px solid var(--accent); transform: rotate(-45deg);
+.download-link:not(.store-link) { gap: .35em; }
+a.download-link:hover { background: var(--text); color: var(--bg); transform: translateY(-1px); }
+a.download-link:active { transform: scale(.97); }
+span.download-link { border-style: dashed; border-color: var(--control-border); color: var(--muted); }
+.store-link {
+  --badge-height: 44px;
+  flex-direction: column; align-items: flex-start; gap: calc(var(--badge-height) / 4); padding: calc(var(--badge-height) / 4);
+  margin: calc(var(--badge-height) / -4); border: 0; min-height: 0; text-align: left; vertical-align: top; font-weight: 700; color: var(--text2);
 }
-.join[open] summary::before { transform: rotate(45deg); margin-bottom: 4px; }
-.join ol { margin: 4px 0 0; padding-left: 24px; color: var(--text2); }
-.join li { margin: 6px 0; }
-.join a { overflow-wrap: anywhere; }
+a.store-link:hover { background: transparent; color: var(--text); transform: none; }
+.store-badge { display: block; width: auto; max-width: none; flex: none; }
+.store-badge-app-store { height: var(--badge-height); }
+/* Google's PNGs are 646 x 250 with transparent margins that differ by language; the common macro marks each image with
+   -full (the badge fills the width: ca, es, ...) or -inset (a margin on every side: en, eu, gl). The image is scaled so that
+   what shows is as tall as Apple's and pulled in by its own margin (docs/contrato.md). */
+.store-badge-play-full { height: calc(var(--badge-height) * 250 / 192); margin-block: calc(var(--badge-height) * -29 / 192); }
+.store-badge-play-inset { height: calc(var(--badge-height) * 250 / 168); margin: calc(var(--badge-height) * -41 / 168); }
+.store-link .download-state { line-height: 1.5; white-space: nowrap; }
 
-/* Capturas: tira horizontal (carrusel de la dirección A, con los radios de la B) */
-.shots {
-  overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory;
-  background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--r-card);
-  scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent;
+/* Capturas: una pantalla cada vez, la captura a la izquierda y lo que enseña a la derecha (como Ink Lab). Sin JS se
+   listan todas, de dos en dos; assets/site.js añade .tour-on (pestañas, desde 761 px) o .tour-step (una pantalla cada vez, en móvil). */
+.tour-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px 40px; }
+.slide { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 24px; align-items: start; }
+.slide-fig picture { display: block; }
+.slide-fig img { display: block; width: 100%; height: auto; border: 1px solid var(--border-strong); border-radius: var(--r-shot); }
+.slide-txt h3 { margin: 0; font-size: 21px; line-height: 1.3; font-weight: 800; letter-spacing: -0.01em; }
+.slide-txt p { margin: 8px 0 0; max-width: 44ch; color: var(--text2); font-size: 15px; line-height: 1.55; }
+/* Each slide holds the light and the dark capture; only the one for the theme in use is shown (data-theme or, without it,
+   the system), and the hidden one is lazy, so it is not downloaded. */
+.by-l { display: block; }
+.by-d { display: none; }
+:root[data-theme="dark"] .by-l { display: none; }
+:root[data-theme="dark"] .by-d { display: block; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .by-l { display: none; }
+  :root:not([data-theme="light"]) .by-d { display: block; }
 }
-.shots:focus-visible { outline-offset: 4px; }
-.gallery {
-  list-style: none; margin: 0; padding: 0; width: max-content; min-width: 100%;
-  display: grid; grid-auto-flow: column; grid-auto-columns: 220px; gap: 1px; background: var(--border-strong);
+/* Without JS the list is one column up to 900 px (two slides of 200 px + text do not fit side by side below that). */
+@media (max-width: 900px) { .tour-list { grid-template-columns: minmax(0, 1fr); gap: 32px; } }
+/* The common «enlarge» link under each capture: a visible text link with a 44 px touch height, quiet next to the picture. */
+.screenshot-enlarge { display: flex; align-items: center; min-height: 44px; margin-top: 2px; color: var(--accent); font-size: 14px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+/* Wide screens, .tour-on: every capture and every text sits in the same grid cell and only the one in use shows; the
+   selector (tabs) goes under the text. */
+.tour-on { --pw: 300px; display: grid; grid-template-columns: var(--pw) minmax(0, 1fr); grid-template-rows: 1fr auto auto 1fr; column-gap: 72px; }
+.tour-on .tour-list, .tour-on .slide { display: contents; }
+.tour-on .slide-fig { grid-column: 1; grid-row: 1 / -1; width: var(--pw); }
+.tour-on .slide-txt { grid-column: 2; grid-row: 2; align-self: start; }
+.tour-on .slide-txt h3 { font-size: 30px; line-height: 1.2; letter-spacing: -0.02em; }
+.tour-on .slide-txt p { margin-top: 12px; font-size: 17px; line-height: 1.6; }
+.tour-on .slide-fig, .tour-on .slide-txt { opacity: 0; visibility: hidden; transform: translateY(12px); transition: opacity .3s var(--soft), transform .3s var(--soft), visibility 0s linear .3s; }
+.tour-on .slide.is-out > * { transform: translateY(-12px); }
+.tour-on .slide.is-on > * { opacity: 1; visibility: visible; transform: none; transition: opacity .5s var(--soft) .08s, transform .5s var(--soft) .08s, visibility 0s; }
+.tour-nav { grid-column: 2; grid-row: 3; position: relative; display: flex; flex-direction: column; margin-top: 32px; border-top: 1px solid var(--border); }
+.tour-tab {
+  display: flex; align-items: center; gap: 16px; height: 45px; padding: 0 0 0 18px; border: 0; border-bottom: 1px solid var(--border);
+  position: relative; background: none; color: var(--text2); font: inherit; font-size: 15px; font-weight: 600; line-height: 20px; text-align: left; cursor: pointer;
+  transition: color .2s var(--soft);
 }
-.gallery li { background: var(--surface); padding: 12px; scroll-snap-align: start; }
-.gallery figure { margin: 0; }
-.gallery img { border-radius: var(--r-cell); border: 1px solid var(--border); }
-.gallery figcaption { margin-top: 10px; min-height: 54px; font-size: 13px; color: var(--muted); line-height: 1.4; }
+.tour-tab:hover { color: var(--text); }
+.tour-tab[aria-selected="true"] { color: var(--text); font-weight: 800; }
+.tour-tab[aria-selected="true"]::before { content: ""; position: absolute; left: 0; top: 0; bottom: -1px; width: 3px; background: var(--accent); }
+.tour-tab:focus-visible { outline-offset: -3px; }
+.tour-tab .n { flex: none; width: 22px; color: var(--muted); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tour-tab .t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tour-boot, .tour-boot * { transition: none !important; }
+@media (max-width: 960px) { .tour-on { --pw: 260px; column-gap: 48px; } }
+/* Phones, .tour-step: one screen at a time. The capture, then the bar (previous, "3 / 10", next), then the text; the
+   slide and the list vanish from the layout (display: contents) so the three share one grid. Screens not in use are
+   display: none (out of the accessibility tree). Only assets/site.js adds the bar and the live region. */
+.tour-step { display: grid; grid-template-columns: minmax(0, 1fr); }
+.tour-step .tour-list, .tour-step .slide.is-on { display: contents; }
+.tour-step .slide:not(.is-on) { display: none; }
+.tour-step .slide-fig { grid-row: 1; width: min(100%, 264px); justify-self: center; touch-action: pan-y pinch-zoom; }
+.tour-bar { grid-row: 2; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 4px 0 20px; }
+.tour-pos { color: var(--text2); font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+.tour-step-btn {
+  display: grid; place-items: center; flex: none; width: 48px; height: 48px; padding: 0; cursor: pointer;
+  background: var(--surface); color: var(--text); border: 1px solid var(--control-border); border-radius: var(--r-ctl);
+  transition: background-color .15s, opacity .15s, scale .375s var(--soft);
+}
+/* Hover only where there is a pointer that hovers: on a phone it would stay on after the tap. */
+@media (hover: hover) {
+  .tour-step-btn:hover { background: var(--raised); }
+  .tour-step-btn[aria-disabled="true"]:hover { background: var(--surface); }
+}
+.tour-step-btn:active { scale: .92; }
+.tour-step-btn[aria-disabled="true"] { opacity: .38; cursor: default; }
+.tour-step-btn[aria-disabled="true"]:active { scale: 1; }
+.tour-step .slide-txt { grid-row: 3; }
+.tour-step .slide-txt h3 { font-size: 20px; }
+.tour-step .slide-txt p { max-width: none; }
+.tour-anim.tour-step .slide.is-on > * { animation: tour-fade .3s var(--soft) both; }
+@keyframes tour-fade { from { opacity: 0; } to { opacity: 1; } }
 
 /* Funciones: tarjetas con distintivo y barra inferior */
 .fcards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
@@ -329,40 +426,62 @@ a.btn:hover { background: var(--text); color: var(--bg); }
 }
 .idx a:hover { color: var(--text); background: var(--accent-soft); }
 .idx-m { display: none; }
-/* The policy's own title and date line live inside <article>; display: contents lets them sit above the notice
-   and the mobile index without moving any policy text out of order. */
 .doc-main { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
-.doc-main > *, .pol > * { order: 9; max-width: 760px; }
-.pol { display: contents; }
-.doc-kicker { order: 1; }
-.pol > .doc-title { order: 2; font-size: clamp(36px, 2vw + 28px, 52px); line-height: 1.02; letter-spacing: -0.03em; margin: 10px 0 0; color: var(--text); }
-.pol > .stamp { order: 3; margin: 14px 0 0; color: var(--muted); font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums; }
+.doc-main > * { max-width: 760px; }
+.doc-title { font-size: clamp(36px, 2vw + 28px, 52px); line-height: 1.02; letter-spacing: -0.03em; margin: 10px 0 0; color: var(--text); }
+.stamp { margin: 14px 0 0; color: var(--muted); font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums; }
 .notice {
-  order: 4; margin: 24px 0 0; width: 100%; padding: 16px 20px;
+  margin: 24px 0 0; width: 100%; padding: 16px 20px;
   background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--r-card);
   font-size: 15px; color: var(--text2);
 }
 .notice .label { color: var(--muted); margin-bottom: 4px; }
 .notice p { margin: 0; }
 .notice strong { color: var(--text); }
-.pol > .doc-gap { order: 6; height: 32px; margin: 0; }
+.pol { width: 100%; margin-top: 32px; }
 
 /* Texto de la política */
 .pol p { margin: 0 0 16px; color: var(--text2); line-height: 1.7; }
 .pol strong { color: var(--text); }
-.pol h3 { font-size: 26px; line-height: 1.2; font-weight: 800; letter-spacing: -0.015em; margin: 48px 0 14px; color: var(--text); scroll-margin-top: 16px; }
-.pol h4 { font-size: 19px; font-weight: 800; line-height: 1.3; margin: 26px 0 8px; color: var(--text); }
+.pol h2 { font-size: 26px; line-height: 1.2; font-weight: 800; letter-spacing: -0.015em; margin: 48px 0 14px; color: var(--text); scroll-margin-top: 16px; }
+.pol h3 { font-size: 19px; font-weight: 800; line-height: 1.3; margin: 26px 0 8px; color: var(--text); }
 .pol ul, .pol ol { margin: 0 0 16px; padding-left: 22px; color: var(--text2); line-height: 1.7; }
 .pol li { margin-bottom: 8px; }
 .pol blockquote { margin: 0 0 16px; padding: 4px 0 4px 18px; border-left: 3px solid var(--border-strong); }
 .pol code { font-size: 0.92em; background: var(--raised); padding: 1px 5px; border-radius: var(--r-chip); }
 .pol a { overflow-wrap: anywhere; }
+/* Tables: the generator wraps each one in div.table-wrap (role="region", tabindex="0", labelled) and puts data-label on each
+   td. Left-aligned headers, cells at the top, hairline row dividers; the wrapper scrolls sideways and shows its focus. Under
+   561 px the rows stack as small cards, each cell with its label (td::before). */
+.pol .table-wrap { margin: 0 0 20px; overflow-x: auto; scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; border-radius: var(--r-cell); }
+.pol .table-wrap:focus-visible { outline-offset: 2px; }
+.pol table { width: 100%; min-width: 520px; border-collapse: collapse; font-size: 15px; line-height: 1.5; color: var(--text2); }
+.pol th, .pol td { padding: 10px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border); }
+.pol th { color: var(--text); font-weight: 800; border-bottom: 2px solid var(--border-strong); }
+.pol thead th { background: var(--surface-muted); }
+.pol tbody th { font-weight: 700; }
+
+/* Phones: the two drawings keep their seven columns, but a cell no longer shrinks with the card (the code, the hours and the
+   number would collide at 320 px). */
+@media (max-width: 560px) {
+  .vmo .mc { aspect-ratio: auto; min-height: 44px; }
+  .mgrid.mini .mc { aspect-ratio: auto; min-height: 36px; }
+}
+@media (max-width: 560px) {
+  .pol table { min-width: 0; display: block; }
+  .pol thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+  .pol tbody, .pol tr, .pol td { display: block; }
+  .pol tr { margin: 0 0 12px; padding: 4px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-cell); }
+  .pol td { padding: 8px 0; border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }
+  .pol td:last-child { border-bottom: 0; }
+  .pol td::before { content: attr(data-label); display: block; margin-bottom: 2px; color: var(--text); font-size: 13px; font-weight: 800; letter-spacing: 0.02em; }
+}
 
 @media (forced-colors: active) {
   .langs a[aria-current="page"] { outline: 2px solid CanvasText; }
   .today, .fcards li { border-bottom-width: 6px; }
-  .kd, .chip, .state, .skip-link { border: 1px solid CanvasText; }
-  .btn-off { border-color: GrayText; }
+  .kd, .chip, .skip-link { border: 1px solid CanvasText; }
+  span.download-link { border-color: GrayText; }
 }
 
 /* Not enough room for brand, five links, theme toggle and languages in one row (Basque needs about 1180 px): the
@@ -375,8 +494,7 @@ a.btn:hover { background: var(--text); color: var(--bg); }
 }
 
 @media (max-width: 1000px) {
-  .row { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); }
-  .row .btn { grid-column: 1 / -1; }
+  .row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "title act" "info info"; }
   .doc { grid-template-columns: 240px minmax(0, 1fr); gap: 48px; }
 }
 
@@ -399,18 +517,19 @@ a.btn:hover { background: var(--text); color: var(--bg); }
   .nav a:focus-visible { outline-offset: -3px; }
   .today { grid-template-columns: minmax(0, 1fr); padding: 28px 20px 36px; gap: 28px; }
   .t-icon { width: 48px; height: 48px; }
-  .chip { font-size: 17px; margin: 20px 0 16px; }
+  .chip { font-size: 16px; margin: 20px 0 16px; }
   .lede { font-size: 17px; }
   .t-shot { width: 220px; justify-self: center; }
   .sec { padding-top: 72px; }
   .h2 { font-size: 32px; }
   .intro { font-size: 17px; margin-bottom: 24px; }
   .rows { padding: 0 16px; }
-  .row { grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 20px 0; }
-  .row .btn { width: 100%; }
-  .gallery { grid-auto-columns: 150px; }
-  .gallery li { padding: 8px; }
-  .gallery figcaption { font-size: 13px; min-height: 50px; }
+  .row { grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "act" "info"; gap: 12px; padding: 20px 0; }
+  .r-act > .download-link:not(.store-link) { width: 100%; }
+  /* The hero button spans the card's content. */
+  .cta .btn-primary { display: flex; width: 100%; }
+  .slide { grid-template-columns: 128px minmax(0, 1fr); gap: 16px; }
+  .slide-txt h3 { font-size: 19px; }
   .fcards { grid-template-columns: minmax(0, 1fr); gap: 12px; }
   .fcards li { flex-direction: column; gap: 12px; padding: 18px 18px 24px; }
   .band { margin-top: 72px; }
@@ -423,7 +542,7 @@ a.btn:hover { background: var(--text); color: var(--bg); }
   .doc { grid-template-columns: minmax(0, 1fr); gap: 0; padding-top: 20px; }
   .side { display: none; }
   .idx-m {
-    order: 5; display: block; width: 100%; margin: 20px 0 0;
+    display: block; width: 100%; margin: 20px 0 0;
     background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--r-card);
   }
   .idx-m summary {
@@ -438,8 +557,9 @@ a.btn:hover { background: var(--text); color: var(--bg); }
   .idx-m[open] summary::after { transform: rotate(-135deg); margin-bottom: -4px; }
   .idx-m .idx { padding: 0 4px 8px; }
   .idx a { min-height: 44px; }
-  .pol > .doc-title { font-size: 36px; }
-  .pol h3 { font-size: 22px; margin-top: 36px; }
+  .doc-title { font-size: 36px; }
+  .pol { margin-top: 28px; }
+  .pol h2 { font-size: 22px; margin-top: 36px; }
 }
 
 /* Narrow phones: brand and theme toggle on the first row, the language switcher full width below. */
@@ -447,4 +567,206 @@ a.btn:hover { background: var(--text); color: var(--bg); }
   .langs-nav { flex: 1 0 100%; margin-top: 8px; }
   .theme-btn:not([hidden]) + .langs-nav { margin-left: 0; }
   .langs li { flex: 1; }
+}
+
+/* ---- Hero: the card of today, with three cards of the app floating beside the screenshot -----------------------------
+   Everything is decorative (aria-hidden) and made of transform and opacity. The cards come in once, in about 1.4 s, and
+   then stand still (WCAG 2.2.2); the countdown is a fixed example. Without assets/site.js the page is whole; with
+   «reduce motion» nothing moves (end of this file). */
+.today > div:first-child { min-width: 0; }
+.stage { position: relative; padding-left: 196px; }
+.fchips { position: absolute; left: 0; top: 0; bottom: 0; width: 184px; }
+.fc { position: absolute; right: 0; }
+.fc:nth-child(1) { top: 4%; }
+.fc:nth-child(2) { top: 36%; right: 22px; }
+.fc:nth-child(3) { top: 74%; }
+.fcard {
+  position: relative; width: max-content; max-width: 236px; padding: 12px; background: var(--surface); color: var(--text);
+  border: 1px solid var(--border-strong); border-radius: var(--r-cell); box-shadow: 0 10px 24px -14px rgba(21, 21, 26, .45);
+  font-weight: 700; line-height: 1.25; font-variant-numeric: tabular-nums;
+}
+.fb {
+  display: grid; place-items: center; flex: none; min-width: 40px; height: 40px; padding: 0 6px;
+  background: var(--disc); color: var(--ink); border-radius: var(--r-chip); font-size: 18px; font-weight: 800; line-height: 1;
+}
+.fl { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+.fh { font-size: 13px; font-weight: 800; color: var(--text2); }
+/* The today card: badge, label, name and hours, and the amber countdown underneath */
+.fa { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "b l" "b t" "p p"; gap: 2px 12px; align-items: center; }
+.fa .fb { grid-area: b; }
+.fa .fl { grid-area: l; align-self: end; }
+.fa .ft { grid-area: t; align-self: start; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; }
+.fa .ft b { font-size: 18px; font-weight: 800; letter-spacing: -.01em; }
+.cdp {
+  grid-area: p; justify-self: start; margin-top: 8px; padding: 3px 10px; background: var(--hl); color: var(--on-hl);
+  border-radius: var(--r-chip); font-size: 12.5px; font-weight: 800; white-space: nowrap;
+}
+/* The small widget */
+.fw { display: grid; gap: 1px; width: 150px; padding: 12px 14px 14px; }
+.fw .fl { font-size: 12px; letter-spacing: 0; text-transform: none; color: var(--muted); font-weight: 700; }
+.fk { font-size: 34px; font-weight: 800; line-height: 1.05; color: var(--ink); }
+.fw .fh { font-size: 15px; color: var(--text); }
+.fm { font-size: 11.5px; font-weight: 700; color: var(--muted); }
+.fbar { display: block; height: 4px; margin-top: 8px; border-radius: 2px; background: var(--bar); }
+/* The next day off */
+.fo { display: flex; align-items: center; gap: 10px; max-width: 208px; padding: 10px 14px 10px 10px; }
+.fo .fh { color: var(--text); white-space: normal; }
+
+@keyframes tn-rise { from { opacity: 0; transform: translateY(14px); } }
+@keyframes tn-lift { from { transform: translateY(14px); } }
+
+/* Cover: icon, headline, chip, text and facts come in 70 ms apart; the cards after them */
+.today > div:first-child > * { animation: tn-rise .6s var(--soft) both; }
+.today > div:first-child > :nth-child(2) { animation-delay: .07s; }
+.today > div:first-child > :nth-child(3) { animation-delay: .14s; }
+.today > div:first-child > :nth-child(4) { animation-delay: .21s; }
+.today > div:first-child > :nth-child(5) { animation-delay: .28s; }
+.today > div:first-child > :nth-child(6) { animation-delay: .32s; }
+.keys li { animation: tn-rise .525s var(--soft) both; animation-delay: .35s; }
+.keys li:nth-child(2) { animation-delay: .42s; }
+.keys li:nth-child(3) { animation-delay: .49s; }
+.keys li:nth-child(4) { animation-delay: .56s; }
+.keys li:nth-child(5) { animation-delay: .63s; }
+.keys li:nth-child(n + 6) { animation-delay: .7s; }
+.t-shot { animation: tn-lift .7s var(--soft) .1s both; }
+.fcard { animation: tn-rise .6s var(--soft) .5s both; }
+.fc:nth-child(2) .fcard { animation-delay: .65s; }
+.fc:nth-child(3) .fcard { animation-delay: .8s; }
+
+/* ---- Features: the month fills and the pattern repeats (data-play: they play once, when they come into view) -------- */
+.fcards .fwide { grid-column: 1 / -1; display: grid; grid-template-columns: 48px minmax(0, 1fr) minmax(0, 400px); column-gap: 18px; align-items: start; }
+.fwide .viz { margin-left: 14px; }
+.viz {
+  container-type: inline-size; width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--r-cell); font-variant-numeric: tabular-nums; user-select: none; -webkit-user-select: none;
+}
+.viz-title { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 8px; color: var(--text); font-size: max(16px, 5.2cqw); font-weight: 800; letter-spacing: -.01em; line-height: 1.2; }
+.viz-title small { color: var(--muted); font-size: 13px; font-weight: 700; letter-spacing: 0; }
+.viz-wk, .mgrid, .pstrip { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1.6cqw; }
+.viz-wk { margin-bottom: 1.6cqw; }
+.viz-wk span { text-align: center; color: var(--muted); font-size: max(10px, 3cqw); font-weight: 700; line-height: 1.2; }
+.mc { position: relative; display: block; aspect-ratio: 1 / 1.08; border-radius: var(--r-chip); overflow: hidden; background: var(--surface-muted); }
+.mc::before { content: ""; position: absolute; inset: 0; background: var(--tint); }
+.mc::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1.7cqw; background: var(--bar); transform-origin: 50% 100%; }
+.mc.s-x::before, .mc.s-x::after { display: none; }
+.mc-n {
+  position: absolute; z-index: 2; top: .9cqw; left: 1.3cqw; right: 1.3cqw; display: flex; justify-content: space-between; align-items: center;
+  color: var(--text2); font-size: max(9px, 2.9cqw); font-weight: 700; line-height: 1;
+}
+.s-x .mc-n { color: var(--muted); }
+.hol .mc-n { color: var(--hol); }
+.hol .mc-n::after { content: ""; width: max(4px, 1.4cqw); height: max(4px, 1.4cqw); border-radius: 50%; background: var(--hol); }
+.mc-k { position: absolute; z-index: 1; left: 0; right: 0; top: 33%; text-align: center; color: var(--ink); font-size: max(14px, 4.7cqw); font-weight: 800; line-height: 1; }
+.mc-k.long { font-size: max(11px, 3.4cqw); }
+.s-l .mc-k, .s-s .mc-k { top: 38%; }
+.mc-t { position: absolute; z-index: 1; left: 0; right: 0; bottom: 2.9cqw; text-align: center; color: var(--ink); font-size: max(7px, 2.2cqw); font-weight: 700; line-height: 1; }
+.mc-r { position: absolute; z-index: 3; inset: 0; border: max(2px, .6cqw) solid var(--ring); border-radius: var(--r-chip); }
+.d0 { --d: 0; } .d1 { --d: 1; } .d2 { --d: 2; } .d3 { --d: 3; } .d4 { --d: 4; } .d5 { --d: 5; }
+.d6 { --d: 6; } .d7 { --d: 7; } .d8 { --d: 8; } .d9 { --d: 9; } .d10 { --d: 10; }
+.r0 { --r: 0; } .r1 { --r: 1; } .r2 { --r: 2; } .r3 { --r: 3; } .r4 { --r: 4; }
+.c0 { --c: 0; } .c1 { --c: 1; } .c2 { --c: 2; } .c3 { --c: 3; } .c4 { --c: 4; } .c5 { --c: 5; } .c6 { --c: 6; }
+.c7 { --c: 7; } .c8 { --c: 8; } .c9 { --c: 9; } .c10 { --c: 10; } .c11 { --c: 11; }
+
+/* 1. The month fills in a diagonal wave from the top left; today gets its ring once, when the wave reaches it */
+.vmo .mc::before { animation: mo-tint .55s var(--soft) calc(.25s + var(--d, 0) * .1s) backwards; }
+.vmo .mc::after { animation: mo-bar .5s var(--soft) calc(.3s + var(--d, 0) * .1s) backwards; }
+.vmo .mc-k, .vmo .mc-t { animation: mo-code .5s var(--soft) calc(.4s + var(--d, 0) * .1s) backwards; }
+.vmo .mc-r { animation: mo-ring .7s var(--soft) calc(.8s + var(--d, 0) * .1s) backwards; }
+@keyframes mo-tint { from { opacity: 0; } }
+@keyframes mo-bar { from { transform: scaleY(0); } }
+@keyframes mo-code { from { opacity: 0; transform: translateY(5px); } }
+@keyframes mo-ring { from { opacity: 0; transform: scale(.72); } }
+
+/* 2. A real rotation of the catalogue (2-2-2-6, 12 days) comes in and is copied along the month, cycle after cycle:
+   r is the copy of the cycle, c the day of the cycle */
+.vpa .viz-title { margin-bottom: 14px; }
+.pstrip { margin: 0 0 3cqw; outline: 1.5px solid var(--accent); outline-offset: 1.3cqw; border-radius: 1px; }
+.pb { display: grid; place-items: center; aspect-ratio: 1 / .8; background: var(--disc); color: var(--ink); border-radius: var(--r-chip); font-size: max(13px, 4.2cqw); font-weight: 800; line-height: 1; animation: pa-in .5s var(--soft) calc(.1s + var(--c, 0) * .07s) backwards; }
+.mini .mc { aspect-ratio: 1 / .78; animation: pa-copy .6s var(--soft) calc(1.2s + var(--r, 0) * .5s + var(--c, 0) * .04s) backwards; }
+.mini .mc::after { height: 1.3cqw; }
+.mini .mc-k { top: 30%; font-size: max(12px, 4cqw); }
+.mini .mc-k.long { font-size: max(10px, 3cqw); }
+.mini .mc-n { top: .7cqw; font-size: max(8px, 2.5cqw); }
+@keyframes pa-in { from { opacity: 0; transform: translateY(8px); } }
+@keyframes pa-copy {
+  0% { opacity: 0; transform: translateY(-6cqw); }
+  35% { opacity: 1; }
+}
+
+/* Scroll: with JS (assets/site.js) what is below the fold comes in when reached. Without JS nothing is hidden. */
+.reveal:not(.in) { opacity: 0; }
+.reveal.in { animation: tn-rise .6s var(--soft) backwards; }
+.reveal.stagger:not(.in) { opacity: 1; }
+.reveal.stagger:not(.in) > * { opacity: 0; }
+.reveal.stagger.in { animation: none; }
+.reveal.stagger.in > * { animation: tn-rise .525s var(--soft) backwards; }
+.reveal.stagger.in > :nth-child(2) { animation-delay: .07s; }
+.reveal.stagger.in > :nth-child(3) { animation-delay: .14s; }
+.reveal.stagger.in > :nth-child(4) { animation-delay: .21s; }
+.reveal.stagger.in > :nth-child(5) { animation-delay: .28s; }
+.reveal.stagger.in > :nth-child(6) { animation-delay: .35s; }
+.reveal.stagger.in > :nth-child(n + 7) { animation-delay: .42s; }
+/* Drawings that have not come into view stand still on their first frame */
+.arm:not(.on), .arm:not(.on) *, .arm:not(.on) *::before, .arm:not(.on) *::after { animation-play-state: paused !important; }
+
+/* Small touches: buttons lift a hair, screenshots rise on hover, answers slide in */
+.btn { transition: transform .375s var(--soft), border-color .15s, background-color .15s, color .15s; }
+a.btn:hover { transform: translateY(-1px); }
+a.btn:active { transform: scale(.97); }
+.qa details[open] > p { animation: tn-rise .5s var(--soft) both; }
+
+/* Theme change: theme.js puts .theme-anim on <html> for ~400 ms when the button is pressed (not on load), so colours fade. */
+:root.theme-anim body, :root.theme-anim *, :root.theme-anim *::before, :root.theme-anim *::after {
+  transition: background-color .32s ease, color .32s ease, border-color .32s ease, box-shadow .32s ease, fill .32s ease, stroke .32s ease, outline-color .32s ease, transform .375s var(--soft), opacity .3s var(--soft);
+}
+:root.theme-anim .theme-btn .i { transition: opacity .3s var(--soft), transform .525s var(--soft), scale .375s var(--soft); }
+
+/* Tablets and phones: the cards become a row under the screenshot, and the two drawings go under their text */
+@media (max-width: 1180px) {
+  .today { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .stage { padding-left: 0; width: 100%; max-width: 640px; justify-self: center; display: flex; flex-direction: column; }
+  .t-shot { margin-inline: auto; }
+  .fchips { position: static; width: auto; order: 2; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 18px; }
+  .fc, .fc:nth-child(n) { position: static; flex: 1 1 190px; max-width: 300px; animation: none; }
+  .fcard, .fw { width: 100%; max-width: none; }
+}
+@media (max-width: 1000px) {
+  .fcards .fwide { grid-template-columns: 48px minmax(0, 1fr); }
+  .fwide .viz { grid-column: 2; margin: 14px 0 0; max-width: 440px; }
+}
+@media (max-width: 760px) {
+  .fcards .fwide { display: flex; }
+  .fwide .viz { margin: 4px 0 0; max-width: none; }
+}
+/* On phones the cards would only stack under the screenshot and add height. */
+@media (max-width: 760px) {
+  .fchips { display: none; }
+}
+
+@media (forced-colors: active) {
+  .fcard, .viz { border: 1px solid CanvasText; }
+  .theme-btn, .tour-step-btn { border-color: ButtonText; }
+  .tour-step-btn[aria-disabled="true"] { color: GrayText; border-color: GrayText; opacity: 1; }
+}
+/* The common pause rule (contract): any loop marked data-loop can be held by the visitor. Turnly has no loops left (the cards
+   come in once, the drawings play once), so there is no pause button; the rule stays in case one is added. */
+.loops-paused [data-loop], .loops-paused [data-loop] * { animation-play-state: paused !important; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .reveal:not(.in), .reveal.stagger:not(.in) > * { opacity: 1; }
+}
+@media print {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .reveal:not(.in), .reveal.stagger:not(.in) > * { opacity: 1; }
+  /* The screenshots: every one listed in normal flow, nothing hidden or clipped, no selector. */
+  .tour-nav { display: none !important; }
+  .tour-bar { display: none !important; }
+  .tour-on, .tour-step, .tour-step .tour-list, .tour-on .tour-list { display: grid; }
+  .tour-on, .tour-step { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; column-gap: 0; }
+  .tour-step .tour-list, .tour-on .tour-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; margin: 0; padding: 0; overflow: visible; }
+  .tour-on .slide, .tour-step .slide, .tour-step .slide:not(.is-on), .tour-step .slide.is-on { display: grid !important; grid-template-columns: 128px minmax(0, 1fr); gap: 16px; break-inside: avoid; }
+  .tour-on .slide-fig, .tour-on .slide-txt, .tour-step .slide-fig, .tour-step .slide-txt { grid-column: auto; grid-row: auto; width: auto; opacity: 1 !important; visibility: visible !important; transform: none !important; }
+  .tour-on .slide.is-out > *, .tour-on .slide.is-on > * { transform: none !important; }
+  .tour-on .slide-txt h3, .tour-step .slide-txt h3 { font-size: 19px; line-height: 1.3; letter-spacing: 0; }
+  .tour-on .slide-txt p, .tour-step .slide-txt p { margin-top: 8px; font-size: 15px; line-height: 1.55; }
 }

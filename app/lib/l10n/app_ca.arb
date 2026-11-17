@@ -4046,6 +4046,7 @@
   "widgetSevenDayHours": "7 dies: {duration}",
   "keyboardDone": "Fet",
   "overtimeRateOutOfRange": "Escriu un preu per hora entre 0 i {max}.",
+  "overtimeRateAtMax": "El màxim és {max}.",
   "backupUiPreviewOvertime": "Blocs d’hores extra",
   "dayCellOvertimeClock": "+{time}",
   "settingsRateTitle": "Valora Turnly",

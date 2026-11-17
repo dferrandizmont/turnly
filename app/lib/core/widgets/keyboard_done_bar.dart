@@ -24,25 +24,40 @@ class KeyboardDoneBar extends StatelessWidget {
   /// Its height: one touch target.
   static const double height = Sp.x3 + Sp.l;
 
+  /// The word keeps up to this text scale. The bar is one fixed touch target
+  /// above the keyboard: at the largest accessibility sizes the word was cut
+  /// by the top edge of the keyboard and the taps missed (1.2.0 QA, F4).
+  static const double maxTextScale = 1.3;
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    return Material(
-      color: colors.surface,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          border: Border(top: BorderSide(color: colors.border)),
-        ),
-        child: SizedBox(
-          height: height,
-          child: Align(
-            alignment: AlignmentDirectional.centerEnd,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: Sp.s),
-              child: TextButton(
-                key: const ValueKey('keyboard-done'),
-                onPressed: () => FocusManager.instance.primaryFocus?.unfocus(),
-                child: Text(context.l10n.keyboardDone),
+    final scaler = MediaQuery.textScalerOf(context)
+        .clamp(maxScaleFactor: maxTextScale);
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(textScaler: scaler),
+      child: Material(
+        color: colors.surface,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border(top: BorderSide(color: colors.border)),
+          ),
+          child: SizedBox(
+            height: height,
+            child: Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: Sp.s),
+                child: TextButton(
+                  key: const ValueKey('keyboard-done'),
+                  style: TextButton.styleFrom(
+                    minimumSize: const Size(Sp.touch * 2, height),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  onPressed: () =>
+                      FocusManager.instance.primaryFocus?.unfocus(),
+                  child: Text(context.l10n.keyboardDone),
+                ),
               ),
             ),
           ),

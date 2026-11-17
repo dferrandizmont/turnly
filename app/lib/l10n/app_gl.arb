@@ -4046,6 +4046,7 @@
   "widgetSevenDayHours": "7 días: {duration}",
   "keyboardDone": "Feito",
   "overtimeRateOutOfRange": "Escribe un prezo por hora entre 0 e {max}.",
+  "overtimeRateAtMax": "O máximo é {max}.",
   "backupUiPreviewOvertime": "Bloques de horas extra",
   "dayCellOvertimeClock": "+{time}",
   "settingsRateTitle": "Valorar Turnly",

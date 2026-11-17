@@ -10,6 +10,25 @@ at once, so they can skip numbers.
 
 ## Unreleased
 
+## 1.2.1 · 2026-11-17
+
+iPhone and iPad update (App Store build 6) that fixes the large-text and iPad layout problems found while testing 1.2.0, plus the new website and privacy policy. Your data is not touched.
+
+- Fixed (iPhone and iPad): in "Create my own", a block you add now scrolls up above the "Add a block" shifts, with its − / + buttons and "Other number" in view.
+- Fixed (iPhone and iPad): with very large text the shifts to add no longer take half the screen: they scroll with your blocks instead of staying pinned, and there is a little room above "Add a block".
+- Fixed (iPhone): with very large text the "Today" card no longer grows past a comfortable size, so the month grid starts higher on the screen.
+- Fixed (iPhone): the "Done" bar above the number pad keeps its word whole at very large text, and a tap on it closes the keyboard.
+- Fixed (iPhone): when you type an amount in an overtime sheet, the field now scrolls above the number pad so you can see what you type.
+- Changed: typing more digits than an hourly rate allows now says what the highest rate is, instead of silently ignoring the extra digits.
+- Changed (iPhone and iPad): the overtime start and end times use the iOS time wheel instead of the round Android clock.
+- Fixed (iPhone): the title of "Discard the sequence?" and similar questions no longer breaks a word in two at very large text.
+- Changed: with "Show the note in the month" on, the note now sits at the bottom of the day on every screen size and orientation (on iPad landscape it used to sit beside the day number), and at very large text a few letters of it show instead of one.
+- Changed (iPad): the "Your cycle" strip fades at the edge where more days wait, so it is clear that it scrolls.
+- Fixed: "Repeat from here…" in a block's menu now closes the menu before the question appears, instead of leaving it dimmed behind.
+- Website on phones: the screenshots now show one at a time, with previous and next buttons and a "3 / 10" counter (they used to be a sideways row with the next one cut off), and the hero "Download for free" button spans the full width of its card.
+- Website: a "Download for free" button at the top; the App Store comes first; official App Store and Google Play badges, with three steps explaining how to join the Google Play test; the screenshots are now a tour, one screen at a time with what it does beside it; the alarms card now tells the platforms apart (an alarm clock on Android; on iPhone and iPad a time-sensitive notification that stays quiet in silent mode, up to 60 pending); shorter feature cards with the right icons; link previews without broken accented letters; and a tidier privacy page (heading order, readable table). The privacy policy (17 November 2026) now explains how support email travels: Cloudflare forwards it, it is read and answered in Gmail, a copy goes to Proton, and replies go out through Brevo, which adds an open pixel and click links in anonymous mode.
+- Website: motion on the home page, quiet and switched off with "Reduce motion": the next-shift cards slide in beside the screenshot and then stay still (hidden on phones), with the same start time as the screenshot, the month fills with its shifts and today's ring, and a real rotation (the 2-2-2-6, with morning, afternoon, night, post-night and off days) is copied along the month, cycle after cycle. The theme button is now the same sun and moon as on the other sites, and the screenshots follow the theme: light ones in light mode and dark ones in dark mode.
+
 ## 1.2.0 · 2026-11-16
 
 iPhone and iPad update (App Store build 5) with everything from 0.10.1, 0.11.0 and 0.11.1: long rotations built in blocks, the "Weeks per shift" template, choosing your cycle day and previewing whole months, notes shown in the month on iPhone, "Rate Turnly" in Settings and the large-text and number-field fixes found in the 1.1.0 test. Your existing data carries over unchanged.

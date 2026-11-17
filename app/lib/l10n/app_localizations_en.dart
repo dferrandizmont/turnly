@@ -7458,6 +7458,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String overtimeRateAtMax(String max) {
+    return 'The highest rate is $max.';
+  }
+
+  @override
   String get overtimeTypeOvertime => 'Overtime';
 
   @override

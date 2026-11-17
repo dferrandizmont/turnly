@@ -1,6 +1,6 @@
 # Turnly privacy policy
 
-Last updated: 13 November 2026
+Last updated: 17 November 2026 · version 2026-11-17
 
 Courtesy translation. The Spanish version ([politica-privacidad.md](politica-privacidad.md)) is the one that
 applies.
@@ -11,11 +11,11 @@ or endorsed by any company, public body or union.
 Summary: **you have no account, there is no server of ours and your shifts stay on your phone.** The app is entirely
 free and open source, and sends no data or crash reports to anyone. The only things that can take your data off the
 phone are the backups of your Google or Apple account and the files or calendars you choose to export, and you
-control those.
+control those. If you email us, the providers explained in “If you write to us” are involved in handling that email.
 
 ## 1. Data controller
 
-- Holder: Daniel Mont Ferrandiz
+- Controller: Daniel Mont Ferrandiz
 - Contact email: turnly@mainshai.com
 
 ## 2. What data is processed
@@ -88,16 +88,46 @@ If you tap "Privacy policy" in Settings › Help, this page opens in your extern
 the website; Turnly sends it none of your shifts, notes or absences.
 
 ### Data NOT processed
-- We do not ask for or store your name, email, phone, ID number, date of birth or employer details.
-- No analytics, no ads, no personalised advertising, no cross-app tracking.
+- The app does not ask for or store your name, email, phone, ID number, date of birth or employer details.
+- In the app and on the website there are no analytics, no ads, no personalised advertising and no cross-app
+  tracking. Support email has its own section (“If you write to us”).
 - We do not access your location, contacts, photos, camera or microphone.
 - We do not receive your shifts, notes, absences or hours.
 
 ### If you write to us
 "Help and contact" (Settings) shows you the support address to copy so you can write from your own mail app, with
-the app version if you want to attach it. The app opens no mail client and sends nothing by itself. If you write to
-us, we process your email address and what you tell us only to reply. Do not send us `.turnly` or `.cuadrante` backups or
-screenshots with real shifts, notes or absences: made-up data is enough to fix a bug.
+the app version if you want to attach it. The app opens no mail client and sends nothing by itself. Do not send us
+`.turnly` or `.cuadrante` backups or screenshots with real shifts, notes or absences: made-up data is enough to fix a
+bug.
+
+If you write to turnly@mainshai.com (or to dev@mainshai.com, the address of the first versions), we use your email
+address, your name if you give it and what you tell us, only to reply and deal with your question. These providers are involved along the way:
+
+- **Cloudflare** (Cloudflare, Inc., United States) receives the message at our domain and forwards it straight away.
+  It does not keep the message, but it does keep a technical log of the forwarding (sender, recipient, subject, date
+  and result). It keeps that log for the period its
+  service sets; we have not been able to confirm that period or the options for deleting the log. If you ask us to
+  delete your data, we will also pass the request on to Cloudflare and tell you the result. Cloudflare also
+  processes the email in the United States.
+- **Google** (Gmail; Google Ireland Limited) is the mailbox where we read your message, answer you and keep the
+  conversation. Google may also process this data in the United States.
+- **Proton** (Proton AG, Switzerland) keeps a copy of the messages we receive, as a backup. We do not reply from it.
+- **Brevo** (Sendinblue SAS, trading as Brevo, France) sends our replies, so it processes their content, and keeps a
+  log of each message sent (recipient, subject, date and whether it was delivered) and a copy of the reply (which may
+  include your message, if it is quoted below it). Brevo also adds to each reply an invisible image (a pixel) that
+  records whether you open it, and replaces the links with its own, which record whether you click them. We cannot
+  remove this on the plan we use, so we have turned on Brevo's anonymous tracking: according to Brevo, it counts opens
+  and clicks without linking them to your email address. Even so, when the image loads or you click a link, your mail
+  program connects to Brevo's servers, which receive technical data such as your IP address. We do not look at or use
+  that information. If you prefer to avoid it, block external images in your mail program and do not open the links in
+  the reply. Copying them and pasting them into your browser does not help either, because they still go through
+  Brevo: to go to a page, type its address yourself. The reply reads just the same.
+
+We keep the conversation in Gmail, the copy in Proton, and the copy and the delivery log in Brevo for at most one year
+after the last message of the conversation, unless we need to keep them longer to deal with a complaint or
+claim. We run a clean-up every three months, and each one deletes whatever would turn one year old before the next clean-up. If we
+stop using one of those services, we delete what is in it. If you ask us to delete your messages sooner, we delete
+them from all three.
 
 ## 3. Purposes and legal basis
 
@@ -105,25 +135,44 @@ screenshots with real shifts, notes or absences: made-up data is enough to fix a
 |---|---|---|
 | Shifts, notes, absences and settings on your phone | Keeping your roster, hours and alarms | We do not receive them: they stay on your device, under your control |
 | Backups and exports | Not losing your data and changing phones | You make them; the services you use (Google, Apple, your cloud) have their own terms |
-| Support emails | Answering your query | Your request and our legitimate interest in handling it (art. 6(1)(f)) |
+| Support emails | Answering your query and keeping the conversation for the period in “Retention” | Your request and our legitimate interest in handling it (art. 6(1)(f)) |
 
 We make no automated decisions and build no profiles about you.
 
 ## 4. Who receives the data
 The app transmits no data to third parties. If you rate the app in the store, Google or Apple receives your rating and
-review directly, not us. If you send a support email, the holder receives it at turnly@mainshai.com
-through the mail service you choose. If you export to a synced calendar or have system backup on, the recipient of
-that data is your account provider (Google, Apple or another), on your behalf and under its terms.
+review directly, not us. If you export to a synced calendar or have system backup on, the recipient of that data is
+your account provider (Google, Apple or another), on your behalf and under its terms.
+
+If you write to us, the support email goes through these providers (details in “If you write to us”):
+
+| Provider | What for | Where |
+|---|---|---|
+| Cloudflare, Inc. | Receiving and forwarding support email; technical forwarding log | United States |
+| Google Ireland Limited (Gmail) | Support mailbox | Ireland; Google LLC may process data in the United States |
+| Proton AG | Backup copy of the email received | Switzerland |
+| Sendinblue SAS (Brevo), RCS Paris 498 019 298 | Sending the replies; delivery log and copy of the reply (at most one year after the last message, with a quarterly clean-up); open pixel and click links, with Brevo's anonymous tracking turned on | EU (France) |
+
+We use an ordinary Gmail account, with no data processing agreement with Google: Google processes those emails under
+its own terms.
 
 ## 5. International transfers
-The app makes no data transfers. External services you decide to use (mail, cloud, synced calendar, the destination
-of an export or the store where you rate the app) are governed by their own terms.
+The app makes no data transfers. External services you decide to use (your mail, cloud, synced calendar, the
+destination of an export or the store where you rate the app) are governed by their own terms.
+
+For support email, Cloudflare and Google may process data in the United States. Cloudflare, Inc. and Google LLC are certified under the EU-U.S. Data Privacy Framework (European Commission adequacy decision of 10 July 2023); Cloudflare's data
+processing agreement also includes standard contractual clauses. Proton is in Switzerland, which is covered by a European Commission adequacy decision. Brevo is a French company and, according to its documentation, hosts
+the data in the European Union.
 
 ## 6. Retention
 
 - **Data on your phone:** until you uninstall the app or clear its data from the system settings (and, where
   relevant, from your account's backups and the files you exported).
-- **Support emails:** as long as needed to handle your query and at most one year after the last reply.
+- **Support emails:** at most one year after the last message of the conversation, in Gmail, in Proton and in Brevo,
+  with a clean-up every three months, unless we need to keep them longer to deal with a complaint or claim. Sooner if
+  you ask us to (details in “If you write to us”). Cloudflare keeps its technical forwarding log for the period its
+  service sets, which we have not been able to confirm; if you ask us to delete your data, we will also pass the
+  request on to it and tell you the result.
 
 ## 7. Your rights
 
@@ -148,7 +197,7 @@ encrypted with your screen lock. The code is public and anyone can check what it
 
 ## 10. Changes to this policy
 
-If what the app does with data changes, we will update this page and the date above. If the change is significant
+If what we do with data changes, in the app or in support email, we will update this page and the date above. If the change is significant
 (for example, if an iCloud backup or any feature that sends data were ever added, which would only be enabled with
 your consent), we will also tell you inside the app.
 

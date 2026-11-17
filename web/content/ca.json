@@ -2,14 +2,15 @@
   "name": "Turnly",
   "title": "Turnly · Els teus torns, d’un cop d’ull",
   "description": "Calendari de torns gratuït i de codi obert per a qui treballa a torns a Espanya. Sense Pro, sense anuncis, sense compte i sense connexió.",
-  "intro": "Calendari de torns per a qui treballa a torns a Espanya (sanitat, policia, bombers, indústria, hostaleria o qualsevol altre sector): organitza matins, tardes, nits, guàrdies, sortints i dies lliures, i consulta el teu proper torn d’un cop d’ull. Tot és gratis, sense versió Pro, anuncis ni compte, i quan canvies de mòbil t’emportes els teus torns sense tornar a pagar res.",
+  "intro": "Calendari per a qui treballa a torns a Espanya (sanitat, policia, bombers, indústria, hostaleria o qualsevol altre sector): organitza matins, tardes, nits, guàrdies, sortints i dies lliures, i consulta el teu proper torn d’un cop d’ull.",
+  "hero_cta": "Descarrega gratis",
   "key_facts": "Tot gratis, sense Pro · Sense anuncis · Sense compte · Funciona sense connexió · Codi obert · Cinc idiomes",
   "features": [
-    "Targeta d’avui amb el proper torn, el proper dia lliure i la ratxa. El mes en quadrícula o llista, l’agenda i l’any, amb les cites del calendari del mòbil al costat dels teus torns. Notes per dia amb fotos, fitxers i tasques. Compara fins a sis calendaris i mira quins dies teniu lliures alhora. Sota el mes, una franja amb els torns, les hores respecte de l’objectiu i el proper dia lliure; toca-la per obrir el resum d’aquell mes.",
-    "Toca o arrossega per pintar diversos dies i, amb «Afegeix un altre torn», posa’n més d’un al mateix dia. Copia, enganxa, desfés i refés. Assistent de rotacions amb vista prèvia: torns rotatius, 24/72, 4×4, 6×4, 5×2, 2-2-3, «2 i 2», «3 i 1» o el teu propi patró, des del dia del cicle que et toqui. En les dues noves tries el torn de treball. Des del detall d’un dia pots iniciar, acabar o reprendre la rotació, amb una explicació dels canvis i l’opció de desfer.",
-    "Un avís per tipus de torn que sona com un despertador i es programa amb un mes de marge, i recordatoris de notes. A Android, sis widgets (avui, setmana, mes, agenda, dues i quatre setmanes) i «Silencia el mòbil durant els meus torns», que li torna el so quan acabes. Els widgets d’Android mostren extres i sortides anticipades; el de set dies suma les hores.",
+    "El teu proper torn i el proper dia lliure a la targeta d’avui; el mes en quadrícula o llista, l’agenda i l’any, amb les cites del calendari del mòbil al costat dels teus torns. Notes amb fotos i tasques, i fins a sis calendaris per veure quins dies teniu lliures alhora.",
+    "Toca o arrossega per pintar diversos dies, posa més d’un torn al mateix dia i desfés el que vulguis. L’assistent de rotacions aplica la teva amb vista prèvia: torns rotatius, 24/72, 4×4, 6×4, 5×2, 2-2-3, «2 i 2», «3 i 1» o el teu propi patró, des del dia del cicle que et toqui.",
+    "Avisos per tipus de torn i recordatoris de notes, programats amb 30 dies de marge. A Android, l’avís de torn sona com un despertador. A l’iPhone i l’iPad és una notificació urgent que no sona amb el mode silenciós; hi caben fins a 60 avisos pendents i es renoven en obrir l’app. A Android, a més, sis widgets (avui, setmana, mes, agenda, dues i quatre setmanes) i «Silencia el mòbil durant els meus torns», que li torna el so quan acabes.",
     "Còpies automàtiques que comproves amb «Prova la restauració» i, a Android, una cada dia a la carpeta que triïs (Drive, Dropbox, OneDrive…). Importa còpies de Shifter de LRHSoft, .ics, CSV o el calendari del mòbil. Amb «Mantenir al dia», els teus torns passen al calendari del mòbil; també els pots desar en un .ics.",
-    "Hores treballades, nocturnes i festives i sortides anticipades per mes, trimestre, any o les dates que vulguis, amb el teu objectiu i la borsa d’hores. Extres per blocs, amb tipus i tarifa; tries si cada tipus compta per a l’objectiu. Preu per hora i plusos fixos, de nit i de festiu: sou brut estimat i net amb la teva retenció. El Resum i l’informe PDF mostren la ratxa més llarga de dies treballats seguits. Informes en PDF i CSV.",
+    "Hores treballades, nocturnes, festives i extra davant el teu objectiu i la borsa d’hores, per mes, trimestre, any o les dates que vulguis. Sou brut i net estimat amb el teu preu per hora, els teus plusos i la teva retenció. Informes en PDF i CSV.",
     "Saldos de vacances, dies de lliure disposició i permisos per any, amb els dies arrossegats i quan caduquen. Al llibre de canvis apuntes els torns que canvies amb els companys, veus qui deu què a qui i els apliques al calendari.",
     "Festius d’Espanya, amb les comunitats i molts municipis, i de 40 països més, sense connexió i amb els que hi afegeixis tu. Al teu gust: format d’hora i de data, moneda, deu colors d’accent, paletes preparades per als teus torns i imatge de fons del calendari."
   ],
@@ -28,7 +29,7 @@
     },
     {
       "question": "Com m’apunto a la prova de Google Play?",
-      "answer": "Uneix-te al grup turnly-testers de Google Groups amb el teu compte de Google, accepta la prova a l’enllaç de Google Play i instal·la l’app des de la botiga. S’actualitzarà sola."
+      "answer": "Uneix-te al grup de proves turnly-testers de Google Groups amb el teu compte de Google, accepta la prova a l’enllaç de Google Play i instal·la l’app des de la botiga. S’actualitzarà sola."
     },
     {
       "question": "I a l’iPhone i l’iPad?",
@@ -36,65 +37,134 @@
     },
     {
       "question": "Com passo Turnly a un mòbil nou?",
-      "answer": "Tens quatre maneres, i totes són gratis. Pas directe: quan configures el mòbil nou, copia-hi les apps i les dades del vell per cable o wifi; Turnly hi passa amb elles. Còpia de Google: amb la còpia de seguretat d’Android activada i un bloqueig de pantalla (PIN, patró o contrasenya), Android desa Turnly xifrat al teu compte de Google i el recupera quan configures el mòbil nou amb el mateix compte (Android 9 o posterior). Sense bloqueig de pantalla, Turnly no entra en aquesta còpia. Fitxer .turnly: a Configuració › Còpia de seguretat, «Exporta un fitxer» o «Desa al dispositiu»; porta’l al mòbil nou i obre’l, o fes servir «Importa un fitxer». Còpia automàtica en una carpeta (Android): en deixa una cada dia a la carpeta que triïs; si aquesta carpeta és al teu núvol o la passes al mòbil nou, importa’n l’última. Amb el fitxer o la carpeta, abans veus què conté la còpia i no se substitueix res sense que ho confirmis. Les còpies que queden dins de l’app es perden si la desinstal·les sense una altra còpia."
+      "answer": [
+        "El més senzill: al mòbil antic, obre Configuració › Còpia de seguretat i prem «Desa una còpia fora de Turnly». Guarda el fitxer .turnly i porta’l al mòbil nou; allà instal·la Turnly i obre el fitxer o prem «Importa un fitxer». Veuràs què conté la còpia i no se substitueix res sense que ho confirmis.",
+        "Altres maneres, totes gratis: en configurar un Android nou, el pas directe d’aplicacions i dades per cable o wifi, o la còpia de Google (Android 9 o posterior, amb la còpia de seguretat activada i un bloqueig de pantalla: PIN, patró o contrasenya); a Android, també la còpia automàtica diària a la carpeta que triïs, de la qual importes l’última; a l’iPhone, la còpia d’iCloud o la de l’ordinador.",
+        "Les còpies que només són dins de l’app es perden en desinstal·lar-la."
+      ]
     },
     {
       "question": "I si vull començar de zero?",
       "answer": "A Configuració, «Esborra-ho tot i comença de zero» esborra els teus calendaris, notes, absències i ajustos (només conserva l’idioma) i et torna al primer ús. Abans desa una còpia de seguretat que pots restaurar o guardar en un altre lloc."
     }
   ],
-  "licence_text": "Codi MIT · Contingut CC BY-SA 4.0",
+  "licence_text": "Llicència MIT · Contingut CC BY-SA 4.0",
   "screenshot_alts": {
     "01-mes": "Mes pintat i targeta del proper torn",
+    "01-mes-oscuro": "Mes pintat i targeta del proper torn",
     "02-lista": "El mateix mes en vista Llista, amb codis i horaris complets",
+    "02-lista-oscuro": "El mateix mes en vista Llista, amb codis i horaris complets",
     "03-pintar": "Mode pintar amb la paleta de torns",
+    "03-pintar-oscuro": "Mode pintar amb la paleta de torns",
     "04-rotaciones": "Assistent de rotacions: el dia del cicle en què comences, abans d'aplicar",
+    "04-rotaciones-oscuro": "Assistent de rotacions: el dia del cicle en què comences, abans d'aplicar",
     "05-horas": "Resum mensual d’hores treballades, nocturnes i festives",
+    "05-horas-oscuro": "Resum mensual d’hores treballades, nocturnes i festives",
     "06-festivos": "Festius per país, comunitat i municipi",
-    "07-mes-oscuro": "El mateix mes amb el tema fosc",
+    "06-festivos-oscuro": "Festius per país, comunitat i municipi",
     "08-vacaciones": "Saldos de vacances i permisos, amb els dies que queden i els arrossegats",
+    "08-vacaciones-oscuro": "Saldos de vacances i permisos, amb els dies que queden i els arrossegats",
     "09-cambios": "Llibre de canvis amb el balanç de cada company i els torns de cada canvi",
-    "10-primer-uso": "Primera pantalla del primer ús, amb tres camins: importar, usar una rotació o pintar a mà",
-    "11-widgets": "Galeria «Afegeix un widget» amb els teus torns reals: petit, agenda, mitjà i més"
+    "09-cambios-oscuro": "Llibre de canvis amb el balanç de cada company i els torns de cada canvi",
+    "10-primer-uso": "Pantalla de benvinguda: importa els teus torns, aplica una rotació o pinta’ls a mà",
+    "10-primer-uso-oscuro": "Pantalla de benvinguda: importa els teus torns, aplica una rotació o pinta’ls a mà",
+    "11-widgets": "Galeria «Afegeix un widget» amb els teus torns reals: petit, agenda, mitjà i més",
+    "11-widgets-oscuro": "Galeria «Afegeix un widget» amb els teus torns reals: petit, agenda, mitjà i més"
   },
-  "privacy_date": "2026-11-04",
+  "privacy_date": "2026-11-17",
   "kicker": "Calendari de torns",
   "tagline": "Els teus torns, d’un cop d’ull.",
   "chip": "Tot gratis: sense Pro, sense anuncis i sense compte.",
   "nav_label": "Seccions",
   "theme_label": "Tema",
-  "theme_system": "Sistema",
-  "theme_light": "Clar",
   "theme_dark": "Fosc",
   "theme_hint": "Canvia el tema",
-  "download_title": "Android en proves; iPhone i iPad, a l’App Store.",
+  "anim": {
+    "month": "Desembre",
+    "weekdays": [
+      "dl",
+      "dt",
+      "dc",
+      "dj",
+      "dv",
+      "ds",
+      "dg"
+    ],
+    "shifts": {
+      "m": {
+        "code": "M",
+        "name": "Matí"
+      },
+      "t": {
+        "code": "T",
+        "name": "Tarda"
+      },
+      "n": {
+        "code": "N",
+        "name": "Nit"
+      },
+      "l": {
+        "code": "L",
+        "name": "Lliure"
+      },
+      "s": {
+        "code": "S",
+        "name": "Sortint"
+      }
+    },
+    "sequence": "La teva seqüència",
+    "cycle_days": "{n} dies",
+    "tonight": "Aquesta nit",
+    "starts_in": "Comença d’aquí a {duration}",
+    "widget_day": "dj. 24",
+    "widget_tomorrow": "Demà",
+    "off_on": "Tens lliure el dissabte 26",
+    "unit_h": "h",
+    "hours": {
+      "m": "06–14",
+      "t": "14–22",
+      "n": "22–06"
+    },
+    "night_range": "22:00–06:00"
+  },
+  "download_title": "A l’App Store per a iPhone i iPad; Android, en proves.",
   "download_intro": "Mode clar i fosc. Gratis i sense compte.",
   "download_notes": {
-    "play": "Qualsevol s’hi pot apuntar: primer t’uneixes al grup de testers i després acceptes la prova.",
+    "play": "Qualsevol s’hi pot apuntar en tres passos:",
     "apk": "L’instal·les a mà. Des de la 0.8.3 porta la mateixa signatura que la versió de Google Play: pots passar de l’una a l’altra sense desinstal·lar.",
     "app_store": "Gratis a l’App Store, per a iPhone i iPad amb iOS 17 o posterior."
   },
-  "join_title": "Com unir-te a la prova de Google Play",
-  "join_steps": [
-    {
-      "text": "Uneix-te al grup de testers",
-      "link_text": "turnly-testers",
-      "href": "https://groups.google.com/g/turnly-testers",
-      "after": ". Amb el teu compte de Google, prem «Uneix-te al grup»."
-    },
-    {
-      "text": "Accepta la prova des del mòbil o l’ordinador:",
-      "link_text": "play.google.com/apps/testing/es.cuadrante.app",
-      "href": "https://play.google.com/apps/testing/es.cuadrante.app",
-      "after": "."
-    },
-    {
-      "text": "Instal·la l’app des de Google Play. S’actualitzarà sola."
-    }
-  ],
   "screenshots_title": "Pantalles reals",
   "screenshots_intro": "Amb dades fictícies, en clar i en fosc.",
-  "features_title": "Tot obert, sense Pro ni compres",
+  "screenshots_nav": "Tria una pantalla",
+  "screenshots_prev": "Pantalla anterior",
+  "screenshots_next": "Pantalla següent",
+  "screenshots_position": "Pantalla {n} de {total}: {title}",
+  "screenshot_captions": {
+    "01-mes": "Mes",
+    "02-lista": "Llista",
+    "03-pintar": "Pinta",
+    "04-rotaciones": "Aplica un patró",
+    "05-horas": "Resum",
+    "06-festivos": "Festius",
+    "08-vacaciones": "Vacances i permisos",
+    "09-cambios": "Llibre de canvis",
+    "10-primer-uso": "Benvinguda",
+    "11-widgets": "Afegeix un widget"
+  },
+  "screenshot_details": {
+    "01-mes": "Consulta els torns del mes per color, codi i horari. La targeta d’avui et diu quan comença el proper torn i quan tens lliure.",
+    "02-lista": "Canvia a Llista per recórrer el mateix mes dia a dia. Hi veus el nom i el codi de cada torn, l’horari complet i les hores extra.",
+    "03-pintar": "Tria un torn de la paleta i toca o arrossega pels dies per pintar-los. Pots canviar el torn, afegir-ne un altre o desfer l’últim traç.",
+    "04-rotaciones": "Revisa els torns, els horaris i la durada de cada bloc del teu cicle. Pots afegir blocs abans de continuar.",
+    "05-horas": "Consulta les hores treballades i previstes del mes, amb el detall de les hores nocturnes i en festiu. També pots fixar un objectiu d’hores.",
+    "06-festivos": "Tria el país, la comunitat i el municipi per consultar els festius de cada any. Pots afegir un festiu local o importar-los del calendari del mòbil.",
+    "08-vacaciones": "Consulta quants dies et queden, quants n’has gaudit i quants en tens planificats. Revisa els dies arrossegats i quan caduquen, o edita els saldos.",
+    "09-cambios": "Anota canvis de torn amb els companys i consulta qui deu torns a qui. Cada canvi mostra els torns que cedeixes o reps i si encara està pendent.",
+    "10-primer-uso": "Tria com comences el teu quadrant: importa els torns, fes servir una rotació o pinta a mà. També pots recuperar una còpia de seguretat.",
+    "11-widgets": "Compara els widgets amb els teus torns reals i tria quin vols afegir a la pantalla d’inici d’Android: avui i demà, agenda o diversos dies."
+  },
+  "features_title": "Organitza els teus torns i porta els comptes",
   "features_intro": "Cada torn porta color, codi i horari, i mai no depèn només del color.",
   "feature_titles": [
     "Mes, agenda i any",

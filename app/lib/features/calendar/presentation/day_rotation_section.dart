@@ -381,6 +381,8 @@ class _ResumeDialogState extends State<_ResumeDialog> {
                       plan: null,
                       keyPrefix: 'resume-',
                       showPreview: false,
+                      // A dialog is `surface`, not the page background.
+                      fadeColor: context.colors.surface,
                     ),
                   ],
                 ],

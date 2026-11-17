@@ -22,6 +22,9 @@ import '../domain/pattern_catalog.dart';
 import 'cycle_strip.dart';
 import 'pattern_block_editor.dart';
 
+/// The most of the height the pinned palette may take.
+const double _maxPinnedPaletteShare = 0.4;
+
 /// Keeps the palette below the scrolling blocks. With little vertical room the
 /// palette joins the page so large text still leaves the sequence reachable.
 class PatternBuilderViewport extends ConsumerWidget {
@@ -65,9 +68,16 @@ class PatternBuilderViewport extends ConsumerWidget {
           textDirection: Directionality.of(context),
           textScaler: MediaQuery.textScalerOf(context),
         )..layout(maxWidth: constraints.maxWidth - Sp.page * 2);
-        final paletteHeight = layout.height + heading.height.ceilToDouble();
+        final paletteHeight =
+            layout.height + heading.height.ceilToDouble() + Sp.s;
         heading.dispose();
-        final fixed = constraints.maxHeight >= paletteHeight + Sp.touch * 4;
+        // Pinned only while it leaves most of the height to the sequence: at
+        // large text (or on a short landscape iPad) it would take half the
+        // screen or more, so it joins the page and scrolls with the blocks
+        // (1.2.0 QA, iPhone F2 and iPad F1).
+        final fixed =
+            constraints.maxHeight >= paletteHeight + Sp.touch * 4 &&
+            paletteHeight <= constraints.maxHeight * _maxPinnedPaletteShare;
         return Column(
           children: [
             Expanded(
@@ -92,7 +102,9 @@ class PatternBuilderViewport extends ConsumerWidget {
             ),
             if (fixed)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: Sp.page),
+                // A little air above, so the help line over the blocks does not
+                // run into «Añadir un bloque».
+                padding: const EdgeInsets.fromLTRB(Sp.page, Sp.s, Sp.page, 0),
                 child: PatternBuilderPalette(args: args, compact: compact),
               ),
           ],
@@ -118,6 +130,8 @@ class PatternBuilder extends ConsumerStatefulWidget {
 class _PatternBuilderState extends ConsumerState<PatternBuilder> {
   late final TextEditingController _name;
   bool _confirming = false;
+  // The controls of the open block, to scroll them into view.
+  final _controlsKey = GlobalKey();
   @override
   void initState() {
     super.initState();
@@ -132,9 +146,58 @@ class _PatternBuilderState extends ConsumerState<PatternBuilder> {
     super.dispose();
   }
 
+  /// A block added from the palette opens right under the palette's edge: its
+  /// − / + row and shortcuts are scrolled up above it (1.2.0 QA, iPhone F1).
+  void _revealOpenBlock() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final controls = _controlsKey.currentContext;
+      if (!mounted || controls == null || !controls.mounted) return;
+      final box = controls.findRenderObject();
+      final scrollable = Scrollable.maybeOf(controls);
+      final viewport = scrollable?.context.findRenderObject();
+      if (box is! RenderBox ||
+          !box.attached ||
+          scrollable == null ||
+          viewport is! RenderBox) {
+        return;
+      }
+      final viewTop = viewport.localToGlobal(Offset.zero).dy;
+      final viewBottom = viewTop + viewport.size.height;
+      final top = box.localToGlobal(Offset.zero).dy;
+      final bottom = top + box.size.height;
+      // Up to the bottom edge of the page, without pushing the top of the
+      // controls out of it when they are taller than what is visible.
+      final double delta;
+      if (top < viewTop) {
+        delta = top - viewTop - Sp.s;
+      } else if (bottom > viewBottom) {
+        delta = math.min(bottom - viewBottom + Sp.s, top - viewTop);
+      } else {
+        return;
+      }
+      final position = scrollable.position;
+      final target = (position.pixels + delta).clamp(
+        position.minScrollExtent,
+        position.maxScrollExtent,
+      );
+      // Reduce motion: the page jumps instead of gliding.
+      if (MediaQuery.disableAnimationsOf(context)) {
+        position.jumpTo(target);
+      } else {
+        position.animateTo(target, duration: Motion.state, curve: Motion.curve);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    ref.listen(
+      patternWizardProvider(widget.args).select((s) => s.draft.length),
+      (before, after) {
+        if (before != null && after > before) _revealOpenBlock();
+      },
+    );
     final wizard = ref.watch(patternWizardProvider(widget.args));
     final controller = ref.read(patternWizardProvider(widget.args).notifier);
     final schedule = ref.watch(
@@ -230,7 +293,10 @@ class _PatternBuilderState extends ConsumerState<PatternBuilder> {
                   ),
                 ),
                 if (wizard.openBlock == i)
-                  PatternBlockControls(args: widget.args, index: i),
+                  KeyedSubtree(
+                    key: _controlsKey,
+                    child: PatternBlockControls(args: widget.args, index: i),
+                  ),
               ],
             ),
           ),

@@ -68,6 +68,13 @@ class Sp {
   /// Minimum touch target.
   static const double touch = 48;
 
+  /// Height of the system time wheel on iOS.
+  static const double wheelHeight = 216;
+
+  /// Least height of the time wheel when the window is short (landscape):
+  /// three rows stay readable and the sheet scrolls for the rest.
+  static const double wheelMinHeight = 132;
+
   static const EdgeInsets pageInsets = EdgeInsets.symmetric(horizontal: page);
 }
 

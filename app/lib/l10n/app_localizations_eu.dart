@@ -7488,6 +7488,11 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
+  String overtimeRateAtMax(String max) {
+    return 'Gehieneko prezioa $max da.';
+  }
+
+  @override
   String get overtimeTypeOvertime => 'Aparteko orduak';
 
   @override

@@ -30,6 +30,7 @@ class CycleStrip extends StatefulWidget {
     this.offset,
     this.onOffsetChanged,
     this.keyPrefix = '',
+    this.fadeColor,
   });
 
   final List<List<String>> steps;
@@ -37,6 +38,11 @@ class CycleStrip extends StatefulWidget {
   final int? offset;
   final ValueChanged<int>? onOffsetChanged;
   final String keyPrefix;
+
+  /// The colour the edge fades go to: that of the surface the strip sits on
+  /// (the page background unless told otherwise; a sheet or dialog is
+  /// `surface`).
+  final Color? fadeColor;
 
   @override
   State<CycleStrip> createState() => _CycleStripState();
@@ -68,11 +74,7 @@ class _CycleStripState extends State<CycleStrip> {
       if (MediaQuery.disableAnimationsOf(context)) {
         _scroll.jumpTo(target);
       } else {
-        _scroll.animateTo(
-          target,
-          duration: Motion.state,
-          curve: Motion.curve,
-        );
+        _scroll.animateTo(target, duration: Motion.state, curve: Motion.curve);
       }
     });
   }
@@ -103,39 +105,47 @@ class _CycleStripState extends State<CycleStrip> {
           builder: (context, constraints) {
             final width = math.max(Sp.touch * scale, constraints.maxWidth / 7);
             _revealSelection(width, constraints.maxWidth);
-            return Semantics(
-              label: width * 7 > constraints.maxWidth
-                  ? l10n.patternCycleScrollable
-                  : null,
-              child: Scrollbar(
+            final overflows = width * 7 > constraints.maxWidth + 0.5;
+            final strip = Scrollbar(
+              controller: _scroll,
+              thumbVisibility: true,
+              child: SingleChildScrollView(
                 controller: _scroll,
-                thumbVisibility: true,
-                child: SingleChildScrollView(
-                  controller: _scroll,
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.only(bottom: Sp.m),
-                  child: SizedBox(
-                    width: width * 7,
-                    child: Column(
-                      children: [
-                        for (var row = 0; row < visibleRows; row++)
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              for (var col = 0; col < 7; col++)
-                                SizedBox(
-                                  width: width,
-                                  child: row * 7 + col >= widget.steps.length
-                                      ? null
-                                      : _cell(context, row * 7 + col, format),
-                                ),
-                            ],
-                          ),
-                      ],
-                    ),
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.only(bottom: Sp.m),
+                child: SizedBox(
+                  width: width * 7,
+                  child: Column(
+                    children: [
+                      for (var row = 0; row < visibleRows; row++)
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            for (var col = 0; col < 7; col++)
+                              SizedBox(
+                                width: width,
+                                child: row * 7 + col >= widget.steps.length
+                                    ? null
+                                    : _cell(context, row * 7 + col, format),
+                              ),
+                          ],
+                        ),
+                    ],
                   ),
                 ),
               ),
+            );
+            return Semantics(
+              label: overflows ? l10n.patternCycleScrollable : null,
+              child: overflows
+                  ? Stack(
+                      children: [
+                        strip,
+                        _edgeFade(context, atStart: true),
+                        _edgeFade(context, atStart: false),
+                      ],
+                    )
+                  : strip,
             );
           },
         ),
@@ -158,6 +168,54 @@ class _CycleStripState extends State<CycleStrip> {
         if (widget.steps.any((day) => day.isEmpty))
           Text(l10n.calendarNoShift, style: context.type.meta),
       ],
+    );
+  }
+
+  /// A fade over the edge where more days wait: the thin scrollbar was the
+  /// only sign that the strip scrolls (1.2.0 QA, iPad F2). It shows at the
+  /// start only once the strip has moved, and at the end until it has
+  /// reached it.
+  Widget _edgeFade(BuildContext context, {required bool atStart}) {
+    final background = widget.fadeColor ?? context.colors.background;
+    return Positioned.directional(
+      textDirection: Directionality.of(context),
+      start: atStart ? 0 : null,
+      end: atStart ? null : 0,
+      top: 0,
+      bottom: Sp.m,
+      width: Sp.x3,
+      child: IgnorePointer(
+        child: ListenableBuilder(
+          listenable: _scroll,
+          builder: (context, _) {
+            final position = _scroll.hasClients ? _scroll.position : null;
+            final ready = position != null && position.hasContentDimensions;
+            final visible = atStart
+                ? ready && position.pixels > 1
+                : !ready || position.pixels < position.maxScrollExtent - 1;
+            return AnimatedOpacity(
+              opacity: visible ? 1 : 0,
+              duration: Motion.of(context, Motion.state),
+              child: DecoratedBox(
+                key: ValueKey(
+                  '${widget.keyPrefix}cycle-fade-${atStart ? 'start' : 'end'}',
+                ),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: atStart
+                        ? AlignmentDirectional.centerStart
+                        : AlignmentDirectional.centerEnd,
+                    end: atStart
+                        ? AlignmentDirectional.centerEnd
+                        : AlignmentDirectional.centerStart,
+                    colors: [background, background.withValues(alpha: 0)],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 

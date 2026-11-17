@@ -11924,6 +11924,12 @@ abstract class AppLocalizations {
   /// **'Escribe un precio por hora entre 0 y {max}.'**
   String overtimeRateOutOfRange(String max);
 
+  /// Aviso bajo el campo de precio por hora cuando ya no caben más cifras. {max} es el máximo con su moneda, p. ej. 9.999,99 €.
+  ///
+  /// In es, this message translates to:
+  /// **'El máximo es {max}.'**
+  String overtimeRateAtMax(String max);
+
   /// Nombre del tipo de horas extra que viene creado (cuenta para el objetivo).
   ///
   /// In es, this message translates to:
