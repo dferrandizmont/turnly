@@ -492,13 +492,13 @@ void main() {
         expect(container.read(provider).draft, hasLength(21));
         expect(container.read(provider).blocks, hasLength(3));
         expect(container.read(provider).canUndoDraft, isFalse);
+        expect(container.read(provider).openBlock, 0);
         expect(tester.takeException(), isNull);
 
         controller.replaceBlocks([
           PatternBlock(shiftIds: ['morning'], days: 200),
         ]);
         await tester.pumpAndSettle();
-        await _tap(tester, 'builder-block-0');
         await _tap(tester, 'block-options');
         await _tap(tester, 'block-repeat');
         await _tap(tester, 'repeat-plus');
@@ -588,7 +588,7 @@ void main() {
       ]);
       await _tap(tester, 'builder-undo');
       expect(blocks(), hasLength(3));
-      await _tap(tester, 'builder-block-1');
+      expect(container.read(provider).openBlock, 1);
       await _tap(tester, 'block-options');
       await _tap(tester, 'block-down');
       expect(blocks().map((b) => b.shiftIds.single), [

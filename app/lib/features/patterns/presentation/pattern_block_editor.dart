@@ -485,7 +485,15 @@ class _NumberDialog extends StatefulWidget {
 }
 
 class _NumberDialogState extends State<_NumberDialog> {
-  late final _text = TextEditingController(text: '${widget.initial}');
+  late final _text = TextEditingController.fromValue(
+    TextEditingValue(
+      text: '${widget.initial}',
+      selection: TextSelection(
+        baseOffset: 0,
+        extentOffset: '${widget.initial}'.length,
+      ),
+    ),
+  );
   @override
   void dispose() {
     _text.dispose();
@@ -504,8 +512,8 @@ class _NumberDialogState extends State<_NumberDialog> {
         key: const ValueKey('block-number'),
         controller: _text,
         autofocus: true,
-        keyboardType: TextInputType.number,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        keyboardType: const TextInputType.numberWithOptions(signed: true),
+        inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9-]'))],
         decoration: InputDecoration(
           labelText: l10n.patternConsecutiveDays,
           helperText: valid ? l10n.patternNumberRange(widget.max) : null,

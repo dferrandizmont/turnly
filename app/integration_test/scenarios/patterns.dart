@@ -14,7 +14,7 @@ import '../support/qa_harness.dart';
 // Demo overrides: 20 note only, 21 Mañana+Tarde, 22 empty, 27-28 Vacaciones.
 const _oct21 = CivilDate(2026, 10, 21);
 const _oct24 = CivilDate(2026, 10, 24);
-const _oct26 = CivilDate(2026, 10, 26);
+const _oct29 = CivilDate(2026, 10, 29);
 
 /// The pattern wizard, "aplicar patrón desde este día", the automatic
 /// saliente and the annual view (roadmap 0.3.0). Registered by
@@ -120,7 +120,7 @@ Future<void> _preview(QaContext qa) async {
   await t.tap(
     find.descendant(
       of: find.byType(DatePickerDialog),
-      matching: find.text('26'),
+      matching: find.text('29'),
     ),
   );
   await t.settle();
@@ -133,12 +133,11 @@ Future<void> _preview(QaContext qa) async {
         .last,
   );
   await t.settle();
-  await t.tapAndSettle(_key('cycle-toggle'));
   await t.tapAndSettle(_key('offset-1'));
   expect(find.text('Ese día te toca: Libre'), findsOneWidget);
 
-  // The preview now belongs to the confirmation step.
-  expect(_key('pattern-preview'), findsNothing);
+  // The preview is already on the start step (PatternMonthPreview).
+  expect(_key('pattern-preview'), findsOneWidget);
   await t.tapAndSettle(_key('pattern-next'));
   expect(_key('pattern-preview'), findsOneWidget);
 
@@ -146,7 +145,7 @@ Future<void> _preview(QaContext qa) async {
   Future<List<String>> previewCodes() async {
     final out = <String>[];
     for (var i = 0; i < 12; i++) {
-      final date = _oct26.addDays(i);
+      final date = _oct29.addDays(i);
       final cell = _key('preview-${date.toIso()}');
       await t.ensureVisible(cell);
       out.add(
@@ -173,7 +172,7 @@ Future<void> _preview(QaContext qa) async {
   final applied = [
     for (var i = 0; i < 12; i++)
       app.schedule
-          .resolve(_oct26.addDays(i))
+          .resolve(_oct29.addDays(i))
           .shifts
           .map((s) => s.code)
           .join('+'),
@@ -237,10 +236,10 @@ Future<void> _ownSequence(QaContext qa) async {
   await t.tapAndSettle(_key('builder-add-morning'));
   await t.tapAndSettle(_key('builder-add-morning'));
   await t.tapAndSettle(_key('builder-add-night'));
-  // Two shifts on the last day.
-  await t.tapAndSettle(_key('builder-same-day'));
-  await t.tapAndSettle(_key('builder-add-afternoon'));
-  await t.tapAndSettle(_key('builder-same-day'));
+  // Two shifts on the last day (night + afternoon).
+  await t.tapAndSettle(_key('block-options'));
+  await t.tapAndSettle(_key('block-same-day'));
+  await t.tapAndSettle(_key('block-add-afternoon'));
   await t.tapAndSettle(_key('builder-add-rest'));
   expect(find.text('4 días'), findsOneWidget);
   await t.enterText(_key('builder-name'), 'Mi cuadrante');

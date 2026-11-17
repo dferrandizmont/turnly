@@ -54,6 +54,7 @@ class MoneySection extends ConsumerWidget {
         ),
         SettingsRow(
           key: const ValueKey('settings-closing-day'),
+          identifier: 'settings-closing-day',
           icon: PayIcons.closingDay,
           title: l10n.closingDayTitle,
           subtitle: l10n.closingDaySubtitle,
@@ -64,6 +65,7 @@ class MoneySection extends ConsumerWidget {
         ),
         SettingsRow(
           key: const ValueKey('settings-overtime-cap'),
+          identifier: 'settings-overtime-cap',
           icon: PayIcons.overtimeCap,
           title: l10n.overtimeCapTitle,
           subtitle: l10n.overtimeCapSubtitle,
@@ -97,6 +99,7 @@ class MoneySection extends ConsumerWidget {
         ),
         SettingsRow(
           key: const ValueKey('settings-pay-template'),
+          identifier: 'settings-pay-template',
           icon: PayIcons.template,
           title: l10n.payTemplateTitle,
           subtitle: l10n.payTemplateSubtitle,

@@ -2308,7 +2308,7 @@ class AppLocalizationsGl extends AppLocalizations {
   String get summaryEstimateTitle => 'Ingresos estimados';
 
   @override
-  String get summaryFixedPluses => 'Complementos';
+  String get summaryFixedPluses => 'Pluses';
 
   @override
   String summaryFixedPlusCount(int count) {
@@ -2332,7 +2332,7 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get summaryEstimateNone =>
-      'Pon o prezo por hora ou o complemento por quenda en As miñas quendas para ver a estimación.';
+      'Pon o prezo por hora ou o plus por quenda en As miñas quendas para ver a estimación.';
 
   @override
   String summaryEstimateMissing(String types) {
@@ -3097,7 +3097,7 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get faqSummaryA =>
-      'A icona de resumo do calendario amosa as quendas, as horas, as nocturnas e as de festivo do mes, dun ano enteiro ou das datas que escollas en «Datas…» (ata 366 días). Unha quenda conta no día en que comeza, aínda que cruce a medianoite.\n\nPara ver importes, pon o prezo por hora e, se o tes, o complemento fixo por tipo de quenda en Configuración › As miñas quendas. A estimación inclúe eses complementos fixos, antes de impostos, na moeda que escollas en Configuración › Aparencia. Tamén suma os pluses por hora nocturna e festiva que poñas en cada quenda; a retención só cambia o neto. En Configuración › Horas e diñeiro tes modelos de complementos por sector, o día de peche do teu mes de nómina e un límite de horas extra.\n\nO «Plus por quenda» súmase unha vez por cada quenda traballada dese tipo, tamén se é partida; non depende das horas. Os descansos e as ausencias non o suman.';
+      'A icona de resumo do calendario amosa as quendas, as horas, as nocturnas e as de festivo do mes, dun ano enteiro ou das datas que escollas en «Datas…» (ata 366 días). Unha quenda conta no día en que comeza, aínda que cruce a medianoite.\n\nPara ver importes, pon o prezo por hora e, se o tes, o plus fixo por tipo de quenda en Configuración › As miñas quendas. A estimación inclúe eses pluses fixos, antes de impostos, na moeda que escollas en Configuración › Aparencia. Tamén suma os pluses por hora nocturna e festiva que poñas en cada quenda; a retención só cambia o neto. En Configuración › Horas e diñeiro tes modelos de pluses por sector, o día de peche do teu mes de nómina e un límite de horas extra.\n\nO «Plus por quenda» súmase unha vez por cada quenda traballada dese tipo, tamén se é partida; non depende das horas. Os descansos e as ausencias non o suman.';
 
   @override
   String get settingsVersionCopied => 'Versión copiada';
@@ -3932,7 +3932,7 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get calSyncHelp =>
-      'Turnly actualiza eses eventos soo, cada vez que cambias o cadro de quendas e ao abrir a app: desde hai unha semana ata os próximos tres meses. Só toca os eventos que creou el. Se o apagas, os que xa están quedan.';
+      'Turnly actualiza eses eventos automaticamente, cada vez que cambias o cadro de quendas e ao abrir a app: desde hai unha semana ata os próximos tres meses. Só toca os eventos que creou el. Se o apagas, os que xa están quedan.';
 
   @override
   String calSyncLast(String when) {
@@ -5455,7 +5455,7 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get alarmsPauseChannelDescription =>
-      'Avísate a metade da quenda para que fagas unha pausa.';
+      'Avísate á metade da quenda para que fagas unha pausa.';
 
   @override
   String get dayReminderAdd => 'Avisarme';
@@ -5536,7 +5536,7 @@ class AppLocalizationsGl extends AppLocalizations {
       'Para silenciar o móbil durante a quenda, permite que Turnly acceda a «Non molestar» na configuración do sistema.';
 
   @override
-  String get dndPermOpen => 'Abrir a configuración';
+  String get dndPermOpen => 'Abrir configuración';
 
   @override
   String get dndShiftSection => 'Non molestar';
@@ -5578,18 +5578,18 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String shiftTypesPauseHelperLong(String duration) {
-    return 'Esta quenda dura $duration: adoita vir ben parar un pouco a metade.';
+    return 'Esta quenda dura $duration: adoita vir ben parar un pouco á metade.';
   }
 
   @override
   String get shiftTypesPauseHelperShort =>
-      'Un aviso a metade da quenda para lembrarte de parar.';
+      'Un aviso á metade da quenda para lembrarte de parar.';
 
   @override
   String get shiftTypesPauseWhen => 'Cando';
 
   @override
-  String get shiftTypesPauseMid => 'A metade da quenda';
+  String get shiftTypesPauseMid => 'Á metade da quenda';
 
   @override
   String shiftTypesPauseAfter(String duration) {
@@ -5951,7 +5951,7 @@ class AppLocalizationsGl extends AppLocalizations {
   String get historyNothingToRedo => 'Nada que refacer';
 
   @override
-  String get monthPresentationGrid => 'Cuadrícula';
+  String get monthPresentationGrid => 'Grella';
 
   @override
   String get monthPresentationList => 'Lista';
@@ -6029,7 +6029,7 @@ class AppLocalizationsGl extends AppLocalizations {
   String get monthListSelected => 'Presentación de lista';
 
   @override
-  String get monthGridSelected => 'Presentación de cuadrícula';
+  String get monthGridSelected => 'Presentación de grella';
 
   @override
   String get absenceRowTitle => 'Vacacións e permisos';
@@ -6425,14 +6425,14 @@ class AppLocalizationsGl extends AppLocalizations {
   }
 
   @override
-  String get payTemplateTitle => 'Modelo de complementos';
+  String get payTemplateTitle => 'Modelo de pluses';
 
   @override
   String get payTemplateSubtitle => 'Sanidade pública, bombeiros ou vixiantes';
 
   @override
   String get payTemplateIntro =>
-      'Enche dunha vez os complementos das túas quendas de traballo. O modelo non trae importes, porque cambian con cada convenio e cada ano: comezan en 0 e escribes os da túa nómina.';
+      'Enche dunha vez os pluses das túas quendas de traballo. O modelo non trae importes, porque cambian con cada convenio e cada ano: comezan en 0 e escribes os da túa nómina.';
 
   @override
   String get payTemplatePublicHealth => 'Sanidade pública';
@@ -6650,7 +6650,7 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get swapFieldDirectionHelper =>
-      'Escolle quen queda en deuda co cambio.';
+      'Escolle quen queda en débeda co cambio.';
 
   @override
   String get swapFieldDate => 'O día que cedes a quenda';
@@ -7101,7 +7101,7 @@ class AppLocalizationsGl extends AppLocalizations {
   String get devEventsPermissionAllow => 'Permitir acceso';
 
   @override
-  String get devEventsPermissionSettings => 'Abrir a configuración';
+  String get devEventsPermissionSettings => 'Abrir configuración';
 
   @override
   String get devEventsPermissionRecheck => 'Comprobar de novo';
@@ -7188,7 +7188,7 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get resetNotes =>
-      'Notas, anexos (fotos, debuxos e ficheiros) e tarefas.';
+      'Notas, adxuntos (fotos, debuxos e ficheiros) e tarefas.';
 
   @override
   String get resetAbsences => 'Vacacións, permisos e ausencias.';

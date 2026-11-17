@@ -102,7 +102,7 @@ void main() {
   for (final (language, label, count) in [
     (AppLanguage.es, 'Pluses', '5 turnos'),
     (AppLanguage.ca, 'Plusos', '5 torns'),
-    (AppLanguage.gl, 'Complementos', '5 quendas'),
+    (AppLanguage.gl, 'Pluses', '5 quendas'),
     (AppLanguage.eu, 'Osagarriak', '5 txanda'),
     (AppLanguage.en, 'Allowances', '5 shifts'),
   ]) {

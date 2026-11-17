@@ -10,6 +10,23 @@ at once, so they can skip numbers.
 
 ## Unreleased
 
+## 0.11.2 · 2026-11-17
+
+Android test build: the rotation builder, large-text and translation fixes from iPhone 1.2.1 and since, now on Android. Your data is not touched.
+
+- Fixed: in "Create my own", a block you add now scrolls up above the "Add a block" shifts, with its − / + buttons and "Other number" in view.
+- Fixed: with very large text the shifts to add no longer take half the screen: they scroll with your blocks instead of staying pinned, and there is a little room above "Add a block".
+- Fixed: "Other number" in the rotation builder selects the current duration for replacement and shows the range error for negative values.
+- Fixed: undo in the rotation builder restores the selected block.
+- Fixed: "Repeat from here…" in a block's menu now closes the menu before the question appears, instead of leaving it dimmed behind.
+- Fixed: with very large text the "Today" card no longer grows past a comfortable size, so the month grid starts higher on the screen.
+- Fixed: when you type an amount in an overtime sheet, the field now scrolls above the number pad so you can see what you type.
+- Changed: typing more digits than an hourly rate allows now says what the highest rate is, instead of silently ignoring the extra digits.
+- Fixed: the title of "Discard the sequence?" and similar questions no longer breaks a word in two at very large text.
+- Changed: with "Show the note in the month" on, the note now sits at the bottom of the day on every screen size and orientation, and at very large text a few letters of it show instead of one.
+- Changed (tablets): the "Your cycle" strip fades at the edge where more days wait, so it is clear that it scrolls.
+- Catalan, Galician and Basque: wording, terminology, placeholder metadata and store descriptions corrected.
+
 ## 1.2.1 · 2026-11-17
 
 iPhone and iPad update (App Store build 6) that fixes the large-text and iPad layout problems found while testing 1.2.0, plus the new website and privacy policy. Your data is not touched.

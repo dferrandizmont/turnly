@@ -152,7 +152,13 @@ class PatternWizardController extends Notifier<PatternWizardState> {
 
   // Id the pattern gets if the user builds it here.
   final String _draftId = 'custom-${const Uuid().v4()}';
-  ({List<PatternBlock> blocks, bool alignWeekdays, int stepOffset})? _undoDraft;
+  ({
+    List<PatternBlock> blocks,
+    bool alignWeekdays,
+    int stepOffset,
+    int? openBlock,
+  })?
+  _undoDraft;
   List<List<String>> _openedDraft = const [];
   String _openedName = '';
   List<String> _openedWeekShiftIds = const [];
@@ -448,6 +454,7 @@ class PatternWizardController extends Notifier<PatternWizardState> {
       blocks: before,
       alignWeekdays: state.alignWeekdays,
       stepOffset: state.stepOffset,
+      openBlock: state.openBlock,
     );
     state = state.copyWith(
       draftBlocks: List.unmodifiable(blocks),
@@ -463,11 +470,15 @@ class PatternWizardController extends Notifier<PatternWizardState> {
     final before = _undoDraft;
     if (before == null) return;
     _undoDraft = null;
+    final openBlock = before.blocks.isEmpty
+        ? null
+        : before.openBlock?.clamp(0, before.blocks.length - 1);
     state = state.copyWith(
       draftBlocks: before.blocks,
       draft: expandBlocks(before.blocks),
       canUndoDraft: false,
-      closeBlock: true,
+      openBlock: openBlock,
+      closeBlock: openBlock == null,
       alignWeekdays: before.alignWeekdays,
       stepOffset: before.alignWeekdays
           ? weeksPerShiftStepOffset(state.start)

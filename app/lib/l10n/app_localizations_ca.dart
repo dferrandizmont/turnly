@@ -684,7 +684,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get shiftColorNameCoral => 'Corall';
 
   @override
-  String get shiftColorNameIndigo => 'Índigo';
+  String get shiftColorNameIndigo => 'Indi';
 
   @override
   String get shiftColorNameLightGrey => 'Gris clar';
@@ -897,7 +897,7 @@ class AppLocalizationsCa extends AppLocalizations {
       'Escriu 6 xifres o lletres de la A a la F, per exemple #1C7ED6.';
 
   @override
-  String get shiftTypesColorUse => 'Fes servir aquest color';
+  String get shiftTypesColorUse => 'Usa aquest color';
 
   @override
   String get shiftTypesCategoryLabel => 'Categoria';
@@ -2618,7 +2618,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get reportFormatCsv => 'CSV per a Excel o Sheets';
 
   @override
-  String get reportIncludeTitle => 'Què vols incloure';
+  String get reportIncludeTitle => 'Què incloure';
 
   @override
   String get reportIncludeNotes => 'Notes dels dies';
@@ -3090,7 +3090,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get faqCalendarsA =>
-      'Sí. A Configuració › Calendaris en crees un per a la teva parella, una segona feina o un fill: cadascun té les seves rotacions i els seus dies, i els tipus de torn són els mateixos. Amb dos o més, el nom del calendari damunt del mes et permet canviar de l’un a l’altre. El widget i les alarmes segueixen el calendari marcat com a «Widget i alarmes».\n\nPer veure quan coincidiu lliures, toca «Compara calendaris» en aquesta mateixa fulla: en tries dos i en veus els torns junts i els dies lliures en comú del mes.';
+      'Sí. A Configuració › Calendaris en crees un per a la teva parella, una segona feina o un fill: cadascun té les seves rotacions i els seus dies, i els tipus de torn són els mateixos. Amb dos o més, el nom del calendari damunt del mes et permet canviar de l’un a l’altre. El widget i les alarmes segueixen el calendari marcat com a «Widget i alarmes».\n\nPer veure quan coincidiu lliures, toca «Compara calendaris» en aquesta mateixa pantalla: en tries dos i en veus els torns junts i els dies lliures en comú del mes.';
 
   @override
   String get faqSummaryQ => 'Com es calculen les hores i els diners?';
@@ -3166,7 +3166,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get importReading => 'S’està llegint…';
 
   @override
-  String get importSourceTitle => 'D’on vénen els teus torns?';
+  String get importSourceTitle => 'D’on venen els teus torns?';
 
   @override
   String get importSourceHelp =>
@@ -3194,7 +3194,7 @@ class AppLocalizationsCa extends AppLocalizations {
       'Un full amb una data i un torn a cada fila.';
 
   @override
-  String get importSourceLrhsoft => 'Còpia de LRHSoft (Calendari de Torns)';
+  String get importSourceLrhsoft => 'Còpia de LRHSoft (Calendario de Turnos)';
 
   @override
   String get importSourceLrhsoftHelp =>
@@ -3259,7 +3259,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get importCalendarsHelp =>
-      'Marca d’on vénen els teus torns. Els altres no es toquen.';
+      'Marca d’on venen els teus torns. Els altres no es toquen.';
 
   @override
   String get importCalendarsEmpty => 'No hi ha calendaris en aquest mòbil.';
@@ -3478,7 +3478,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get importNewTypeTitle => 'Tipus de torn nou';
 
   @override
-  String get importNewTypeUse => 'Fes servir aquest tipus';
+  String get importNewTypeUse => 'Usa aquest tipus';
 
   @override
   String get importPreviewTitle => 'Així quedarà';
@@ -4896,8 +4896,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get calendarsCreate => 'Crea';
 
   @override
-  String get calendarsMakePrimary =>
-      'Fes-lo servir per al widget i les alarmes';
+  String get calendarsMakePrimary => 'Usa’l per al widget i les alarmes';
 
   @override
   String get calendarsPrimaryHelp =>
@@ -6076,14 +6075,14 @@ class AppLocalizationsCa extends AppLocalizations {
   String get absenceAdd => 'Afegeix un saldo';
 
   @override
-  String get absenceContinueSeries => 'Continuar una sèrie';
+  String get absenceContinueSeries => 'Continua una sèrie';
 
   @override
   String get absenceContinueSeriesHelper =>
       'Si continues la sèrie d’un any anterior, se’n copien el nom, els tipus i el topall, i el que et va sobrar s’arrossega. Tu només omples els dies permesos.';
 
   @override
-  String get absenceCopyNextYear => 'Copiar a l’any següent';
+  String get absenceCopyNextYear => 'Copia a l’any següent';
 
   @override
   String absenceCopiedNextYear(int year) {

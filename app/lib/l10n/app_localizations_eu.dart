@@ -1370,7 +1370,7 @@ class AppLocalizationsEu extends AppLocalizations {
   String get selectionRunsTitle => 'Nire txandaketak';
 
   @override
-  String get selectionRunsSubtitle => 'Amaitu edo kendu eredu bat behingoz';
+  String get selectionRunsSubtitle => 'Amaitu edo kendu eredu bat aldi berean';
 
   @override
   String get selectionRunsEmptyTitle => 'Txandaketarik ez';
@@ -1599,7 +1599,7 @@ class AppLocalizationsEu extends AppLocalizations {
   String get patternBuilderEmpty => 'Ukitu beheko txandak egunak gehitzeko.';
 
   @override
-  String get patternBuilderSameDay => 'Txanda bat baino gehiago egun batean';
+  String get patternBuilderSameDay => 'Hainbat txanda egun batean';
 
   @override
   String get patternBuilderSameDayHint =>
@@ -2068,7 +2068,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get onboardingTipBody =>
-      'Sakatu Margotu, aukeratu txanda bat eta arrastatu egunen gainetik. Eredua botoiarekin txandaketa oso bat errepikatzen duzu behingoz.';
+      'Sakatu Margotu, aukeratu txanda bat eta arrastatu egunen gainetik. Eredua botoiarekin txandaketa oso bat errepikatzen duzu aldi berean.';
 
   @override
   String get onboardingTipDismiss => 'Ados';
@@ -2322,10 +2322,10 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
-  String get summaryNightPlus => 'Gaueko plusa';
+  String get summaryNightPlus => 'Gaueko osagarria';
 
   @override
-  String get summaryHolidayPlus => 'Jaiegun-plusa';
+  String get summaryHolidayPlus => 'Jaieguneko osagarria';
 
   @override
   String get summaryEstimateNote => 'Estimazioa, zergen aurretik';
@@ -2459,7 +2459,7 @@ class AppLocalizationsEu extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: '$days egunei',
+      other: '$days eguni',
       one: 'egun bati',
     );
     return 'Urtean $goal, $_temp0 dagokien zatia';
@@ -2470,7 +2470,7 @@ class AppLocalizationsEu extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: '$days egunei',
+      other: '$days eguni',
       one: 'egun bati',
     );
     return 'Hilean $goal bider 12, $_temp0 dagokien zatia';
@@ -2641,7 +2641,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get reportAbsencesHint =>
-      'Gaixotasun-baja bat ez da bere izenarekin edo oharrarekin agertzen, «Izenarekin eta oharrarekin» aukeratzen ez baduzu.';
+      'Baja mediko bat ez da bere izenarekin edo oharrarekin agertzen, «Izenarekin eta oharrarekin» aukeratzen ez baduzu.';
 
   @override
   String get reportCreate => 'Sortu eta partekatu';
@@ -2682,7 +2682,7 @@ class AppLocalizationsEu extends AppLocalizations {
   String get reportHoursTotal => 'Orduak';
 
   @override
-  String get reportHoursDone => 'Atzora arte landuak';
+  String get reportHoursDone => 'Atzo arte lan egindakoak';
 
   @override
   String get reportHoursPlannedFrom => 'Gaurtik aurrera aurreikusiak';
@@ -2822,7 +2822,7 @@ class AppLocalizationsEu extends AppLocalizations {
       'Hilabeteko egun bakoitzaren kodea eta ordua. Gelaxka batean sartzen ez badira, berez egokitzen dira.';
 
   @override
-  String get appearanceCellSizeSampleCode => 'G';
+  String get appearanceCellSizeSampleCode => 'Gau';
 
   @override
   String get settingsWeekStartTitle => 'Asteko lehen eguna';
@@ -3049,7 +3049,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get faqNotesA =>
-      'Ukitu egun bat eta idatzi oharraren eremuan; oharra duten egunak egutegian markatzen dira. Ireki agenda egutegiaren goiko aldean: «Oharrak» atalak oharrak eta jaiegun pertsonalak biltzen ditu; «Txandak» atalak hurrengo txandak erakusten ditu.\n\nBilatu testua, maiuskulak eta azentuak kontuan hartu gabe, edo data: adibidez, 15/10 edo urr 15. Bilaketak ohar eta jaiegun pertsonal guztiak hartzen ditu, baita duela urtebetetik datorren urtera arteko txandak ere.';
+      'Ukitu egun bat eta idatzi oharraren eremuan; oharra duten egunak egutegian markatzen dira. Ireki agenda egutegiaren goiko aldean: «Oharrak» atalak oharrak eta jaiegun pertsonalak biltzen ditu; «Txandak» atalak hurrengo txandak erakusten ditu.\n\nBilatu testua, maiuskulak eta azentuak kontuan hartu gabe, edo data: adibidez, 15/10 edo urr 15. Bilaketak ohar eta jaiegun pertsonal guztiak hartzen ditu, baita duela urtebetetik urtebete barrura arteko txandak ere.';
 
   @override
   String get faqAlarmsQ =>
@@ -3102,7 +3102,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get faqSummaryA =>
-      'Egutegiko laburpen-ikonoak txandak, orduak, gaueko orduak eta jaiegunetakoak erakusten ditu, hilabetekoak, urte osokoak edo «Datak…» atalean aukeratzen dituzun datetakoak (366 egun arte). Txanda bat hasten den egunean kontatzen da, gauerdia gainditzen badu ere.\n\nZenbatekoak ikusteko, jarri txanden orduko prezioa eta, baduzu, txanda motaren osagarri finkoa Ezarpenak › Nire txandak atalean. Estimazioak osagarri finko horiek barne hartzen ditu, zergen aurretik, Ezarpenak › Itxura atalean aukeratzen duzun monetan. Txanda bakoitzean jartzen dituzun gaueko eta jaiegunetako orduko plusak ere batzen ditu; atxikipenak garbia bakarrik aldatzen du. Ezarpenak › Orduak eta dirua atalean sektorekako osagarrien txantiloiak, nomina-hilabeteko itxiera-eguna eta aparteko orduen muga dituzu.\n\n«Txandako osagarria» behin gehitzen da mota horretako txanda landu bakoitzeko, baita zatitutakoa bada ere; ez da ordu kopuruaren araberakoa. Atsedenek eta absentziek ez dute gehitzen.';
+      'Egutegiko laburpen-ikonoak txandak, orduak, gaueko orduak eta jaiegunetakoak erakusten ditu, hilabetekoak, urte osokoak edo «Datak…» atalean aukeratzen dituzun datetakoak (366 egun arte). Txanda bat hasten den egunean kontatzen da, gauerdia gainditzen badu ere.\n\nZenbatekoak ikusteko, jarri txanden orduko prezioa eta, baduzu, txanda motaren osagarri finkoa Ezarpenak › Nire txandak atalean. Estimazioak osagarri finko horiek barne hartzen ditu, zergen aurretik, Ezarpenak › Itxura atalean aukeratzen duzun monetan. Txanda bakoitzean jartzen dituzun gaueko eta jaiegunetako orduko osagarriak ere batzen ditu; atxikipenak garbia bakarrik aldatzen du. Ezarpenak › Orduak eta dirua atalean sektorekako osagarrien txantiloiak, nomina-hilabeteko itxiera-eguna eta aparteko orduen muga dituzu.\n\n«Txandako osagarria» behin gehitzen da mota horretako lan egindako txanda bakoitzeko, baita zatitutakoa bada ere; ez da ordu kopuruaren araberakoa. Atsedenek eta absentziek ez dute gehitzen.';
 
   @override
   String get settingsVersionCopied => 'Bertsioa kopiatu da';
@@ -3199,7 +3199,7 @@ class AppLocalizationsEu extends AppLocalizations {
       'Errenkada bakoitzean data bat eta txanda bat dituen orri bat.';
 
   @override
-  String get importSourceLrhsoft => 'LRHSoft kopia (Txanden Egutegia)';
+  String get importSourceLrhsoft => 'LRHSoft kopia (Calendario de Turnos)';
 
   @override
   String get importSourceLrhsoftHelp =>
@@ -3652,7 +3652,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get importProblemNotCalendar =>
-      'Fitxategi hori ez dirudi .ics egutegi bat.';
+      'Fitxategi horrek ez dirudi .ics egutegi bat.';
 
   @override
   String get importProblemNotCsv =>
@@ -3671,7 +3671,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get importProblemNotLrhsoft =>
-      'Fitxategi hori ez dirudi LRHSoft kopia bat (.Shifter). Saiatu beste kopia lokal bat sortzen.';
+      'Fitxategi horrek ez dirudi LRHSoft kopia bat (.Shifter). Saiatu beste kopia lokal bat sortzen.';
 
   @override
   String importRangeLrhsoftDays(int count) {
@@ -4116,7 +4116,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get shareLinkHowBody =>
-      'Google Calendar-en: Beste egutegi batzuk › URL bidez, eta itsatsi esteka. iPhone-an: ireki esteka, edo joan Ezarpenak › Egutegia › Kontuak › Gehitu kontua › Bestelakoa › Gehitu harpidetutako egutegia. Egutegi bakoitzak erabakitzen du noizero begiratzen dituen aldaketak: ordu batzuk behar ditzakete.';
+      'Google Calendar-en: Beste egutegi batzuk › URL bidez, eta itsatsi esteka. iPhone-an: ireki esteka, edo joan Ezarpenak › Egutegia › Kontuak › Gehitu kontua › Bestelakoa › Gehitu harpidetutako egutegia. Egutegi bakoitzak erabakitzen du zenbatean behin begiratzen dituen aldaketak: ordu batzuk behar ditzakete.';
 
   @override
   String get shareLinkRevoke => 'Baliogabetu esteka';
@@ -4362,7 +4362,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get autoBackupFolderErrRevoked =>
-      'Turnlyk jada ez du karpeta hori erabiltzeko baimenik. Aukeratu berriro.';
+      'Turnly-k jada ez du karpeta hori erabiltzeko baimenik. Aukeratu berriro.';
 
   @override
   String get autoBackupFolderErrMissing =>
@@ -4798,7 +4798,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get compareIntro =>
-      'Aukeratu bi egutegietatik sei artean eta ikusi haien txandak elkarrekin. Egun libre guztiak markatuta daude.';
+      'Aukeratu bi eta sei egutegi artean eta ikusi haien txandak elkarrekin. Denak libre dauden egunak markatzen dira.';
 
   @override
   String get comparePickTitle => 'Aukeratu egutegiak';
@@ -4830,7 +4830,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get compareNote =>
-      'Egun bat libretzat hartzen da inork lan egiten ez duenean eta guztiak libre bat edo absentzia bat (oporrak, baja…) idatzita dutenean. Txandarik idatzi gabeko eguna ez da libretzat hartzen: «idatzi gabe» markatzen da. Txanda bakoitza hasten den egunean kontatzen da.';
+      'Egun bat libretzat hartzen da inork lan egiten ez duenean eta guztiek libre bat edo absentzia bat (oporrak, baja…) idatzita dutenean. Txandarik idatzi gabeko eguna ez da libretzat hartzen: «idatzi gabe» markatzen da. Txanda bakoitza hasten den egunean kontatzen da.';
 
   @override
   String get compareNoShiftMark => '–';
@@ -4844,21 +4844,21 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
-  String get compareLegendUnrecorded => 'Bat batean idatzi gabe';
+  String get compareLegendUnrecorded => 'Egutegiren batean idatzi gabe';
 
   @override
   String compareUnrecordedCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count egun bat batean idatzi gabe',
-      one: 'Egun 1 bat batean idatzi gabe',
+      other: '$count egun egutegiren batean idatzi gabe',
+      one: 'Egun 1 egutegiren batean idatzi gabe',
     );
     return '$_temp0';
   }
 
   @override
-  String get compareUnrecorded => 'bat batean idatzi gabe';
+  String get compareUnrecorded => 'egutegiren batean idatzi gabe';
 
   @override
   String get compareLoadFailed => 'Ezin izan dira egutegiak irakurri.';
@@ -4959,7 +4959,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get calendarsDeleteBody =>
-      'Mugikor honetatik haren txandak, oharrak, zereginak eta txanda-aldaketak ezabatuko dira. Ezin da desegin. Aurretik segurtasun-kopia bat gordeko dugu, behar baduzu.';
+      'Mugikor honetatik haren txandak, oharrak, zereginak eta txanda-aldaketak ezabatuko dira. Ezin da desegin. Aurretik babeskopia bat gordeko dugu, behar baduzu.';
 
   @override
   String get calendarsDeleteConfirm => 'Ezabatu betiko';
@@ -4975,7 +4975,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get calendarsDeleteBackupFailed =>
-      'Ezin izan da aurretiko segurtasun-kopia gorde, beraz ez da ezer ezabatu. Begiratu mugikorraren lekua eta saiatu berriro.';
+      'Ezin izan da aurretiko babeskopia gorde, beraz ez da ezer ezabatu. Begiratu mugikorraren lekua eta saiatu berriro.';
 
   @override
   String get calendarsLastError =>
@@ -5629,7 +5629,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get shiftTypesPauseAlarmsOff =>
-      'Alarmak desaktibatuta daude. Aktibatu itzazu Ezarpenak › Alarmak atalean abisua jo dezan.';
+      'Alarmak desaktibatuta daude. Aktibatu itzazu Ezarpenak › Alarmak atalean abisuak jo dezan.';
 
   @override
   String get catalogShiftMorningName => 'Goiza';
@@ -5974,7 +5974,7 @@ class AppLocalizationsEu extends AppLocalizations {
   String get monthSelectDays => 'Hautatu egunak';
 
   @override
-  String get monthNavMonth => 'Hilabetea';
+  String get monthNavMonth => 'Hila';
 
   @override
   String get monthNavRotation => 'Txandaketa';
@@ -6115,7 +6115,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String absenceLeftSemantics(String name, String days) {
-    return '$name: $days geratzen zaizkizu';
+    return '$name: geratzen dena: $days';
   }
 
   @override
@@ -6151,7 +6151,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String absenceWarnExpiring(String days, String date) {
-    return 'Aurreko urteko $days geratzen zaizkizu. Iraungitze-data: $date.';
+    return 'Aurreko urtetik geratzen dena: $days. Iraungitze-data: $date.';
   }
 
   @override
@@ -6264,20 +6264,20 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String absenceSummaryLeft(String days, String name) {
-    return '$name: $days geratzen zaizkizu';
+    return '$name: geratzen dena: $days';
   }
 
   @override
   String get absenceSummaryOpen => 'Ireki oporrak eta baimenak';
 
   @override
-  String get moneyNightPlusLabel => 'Orduko gaueko plusa';
+  String get moneyNightPlusLabel => 'Orduko gaueko osagarria';
 
   @override
   String get moneyNightPlusHelper => 'Gaueko lan-ordu bakoitzeko gehitzen da.';
 
   @override
-  String get moneyHolidayPlusLabel => 'Orduko jaiegun-plusa';
+  String get moneyHolidayPlusLabel => 'Orduko jaieguneko osagarria';
 
   @override
   String get moneyHolidayPlusHelper =>
@@ -6939,7 +6939,7 @@ class AppLocalizationsEu extends AppLocalizations {
       'Oharraren lehen lerroa eguneko laukian';
 
   @override
-  String get appearancePaintSoundTitle => 'Soa margotzean';
+  String get appearancePaintSoundTitle => 'Soinua margotzean';
 
   @override
   String get appearancePaintSoundSubtitle =>
@@ -7033,16 +7033,16 @@ class AppLocalizationsEu extends AppLocalizations {
       'Dagoeneko 6 egutegi konparatzen ari zara, gehienekoa.';
 
   @override
-  String get compareWeekendTitle => 'Asteburu libre amankomunak';
+  String get compareWeekendTitle => 'Asteburu libre komunak';
 
   @override
   String compareWeekendCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count asteburu libre amankomun hilabete honetan',
-      one: 'Asteburu libre amankomun 1 hilabete honetan',
-      zero: 'Hilabete honetan ez dago asteburu libre amankomunik',
+      other: '$count asteburu libre komun hilabete honetan',
+      one: 'Asteburu libre komun 1 hilabete honetan',
+      zero: 'Hilabete honetan ez dago asteburu libre komunik',
     );
     return '$_temp0';
   }
@@ -7052,15 +7052,15 @@ class AppLocalizationsEu extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Asteburuko $count egun libre amankomun',
-      one: 'Asteburuko egun libre amankomun 1',
+      other: 'Asteburuko $count egun libre komun',
+      one: 'Asteburuko egun libre komun 1',
     );
     return '$_temp0';
   }
 
   @override
   String compareWeekendSpoken(String saturday, String sunday) {
-    return '$saturday eta $sunday, denek libre';
+    return '$saturday eta $sunday, denak libre';
   }
 
   @override
@@ -7197,7 +7197,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get resetCalendars =>
-      'Egutegi guztiak eta haien txandak, txandakatzeak eta salbuespenak.';
+      'Egutegi guztiak eta haien txandak, txandaketak eta salbuespenak.';
 
   @override
   String get resetNotes =>
@@ -7207,7 +7207,7 @@ class AppLocalizationsEu extends AppLocalizations {
   String get resetAbsences => 'Oporrak, baimenak eta absentziak.';
 
   @override
-  String get resetSwaps => 'Aldaketen liburua.';
+  String get resetSwaps => 'Trukeen liburua.';
 
   @override
   String get resetAlarms => 'Alarmak eta programatutako abisuak.';

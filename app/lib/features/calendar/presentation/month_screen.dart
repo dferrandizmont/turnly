@@ -928,10 +928,14 @@ class _DateHeader extends ConsumerWidget {
         ),
       ),
       ReportShareButton(month: month),
-      IconButton(
-        tooltip: l10n.settingsOpenTooltip,
-        icon: Icon(AppIcons.settings, color: colors.textMuted),
-        onPressed: () => context.push(AppRoutes.settings),
+      Semantics(
+        identifier: 'open-settings',
+        button: true,
+        child: IconButton(
+          tooltip: l10n.settingsOpenTooltip,
+          icon: Icon(AppIcons.settings, color: colors.textMuted),
+          onPressed: () => context.push(AppRoutes.settings),
+        ),
       ),
     ];
   }

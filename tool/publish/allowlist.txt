@@ -1672,3 +1672,7 @@ docs/readme/gl/09-cambios-oscuro.png
 docs/readme/gl/10-primer-uso-oscuro.png
 docs/readme/gl/11-widgets-oscuro.png
 web/assets/site.js
+# 17-nov-2026: tests of the builder fixes (Other number, Undo) and the hourly rate limit, reviewed.
+app/test/features/calendar/overtime_rate_limit_test.dart
+app/test/features/patterns/pattern_block_editor_test.dart
+app/test/features/shift_types/money_input_formatter_test.dart

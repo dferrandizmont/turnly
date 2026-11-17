@@ -584,7 +584,7 @@
   "shiftTypesColorOptionNamed": "{name}, {number} de {total}",
   "shiftColorNameOrange": "Taronja",
   "shiftColorNameCoral": "Corall",
-  "shiftColorNameIndigo": "Índigo",
+  "shiftColorNameIndigo": "Indi",
   "shiftColorNameLightGrey": "Gris clar",
   "shiftColorNameRed": "Vermell",
   "shiftColorNameLilac": "Lila",
@@ -673,7 +673,7 @@
   },
   "shiftTypesColorHexLabel": "Codi hexadecimal",
   "shiftTypesColorHexError": "Escriu 6 xifres o lletres de la A a la F, per exemple #1C7ED6.",
-  "shiftTypesColorUse": "Fes servir aquest color",
+  "shiftTypesColorUse": "Usa aquest color",
   "shiftTypesCategoryLabel": "Categoria",
   "shiftTypesTimesLabel": "Horari",
   "shiftTypesStarts": "Comença {time}",
@@ -1190,31 +1190,25 @@
   "patternHideCycle": "Amaga el cicle complet",
   "patternOccurrenceInRun": "Dia {position} de {count}",
   "@patternOccurrenceInRun": {
-    "description": "Dia d'una tanda de diversos dies: «2n de 5 · Matí».",
+    "description": "Opción: un día de una racha de días seguidos del mismo turno, «Día 2 de 5». Sin el nombre del turno (va en la pregunta) y sin ordinal con género (el nombre lo pone el usuario).",
     "placeholders": {
-      "ordinal": {
-        "type": "String"
+      "position": {
+        "type": "int"
       },
       "count": {
         "type": "int"
-      },
-      "shift": {
-        "type": "String"
       }
     }
   },
   "patternOccurrenceInRunAfter": "Dia {position} de {count}, després de {previous}",
   "@patternOccurrenceInRunAfter": {
-    "description": "Dia d'una tanda, dient quina tanda: «1r de 2 · Lliure, després de Nit».",
+    "description": "Como patternOccurrenceInRun, cuando el turno tiene varias rachas: «Día 1 de 2, después de Libre».",
     "placeholders": {
-      "ordinal": {
-        "type": "String"
+      "position": {
+        "type": "int"
       },
       "count": {
         "type": "int"
-      },
-      "shift": {
-        "type": "String"
       },
       "previous": {
         "type": "String"
@@ -1223,11 +1217,8 @@
   },
   "patternOccurrenceAfter": "Després de {previous}",
   "@patternOccurrenceAfter": {
-    "description": "Tanda d'un sol dia: «Lliure, després de Tarda».",
+    "description": "Racha de un solo día cuando el turno tiene varias: «Después de Noche».",
     "placeholders": {
-      "shift": {
-        "type": "String"
-      },
       "previous": {
         "type": "String"
       }
@@ -1726,7 +1717,7 @@
   "reportSheetIntro": "Un PDF net per imprimir o enviar, o un full de càlcul amb els teus torns.",
   "reportFormatPdf": "PDF per imprimir o enviar",
   "reportFormatCsv": "CSV per a Excel o Sheets",
-  "reportIncludeTitle": "Què vols incloure",
+  "reportIncludeTitle": "Què incloure",
   "reportIncludeNotes": "Notes dels dies",
   "reportIncludeEarnings": "Imports estimats",
   "reportAbsencesTitle": "Absències",
@@ -1920,7 +1911,7 @@
   "faqImportQ": "Puc importar o exportar els meus torns al calendari?",
   "faqImportA": "Sí. A Configuració › Importa torns pots portar una còpia «.Shifter» de LRHSoft, torns del calendari del mòbil, un fitxer .ics o un CSV. A LRHSoft, crea una còpia a Menú › Còpia de seguretat › Còpia local i tria el fitxer de Documents › ShifterBackups. Revisa les dates, els tipus de torn i la previsualització abans d’importar.\n\n«Exporta al calendari del mòbil» copia els teus torns una vegada a un calendari del telèfon. Si tornes a exportar no es dupliquen: només es toquen els esdeveniments que va crear Turnly.",
   "faqCalendarsQ": "Puc portar diversos calendaris i comparar-los?",
-  "faqCalendarsA": "Sí. A Configuració › Calendaris en crees un per a la teva parella, una segona feina o un fill: cadascun té les seves rotacions i els seus dies, i els tipus de torn són els mateixos. Amb dos o més, el nom del calendari damunt del mes et permet canviar de l’un a l’altre. El widget i les alarmes segueixen el calendari marcat com a «Widget i alarmes».\n\nPer veure quan coincidiu lliures, toca «Compara calendaris» en aquesta mateixa fulla: en tries dos i en veus els torns junts i els dies lliures en comú del mes.",
+  "faqCalendarsA": "Sí. A Configuració › Calendaris en crees un per a la teva parella, una segona feina o un fill: cadascun té les seves rotacions i els seus dies, i els tipus de torn són els mateixos. Amb dos o més, el nom del calendari damunt del mes et permet canviar de l’un a l’altre. El widget i les alarmes segueixen el calendari marcat com a «Widget i alarmes».\n\nPer veure quan coincidiu lliures, toca «Compara calendaris» en aquesta mateixa pantalla: en tries dos i en veus els torns junts i els dies lliures en comú del mes.",
   "faqSummaryQ": "Com es calculen les hores i els diners?",
   "faqSummaryA": "La icona de resum del calendari mostra els torns, les hores, les nocturnes i les de festiu del mes, d’un any sencer o de les dates que triïs a «Dates…» (fins a 366 dies). Un torn compta el dia que comença, encara que passi la mitjanit.\n\nPer veure imports, posa el preu per hora i, si en tens, el plus fix per tipus de torn a Configuració › Els meus torns. L’estimació inclou aquests plusos fixos, abans d’impostos, en la moneda que triïs a Configuració › Aparença. També suma els plusos per hora nocturna i festiva que posis a cada torn; la retenció només canvia el net. A Configuració › Hores i diners tens plantilles de plusos per sector, el dia de tancament del teu mes de nòmina i un límit d’hores extra.\n\nEl «Plus per torn» se suma una vegada per cada torn treballat d’aquell tipus, també si és partit; no depèn de les hores. Els descansos i les absències no el sumen.",
   "settingsVersionCopied": "S’ha copiat la versió",
@@ -1965,7 +1956,7 @@
   },
   "importNext": "Següent",
   "importReading": "S’està llegint…",
-  "importSourceTitle": "D’on vénen els teus torns?",
+  "importSourceTitle": "D’on venen els teus torns?",
   "importSourceHelp": "Turnly llegeix els esdeveniments aquí mateix, al teu mòbil, i no els envia enlloc. Tu decideixes què s’importa.",
   "importSourceDevice": "Calendari del mòbil",
   "importSourceDeviceHelp": "Google, iCloud, Outlook… el que tinguis a l’app de calendari.",
@@ -1973,7 +1964,7 @@
   "importSourceIcsHelp": "Un calendari exportat, amb un torn per esdeveniment.",
   "importSourceCsv": "Fitxer CSV",
   "importSourceCsvHelp": "Un full amb una data i un torn a cada fila.",
-  "importSourceLrhsoft": "Còpia de LRHSoft (Calendari de Torns)",
+  "importSourceLrhsoft": "Còpia de LRHSoft (Calendario de Turnos)",
   "importSourceLrhsoftHelp": "El fitxer .Shifter de la teva còpia local",
   "importFileLrhsoft": "Còpia de LRHSoft",
   "importHowToTitle": "Vens de LRHSoft o Supershift?",
@@ -1991,7 +1982,7 @@
   "calExportPermissionRestrictedBody": "Pot ser un control parental o un perfil de feina. Si importes, prova amb un fitxer .ics.",
   "calExportPermissionWriteOnlyBody": "El sistema només ha donat permís per afegir esdeveniments. Turnly necessita accés complet per llegir els calendaris o per substituir els esdeveniments d’una exportació anterior.",
   "importCalendarsTitle": "Tria els calendaris",
-  "importCalendarsHelp": "Marca d’on vénen els teus torns. Els altres no es toquen.",
+  "importCalendarsHelp": "Marca d’on venen els teus torns. Els altres no es toquen.",
   "importCalendarsEmpty": "No hi ha calendaris en aquest mòbil.",
   "importCalendarsNoAccount": "Sense compte",
   "importCalendarsReadOnly": "Només lectura",
@@ -2157,7 +2148,7 @@
     }
   },
   "importNewTypeTitle": "Tipus de torn nou",
-  "importNewTypeUse": "Fes servir aquest tipus",
+  "importNewTypeUse": "Usa aquest tipus",
   "importPreviewTitle": "Així quedarà",
   "importPreviewHelp": "Revisa els mesos. No es desa res fins que toquis Importa.",
   "importPreviewTarget": "S’importa a «{name}».",
@@ -2879,7 +2870,7 @@
     }
   },
   "calendarsCreate": "Crea",
-  "calendarsMakePrimary": "Fes-lo servir per al widget i les alarmes",
+  "calendarsMakePrimary": "Usa’l per al widget i les alarmes",
   "calendarsPrimaryHelp": "El widget i les alarmes segueixen aquest calendari encara que n’estiguis mirant un altre.",
   "calendarsArchive": "Arxiva",
   "calendarsArchiveTitle": "Vols arxivar «{name}»?",
@@ -3529,9 +3520,9 @@
   "absenceEmptyTitle": "Encara no hi ha saldos",
   "absenceEmptyBody": "Crea un saldo (vacances, assumptes particulars…) i l’app compta els dies a partir del teu quadrant.",
   "absenceAdd": "Afegeix un saldo",
-  "absenceContinueSeries": "Continuar una sèrie",
+  "absenceContinueSeries": "Continua una sèrie",
   "absenceContinueSeriesHelper": "Si continues la sèrie d’un any anterior, se’n copien el nom, els tipus i el topall, i el que et va sobrar s’arrossega. Tu només omples els dies permesos.",
-  "absenceCopyNextYear": "Copiar a l’any següent",
+  "absenceCopyNextYear": "Copia a l’any següent",
   "absenceCopiedNextYear": "Saldo copiat a {year}.",
   "absenceLeftCaption": "{days, plural, =1{dia que et queda} other{dies que et queden}}",
   "absenceLeftSemantics": "{name}: et queden {days}",

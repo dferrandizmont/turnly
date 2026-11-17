@@ -276,6 +276,7 @@ class _PayTemplateSheetState extends State<_PayTemplateSheet> {
       children: [
         Semantics(
           header: true,
+          identifier: 'pay-template-sheet',
           child: Text(l10n.payTemplateTitle, style: type.headline),
         ),
         const SizedBox(height: Sp.s),

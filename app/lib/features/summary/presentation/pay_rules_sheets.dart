@@ -105,6 +105,7 @@ class _ClosingDaySheetState extends State<_ClosingDaySheet> {
       children: [
         Semantics(
           header: true,
+          identifier: 'closing-day-sheet',
           child: Text(l10n.closingDayTitle, style: type.headline),
         ),
         const SizedBox(height: Sp.l),
@@ -187,6 +188,7 @@ class _OvertimeCapSheetState extends State<_OvertimeCapSheet> {
       children: [
         Semantics(
           header: true,
+          identifier: 'overtime-cap-sheet',
           child: Text(l10n.overtimeCapTitle, style: type.headline),
         ),
         const SizedBox(height: Sp.s),

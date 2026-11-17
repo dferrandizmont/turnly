@@ -959,7 +959,7 @@
     }
   },
   "selectionRunsTitle": "Nire txandaketak",
-  "selectionRunsSubtitle": "Amaitu edo kendu eredu bat behingoz",
+  "selectionRunsSubtitle": "Amaitu edo kendu eredu bat aldi berean",
   "selectionRunsEmptyTitle": "Txandaketarik ez",
   "selectionRunsEmptyMessage": "Margotu ataletik eredu bat aplikatzen duzunean, hemen agertuko da.",
   "selectionRunsRange": "{from} – {to}",
@@ -1138,7 +1138,7 @@
   "patternBuilderDefaultName": "Nire eredua",
   "patternBuilderSequence": "Zure sekuentzia",
   "patternBuilderEmpty": "Ukitu beheko txandak egunak gehitzeko.",
-  "patternBuilderSameDay": "Txanda bat baino gehiago egun batean",
+  "patternBuilderSameDay": "Hainbat txanda egun batean",
   "patternBuilderSameDayHint": "Aktibatuta: ukitzen duzun txanda bakoitza sekuentziako azken egunari gehitzen zaio, egun berri bat sortu beharrean.",
   "patternBuilderRemoveLast": "Kendu azkena",
   "patternBuilderClear": "Hustu sekuentzia",
@@ -1190,31 +1190,25 @@
   "patternHideCycle": "Ezkutatu ziklo osoa",
   "patternOccurrenceInRun": "{position}. eguna, guztira {count}",
   "@patternOccurrenceInRun": {
-    "description": "Hainbat eguneko sortaren eguna: «5 egunetan, 2. eguna · Goiza».",
+    "description": "Opción: un día de una racha de días seguidos del mismo turno, «Día 2 de 5». Sin el nombre del turno (va en la pregunta) y sin ordinal con género (el nombre lo pone el usuario).",
     "placeholders": {
-      "ordinal": {
-        "type": "String"
+      "position": {
+        "type": "int"
       },
       "count": {
         "type": "int"
-      },
-      "shift": {
-        "type": "String"
       }
     }
   },
   "patternOccurrenceInRunAfter": "{position}. eguna, guztira {count} · Aurrekoa: {previous}",
   "@patternOccurrenceInRunAfter": {
-    "description": "Sortaren eguna, zein sortatakoa den esanda: «2 egunetan, 1. eguna · Libre · Aurrekoa: Gaua».",
+    "description": "Como patternOccurrenceInRun, cuando el turno tiene varias rachas: «Día 1 de 2, después de Libre».",
     "placeholders": {
-      "ordinal": {
-        "type": "String"
+      "position": {
+        "type": "int"
       },
       "count": {
         "type": "int"
-      },
-      "shift": {
-        "type": "String"
       },
       "previous": {
         "type": "String"
@@ -1223,11 +1217,8 @@
   },
   "patternOccurrenceAfter": "Aurrekoa: {previous}",
   "@patternOccurrenceAfter": {
-    "description": "Egun bakarreko sorta: «Libre · Aurrekoa: Arratsaldea».",
+    "description": "Racha de un solo día cuando el turno tiene varias: «Después de Noche».",
     "placeholders": {
-      "shift": {
-        "type": "String"
-      },
       "previous": {
         "type": "String"
       }
@@ -1437,7 +1428,7 @@
   "onboardingReadySaveFailed": "Ezin izan da dena gorde. Berrikusi zure txandak eta jaiegunak Ezarpenak atalean.",
   "onboardingOpenCalendar": "Ikusi nire egutegia",
   "onboardingTipTitle": "Margotu zure hila berehala",
-  "onboardingTipBody": "Sakatu Margotu, aukeratu txanda bat eta arrastatu egunen gainetik. Eredua botoiarekin txandaketa oso bat errepikatzen duzu behingoz.",
+  "onboardingTipBody": "Sakatu Margotu, aukeratu txanda bat eta arrastatu egunen gainetik. Eredua botoiarekin txandaketa oso bat errepikatzen duzu aldi berean.",
   "onboardingTipDismiss": "Ados",
   "onboardingTipClose": "Itxi aholkua",
   "paintScrollUp": "Gora egin hilabetean",
@@ -1589,8 +1580,8 @@
       }
     }
   },
-  "summaryNightPlus": "Gaueko plusa",
-  "summaryHolidayPlus": "Jaiegun-plusa",
+  "summaryNightPlus": "Gaueko osagarria",
+  "summaryHolidayPlus": "Jaieguneko osagarria",
   "summaryEstimateNote": "Estimazioa, zergen aurretik",
   "summaryEstimateNone": "Jarri orduko prezioa edo txandako osagarria Nire txandak atalean estimazioa ikusteko.",
   "summaryEstimateMissing": "Orduko preziorik gabe, orduko ordainketa ez da sartzen: {types}.",
@@ -1654,8 +1645,8 @@
   "summaryGoalPerYear": "Urteko helburua",
   "summaryGoalFromYear": "Urtean {goal}, zati 12",
   "summaryGoalFromMonth": "Hilean {goal}, bider 12",
-  "summaryGoalRangeFromYear": "Urtean {goal}, {days, plural, =1{egun bati} other{{days} egunei}} dagokien zatia",
-  "summaryGoalRangeFromMonth": "Hilean {goal} bider 12, {days, plural, =1{egun bati} other{{days} egunei}} dagokien zatia",
+  "summaryGoalRangeFromYear": "Urtean {goal}, {days, plural, =1{egun bati} other{{days} eguni}} dagokien zatia",
+  "summaryGoalRangeFromMonth": "Hilean {goal} bider 12, {days, plural, =1{egun bati} other{{days} eguni}} dagokien zatia",
   "summaryGoalChoiceYear": "Urtean",
   "summaryGoalChoiceMonth": "Hilean",
   "summaryGoalHoursYear": "Orduak urtean",
@@ -1733,7 +1724,7 @@
   "reportAbsencesHidden": "Ez erakutsi",
   "reportAbsencesGeneric": "«Absentzia» gisa soilik",
   "reportAbsencesDetailed": "Izenarekin eta oharrarekin",
-  "reportAbsencesHint": "Gaixotasun-baja bat ez da bere izenarekin edo oharrarekin agertzen, «Izenarekin eta oharrarekin» aukeratzen ez baduzu.",
+  "reportAbsencesHint": "Baja mediko bat ez da bere izenarekin edo oharrarekin agertzen, «Izenarekin eta oharrarekin» aukeratzen ez baduzu.",
   "reportCreate": "Sortu eta partekatu",
   "reportFailed": "Ezin izan da txostena sortu",
   "reportSubject": "Txandak: {period}",
@@ -1753,7 +1744,7 @@
   "reportAbsenceName": "Absentzia",
   "reportAbsenceCode": "ABS",
   "reportHoursTotal": "Orduak",
-  "reportHoursDone": "Atzora arte landuak",
+  "reportHoursDone": "Atzo arte lan egindakoak",
   "reportHoursPlannedFrom": "Gaurtik aurrera aurreikusiak",
   "reportFooter": "Turnly-rekin sortua",
   "reportPageOf": "Orria: {page}/{total}",
@@ -1811,7 +1802,7 @@
   "appearanceCellSizeLarge": "Handia",
   "appearanceCellSizeExtraLarge": "Oso handia",
   "appearanceCellSizeNote": "Hilabeteko egun bakoitzaren kodea eta ordua. Gelaxka batean sartzen ez badira, berez egokitzen dira.",
-  "appearanceCellSizeSampleCode": "G",
+  "appearanceCellSizeSampleCode": "Gau",
   "settingsWeekStartTitle": "Asteko lehen eguna",
   "settingsWeekStartMonday": "Astelehena",
   "settingsWeekStartSunday": "Igandea",
@@ -1908,7 +1899,7 @@
   "faqPostNightQ": "Zer da gau-ondoko automatikoa?",
   "faqPostNightA": "Gau baten hurrengo eguneko atsedena da. Ezarpenak › Gau-ondoko automatikoa atalean aktibatzen baduzu, gau bat margotzean edo aplikatzean, hurrengo eguna Gau-ondokoa bihurtzen da, hutsik edo libre bazegoen. Beste txanda bat zuten egunak ez dira ukitzen. Desaktibatuta dator.",
   "faqNotesQ": "Nola erabiltzen ditut oharrak eta agenda?",
-  "faqNotesA": "Ukitu egun bat eta idatzi oharraren eremuan; oharra duten egunak egutegian markatzen dira. Ireki agenda egutegiaren goiko aldean: «Oharrak» atalak oharrak eta jaiegun pertsonalak biltzen ditu; «Txandak» atalak hurrengo txandak erakusten ditu.\n\nBilatu testua, maiuskulak eta azentuak kontuan hartu gabe, edo data: adibidez, 15/10 edo urr 15. Bilaketak ohar eta jaiegun pertsonal guztiak hartzen ditu, baita duela urtebetetik datorren urtera arteko txandak ere.",
+  "faqNotesA": "Ukitu egun bat eta idatzi oharraren eremuan; oharra duten egunak egutegian markatzen dira. Ireki agenda egutegiaren goiko aldean: «Oharrak» atalak oharrak eta jaiegun pertsonalak biltzen ditu; «Txandak» atalak hurrengo txandak erakusten ditu.\n\nBilatu testua, maiuskulak eta azentuak kontuan hartu gabe, edo data: adibidez, 15/10 edo urr 15. Bilaketak ohar eta jaiegun pertsonal guztiak hartzen ditu, baita duela urtebetetik urtebete barrura arteko txandak ere.",
   "faqAlarmsQ": "Nola konfiguratzen ditut alarmak, eta zer da alarma zehatzen baimena?",
   "faqAlarmsA": "Ezarpenak › Alarmak atalean, aktibatu «Abisatu txanda bakoitzaren aurretik», aukeratu zenbat lehenago eta, nahi baduzu, aurreko eguneko abisu bat ordu jakin batean. Egun baten xehetasunetan haren alarma ken dezakezu «Alarmarik ez egun honetan» aukerarekin.\n\nAndroiden, jakinarazpenak eta sistemaren ezarpenetako «Alarmak eta abisuak» baimena behar dira: hori gabe, Androidek minutu batzuk atzeratu dezake abisua. Alarmen pantailak esaten dizu zer falta den eta ezarpenetara eramaten zaitu. Zure mugikorrak bateria modu oldarkorrean aurrezten badu, utzi Turnly murrizketarik gabe, abisuak geldi ez ditzan.",
   "faqHolidaysQ": "Nola gehitzen dut tokiko jaiegun bat?",
@@ -1922,7 +1913,7 @@
   "faqCalendarsQ": "Egutegi bat baino gehiago izan eta alderatu ditzaket?",
   "faqCalendarsA": "Bai. Ezarpenak › Egutegiak atalean, egutegi bat sortzen duzu zure bikotearentzat, bigarren lan batentzat edo seme-alaba batentzat: bakoitzak bere txandaketak eta egunak ditu, eta txanda motak berak dira. Bi edo gehiago dituzunean, hilaren gaineko egutegi-izenarekin batetik bestera alda zaitezke. Widgetak eta alarmek «Widgeta eta alarmak» gisa markatutako egutegia jarraitzen dute.\n\nNoiz zaudeten biak libre ikusteko, sakatu «Alderatu egutegiak» orri berean: bi aukeratzen dituzu eta haien txandak elkarrekin ikusten dituzu, baita hilabeteko egun libre komunak ere.",
   "faqSummaryQ": "Nola kalkulatzen dira orduak eta dirua?",
-  "faqSummaryA": "Egutegiko laburpen-ikonoak txandak, orduak, gaueko orduak eta jaiegunetakoak erakusten ditu, hilabetekoak, urte osokoak edo «Datak…» atalean aukeratzen dituzun datetakoak (366 egun arte). Txanda bat hasten den egunean kontatzen da, gauerdia gainditzen badu ere.\n\nZenbatekoak ikusteko, jarri txanden orduko prezioa eta, baduzu, txanda motaren osagarri finkoa Ezarpenak › Nire txandak atalean. Estimazioak osagarri finko horiek barne hartzen ditu, zergen aurretik, Ezarpenak › Itxura atalean aukeratzen duzun monetan. Txanda bakoitzean jartzen dituzun gaueko eta jaiegunetako orduko plusak ere batzen ditu; atxikipenak garbia bakarrik aldatzen du. Ezarpenak › Orduak eta dirua atalean sektorekako osagarrien txantiloiak, nomina-hilabeteko itxiera-eguna eta aparteko orduen muga dituzu.\n\n«Txandako osagarria» behin gehitzen da mota horretako txanda landu bakoitzeko, baita zatitutakoa bada ere; ez da ordu kopuruaren araberakoa. Atsedenek eta absentziek ez dute gehitzen.",
+  "faqSummaryA": "Egutegiko laburpen-ikonoak txandak, orduak, gaueko orduak eta jaiegunetakoak erakusten ditu, hilabetekoak, urte osokoak edo «Datak…» atalean aukeratzen dituzun datetakoak (366 egun arte). Txanda bat hasten den egunean kontatzen da, gauerdia gainditzen badu ere.\n\nZenbatekoak ikusteko, jarri txanden orduko prezioa eta, baduzu, txanda motaren osagarri finkoa Ezarpenak › Nire txandak atalean. Estimazioak osagarri finko horiek barne hartzen ditu, zergen aurretik, Ezarpenak › Itxura atalean aukeratzen duzun monetan. Txanda bakoitzean jartzen dituzun gaueko eta jaiegunetako orduko osagarriak ere batzen ditu; atxikipenak garbia bakarrik aldatzen du. Ezarpenak › Orduak eta dirua atalean sektorekako osagarrien txantiloiak, nomina-hilabeteko itxiera-eguna eta aparteko orduen muga dituzu.\n\n«Txandako osagarria» behin gehitzen da mota horretako lan egindako txanda bakoitzeko, baita zatitutakoa bada ere; ez da ordu kopuruaren araberakoa. Atsedenek eta absentziek ez dute gehitzen.",
   "settingsVersionCopied": "Bertsioa kopiatu da",
   "settingsEmailCopied": "Helbidea kopiatu da",
   "settingsAboutTitle": "Honi buruz",
@@ -1973,7 +1964,7 @@
   "importSourceIcsHelp": "Esportatutako egutegi bat, gertaera bakoitzeko txanda batekin.",
   "importSourceCsv": "CSV fitxategia",
   "importSourceCsvHelp": "Errenkada bakoitzean data bat eta txanda bat dituen orri bat.",
-  "importSourceLrhsoft": "LRHSoft kopia (Txanden Egutegia)",
+  "importSourceLrhsoft": "LRHSoft kopia (Calendario de Turnos)",
   "importSourceLrhsoftHelp": "Zure kopia lokaleko .Shifter fitxategia",
   "importFileLrhsoft": "LRHSoft kopia",
   "importHowToTitle": "LRHSoft edo Supershift aplikaziotik zatoz?",
@@ -2266,12 +2257,12 @@
   "importProblemReadFailed": "Ezin izan dira gertaerak irakurri. Saiatu berriro.",
   "importProblemFileTooLarge": "Fitxategiak 5 MB baino gehiago ditu. Esportatzean, aukeratu data gutxiago.",
   "importProblemFileUnreadable": "Ezin izan dugu fitxategi hori ireki. .csv, .ics eta .Shifter (LRHSoft) fitxategiak onartzen ditugu.",
-  "importProblemNotCalendar": "Fitxategi hori ez dirudi .ics egutegi bat.",
+  "importProblemNotCalendar": "Fitxategi horrek ez dirudi .ics egutegi bat.",
   "importProblemNotCsv": "Ez dugu daten zutaberik aurkitu CSV horretan.",
   "importProblemNoEvents": "Ez dago gertaerarik data horietan.",
   "importProblemTooComplex": "Fitxategi hori handiegia edo konplexuegia da, eta gehiegi behar du. Esportatzean, aukeratu data gutxiago.",
   "importProblemUnknown": "Zerbaitek huts egin du fitxategia irakurtzean. Probatu beste batekin.",
-  "importProblemNotLrhsoft": "Fitxategi hori ez dirudi LRHSoft kopia bat (.Shifter). Saiatu beste kopia lokal bat sortzen.",
+  "importProblemNotLrhsoft": "Fitxategi horrek ez dirudi LRHSoft kopia bat (.Shifter). Saiatu beste kopia lokal bat sortzen.",
   "importRangeLrhsoftDays": "{count, plural, =1{Kopiak egun 1 dauka.} other{Kopiak {count} egun dauzka.}}",
   "importMappingInvalidRows": "{count, plural, =1{Baliozkoa ez zen errenkada 1 baztertu da.} other{Baliozkoak ez ziren {count} errenkada baztertu dira.}}",
   "importLrhsoftNotImported": "Alarmak, marrazkiak, argazkiak eta aparteko orduak ez dira ekartzen.",
@@ -2480,7 +2471,7 @@
   },
   "shareLinkCalendarMissing": "Partekatzen zenuen egutegia ez dago jada. Aukeratu beste bat esteka eguneratzen jarraitzeko.",
   "shareLinkHowTitle": "Nola harpidetu",
-  "shareLinkHowBody": "Google Calendar-en: Beste egutegi batzuk › URL bidez, eta itsatsi esteka. iPhone-an: ireki esteka, edo joan Ezarpenak › Egutegia › Kontuak › Gehitu kontua › Bestelakoa › Gehitu harpidetutako egutegia. Egutegi bakoitzak erabakitzen du noizero begiratzen dituen aldaketak: ordu batzuk behar ditzakete.",
+  "shareLinkHowBody": "Google Calendar-en: Beste egutegi batzuk › URL bidez, eta itsatsi esteka. iPhone-an: ireki esteka, edo joan Ezarpenak › Egutegia › Kontuak › Gehitu kontua › Bestelakoa › Gehitu harpidetutako egutegia. Egutegi bakoitzak erabakitzen du zenbatean behin begiratzen dituen aldaketak: ordu batzuk behar ditzakete.",
   "shareLinkRevoke": "Baliogabetu esteka",
   "shareLinkRevokeConfirmTitle": "Esteka baliogabetu?",
   "shareLinkRevokeConfirmBody": "Zerbitzaritik ezabatzen da eta inorentzat ez du funtzionatzen. Berriro argitaratzen baduzu, esteka berri bat sortzen da.",
@@ -2561,7 +2552,7 @@
   "autoBackupFolderStopped": "Jada ez da kopiarik egiten karpeta horretan",
   "autoBackupFolderFailedTitle": "Karpetako kopiak ez du funtzionatzen",
   "autoBackupFolderFailedWhen": "Azken saiakera: {when}.",
-  "autoBackupFolderErrRevoked": "Turnlyk jada ez du karpeta hori erabiltzeko baimenik. Aukeratu berriro.",
+  "autoBackupFolderErrRevoked": "Turnly-k jada ez du karpeta hori erabiltzeko baimenik. Aukeratu berriro.",
   "autoBackupFolderErrMissing": "Ez dugu karpeta aurkitu: agian ezabatu edo lekuz aldatu da. Aukeratu beste bat.",
   "autoBackupFolderErrUnwritable": "Karpeta horrek ez du fitxategiak gordetzen uzten. Aukeratu beste bat.",
   "autoBackupFolderErrNoSpace": "Ez dago lekurik karpeta dagoen tokian (gailuan edo zure hodeian). Egin lekua eta saiatu berriro.",
@@ -2817,7 +2808,7 @@
   "compareOpen": "Alderatu egutegiak",
   "compareOpenSubtitle": "Ikusi noiz zaudeten biak libre",
   "compareSwap": "Trukatu",
-  "compareIntro": "Aukeratu bi egutegietatik sei artean eta ikusi haien txandak elkarrekin. Egun libre guztiak markatuta daude.",
+  "compareIntro": "Aukeratu bi eta sei egutegi artean eta ikusi haien txandak elkarrekin. Denak libre dauden egunak markatzen dira.",
   "comparePickTitle": "Aukeratu egutegiak",
   "compareNeedTwoTitle": "Bi egutegi behar dituzu",
   "compareNeedTwoBody": "Sortu beste egutegi bat (zure bikotea, bigarren lan bat) noiz zaudeten biak libre ikusteko.",
@@ -2831,7 +2822,7 @@
   },
   "compareFreeListTitle": "Egun libre komunak",
   "compareLegendFree": "Denak libre",
-  "compareNote": "Egun bat libretzat hartzen da inork lan egiten ez duenean eta guztiak libre bat edo absentzia bat (oporrak, baja…) idatzita dutenean. Txandarik idatzi gabeko eguna ez da libretzat hartzen: «idatzi gabe» markatzen da. Txanda bakoitza hasten den egunean kontatzen da.",
+  "compareNote": "Egun bat libretzat hartzen da inork lan egiten ez duenean eta guztiek libre bat edo absentzia bat (oporrak, baja…) idatzita dutenean. Txandarik idatzi gabeko eguna ez da libretzat hartzen: «idatzi gabe» markatzen da. Txanda bakoitza hasten den egunean kontatzen da.",
   "compareNoShiftMark": "–",
   "compareBothFree": "denak libre",
   "compareCellCalendar": "{calendar}: {shifts}",
@@ -2845,8 +2836,8 @@
       }
     }
   },
-  "compareLegendUnrecorded": "Bat batean idatzi gabe",
-  "compareUnrecordedCount": "{count, plural, =1{Egun 1 bat batean idatzi gabe} other{{count} egun bat batean idatzi gabe}}",
+  "compareLegendUnrecorded": "Egutegiren batean idatzi gabe",
+  "compareUnrecordedCount": "{count, plural, =1{Egun 1 egutegiren batean idatzi gabe} other{{count} egun egutegiren batean idatzi gabe}}",
   "@compareUnrecordedCount": {
     "description": "Comparar calendarios: días del mes en que alguno de los calendarios comparados no tiene nada anotado (no cuentan como libres).",
     "placeholders": {
@@ -2855,7 +2846,7 @@
       }
     }
   },
-  "compareUnrecorded": "bat batean idatzi gabe",
+  "compareUnrecorded": "egutegiren batean idatzi gabe",
   "@compareUnrecorded": {
     "description": "Comparar calendarios, lectura en voz alta de un día: alguno de los calendarios comparados no tiene nada anotado."
   },
@@ -2941,7 +2932,7 @@
       }
     }
   },
-  "calendarsDeleteBody": "Mugikor honetatik haren txandak, oharrak, zereginak eta txanda-aldaketak ezabatuko dira. Ezin da desegin. Aurretik segurtasun-kopia bat gordeko dugu, behar baduzu.",
+  "calendarsDeleteBody": "Mugikor honetatik haren txandak, oharrak, zereginak eta txanda-aldaketak ezabatuko dira. Ezin da desegin. Aurretik babeskopia bat gordeko dugu, behar baduzu.",
   "calendarsDeleteConfirm": "Ezabatu betiko",
   "calendarsDeleted": "«{name}» ezabatu da",
   "@calendarsDeleted": {
@@ -2952,7 +2943,7 @@
     }
   },
   "calendarsDeleteNotArchivedError": "Artxibatutako egutegiak bakarrik ezabatu daitezke.",
-  "calendarsDeleteBackupFailed": "Ezin izan da aurretiko segurtasun-kopia gorde, beraz ez da ezer ezabatu. Begiratu mugikorraren lekua eta saiatu berriro.",
+  "calendarsDeleteBackupFailed": "Ezin izan da aurretiko babeskopia gorde, beraz ez da ezer ezabatu. Begiratu mugikorraren lekua eta saiatu berriro.",
   "calendarsLastError": "Ezin duzu azken egutegia artxibatu: beti egon behar da bat.",
   "calendarsNameRequired": "Jarri izen bat egutegiari.",
   "calendarsNotFoundError": "Egutegi hori ez dago jada.",
@@ -3386,7 +3377,7 @@
   "shiftTypesPauseCustomHelp": "Txanda hasi eta zenbat ordu eta minutu geroago.",
   "shiftTypesPauseSplitNote": "Txanda zatitu batean, abisua zati luzeenean doa.",
   "shiftTypesPauseOutside": "Denbora hori txanda baino luzeagoa da: ez du joko.",
-  "shiftTypesPauseAlarmsOff": "Alarmak desaktibatuta daude. Aktibatu itzazu Ezarpenak › Alarmak atalean abisua jo dezan.",
+  "shiftTypesPauseAlarmsOff": "Alarmak desaktibatuta daude. Aktibatu itzazu Ezarpenak › Alarmak atalean abisuak jo dezan.",
   "catalogShiftMorningName": "Goiza",
   "@catalogShiftMorningName": {
     "description": "Plantillas de tipo de turno: nombre y código (1 a 3 caracteres, sin espacios, distinto en cada plantilla). Solo se usan al crear el tipo (instalación nueva, saliente automático…); los tipos ya guardados no se renombran."
@@ -3503,7 +3494,7 @@
   "monthPresentationGrid": "Sareta",
   "monthPresentationList": "Zerrenda",
   "monthSelectDays": "Hautatu egunak",
-  "monthNavMonth": "Hilabetea",
+  "monthNavMonth": "Hila",
   "monthNavRotation": "Txandaketa",
   "monthNavAgenda": "Agenda",
   "monthNavSummary": "Laburpena",
@@ -3534,7 +3525,7 @@
   "absenceCopyNextYear": "Hurrengo urtera kopiatu",
   "absenceCopiedNextYear": "Saldoa hurrengo urtera kopiatu da ({year}).",
   "absenceLeftCaption": "{days, plural, =1{egun geratzen zaizu} other{egun geratzen zaizkizu}}",
-  "absenceLeftSemantics": "{name}: {days} geratzen zaizkizu",
+  "absenceLeftSemantics": "{name}: geratzen dena: {days}",
   "absenceAllowed": "Baimenduak",
   "absenceWorkingDaysNote": "Egun baliodunetan",
   "absenceCarried": "Ekarritakoak",
@@ -3544,7 +3535,7 @@
   "absenceCarriedUntil": "Iraungitzen dira: {date}",
   "absenceCarriedNoExpiry": "Iraungitze-datarik gabe",
   "absenceCarriedExpired": "Iraungi ziren: {date}",
-  "absenceWarnExpiring": "Aurreko urteko {days} geratzen zaizkizu. Iraungitze-data: {date}.",
+  "absenceWarnExpiring": "Aurreko urtetik geratzen dena: {days}. Iraungitze-data: {date}.",
   "absenceWarnPlanned": "Dituzunak baino gehiago planifikatu dituzu: {planned} planifikatuta eta {left} erabilgarri.",
   "absenceNewTitle": "Saldo berria",
   "absenceEditTitle": "Editatu saldoa",
@@ -3576,11 +3567,11 @@
   "absenceRemoveBody": "«{name}» saldoa ezabatuko da ({year}). Zure txandak ez dira aldatuko.",
   "absenceRemoveConfirm": "Kendu",
   "absenceSaveFailed": "Ezin izan da saldoa gorde. Saiatu berriro.",
-  "absenceSummaryLeft": "{name}: {days} geratzen zaizkizu",
+  "absenceSummaryLeft": "{name}: geratzen dena: {days}",
   "absenceSummaryOpen": "Ireki oporrak eta baimenak",
-  "moneyNightPlusLabel": "Orduko gaueko plusa",
+  "moneyNightPlusLabel": "Orduko gaueko osagarria",
   "moneyNightPlusHelper": "Gaueko lan-ordu bakoitzeko gehitzen da.",
-  "moneyHolidayPlusLabel": "Orduko jaiegun-plusa",
+  "moneyHolidayPlusLabel": "Orduko jaieguneko osagarria",
   "moneyHolidayPlusHelper": "Jaiegunetan lan egindako ordu bakoitzeko gehitzen da.",
   "moneyLocationLabel": "Lekua",
   "moneyLocationHint": "Ospitalea, 3. solairua",
@@ -3797,7 +3788,7 @@
   "sketchFailed": "Ezin izan da marrazkia gorde.",
   "appearanceNoteInMonthTitle": "Erakutsi oharra hilabetean",
   "appearanceNoteInMonthSubtitle": "Oharraren lehen lerroa eguneko laukian",
-  "appearancePaintSoundTitle": "Soa margotzean",
+  "appearancePaintSoundTitle": "Soinua margotzean",
   "appearancePaintSoundSubtitle": "Klik bat egun bat margotzean, mugikorra isilik ez badago",
   "appearancePresetsTitle": "Prestatutako paletak",
   "appearancePresetsNote": "Fabrikako koloreak dituzten txanden kolorea aldi berean aldatzen dute. Zuk zure gustura margotutakoak ez dira aldatzen.",
@@ -3826,8 +3817,8 @@
   "compareSheetDone": "Eginda",
   "compareSheetMinWarning": "Konparatzeko gutxienez 2 egutegi behar dira.",
   "compareSheetMaxWarning": "Dagoeneko 6 egutegi konparatzen ari zara, gehienekoa.",
-  "compareWeekendTitle": "Asteburu libre amankomunak",
-  "compareWeekendCount": "{count, plural, =0{Hilabete honetan ez dago asteburu libre amankomunik} =1{Asteburu libre amankomun 1 hilabete honetan} other{{count} asteburu libre amankomun hilabete honetan}}",
+  "compareWeekendTitle": "Asteburu libre komunak",
+  "compareWeekendCount": "{count, plural, =0{Hilabete honetan ez dago asteburu libre komunik} =1{Asteburu libre komun 1 hilabete honetan} other{{count} asteburu libre komun hilabete honetan}}",
   "@compareWeekendCount": {
     "placeholders": {
       "count": {
@@ -3835,7 +3826,7 @@
       }
     }
   },
-  "compareWeekendDaysCount": "{count, plural, =1{Asteburuko egun libre amankomun 1} other{Asteburuko {count} egun libre amankomun}}",
+  "compareWeekendDaysCount": "{count, plural, =1{Asteburuko egun libre komun 1} other{Asteburuko {count} egun libre komun}}",
   "@compareWeekendDaysCount": {
     "description": "Comparar calendarios: días de fin de semana libres en todos los calendarios comparados que no forman un fin de semana entero.",
     "placeholders": {
@@ -3844,7 +3835,7 @@
       }
     }
   },
-  "compareWeekendSpoken": "{saturday} eta {sunday}, denek libre",
+  "compareWeekendSpoken": "{saturday} eta {sunday}, denak libre",
   "@compareWeekendSpoken": {
     "placeholders": {
       "saturday": {
@@ -3924,10 +3915,10 @@
   },
   "resetTitle": "Dena ezabatu eta hutsetik hasi",
   "resetListTitle": "Zer ezabatzen da",
-  "resetCalendars": "Egutegi guztiak eta haien txandak, txandakatzeak eta salbuespenak.",
+  "resetCalendars": "Egutegi guztiak eta haien txandak, txandaketak eta salbuespenak.",
   "resetNotes": "Oharrak, eranskinak (argazkiak, marrazkiak eta fitxategiak) eta zereginak.",
   "resetAbsences": "Oporrak, baimenak eta absentziak.",
-  "resetSwaps": "Aldaketen liburua.",
+  "resetSwaps": "Trukeen liburua.",
   "resetAlarms": "Alarmak eta programatutako abisuak.",
   "resetWidget": "Widgetaren edukia.",
   "resetDnd": "Ez molestatu moduaren arauak eta denbora-tarteak.",

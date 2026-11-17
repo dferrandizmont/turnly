@@ -1190,31 +1190,25 @@
   "patternHideCycle": "Ocultar o ciclo completo",
   "patternOccurrenceInRun": "Día {position} de {count}",
   "@patternOccurrenceInRun": {
-    "description": "Día dunha tanda de varios días: «2.º de 5 · Mañá».",
+    "description": "Opción: un día de una racha de días seguidos del mismo turno, «Día 2 de 5». Sin el nombre del turno (va en la pregunta) y sin ordinal con género (el nombre lo pone el usuario).",
     "placeholders": {
-      "ordinal": {
-        "type": "String"
+      "position": {
+        "type": "int"
       },
       "count": {
         "type": "int"
-      },
-      "shift": {
-        "type": "String"
       }
     }
   },
   "patternOccurrenceInRunAfter": "Día {position} de {count}, despois de {previous}",
   "@patternOccurrenceInRunAfter": {
-    "description": "Día dunha tanda, dicindo cal: «1.º de 2 · Libre, despois de Noite».",
+    "description": "Como patternOccurrenceInRun, cuando el turno tiene varias rachas: «Día 1 de 2, después de Libre».",
     "placeholders": {
-      "ordinal": {
-        "type": "String"
+      "position": {
+        "type": "int"
       },
       "count": {
         "type": "int"
-      },
-      "shift": {
-        "type": "String"
       },
       "previous": {
         "type": "String"
@@ -1223,11 +1217,8 @@
   },
   "patternOccurrenceAfter": "Despois de {previous}",
   "@patternOccurrenceAfter": {
-    "description": "Tanda dun só día: «Libre, despois de Tarde».",
+    "description": "Racha de un solo día cuando el turno tiene varias: «Después de Noche».",
     "placeholders": {
-      "shift": {
-        "type": "String"
-      },
       "previous": {
         "type": "String"
       }
@@ -1580,7 +1571,7 @@
   "summaryGroupWork": "Quendas de traballo",
   "summaryGroupRest": "Descansos",
   "summaryEstimateTitle": "Ingresos estimados",
-  "summaryFixedPluses": "Complementos",
+  "summaryFixedPluses": "Pluses",
   "summaryFixedPlusCount": "{count, plural, one{1 quenda} other{{count} quendas}}",
   "@summaryFixedPlusCount": {
     "placeholders": {
@@ -1592,7 +1583,7 @@
   "summaryNightPlus": "Plus nocturno",
   "summaryHolidayPlus": "Plus festivo",
   "summaryEstimateNote": "Estimación, antes de impostos",
-  "summaryEstimateNone": "Pon o prezo por hora ou o complemento por quenda en As miñas quendas para ver a estimación.",
+  "summaryEstimateNone": "Pon o prezo por hora ou o plus por quenda en As miñas quendas para ver a estimación.",
   "summaryEstimateMissing": "Non inclúe o pago por hora de {types}: sen prezo.",
   "@summaryEstimateMissing": {
     "placeholders": {
@@ -1922,7 +1913,7 @@
   "faqCalendarsQ": "Podo levar varios calendarios e comparalos?",
   "faqCalendarsA": "Si. En Configuración › Calendarios creas un para a túa parella, un segundo traballo ou un fillo: cada un ten as súas rotacións e os seus días, e os tipos de quenda son os mesmos. Con dous ou máis, o nome do calendario sobre o mes déixache cambiar dun a outro. O widget e as alarmas seguen o calendario marcado como «Widget e alarmas».\n\nPara ver cando coincidides libres, preme «Comparar calendarios» nesa mesma folla: escolles dous e ves as súas quendas xuntas e os días libres en común do mes.",
   "faqSummaryQ": "Como se calculan as horas e o diñeiro?",
-  "faqSummaryA": "A icona de resumo do calendario amosa as quendas, as horas, as nocturnas e as de festivo do mes, dun ano enteiro ou das datas que escollas en «Datas…» (ata 366 días). Unha quenda conta no día en que comeza, aínda que cruce a medianoite.\n\nPara ver importes, pon o prezo por hora e, se o tes, o complemento fixo por tipo de quenda en Configuración › As miñas quendas. A estimación inclúe eses complementos fixos, antes de impostos, na moeda que escollas en Configuración › Aparencia. Tamén suma os pluses por hora nocturna e festiva que poñas en cada quenda; a retención só cambia o neto. En Configuración › Horas e diñeiro tes modelos de complementos por sector, o día de peche do teu mes de nómina e un límite de horas extra.\n\nO «Plus por quenda» súmase unha vez por cada quenda traballada dese tipo, tamén se é partida; non depende das horas. Os descansos e as ausencias non o suman.",
+  "faqSummaryA": "A icona de resumo do calendario amosa as quendas, as horas, as nocturnas e as de festivo do mes, dun ano enteiro ou das datas que escollas en «Datas…» (ata 366 días). Unha quenda conta no día en que comeza, aínda que cruce a medianoite.\n\nPara ver importes, pon o prezo por hora e, se o tes, o plus fixo por tipo de quenda en Configuración › As miñas quendas. A estimación inclúe eses pluses fixos, antes de impostos, na moeda que escollas en Configuración › Aparencia. Tamén suma os pluses por hora nocturna e festiva que poñas en cada quenda; a retención só cambia o neto. En Configuración › Horas e diñeiro tes modelos de pluses por sector, o día de peche do teu mes de nómina e un límite de horas extra.\n\nO «Plus por quenda» súmase unha vez por cada quenda traballada dese tipo, tamén se é partida; non depende das horas. Os descansos e as ausencias non o suman.",
   "settingsVersionCopied": "Versión copiada",
   "settingsEmailCopied": "Correo copiado",
   "settingsAboutTitle": "Acerca de",
@@ -2387,7 +2378,7 @@
   "calExportProblemFailed": "Non se puido exportar. Proba outra vez.",
   "calExportRangeClamped": "O máximo é un ano: recortouse o final.",
   "calSyncTitle": "Manter ao día",
-  "calSyncHelp": "Turnly actualiza eses eventos soo, cada vez que cambias o cadro de quendas e ao abrir a app: desde hai unha semana ata os próximos tres meses. Só toca os eventos que creou el. Se o apagas, os que xa están quedan.",
+  "calSyncHelp": "Turnly actualiza eses eventos automaticamente, cada vez que cambias o cadro de quendas e ao abrir a app: desde hai unha semana ata os próximos tres meses. Só toca os eventos que creou el. Se o apagas, os que xa están quedan.",
   "calSyncLast": "Última actualización: {when}",
   "@calSyncLast": {
     "placeholders": {
@@ -3313,7 +3304,7 @@
   },
   "alarmsPauseTitle": "Toca pausa",
   "alarmsPauseChannelName": "Avisos de pausa",
-  "alarmsPauseChannelDescription": "Avísate a metade da quenda para que fagas unha pausa.",
+  "alarmsPauseChannelDescription": "Avísate á metade da quenda para que fagas unha pausa.",
   "dayReminderAdd": "Avisarme",
   "@dayReminderAdd": {
     "description": "Botón del detalle del día, bajo la nota: pide una hora y programa un aviso."
@@ -3357,7 +3348,7 @@
   "dndPermOkBody": "Turnly pode poñer o móbil en «Non molestar» durante as túas quendas. Prográmase como unha alarma do sistema: o reloxo pode amosar o inicio ou o final da quenda como próxima alarma.",
   "dndPermTitle": "Falta o acceso a Non molestar",
   "dndPermBody": "Para silenciar o móbil durante a quenda, permite que Turnly acceda a «Non molestar» na configuración do sistema.",
-  "dndPermOpen": "Abrir a configuración",
+  "dndPermOpen": "Abrir configuración",
   "dndShiftSection": "Non molestar",
   "dndShiftSwitch": "Activar Non molestar durante esta quenda",
   "dndShiftHelper": "O móbil silénciase mentres traballas nesta quenda.",
@@ -3376,10 +3367,10 @@
   "shiftTypesSoundReset": "Usar o predeterminado",
   "shiftTypesPauseSection": "Aviso de pausa",
   "shiftTypesPauseSwitch": "Avisarme para facer unha pausa",
-  "shiftTypesPauseHelperLong": "Esta quenda dura {duration}: adoita vir ben parar un pouco a metade.",
-  "shiftTypesPauseHelperShort": "Un aviso a metade da quenda para lembrarte de parar.",
+  "shiftTypesPauseHelperLong": "Esta quenda dura {duration}: adoita vir ben parar un pouco á metade.",
+  "shiftTypesPauseHelperShort": "Un aviso á metade da quenda para lembrarte de parar.",
   "shiftTypesPauseWhen": "Cando",
-  "shiftTypesPauseMid": "A metade da quenda",
+  "shiftTypesPauseMid": "Á metade da quenda",
   "shiftTypesPauseAfter": "{duration} despois de comezar",
   "shiftTypesPauseSheetTitle": "Cando te avisamos",
   "shiftTypesPauseCustomTitle": "Tempo desde o comezo",
@@ -3500,7 +3491,7 @@
   "historyRedone": "Cambio refeito",
   "historyNothingToUndo": "Nada que desfacer",
   "historyNothingToRedo": "Nada que refacer",
-  "monthPresentationGrid": "Cuadrícula",
+  "monthPresentationGrid": "Grella",
   "monthPresentationList": "Lista",
   "monthSelectDays": "Seleccionar días",
   "monthNavMonth": "Mes",
@@ -3519,7 +3510,7 @@
   "monthSelectDay": "Toca para escoller este día",
   "monthListRecommended": "Lista recomendada para ver os horarios completos e o texto grande.",
   "monthListSelected": "Presentación de lista",
-  "monthGridSelected": "Presentación de cuadrícula",
+  "monthGridSelected": "Presentación de grella",
   "absenceRowTitle": "Vacacións e permisos",
   "absenceRowSubtitle": "Días permitidos, usados e os que che quedan",
   "absenceTitle": "Vacacións e permisos",
@@ -3624,9 +3615,9 @@
   "overtimeCapNear": "Achégaste ao límite: quédanche {left}.",
   "overtimeCapReached": "Chegaches ao límite de horas extra.",
   "overtimeCapOver": "Pasaches o límite de horas extra en {excess}.",
-  "payTemplateTitle": "Modelo de complementos",
+  "payTemplateTitle": "Modelo de pluses",
   "payTemplateSubtitle": "Sanidade pública, bombeiros ou vixiantes",
-  "payTemplateIntro": "Enche dunha vez os complementos das túas quendas de traballo. O modelo non trae importes, porque cambian con cada convenio e cada ano: comezan en 0 e escribes os da túa nómina.",
+  "payTemplateIntro": "Enche dunha vez os pluses das túas quendas de traballo. O modelo non trae importes, porque cambian con cada convenio e cada ano: comezan en 0 e escribes os da túa nómina.",
   "payTemplatePublicHealth": "Sanidade pública",
   "payTemplateFirefighters": "Bombeiros",
   "payTemplatePrivateSecurity": "Vixiantes de seguridade",
@@ -3683,7 +3674,7 @@
   "swapFieldColleagueHint": "Marta",
   "swapInvalidColleague": "Escribe con quen é o cambio.",
   "swapFieldDirection": "Quen debe a quenda",
-  "swapFieldDirectionHelper": "Escolle quen queda en deuda co cambio.",
+  "swapFieldDirectionHelper": "Escolle quen queda en débeda co cambio.",
   "swapFieldDate": "O día que cedes a quenda",
   "swapFieldReturnDate": "O día que recibes a quenda",
   "swapFieldReturnNone": "Aínda non a recibiches",
@@ -3869,7 +3860,7 @@
   "devEventsPermissionRestrictedBody": "Pode ser un control parental ou un perfil de traballo. Sen ese permiso non se poden mostrar as citas.",
   "devEventsPermissionDeclinedBody": "Non deches o permiso. Sen el non podemos ler os teus calendarios, pero podes permitilo agora.",
   "devEventsPermissionAllow": "Permitir acceso",
-  "devEventsPermissionSettings": "Abrir a configuración",
+  "devEventsPermissionSettings": "Abrir configuración",
   "devEventsPermissionRecheck": "Comprobar de novo",
   "devEventsCalendarsTitle": "Calendarios do móbil",
   "devEventsChosenCount": "{count, plural, =1{1 calendario escollido} other{{count} calendarios escollidos}}",
@@ -3925,7 +3916,7 @@
   "resetTitle": "Borrar todo e comezar de cero",
   "resetListTitle": "Que se borra",
   "resetCalendars": "Todos os calendarios e as súas quendas, rotacións e excepcións.",
-  "resetNotes": "Notas, anexos (fotos, debuxos e ficheiros) e tarefas.",
+  "resetNotes": "Notas, adxuntos (fotos, debuxos e ficheiros) e tarefas.",
   "resetAbsences": "Vacacións, permisos e ausencias.",
   "resetSwaps": "O libro de cambios.",
   "resetAlarms": "Alarmas e avisos programados.",

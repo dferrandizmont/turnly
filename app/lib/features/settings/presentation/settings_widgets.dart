@@ -73,6 +73,7 @@ class SettingsRow extends StatelessWidget {
     this.trailing,
     this.forceStacked = false,
     this.destructive = false,
+    this.identifier,
   });
 
   final IconData icon;
@@ -90,6 +91,9 @@ class SettingsRow extends StatelessWidget {
 
   /// Replaces the value and the chevron (a switch).
   final Widget? trailing;
+
+  /// Identifier exposed as a resource id on Android (Maestro `id:` selector).
+  final String? identifier;
 
   static const double minHeight = 56;
 
@@ -166,6 +170,7 @@ class SettingsRow extends StatelessWidget {
     if (onTap == null) return content;
     return Semantics(
       button: true,
+      identifier: identifier,
       child: InkWell(onTap: onTap, child: content),
     );
   }

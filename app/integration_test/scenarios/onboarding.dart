@@ -91,7 +91,7 @@ Future<void> _nurse(QaContext qa) async {
   await tap(_key('onboarding-pattern-12h'));
   await tap(_key('onboarding-next'));
   expect(_title(t), '¿Cuándo empiezas?');
-  await tap(_key('onboarding-shift-night12'), reason: 'día 2 del ciclo');
+  await tap(_key('onboarding-offset-1'), reason: 'día 2 del ciclo');
   await tap(_key('onboarding-next'));
   expect(_title(t), 'Listo');
   await tap(_key('onboarding-next'), reason: 'Ver mi calendario');
