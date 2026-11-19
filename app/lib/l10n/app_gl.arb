@@ -1141,7 +1141,7 @@
   "patternBuilderSameDay": "Varias quendas nun día",
   "patternBuilderSameDayHint": "Activado: cada quenda que toques súmase ao último día da secuencia, en vez de crear un día novo.",
   "patternBuilderRemoveLast": "Quitar o último",
-  "patternBuilderClear": "Baleirar a secuencia",
+  "patternBuilderClearCycle": "Baleirar o ciclo",
   "patternBuilderAdd": "Engadir {name}",
   "@patternBuilderAdd": {
     "placeholders": {

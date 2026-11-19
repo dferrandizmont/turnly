@@ -1141,7 +1141,7 @@
   "patternBuilderSameDay": "Hainbat txanda egun batean",
   "patternBuilderSameDayHint": "Aktibatuta: ukitzen duzun txanda bakoitza sekuentziako azken egunari gehitzen zaio, egun berri bat sortu beharrean.",
   "patternBuilderRemoveLast": "Kendu azkena",
-  "patternBuilderClear": "Hustu sekuentzia",
+  "patternBuilderClearCycle": "Hustu zikloa",
   "patternBuilderAdd": "Gehitu: {name}",
   "@patternBuilderAdd": {
     "placeholders": {

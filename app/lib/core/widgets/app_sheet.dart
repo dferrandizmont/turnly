@@ -22,8 +22,9 @@ Future<T?> showAppSheet<T>({
   bool isDismissible = true,
   bool enableDrag = true,
 }) {
+  final barrierLabel = context.l10n.close;
   return showModalBottomSheet<T>(
-    context: context,
+    context: Navigator.of(context, rootNavigator: true).context,
     useRootNavigator: true,
     isScrollControlled: true,
     useSafeArea: true,
@@ -31,7 +32,7 @@ Future<T?> showAppSheet<T>({
     enableDrag: enableDrag,
     // The dimmed area is a button for TalkBack: it says what it does (it
     // read «Sombreado», H-T18-3).
-    barrierLabel: context.l10n.close,
+    barrierLabel: barrierLabel,
     constraints: const BoxConstraints(maxWidth: Sp.maxContentWidth),
     builder: padded ? (ctx) => AppSheetBody(child: builder(ctx)) : builder,
   );
@@ -55,8 +56,15 @@ class AppSheetBody extends StatefulWidget {
 
 class _AppSheetBodyState extends State<AppSheetBody> {
   bool _hadBar = false;
+  Size? _lastSize;
   BuildContext? _revealed;
   Timer? _settle;
+
+  /// The field that was focused when the device turned. While it keeps the
+  /// focus the keyboard is still settling into its new size, even if a frame
+  /// in between reports no keyboard at all, so the long wait applies until it
+  /// has been run with the keyboard up.
+  BuildContext? _turnedField;
 
   @override
   void dispose() {
@@ -66,9 +74,18 @@ class _AppSheetBodyState extends State<AppSheetBody> {
 
   /// Brings the focused field into view once the bar has made room for
   /// itself, and again when the keyboard has finished rising.
-  void _reveal(bool bar) {
+  void _reveal(bool bar, Size size) {
     final field = FocusManager.instance.primaryFocus?.context;
-    final fresh = bar && (!_hadBar || !identical(field, _revealed));
+    // Turning the device with the pad up re-lays the sheet out: the field
+    // that was in view can end under the keyboard, so it is revealed again.
+    final turned = _lastSize != null && _lastSize != size;
+    _lastSize = size;
+    if (turned) _turnedField = field;
+    if (_turnedField != null && !identical(field, _turnedField)) {
+      _turnedField = null;
+    }
+    final settling = _turnedField != null;
+    final fresh = bar && (!_hadBar || !identical(field, _revealed) || turned);
     _hadBar = bar;
     if (!bar) {
       _revealed = null;
@@ -113,7 +130,11 @@ class _AppSheetBodyState extends State<AppSheetBody> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) => show());
     _settle?.cancel();
-    _settle = Timer(const Duration(milliseconds: 400), show);
+    // After a turn the keyboard takes longer to settle into its new size.
+    _settle = Timer(Duration(milliseconds: settling ? 900 : 400), () {
+      show();
+      _turnedField = null;
+    });
   }
 
   @override
@@ -131,7 +152,7 @@ class _AppSheetBodyState extends State<AppSheetBody> {
               inset > 0 &&
               (ModalRoute.of(context)?.isCurrent ?? true) &&
               numberPadHasFocus();
-          _reveal(bar);
+          _reveal(bar, MediaQuery.sizeOf(context));
           return Stack(
             children: [
               SafeArea(

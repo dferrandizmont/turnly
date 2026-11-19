@@ -160,11 +160,11 @@ datos van al destino que elijas. El archivo de copia `.turnly` no está cifrado.
 
 ## Novedades
 
+- **0.11.3 (19-nov-2026):** Android: la vista previa del mes en el primer uso muestra los horarios de los turnos de la profesión que eliges. En la tablet, el campo del importe vuelve a verse por encima del teclado al girarla y las hojas abiertas siguen el modo claro u oscuro del sistema. Con letra grande, el título del bloque nuevo queda a la vista. Con letra muy grande, la tarjeta «Hoy» ocupa menos espacio. VoiceOver y TalkBack leen una sola vez el nombre de cada botón («Deshacer», «Vaciar el ciclo» y «Atrás»).
 - **0.11.2 (17-nov-2026):** Android recibe los arreglos de la 1.2.1 para el constructor de rotaciones y los problemas con letra muy grande. «Otro número» selecciona la duración actual, «Deshacer» recupera el bloque elegido y un aviso indica el precio máximo por hora. También se han corregido textos en catalán, gallego y euskera.
 - **1.2.1 (17-nov-2026):** iPhone y iPad: arreglos con letra muy grande (el constructor de rotaciones, la tarjeta «Hoy», la barra «Listo» del teclado, los títulos de las preguntas, la nota en el mes), la rueda de iOS para las horas extra, una tira «Tu ciclo» más clara y un aviso cuando el precio por hora llega al máximo.
 - **1.2.0 (16-nov-2026):** el iPhone y el iPad reciben todo lo de la 0.10.1, la 0.11.0 y la 0.11.1: la nota en el mes en el iPhone, las rotaciones largas por bloques con la plantilla «Semanas por turno», la tira numerada del ciclo y los meses enteros en la vista previa, «Valorar Turnly» en Ajustes y los arreglos con letra grande.
 - **0.11.1 (15-nov-2026):** Android: con «Ver la nota en el mes» activada, el móvil ya escribe la primera línea de la nota en la casilla del día, en vertical y en horizontal, en lugar de mostrar solo el clip.
-- **0.11.0 (15-nov-2026):** Android: crea rotaciones largas por bloques («Mañana × 21»), con atajos de semanas, «Repetir» y la plantilla «Semanas por turno». Elige el día del ciclo en una tira numerada, previsualiza meses enteros y edita patrones como copia; la app también puede pedirte una valoración en la tienda.
 
 Lo que cambia en cada versión está en [CHANGELOG.md](CHANGELOG.md) y en las
 [versiones publicadas](https://github.com/dferrandizmont/turnly/releases).

@@ -1448,7 +1448,7 @@
   "patternBuilderSameDay": "Varios turnos en un día",
   "patternBuilderSameDayHint": "Activado: cada turno que toques se suma al último día de la secuencia, en vez de crear un día nuevo.",
   "patternBuilderRemoveLast": "Quitar el último",
-  "patternBuilderClear": "Vaciar la secuencia",
+  "patternBuilderClearCycle": "Vaciar el ciclo",
   "patternBuilderAdd": "Añadir {name}",
   "@patternBuilderAdd": {
     "placeholders": {

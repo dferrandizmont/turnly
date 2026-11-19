@@ -1140,6 +1140,7 @@ class _MonthNavigation extends ConsumerWidget {
             final titleWidget = KeyedSubtree(
               key: const ValueKey('open-year'),
               child: Semantics(
+                identifier: 'month-screen',
                 header: true,
                 button: true,
                 // «Octubre, elegir mes»: it is a button, not just a heading

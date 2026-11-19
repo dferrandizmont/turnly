@@ -43,6 +43,7 @@ class RunsScreen extends ConsumerWidget {
       appBar: ContentAppBar.adaptive(
         context,
         title: Text(l10n.selectionRunsTitle),
+        titleIdentifier: 'rotation-screen',
       ),
       body: PageBody(
         child: runs.isEmpty

@@ -1606,7 +1606,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get patternBuilderRemoveLast => 'Remove the last one';
 
   @override
-  String get patternBuilderClear => 'Clear the sequence';
+  String get patternBuilderClearCycle => 'Clear the cycle';
 
   @override
   String patternBuilderAdd(String name) {

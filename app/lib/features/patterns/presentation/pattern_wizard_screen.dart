@@ -92,6 +92,8 @@ class _PatternWizardScreenState extends ConsumerState<PatternWizardScreen> {
         : last
         ? l10n.patternApply
         : l10n.patternNext;
+    final actionIcons =
+        ActionIconTheme.of(context) ?? const ActionIconThemeData();
 
     return PopScope(
       canPop: !wizard.applying && !controller.hasDraftChanges,
@@ -107,6 +109,22 @@ class _PatternWizardScreenState extends ConsumerState<PatternWizardScreen> {
             appBar: ContentAppBar.adaptive(
               context,
               title: Text(l10n.patternTitle),
+              titleIdentifier: 'rotation-screen',
+              backButton: TooltipTheme(
+                data: TooltipTheme.of(context)
+                    .copyWith(excludeFromSemantics: true),
+                child: ActionIconTheme(
+                  data: actionIcons.copyWith(
+                    backButtonIconBuilder: (context) => Semantics(
+                      label: l10n.back,
+                      child:
+                          actionIcons.backButtonIconBuilder?.call(context) ??
+                          Icon(AppIcons.back),
+                    ),
+                  ),
+                  child: const BackButton(),
+                ),
+              ),
             ),
             body: PageBody(
               child: Column(

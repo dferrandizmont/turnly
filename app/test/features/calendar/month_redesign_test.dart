@@ -58,9 +58,16 @@ void main() {
 
     testWidgets('Agenda and Resumen open their screens', (tester) async {
       await pumpCalendar(tester);
-      await tester.tap(key('open-agenda'));
+      expect(find.bySemanticsIdentifier('month-screen'), findsOneWidget);
+      expect(find.bySemanticsIdentifier('nav-month'), findsOneWidget);
+      await tester.tap(find.bySemanticsIdentifier('nav-agenda'));
       await tester.pumpAndSettle();
       expect(find.text('Agenda'), findsWidgets);
+      final agendaTitle = tester.getSemantics(
+        find.bySemanticsIdentifier('agenda-screen'),
+      );
+      expect(agendaTitle.label, 'Agenda');
+      expect(agendaTitle.flagsCollection.namesRoute, isTrue);
       expect(key('month-nav-bar'), findsNothing);
       rootNavigatorKey.currentState!.pop();
       await tester.pumpAndSettle();
@@ -69,8 +76,9 @@ void main() {
           .read(visibleMonthProvider.notifier)
           .goTo(const CivilDate(2026, 12, 1));
       await tester.pumpAndSettle();
-      await tester.tap(key('open-summary'));
+      await tester.tap(find.bySemanticsIdentifier('nav-summary'));
       await tester.pumpAndSettle();
+      expect(find.bySemanticsIdentifier('summary-screen'), findsOneWidget);
       // The summary of the month on screen.
       expect(find.textContaining('Diciembre'), findsWidgets);
     });
@@ -81,9 +89,10 @@ void main() {
       await pumpCalendar(tester);
       final runs = scheduleOf(tester).runs;
       expect(runs, isNotEmpty, reason: 'the demo data has a rotation');
-      await tester.tap(key('open-rotation'));
+      await tester.tap(find.bySemanticsIdentifier('nav-rotation'));
       await tester.pumpAndSettle();
       expect(find.text('Mis rotaciones'), findsOneWidget);
+      expect(find.bySemanticsIdentifier('rotation-screen'), findsOneWidget);
       rootNavigatorKey.currentState!.pop();
       await tester.pumpAndSettle();
 
@@ -93,10 +102,11 @@ void main() {
         controller.deleteRun(run.id);
       }
       await tester.pumpAndSettle();
-      await tester.tap(key('open-rotation'));
+      await tester.tap(find.bySemanticsIdentifier('nav-rotation'));
       await tester.pumpAndSettle();
       expect(find.text('Mis rotaciones'), findsNothing);
       expect(find.textContaining('1 de 3'), findsWidgets);
+      expect(find.bySemanticsIdentifier('rotation-screen'), findsOneWidget);
     });
 
     testWidgets('Mes brings back the month of today', (tester) async {
@@ -226,9 +236,32 @@ void main() {
       tester,
     ) async {
       await pumpCalendar(tester, size: const Size(1280, 800));
-      await openFromRail(tester, 'open-agenda');
-      await openFromRail(tester, 'open-summary');
-      await openFromRail(tester, 'nav-month');
+      final monthScreen = find.bySemanticsIdentifier('month-screen');
+      void expectRailIdentifiers() {
+        for (final destination in ['month', 'rotation', 'agenda', 'summary']) {
+          expect(
+            find.bySemanticsIdentifier('nav-$destination'),
+            findsOneWidget,
+          );
+        }
+      }
+
+      expect(monthScreen, findsOneWidget);
+      expectRailIdentifiers();
+      for (final destination in ['agenda', 'summary']) {
+        await tester.tap(find.bySemanticsIdentifier('nav-$destination'));
+        await tester.pumpAndSettle();
+        expect(
+          find.bySemanticsIdentifier('$destination-screen'),
+          findsOneWidget,
+        );
+        expect(monthScreen, findsNothing);
+        expectRailIdentifiers();
+      }
+      await tester.tap(find.bySemanticsIdentifier('nav-month'));
+      await tester.pumpAndSettle();
+      expect(monthScreen, findsOneWidget);
+      expectRailIdentifiers();
       expect(railSelected(tester), 0);
       expect(find.byType(NavigationRail), findsOneWidget);
       expect(key('pane-divider'), findsOneWidget);

@@ -700,6 +700,7 @@ app/test/features/calendar/month_tip_test.dart
 app/test/features/calendar/month_title_a11y_test.dart
 app/test/features/calendar/month_title_test.dart
 app/test/features/calendar/note_reminder_controller_test.dart
+app/test/features/calendar/overtime_sheet_theme_test.dart
 app/test/features/calendar/paint_grey_days_test.dart
 app/test/features/calendar/paint_header_test.dart
 app/test/features/calendar/paint_layout_test.dart
@@ -720,6 +721,7 @@ app/test/features/calendar/shift_icon_cell_test.dart
 app/test/features/calendar/split_layout_test.dart
 app/test/features/calendar/split_shift_ui_test.dart
 app/test/features/calendar/tablet_overlap_test.dart
+app/test/features/calendar/today_card_large_text_test.dart
 app/test/features/calendar/today_card_test.dart
 app/test/features/calendar/today_status_test.dart
 app/test/features/calendar/upgrade_paint_persistence_test.dart

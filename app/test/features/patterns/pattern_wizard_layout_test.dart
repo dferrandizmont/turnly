@@ -365,6 +365,49 @@ void main() {
     );
   }
 
+  for (final (size, scale) in [
+    (const Size(360, 640), 2.0),
+    (const Size(390, 844), 2.0),
+    (const Size(320, 568), 2.0),
+  ]) {
+    testWidgets(
+      'the title of a block just added stays under the top bar at $size x$scale',
+      (tester) async {
+        await _openWizard(tester, size: size, scale: scale);
+        await _tap(tester, 'pattern-create-own');
+        for (final (i, id) in [
+          'morning',
+          'afternoon',
+          'night',
+          'morning',
+        ].indexed) {
+          await _tap(tester, 'builder-add-$id');
+          await tester.pumpAndSettle();
+          final viewport = tester.getRect(_key('pattern-step-choose'));
+          final card = _key('builder-block-$i');
+          final title = find.descendant(of: card, matching: find.byType(Text));
+          final titleRect = tester.getRect(title.first);
+          expect(
+            titleRect.top,
+            greaterThanOrEqualTo(viewport.top - 0.5),
+            reason: 'title of block $i under the top bar after adding $id',
+          );
+          expect(
+            titleRect.bottom,
+            lessThanOrEqualTo(viewport.bottom + 0.5),
+            reason: 'title of block $i below the viewport after adding $id',
+          );
+          // The bar of the screen is above the viewport, never over it.
+          expect(
+            tester.getRect(card).top,
+            greaterThanOrEqualTo(viewport.top - 0.5),
+          );
+        }
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
   testWidgets('at the largest text the palette joins the page', (tester) async {
     await _openWizard(tester, size: const Size(414, 896), scale: 3.1);
     await _tap(tester, 'pattern-create-own');

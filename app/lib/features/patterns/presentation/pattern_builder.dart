@@ -132,6 +132,8 @@ class _PatternBuilderState extends ConsumerState<PatternBuilder> {
   bool _confirming = false;
   // The controls of the open block, to scroll them into view.
   final _controlsKey = GlobalKey();
+  // The whole open block (its title card and the controls under it).
+  final _blockKey = GlobalKey();
   @override
   void initState() {
     super.initState();
@@ -165,13 +167,23 @@ class _PatternBuilderState extends ConsumerState<PatternBuilder> {
       final viewBottom = viewTop + viewport.size.height;
       final top = box.localToGlobal(Offset.zero).dy;
       final bottom = top + box.size.height;
-      // Up to the bottom edge of the page, without pushing the top of the
-      // controls out of it when they are taller than what is visible.
+      // The block is its title card and, under it, the controls: the title
+      // must stay in view too (iPhone F1, large text: it hid above the top).
+      final block = _blockKey.currentContext?.findRenderObject();
+      final blockTop = block is RenderBox && block.attached
+          ? math.min(top, block.localToGlobal(Offset.zero).dy)
+          : top;
+      // Up to the bottom edge of the page, without pushing the title of the
+      // block out of the top when it and its controls are taller than what
+      // is visible.
       final double delta;
-      if (top < viewTop) {
-        delta = top - viewTop - Sp.s;
+      if (blockTop < viewTop) {
+        delta = blockTop - viewTop - Sp.s;
       } else if (bottom > viewBottom) {
-        delta = math.min(bottom - viewBottom + Sp.s, top - viewTop);
+        delta = math.min(
+          bottom - viewBottom + Sp.s,
+          math.max(0.0, blockTop - viewTop - Sp.s),
+        );
       } else {
         return;
       }
@@ -247,6 +259,7 @@ class _PatternBuilderState extends ConsumerState<PatternBuilder> {
           Padding(
             padding: const EdgeInsets.only(bottom: Sp.s),
             child: Column(
+              key: wizard.openBlock == i ? _blockKey : null,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 AppCard(
@@ -300,24 +313,30 @@ class _PatternBuilderState extends ConsumerState<PatternBuilder> {
               ],
             ),
           ),
-        Wrap(
-          spacing: Sp.s,
-          runSpacing: Sp.xs,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            IconButton(
-              key: const ValueKey('builder-undo'),
-              tooltip: l10n.undo,
-              onPressed: wizard.canUndoDraft ? controller.undoDraft : null,
-              icon: Icon(AppIcons.undo),
-            ),
-            IconButton(
-              key: const ValueKey('builder-clear'),
-              tooltip: l10n.patternBuilderClear,
-              onPressed: wizard.draft.isEmpty ? null : controller.clearDraft,
-              icon: Icon(AppIcons.erase),
-            ),
-          ],
+        TooltipTheme(
+          data: TooltipTheme.of(context).copyWith(excludeFromSemantics: true),
+          child: Wrap(
+            spacing: Sp.s,
+            runSpacing: Sp.xs,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              IconButton(
+                key: const ValueKey('builder-undo'),
+                tooltip: l10n.undo,
+                onPressed: wizard.canUndoDraft ? controller.undoDraft : null,
+                icon: Icon(AppIcons.undo, semanticLabel: l10n.undo),
+              ),
+              IconButton(
+                key: const ValueKey('builder-clear'),
+                tooltip: l10n.patternBuilderClearCycle,
+                onPressed: wizard.draft.isEmpty ? null : controller.clearDraft,
+                icon: Icon(
+                  AppIcons.erase,
+                  semanticLabel: l10n.patternBuilderClearCycle,
+                ),
+              ),
+            ],
+          ),
         ),
         if (wizard.draft.isNotEmpty) ...[
           const SizedBox(height: Sp.m),

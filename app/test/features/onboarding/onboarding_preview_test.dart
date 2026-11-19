@@ -7,6 +7,7 @@ import 'package:cuadrante/features/onboarding/domain/profession.dart';
 import 'package:cuadrante/features/patterns/domain/pattern_catalog.dart';
 import 'package:cuadrante/features/schedule/data/schedule_repository.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../support/test_storage.dart';
@@ -62,6 +63,43 @@ void main() {
     final seeded = await _seeded();
     expect(scheduleWithProfession(seeded, null), same(seeded));
     expect(scheduleWithProfession(seeded, Profession.other), same(seeded));
+  });
+
+  testWidgets('the month preview follows the job and survives a tablet turn', (
+    tester,
+  ) async {
+    final app = await FirstLaunch.open(tester, size: const Size(800, 1100));
+
+    void expectPreviewHours(String morning, String afternoon) {
+      final preview = key('onboarding-pattern-preview');
+      expect(preview, findsOneWidget);
+      for (final hours in [morning, afternoon]) {
+        expect(
+          find.descendant(of: preview, matching: find.text(hours)),
+          findsWidgets,
+        );
+      }
+    }
+
+    await app.chooseRotation();
+    await app.tap(key('onboarding-profession-nursing'));
+    await app.tap(key('onboarding-pattern-continental'));
+    await app.tap(key('onboarding-next'));
+    expectPreviewHours('08–15', '15–22');
+
+    await app.tap(key('onboarding-back'));
+    await app.tap(key('onboarding-profession-industry'));
+    await app.tap(key('onboarding-next'));
+    expectPreviewHours('06–14', '14–22');
+
+    await app.tap(key('onboarding-back'));
+    await app.tap(key('onboarding-profession-nursing'));
+    await app.tap(key('onboarding-next'));
+    expectPreviewHours('08–15', '15–22');
+
+    tester.view.physicalSize = const Size(1100, 800) * 3;
+    await tester.pumpAndSettle();
+    expectPreviewHours('08–15', '15–22');
   });
 
   testWidgets('the start step shows the hours the calendar ends up with', (

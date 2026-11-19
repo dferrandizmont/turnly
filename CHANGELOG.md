@@ -10,6 +10,17 @@ at once, so they can skip numbers.
 
 ## Unreleased
 
+## 0.11.3 · 2026-11-19
+
+Android test build: fixes from the 0.11.2 and iPhone 1.2.1 tests for large text, tablets and screen readers. Your data is not touched.
+
+- Fixed: in the first-use rotation step, the month preview now shows the shift hours of the profession you chose (for example 08–15 and 15–22 for nursing) instead of the default ones.
+- Fixed: if you turn a tablet while typing an amount, the field comes back above the keyboard after the turn.
+- Fixed: with large text, a block you add in "Create my own" keeps its title in view under the top bar.
+- Fixed (tablets): sheets such as the overtime one now switch between light and dark with the system while open.
+- Fixed: with very large text the "Today" card takes about a third of the screen instead of half, so more of the month shows.
+- Fixed: in the rotation builder, the undo, "Clear the cycle" and back buttons now have a name that VoiceOver and TalkBack read once.
+
 ## 0.11.2 · 2026-11-17
 
 Android test build: the rotation builder, large-text and translation fixes from iPhone 1.2.1 and since, now on Android. Your data is not touched.

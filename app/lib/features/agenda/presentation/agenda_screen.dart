@@ -122,7 +122,11 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen> {
     }
 
     return Scaffold(
-      appBar: ContentAppBar.adaptive(context, title: Text(l10n.agendaTitle)),
+      appBar: ContentAppBar.adaptive(
+        context,
+        title: Text(l10n.agendaTitle),
+        titleIdentifier: 'agenda-screen',
+      ),
       body: PageBody(
         child: Column(
           children: [

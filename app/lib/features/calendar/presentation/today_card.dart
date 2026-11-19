@@ -39,8 +39,9 @@ class TodayCard extends ConsumerStatefulWidget {
   /// The most the text of the card grows with the reader's text size. Past it
   /// the open card took about 70 % of the first screen at the largest
   /// accessibility size and pushed the grid off it (iOS AX3, 1.2.0 QA F3);
-  /// the grid keeps the full size.
-  static const double maxTextScale = 1.6;
+  /// the grid keeps the full size. 1.6 still left it at about half of the
+  /// screen (0.11.2 QA), so it stops at 1.3, a third of it.
+  static const double maxTextScale = 1.3;
 
   /// Shows the fold button and honours the remembered fold.
   final bool collapsible;

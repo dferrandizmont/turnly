@@ -290,6 +290,120 @@ void main() {
     }
   });
 
+  group('sheet with a number field, device turned', () {
+    testWidgets('portrait to landscape with the pad up: the field is brought '
+        'above the pad again', (tester) async {
+      tester.view.physicalSize = const Size(600, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      addTearDown(tester.view.resetViewInsets);
+      await tester.pumpWidget(
+        app(
+          Builder(
+            builder: (context) => TextButton(
+              onPressed: () => showAppSheet<void>(
+                context: context,
+                padded: true,
+                builder: (_) => Column(
+                  children: [
+                    for (var i = 0; i < 4; i++)
+                      const SizedBox(height: 90, child: Text('relleno')),
+                    const TextField(
+                      key: ValueKey('rate'),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 90),
+                  ],
+                ),
+              ),
+              child: const Text('abrir'),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('abrir'));
+      await tester.pumpAndSettle();
+      tester.view.viewInsets = const FakeViewPadding(bottom: 300);
+      await tester.tap(find.byKey(const ValueKey('rate')));
+      await tester.pumpAndSettle(const Duration(milliseconds: 100));
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('keyboard-done')), findsOneWidget);
+
+      // Turn the device: a wide, short window with the pad still up.
+      tester.view.physicalSize = const Size(900, 420);
+      tester.view.viewInsets = const FakeViewPadding(bottom: 200);
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
+
+      final field = tester.getRect(find.byKey(const ValueKey('rate')));
+      final bar = tester.getRect(find.byKey(const ValueKey('keyboard-done')));
+      expect(field.bottom, lessThanOrEqualTo(bar.top + 0.5));
+      expect(field.top, greaterThanOrEqualTo(0));
+    });
+
+    testWidgets('the new size arrives with no keyboard and the pad comes back '
+        'late: the field still ends above the pad', (tester) async {
+      tester.view.physicalSize = const Size(600, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      addTearDown(tester.view.resetViewInsets);
+      await tester.pumpWidget(
+        app(
+          Builder(
+            builder: (context) => TextButton(
+              onPressed: () => showAppSheet<void>(
+                context: context,
+                padded: true,
+                builder: (_) => Column(
+                  children: [
+                    for (var i = 0; i < 4; i++)
+                      const SizedBox(height: 90, child: Text('relleno')),
+                    const TextField(
+                      key: ValueKey('rate'),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 90),
+                  ],
+                ),
+              ),
+              child: const Text('abrir'),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('abrir'));
+      await tester.pumpAndSettle();
+      tester.view.viewInsets = const FakeViewPadding(bottom: 300);
+      await tester.tap(find.byKey(const ValueKey('rate')));
+      await tester.pumpAndSettle(const Duration(milliseconds: 100));
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('keyboard-done')), findsOneWidget);
+
+      // Turn: the new window size lands in a frame with no keyboard at all.
+      tester.view.physicalSize = const Size(900, 420);
+      tester.view.viewInsets = FakeViewPadding.zero;
+      await tester.pump();
+      // The pad starts to come back, and only reaches its final height after
+      // the short settle time (400 ms) but before the long one (900 ms).
+      tester.view.viewInsets = const FakeViewPadding(bottom: 100);
+      await tester.pump(const Duration(milliseconds: 50));
+      await tester.pump(const Duration(milliseconds: 450));
+      tester.view.viewInsets = const FakeViewPadding(bottom: 200);
+      await tester.pump(const Duration(milliseconds: 50));
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const ValueKey('keyboard-done')), findsOneWidget);
+      final field = tester.getRect(find.byKey(const ValueKey('rate')));
+      final bar = tester.getRect(find.byKey(const ValueKey('keyboard-done')));
+      expect(field.bottom, lessThanOrEqualTo(bar.top + 0.5));
+      expect(field.top, greaterThanOrEqualTo(0));
+    });
+  });
+
   group('time wheel sheet', () {
     Widget opener() => Builder(
       builder: (context) => TextButton(

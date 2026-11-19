@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../theme/theme_context.dart';
@@ -15,6 +16,8 @@ class ContentAppBar extends StatelessWidget implements PreferredSizeWidget {
   const ContentAppBar({
     super.key,
     this.title,
+    this.titleIdentifier,
+    this.backButton,
     this.actions,
     this.titleSpacing,
     this.maxWidth = Sp.maxContentWidth,
@@ -30,6 +33,8 @@ class ContentAppBar extends StatelessWidget implements PreferredSizeWidget {
     BuildContext context, {
     Key? key,
     required Text title,
+    String? titleIdentifier,
+    Widget? backButton,
     List<Widget>? actions,
     double? titleSpacing,
     double maxWidth = Sp.maxContentWidth,
@@ -91,6 +96,8 @@ class ContentAppBar extends StatelessWidget implements PreferredSizeWidget {
           child: title,
         ),
       ),
+      titleIdentifier: titleIdentifier,
+      backButton: backButton,
       actions: actions,
       titleSpacing: titleSpacing,
       maxWidth: maxWidth,
@@ -102,6 +109,10 @@ class ContentAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   final Widget? title;
+  final String? titleIdentifier;
+
+  /// Replaces the default back button when the route can go back.
+  final Widget? backButton;
   final List<Widget>? actions;
 
   /// Phone only: passed to [AppBar.titleSpacing] (tab screens use `Sp.page`).
@@ -120,6 +131,18 @@ class ContentAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final title = titleIdentifier == null
+        ? this.title
+        : Semantics(
+            identifier: titleIdentifier,
+            // Keep AppBar's heading and route announcement on the same node.
+            header: true,
+            namesRoute: switch (defaultTargetPlatform) {
+              TargetPlatform.iOS || TargetPlatform.macOS => null,
+              _ => true,
+            },
+            child: this.title,
+          );
     return LayoutBuilder(
       builder: (context, box) {
         final wide = wideMaxWidth;
@@ -128,6 +151,7 @@ class ContentAppBar extends StatelessWidget implements PreferredSizeWidget {
         if (titleBelowActions) {
           return AppBar(
             toolbarHeight: toolbarHeight,
+            excludeHeaderSemantics: titleIdentifier != null,
             automaticallyImplyLeading: false,
             centerTitle: false,
             titleSpacing: 0,
@@ -145,7 +169,7 @@ class ContentAppBar extends StatelessWidget implements PreferredSizeWidget {
                         padding: const EdgeInsets.symmetric(horizontal: Sp.s),
                         child: Row(
                           children: [
-                            if (canPop) const BackButton(),
+                            if (canPop) backButton ?? const BackButton(),
                             const Spacer(),
                             ...?actions,
                           ],
@@ -168,6 +192,10 @@ class ContentAppBar extends StatelessWidget implements PreferredSizeWidget {
         if (box.maxWidth <= cap + 2 * Sp.xs) {
           return AppBar(
             toolbarHeight: toolbarHeight,
+            excludeHeaderSemantics: titleIdentifier != null,
+            leading: canPop && backButton != null
+                ? Center(child: backButton)
+                : null,
             titleSpacing: titleSpacing,
             title: title,
             actions: actions,
@@ -175,6 +203,7 @@ class ContentAppBar extends StatelessWidget implements PreferredSizeWidget {
         }
         return AppBar(
           toolbarHeight: toolbarHeight,
+          excludeHeaderSemantics: titleIdentifier != null,
           automaticallyImplyLeading: false,
           centerTitle: false,
           titleSpacing: 0,
@@ -185,9 +214,9 @@ class ContentAppBar extends StatelessWidget implements PreferredSizeWidget {
               child: Row(
                 children: [
                   if (canPop)
-                    const Padding(
-                      padding: EdgeInsets.only(left: Sp.s),
-                      child: BackButton(),
+                    Padding(
+                      padding: const EdgeInsets.only(left: Sp.s),
+                      child: backButton ?? const BackButton(),
                     )
                   else
                     const SizedBox(width: Sp.page),

@@ -372,6 +372,26 @@ void main() {
   });
 
   group('my own sequence', () {
+    testWidgets('the builder buttons and back arrow have one spoken label', (
+      tester,
+    ) async {
+      await _openWizard(tester);
+      await _tap(tester, _key('pattern-create-own'));
+      await _tap(tester, _key('builder-add-morning'));
+      await tester.ensureVisible(_key('builder-undo'));
+      await tester.pumpAndSettle();
+
+      for (final (button, label) in [
+        (_key('builder-undo'), 'Deshacer'),
+        (_key('builder-clear'), 'Vaciar el ciclo'),
+        (find.byType(BackButton), 'Atrás'),
+      ]) {
+        final semantics = tester.getSemantics(button).getSemanticsData();
+        expect(semantics.label, label);
+        expect(semantics.tooltip, isEmpty, reason: label);
+      }
+    }, variant: const TargetPlatformVariant({TargetPlatform.iOS}));
+
     testWidgets('built with taps, several shifts per day, saved and applied', (
       tester,
     ) async {

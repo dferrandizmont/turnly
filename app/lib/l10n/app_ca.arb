@@ -1141,7 +1141,7 @@
   "patternBuilderSameDay": "Diversos torns en un dia",
   "patternBuilderSameDayHint": "Activat: cada torn que toquis se suma a l’últim dia de la seqüència, en lloc de crear un dia nou.",
   "patternBuilderRemoveLast": "Treu l’últim",
-  "patternBuilderClear": "Buida la seqüència",
+  "patternBuilderClearCycle": "Buida el cicle",
   "patternBuilderAdd": "Afegeix {name}",
   "@patternBuilderAdd": {
     "placeholders": {

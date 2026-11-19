@@ -1609,7 +1609,7 @@ class AppLocalizationsEu extends AppLocalizations {
   String get patternBuilderRemoveLast => 'Kendu azkena';
 
   @override
-  String get patternBuilderClear => 'Hustu sekuentzia';
+  String get patternBuilderClearCycle => 'Hustu zikloa';
 
   @override
   String patternBuilderAdd(String name) {

@@ -161,10 +161,13 @@ class MonthNavigationBar extends ConsumerWidget {
               ),
               destinations: [
                 for (final destination in MonthDestination.values)
-                  NavigationDestination(
-                    key: _destinationKeys[destination],
-                    icon: Icon(_describe(context, destination).icon),
-                    label: _describe(context, destination).label,
+                  Semantics(
+                    identifier: 'nav-${destination.name}',
+                    child: NavigationDestination(
+                      key: _destinationKeys[destination],
+                      icon: Icon(_describe(context, destination).icon),
+                      label: _describe(context, destination).label,
+                    ),
                   ),
               ],
             ),
@@ -218,7 +221,10 @@ class MonthNavigationRail extends ConsumerWidget {
             NavigationRailDestination(
               icon: KeyedSubtree(
                 key: _destinationKeys[destination],
-                child: Icon(_describe(context, destination).icon),
+                child: Semantics(
+                  identifier: 'nav-${destination.name}',
+                  child: Icon(_describe(context, destination).icon),
+                ),
               ),
               label: Text(
                 _describe(context, destination).label,

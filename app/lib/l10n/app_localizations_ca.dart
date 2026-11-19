@@ -1607,7 +1607,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get patternBuilderRemoveLast => 'Treu l’últim';
 
   @override
-  String get patternBuilderClear => 'Buida la seqüència';
+  String get patternBuilderClearCycle => 'Buida el cicle';
 
   @override
   String patternBuilderAdd(String name) {

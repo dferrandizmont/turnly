@@ -2659,11 +2659,11 @@ abstract class AppLocalizations {
   /// **'Quitar el último'**
   String get patternBuilderRemoveLast;
 
-  /// No description provided for @patternBuilderClear.
+  /// No description provided for @patternBuilderClearCycle.
   ///
   /// In es, this message translates to:
-  /// **'Vaciar la secuencia'**
-  String get patternBuilderClear;
+  /// **'Vaciar el ciclo'**
+  String get patternBuilderClearCycle;
 
   /// No description provided for @patternBuilderAdd.
   ///

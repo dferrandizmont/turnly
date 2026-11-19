@@ -1610,7 +1610,7 @@ class AppLocalizationsGl extends AppLocalizations {
   String get patternBuilderRemoveLast => 'Quitar o último';
 
   @override
-  String get patternBuilderClear => 'Baleirar a secuencia';
+  String get patternBuilderClearCycle => 'Baleirar o ciclo';
 
   @override
   String patternBuilderAdd(String name) {

@@ -234,6 +234,7 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
       appBar: ContentAppBar.adaptive(
         context,
         title: Text(l10n.summaryTitle),
+        titleIdentifier: 'summary-screen',
         actions: [
           if (_period == _Period.month)
             Builder(

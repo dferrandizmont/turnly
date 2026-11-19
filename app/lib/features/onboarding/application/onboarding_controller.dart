@@ -562,8 +562,9 @@ final onboardingPreviewProvider = Provider.autoDispose<PatternApplication?>((
 ) {
   final state = ref.watch(onboardingControllerProvider);
   if (!state.hasRotation) return null;
-  final schedule = ref.watch(
-    scheduleControllerProvider.select((s) => s.schedule),
+  final schedule = scheduleWithProfession(
+    ref.watch(scheduleControllerProvider.select((s) => s.schedule)),
+    state.profession,
   );
   final palette = ref.watch(
     scheduleControllerProvider.select((s) => s.palette),
@@ -571,7 +572,7 @@ final onboardingPreviewProvider = Provider.autoDispose<PatternApplication?>((
   final auto = ref.watch(postNightAutoProvider);
   final request = ref
       .read(onboardingControllerProvider.notifier)
-      .request(scheduleWithProfession(schedule, state.profession));
+      .request(schedule);
   if (request == null) return null;
   final plan = planPatternApplication(
     schedule,

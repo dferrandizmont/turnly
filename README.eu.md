@@ -167,11 +167,11 @@ dago zifratuta.
 
 ## Berriak
 
+- **0.11.3 (2026-11-19):** Androiden: lehen erabilerako hilabetearen aurrebistan, aukeratzen duzun lanbideko txanden ordutegiak agertzen dira. Tableta biratzean, zenbatekoaren eremua berriro agertzen da teklatuaren gainean, eta tabletan irekita dauden orriak sistemaren modu argira edo ilunera egokitzen dira. Letra handiarekin, bloke berriaren izenburua bistan geratzen da. Letra oso handiarekin, «Gaur» txartelak leku gutxiago hartzen du. VoiceOver-ek eta TalkBack-ek behin bakarrik irakurtzen dute botoi bakoitzaren izena («Desegin», «Hustu zikloa» eta «Atzera»).
 - **0.11.2 (2026-11-17):** Androiden ere aplikatu dira 1.2.1 bertsioko konponketak, txandaketen eraikitzailean eta letra oso handia erabiltzean agertzen ziren arazoak konpontzeko. «Beste zenbaki bat» aukerak uneko iraupena hautatzen du, «Desegin» aukerak hautatutako blokea berreskuratzen du, eta abisu batek orduko gehieneko prezioa adierazten du. Katalanezko, galizierazko eta euskarazko testuak ere zuzendu dira.
 - **1.2.1 (2026-11-17):** iPhone eta iPad: letra oso handiko konponketak (txandaketen eraikitzailea, «Gaur» txartela, teklatuaren «Eginda» barra, galderen izenburuak, oharra hilabetean), iOSen gurpila aparteko orduetarako, «Zure zikloa» zerrenda argiagoa eta abisu bat orduko prezioa gehienekora iristen denean.
 - **1.2.0 (2026-11-16):** iPhoneak eta iPadak 0.10.1, 0.11.0 eta 0.11.1eko guztia jasotzen dute: oharra hilabetean iPhonean, txandaketa luzeak blokeka «Asteak txandako» txantiloiarekin, zikloaren zenbakidun zerrenda eta hilabete osoak aurrebistan, «Baloratu Turnly» Ezarpenetan eta letra handiko konponketak.
 - **0.11.1 (2026-11-15):** Androiden: «Erakutsi oharra hilabetean» aktibatuta, mugikorrak oharraren lehen lerroa idazten du orain eguneko laukian, bertikalean eta horizontalean, klipa bakarrik erakutsi beharrean.
-- **0.11.0 (2026-11-15):** Androiden: sortu txandaketa luzeak blokeka («Goiza × 21»), asteetarako lasterbideekin, «Errepikatu» aukerarekin eta «Asteak txandako» txantiloiarekin. Zikloko eguna zenbakidun zerrendan aukera dezakezu, hilabete osoak aurrebistan ikusi eta ereduak kopia gisa editatu; aplikazioak dendan balorazio bat ere eska diezazuke.
 
 Zer aldatu den bertsio bakoitzean [CHANGELOG.md](CHANGELOG.md) eta
 [argitalpenetan](https://github.com/dferrandizmont/turnly/releases) dago.

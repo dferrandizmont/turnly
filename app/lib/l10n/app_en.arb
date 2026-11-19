@@ -1142,7 +1142,7 @@
   "patternBuilderSameDay": "Several shifts in one day",
   "patternBuilderSameDayHint": "On: each shift you tap is added to the last day of the sequence instead of making a new day.",
   "patternBuilderRemoveLast": "Remove the last one",
-  "patternBuilderClear": "Clear the sequence",
+  "patternBuilderClearCycle": "Clear the cycle",
   "patternBuilderAdd": "Add {name}",
   "@patternBuilderAdd": {
     "placeholders": {

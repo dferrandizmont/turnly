@@ -159,11 +159,11 @@ datos van ao destino que escollas. O ficheiro de copia `.turnly` non está cifra
 
 ## Novidades
 
+- **0.11.3 (19-nov-2026):** Android: a vista previa do mes no primeiro uso amosa os horarios das quendas da profesión que escolles. Na tableta, o campo do importe volve quedar á vista por riba do teclado ao xirala e as follas abertas seguen o modo claro ou escuro do sistema. Con letra grande, o título do bloque novo queda á vista. Con letra moi grande, a tarxeta «Hoxe» ocupa menos espazo. VoiceOver e TalkBack len unha soa vez o nome de cada botón («Desfacer», «Baleirar o ciclo» e «Atrás»).
 - **0.11.2 (17-nov-2026):** Android recibe os arranxos da 1.2.1 para o construtor de rotacións e os problemas con letra moi grande. «Outro número» selecciona a duración actual, «Desfacer» recupera o bloque escollido e un aviso indica o prezo máximo por hora. Tamén se corrixiron textos en catalán, galego e éuscaro.
 - **1.2.1 (17-nov-2026):** iPhone e iPad: arranxos con letra moi grande (o construtor de rotacións, a tarxeta «Hoxe», a barra «Feito» do teclado, os títulos das preguntas, a nota no mes), a roda de iOS para as horas extra, unha tira «O teu ciclo» máis clara e un aviso cando o prezo por hora chega ao máximo.
 - **1.2.0 (16-nov-2026):** o iPhone e o iPad reciben todo o da 0.10.1, a 0.11.0 e a 0.11.1: a nota no mes no iPhone, as rotacións longas por bloques co modelo «Semanas por quenda», a tira numerada do ciclo e os meses enteiros na previsualización, «Valorar Turnly» en Configuración e os arranxos con letra grande.
 - **0.11.1 (15-nov-2026):** Android: con «Ver a nota no mes» activada, o móbil xa escribe a primeira liña da nota na casa do día, en vertical e en horizontal, en lugar de amosar só o clip.
-- **0.11.0 (15-nov-2026):** Android: crea rotacións longas por bloques («Mañá × 21»), con atallos de semanas, «Repetir» e o modelo «Semanas por quenda». Escolle o día do ciclo nunha tira numerada, previsualiza meses enteiros e edita patróns como copia; a app tamén pode pedirche unha valoración na tenda.
 
 O que cambia en cada versión está no [CHANGELOG.md](CHANGELOG.md) e nas
 [versións publicadas](https://github.com/dferrandizmont/turnly/releases).

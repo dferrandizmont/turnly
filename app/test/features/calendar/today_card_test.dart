@@ -162,7 +162,7 @@ void main() {
       expect(find.text('Empieza en 3 h 40 min'), findsOneWidget);
     });
 
-    testWidgets('at the largest text the card text stops growing at x1.6', (
+    testWidgets('at the largest text the card text stops growing at x1.3', (
       tester,
     ) async {
       // iOS AX3 (1.2.0 QA, iPhone F3): the open card took about 70 % of the
@@ -177,7 +177,7 @@ void main() {
       final chip = find.text('Empieza en 3 h 40 min');
       expect(chip, findsOneWidget);
       final scaler = MediaQuery.textScalerOf(tester.element(chip));
-      expect(scaler.scale(10), closeTo(16, 0.01));
+      expect(scaler.scale(10), closeTo(13, 0.01));
     });
   });
 
