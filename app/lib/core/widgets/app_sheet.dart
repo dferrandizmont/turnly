@@ -15,6 +15,13 @@ import 'keyboard_done_bar.dart';
 /// (scroll view, page gutter, keyboard inset), the layout most sheets want.
 /// Without it the builder owns its layout (lists with their own scroll,
 /// search sheets) and the keyboard inset.
+///
+/// A text field that has the focus when the sheet opens loses it for good: the
+/// route below would otherwise give it the focus back when the sheet closes
+/// and the keyboard would pop up again, as the day note did after saving an
+/// overtime block (1.1.0 QA, iPhone F5). Anything else that has the focus (a
+/// button a keyboard user pressed to open the sheet) keeps it and gets it
+/// back, as the framework does.
 Future<T?> showAppSheet<T>({
   required BuildContext context,
   required WidgetBuilder builder,
@@ -23,6 +30,7 @@ Future<T?> showAppSheet<T>({
   bool enableDrag = true,
 }) {
   final barrierLabel = context.l10n.close;
+  _dropTextFocus();
   return showModalBottomSheet<T>(
     context: Navigator.of(context, rootNavigator: true).context,
     useRootNavigator: true,
@@ -180,4 +188,15 @@ class _AppSheetBodyState extends State<AppSheetBody> {
       ),
     );
   }
+}
+
+/// Unfocuses the primary focus only when it is an editable text field.
+void _dropTextFocus() {
+  final focus = FocusManager.instance.primaryFocus;
+  final context = focus?.context;
+  if (focus == null || context == null) return;
+  final isText =
+      context.widget is EditableText ||
+      context.findAncestorWidgetOfExactType<EditableText>() != null;
+  if (isText) focus.unfocus();
 }

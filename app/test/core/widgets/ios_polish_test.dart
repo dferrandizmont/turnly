@@ -496,4 +496,151 @@ void main() {
       );
     });
   });
+
+  group('sheet opened over a focused field', () {
+    testWidgets('closing the sheet does not give the focus back to the field '
+        'below (1.1.0 QA, iPhone F5)', (tester) async {
+      final focus = FocusNode();
+      addTearDown(focus.dispose);
+      await tester.pumpWidget(
+        app(
+          Scaffold(
+            body: Column(
+              children: [
+                TextField(key: const ValueKey('note'), focusNode: focus),
+                Builder(
+                  builder: (context) => TextButton(
+                    onPressed: () => showAppSheet<void>(
+                      context: context,
+                      padded: true,
+                      builder: (sheet) => TextButton(
+                        onPressed: () => Navigator.of(sheet).pop(),
+                        child: const Text('guardar'),
+                      ),
+                    ),
+                    child: const Text('abrir'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.byKey(const ValueKey('note')));
+      await tester.pump();
+      expect(focus.hasPrimaryFocus, isTrue);
+
+      await tester.tap(find.text('abrir'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('guardar'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('guardar'), findsNothing);
+      expect(focus.hasFocus, isFalse);
+    });
+  });
+
+  group('sheet opened over a button', () {
+    testWidgets('a button that had the focus gets it back when the sheet '
+        'closes', (tester) async {
+      final launcher = FocusNode();
+      addTearDown(launcher.dispose);
+      await tester.pumpWidget(
+        app(
+          Scaffold(
+            body: Builder(
+              builder: (context) => TextButton(
+                focusNode: launcher,
+                onPressed: () => showAppSheet<void>(
+                  context: context,
+                  padded: true,
+                  builder: (sheet) => TextButton(
+                    onPressed: () => Navigator.of(sheet).pop(),
+                    child: const Text('guardar'),
+                  ),
+                ),
+                child: const Text('abrir'),
+              ),
+            ),
+          ),
+        ),
+      );
+      launcher.requestFocus();
+      await tester.pump();
+      expect(launcher.hasPrimaryFocus, isTrue);
+
+      await tester.tap(find.text('abrir'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('guardar'));
+      await tester.pumpAndSettle();
+
+      expect(launcher.hasPrimaryFocus, isTrue);
+    });
+
+    testWidgets('an unsaved note survives a nested sheet and does not take '
+        'the focus back', (tester) async {
+      final focus = FocusNode();
+      final note = TextEditingController();
+      addTearDown(focus.dispose);
+      addTearDown(note.dispose);
+      var lostFocus = 0;
+      focus.addListener(() {
+        if (!focus.hasFocus) lostFocus++;
+      });
+      await tester.pumpWidget(
+        app(
+          Scaffold(
+            body: Column(
+              children: [
+                TextField(
+                  key: const ValueKey('note'),
+                  controller: note,
+                  focusNode: focus,
+                ),
+                Builder(
+                  builder: (context) => TextButton(
+                    onPressed: () => showAppSheet<void>(
+                      context: context,
+                      padded: true,
+                      builder: (outer) => Builder(
+                        builder: (outerContext) => TextButton(
+                          onPressed: () => showAppSheet<void>(
+                            context: outerContext,
+                            padded: true,
+                            builder: (inner) => TextButton(
+                              onPressed: () => Navigator.of(inner).pop(),
+                              child: const Text('guardar'),
+                            ),
+                          ),
+                          child: const Text('otra'),
+                        ),
+                      ),
+                    ),
+                    child: const Text('abrir'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.byKey(const ValueKey('note')));
+      await tester.enterText(find.byKey(const ValueKey('note')), 'a medias');
+      await tester.pump();
+
+      await tester.tap(find.text('abrir'));
+      await tester.pumpAndSettle();
+      // The note committed on losing the focus, once.
+      expect(lostFocus, 1);
+      await tester.tap(find.text('otra'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('guardar'));
+      await tester.pumpAndSettle();
+      await tester.tapAt(const Offset(5, 5));
+      await tester.pumpAndSettle();
+
+      expect(note.text, 'a medias');
+      expect(focus.hasFocus, isFalse);
+    });
+  });
 }

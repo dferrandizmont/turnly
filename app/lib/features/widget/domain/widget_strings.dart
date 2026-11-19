@@ -80,6 +80,18 @@ class WidgetStrings {
   String? nextOffLabel(OffOutlook outlook) =>
       nextOffText(_l10n, AppDateFormat(locale), outlook);
 
+  /// «Mañana: Tarde de 14:00 a 22:00»: the day after, by the names and hours
+  /// of its shifts, for the spoken label of the small widget (the visible
+  /// line has codes, «Mañana: T 14–22»).
+  String describeTomorrow(ResolvedDay day) {
+    final l10n = _l10n;
+    final format = AppDateFormat(locale, hour12);
+    final what = day.shifts.isEmpty
+        ? noShift
+        : day.shifts.map((s) => s.spoken(l10n, format)).join('. ');
+    return '$tomorrow: $what';
+  }
+
   String describe(
     CivilDate date,
     ResolvedDay day,

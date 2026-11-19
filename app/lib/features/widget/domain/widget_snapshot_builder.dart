@@ -93,6 +93,7 @@ class _Builder {
   final _kinds = <CivilDate, DayKind>{};
   final _descriptions = <String, String>{};
   final _absenceDescriptions = <String, String>{};
+  final _tomorrowDescriptions = <String, String>{};
   final _styleIndex = <int, int>{};
   final _styles = <WidgetStyle>[];
   final _monthIndex = <String, int>{};
@@ -195,6 +196,7 @@ class _Builder {
         today: strings.todayLabel,
         days: _descriptions,
         absences: _absenceDescriptions,
+        tomorrow: _tomorrowDescriptions,
       ),
       nextOff: _nextOffs(today, days),
       notes: notes.isEmpty ? null : notes,
@@ -213,6 +215,9 @@ class _Builder {
     final month = _monthFor(date);
     final weekdayShort = strings.weekdaysShort[date.weekday - 1];
     final tomorrow = _tomorrowLine(date.addDays(1));
+    _tomorrowDescriptions[date.toIso()] = strings.describeTomorrow(
+      _day(date.addDays(1)),
+    );
     final single = shifts.length == 1;
 
     return WidgetDay(

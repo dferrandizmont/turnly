@@ -26,6 +26,10 @@ import flutter_local_notifications
     if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "TurnlyAlarmSystem") {
       AlarmSystemChannel.shared.register(with: registrar)
     }
+    // Windowed Apps (iPadOS 26): room for the window controls.
+    if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "TurnlyWindowControls") {
+      WindowControlsChannel.shared.register(with: registrar)
+    }
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
     // flutter_local_notifications: the engine that runs «Posponer» with the app
     // closed needs the plugins too (docs/mac-ios.md 4.2, step 4).

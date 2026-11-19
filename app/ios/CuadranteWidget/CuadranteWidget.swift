@@ -165,7 +165,23 @@ struct EntryBuilder {
   /// Fail closed: a cell is sensitive if it is an absence, or if it shows
   /// shifts (or adjustments) for a date the snapshot cannot classify.
   func isSensitive(_ date: String, hasBands: Bool) -> Bool {
-    absenceDates.contains(date) || (hasBands && !knownDates.contains(date))
+    if absenceDates.contains(date) { return true }
+    guard !knownDates.contains(date) else { return false }
+    // An unclassified date with something to show or say could be an absence.
+    return hasBands || snapshot.descriptions?.days?[date] != nil
+  }
+
+  /// `yyyy-MM-dd` of the civil day after [date], or nil if it cannot be read.
+  static func nextDate(_ date: String) -> String? {
+    let parts = date.split(separator: "-").compactMap { Int($0) }
+    guard parts.count == 3 else { return nil }
+    var cal = Calendar(identifier: .gregorian)
+    cal.timeZone = TimeZone(identifier: "UTC")!
+    guard let d = cal.date(from: DateComponents(year: parts[0], month: parts[1], day: parts[2])),
+      let n = cal.date(byAdding: .day, value: 1, to: d)
+    else { return nil }
+    let c = cal.dateComponents([.year, .month, .day], from: n)
+    return String(format: "%04d-%02d-%02d", c.year!, c.month!, c.day!)
   }
 
   func content(at index: Int) -> EntryContent {
@@ -215,19 +231,41 @@ struct EntryBuilder {
     return isToday ? prefixedToday(text) : text
   }
 
+  /// What is said for [date] while the device redacts private content: the
+  /// snapshot's anonymized sentence for an absence («Ausencia», no name, no
+  /// hours, no note), else [fallback] (a bare day number): never the sentence
+  /// of `descriptions.days`, which names the absence.
+  private func redactedSpoken(_ date: String, isToday: Bool, fallback: String) -> String {
+    if absenceDates.contains(date) {
+      guard let text = snapshot.descriptions?.absences?[date] else { return fallback }
+      return isToday ? prefixedToday(text) : text
+    }
+    // Only sensitive cells reach here; a date that cannot be classified says
+    // the bare day, never its full sentence (fail closed).
+    return fallback
+  }
+
+  /// What is said aloud for the line of the day after [date]: the shifts by
+  /// name and hours when the snapshot brings them, else the visible line
+  /// ([visible], with codes).
+  private func spokenTomorrow(after date: String, visible: String) -> String {
+    snapshot.descriptions?.tomorrow?[date] ?? visible
+  }
+
   // MARK: Small
 
   private func small(at index: Int) -> SmallModel {
     let day = snapshot.days[index]
     let small = day.small
     let extras = extras(day.date)
+    let tomorrowSpoken = spokenTomorrow(after: day.date, visible: small.tomorrow)
     // The snapshot's sentence already includes the adjustments; only without
     // it are they spelled out here (never twice).
     let spoken =
-      description(day.date, isToday: true).map { "\($0). \(small.tomorrow)" }
+      description(day.date, isToday: true).map { "\($0). \(tomorrowSpoken)" }
       ?? (extras.isEmpty
         ? nil
-        : [day.dateLabel, small.big, small.detail, extras.joined(separator: ". "), small.tomorrow]
+        : [day.dateLabel, small.big, small.detail, extras.joined(separator: ". "), tomorrowSpoken]
           .compactMap { $0 }.joined(separator: ". "))
     let plan = smallPlan(day: day, extras: extras)
     return SmallModel(
@@ -235,10 +273,34 @@ struct EntryBuilder {
       big: small.big, isEmpty: small.isEmpty, detail: small.detail, tomorrow: small.tomorrow,
       shifts: day.shifts.map(paint), extra: plan.extra, showTomorrow: plan.showTomorrow,
       compact: plan.compact,
-      // Today or tomorrow an absence: redacted on a locked device (StandBy).
-      sensitive: absenceDates.contains(day.date)
-        || absenceDates.contains(day.medium.cells.dropFirst().first?.date ?? ""),
-      spoken: spoken)
+      // Today an absence, or tomorrow an absence or not classified (fail
+      // closed): redacted on a locked device (StandBy).
+      sensitive: absenceDates.contains(day.date) || !tomorrowIsPublic(day),
+      spoken: spoken,
+      spokenRedacted: smallRedacted(day, tomorrowSpoken: tomorrowSpoken))
+  }
+
+  /// The small widget said aloud while redacted: today as above but without
+  /// the name of an absence, and no line of tomorrow when that is an absence
+  /// (or cannot be told).
+  private func smallRedacted(_ day: WidgetDay, tomorrowSpoken: String) -> String? {
+    guard absenceDates.contains(day.date) || !tomorrowIsPublic(day) else { return nil }
+    let todayKnown = knownDates.contains(day.date) && !absenceDates.contains(day.date)
+    var parts = [
+      todayKnown
+        ? (description(day.date, isToday: true) ?? day.dateLabel)
+        : redactedSpoken(day.date, isToday: true, fallback: day.dateLabel)
+    ]
+    if tomorrowIsPublic(day) { parts.append(tomorrowSpoken) }
+    return parts.joined(separator: ". ")
+  }
+
+  /// Tomorrow is classified by the snapshot and is not an absence: its line
+  /// (visible or spoken) can be read out whatever the device state. Otherwise
+  /// the line could carry the code of an absence and the widget is sensitive.
+  private func tomorrowIsPublic(_ day: WidgetDay) -> Bool {
+    guard let tomorrow = day.medium.cells.dropFirst().first?.date else { return false }
+    return knownDates.contains(tomorrow) && !absenceDates.contains(tomorrow)
   }
 
   private static let smallExtrasSize: CGFloat = 11
@@ -306,14 +368,19 @@ struct EntryBuilder {
         ? nil
         : ([cell.weekdayShort, String(cell.dayOfMonth)] + cell.bands.map(\.code) + extras)
           .joined(separator: ". ")
+      // Fail closed: adjustments of an unclassified date are redacted too.
+      let sensitive = isSensitive(cell.date, hasBands: !bands.isEmpty || !extras.isEmpty)
       return StripCellModel(
         date: cell.date, weekdayShort: cell.weekdayShort, dayOfMonth: cell.dayOfMonth,
         isToday: cell.isToday, isHoliday: cell.isHoliday, hasNote: cell.hasNote, bands: bands,
         extra: DayCellView.extraLines(
           extras, cell: cellSize, shown: min(bands.count, 2), codeSize: 20, maxLines: 3),
-        // Fail closed: adjustments of an unclassified date are redacted too.
-        sensitive: isSensitive(cell.date, hasBands: !bands.isEmpty || !extras.isEmpty),
-        spoken: description(cell.date, isToday: cell.isToday) ?? fallback)
+        sensitive: sensitive,
+        spoken: description(cell.date, isToday: cell.isToday) ?? fallback,
+        spokenRedacted: sensitive
+          ? redactedSpoken(
+            cell.date, isToday: cell.isToday, fallback: "\(cell.weekdayShort) \(cell.dayOfMonth)")
+          : nil)
     }
     return MediumModel(
       date: day.date, total: total,
@@ -333,6 +400,7 @@ struct EntryBuilder {
       let extras = extras(cell.date)
       let bands = cell.bands.map { paint($0, dim: !cell.inMonth) }
       let isToday = i == todayCell
+      let sensitive = isSensitive(cell.date, hasBands: !bands.isEmpty || !extras.isEmpty)
       let fallback: String? =
         extras.isEmpty
         ? nil
@@ -343,8 +411,11 @@ struct EntryBuilder {
         // No adjustment text is drawn in the grid (its cells never have the
         // height for it on an iPhone); the spoken label has it. Fail closed:
         // adjustments of an unclassified date are redacted too.
-        sensitive: isSensitive(cell.date, hasBands: !bands.isEmpty || !extras.isEmpty),
-        spoken: description(cell.date, isToday: isToday) ?? fallback)
+        sensitive: sensitive,
+        spoken: description(cell.date, isToday: isToday) ?? fallback,
+        spokenRedacted: sensitive
+          ? redactedSpoken(cell.date, isToday: isToday, fallback: String(cell.dayOfMonth))
+          : nil)
     }
     return LargeModel(
       date: day.date, monthKey: month.key, title: month.title,
@@ -356,12 +427,11 @@ struct EntryBuilder {
   /// Shifts of the day after `days[index]`, from `days` or, past the last
   /// day, from `displayDays` (which run to `lastDate + 27`). nil if unknown.
   private func tomorrowShifts(after index: Int) -> [WidgetShift]? {
-    let days = snapshot.days
-    if index + 1 < days.count { return days[index + 1].shifts }
-    guard let aux = snapshot.displayDays,
-      let i = aux.firstIndex(where: { $0.date == days[index].date }), i + 1 < aux.count
-    else { return nil }
-    return aux[i + 1].shifts
+    // By date, not by position: a gap in the snapshot must not let a later
+    // day stand in for tomorrow.
+    guard let next = EntryBuilder.nextDate(snapshot.days[index].date) else { return nil }
+    if let d = snapshot.days.first(where: { $0.date == next }) { return d.shifts }
+    return snapshot.displayDays?.first(where: { $0.date == next })?.shifts
   }
 
   private func lock(at index: Int) -> LockModel {
@@ -374,7 +444,10 @@ struct EntryBuilder {
     let line2 = tomorrowHidden ? nil : day.lock.rectangular[1]
 
     guard absence else {
-      let spoken = [description(day.date, isToday: true), line2].compactMap { $0 }
+      let spoken = [
+        description(day.date, isToday: true),
+        line2.map { spokenTomorrow(after: day.date, visible: $0) },
+      ].compactMap { $0 }
       return LockModel(
         date: day.date, inline: day.lock.inline, circular: day.lock.circular,
         line1: day.lock.rectangular[0], line2: line2,
@@ -391,7 +464,7 @@ struct EntryBuilder {
     } else {
       spoken.append(neutral)
     }
-    if let line2 { spoken.append(line2) }
+    if let line2 { spoken.append(spokenTomorrow(after: day.date, visible: line2)) }
     return LockModel(
       date: day.date, inline: neutral, circular: neutral, line1: neutral, line2: line2,
       spoken: spoken.joined(separator: ". "))

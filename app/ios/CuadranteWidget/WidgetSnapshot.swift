@@ -135,6 +135,10 @@ struct WidgetDescriptions: Decodable {
   let days: [String: String]?
   /// Anonymized sentences for dates with absences.
   let absences: [String: String]?
+  /// «Mañana: Tarde de 14:00 a 22:00», keyed by the date whose next day it
+  /// is: what the small widget and the lock screen say aloud instead of the
+  /// visible line, which has codes. Absent in snapshots older than 1.2.2.
+  let tomorrow: [String: String]?
 }
 
 /// v3: hours counting for this job over the seven days that start on a date
@@ -296,6 +300,10 @@ struct SmallModel: Codable {
   /// Today or tomorrow an absence: redacted on a locked device.
   let sensitive: Bool
   let spoken: String?
+  /// What is said instead of [spoken] while the device redacts private
+  /// content (locked, StandBy). Only on sensitive entries, and never with
+  /// the name of an absence.
+  var spokenRedacted: String? = nil
 }
 
 struct StripCellModel: Codable {
@@ -310,6 +318,8 @@ struct StripCellModel: Codable {
   let extra: [String]
   let sensitive: Bool
   let spoken: String?
+  /// See `SmallModel.spokenRedacted`.
+  var spokenRedacted: String? = nil
 }
 
 struct MediumModel: Codable {
@@ -331,6 +341,8 @@ struct GridCellModel: Codable {
   let bands: [BandPaint]
   let sensitive: Bool
   let spoken: String?
+  /// See `SmallModel.spokenRedacted`.
+  var spokenRedacted: String? = nil
 }
 
 struct LargeModel: Codable {

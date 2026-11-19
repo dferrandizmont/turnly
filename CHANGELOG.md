@@ -10,6 +10,21 @@ at once, so they can skip numbers.
 
 ## Unreleased
 
+## 1.2.2 · 2026-11-19
+
+iPhone and iPad update (App Store build 7): choose the day of the cycle in "Start the rotation here", the large-text, landscape and tablet fixes of Android 0.11.3 and 0.11.4, and three fixes only for iPhone and iPad. Your data is not touched.
+
+- Fixed (iPad): in a resizable window (Windowed Apps), the window buttons in the top-left corner no longer cover the "Month" icon of the side rail or the start of the date at the top.
+- Fixed (iPhone): after saving an overtime block, the day note no longer takes the focus back and opens the keyboard.
+- Fixed (iPhone): VoiceOver now reads "Tomorrow" in the small and lock-screen widgets by the shift name and hours ("Afternoon from 14:00 to 22:00"), not by its code, and each day of the medium and large widgets is one button with the day, the shift name and its hours.
+- Improved: "Start the rotation here" in the day detail shows the numbered cycle strip, so you choose which day of the cycle falls on that date (it is also offered on a day that already is day 1 of the cycle).
+- Fixed: in the first-use rotation step, the month preview shows the shift hours of the profession you chose.
+- Fixed: in the rotation wizard in landscape or with large text, the step header scrolls away with the step; in "Weeks per shift", choosing a shift no longer moves the list under your finger.
+- Fixed: with large text, a block you add in "Create my own" keeps its title in view, the "Today" card takes about a third of the screen, and the dates in "Upcoming days" no longer stack one digit per line.
+- Fixed: the undo, "Clear the cycle" and back buttons of the rotation builder have a name that VoiceOver reads once.
+- Fixed (iPad): the shift palette of "Create my own" fits under the blocks; "My rotations", "Agenda" and "Summary" have no back arrow when opened from the side rail; the month summary sits right under the grid; the report sheet keeps "Create and share" in view; the first-use steps are centred; sheets follow light and dark mode while open; a typed amount comes back above the keyboard after turning the iPad.
+- Fixed: the small widget preview in the app shrinks the hours a little to fit instead of cutting them off.
+
 ## 0.11.4 · 2026-11-19
 
 Android test build: choose the day of the cycle in "Start the rotation here", and fixes for the rotation wizard, large text and tablets. Your data is not touched.

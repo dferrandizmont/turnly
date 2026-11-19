@@ -7,6 +7,7 @@ import 'core/l10n/app_locales.dart';
 import 'core/l10n/app_material_localizations.dart';
 import 'core/l10n/catalog_texts.dart';
 import 'core/l10n/l10n.dart';
+import 'core/platform/window_controls.dart';
 import 'core/router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/widgets/app_snack_bar.dart';
@@ -85,7 +86,9 @@ class CuadranteApp extends ConsumerWidget {
                             Theme.of(context).brightness,
                           ),
                           child: AppSnackBarLayout(
-                            child: child ?? const SizedBox.shrink(),
+                            child: WindowControlsInset(
+                              child: child ?? const SizedBox.shrink(),
+                            ),
                           ),
                         ),
                       ),

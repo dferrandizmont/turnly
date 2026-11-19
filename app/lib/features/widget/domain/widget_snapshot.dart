@@ -597,14 +597,19 @@ class WidgetDescriptions {
     required this.today,
     required Map<String, String> days,
     required Map<String, String> absences,
+    Map<String, String> tomorrow = const {},
   }) : days = Map.unmodifiable(days),
-       absences = Map.unmodifiable(absences);
+       absences = Map.unmodifiable(absences),
+       tomorrow = Map.unmodifiable(tomorrow);
 
   factory WidgetDescriptions.fromJson(Map<String, Object?> j) =>
       WidgetDescriptions(
         today: _str(j, 'today'),
         days: _map(j, 'days').cast<String, String>(),
         absences: _map(j, 'absences').cast<String, String>(),
+        tomorrow: j.containsKey('tomorrow')
+            ? _map(j, 'tomorrow').cast<String, String>()
+            : const {},
       );
 
   final String today;
@@ -612,10 +617,17 @@ class WidgetDescriptions {
   // Auxiliary widgets use these redacted labels instead of private absences.
   final Map<String, String> absences;
 
+  /// Spoken line of the day after each date of the timeline, keyed by that
+  /// date: «Mañana: Tarde de 14:00 a 22:00». The small widget and the lock
+  /// screen read it instead of the visible «Mañana: T 14–22», whose codes
+  /// say nothing aloud. Absent (empty) in snapshots written before 1.2.2.
+  final Map<String, String> tomorrow;
+
   Map<String, Object?> toJson() => {
     'today': today,
     'days': days,
     'absences': absences,
+    if (tomorrow.isNotEmpty) 'tomorrow': tomorrow,
   };
 }
 

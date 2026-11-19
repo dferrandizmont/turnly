@@ -36,13 +36,72 @@ struct CuadranteEntryView: View {
 
 private extension View {
   /// The whole view read as one sentence when the snapshot brings it;
-  /// otherwise VoiceOver reads the visible texts together.
-  @ViewBuilder
-  func spoken(_ label: String?) -> some View {
-    if let label {
-      self.accessibilityElement(children: .ignore).accessibilityLabel(Text(verbatim: label))
+  /// otherwise VoiceOver reads the visible texts together. A [sensitive] view
+  /// says [redacted] instead while the device redacts private content.
+  func spoken(_ label: String?, redacted: String? = nil, sensitive: Bool = false) -> some View {
+    modifier(SpokenLabel(label: label, redacted: redacted, sensitive: sensitive, link: false))
+  }
+}
+
+/// The spoken label, which must follow the redaction of the visible content:
+/// `privacySensitive` hides the texts on a locked device but not a label put
+/// on top of them, so a sensitive view (an absence) reads [redacted] while
+/// `redactionReasons` has `.privacy` (1.2.2 review of F8).
+private struct SpokenLabel: ViewModifier {
+  @Environment(\.redactionReasons) private var reasons
+  let label: String?
+  let redacted: String?
+  let sensitive: Bool
+  /// A `Link`: the label goes on the button and its content is hidden.
+  let link: Bool
+
+  func body(content: Content) -> some View {
+    let hide = sensitive && reasons.contains(.privacy)
+    // Sensitive and redacted: never the full sentence, never the visible texts.
+    let text: String? = hide ? (redacted ?? "") : label
+    if link {
+      if let text {
+        content.accessibilityLabel(Text(verbatim: text))
+      } else {
+        content
+      }
+    } else if let text {
+      content.accessibilityElement(children: .ignore).accessibilityLabel(Text(verbatim: text))
     } else {
-      self.accessibilityElement(children: .combine)
+      content.accessibilityElement(children: .combine)
+    }
+  }
+}
+
+// A cell is a `Link` (a button for VoiceOver). `spoken` on the link itself
+// did not replace its texts: the button was read as «vie, 13, M» (weekday,
+// day, code), with each of them a child. The sentence goes on the link and
+// what is inside it is hidden from VoiceOver (1.1.0 QA, iPhone F8). Without a
+// sentence, the visible texts are read together as before.
+private extension View {
+  func linkContent(spoken label: String?, sensitive: Bool) -> some View {
+    modifier(LinkContent(hasSentence: label != nil, sensitive: sensitive))
+  }
+
+  func linkSpoken(_ label: String?, redacted: String?, sensitive: Bool) -> some View {
+    modifier(SpokenLabel(label: label, redacted: redacted, sensitive: sensitive, link: true))
+  }
+}
+
+/// What is inside a cell's `Link` for VoiceOver: hidden when the link
+/// carries a sentence, or while a sensitive cell is redacted (its redacted
+/// label is on the link); otherwise the visible texts read together.
+private struct LinkContent: ViewModifier {
+  @Environment(\.redactionReasons) private var reasons
+  let hasSentence: Bool
+  let sensitive: Bool
+
+  @ViewBuilder
+  func body(content: Content) -> some View {
+    if hasSentence || (sensitive && reasons.contains(.privacy)) {
+      content.accessibilityHidden(true)
+    } else {
+      content.accessibilityElement(children: .combine)
     }
   }
 }
@@ -352,7 +411,7 @@ struct SmallView: View {
     .padding(.horizontal, WidgetMetrics.l)
     .padding(.vertical, model.compact ? WidgetMetrics.xs * 2 : WidgetMetrics.m)
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-    .spoken(model.spoken)
+    .spoken(model.spoken, redacted: model.spokenRedacted, sensitive: model.sensitive)
     .privacySensitive(model.sensitive)
     .widgetURL(WidgetLink.day(model.date))
     .containerBackground(for: .widget) {
@@ -404,8 +463,9 @@ struct MediumView: View {
                 sensitive: cell.sensitive,
                 extras: cell.extra)
             }
+            .linkContent(spoken: cell.spoken, sensitive: cell.sensitive)
           }
-          .spoken(cell.spoken)
+          .linkSpoken(cell.spoken, redacted: cell.spokenRedacted, sensitive: cell.sensitive)
         }
       }
     }
@@ -461,8 +521,9 @@ struct LargeView: View {
                   radius: WidgetMetrics.gridRadius,
                   codeSize: 15,
                   sensitive: cell.sensitive)
+                .linkContent(spoken: cell.spoken, sensitive: cell.sensitive)
               }
-              .spoken(cell.spoken)
+              .linkSpoken(cell.spoken, redacted: cell.spokenRedacted, sensitive: cell.sensitive)
             }
           }
         }

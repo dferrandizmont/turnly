@@ -18,6 +18,7 @@
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		75E7865A573A0D0A42744072 /* CuadranteWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 51DD23DDF27E8B4CE3C254F1 /* CuadranteWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7644298341E9A01C5CC38F9A /* AlarmSystemChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41EB9CD87B9D37018ACA0A86 /* AlarmSystemChannel.swift */; };
+		A1B2C3D4E5F60718293A4B5C /* WindowControlsChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5D /* WindowControlsChannel.swift */; };
 		7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */; };
 		78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */; };
 		8703A218DFA321624515B950 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 20E7C80CC105E8A792802673 /* PrivacyInfo.xcprivacy */; };
@@ -86,6 +87,7 @@
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		35BBAABE24B08F8C1394A45A /* CuadranteWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CuadranteWidget.swift; sourceTree = "<group>"; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A4B5D /* WindowControlsChannel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WindowControlsChannel.swift; sourceTree = "<group>"; };
 		41EB9CD87B9D37018ACA0A86 /* AlarmSystemChannel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlarmSystemChannel.swift; sourceTree = "<group>"; };
 		51DD23DDF27E8B4CE3C254F1 /* CuadranteWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CuadranteWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		65E8FA78B7FF92D834696EB5 /* CuadranteWidget.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = CuadranteWidget.xcconfig; sourceTree = "<group>"; };
@@ -199,6 +201,7 @@
 				F9C9ACA7E7EDC3E2D8B50AE9 /* IncomingBackupChannel.swift */,
 				BDEB201FDBFA148993EECC9B /* IncomingFileStore.swift */,
 				41EB9CD87B9D37018ACA0A86 /* AlarmSystemChannel.swift */,
+				A1B2C3D4E5F60718293A4B5D /* WindowControlsChannel.swift */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -431,6 +434,7 @@
 				9B09C8A65137313A8BD17622 /* IncomingBackupChannel.swift in Sources */,
 				6A49302AF2AA93314E27559A /* IncomingFileStore.swift in Sources */,
 				7644298341E9A01C5CC38F9A /* AlarmSystemChannel.swift in Sources */,
+				A1B2C3D4E5F60718293A4B5C /* WindowControlsChannel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
