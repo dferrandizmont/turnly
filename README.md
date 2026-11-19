@@ -155,11 +155,11 @@ you choose. The `.turnly` backup file is not encrypted.
 
 ## What's new
 
+- **0.11.4 (19 Nov 2026):** Android: In “Start the rotation here”, choose the cycle day for that date on the numbered strip. On phones in landscape or with large text, the wizard header scrolls with the step. In “Weeks per shift”, the list stays still when you choose a shift. On tablets, if “Create my own” has only a few blocks, the shift palette sits right below them. With very large text, the digits of each date in “Upcoming days” stay on one line. Shift times fit in the small widget preview. On tablets, opening “Agenda” from the side rail no longer shows a back arrow. The month summary sits just below the calendar, and “Create and share” stays in view as you scroll through the report options.
 - **0.11.3 (19 Nov 2026):** Android: the month preview during setup shows the shift hours for the profession you choose. On tablets, the amount field comes back into view above the keyboard when you rotate the tablet, and open sheets follow the system’s light or dark theme. With large text, a new block’s title stays in view. With very large text, the “Today” card takes up less space. VoiceOver and TalkBack announce each button name once (“Undo”, “Clear the cycle” and “Back”).
 - **0.11.2 (17 Nov 2026):** Android gets the fixes from 1.2.1 for the rotation builder and issues with very large text. “Other number” selects the current duration, “Undo” restores the selected block, and a warning shows the maximum hourly rate. Text in Catalan, Galician and Basque has also been corrected.
 - **1.2.1 (17 Nov 2026):** iPhone and iPad: fixes for very large text (the rotation builder, the “Today” card, the keyboard’s “Done” bar, question titles, the note in the month), the iOS time wheel for overtime, a clearer “Your cycle” strip and a warning when an hourly rate hits its maximum.
 - **1.2.0 (16 Nov 2026):** iPhone and iPad get everything from 0.10.1, 0.11.0 and 0.11.1: notes in the month on iPhone, long rotations in blocks with the “Weeks per shift” template, the numbered cycle strip and whole-month previews, “Rate Turnly” in Settings and the large-text fixes.
-- **0.11.1 (15 Nov 2026):** Android: with “Show the note in the month” on, phones now write the first line of the note in the day’s box, in portrait and landscape, instead of only the clip.
 
 See [CHANGELOG.md](CHANGELOG.md) or the [releases](https://github.com/dferrandizmont/turnly/releases).
 

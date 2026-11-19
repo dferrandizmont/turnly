@@ -63,12 +63,28 @@ class WeeksPerShiftEditor extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // The line is always there, hidden until the shift is
+                    // chosen: the card keeps its height, so the list does not
+                    // move under the finger that taps it (0.11.0 QA, F12).
                     if (wizard.weekShiftIds.indexOf(shift.id) case final i
                         when i >= 0)
                       Text(
                         l10n.patternWeeksPosition(i + 1),
                         key: ValueKey('weeks-order-${shift.id}'),
                         style: context.type.bodyStrong,
+                      )
+                    else
+                      ExcludeSemantics(
+                        child: Visibility(
+                          visible: false,
+                          maintainSize: true,
+                          maintainAnimation: true,
+                          maintainState: true,
+                          child: Text(
+                            l10n.patternWeeksPosition(1),
+                            style: context.type.bodyStrong,
+                          ),
+                        ),
                       ),
                     PatternShiftLabel(shift: shift),
                   ],

@@ -31,7 +31,9 @@ Future<void> showReportSheet(
   required CivilDate month,
 }) => showAppSheet<void>(
   context: context,
-  padded: true,
+  // The sheet lays itself out: the options scroll and «Crear y compartir»
+  // stays under them, so it is within reach however short the screen or
+  // large the text (iPad QA 1.1.0 F3).
   builder: (_) => ReportSheet(month: month),
 );
 
@@ -149,7 +151,7 @@ class _ReportSheetState extends ConsumerState<ReportSheet> {
       format.monthYear(DateTime(_month.year, _month.month)),
     );
 
-    return Column(
+    final options = Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -319,20 +321,37 @@ class _ReportSheetState extends ConsumerState<ReportSheet> {
             style: type.meta.copyWith(color: colors.textMuted),
           ),
         ),
-        const SizedBox(height: Sp.xl),
-        Builder(
-          builder: (buttonContext) => PrimaryButton(
-            key: const ValueKey('report-create'),
-            label: l10n.reportCreate,
-            icon: AppIcons.share,
-            loading: busy,
-            onPressed: () {
-              rememberShareOrigin(buttonContext);
-              _create();
-            },
-          ),
-        ),
       ],
+    );
+    return SafeArea(
+      top: false,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Flexible(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: Sp.page),
+              child: options,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(Sp.page, Sp.m, Sp.page, Sp.l),
+            child: Builder(
+              builder: (buttonContext) => PrimaryButton(
+                key: const ValueKey('report-create'),
+                label: l10n.reportCreate,
+                icon: AppIcons.share,
+                loading: busy,
+                onPressed: () {
+                  rememberShareOrigin(buttonContext);
+                  _create();
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

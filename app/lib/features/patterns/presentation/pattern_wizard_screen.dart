@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/format/app_date_format.dart';
+import '../../../core/format/text_measure.dart';
 import '../../../core/icons/app_icons.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme_context.dart';
@@ -51,6 +53,8 @@ class PatternWizardScreen extends ConsumerStatefulWidget {
 class _PatternWizardScreenState extends ConsumerState<PatternWizardScreen> {
   PatternWizardArgs get _args => (start: widget.start, shiftId: widget.shiftId);
   bool _confirming = false;
+  // Where the list of patterns was when a sub-form opened over it.
+  double _listOffset = 0;
   Timer? _tapTimer;
   Completer<void>? _tapsSettled;
 
@@ -58,6 +62,24 @@ class _PatternWizardScreenState extends ConsumerState<PatternWizardScreen> {
     if (_tapsSettled == null) return;
     _tapTimer?.cancel();
     _tapTimer = Timer(kDoubleTapTimeout, () => _tapsSettled?.complete());
+  }
+
+  /// «Semanas por turno» opens over the list with its own scroll position: at
+  /// its top, and the list gets its place back when you return (0.11.0 QA,
+  /// F12: the sub-form opened scrolled to the bottom).
+  void _weeksTemplateChanged(bool opened) {
+    // The route's own scroll controller (status-bar tap, Page Down), not
+    // one of ours: the steps keep using it.
+    final scroll = PrimaryScrollController.maybeOf(context);
+    if (scroll == null || scroll.positions.length != 1) return;
+    if (opened) _listOffset = scroll.offset;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || scroll.positions.length != 1) return;
+      final target = opened
+          ? 0.0
+          : _listOffset.clamp(0.0, scroll.position.maxScrollExtent);
+      scroll.jumpTo(target);
+    });
   }
 
   @override
@@ -80,6 +102,9 @@ class _PatternWizardScreenState extends ConsumerState<PatternWizardScreen> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final provider = patternWizardProvider(_args);
+    ref.listen(provider.select((s) => s.weeksTemplate), (before, after) {
+      if (before != null && before != after) _weeksTemplateChanged(after);
+    });
     final wizard = ref.watch(provider);
     final controller = ref.read(provider.notifier);
     final last = wizard.step == WizardStep.end;
@@ -127,32 +152,69 @@ class _PatternWizardScreenState extends ConsumerState<PatternWizardScreen> {
               ),
             ),
             body: PageBody(
-              child: Column(
-                children: [
-                  if (!(wizard.step == WizardStep.choose && wizard.building))
-                    _StepIndicator(step: wizard.step),
-                  Expanded(
-                    child: wizard.step == WizardStep.choose && wizard.building
-                        ? PatternBuilderViewport(
-                            args: _args,
-                            header: _StepIndicator(step: wizard.step),
-                          )
-                        : SingleChildScrollView(
-                            key: ValueKey('pattern-step-${wizard.step.name}'),
-                            padding: const EdgeInsets.fromLTRB(
-                              Sp.page,
-                              Sp.s,
-                              Sp.page,
-                              Sp.section,
-                            ),
-                            child: switch (wizard.step) {
-                              WizardStep.choose => _ChooseStep(args: _args),
-                              WizardStep.start => _StartStep(args: _args),
-                              WizardStep.end => _EndStep(args: _args),
-                            },
-                          ),
-                  ),
-                ],
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final building =
+                      wizard.step == WizardStep.choose && wizard.building;
+                  // Pinned only while it leaves most of the height to the
+                  // step: on a short screen (a phone on its side, large
+                  // text) it joins the page and scrolls away with it, as the
+                  // builder's already does (0.11.0 QA, F6/F7).
+                  final pinned =
+                      !building &&
+                      constraints.maxHeight >=
+                          _stepIndicatorHeight(
+                                context,
+                                wizard.step,
+                                constraints.maxWidth,
+                              ) *
+                              _pinnedIndicatorShare;
+                  final indicator = _StepIndicator(step: wizard.step);
+                  return Column(
+                    children: [
+                      // Same slot either way, so the scroll position survives
+                      // a turn of the phone.
+                      pinned ? indicator : const SizedBox.shrink(),
+                      Expanded(
+                        child: building
+                            ? PatternBuilderViewport(
+                                args: _args,
+                                header: indicator,
+                              )
+                            : SingleChildScrollView(
+                                key: ValueKey(
+                                  'pattern-step-${wizard.step.name}',
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    pinned
+                                        ? const SizedBox.shrink()
+                                        : indicator,
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                        Sp.page,
+                                        Sp.s,
+                                        Sp.page,
+                                        Sp.section,
+                                      ),
+                                      child: switch (wizard.step) {
+                                        WizardStep.choose => _ChooseStep(
+                                          args: _args,
+                                        ),
+                                        WizardStep.start => _StartStep(
+                                          args: _args,
+                                        ),
+                                        WizardStep.end => _EndStep(args: _args),
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
             bottomNavigationBar: Column(
@@ -277,6 +339,45 @@ class _PatternWizardScreenState extends ConsumerState<PatternWizardScreen> {
         ),
       );
   }
+}
+
+/// The indicator stays pinned while the page is at least this many times
+/// taller than it; below that it scrolls with the step.
+const double _pinnedIndicatorShare = 4;
+
+/// Height of [_StepIndicator] at the reader's text size, to decide whether it
+/// stays pinned.
+double _stepIndicatorHeight(
+  BuildContext context,
+  WizardStep step,
+  double width,
+) {
+  final l10n = context.l10n;
+  final type = context.type;
+  double heightOf(String text, TextStyle style) {
+    final painter = TextPainter(
+      text: TextSpan(text: text, style: effectiveTextStyle(context, style)),
+      textDirection: Directionality.of(context),
+      textScaler: MediaQuery.textScalerOf(context),
+    )..layout(maxWidth: math.max(0, width - Sp.page * 2));
+    final height = painter.height;
+    painter.dispose();
+    return height;
+  }
+
+  final title = switch (step) {
+    WizardStep.choose => l10n.patternStepChoose,
+    WizardStep.start => l10n.patternStepStart,
+    WizardStep.end => l10n.patternStepEnd,
+  };
+  return Sp.s * 2 +
+      Sp.xs +
+      Sp.s +
+      heightOf(
+        l10n.patternStepOf(step.index + 1, WizardStep.values.length),
+        type.label,
+      ) +
+      heightOf(title, type.headline);
 }
 
 /// "Paso 2 de 3" with three segments.

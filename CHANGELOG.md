@@ -10,6 +10,22 @@ at once, so they can skip numbers.
 
 ## Unreleased
 
+## 0.11.4 · 2026-11-19
+
+Android test build: choose the day of the cycle in "Start the rotation here", and fixes for the rotation wizard, large text and tablets. Your data is not touched.
+
+- Improved: "Start the rotation here" in the day detail now shows the numbered cycle strip, so you choose which day of the cycle falls on that date (before, it always started on day 1). It is also offered on a day that already is day 1 of the cycle.
+- Fixed: in the rotation wizard on a phone in landscape or with large text, the step header scrolls away with the step, so the cycle strip and the options get the room.
+- Fixed: in "Weeks per shift", choosing a shift no longer moves the list under your finger, and its options open at the top.
+- Fixed (tablets): in "Create my own", the shift palette shows two rows or scrolls with the blocks, and with few blocks it sits right under them.
+- Fixed (tablets): "My rotations", "Agenda" and "Summary" no longer show a back arrow when they are opened from the side rail; opened from Settings or the year view, they keep it.
+- Fixed (tablets): the month summary sits right under the calendar grid, without a large gap.
+- Fixed: with very large text, the dates in "Upcoming days" no longer stack one digit per line.
+- Fixed (tablets): the report sheet keeps "Create and share" in view; its options scroll above it.
+- Fixed (tablets): the first-use steps are centred on the screen.
+- Fixed: the small widget preview in the app shrinks the hours a little to fit instead of cutting them off.
+- Website: the privacy policy (19 November 2026) now explains the Android daily copy to a folder you choose: what it contains, that it is off until you pick the folder, that a cloud folder is uploaded by that service, that the last 10 are kept, and that stopping it or uninstalling the app leaves the copies already in the folder.
+
 ## 0.11.3 · 2026-11-19
 
 Android test build: fixes from the 0.11.2 and iPhone 1.2.1 tests for large text, tablets and screen readers. Your data is not touched.

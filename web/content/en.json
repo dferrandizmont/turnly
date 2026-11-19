@@ -16,7 +16,7 @@
   ],
   "privacy_summary": [
     "Your shifts, notes and absences are stored only on your phone: there is no account, no server of ours and no analytics.",
-    "The app sends no data or crash reports to anyone. The only things that leave your phone are what you choose to export or send to your phone calendar, and the system backup: on Android, the one in your Google account, end-to-end encrypted with your screen lock (without a screen lock, Turnly stays out of it); on iPhone, the iCloud or computer backup."
+    "The app sends no data or crash reports to anyone. The only things that leave your phone are what you choose to export or send to your phone calendar, the daily copy in the folder you choose (on Android, if you turn it on), and the system backup: on Android, the one in your Google account, end-to-end encrypted with your screen lock (without a screen lock, Turnly stays out of it); on iPhone, the iCloud or computer backup."
   ],
   "faq": [
     {
@@ -71,7 +71,7 @@
     "11-widgets": "The «Add widget» gallery with your real shifts: small, agenda, medium and more",
     "11-widgets-oscuro": "The «Add widget» gallery with your real shifts: small, agenda, medium and more"
   },
-  "privacy_date": "2026-11-17",
+  "privacy_date": "2026-11-19",
   "kicker": "Shift calendar",
   "tagline": "Your shifts at a glance.",
   "chip": "All free: no Pro, no ads and no account.",

@@ -387,6 +387,7 @@
   "dayRotationResume": "Comezar a túa rotación aquí",
   "dayRotationRestartTitle": "Queres comezar a rotación aquí?",
   "dayRotationRestartBody": "A túa rotación «{name}» volverá comezar o {date}: ese día será o primeiro do ciclo ({shifts}).",
+  "dayRotationRestartBodyStep": "A túa rotación «{name}» volverá comezar o {date}: ese día será o día {day} do ciclo ({shifts}).",
   "dayRotationEndKeepsOthers": "As demais rotacións manteñen as súas datas.",
   "dayRotationRestartOthersUntil": "Esta rotación terá prioridade ata o {date}. As demais seguirán aplicándose nas datas que queden fóra dese intervalo.",
   "dayRotationRestartOthers": "As rotacións que puxeras para despois dese día eliminaranse.",

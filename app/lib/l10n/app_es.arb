@@ -435,7 +435,7 @@
   },
   "dayRotationRestart": "Empezar la rotación aquí",
   "@dayRotationRestart": {
-    "description": "Menú «Rotación» del detalle del día: la rotación de ese día vuelve a empezar ese día por el primer día del ciclo."
+    "description": "Menú «Rotación» del detalle del día: la rotación de ese día vuelve a empezar ese día por el día del ciclo que elijas."
   },
   "dayRotationEndHere": "Último día de esta rotación",
   "@dayRotationEndHere": {
@@ -464,6 +464,27 @@
       "shifts": {
         "type": "String",
         "example": "Mañana 06:00–14:00"
+      }
+    }
+  },
+  "dayRotationRestartBodyStep": "Tu rotación «{name}» volverá a empezar el {date}: ese día será el día {day} del ciclo ({shifts}).",
+  "@dayRotationRestartBodyStep": {
+    "description": "Diálogo de «Empezar la rotación aquí» cuando eliges un día del ciclo que no es el primero: qué cambia. {day} es el número de ese día del ciclo y {shifts} lo que da.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Correturnos"
+      },
+      "date": {
+        "type": "String",
+        "example": "viernes 27 de noviembre"
+      },
+      "day": {
+        "type": "int"
+      },
+      "shifts": {
+        "type": "String",
+        "example": "Noche 22:00–06:00"
       }
     }
   },

@@ -345,6 +345,16 @@ class AppLocalizationsCa extends AppLocalizations {
   }
 
   @override
+  String dayRotationRestartBodyStep(
+    String name,
+    String date,
+    int day,
+    String shifts,
+  ) {
+    return 'La teva rotació «$name» tornarà a començar el $date: aquell dia serà el dia $day del cicle ($shifts).';
+  }
+
+  @override
   String get dayRotationEndKeepsOthers =>
       'Les altres rotacions mantenen les seves dates.';
 

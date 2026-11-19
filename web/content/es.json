@@ -16,7 +16,7 @@
   ],
   "privacy_summary": [
     "Tus turnos, notas y ausencias se guardan solo en tu móvil: no hay cuenta, ni servidor propio, ni analítica.",
-    "La app no envía datos ni informes de errores a nadie. Solo sale del móvil lo que tú decidas exportar o pasar al calendario del móvil y la copia del sistema: en Android, la de tu cuenta de Google, cifrada de extremo a extremo con tu bloqueo de pantalla (sin bloqueo, Turnly no entra); en iPhone, la de iCloud o la del ordenador."
+    "La app no envía datos ni informes de errores a nadie. Solo sale del móvil lo que tú decidas exportar o pasar al calendario del móvil, la copia diaria en la carpeta que elijas (en Android, si la activas) y la copia del sistema: en Android, la de tu cuenta de Google, cifrada de extremo a extremo con tu bloqueo de pantalla (sin bloqueo, Turnly no entra); en iPhone, la de iCloud o la del ordenador."
   ],
   "faq": [
     {
@@ -71,7 +71,7 @@
     "11-widgets": "Galería «Añadir widget» con tus turnos reales: pequeño, agenda, mediano y más",
     "11-widgets-oscuro": "Galería «Añadir widget» con tus turnos reales: pequeño, agenda, mediano y más"
   },
-  "privacy_date": "2026-11-17",
+  "privacy_date": "2026-11-19",
   "kicker": "Calendario de turnos",
   "tagline": "Tus turnos, de un vistazo.",
   "chip": "Todo gratis: sin Pro, sin anuncios y sin cuenta.",

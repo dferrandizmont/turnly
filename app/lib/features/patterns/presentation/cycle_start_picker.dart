@@ -24,6 +24,7 @@ class CycleStartPicker extends StatefulWidget {
     this.keyPrefix = '',
     this.showPreview = true,
     this.fadeColor,
+    this.resultText,
   });
 
   final List<List<String>> steps;
@@ -49,6 +50,11 @@ class CycleStartPicker extends StatefulWidget {
   /// The surface the picker sits on, for the fades of the strip (see
   /// [CycleStrip.fadeColor]); the page background by default.
   final Color? fadeColor;
+
+  /// The live line under the strip, from the shifts of the chosen day
+  /// (`Ese día te toca: …` by default). A day changed by hand says what the
+  /// rotation would give instead.
+  final String Function(String shifts)? resultText;
 
   @override
   State<CycleStartPicker> createState() => _CycleStartPickerState();
@@ -85,7 +91,7 @@ class _CycleStartPickerState extends State<CycleStartPicker> {
           liveRegion: true,
           child: Text(
             keepTimeRangesTogether(
-              l10n.patternOffsetThatDay(
+              (widget.resultText ?? l10n.patternOffsetThatDay)(
                 shiftsLine(l10n, format, [
                   for (final id in steps[offset]) ?widget.shiftOf(id),
                 ]),

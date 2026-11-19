@@ -16,7 +16,7 @@
   ],
   "privacy_summary": [
     "As túas quendas, notas e ausencias gárdanse só no teu móbil: non hai conta, nin servidor propio, nin analítica.",
-    "A app non envía datos nin informes de erros a ninguén. Só sae do móbil o que ti decidas exportar ou pasar ao calendario do móbil e a copia do sistema: en Android, a da túa conta de Google, cifrada de extremo a extremo co bloqueo de pantalla (sen bloqueo, Turnly non entra nela); no iPhone, a de iCloud ou a do ordenador."
+    "A app non envía datos nin informes de erros a ninguén. Só sae do móbil o que ti decidas exportar ou pasar ao calendario do móbil, a copia diaria no cartafol que escollas (en Android, se a activas) e a copia do sistema: en Android, a da túa conta de Google, cifrada de extremo a extremo co bloqueo de pantalla (sen bloqueo, Turnly non entra nela); no iPhone, a de iCloud ou a do ordenador."
   ],
   "faq": [
     {
@@ -71,7 +71,7 @@
     "11-widgets": "Galería «Engadir widget» coas túas quendas reais: pequeno, axenda, mediano e máis",
     "11-widgets-oscuro": "Galería «Engadir widget» coas túas quendas reais: pequeno, axenda, mediano e máis"
   },
-  "privacy_date": "2026-11-17",
+  "privacy_date": "2026-11-19",
   "kicker": "Calendario de quendas",
   "tagline": "As túas quendas, dunha ollada.",
   "chip": "Todo gratis: sen Pro, sen anuncios e sen conta.",

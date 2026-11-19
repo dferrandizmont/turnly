@@ -1129,19 +1129,21 @@ class ScheduleController extends Notifier<ScheduleState> {
       );
 
   /// «Empezar la rotación aquí» of the day detail: the rotation that rules
-  /// [date] starts over on it, as ONE undoable step ([planRestartRun]: the
-  /// same as applying its pattern from [date]). Returns the undo step, or
-  /// `null` when nothing was applied (no rotation on [date], [date] already
-  /// is the first day of the cycle, or the calendar was switched meanwhile).
-  Future<ScheduleChange?> restartRunAt(CivilDate date) => _applyRunPlan(
-    (schedule, seq) => planRestartRun(
-      schedule,
-      date,
-      seq: seq,
-      postNightAuto: ref.read(postNightAutoProvider),
-      palette: state.palette,
-    ),
-  );
+  /// [date] starts over on it at [stepOffset] (0 is the first day), as ONE
+  /// undoable step ([planRestartRun]). Returns the undo step, or `null` when
+  /// there is no rotation on [date], the selected step already falls on
+  /// [date], or the calendar was switched meanwhile.
+  Future<ScheduleChange?> restartRunAt(CivilDate date, {int stepOffset = 0}) =>
+      _applyRunPlan(
+        (schedule, seq) => planRestartRun(
+          schedule,
+          date,
+          seq: seq,
+          stepOffset: stepOffset,
+          postNightAuto: ref.read(postNightAutoProvider),
+          palette: state.palette,
+        ),
+      );
 
   /// «Empezar tu rotación aquí» of the day detail: on a day without rotation,
   /// the last one that ended before [date] applies again from [date], with

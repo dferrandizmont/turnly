@@ -196,32 +196,48 @@ class DayRotationSection extends ConsumerWidget {
     final pattern = rotation.pattern;
     if (pattern == null || !rotation.canRestart) return;
     final day = format.weekdayDayMonth(_at(date));
-    final first = shiftsLine(l10n, format, [
-      for (final id in pattern.steps.first) ?schedule.shiftTypeOn(id, date),
-    ]);
-    final ok = await showConfirmDialog(
-      context,
-      title: l10n.dayRotationRestartTitle,
-      body: [
-        l10n.dayRotationRestartBody(
-          patternDisplayName(schedule, pattern),
-          day,
-          first,
-        ),
-        if (restartCoversOtherRuns(schedule, date))
-          rotation.run!.endDate == null
-              ? l10n.dayRotationRestartOthers
-              : l10n.dayRotationRestartOthersUntil(
-                  format.weekdayDayMonth(_at(rotation.run!.endDate!)),
-                ),
-        l10n.dayRotationKeeps,
-      ].join(' '),
-      confirmLabel: l10n.dayRotationStartConfirm,
-      scrollable: true,
+    final name = patternDisplayName(schedule, pattern);
+    final tail = [
+      if (restartCoversOtherRuns(schedule, date))
+        rotation.run!.endDate == null
+            ? l10n.dayRotationRestartOthers
+            : l10n.dayRotationRestartOthersUntil(
+                format.weekdayDayMonth(_at(rotation.run!.endDate!)),
+              ),
+      l10n.dayRotationKeeps,
+    ];
+    final offset = await showDialog<int>(
+      context: context,
+      builder: (_) => _StartHereDialog(
+        date: date,
+        pattern: pattern,
+        schedule: schedule,
+        title: l10n.dayRotationRestartTitle,
+        keyPrefix: 'restart-',
+        // Choosing the day that already falls on [date] changes nothing.
+        unchangedOffset: rotation.stepIndex,
+        bodyFor: (offset) {
+          final shifts = shiftsLine(l10n, format, [
+            for (final id in pattern.steps[offset])
+              ?_shiftTypeOn(schedule, date, id),
+          ]);
+          return [
+            offset == 0
+                ? l10n.dayRotationRestartBody(name, day, shifts)
+                : l10n.dayRotationRestartBodyStep(
+                    name,
+                    day,
+                    offset + 1,
+                    shifts,
+                  ),
+            ...tail,
+          ].join(' ');
+        },
+      ),
     );
-    if (!ok || !context.mounted) return;
+    if (offset == null || !context.mounted) return;
     onBeforeAction();
-    final step = await controller.restartRunAt(date);
+    final step = await controller.restartRunAt(date, stepOffset: offset);
     if (step == null || !context.mounted) return;
     _done(context, ref, controller, step, l10n.dayRotationStartDone(day));
   }
@@ -277,11 +293,13 @@ class DayRotationSection extends ConsumerWidget {
     final name = patternDisplayName(schedule, pattern);
     final offset = await showDialog<int>(
       context: context,
-      builder: (_) => _ResumeDialog(
+      builder: (_) => _StartHereDialog(
         date: date,
         pattern: pattern,
         schedule: schedule,
-        body: [
+        title: l10n.dayRotationResumeTitle,
+        keyPrefix: 'resume-',
+        bodyFor: (_) => [
           until == null
               ? l10n.dayRotationResumeBody(name, day)
               : l10n.dayRotationResumeBodyUntil(
@@ -301,28 +319,45 @@ class DayRotationSection extends ConsumerWidget {
   }
 }
 
-/// The confirmation of «Empezar tu rotación aquí»: what changes and, when the
-/// cycle has more than one day, which of them falls on [date] (the same
-/// question as the rotation wizard). Pops the chosen day of the cycle, or
-/// nothing when cancelled.
-class _ResumeDialog extends StatefulWidget {
-  const _ResumeDialog({
+/// The shift type [id] as it was on [date] (its hours then), the same for the
+/// text of the dialog and for its strip; the displayed one when the calendar
+/// has no such type yet.
+ShiftType? _shiftTypeOn(Schedule schedule, CivilDate date, String id) =>
+    schedule.shiftTypeOn(id, date) ?? shiftTypeForDisplay(schedule, id);
+
+/// The confirmation of «Empezar tu rotación aquí» and «Empezar la rotación
+/// aquí»: what changes and, when the cycle has more than one day, which of
+/// them falls on [date] (the same question as the rotation wizard). Pops the
+/// chosen day of the cycle, or nothing when cancelled.
+///
+/// [bodyFor] gives the text for the day of the cycle chosen now. [keyPrefix]
+/// is the picker's (`resume-`, `restart-`) and also names the scroll and the
+/// body. With [unchangedOffset], choosing that day disables the confirm
+/// button: it is the one that already falls on [date], nothing would change.
+class _StartHereDialog extends StatefulWidget {
+  const _StartHereDialog({
     required this.date,
     required this.pattern,
     required this.schedule,
-    required this.body,
+    required this.title,
+    required this.bodyFor,
+    required this.keyPrefix,
+    this.unchangedOffset,
   });
 
   final CivilDate date;
   final Pattern pattern;
   final Schedule schedule;
-  final String body;
+  final String title;
+  final String Function(int offset) bodyFor;
+  final String keyPrefix;
+  final int? unchangedOffset;
 
   @override
-  State<_ResumeDialog> createState() => _ResumeDialogState();
+  State<_StartHereDialog> createState() => _StartHereDialogState();
 }
 
-class _ResumeDialogState extends State<_ResumeDialog> {
+class _StartHereDialogState extends State<_StartHereDialog> {
   int _offset = 0;
 
   @override
@@ -350,7 +385,7 @@ class _ResumeDialogState extends State<_ResumeDialog> {
         children: [
           Flexible(
             child: SingleChildScrollView(
-              key: const ValueKey('day-rotation-resume-scroll'),
+              key: ValueKey('day-rotation-${widget.keyPrefix}scroll'),
               padding: const EdgeInsets.fromLTRB(Sp.xxl, Sp.xxl, Sp.xxl, Sp.l),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -358,29 +393,34 @@ class _ResumeDialogState extends State<_ResumeDialog> {
                   Semantics(
                     header: true,
                     namesRoute: true,
-                    child: Text(
-                      l10n.dayRotationResumeTitle,
-                      style: type.headline,
-                    ),
+                    child: Text(widget.title, style: type.headline),
                   ),
                   const SizedBox(height: Sp.l),
                   Text(
-                    widget.body,
-                    key: const ValueKey('day-rotation-resume-body'),
+                    widget.bodyFor(_offset),
+                    key: ValueKey('day-rotation-${widget.keyPrefix}body'),
                     style: type.body,
                   ),
                   if (steps.length > 1) ...[
                     const SizedBox(height: Sp.l),
                     CycleStartPicker(
                       steps: steps,
-                      shiftOf: (id) => shiftTypeForDisplay(widget.schedule, id),
+                      shiftOf: (id) =>
+                          _shiftTypeOn(widget.schedule, widget.date, id),
                       offset: _offset,
                       onOffsetChanged: (offset) =>
                           setState(() => _offset = offset),
                       start: widget.date,
                       plan: null,
-                      keyPrefix: 'resume-',
+                      keyPrefix: widget.keyPrefix,
                       showPreview: false,
+                      // A day changed by hand keeps what the person put there:
+                      // the line says what the rotation would give.
+                      resultText:
+                          widget.schedule.entries[widget.date]?.shiftTypeIds !=
+                              null
+                          ? l10n.dayDetailPatternGives
+                          : null,
                       // A dialog is `surface`, not the page background.
                       fadeColor: context.colors.surface,
                     ),
@@ -403,7 +443,9 @@ class _ResumeDialogState extends State<_ResumeDialog> {
                 ),
                 FilledButton(
                   key: const ValueKey('confirm-ok'),
-                  onPressed: () => Navigator.pop(context, _offset),
+                  onPressed: _offset == widget.unchangedOffset
+                      ? null
+                      : () => Navigator.pop(context, _offset),
                   child: Text(l10n.dayRotationStartConfirm),
                 ),
               ],

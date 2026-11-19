@@ -1,14 +1,14 @@
 # Política de privacidad de Turnly
 
-Última actualización: 17 de noviembre de 2026 · versión 2026-11-17
+Última actualización: 19 de noviembre de 2026 · versión 2026-11-19
 
 Turnly es una app de calendario de turnos para quien trabaja a turnos en España. Es una app independiente: no
 está creada, revisada ni respaldada por ninguna empresa, administración ni sindicato.
 
 Resumen: **no tienes cuenta, no hay servidor propio y tus turnos se quedan en tu móvil.** La app es totalmente
 gratuita y de código abierto, y no envía datos ni informes de errores a nadie. Lo único que puede sacar tus datos del
-móvil son las copias de seguridad de tu cuenta de Google o de Apple y los archivos o calendarios que tú decidas
-exportar, y eso lo controlas tú. Si nos escribes por correo, en ese correo intervienen los proveedores que se
+móvil son las copias de seguridad de tu cuenta de Google o de Apple, la copia diaria en la carpeta que elijas (en
+Android, si la activas) y los archivos o calendarios que tú decidas exportar, y eso lo controlas tú. Si nos escribes por correo, en ese correo intervienen los proveedores que se
 explican en «Si nos escribes».
 
 ## 1. Responsable del tratamiento
@@ -40,6 +40,22 @@ archivo contiene tus turnos, notas y ausencias, no lleva ningún identificador y
 controlas tú: la app solo lo entrega a la app que elijas en la hoja de compartir del sistema. Lo que hagas con él
 después (subirlo a tu nube, mandarlo por WhatsApp o por correo...) queda fuera de la app. Al abrir un `.turnly` o un `.cuadrante`,
 nada se restaura sin que lo confirmes.
+
+**Copia diaria en una carpeta (solo Android).** Si la activas en Ajustes › Copia de seguridad › «Copia automática en
+una carpeta», eliges una carpeta con el selector del sistema (una del móvil o de la tarjeta, o la de un servicio en la
+nube si su app la ofrece en ese selector; no todos lo hacen). La app deja en ella una copia `.turnly` al elegirla y,
+después, más o menos una vez al día si ha cambiado algo desde la última (el sistema decide el momento), además de otra
+después de tus cambios si tienes la app abierta (como mucho cada 6 horas) y cuando tocas «Copiar ahora en la carpeta».
+Es el mismo archivo que exportas a mano: lleva todo tu cuadrante, con las notas, sus adjuntos y las ausencias, baja
+médica incluida, y no está cifrado. Viene desactivada: no se copia nada hasta que eliges la carpeta. Turnly solo tiene
+permiso sobre esa carpeta, no ve ninguna cuenta y no envía nada por sí misma: si la carpeta es de un servicio en la
+nube, es ese servicio el que sube la copia, según sus propias condiciones. La app guarda las 10 últimas copias y borra
+las más antiguas; solo escribe, lee y borra sus propios archivos (`turnly-auto-…`); de los demás que haya en la
+carpeta solo ve el nombre, el tamaño y la fecha, y nunca los abre, cambia ni borra. Si tocas «Dejar de copiar en esta
+carpeta», la app deja de copiar y devuelve el permiso, pero las copias que ya están en la carpeta no se borran, igual
+que al usar «Borrar todo y empezar de cero» o al desinstalar la app. Si eliges otra carpeta, las copias de la anterior
+tampoco se borran. Si no las quieres, bórralas tú. Qué carpeta has elegido y su permiso se quedan en el móvil y no van
+en la copia del sistema.
 
 **Copia del sistema.** En Android 9 o superior, si tienes activada la copia de seguridad de Google y tu móvil tiene
 bloqueo de pantalla, el sistema sube periódicamente la base de datos, las copias y los adjuntos de la app a tu cuenta
@@ -141,8 +157,9 @@ No tomamos decisiones automatizadas ni elaboramos perfiles sobre ti.
 
 ## 4. Quién recibe los datos
 La app no transmite datos a terceros. Si valoras la app en la tienda, tu valoración y tu reseña las recibe Google o Apple
-directamente, no nosotros. Si exportas a un calendario sincronizado o tienes activada la copia del sistema, quien
-recibe esos datos es el proveedor de tu cuenta (Google, Apple u otro), en tu nombre y según sus condiciones.
+directamente, no nosotros. Si exportas a un calendario sincronizado, eliges para la copia diaria una carpeta de un servicio en la
+nube o tienes activada la copia del sistema, quien recibe esos datos es el proveedor de tu cuenta (Google, Apple u
+otro), en tu nombre y según sus condiciones.
 
 Si nos escribes, el correo de soporte pasa por estos proveedores (detalle en «Si nos escribes»):
 
@@ -169,7 +186,8 @@ documentación, aloja los datos en la Unión Europea.
 ## 6. Cuánto tiempo se conservan
 
 - **Datos en tu móvil:** hasta que desinstales la app o borres sus datos desde los ajustes del sistema (y, en su
-  caso, de las copias de seguridad de tu cuenta y de los archivos que hayas exportado).
+  caso, de las copias de seguridad de tu cuenta, de los archivos que hayas exportado y de las copias diarias de la
+  carpeta que elegiste, que siguen en ella hasta que las borres tú).
 - **Correos de soporte:** como máximo un año desde el último mensaje de la conversación, en Gmail, en Proton y en
   Brevo, con una limpieza cada tres meses, salvo que necesitemos conservarlos más tiempo para atender una reclamación.
   Antes, si nos lo pides (detalle en «Si nos escribes»). Cloudflare conserva su registro técnico del reenvío durante el
@@ -194,7 +212,9 @@ menores: los turnos y los ajustes se mantienen en el dispositivo.
 
 ## 9. Seguridad
 No hay servidor ni transmisión de datos desde la app. Las copias automáticas se guardan en la carpeta privada de la
-app. Tú controlas los archivos exportados y las copias de tu cuenta de Google o de Apple; la copia de Google de
+app. La copia diaria en una carpeta, si la activas, queda fuera de la app y sin cifrar: puede leerla quien tenga
+acceso a esa carpeta (otras apps con permiso sobre ella, el servicio en la nube al que pertenezca o quien use tu
+cuenta). Tú controlas los archivos exportados y las copias de tu cuenta de Google o de Apple; la copia de Google de
 Turnly solo se hace cifrada con tu bloqueo de pantalla. El código es público y cualquiera puede comprobar lo que hace.
 
 ## 10. Cambios en esta política

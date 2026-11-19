@@ -1678,3 +1678,8 @@ web/assets/site.js
 app/test/features/calendar/overtime_rate_limit_test.dart
 app/test/features/patterns/pattern_block_editor_test.dart
 app/test/features/shift_types/money_input_formatter_test.dart
+app/test/features/calendar/tablet_layout_qa_test.dart
+app/test/features/onboarding/onboarding_tablet_test.dart
+app/test/features/patterns/builder_layout_test.dart
+app/test/features/reports/report_sheet_tablet_test.dart
+app/test/features/widget/widget_preview_fit_test.dart

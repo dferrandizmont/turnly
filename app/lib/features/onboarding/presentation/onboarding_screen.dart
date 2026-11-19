@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +8,7 @@ import '../../../core/icons/app_icons.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/router.dart';
 import '../../../core/theme/theme_context.dart';
+import '../../../core/widgets/adaptive.dart';
 import '../../../core/widgets/buttons.dart';
 import '../../../core/widgets/page_body.dart';
 import '../../calendar/application/paint_controller.dart';
@@ -152,7 +155,10 @@ class OnboardingScreen extends ConsumerWidget {
     );
   }
 
-  /// The bar and the step scroll; «Siguiente» is under them, fixed.
+  /// The bar and the step scroll; «Siguiente» is under them, fixed. On a
+  /// tablet a step shorter than the screen sits in the middle of it, between
+  /// the bar and the button, instead of pinned to the top with the lower half
+  /// empty (iPad QA 1.1.0 F6); a taller one scrolls as always.
   static Widget _fixedBody(
     Widget header,
     Widget step,
@@ -163,18 +169,38 @@ class OnboardingScreen extends ConsumerWidget {
     children: [
       if (!barScrolls) header,
       Expanded(
-        child: SingleChildScrollView(
-          key: ValueKey('onboarding-${stage.name}'),
-          padding: barScrolls ? EdgeInsets.zero : _stepPadding,
-          child: barScrolls
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    header,
-                    Padding(padding: _stepPadding, child: step),
-                  ],
-                )
-              : step,
+        child: LayoutBuilder(
+          builder: (context, box) {
+            final centred =
+                !barScrolls && Adaptive.isTablet(MediaQuery.sizeOf(context));
+            return SingleChildScrollView(
+              key: ValueKey('onboarding-${stage.name}'),
+              padding: barScrolls ? EdgeInsets.zero : _stepPadding,
+              child: barScrolls
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        header,
+                        Padding(padding: _stepPadding, child: step),
+                      ],
+                    )
+                  : centred
+                  ? ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: math.max(
+                          0,
+                          box.maxHeight - _stepPadding.vertical,
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [step],
+                      ),
+                    )
+                  : step,
+            );
+          },
         ),
       ),
       next,
@@ -202,26 +228,32 @@ class OnboardingScreen extends ConsumerWidget {
       return _fixedBody(header, step, next, stage, barScrolls: true);
     }
     return LayoutBuilder(
-      builder: (context, box) => SingleChildScrollView(
-        key: ValueKey('onboarding-${stage.name}'),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: box.maxHeight),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  header,
-                  Padding(padding: _stepPadding, child: step),
-                ],
-              ),
-              next,
-            ],
+      builder: (context, box) {
+        final padded = Padding(padding: _stepPadding, child: step);
+        // On a tablet the step sits in the middle between the bar and the
+        // button (three children share the free room evenly); on a phone it
+        // follows the bar.
+        final centred = Adaptive.isTablet(MediaQuery.sizeOf(context));
+        return SingleChildScrollView(
+          key: ValueKey('onboarding-${stage.name}'),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: box.maxHeight),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: centred
+                  ? [header, padded, next]
+                  : [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [header, padded],
+                      ),
+                      next,
+                    ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

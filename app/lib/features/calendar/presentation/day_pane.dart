@@ -299,8 +299,11 @@ class _UpcomingRow extends ConsumerWidget {
             ),
             child: Row(
               children: [
-                SizedBox(
-                  width: Disc.l,
+                // As wide as the day needs, never less than a disc: at a very
+                // large text size a fixed width broke «14» into «1» and «4»
+                // (iPad QA 1.1.0 F1).
+                ConstrainedBox(
+                  constraints: const BoxConstraints(minWidth: Disc.l),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -308,10 +311,13 @@ class _UpcomingRow extends ConsumerWidget {
                         capitalize(format.weekdayShort(date))
                             .replaceAll('.', ''),
                         maxLines: 1,
+                        softWrap: false,
                         style: type.caption.copyWith(color: dayColor),
                       ),
                       Text(
                         '${day.date.day}',
+                        maxLines: 1,
+                        softWrap: false,
                         style: AppTypography.tabular(
                           type.bodyStrong.copyWith(color: dayColor),
                         ),

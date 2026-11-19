@@ -9,6 +9,7 @@ import '../../../core/format/text_wrap.dart';
 import '../../../core/icons/app_icons.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme_context.dart';
+import '../../../core/widgets/adaptive.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_snack_bar.dart';
 import '../../../core/widgets/confirm_dialog.dart';
@@ -24,6 +25,9 @@ import 'pattern_block_editor.dart';
 
 /// The most of the height the pinned palette may take.
 const double _maxPinnedPaletteShare = 0.4;
+
+/// Content width from which the one-row palette is not pinned any more.
+const double _compactPinnedMaxWidth = Adaptive.splitLandscapeMin;
 
 /// Keeps the palette below the scrolling blocks. With little vertical room the
 /// palette joins the page so large text still leaves the sequence reachable.
@@ -75,12 +79,23 @@ class PatternBuilderViewport extends ConsumerWidget {
         // large text (or on a short landscape iPad) it would take half the
         // screen or more, so it joins the page and scrolls with the blocks
         // (1.2.0 QA, iPhone F2 and iPad F1).
+        // The one-row palette (compact) is for a narrow phone; on a wide
+        // screen it would show a single row with an inner scroll, so there
+        // the palette joins the page too (0.11.3 QA, C2).
         final fixed =
+            (!compact || constraints.maxWidth < _compactPinnedMaxWidth) &&
             constraints.maxHeight >= paletteHeight + Sp.touch * 4 &&
             paletteHeight <= constraints.maxHeight * _maxPinnedPaletteShare;
+        final loose = fixed && constraints.maxWidth >= _compactPinnedMaxWidth;
         return Column(
           children: [
-            Expanded(
+            // On a tablet the list is loose, so with few blocks the palette
+            // sits right under them instead of at the bottom of a tall screen
+            // (0.11.0 QA, F8). On a phone it fills the height: the palette
+            // stays where it is, so a second tap at the same spot lands on the
+            // same shift.
+            Flexible(
+              fit: loose ? FlexFit.loose : FlexFit.tight,
               child: SingleChildScrollView(
                 key: const ValueKey('pattern-step-choose'),
                 child: Column(

@@ -1,6 +1,6 @@
 # Turnly privacy policy
 
-Last updated: 17 November 2026 · version 2026-11-17
+Last updated: 19 November 2026 · version 2026-11-19
 
 Courtesy translation. The Spanish version ([politica-privacidad.md](politica-privacidad.md)) is the one that
 applies.
@@ -10,8 +10,8 @@ or endorsed by any company, public body or union.
 
 Summary: **you have no account, there is no server of ours and your shifts stay on your phone.** The app is entirely
 free and open source, and sends no data or crash reports to anyone. The only things that can take your data off the
-phone are the backups of your Google or Apple account and the files or calendars you choose to export, and you
-control those. If you email us, the providers explained in “If you write to us” are involved in handling that email.
+phone are the backups of your Google or Apple account, the daily copy in the folder you choose (on Android, if you
+turn it on) and the files or calendars you choose to export, and you control those. If you email us, the providers explained in “If you write to us” are involved in handling that email.
 
 ## 1. Data controller
 
@@ -41,6 +41,22 @@ The app makes **automatic backups on your own phone** and lets you **export a ba
 shifts, notes and absences, carries no identifier and is not encrypted; you keep and control it: the app only hands
 it to the app you pick in the system share sheet. What you do with it afterwards (upload it to your cloud, send it by
 WhatsApp or email...) is outside the app. When you open a `.turnly` or `.cuadrante` file, nothing is restored until you confirm.
+
+**Daily copy in a folder (Android only).** If you turn it on in Settings › Backup › “Automatic backup to a folder”, you
+choose a folder with the system picker (one on the phone or the SD card, or a cloud service's folder if its app offers
+it in that picker; not all of them do). The app leaves a `.turnly` copy in it when you choose it and, after that,
+roughly once a day if something has changed since the last one (the system decides when), plus another after your
+changes while the app is open (at most every 6 hours) and when you tap “Back up to the folder now”. It is the same file
+you export by hand: it holds your whole schedule, with notes, their attachments and absences, sick leave included, and
+it is not encrypted. It is off by default: nothing is copied until you choose the folder. Turnly only has permission
+for that folder, sees no account and sends nothing on its own: if the folder belongs to a cloud service, that service
+uploads the copy, under its own terms. The app keeps the last 10 copies and deletes older ones; it only writes, reads
+and deletes its own files (`turnly-auto-…`); of anything else in the folder it only sees the name, size and date, and
+never opens, changes or deletes it. If you tap “Stop backing up to this folder”, the app stops copying and gives the
+permission back, but the copies already in the folder are not deleted, just as with “Delete everything and start over”
+or when you uninstall the app. If you choose another folder, the copies in the previous one are not deleted either. If
+you do not want them, delete them yourself. Which folder you chose and its permission stay on the phone and are not
+part of the system backup.
 
 **System backup.** On Android 9 or later, if Google backup is on and your phone has a screen lock, the system
 periodically uploads the app's database, backups and attachments to your Google account, end-to-end encrypted with
@@ -141,8 +157,9 @@ We make no automated decisions and build no profiles about you.
 
 ## 4. Who receives the data
 The app transmits no data to third parties. If you rate the app in the store, Google or Apple receives your rating and
-review directly, not us. If you export to a synced calendar or have system backup on, the recipient of that data is
-your account provider (Google, Apple or another), on your behalf and under its terms.
+review directly, not us. If you export to a synced calendar, choose a cloud service's folder for the daily copy or have system
+backup on, the recipient of that data is your account provider (Google, Apple or another), on your behalf and under
+its terms.
 
 If you write to us, the support email goes through these providers (details in “If you write to us”):
 
@@ -167,7 +184,8 @@ the data in the European Union.
 ## 6. Retention
 
 - **Data on your phone:** until you uninstall the app or clear its data from the system settings (and, where
-  relevant, from your account's backups and the files you exported).
+  relevant, from your account's backups, the files you exported and the daily copies in the folder you chose, which stay
+  there until you delete them).
 - **Support emails:** at most one year after the last message of the conversation, in Gmail, in Proton and in Brevo,
   with a clean-up every three months, unless we need to keep them longer to deal with a complaint or claim. Sooner if
   you ask us to (details in “If you write to us”). Cloudflare keeps its technical forwarding log for the period its
@@ -191,7 +209,9 @@ The app is meant for working people. It does not ask for age or collect personal
 shifts and settings stay on the device.
 
 ## 9. Security
-There is no server and no data transmission from the app. Automatic backups are kept in the app's private folder.
+There is no server and no data transmission from the app. Automatic backups are kept in the app's private folder;
+the daily copy in a folder, if you turn it on, sits outside the app and unencrypted: anyone with access to that
+folder can read it (other apps with permission on it, the cloud service it belongs to or whoever uses your account).
 You control exported files and the backups of your Google or Apple account; Turnly's Google backup only happens
 encrypted with your screen lock. The code is public and anyone can check what it does.
 

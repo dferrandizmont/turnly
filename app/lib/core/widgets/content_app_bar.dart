@@ -6,6 +6,20 @@ import 'package:flutter/material.dart';
 import '../theme/theme_context.dart';
 import 'adaptive.dart';
 
+/// Marks the screens below it as a top-level destination of the navigation
+/// rail (`DestinationRailShell`): their app bar shows no back button, because
+/// the rail is how you go anywhere else. The system back gesture still works.
+class TopLevelDestination extends InheritedWidget {
+  const TopLevelDestination({super.key, required super.child});
+
+  /// Whether the screen of [context] is a destination of the rail.
+  static bool of(BuildContext context) =>
+      context.getInheritedWidgetOfExactType<TopLevelDestination>() != null;
+
+  @override
+  bool updateShouldNotify(TopLevelDestination oldWidget) => false;
+}
+
 /// App bar whose title (and back arrow / actions) line up with the page's
 /// content column on tablets. On phones (no room to centre) it is a plain
 /// [AppBar]. [ContentAppBar.adaptive] also reserves enough height for a title
@@ -46,7 +60,8 @@ class ContentAppBar extends StatelessWidget implements PreferredSizeWidget {
         ? wideMaxWidth
         : maxWidth;
     final centered = width > cap + 2 * Sp.xs;
-    final canPop = Navigator.of(context).canPop();
+    final canPop =
+        Navigator.of(context).canPop() && !TopLevelDestination.of(context);
     final spacing =
         titleSpacing ?? Theme.of(context).appBarTheme.titleSpacing ?? Sp.xs;
     final leading = canPop
@@ -147,7 +162,8 @@ class ContentAppBar extends StatelessWidget implements PreferredSizeWidget {
       builder: (context, box) {
         final wide = wideMaxWidth;
         final cap = wide != null && box.maxWidth >= wideFrom ? wide : maxWidth;
-        final canPop = Navigator.of(context).canPop();
+        final canPop =
+            Navigator.of(context).canPop() && !TopLevelDestination.of(context);
         if (titleBelowActions) {
           return AppBar(
             toolbarHeight: toolbarHeight,
@@ -193,6 +209,9 @@ class ContentAppBar extends StatelessWidget implements PreferredSizeWidget {
           return AppBar(
             toolbarHeight: toolbarHeight,
             excludeHeaderSemantics: titleIdentifier != null,
+            // Without it AppBar adds its own back button to a pushed route
+            // even where this bar decided there is none (a rail destination).
+            automaticallyImplyLeading: canPop,
             leading: canPop && backButton != null
                 ? Center(child: backButton)
                 : null,

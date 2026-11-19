@@ -387,6 +387,7 @@
   "dayRotationResume": "Hasi zure txandaketa hemen",
   "dayRotationRestartTitle": "Txandaketa hemen hasi nahi duzu?",
   "dayRotationRestartBody": "Zure «{name}» txandaketa berriro hasiko da egun honetan: {date}. Zikloaren lehen eguna izango da ({shifts}).",
+  "dayRotationRestartBodyStep": "Zure «{name}» txandaketa berriro hasiko da egun honetan: {date}. Zikloaren {day}. eguna izango da ({shifts}).",
   "dayRotationEndKeepsOthers": "Gainerako txandaketek beren datak mantenduko dituzte.",
   "dayRotationRestartOthersUntil": "Txandaketa honek lehentasuna izango du egun hau barne: {date}. Tarte horretatik kanpoko datetan gainerako txandaketak aplikatuko dira.",
   "dayRotationRestartOthers": "Egun horren ondorenerako jarrita zenituen txandaketak kenduko dira.",

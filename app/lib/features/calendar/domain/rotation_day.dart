@@ -29,10 +29,9 @@ class RotationDay {
   final Pattern? pattern;
   final int? stepIndex;
 
-  /// «Empezar la rotación aquí»: [run] starts over on [date], which becomes
-  /// the first day of the cycle. Not offered when [date] already is the
-  /// first day of the cycle: nothing would change.
-  bool get canRestart => run != null && stepIndex != 0;
+  /// «Empezar la rotación aquí»: [run] starts over on [date] at a chosen
+  /// step of the cycle. Offered when the pattern has more than one step.
+  bool get canRestart => run != null && (pattern?.steps.length ?? 0) > 1;
 
   /// «Último día de esta rotación»: [run] ends on [date]. Not offered when
   /// it already ends there.
@@ -100,32 +99,41 @@ RotationDay rotationDayOf(Schedule schedule, CivilDate date) {
 }
 
 /// «Empezar la rotación aquí»: the rotation that rules [date] starts over on
-/// [date] (first day of its cycle), as ONE undoable step. It is the same as
-/// applying its pattern from [date] (`applyPattern`): the rotation is cut at
-/// `date - 1`, the days before do not change and the days changed by hand
-/// stay as they are. A rotation with an end keeps it.
+/// [date], with [stepOffset] selecting the step that falls on [date] (0 is
+/// the first day, and offsets wrap around the cycle), as ONE undoable step.
+/// Applying the same pattern from [date] (`applyPattern`) cuts the rotation at
+/// `date - 1` and keeps the days before and the days changed by hand. A
+/// rotation with an end keeps it.
 ///
 /// As when a pattern is applied without an end, a rotation that started after
 /// [date] on top of this one is removed (see [restartCoversOtherRuns], which
 /// the confirmation uses to say so). [seq], [postNightAuto] and [palette] are
 /// those of [planPatternApplication].
 ///
-/// `null` when no rotation rules [date] or [date] already is the first day
-/// of the cycle.
+/// `null` when no rotation rules [date] or the selected step already falls
+/// on [date].
 PatternApplication? planRestartRun(
   Schedule schedule,
   CivilDate date, {
   required int seq,
+  int stepOffset = 0,
   bool postNightAuto = false,
   Iterable<ShiftType>? palette,
 }) {
   final day = rotationDayOf(schedule, date);
   final run = day.run;
   final pattern = day.pattern;
-  if (run == null || pattern == null || !day.canRestart) return null;
+  if (run == null || pattern == null) return null;
+  final offset = stepOffset % pattern.lengthDays;
+  if (offset == day.stepIndex) return null;
   final plan = _planDayRotation(
     schedule,
-    PatternRequest(pattern: pattern, from: date, until: run.endDate),
+    PatternRequest(
+      pattern: pattern,
+      from: date,
+      until: run.endDate,
+      stepOffset: offset,
+    ),
     seq: seq,
     postNightAuto: postNightAuto,
     palette: palette,

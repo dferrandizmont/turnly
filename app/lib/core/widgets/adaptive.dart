@@ -36,6 +36,14 @@ class Adaptive {
   /// The two panes never spread wider than this (desktop-like windows).
   static const double splitMaxWidth = 1280;
 
+  /// Shortest side (dp) from which the window is a tablet's: first use and
+  /// other single-column flows then sit in the middle of the screen instead of
+  /// at its top.
+  static const double tabletShortestSide = 600;
+
+  static bool isTablet(Size window) =>
+      window.shortestSide >= tabletShortestSide;
+
   /// Two panes (month | day) or one column? Decided on the size of the whole
   /// window (`MediaQuery.sizeOf`), which the keyboard does not change: an
   /// 800 x 1280 tablet in portrait with the keyboard up is still portrait.

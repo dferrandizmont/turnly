@@ -283,8 +283,9 @@ Rehacer sigue en Pintar. Debajo, por capas:
    «Cambiado a mano»; en un día sin rotación después de que una terminara, «Tu rotación «Correturnos» terminó el
    viernes 23 de octubre») y, al final de esa línea (o debajo si no cabe), el menú **«Rotación»** (`day-rotation-menu`:
    icono de rotaciones, etiqueta en `meta` negrita `accentText` y flecha, 48 dp de alto) con las acciones que tienen
-   sentido ese día (`day_rotation_section.dart`): «Empezar la rotación aquí» (no sale si el día ya es el primero del
-   ciclo), «Último día de esta rotación» (no sale si ya termina ese día) y, en el día sin rotación, «Empezar tu
+   sentido ese día (`day_rotation_section.dart`): «Empezar la rotación aquí» (sale si el patrón tiene más de un día; su
+   diálogo lleva la tira numerada del ciclo, como «Empezar tu rotación aquí», y «Empezar aquí» queda desactivado
+   mientras la tira marca el día del ciclo que ya cae ese día), «Último día de esta rotación» (no sale si ya termina ese día) y, en el día sin rotación, «Empezar tu
    rotación aquí». Cada una pregunta antes con un diálogo que dice qué cambia, con las fechas («El miércoles 21
    de octubre no tendrá ninguna rotación asignada. Las demás rotaciones mantienen sus fechas.»; si debajo seguía
    otra rotación, «El miércoles 21 de octubre se aplicará tu rotación «6x4»»). El reinicio con fin aclara la prioridad

@@ -10,6 +10,7 @@ import '../../../core/l10n/l10n.dart';
 import '../../../core/router.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/adaptive.dart';
+import '../../../core/widgets/content_app_bar.dart' show TopLevelDestination;
 import '../../patterns/application/pattern_start_pick.dart';
 import '../application/open_day.dart';
 import '../application/schedule_controller.dart';
@@ -38,6 +39,15 @@ const _destinationKeys = {
   MonthDestination.summary: ValueKey('open-summary'),
 };
 
+/// The `extra` of a route opened through the destinations (the bar, the rail,
+/// the strip of the month): the screen belongs to the main destinations, so
+/// with the rail beside it there is no back button. A screen reached from
+/// elsewhere (Ajustes › Mis rotaciones, Año › Resumen) has no such extra and
+/// keeps its back button, which returns to the screen that opened it.
+class RailNavigation {
+  const RailNavigation();
+}
+
 /// Opens [destination]. From the month ([from] is [MonthDestination.month])
 /// the three screens open on top of it; from one of them (the rail shows on
 /// all four when there are two panes) they take its place, so the back button
@@ -47,11 +57,17 @@ void openMonthDestination(
   WidgetRef ref,
   MonthDestination destination, {
   MonthDestination from = MonthDestination.month,
+  // Whether the screen being left was itself reached through the destinations;
+  // if not (it was opened from Ajustes or the year), the next one is not
+  // either, and keeps the way back to where it came from.
+  bool viaDestinations = true,
 }) {
   if (destination == from && destination != MonthDestination.month) return;
   final onTop = from != MonthDestination.month;
-  void open(String location) =>
-      onTop ? context.pushReplacement(location) : context.push(location);
+  final extra = viaDestinations ? const RailNavigation() : null;
+  void open(String location) => onTop
+      ? context.pushReplacement(location, extra: extra)
+      : context.push(location, extra: extra);
   switch (destination) {
     case MonthDestination.month:
       ref.read(openDayProvider.notifier).close();
@@ -182,9 +198,16 @@ class MonthNavigationBar extends ConsumerWidget {
 /// the three screens that open from it ([DestinationRailShell]). [current] is
 /// the destination on screen.
 class MonthNavigationRail extends ConsumerWidget {
-  const MonthNavigationRail({super.key, this.current = MonthDestination.month});
+  const MonthNavigationRail({
+    super.key,
+    this.current = MonthDestination.month,
+    this.viaDestinations = true,
+  });
 
   final MonthDestination current;
+
+  /// See [openMonthDestination].
+  final bool viaDestinations;
 
   /// The width of the rail at normal text (Material's).
   static const double width = 80;
@@ -215,6 +238,7 @@ class MonthNavigationRail extends ConsumerWidget {
           ref,
           MonthDestination.values[index],
           from: current,
+          viaDestinations: viaDestinations,
         ),
         destinations: [
           for (final destination in MonthDestination.values)
@@ -248,10 +272,16 @@ class DestinationRailShell extends StatelessWidget {
     super.key,
     required this.current,
     required this.child,
+    this.viaDestinations = false,
   });
 
   /// The destination the child is.
   final MonthDestination current;
+
+  /// Whether it was opened through the destinations (the router reads it from
+  /// the `extra` of the route). Only then it has no back button beside the
+  /// rail; opened from Ajustes or the year, it keeps the way back.
+  final bool viaDestinations;
   final Widget child;
 
   @override
@@ -272,7 +302,10 @@ class DestinationRailShell extends StatelessWidget {
                   // The rail needs a Material to paint its ink on.
                   child: Material(
                     color: colors.background,
-                    child: MonthNavigationRail(current: current),
+                    child: MonthNavigationRail(
+                      current: current,
+                      viaDestinations: viaDestinations,
+                    ),
                   ),
                 ),
                 Expanded(
@@ -287,7 +320,11 @@ class DestinationRailShell extends StatelessWidget {
                         data: MediaQuery.of(
                           context,
                         ).copyWith(size: Size(area.maxWidth, area.maxHeight)),
-                        child: child,
+                        // Between the main destinations the rail is the way
+                        // to the other three: no back button.
+                        child: viaDestinations
+                            ? TopLevelDestination(child: child)
+                            : child,
                       ),
                     ),
                   ),

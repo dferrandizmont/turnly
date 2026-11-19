@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/format/text_measure.dart';
 import '../../../core/theme/theme_context.dart';
 import '../data/widget_publisher.dart';
 import '../domain/widget_snapshot.dart';
@@ -153,22 +154,23 @@ class _Small extends StatelessWidget {
                 ),
               ),
             ),
+            // The hours and tomorrow's line shrink to the width of the widget
+            // before they are cut: a day with two shifts ("06–14 + 14–22")
+            // ended in an ellipsis (iPad QA 1.1.0 F8).
             if (small.detail != null)
-              Text(
+              _FitLine(
                 small.detail!,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
                 style: type.bodyStrong.copyWith(color: colors.textSecondary),
+                minScale: detailMinScale,
               ),
             const Spacer(),
-            Text(
+            _FitLine(
               small.tomorrow,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
               style: type.caption.copyWith(
                 color: colors.textMuted,
                 fontWeight: FontWeight.w700,
               ),
+              minScale: tomorrowMinScale,
             ),
             if (shifts.isNotEmpty) ...[
               const SizedBox(height: Sp.s),
@@ -195,6 +197,50 @@ class _Small extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Smallest share of its size the hours line shrinks to before it is cut with
+/// an ellipsis: the same `minimumScaleFactor` as the iOS widget
+/// (`WidgetViews.swift`).
+const double detailMinScale = 0.5;
+
+/// The same for tomorrow's line.
+const double tomorrowMinScale = 0.6;
+
+/// One line that gets smaller before it is cut, but never below [minScale] of
+/// its size: past that it ends in an ellipsis, as in the native widget.
+class _FitLine extends StatelessWidget {
+  const _FitLine(this.text, {required this.style, required this.minScale});
+
+  final String text;
+  final TextStyle style;
+  final double minScale;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, box) {
+      // Measure with the style the `Text` really draws (theme family...).
+      final effective = effectiveTextStyle(context, style);
+      final painter = TextPainter(
+        text: TextSpan(text: text, style: effective),
+        textDirection: Directionality.of(context),
+        textScaler: MediaQuery.textScalerOf(context),
+        maxLines: 1,
+      )..layout();
+      final natural = painter.width;
+      painter.dispose();
+      final scale = natural <= box.maxWidth || natural == 0
+          ? 1.0
+          : (box.maxWidth / natural).clamp(minScale, 1.0);
+      return Text(
+        text,
+        maxLines: 1,
+        softWrap: false,
+        overflow: TextOverflow.ellipsis,
+        style: style.copyWith(fontSize: effective.fontSize! * scale),
+      );
+    },
+  );
 }
 
 /// A day cell of the strips and grids: the day number, the code(s) on the

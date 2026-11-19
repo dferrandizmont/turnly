@@ -228,12 +228,15 @@ El saliente automático de estas acciones protege los overrides originales, tamb
 dentro del intervalo anunciado (fin incluido): nunca cambia el día posterior ni el inicio de otra rotación.
 Una entrada con solo nota sí puede recibir Saliente, conservando su nota; deshacer restaura la entrada exacta.
 
-- **«Empezar la rotación aquí»** (`planRestartRun`): la rotación que rige el día vuelve a empezar ese día en el paso 0.
+- Con **«Empezar la rotación aquí»** (`planRestartRun`), la rotación que rige el día vuelve a empezar en el paso del
+  ciclo que elija la persona (`stepOffset`, por defecto el primero).
   Es aplicar su mismo patrón desde esa fecha con `planPatternApplication` (el mismo camino que el asistente, con
   «Saliente automático» y `nextRunSeq`): la rotación se corta en `fecha − 1` y nace una nueva con `seq` = máximo + 1.
-  Si la rotación tenía fin, la nueva conserva ese fin y la antigua también se corta (no se queda entera debajo). No se
-  ofrece si el día ya es el paso 0. Como al aplicar un patrón, la nueva es la más reciente: una rotación posterior que
-  empezaba después de ese día encima de esta deja de aplicarse (sin fin se borra; con fin queda tapada);
+  Si la rotación tenía fin, la nueva conserva ese fin y la antigua también se corta (no se queda entera debajo).
+  Se ofrece si el patrón tiene más de un paso y solo hay cambios si se elige un paso distinto del que ya cae ese día.
+  La nueva rotación tiene prioridad sobre las que empezaban después de ese día encima de la original. Si el reinicio
+  es sin fin, esas rotaciones se borran. Si tiene fin, se borran las que quedan enteras dentro del intervalo y las
+  que siguen después del fin quedan tapadas durante el intervalo y vuelven a regir al día siguiente del fin.
   `restartCoversOtherRuns` lo detecta y el diálogo lo avisa.
 - **«Último día de esta rotación»** (`planEndRunOn`): `planEndRun` con el día siguiente; la rotación acaba ese día
   (`endDate` incluida). Desde el siguiente rige lo que diga el motor: nada, o una rotación anterior que seguía debajo

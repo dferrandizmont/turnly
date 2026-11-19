@@ -345,6 +345,16 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
+  String dayRotationRestartBodyStep(
+    String name,
+    String date,
+    int day,
+    String shifts,
+  ) {
+    return 'Zure «$name» txandaketa berriro hasiko da egun honetan: $date. Zikloaren $day. eguna izango da ($shifts).';
+  }
+
+  @override
   String get dayRotationEndKeepsOthers =>
       'Gainerako txandaketek beren datak mantenduko dituzte.';
 

@@ -686,7 +686,10 @@ class _MonthScreenState extends ConsumerState<MonthScreen>
                         ? grid
                         : Column(
                             children: [
-                              Expanded(child: grid),
+                              // The grid keeps its rows (at most 1.5 times
+                              // the width of a cell); the strip follows the
+                              // last row and the spare height stays under it.
+                              Flexible(child: grid),
                               MonthSummaryStrip(layout: stripLayout),
                             ],
                           ),

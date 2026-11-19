@@ -590,7 +590,7 @@ abstract class AppLocalizations {
   /// **'Rotación'**
   String get dayRotationMenu;
 
-  /// Menú «Rotación» del detalle del día: la rotación de ese día vuelve a empezar ese día por el primer día del ciclo.
+  /// Menú «Rotación» del detalle del día: la rotación de ese día vuelve a empezar ese día por el día del ciclo que elijas.
   ///
   /// In es, this message translates to:
   /// **'Empezar la rotación aquí'**
@@ -619,6 +619,17 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Tu rotación «{name}» volverá a empezar el {date}: ese día será el primero del ciclo ({shifts}).'**
   String dayRotationRestartBody(String name, String date, String shifts);
+
+  /// Diálogo de «Empezar la rotación aquí» cuando eliges un día del ciclo que no es el primero: qué cambia. {day} es el número de ese día del ciclo y {shifts} lo que da.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu rotación «{name}» volverá a empezar el {date}: ese día será el día {day} del ciclo ({shifts}).'**
+  String dayRotationRestartBodyStep(
+    String name,
+    String date,
+    int day,
+    String shifts,
+  );
 
   /// Terminar una rotación no cambia las fechas de las demás.
   ///

@@ -9,7 +9,7 @@ import '../features/backup/application/backup_models.dart';
 import '../features/backup/presentation/backup_screen.dart';
 import '../features/backup/presentation/restore_preview_screen.dart';
 import '../features/calendar/presentation/month_destinations.dart'
-    show DestinationRailShell, MonthDestination;
+    show DestinationRailShell, MonthDestination, RailNavigation;
 import '../features/calendar/presentation/month_screen.dart';
 import '../features/calendar_export/presentation/export_screen.dart';
 import '../features/calendars/presentation/calendars_screen.dart';
@@ -258,22 +258,25 @@ GoRouter buildRouter({
       // beside them when there are two panes, like the month.
       GoRoute(
         path: AppRoutes.agenda,
-        builder: (c, s) => const DestinationRailShell(
+        builder: (c, s) => DestinationRailShell(
           current: MonthDestination.agenda,
-          child: AgendaScreen(),
+          viaDestinations: s.extra is RailNavigation,
+          child: const AgendaScreen(),
         ),
       ),
       GoRoute(
         path: AppRoutes.settingsRuns,
-        builder: (c, s) => const DestinationRailShell(
+        builder: (c, s) => DestinationRailShell(
           current: MonthDestination.rotation,
-          child: RunsScreen(),
+          viaDestinations: s.extra is RailNavigation,
+          child: const RunsScreen(),
         ),
       ),
       GoRoute(
         path: AppRoutes.summary,
         builder: (c, s) => DestinationRailShell(
           current: MonthDestination.summary,
+          viaDestinations: s.extra is RailNavigation,
           child: SummaryScreen(
             // A new link to the same screen starts over.
             key: ValueKey(s.uri.toString()),

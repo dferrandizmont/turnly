@@ -388,6 +388,7 @@
   "dayRotationResume": "Start your rotation here",
   "dayRotationRestartTitle": "Start the rotation here?",
   "dayRotationRestartBody": "Your rotation “{name}” will start again on {date}: that day becomes the first day of the cycle ({shifts}).",
+  "dayRotationRestartBodyStep": "Your rotation “{name}” will start again on {date}: that day becomes day {day} of the cycle ({shifts}).",
   "dayRotationEndKeepsOthers": "The other rotations keep their dates.",
   "dayRotationRestartOthersUntil": "This rotation will take priority up to and including {date}. The other rotations will still apply on dates outside that interval.",
   "dayRotationRestartOthers": "The rotations you had set for after that day will be removed.",

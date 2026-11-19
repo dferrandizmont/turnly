@@ -423,7 +423,13 @@ class _MonthGridState extends ConsumerState<MonthGrid> {
         );
 
         if (geometry.height <= box.maxHeight) {
-          return Align(alignment: Alignment.topCenter, child: grid);
+          // As tall as its rows: what follows it (the strip of the month) sits
+          // right under the last row, and any spare room is left below.
+          return Align(
+            alignment: Alignment.topCenter,
+            heightFactor: 1,
+            child: grid,
+          );
         }
         // Too little room (landscape, very large text): scroll the grid,
         // but never while painting, where a drag means paint.

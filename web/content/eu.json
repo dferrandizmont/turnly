@@ -16,7 +16,7 @@
   ],
   "privacy_summary": [
     "Zure txandak, oharrak eta absentziak zure mugikorrean bakarrik gordetzen dira: ez dago konturik, ez zerbitzari propiorik, ez analitikarik.",
-    "Aplikazioak ez dio inori daturik edo errore-txostenik bidaltzen. Mugikorretik zuk esportatzea edo mugikorreko egutegira pasatzea erabakitzen duzuna eta sistemaren babeskopia bakarrik ateratzen dira: Androiden, zure Google kontukoa, muturretik muturrera zifratua pantailaren blokeoarekin (blokeorik gabe, Turnly ez da bertan sartzen); iPhonean, iCloud-ekoa edo ordenagailukoa."
+    "Aplikazioak ez dio inori daturik edo errore-txostenik bidaltzen. Mugikorretik zuk esportatzea edo mugikorreko egutegira pasatzea erabakitzen duzuna, zuk aukeratutako karpetako eguneroko kopia (Androiden, aktibatzen baduzu) eta sistemaren babeskopia bakarrik ateratzen dira: Androiden, zure Google kontukoa, muturretik muturrera zifratua pantailaren blokeoarekin (blokeorik gabe, Turnly ez da bertan sartzen); iPhonean, iCloud-ekoa edo ordenagailukoa."
   ],
   "faq": [
     {
@@ -71,7 +71,7 @@
     "11-widgets": "«Gehitu widgeta» galeria zure benetako txandekin: txikia, agenda, ertaina eta gehiago",
     "11-widgets-oscuro": "«Gehitu widgeta» galeria zure benetako txandekin: txikia, agenda, ertaina eta gehiago"
   },
-  "privacy_date": "2026-11-17",
+  "privacy_date": "2026-11-19",
   "kicker": "Txanden egutegia",
   "tagline": "Zure txandak, begi-kolpe batean.",
   "chip": "Dena doan: Pro bertsiorik, iragarkirik eta konturik gabe.",

@@ -103,16 +103,28 @@ void main() {
       expect(_key('day-rotation-resume'), findsNothing);
     });
 
-    testWidgets('the first day of the cycle has nothing to start over', (
-      tester,
-    ) async {
+    testWidgets('the first day of the cycle can start over on another day of '
+        'the cycle, not on the same one', (tester) async {
       await pumpCalendar(tester);
       await openDay(tester, _oct26);
       expect(_source(tester), 'De tu rotación «Correturnos»');
       await _openMenu(tester);
-      expect(_key('day-rotation-restart'), findsNothing);
+      expect(_key('day-rotation-restart'), findsOneWidget);
       expect(_key('day-rotation-end'), findsOneWidget);
       expect(_key('day-rotation-resume'), findsNothing);
+
+      await tester.tap(_key('day-rotation-restart'));
+      await tester.pumpAndSettle();
+      FilledButton ok() => tester.widget<FilledButton>(_key('confirm-ok'));
+      // Day 1 of the cycle already falls on 26 Oct: nothing would change.
+      expect(ok().onPressed, isNull);
+      await tester.ensureVisible(_key('restart-offset-2'));
+      await tester.pumpAndSettle();
+      await tester.tap(_key('restart-offset-2'));
+      await tester.pumpAndSettle();
+      expect(ok().onPressed, isNotNull);
+      await _confirm(tester);
+      expect(_schedule(tester).resolvePattern(_oct26).stepIndex, 2);
     });
 
     testWidgets(
@@ -248,6 +260,127 @@ void main() {
       await tester.pumpAndSettle();
       expect(_schedule(tester).runs, runsBefore);
       expect(idsOn(_schedule(tester), _oct20), 'night');
+    });
+
+    testWidgets('asks which day of the cycle falls on that day, says it live '
+        'and applies it', (tester) async {
+      await pumpCalendar(tester);
+      final runsBefore = _schedule(tester).runs;
+      await openDay(tester, _oct20);
+      await _choose(tester, 'day-rotation-restart');
+
+      expect(find.byType(CycleStartPicker), findsOneWidget);
+      expect(find.text('¿En qué día del ciclo estás ese día?'), findsOneWidget);
+      expect(
+        _dialogBody(tester),
+        contains('ese día será el primero del ciclo'),
+      );
+      await tester.ensureVisible(_key('restart-offset-2'));
+      await tester.pumpAndSettle();
+      await tester.tap(_key('restart-offset-2'));
+      await tester.pumpAndSettle();
+      expect(
+        _dialogBody(tester),
+        startsWith(
+          'Tu rotación «Correturnos» volverá a empezar el martes 20 de '
+          'octubre: ese día será el día 3 del ciclo (',
+        ),
+      );
+      expect(_dialogBody(tester), endsWith('no se tocan.'));
+      expect(_schedule(tester).runs, runsBefore);
+      await _confirm(tester);
+
+      final schedule = _schedule(tester);
+      expect(schedule.resolve(_oct20).stepIndex, 2);
+      expect(schedule.resolvePattern(_oct21).stepIndex, 3);
+      expect(schedule.resolve(_oct20).runId, isNot('run-1'));
+      expect(
+        find.text('La rotación empieza el martes 20 de octubre'),
+        findsOneWidget,
+      );
+      await tester.tap(find.text('Deshacer'));
+      await tester.pumpAndSettle();
+      expect(_schedule(tester).runs, runsBefore);
+    });
+
+    testWidgets('the day that already falls on that date cannot be confirmed', (
+      tester,
+    ) async {
+      await pumpCalendar(tester);
+      final current = _schedule(tester).resolve(_oct20).stepIndex!;
+      expect(current, isNot(0));
+      await openDay(tester, _oct20);
+      await _choose(tester, 'day-rotation-restart');
+      FilledButton ok() => tester.widget<FilledButton>(_key('confirm-ok'));
+      expect(ok().onPressed, isNotNull);
+
+      await tester.ensureVisible(_key('restart-offset-$current'));
+      await tester.pumpAndSettle();
+      await tester.tap(_key('restart-offset-$current'));
+      await tester.pumpAndSettle();
+      expect(ok().onPressed, isNull);
+
+      await tester.ensureVisible(_key('restart-offset-0'));
+      await tester.pumpAndSettle();
+      await tester.tap(_key('restart-offset-0'));
+      await tester.pumpAndSettle();
+      expect(ok().onPressed, isNotNull);
+    });
+
+    testWidgets('the text and the strip show the hours the shift had on that '
+        'day', (tester) async {
+      final old = shiftTemplates
+          .firstWhere((t) => t.key == 'night')
+          .toShiftType('night');
+      await pumpCalendar(
+        tester,
+        // Noche now ends at 07:00, but until 25 Oct it ended at 06:00.
+        prepare: (repository) => repository.saveShiftTypeWithHistory(
+          old.copyWith(endMinute: 7 * 60),
+          [
+            ShiftTypeVersion(
+              until: _oct23.addDays(2),
+              terms: ShiftTerms.of(old),
+            ),
+          ],
+        ),
+      );
+      await openDay(tester, _oct20);
+      await _choose(tester, 'day-rotation-restart');
+      await tester.ensureVisible(_key('restart-offset-14'));
+      await tester.pumpAndSettle();
+      await tester.tap(_key('restart-offset-14'));
+      await tester.pumpAndSettle();
+
+      // The line keeps the time range together with a word joiner.
+      final result = tester
+          .widget<Text>(_key('restart-offset-result'))
+          .data!
+          .replaceAll('\u2060', '');
+      expect(result, contains('Noche 22:00–06:00'));
+      expect(_dialogBody(tester), contains('Noche 22:00–06:00'));
+      expect(result, isNot(contains('07:00')));
+      expect(_dialogBody(tester), isNot(contains('07:00')));
+    });
+
+    testWidgets('on a day changed by hand the line says what the rotation '
+        'would give and the day keeps what is there', (tester) async {
+      await pumpCalendar(tester);
+      expect(idsOn(_schedule(tester), _oct28), 'vacation');
+      final current = _schedule(tester).resolvePattern(_oct28).stepIndex!;
+      final pick = (current + 1) % 20;
+      await openDay(tester, _oct28);
+      await _choose(tester, 'day-rotation-restart');
+      await tester.ensureVisible(_key('restart-offset-$pick'));
+      await tester.pumpAndSettle();
+      await tester.tap(_key('restart-offset-$pick'));
+      await tester.pumpAndSettle();
+      final result = tester.widget<Text>(_key('restart-offset-result')).data!;
+      expect(result, startsWith('Según tu rotación: '));
+      expect(result, isNot(contains('Ese día te toca')));
+      await _confirm(tester);
+      expect(idsOn(_schedule(tester), _oct28), 'vacation');
+      expect(_schedule(tester).resolvePattern(_oct28).stepIndex, pick);
     });
 
     testWidgets('cancelling changes nothing', (tester) async {

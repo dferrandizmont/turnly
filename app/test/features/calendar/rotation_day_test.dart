@@ -159,14 +159,34 @@ void main() {
       expect(day.canResume, isFalse);
     });
 
-    test('the first day of the cycle has nothing to restart', () {
-      expect(rotationDayOf(_sixFour(), _start).canRestart, isFalse);
+    test('the cycle can restart even on its first step', () {
+      expect(rotationDayOf(_sixFour(), _start).canRestart, isTrue);
       // The cycle comes round: day 10 is the first day again.
       final again = rotationDayOf(_sixFour(), _day(10));
       expect(again.stepIndex, 0);
-      expect(again.canRestart, isFalse);
+      expect(again.canRestart, isTrue);
       expect(again.canEndHere, isTrue);
       expect(again.hasActions, isTrue);
+    });
+
+    test('a one-step cycle cannot restart', () {
+      const pattern = Pattern(
+        id: 'daily',
+        name: 'Daily',
+        steps: [
+          ['morning'],
+        ],
+      );
+      final schedule = Schedule(
+        shiftTypes: allTypes,
+        patterns: [pattern],
+        runs: [_run('r1', pattern.id, _start, seq: 1)],
+      );
+      final date = _day(3);
+      final day = rotationDayOf(schedule, date);
+      expect(day.run?.id, 'r1');
+      expect(day.canRestart, isFalse);
+      expect(planRestartRun(schedule, date, seq: 2, stepOffset: 2), isNull);
     });
 
     test('the last day of a rotation cannot end there again', () {
@@ -259,21 +279,40 @@ void main() {
       expect(schedule.apply(plan.change).runs, after.runs);
     });
 
-    test('the days changed by hand stay, before and after that day', () {
+    test('the chosen step falls on that day and the cycle continues', () {
+      final date = _day(3);
+      final plan = planRestartRun(_sixFour(), date, seq: 2, stepOffset: 6)!;
+      expect(plan.schedule.runs.last.stepOffset, 6);
+      expect(plan.schedule.resolve(date).stepIndex, 6);
+      expect(codesOf(plan.schedule, date, 5), 'L L L L M');
+    });
+
+    test('an offset beyond the length of the cycle wraps around', () {
+      final date = _day(3);
+      final plan = planRestartRun(_sixFour(), date, seq: 2, stepOffset: 16)!;
+      expect(plan.schedule.runs.last.stepOffset, 6);
+      expect(plan.schedule.resolve(date).stepIndex, 6);
+    });
+
+    test('the days changed by hand stay before, on and after the restart', () {
       final before = _day(1);
+      final date = _day(3);
       final later = _day(8);
       final noted = _day(5);
       final entries = {
         before: DayEntry(date: before, shiftTypeIds: const ['vacation']),
+        date: DayEntry(date: date, shiftTypeIds: const []),
         later: DayEntry(date: later, shiftTypeIds: const ['night']),
         noted: DayEntry(date: noted, note: 'Dentista'),
       };
       final schedule = _sixFour(entries: entries);
-      final plan = planRestartRun(schedule, _day(3), seq: 2)!;
+      final plan = planRestartRun(schedule, date, seq: 2, stepOffset: 6)!;
 
       expect(plan.change.patch.isEmpty, isTrue);
       expect(plan.schedule.entries, entries);
       expect(plan.schedule.resolve(before).shiftIds, ['vacation']);
+      expect(plan.schedule.resolve(date).source, DaySource.override);
+      expect(plan.schedule.resolve(date).shiftIds, isEmpty);
       expect(plan.schedule.resolve(later).shiftIds, ['night']);
       expect(plan.schedule.resolve(later).source, DaySource.override);
       expect(plan.schedule.resolve(noted).note, 'Dentista');
@@ -293,12 +332,29 @@ void main() {
       expect(codesOf(undone, _start, 30), codesOf(schedule, _start, 30));
     });
 
-    test('nothing to do without a rotation or on the first day of the '
-        'cycle', () {
-      expect(planRestartRun(_sixFour(), _start, seq: 2), isNull);
-      expect(planRestartRun(_sixFour(), _day(10), seq: 2), isNull);
-      expect(planRestartRun(_sixFour(), _day(-1), seq: 2), isNull);
-      expect(planRestartRun(_sixFour(end: _day(7)), _day(9), seq: 2), isNull);
+    test('nothing to do without a rotation', () {
+      expect(planRestartRun(_sixFour(), _day(-1), seq: 2, stepOffset: 2), isNull);
+      expect(
+        planRestartRun(_sixFour(end: _day(7)), _day(9), seq: 2, stepOffset: 2),
+        isNull,
+      );
+    });
+
+    test('the current step is a no-op even with a wrapped offset', () {
+      final schedule = _sixFour(stepOffset: 2);
+      final date = _day(3);
+      expect(schedule.resolve(date).stepIndex, 5);
+      expect(planRestartRun(schedule, date, seq: 2, stepOffset: 5), isNull);
+      expect(planRestartRun(schedule, date, seq: 2, stepOffset: 15), isNull);
+    });
+
+    test('on the first day, the restart needs a different step', () {
+      final schedule = _sixFour();
+      final date = _day(10);
+      expect(planRestartRun(schedule, _start, seq: 2), isNull);
+      expect(planRestartRun(schedule, date, seq: 2, stepOffset: 0), isNull);
+      final plan = planRestartRun(schedule, date, seq: 2, stepOffset: 2)!;
+      expect(plan.schedule.resolve(date).stepIndex, 2);
     });
 
     test('a rotation that starts that day on another day of the cycle is '
@@ -322,7 +378,7 @@ void main() {
       ]);
       final date = _day(9);
       expect(schedule.resolve(date).stepIndex, 5);
-      final plan = planRestartRun(schedule, date, seq: 3)!;
+      final plan = planRestartRun(schedule, date, seq: 3, stepOffset: 6)!;
       final after = plan.schedule;
 
       final top = after.runs.firstWhere((r) => r.id == 'top');
@@ -331,10 +387,11 @@ void main() {
       expect(fresh.patternId, '6x4');
       expect(fresh.startDate, date);
       expect(fresh.endDate, _day(23));
+      expect(fresh.stepOffset, 6);
       expect(after.runs.firstWhere((r) => r.id == 'base'), schedule.runs.first);
 
       expect(codesOf(after, _start, 9), codesOf(schedule, _start, 9));
-      expect(codesOf(after, date, 10), 'M M M M M M L L L L');
+      expect(codesOf(after, date, 10), 'L L L L M M M M M M');
       // After its end the earlier rotation rules, as before.
       expect(codesOf(after, _day(24), 8), codesOf(schedule, _day(24), 8));
       expect(after.resolve(_day(24)).runId, 'base');
