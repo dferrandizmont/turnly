@@ -864,6 +864,7 @@ app/test/fixtures/golden_backup/golden_v2.expected.json
 app/test/fixtures/golden_backup/golden_v3.cuadrante
 app/test/fixtures/golden_backup/golden_v3.expected.json
 app/test/fixtures/widget/snapshot_v2_before_descriptions.json
+app/test/fixtures/widget/snapshot_v3_before_tomorrow.json
 app/test/flutter_test_config.dart
 app/test/l10n/arb_files_test.dart
 app/test/l10n/languages_layout_test.dart
@@ -1552,11 +1553,13 @@ app/ios/CuadranteWidget/WidgetViews.swift
 app/ios/Runner/AlarmSystemChannel.swift
 app/ios/Runner/IncomingBackupChannel.swift
 app/ios/Runner/IncomingFileStore.swift
+app/ios/Runner/WindowControlsChannel.swift
 app/ios/Runner/PrivacyInfo.xcprivacy
 app/ios/Runner/Runner.entitlements
 app/ios/scripts/configure_xcode_project.rb
 app/lib/core/database/migration_v6_to_v7.dart
 app/lib/core/platform/share_origin.dart
+app/lib/core/platform/window_controls.dart
 app/lib/core/widgets/keyboard_done_bar.dart
 app/lib/core/widgets/unsaved_changes_guard.dart
 app/lib/features/calendar/application/month_strip.dart
@@ -1582,6 +1585,7 @@ app/lib/features/schedule/domain/overtime.dart
 app/lib/features/shift_types/presentation/money_input_formatter.dart
 app/lib/features/summary/domain/work_streak.dart
 app/test/core/platform/share_origin_test.dart
+app/test/core/platform/window_controls_test.dart
 app/test/core/widgets/ios_polish_test.dart
 app/test/drift/app_database/generated/schema_v7.dart
 app/test/drift/app_database/migration_v6_to_v7_test.dart
