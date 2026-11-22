@@ -962,7 +962,7 @@
   "selectionRunsTitle": "Les meves rotacions",
   "selectionRunsSubtitle": "Acaba o treu un patró d’un cop",
   "selectionRunsEmptyTitle": "Sense rotacions",
-  "selectionRunsEmptyMessage": "Quan apliquis un patró des de Pinta, apareixerà aquí.",
+  "selectionRunsEmptyMessage": "Aplica un patró i la teva primera rotació apareixerà aquí.",
   "selectionRunsRange": "De {from} a {to}",
   "@selectionRunsRange": {
     "placeholders": {
@@ -3419,7 +3419,7 @@
   "catalogPattern6x4Name": "6 x 4",
   "catalogPattern6x4Description": "6 matins i 4 lliures",
   "catalogPattern4x4Name": "4 x 4",
-  "catalogPattern4x4Description": "4 dies de 12 h i 4 lliures (4x4 o quatre i quatre)",
+  "catalogPattern4x4Description": "4 dies de 12 h i 4 lliures, sense nits (4x4 o quatre i quatre)",
   "catalogPattern5x2Name": "5 x 2",
   "catalogPattern5x2Description": "5 matins i 2 lliures (de dilluns a divendres)",
   "catalogPattern223Name": "2-2-3",
@@ -3432,6 +3432,46 @@
   "catalogPatternPn2226Description": "2 matins, 2 tardes, 2 nits, sortint i 5 lliures (el 6x6 de la Policia Nacional)",
   "catalogPatternGuard14Name": "Guàrdia 1-4",
   "catalogPatternGuard14Description": "Guàrdia de 24 h i 4 dies lliures (1 guàrdia i 4 lliures)",
+  "catalogPattern4x4NightsName": "4 x 4 amb nits",
+  "@catalogPattern4x4NightsName": {
+    "description": "Catálogo de rotaciones: nombre y descripción de cada patrón (asistente de patrón y primer uso)."
+  },
+  "catalogPattern4x4NightsDescription": "4 dies de 12 h, 4 lliures, 4 nits de 12 h i 4 lliures",
+  "@catalogPattern4x4NightsDescription": {
+    "description": "El 4x4 con noches: cuatro días de 12 h, cuatro libres, cuatro noches de 12 h y cuatro libres."
+  },
+  "catalogPatternGuard2448Name": "Guàrdia 24/48",
+  "@catalogPatternGuard2448Name": {
+    "description": "Catálogo de rotaciones: nombre y descripción de cada patrón (asistente de patrón y primer uso)."
+  },
+  "catalogPatternGuard2448Description": "Guàrdia de 24 h i 48 h lliures (24/48)",
+  "@catalogPatternGuard2448Description": {
+    "description": "Una guardia de 24 h y dos días libres."
+  },
+  "catalogPattern6x6Name": "6 x 6",
+  "@catalogPattern6x6Name": {
+    "description": "Catálogo de rotaciones: nombre y descripción de cada patrón (asistente de patrón y primer uso)."
+  },
+  "catalogPattern6x6Description": "6 dies de feina i 6 lliures (6x6). Tria el teu torn de feina.",
+  "@catalogPattern6x6Description": {
+    "description": "Seis días de trabajo y seis libres, con el turno de trabajo a elegir."
+  },
+  "catalogPattern7x7Name": "7 x 7",
+  "@catalogPattern7x7Name": {
+    "description": "Catálogo de rotaciones: nombre y descripción de cada patrón (asistente de patrón y primer uso)."
+  },
+  "catalogPattern7x7Description": "7 dies de feina i 7 lliures (7x7). Tria el teu torn de feina.",
+  "@catalogPattern7x7Description": {
+    "description": "Siete días de trabajo y siete libres, con el turno de trabajo a elegir."
+  },
+  "catalogPattern14x14Name": "14 x 14",
+  "@catalogPattern14x14Name": {
+    "description": "Catálogo de rotaciones: nombre y descripción de cada patrón (asistente de patrón y primer uso)."
+  },
+  "catalogPattern14x14Description": "14 dies de feina i 14 lliures (14x14). Tria el teu torn de feina.",
+  "@catalogPattern14x14Description": {
+    "description": "Catorce días de trabajo y catorce libres, con el turno de trabajo a elegir."
+  },
   "holidayNameNewYear": "Cap d’Any",
   "holidayNameEpiphany": "Reis",
   "holidayNameMaundyThursday": "Dijous Sant",

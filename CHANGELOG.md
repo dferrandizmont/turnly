@@ -10,6 +10,16 @@ at once, so they can skip numbers.
 
 ## Unreleased
 
+## 0.12.0 · 2026-11-21
+
+- New: five ready-made rotations: 4 on 4 off with nights, 24/48 guard, 6 on 6 off, 7 on 7 off and 14 on 14 off. In the last three you choose your work shift.
+
+- Improved: the bottom bar stays on Rotation, Agenda and Summary, so you can switch between them without going back to the month. "Rotation" always opens "My rotations", and with none yet it offers "Apply pattern" there.
+
+- Google Play listings: improved local search terms and clarified supported summary periods.
+
+- Website: the privacy policy (20 November 2026): support replies are now sent through Resend, with open and click tracking turned off (no tracking pixel, links left unchanged); Resend keeps a copy of each reply and its sending log for 30 days. Brevo, which added a tracking pixel and rewrote links, was only ever used for the owner's test emails; the policy explains what remains there and when it is deleted.
+
 ## 1.2.2 · 2026-11-19
 
 iPhone and iPad update (App Store build 7): choose the day of the cycle in "Start the rotation here", the large-text, landscape and tablet fixes of Android 0.11.3 and 0.11.4, and three fixes only for iPhone and iPad. Your data is not touched.

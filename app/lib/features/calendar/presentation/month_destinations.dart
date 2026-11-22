@@ -11,9 +11,7 @@ import '../../../core/router.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/adaptive.dart';
 import '../../../core/widgets/content_app_bar.dart' show TopLevelDestination;
-import '../../patterns/application/pattern_start_pick.dart';
 import '../application/open_day.dart';
-import '../application/schedule_controller.dart';
 import '../application/visible_month.dart';
 import 'day_cell.dart' show textWidth;
 
@@ -22,10 +20,14 @@ import 'day_cell.dart' show textWidth;
 /// beside the month with two panes (`docs/diseno.md`, «Barra de destinos»).
 ///
 /// «Mes» is this screen: tapping it brings back today's month. The other
-/// three open their screen on top, with its back button, as before:
-/// - «Rotación»: «Mis rotaciones» (end or remove a rotation); with none yet,
-///   the pattern wizard, which is where a rotation is created. The year view
-///   is not a rotation: it opens from the title of the month.
+/// three open their screen on top of it, and the bar (or the rail) stays on
+/// all four, with the destination on screen selected and no back button
+/// (decision of 21-nov-2026; before, with one column the bar was only on the
+/// month):
+/// - «Rotación»: «Mis rotaciones» (end or remove a rotation), always, also
+///   with none yet: its empty state offers «Aplicar patrón», which opens the
+///   wizard on top (a flow, so it has no bar). The year view is not a
+///   rotation: it opens from the title of the month.
 /// - «Agenda»: upcoming notes and search.
 /// - «Resumen»: the summary of the month on screen.
 enum MonthDestination { month, rotation, agenda, summary }
@@ -41,17 +43,20 @@ const _destinationKeys = {
 
 /// The `extra` of a route opened through the destinations (the bar, the rail,
 /// the strip of the month): the screen belongs to the main destinations, so
-/// with the rail beside it there is no back button. A screen reached from
-/// elsewhere (Ajustes › Mis rotaciones, Año › Resumen) has no such extra and
-/// keeps its back button, which returns to the screen that opened it.
+/// with the bar or the rail beside it there is no back button, and it takes
+/// the place of the previous destination without a slide (a tab switch, not a
+/// push). A screen reached from elsewhere (Ajustes › Mis rotaciones,
+/// Año › Resumen) has no such extra: it keeps its back button, which returns
+/// to the screen that opened it, and shows no bar.
 class RailNavigation {
   const RailNavigation();
 }
 
 /// Opens [destination]. From the month ([from] is [MonthDestination.month])
-/// the three screens open on top of it; from one of them (the rail shows on
-/// all four when there are two panes) they take its place, so the back button
-/// still goes to the month, and «Mes» goes back to today's month.
+/// the three screens open on top of it; from one of them (the bar or the rail
+/// show on all four) they take its place, so the stack stays [month,
+/// destination] and the system back still goes to the month. «Mes» goes back
+/// to today's month, and the selected destination does nothing.
 void openMonthDestination(
   BuildContext context,
   WidgetRef ref,
@@ -74,8 +79,7 @@ void openMonthDestination(
       ref.read(visibleMonthProvider.notifier).today();
       if (onTop) context.go(AppRoutes.home);
     case MonthDestination.rotation:
-      final runs = ref.read(scheduleControllerProvider).schedule.runs;
-      open(runs.isEmpty ? patternWizardLocation() : AppRoutes.settingsRuns);
+      open(AppRoutes.settingsRuns);
     case MonthDestination.agenda:
       open(AppRoutes.agenda);
     case MonthDestination.summary:
@@ -133,9 +137,20 @@ double _namesWidth(BuildContext context) {
   return widest + 2 * Sp.xs;
 }
 
-/// The bottom bar of the month in one column.
+/// The bottom bar in one column: on the month and, through
+/// [DestinationRailShell], under Rotación, Agenda and Resumen. [current] is
+/// the destination on screen. It takes the system bottom inset itself.
 class MonthNavigationBar extends ConsumerWidget {
-  const MonthNavigationBar({super.key});
+  const MonthNavigationBar({
+    super.key,
+    this.current = MonthDestination.month,
+    this.viaDestinations = true,
+  });
+
+  final MonthDestination current;
+
+  /// See [openMonthDestination].
+  final bool viaDestinations;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -155,7 +170,7 @@ class MonthNavigationBar extends ConsumerWidget {
             child: NavigationBar(
               key: const ValueKey('month-nav-bar'),
               backgroundColor: colors.surface,
-              selectedIndex: MonthDestination.month.index,
+              selectedIndex: current.index,
               labelBehavior: names
                   ? NavigationDestinationLabelBehavior.alwaysShow
                   : NavigationDestinationLabelBehavior.alwaysHide,
@@ -174,6 +189,8 @@ class MonthNavigationBar extends ConsumerWidget {
                 context,
                 ref,
                 MonthDestination.values[index],
+                from: current,
+                viaDestinations: viaDestinations,
               ),
               destinations: [
                 for (final destination in MonthDestination.values)
@@ -263,10 +280,17 @@ class MonthNavigationRail extends ConsumerWidget {
   }
 }
 
-/// Puts the rail of destinations beside [child], a whole screen with its own
-/// app bar (Rotación, Agenda, Resumen), when the window has two panes
-/// ([Adaptive.useSplit], the same cut-off as the month). With one column
-/// (a phone, a tablet in portrait) it is [child] alone, as before.
+/// Puts the destinations beside or under [child], a whole screen with its own
+/// app bar (Rotación, Agenda, Resumen): the rail beside it when the window has
+/// two panes ([Adaptive.useSplit], the same cut-off as the month), the bottom
+/// bar under it with one column (a phone, a tablet in portrait). Only when it
+/// was opened through the destinations ([viaDestinations]); from Ajustes or the
+/// year it is [child] alone, with its back button.
+///
+/// One column: the bar is laid out under the screen, takes the system bottom
+/// inset itself, and the screen does not pad for it again. With the keyboard
+/// open the bar is not built (as on the month, `docs/diseno.md`): it would
+/// float over the keyboard or squeeze the screen.
 class DestinationRailShell extends StatelessWidget {
   const DestinationRailShell({
     super.key,
@@ -286,7 +310,22 @@ class DestinationRailShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!Adaptive.useSplit(MediaQuery.sizeOf(context))) return child;
+    if (!Adaptive.useSplit(MediaQuery.sizeOf(context))) {
+      if (!viaDestinations) return child;
+      return Column(
+        children: [
+          Expanded(
+            child: MediaQuery.removePadding(
+              context: context,
+              removeBottom: true,
+              child: TopLevelDestination(child: child),
+            ),
+          ),
+          if (MediaQuery.viewInsetsOf(context).bottom == 0)
+            MonthNavigationBar(current: current),
+        ],
+      );
+    }
     final colors = context.colors;
     return ColoredBox(
       color: colors.background,

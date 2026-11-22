@@ -54,6 +54,11 @@ void main() {
         'dupont',
         'pn-2-2-2-6',
         'guard-1-4',
+        '4x4-nights',
+        'guard-24-48',
+        '6x6',
+        '7x7',
+        '14x14',
       ]);
       expect(patternPresetById('correturnos').suggestedStart, DateTime.monday);
       expect(patternPresetById('5x2').suggestedStart, DateTime.monday);
@@ -95,6 +100,11 @@ void main() {
       ('dupont', 28, 14, 14),
       ('pn-2-2-2-6', 12, 6, 6),
       ('guard-1-4', 5, 1, 4),
+      ('4x4-nights', 16, 8, 8),
+      ('guard-24-48', 3, 1, 2),
+      ('6x6', 12, 6, 6),
+      ('7x7', 14, 7, 7),
+      ('14x14', 28, 14, 14),
     ];
 
     for (final (id, length, work, rest) in specs) {
@@ -194,6 +204,21 @@ void main() {
       }
     });
 
+    test('4x4-nights: 4 days of 12 h, 4 off, 4 nights of 12 h, 4 off', () {
+      expect(
+        codesOf(presetSchedule('4x4-nights', jan1), jan1, 17),
+        'D D D D L L L L N12 N12 N12 N12 L L L L D',
+      );
+    });
+
+    test('guard-24-48: one 24 h guard and two days off', () {
+      final s = presetSchedule('guard-24-48', jan1);
+      expect(codesOf(s, jan1, 7), 'G L L G L L G');
+      for (final day in [1, 4, 7]) {
+        expect(s.resolve(CivilDate(2026, 1, day)).shifts.single.id, 'guard24');
+      }
+    });
+
     test('12h: day, night, post-night, rest', () {
       final s = presetSchedule('12h', jan1);
       expect(codesOf(s, jan1, 8), 'D N12 S L D N12 S L');
@@ -227,10 +252,47 @@ void main() {
       }
     });
 
+    test('6x6, 7x7 and 14x14: work days, then as many days off', () {
+      expect(
+        codesOf(presetSchedule('6x6', jan1), jan1, 13),
+        'M M M M M M L L L L L L M',
+      );
+      expect(
+        codesOf(presetSchedule('7x7', jan1), jan1, 15),
+        'D D D D D D D L L L L L L L D',
+      );
+      expect(
+        codesOf(presetSchedule('14x14', jan1), jan1, 29),
+        'D D D D D D D D D D D D D D '
+        'L L L L L L L L L L L L L L D',
+      );
+    });
+
+    test('the work days of 6x6, 7x7 and 14x14 take the chosen shift', () {
+      // (preset, the template key of its work days, work days, days off)
+      for (final (id, workKey, work, rest) in [
+        ('6x6', 'morning', 6, 6),
+        ('7x7', 'day12', 7, 7),
+        ('14x14', 'day12', 14, 14),
+      ]) {
+        final preset = patternPresetById(id);
+        expect(preset.chooseWorkShift, isTrue, reason: id);
+        expect(preset.workKey, workKey, reason: id);
+        final chosen = preset.materialize({workKey: 'night', 'rest': 'rest'});
+        expect(chosen.steps, [
+          for (var i = 0; i < work; i++) ['night'],
+          for (var i = 0; i < rest; i++) ['rest'],
+        ], reason: id);
+      }
+    });
+
     test('familiar names describe the correct rotation', () {
       expect(patternPresetById('2-2-3').description, contains('Pitman'));
       expect(patternPresetById('2-2-3').description, contains('Panamá'));
       expect(patternPresetById('4x4').description, contains('cuatro y cuatro'));
+      // The 4x4 is the half without nights; the 4x4-nights is the other half.
+      expect(patternPresetById('4x4').description, contains('sin noches'));
+      expect(patternPresetById('4x4-nights').description, contains('noches'));
       expect(
         patternPresetById('4x4').description,
         isNot(contains('Continental')),
@@ -319,10 +381,23 @@ void main() {
     });
 
     test('2-2-3 is also the 2-2-3-2-2-3: one preset, no duplicate', () {
-      expect(patternPresets.where((p) => p.steps.length == 14), hasLength(1));
+      // The 7x7 is also 14 days, but another cycle.
+      final fourteen = [
+        for (final p in patternPresets) if (p.steps.length == 14) p.id,
+      ];
+      expect(fourteen, unorderedEquals(['2-2-3', '7x7']));
       // And no two presets are the same cycle under different names.
       final cycles = {for (final p in patternPresets) p.steps.join('|')};
       expect(cycles, hasLength(patternPresets.length));
+      // The 2-2-3 cycle is in one preset only.
+      expect(
+        [
+          for (final p in patternPresets)
+            if (p.steps.join('|') == patternPresetById('2-2-3').steps.join('|'))
+              p.id,
+        ],
+        ['2-2-3'],
+      );
       expect(patternPresetById('2-2-3').description, contains('2-2-3-2-2-3'));
       // Two weeks of 2 on, 2 off, 3 on, 2 on... as the name reads.
       expect(

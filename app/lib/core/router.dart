@@ -254,35 +254,45 @@ GoRouter buildRouter({
         ),
       ),
       GoRoute(path: AppRoutes.year, builder: (c, s) => const YearScreen()),
-      // «Rotación», «Agenda» and «Resumen» carry the rail of destinations
-      // beside them when there are two panes, like the month.
+      // «Rotación», «Agenda» and «Resumen» carry the destinations with them
+      // (the bar in one column, the rail with two panes), like the month.
+      // Opened through them they replace each other without a slide.
       GoRoute(
         path: AppRoutes.agenda,
-        builder: (c, s) => DestinationRailShell(
-          current: MonthDestination.agenda,
-          viaDestinations: s.extra is RailNavigation,
-          child: const AgendaScreen(),
+        pageBuilder: (c, s) => _destinationPage(
+          s,
+          DestinationRailShell(
+            current: MonthDestination.agenda,
+            viaDestinations: s.extra is RailNavigation,
+            child: const AgendaScreen(),
+          ),
         ),
       ),
       GoRoute(
         path: AppRoutes.settingsRuns,
-        builder: (c, s) => DestinationRailShell(
-          current: MonthDestination.rotation,
-          viaDestinations: s.extra is RailNavigation,
-          child: const RunsScreen(),
+        pageBuilder: (c, s) => _destinationPage(
+          s,
+          DestinationRailShell(
+            current: MonthDestination.rotation,
+            viaDestinations: s.extra is RailNavigation,
+            child: const RunsScreen(),
+          ),
         ),
       ),
       GoRoute(
         path: AppRoutes.summary,
-        builder: (c, s) => DestinationRailShell(
-          current: MonthDestination.summary,
-          viaDestinations: s.extra is RailNavigation,
-          child: SummaryScreen(
-            // A new link to the same screen starts over.
-            key: ValueKey(s.uri.toString()),
-            // /resumen?mes=2026-10&vista=ano
-            month: _parseMonth(s.uri.queryParameters['mes'], now()),
-            yearView: s.uri.queryParameters['vista'] == 'ano',
+        pageBuilder: (c, s) => _destinationPage(
+          s,
+          DestinationRailShell(
+            current: MonthDestination.summary,
+            viaDestinations: s.extra is RailNavigation,
+            child: SummaryScreen(
+              // A new link to the same screen starts over.
+              key: ValueKey(s.uri.toString()),
+              // /resumen?mes=2026-10&vista=ano
+              month: _parseMonth(s.uri.queryParameters['mes'], now()),
+              yearView: s.uri.queryParameters['vista'] == 'ano',
+            ),
           ),
         ),
       ),
@@ -305,6 +315,14 @@ GoRouter buildRouter({
     ],
   );
 }
+
+/// The page of Rotación, Agenda or Resumen: opened through the destinations
+/// (the route carries [RailNavigation]) it appears without a transition, as a
+/// tab switch would; from anywhere else it is the normal push.
+Page<void> _destinationPage(GoRouterState state, Widget child) =>
+    state.extra is RailNavigation
+    ? NoTransitionPage<void>(key: state.pageKey, child: child)
+    : MaterialPage<void>(key: state.pageKey, child: child);
 
 CivilDate? _parseDate(String? iso) {
   if (iso == null) return null;

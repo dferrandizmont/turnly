@@ -58,7 +58,7 @@ class OnboardingState {
     this.municipalityCode,
     this.municipalityName,
     this.presetId,
-    this.workShiftId = 'morning',
+    this.workShiftId,
     this.byHand = false,
     this.stepOffset = 0,
     this.finishing = false,
@@ -87,7 +87,10 @@ class OnboardingState {
 
   /// Catalogue preset chosen on the rotation screen.
   final String? presetId;
-  final String workShiftId;
+
+  /// The work shift the person chose for the work days; `null` = they have
+  /// not chosen one and the preset's own work shift applies.
+  final String? workShiftId;
 
   /// "Lo pinto a mano": no rotation.
   final bool byHand;
@@ -417,10 +420,11 @@ class OnboardingController extends Notifier<OnboardingState> {
   PatternRequest? request(Schedule schedule) {
     final id = state.presetId;
     if (id == null || state.byHand) return null;
+    final preset = patternPresetById(id);
     final pattern = presetPattern(
       schedule,
-      patternPresetById(id),
-      workShiftId: state.workShiftId,
+      preset,
+      workShiftId: workShiftOf(preset, state.workShiftId),
     );
     return PatternRequest(
       pattern: pattern,

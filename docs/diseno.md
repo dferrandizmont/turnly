@@ -509,12 +509,20 @@ largo no cabe en su cuarto de ancho a ese tamaño, los destinos quedan solo con 
 leído. «Seleccionar días», bajo la cuadrícula, deja sitio al «Pintar» flotante: si con el texto grande no caben los dos
 (p. ej. euskera a ×2), se queda en su icono, con el nombre como tooltip y texto leído. Con dos paneles los mismos destinos van en un **raíl** de 80 dp a la izquierda del mes
 (`NavigationRail`, nombres debajo; con la misma regla que la barra: los nombres se quedan con cualquier tamaño de texto, a ×1,3 como mucho y en una línea, y el raíl se ensancha lo justo para el más largo, hasta 128 dp; solo si ni así cabe, queda con solo iconos; comparten la medida en `month_destinations.dart`), porque una barra inferior se comería el alto que le
-falta al mes en un móvil horizontal. Ese raíl lo llevan también Rotación, Agenda y Resumen (`DestinationRailShell`, puesto en la ruta) cuando hay dos paneles: el mismo punto de corte (`Adaptive.useSplit`), con su destino marcado; tocar otro destino sustituye la pantalla (el atrás sigue yendo al mes) y «Mes» vuelve al mes de hoy. Con una columna (móvil, tableta en vertical) no cambia nada.
+falta al mes en un móvil horizontal. Ese raíl lo llevan también Rotación, Agenda y Resumen (`DestinationRailShell`, puesto en la ruta) cuando hay dos paneles: el mismo punto de corte (`Adaptive.useSplit`), con su destino marcado; tocar otro destino sustituye la pantalla (el atrás sigue yendo al mes) y «Mes» vuelve al mes de hoy.
 
-Qué abre cada uno (los tres últimos se abren encima, con su botón atrás, como antes):
+**La barra se queda en los cuatro destinos (decisión del 21-nov-2026).** Con una columna (móvil, tableta en vertical) la misma barra inferior va también bajo Rotación, Agenda y Resumen cuando se abren desde los destinos (`DestinationRailShell`, `viaDestinations`), con su destino marcado y **sin botón atrás** (`TopLevelDestination`); antes solo estaba en el mes y las tres pantallas se abrían con flecha y sin barra. `MonthNavigationBar` lleva `current` y `viaDestinations`, igual que el raíl; los nombres, las claves y los identificadores no cambian. Reglas:
+- Tocar otro destino sustituye la pantalla sin deslizamiento (cambio de pestaña, no un push: `NoTransitionPage` cuando la ruta lleva `RailNavigation`); la pila sigue siendo [mes, destino], así que el atrás del sistema vuelve al mes, y «Mes» vuelve al mes de hoy. Tocar el destino marcado no hace nada.
+- Abiertas desde otro sitio (Ajustes › Mis rotaciones, Año › Resumen) no llevan la barra y conservan su flecha atrás.
+- La barra va bajo la pantalla (que es un `Scaffold` entero), toma ella el margen inferior del sistema y la pantalla no lo repite (`MediaQuery` sin relleno inferior). Con el teclado abierto (`viewInsets.bottom > 0`; p. ej. la búsqueda de Agenda) la barra **no se construye**, como en el mes: así no flota sobre el teclado ni le quita sitio al contenido.
+- Sin deslizar desde el borde en iOS: las barras de pestañas de iOS no lo tienen, y el atrás del sistema sigue funcionando. Tampoco se guarda de dónde se abrió la pantalla: la app no restaura rutas, y un enlace directo abre la pantalla con su flecha atrás y sin barra, que es lo esperado.
+- El asistente de patrón (`/patron`) es un flujo y no lleva barra; por eso «Rotación» abre siempre «Mis rotaciones», y su estado vacío ofrece «Aplicar patrón», que abre el asistente encima.
+
+Qué abre cada uno (los tres últimos se abren encima del mes, con la barra o el raíl a la vista):
 - **Mes**: esta pantalla; tocarlo vuelve al mes de hoy (y cierra el día abierto en el panel).
-- **Rotación**: «Mis rotaciones» (`/ajustes/rotaciones`: terminar o quitar una rotación) si el calendario tiene alguna;
-  si no hay ninguna, el asistente de patrón (`/patron`), que es donde se crea. Antes de B1 no había un acceso
+- **Rotación**: «Mis rotaciones» (`/ajustes/rotaciones`: terminar o quitar una rotación), siempre; si el calendario no
+  tiene ninguna, su estado vacío ofrece «Aplicar patrón», que abre el asistente (`/patron`) encima, sin barra (hasta el
+  21-nov-2026 abría el asistente directamente). Antes de B1 no había un acceso
   «Rotación»: el icono de la fila del mes era la **vista anual**, que no es una rotación; la vista anual sigue a un
   toque desde el **título del mes** («Octubre, elegir mes»).
 - **Agenda**: próximas notas y búsqueda (antes, icono de la cabecera).

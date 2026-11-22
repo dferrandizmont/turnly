@@ -68,7 +68,8 @@ void main() {
       );
       expect(agendaTitle.label, 'Agenda');
       expect(agendaTitle.flagsCollection.namesRoute, isTrue);
-      expect(key('month-nav-bar'), findsNothing);
+      // The bar stays under the screen (decision of 21-nov-2026).
+      expect(key('month-nav-bar'), findsOneWidget);
       rootNavigatorKey.currentState!.pop();
       await tester.pumpAndSettle();
 
@@ -83,7 +84,7 @@ void main() {
       expect(find.textContaining('Diciembre'), findsWidgets);
     });
 
-    testWidgets('Rotación: my rotations, or the wizard when there is none', (
+    testWidgets('Rotación: always my rotations, with a way to create the first', (
       tester,
     ) async {
       await pumpCalendar(tester);
@@ -104,9 +105,11 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.bySemanticsIdentifier('nav-rotation'));
       await tester.pumpAndSettle();
-      expect(find.text('Mis rotaciones'), findsNothing);
-      expect(find.textContaining('1 de 3'), findsWidgets);
+      // Not the wizard: a flow has no bar. Its button is in the empty state.
+      expect(find.textContaining('1 de 3'), findsNothing);
       expect(find.bySemanticsIdentifier('rotation-screen'), findsOneWidget);
+      expect(find.text('Sin rotaciones'), findsOneWidget);
+      expect(find.text('Aplicar patrón'), findsOneWidget);
     });
 
     testWidgets('Mes brings back the month of today', (tester) async {
@@ -282,13 +285,13 @@ void main() {
 
     for (final size in const [Size(390, 844), Size(800, 1280)]) {
       testWidgets('one column ${size.width.toInt()}x${size.height.toInt()}: '
-          'the screens open without a rail', (tester) async {
+          'the screens open with the bar, not a rail', (tester) async {
         await pumpCalendar(tester, size: size);
         await tester.tap(key('open-agenda'));
         await tester.pumpAndSettle();
         expect(find.byType(NavigationRail), findsNothing);
-        expect(key('month-nav-bar'), findsNothing);
-        expect(find.byType(BackButton), findsWidgets);
+        expect(key('month-nav-bar'), findsOneWidget);
+        expect(find.byType(BackButton), findsNothing);
         expect(tester.takeException(), isNull);
       });
     }

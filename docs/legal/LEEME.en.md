@@ -43,5 +43,5 @@ redirect to the new website.
 ## Notes for the holder
 They used to sit at the end of the Spanish policy and moved here on 30-Oct-2026, when the policy went to the new
 website. See the Spanish [LEEME.md](LEEME.md#notas-para-el-titular): support email `turnly@mainshai.com` (formerly
-`dev@mainshai.com`), email retention of at most one year after the last message of the conversation, with a clean-up every three months that deletes whatever would turn one year old before the next clean-up, no tax ID published, and decision 13 of
+`dev@mainshai.com`), support replies sent through Resend without tracking since 20-Nov-2026 (from 16 to 20 Nov the intended service was Brevo, with its pixel, but it only sent the owner's test emails; see "Respuestas por Resend"), email retention of at most one year after the last message of the conversation in Gmail and Proton, with a clean-up every three months that deletes whatever would turn one year old before the next clean-up, while Resend deletes after 30 days, no tax ID published, and decision 13 of
 `docs/preguntas.md` still pending.

@@ -963,7 +963,7 @@
   "selectionRunsTitle": "My rotations",
   "selectionRunsSubtitle": "End or remove a pattern in one go",
   "selectionRunsEmptyTitle": "No rotations",
-  "selectionRunsEmptyMessage": "When you apply a pattern from Paint, it will show up here.",
+  "selectionRunsEmptyMessage": "Apply a pattern and your first rotation will show up here.",
   "selectionRunsRange": "From {from} to {to}",
   "@selectionRunsRange": {
     "placeholders": {
@@ -3432,7 +3432,7 @@
   "catalogPattern6x4Name": "6 x 4",
   "catalogPattern6x4Description": "6 mornings and 4 off",
   "catalogPattern4x4Name": "4 x 4",
-  "catalogPattern4x4Description": "4 12-hour days and 4 off (4x4 or four on, four off)",
+  "catalogPattern4x4Description": "4 12-hour days and 4 off, no nights (4x4 or four on, four off)",
   "catalogPattern5x2Name": "5 x 2",
   "catalogPattern5x2Description": "5 mornings and 2 off (Monday to Friday)",
   "catalogPattern223Name": "2-2-3",
@@ -3445,6 +3445,46 @@
   "catalogPatternPn2226Description": "2 mornings, 2 afternoons, 2 nights, post-night and 5 off (the National Police 6x6)",
   "catalogPatternGuard14Name": "24-hour shift 1-4",
   "catalogPatternGuard14Description": "24-hour shift and 4 days off (1 shift, 4 off)",
+  "catalogPattern4x4NightsName": "4 on, 4 off with nights",
+  "@catalogPattern4x4NightsName": {
+    "description": "Catálogo de rotaciones: nombre y descripción de cada patrón (asistente de patrón y primer uso)."
+  },
+  "catalogPattern4x4NightsDescription": "4 12-hour days, 4 off, 4 12-hour nights and 4 off",
+  "@catalogPattern4x4NightsDescription": {
+    "description": "El 4x4 con noches: cuatro días de 12 h, cuatro libres, cuatro noches de 12 h y cuatro libres."
+  },
+  "catalogPatternGuard2448Name": "24/48 guard",
+  "@catalogPatternGuard2448Name": {
+    "description": "Catálogo de rotaciones: nombre y descripción de cada patrón (asistente de patrón y primer uso)."
+  },
+  "catalogPatternGuard2448Description": "24-hour shift and 48 hours off (24/48)",
+  "@catalogPatternGuard2448Description": {
+    "description": "Una guardia de 24 h y dos días libres."
+  },
+  "catalogPattern6x6Name": "6 on, 6 off",
+  "@catalogPattern6x6Name": {
+    "description": "Catálogo de rotaciones: nombre y descripción de cada patrón (asistente de patrón y primer uso)."
+  },
+  "catalogPattern6x6Description": "6 work days and 6 off (6x6). Choose your work shift.",
+  "@catalogPattern6x6Description": {
+    "description": "Seis días de trabajo y seis libres, con el turno de trabajo a elegir."
+  },
+  "catalogPattern7x7Name": "7 on, 7 off",
+  "@catalogPattern7x7Name": {
+    "description": "Catálogo de rotaciones: nombre y descripción de cada patrón (asistente de patrón y primer uso)."
+  },
+  "catalogPattern7x7Description": "7 work days and 7 off (7x7). Choose your work shift.",
+  "@catalogPattern7x7Description": {
+    "description": "Siete días de trabajo y siete libres, con el turno de trabajo a elegir."
+  },
+  "catalogPattern14x14Name": "14 on, 14 off",
+  "@catalogPattern14x14Name": {
+    "description": "Catálogo de rotaciones: nombre y descripción de cada patrón (asistente de patrón y primer uso)."
+  },
+  "catalogPattern14x14Description": "14 work days and 14 off (14x14). Choose your work shift.",
+  "@catalogPattern14x14Description": {
+    "description": "Catorce días de trabajo y catorce libres, con el turno de trabajo a elegir."
+  },
   "holidayNameNewYear": "New Year’s Day",
   "holidayNameEpiphany": "Epiphany",
   "holidayNameMaundyThursday": "Maundy Thursday",

@@ -79,9 +79,11 @@ void main() {
     ) async {
       await pumpCalendar(tester);
       await _openSummary(tester);
-      expect(find.text('Resumen'), findsOneWidget);
+      // Its title, and «Resumen» in the bar that stays under it.
+      expect(find.bySemanticsIdentifier('summary-screen'), findsOneWidget);
       expect(_text(tester, 'summary-period'), 'Octubre 2026');
-      await tester.tap(find.byType(BackButton));
+      // The bar stays under it: «Mes» goes back to the month.
+      await tester.tap(_key('nav-month'));
       await tester.pumpAndSettle();
       expect(find.byType(MonthScreen), findsOneWidget);
 
@@ -708,7 +710,7 @@ void main() {
       await tester.tap(_key('summary-share'));
       await _until(tester, () => fromSummary.isNotEmpty);
       await tester.pumpAndSettle();
-      await tester.tap(find.byType(BackButton));
+      await tester.tap(_key('nav-month'));
       await tester.pumpAndSettle();
 
       await tester.tap(_key('open-year'));

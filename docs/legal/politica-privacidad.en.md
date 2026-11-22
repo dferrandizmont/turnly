@@ -1,6 +1,6 @@
 # Turnly privacy policy
 
-Last updated: 19 November 2026 · version 2026-11-19
+Last updated: 20 November 2026 · version 2026-11-20
 
 Courtesy translation. The Spanish version ([politica-privacidad.md](politica-privacidad.md)) is the one that
 applies.
@@ -11,7 +11,8 @@ or endorsed by any company, public body or union.
 Summary: **you have no account, there is no server of ours and your shifts stay on your phone.** The app is entirely
 free and open source, and sends no data or crash reports to anyone. The only things that can take your data off the
 phone are the backups of your Google or Apple account, the daily copy in the folder you choose (on Android, if you
-turn it on) and the files or calendars you choose to export, and you control those. If you email us, the providers explained in “If you write to us” are involved in handling that email.
+turn it on) and the files or calendars you choose to export, and you control those. If you write to us, Cloudflare forwards your message to Gmail, and a copy is kept in Proton. We send replies
+through Resend with open and click tracking turned off (details in “If you write to us”).
 
 ## 1. Data controller
 
@@ -117,7 +118,10 @@ the app version if you want to attach it. The app opens no mail client and sends
 bug.
 
 If you write to turnly@mainshai.com (or to dev@mainshai.com, the address of the first versions), we use your email
-address, your name if you give it and what you tell us, only to reply and deal with your question. These providers are involved along the way:
+address, your name if you give it and what you tell us to reply and deal with your question. If you exercise a data
+protection right, we process your request to meet our obligations under the GDPR (art. 6(1)(c)). If we need to keep a
+conversation for a legal claim, we do so for as long as necessary for our legitimate interest in establishing,
+exercising or defending that claim (art. 6(1)(f)). These providers are involved along the way:
 
 - **Cloudflare** (Cloudflare, Inc., United States) receives the message at our domain and forwards it straight away.
   It does not keep the message, but it does keep a technical log of the forwarding (sender, recipient, subject, date
@@ -128,22 +132,29 @@ address, your name if you give it and what you tell us, only to reply and deal w
 - **Google** (Gmail; Google Ireland Limited) is the mailbox where we read your message, answer you and keep the
   conversation. Google may also process this data in the United States.
 - **Proton** (Proton AG, Switzerland) keeps a copy of the messages we receive, as a backup. We do not reply from it.
-- **Brevo** (Sendinblue SAS, trading as Brevo, France) sends our replies, so it processes their content, and keeps a
-  log of each message sent (recipient, subject, date and whether it was delivered) and a copy of the reply (which may
-  include your message, if it is quoted below it). Brevo also adds to each reply an invisible image (a pixel) that
-  records whether you open it, and replaces the links with its own, which record whether you click them. We cannot
-  remove this on the plan we use, so we have turned on Brevo's anonymous tracking: according to Brevo, it counts opens
-  and clicks without linking them to your email address. Even so, when the image loads or you click a link, your mail
-  program connects to Brevo's servers, which receive technical data such as your IP address. We do not look at or use
-  that information. If you prefer to avoid it, block external images in your mail program and do not open the links in
-  the reply. Copying them and pasting them into your browser does not help either, because they still go through
-  Brevo: to go to a page, type its address yourself. The reply reads just the same.
+- **Resend** (Plus Five Five, Inc., United States) sends our replies, which go out from turnly@mainshai.com, so it
+  processes their content. It sends them
+  from its servers in Ireland, but stores the data in the United States: a copy of each reply (which may include your
+  message, if it is quoted below it) and a sending log (recipient, subject, date and whether it was delivered). Resend
+  says it keeps each reply and its sending log for 30 days after sending, and it keeps backups for seven days. We have
+  turned off open and click tracking: our replies carry no tracking image and their links are not changed. Resend uses
+  its own sub-processors (for example, Amazon Web Services for sending), in the United States, listed at
+  https://resend.com/legal/subprocessors.
 
-We keep the conversation in Gmail, the copy in Proton, and the copy and the delivery log in Brevo for at most one year
-after the last message of the conversation, unless we need to keep them longer to deal with a complaint or
-claim. We run a clean-up every three months, and each one deletes whatever would turn one year old before the next clean-up. If we
-stop using one of those services, we delete what is in it. If you ask us to delete your messages sooner, we delete
-them from all three.
+**Brevo, until 20 November 2026.** Until that date, this policy said that replies were sent through Brevo (Sendinblue
+SAS, trading as Brevo, France), which adds to emails an invisible image (a pixel) that records whether they are opened
+and replaces the links with its own, which record whether they are clicked. Before the switch to Resend, the owner
+used Brevo only to send test emails from turnly@mainshai.com, and no reply to anyone who wrote to us. Brevo keeps the
+log of those tests and deletes it automatically twelve months after each email is sent (deletion can take up to
+another day). We will ask Brevo to delete that history sooner and we will close the account.
+
+We keep the conversation in Gmail and the copy in Proton for at most one year after the last message of the
+conversation, unless we need to keep them longer to deal with a complaint or claim. We run a clean-up every three
+months, and each one deletes whatever would turn one year old before the next clean-up. Resend says it keeps each
+reply and its sending log for 30 days after sending, and it keeps backups for seven days. If you ask us to delete your
+messages sooner and the right to erasure applies, we delete the messages from Gmail and Proton and ask Resend to delete
+any replies and sending logs it still holds (this can only be done by asking its support team). If we need to keep any
+data, we will explain what we keep and why.
 
 ## 3. Purposes and legal basis
 
@@ -152,6 +163,8 @@ them from all three.
 | Shifts, notes, absences and settings on your phone | Keeping your roster, hours and alarms | We do not receive them: they stay on your device, under your control |
 | Backups and exports | Not losing your data and changing phones | You make them; the services you use (Google, Apple, your cloud) have their own terms |
 | Support emails | Answering your query and keeping the conversation for the period in “Retention” | Your request and our legitimate interest in handling it (art. 6(1)(f)) |
+| Data protection rights requests | Handling and documenting your request | Meeting our obligations under the GDPR (art. 6(1)(c)) |
+| Keeping a conversation for a legal claim | Establishing, exercising or defending a legal claim | Our legitimate interest (art. 6(1)(f)), for as long as necessary |
 
 We make no automated decisions and build no profiles about you.
 
@@ -161,36 +174,46 @@ review directly, not us. If you export to a synced calendar, choose a cloud serv
 backup on, the recipient of that data is your account provider (Google, Apple or another), on your behalf and under
 its terms.
 
-If you write to us, the support email goes through these providers (details in “If you write to us”):
+If you write to us, the support email goes through these providers, each at the step shown in the table (details in
+“If you write to us”):
 
 | Provider | What for | Where |
 |---|---|---|
 | Cloudflare, Inc. | Receiving and forwarding support email; technical forwarding log | United States |
 | Google Ireland Limited (Gmail) | Support mailbox | Ireland; Google LLC may process data in the United States |
 | Proton AG | Backup copy of the email received | Switzerland |
-| Sendinblue SAS (Brevo), RCS Paris 498 019 298 | Sending the replies; delivery log and copy of the reply (at most one year after the last message, with a quarterly clean-up); open pixel and click links, with Brevo's anonymous tracking turned on | EU (France) |
+| Plus Five Five, Inc. (Resend) | Sending the replies; copy of each reply and its sending log for 30 days after sending (it keeps backups for seven days); no open or click tracking | United States (emails are sent from Ireland) |
+| Sendinblue SAS (Brevo), RCS Paris 498 019 298 | Until 20 November 2026, the intended sending service; it only sent the owner's test emails, whose log it deletes automatically twelve months after each email is sent, although deletion can take up to one additional day | EU (France) |
 
 We use an ordinary Gmail account, with no data processing agreement with Google: Google processes those emails under
-its own terms.
+its own terms. Resend processes the replies as a processor, under the data processing agreement (art. 28 GDPR) that
+applies to all its accounts (https://resend.com/legal/dpa).
 
 ## 5. International transfers
 The app makes no data transfers. External services you decide to use (your mail, cloud, synced calendar, the
 destination of an export or the store where you rate the app) are governed by their own terms.
 
 For support email, Cloudflare and Google may process data in the United States. Cloudflare, Inc. and Google LLC are certified under the EU-U.S. Data Privacy Framework (European Commission adequacy decision of 10 July 2023); Cloudflare's data
-processing agreement also includes standard contractual clauses. Proton is in Switzerland, which is covered by a European Commission adequacy decision. Brevo is a French company and, according to its documentation, hosts
-the data in the European Union.
+processing agreement also includes standard contractual clauses. Proton is in Switzerland, which is covered by a European Commission adequacy decision. Resend (Plus Five Five, Inc.) stores the replies and their log in the United States, even though the emails are sent
+from Ireland; that transfer relies on Resend's certification under the EU-U.S. Data Privacy Framework and on the European
+Commission's standard contractual clauses (module 2) included in its data processing agreement
+(https://resend.com/legal/dpa); you can also ask us for information at the contact email. Brevo, the intended sending
+service until 20 November 2026, is a French company and, according to its documentation, hosts the data in the
+European Union.
 
 ## 6. Retention
 
 - **Data on your phone:** until you uninstall the app or clear its data from the system settings (and, where
   relevant, from your account's backups, the files you exported and the daily copies in the folder you chose, which stay
   there until you delete them).
-- **Support emails:** at most one year after the last message of the conversation, in Gmail, in Proton and in Brevo,
-  with a clean-up every three months, unless we need to keep them longer to deal with a complaint or claim. Sooner if
-  you ask us to (details in “If you write to us”). Cloudflare keeps its technical forwarding log for the period its
-  service sets, which we have not been able to confirm; if you ask us to delete your data, we will also pass the
-  request on to it and tell you the result.
+- **Support emails:** the conversation in Gmail and the copy in Proton, at most one year after the last message of the
+  conversation, with a clean-up every three months, unless we need to keep them longer to deal with a complaint or
+  claim. Resend says it keeps each reply and its sending log for 30 days after sending, and it keeps backups for seven
+  days. You can ask for erasure sooner. Where the right to erasure applies, we delete the messages from Gmail and
+  Proton and ask Resend to delete any replies and sending logs it still holds. If we need to keep any data, we will
+  explain what we keep and why (details in “If you write to us”). Cloudflare keeps its technical forwarding log for
+  the period its service sets, which we have not been able to confirm; if you ask us to delete your data, we will also
+  pass the request on to it and tell you the result. For what remains at Brevo, see “If you write to us”.
 
 ## 7. Your rights
 

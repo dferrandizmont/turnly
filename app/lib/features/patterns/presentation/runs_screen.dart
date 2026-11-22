@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/format/app_date_format.dart';
 import '../../../core/icons/app_icons.dart';
@@ -15,6 +16,7 @@ import '../../../core/widgets/empty_illustration.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/page_body.dart';
 import '../../calendar/application/schedule_controller.dart';
+import '../application/pattern_start_pick.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../domain/pattern_catalog.dart';
 import '../../../core/widgets/app_snack_bar.dart';
@@ -55,6 +57,13 @@ class RunsScreen extends ConsumerWidget {
                 ),
                 title: l10n.selectionRunsEmptyTitle,
                 message: l10n.selectionRunsEmptyMessage,
+                // «Rotación» always opens this screen, so it is also where the
+                // first rotation is created: the wizard opens on top, a flow
+                // without the bar of destinations.
+                actionLabel: l10n.patternTitle,
+                actionIcon: AppIcons.pattern,
+                primaryAction: true,
+                onAction: () => context.push(patternWizardLocation()),
               )
             : ListView.separated(
                 key: const ValueKey('runs-list'),

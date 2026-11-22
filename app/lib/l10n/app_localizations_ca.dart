@@ -1384,7 +1384,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get selectionRunsEmptyMessage =>
-      'Quan apliquis un patró des de Pinta, apareixerà aquí.';
+      'Aplica un patró i la teva primera rotació apareixerà aquí.';
 
   @override
   String selectionRunsRange(String from, String to) {
@@ -5725,7 +5725,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get catalogPattern4x4Description =>
-      '4 dies de 12 h i 4 lliures (4x4 o quatre i quatre)';
+      '4 dies de 12 h i 4 lliures, sense nits (4x4 o quatre i quatre)';
 
   @override
   String get catalogPattern5x2Name => '5 x 2';
@@ -5768,6 +5768,41 @@ class AppLocalizationsCa extends AppLocalizations {
   @override
   String get catalogPatternGuard14Description =>
       'Guàrdia de 24 h i 4 dies lliures (1 guàrdia i 4 lliures)';
+
+  @override
+  String get catalogPattern4x4NightsName => '4 x 4 amb nits';
+
+  @override
+  String get catalogPattern4x4NightsDescription =>
+      '4 dies de 12 h, 4 lliures, 4 nits de 12 h i 4 lliures';
+
+  @override
+  String get catalogPatternGuard2448Name => 'Guàrdia 24/48';
+
+  @override
+  String get catalogPatternGuard2448Description =>
+      'Guàrdia de 24 h i 48 h lliures (24/48)';
+
+  @override
+  String get catalogPattern6x6Name => '6 x 6';
+
+  @override
+  String get catalogPattern6x6Description =>
+      '6 dies de feina i 6 lliures (6x6). Tria el teu torn de feina.';
+
+  @override
+  String get catalogPattern7x7Name => '7 x 7';
+
+  @override
+  String get catalogPattern7x7Description =>
+      '7 dies de feina i 7 lliures (7x7). Tria el teu torn de feina.';
+
+  @override
+  String get catalogPattern14x14Name => '14 x 14';
+
+  @override
+  String get catalogPattern14x14Description =>
+      '14 dies de feina i 14 lliures (14x14). Tria el teu torn de feina.';
 
   @override
   String get holidayNameNewYear => 'Cap d’Any';

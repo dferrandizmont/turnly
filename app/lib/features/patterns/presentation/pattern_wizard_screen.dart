@@ -508,7 +508,15 @@ class _ChooseStep extends ConsumerWidget {
       selected: wizard.presetId == p.id,
       onTap: () => controller.selectPreset(p.id),
       onEdit: () => controller.editAsCopy(
-        presetPattern(schedule, p, workShiftId: wizard.workShiftId),
+        presetPattern(
+          schedule,
+          p,
+          workShiftId: workShiftOf(
+            p,
+            wizard.workShiftId,
+            openedWith: controller.openedWorkShift,
+          ),
+        ),
       ),
     );
 
@@ -858,6 +866,15 @@ class _StartStep extends ConsumerWidget {
     final preset = wizard.presetId == null
         ? null
         : patternPresetById(wizard.presetId!);
+    // The work shift of the work days: the one the person chose, or the
+    // default one (the shift the wizard opened with, or the preset's own).
+    final workShift = preset == null
+        ? (wizard.workShiftId ?? 'morning')
+        : workShiftOf(
+            preset,
+            wizard.workShiftId,
+            openedWith: controller.openedWorkShift,
+          );
     final paletteIds = ref.watch(
       scheduleControllerProvider.select(
         (s) => {for (final t in s.palette) t.id},
@@ -902,13 +919,12 @@ class _StartStep extends ConsumerWidget {
             shifts: [
               for (final shift in schedule.shiftTypes)
                 if (shift.category == ShiftCategory.work &&
-                    (paletteIds.contains(shift.id) ||
-                        shift.id == wizard.workShiftId))
+                    (paletteIds.contains(shift.id) || shift.id == workShift))
                   shift,
-              if (schedule.shiftTypeById(wizard.workShiftId) == null)
-                shiftTypeForDisplay(schedule, wizard.workShiftId)!,
+              if (schedule.shiftTypeById(workShift) == null)
+                shiftTypeForDisplay(schedule, workShift)!,
             ],
-            selectedId: wizard.workShiftId,
+            selectedId: workShift,
             onChanged: controller.setWorkShift,
           ),
         // The numbered strip and whole months share the planner used to apply.

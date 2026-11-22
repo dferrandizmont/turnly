@@ -1387,7 +1387,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get selectionRunsEmptyMessage =>
-      'Margotu ataletik eredu bat aplikatzen duzunean, hemen agertuko da.';
+      'Aplikatu eredu bat eta zure lehen txandaketa hemen agertuko da.';
 
   @override
   String selectionRunsRange(String from, String to) {
@@ -5739,7 +5739,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get catalogPattern4x4Description =>
-      '12 orduko 4 egun eta 4 libre (4x4 edo lau eta lau)';
+      '12 orduko 4 egun eta 4 libre, gaueko txandarik gabe (4x4 edo lau eta lau)';
 
   @override
   String get catalogPattern5x2Name => '5 x 2';
@@ -5782,6 +5782,41 @@ class AppLocalizationsEu extends AppLocalizations {
   @override
   String get catalogPatternGuard14Description =>
       '24 orduko guardia eta 4 egun libre (guardia 1 eta libre 4)';
+
+  @override
+  String get catalogPattern4x4NightsName => '4 x 4 gaueko txandekin';
+
+  @override
+  String get catalogPattern4x4NightsDescription =>
+      '12 orduko 4 egun, 4 libre, 12 orduko 4 gau eta 4 libre';
+
+  @override
+  String get catalogPatternGuard2448Name => 'Guardia 24/48';
+
+  @override
+  String get catalogPatternGuard2448Description =>
+      '24 orduko guardia eta 48 ordu libre (24/48)';
+
+  @override
+  String get catalogPattern6x6Name => '6 x 6';
+
+  @override
+  String get catalogPattern6x6Description =>
+      '6 lanegun eta 6 libre (6x6). Aukeratu zure laneko txanda.';
+
+  @override
+  String get catalogPattern7x7Name => '7 x 7';
+
+  @override
+  String get catalogPattern7x7Description =>
+      '7 lanegun eta 7 libre (7x7). Aukeratu zure laneko txanda.';
+
+  @override
+  String get catalogPattern14x14Name => '14 x 14';
+
+  @override
+  String get catalogPattern14x14Description =>
+      '14 lanegun eta 14 libre (14x14). Aukeratu zure laneko txanda.';
 
   @override
   String get holidayNameNewYear => 'Urte Berri eguna';

@@ -136,9 +136,14 @@ Android, que no entran en la copia del sistema. Solo lo leen los widgets de esta
 La dirección es **turnly@mainshai.com**, definida en `kSupportEmail`
 (`app/lib/core/config.dart`); el build puede sustituirla con `--dart-define=SUPPORT_EMAIL=...`.
 Circuito del correo (fuera de la app, desde el 16-nov-2026): Cloudflare Email Routing recibe y reenvía a un buzón de
-Gmail, donde se lee y se responde; un filtro de Gmail deja una copia en Proton; las respuestas salen por el SMTP de
-Brevo, que añade un píxel de apertura y reescribe los enlaces (seguimiento anónimo activado; no se puede quitar en el
-plan gratuito). La política lo cuenta en «Si nos escribes», «Quién recibe los datos» y «Transferencias».
+Gmail, donde se lee y se responde; un filtro de Gmail deja una copia en Proton. Desde el 20-nov-2026 las respuestas
+salen por el SMTP de Resend (`smtp.resend.com`, dominio `mainshai.com` en la región de Irlanda), con el seguimiento de
+aperturas y de clics desactivado: sin píxel, sin enlaces reescritos y sin pie de baja. Resend guarda en EE. UU. una
+copia de cada respuesta y su registro de envío 30 días desde el envío (sus copias de seguridad se conservan siete
+días). Hasta el 20-nov-2026 el servicio previsto era el SMTP de Brevo, con píxel de apertura y enlaces reescritos
+(seguimiento anónimo), pero desde turnly@mainshai.com solo se enviaron pruebas del titular; Brevo conserva el registro
+de esas pruebas con su regla de retención (12 meses). La política lo cuenta en «Si nos escribes», «Quién
+recibe los datos», «Transferencias» y «Cuánto tiempo se conservan».
 «Licencias de código abierto» abre la página de licencias de Flutter, sin conexión.
 «Política de privacidad» (Ajustes › Ayuda) abre la web en el **navegador externo**, solo al tocar la fila, mediante
 el plugin oficial `url_launcher`. No envía datos del cuadrante ni añade permiso `INTERNET` a la app: el navegador

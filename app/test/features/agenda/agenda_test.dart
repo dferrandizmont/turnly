@@ -473,7 +473,7 @@ void main() {
       expect(find.text('Sin notas próximas'), findsNothing);
 
       // Leaving the agenda and coming back keeps «Turnos» (session memory).
-      await tester.tap(find.byType(BackButton));
+      await tester.tap(key('nav-month'));
       await tester.pumpAndSettle();
       await tester.tap(key('open-agenda'));
       await tester.pumpAndSettle();

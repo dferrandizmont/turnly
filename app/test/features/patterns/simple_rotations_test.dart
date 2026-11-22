@@ -162,4 +162,95 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  // (preset, work days, cycle, the shift it works with until it is chosen)
+  for (final (id, workDays, cycle, ownShift) in [
+    ('6x6', 6, 12, 'morning'),
+    ('7x7', 7, 14, 'day12'),
+  ]) {
+    testWidgets('$id: the work shift of the wizard, 360 dp at x2', (
+      tester,
+    ) async {
+      await pumpCalendar(tester, size: const Size(360, 800), textScale: 2);
+      await enterPaintMode(tester);
+      await tester.tap(key('paint-pattern'));
+      await tester.pumpAndSettle();
+      await tap(tester, 'pattern-card-$id');
+      await tap(tester, 'pattern-next');
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(CuadranteApp)),
+      );
+      final screen = tester.widget<PatternWizardScreen>(
+        find.byType(PatternWizardScreen),
+      );
+      final args = (start: screen.start, shiftId: screen.shiftId);
+      final wizard = container.read(patternWizardProvider(args).notifier);
+      // The demo data has manual days in this week; replace them so only the
+      // rotation is left to check.
+      wizard.setClearOverrides(true);
+      // The cycle starts on the day the wizard starts on.
+      final start = wizard.state.start;
+      void expectCycle(PatternApplication preview, String shift) {
+        for (var i = 0; i < cycle; i++) {
+          expect(
+            preview.schedule.resolve(start.addDays(i)).shifts.single.id,
+            i % cycle < workDays ? shift : 'rest',
+            reason: '$id day $i',
+          );
+        }
+      }
+
+      // Without touching the picker, the preset works with its own shift.
+      expectCycle(container.read(patternPreviewProvider(args))!, ownShift);
+
+      await tap(tester, 'rotation-work-afternoon');
+      expectCycle(container.read(patternPreviewProvider(args))!, 'afternoon');
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  test('the work days of 6x6, 7x7 and 14x14 take the chosen shift', () {
+    final schedule = Schedule(
+      shiftTypes: [for (final t in shiftTemplates) t.toShiftType(t.key)],
+    );
+    // (preset, work days, days off)
+    for (final (id, work, rest) in [
+      ('6x6', 6, 6),
+      ('7x7', 7, 7),
+      ('14x14', 14, 14),
+    ]) {
+      final preset = patternPresetById(id);
+      final chosen = presetPattern(schedule, preset, workShiftId: 'night');
+      expect(chosen.id, '$id-night');
+      expect(chosen.steps, [
+        for (var i = 0; i < work; i++) ['night'],
+        for (var i = 0; i < rest; i++) ['rest'],
+      ], reason: id);
+      // Without a choice the preset keeps its own work shift.
+      final own = presetPattern(schedule, preset);
+      expect(own.id, id);
+      expect(own.steps, [
+        for (var i = 0; i < work; i++) [preset.workKey],
+        for (var i = 0; i < rest; i++) ['rest'],
+      ], reason: id);
+    }
+  });
+
+  test('without a choice, the work shift of a preset is its own', () {
+    expect(workShiftOf(patternPresetById('2x2'), null), 'morning');
+    expect(workShiftOf(patternPresetById('6x6'), null), 'morning');
+    expect(workShiftOf(patternPresetById('7x7'), null), 'day12');
+    expect(workShiftOf(patternPresetById('14x14'), null), 'day12');
+    expect(workShiftOf(patternPresetById('7x7'), 'night'), 'night');
+    // The shift the wizard opened with is the default of the presets that
+    // work mornings; the ones that name a shift of their own keep it.
+    expect(
+      workShiftOf(patternPresetById('2x2'), null, openedWith: 'afternoon'),
+      'afternoon',
+    );
+    expect(
+      workShiftOf(patternPresetById('7x7'), null, openedWith: 'afternoon'),
+      'day12',
+    );
+  });
 }

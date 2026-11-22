@@ -962,7 +962,7 @@
   "selectionRunsTitle": "As miñas rotacións",
   "selectionRunsSubtitle": "Remata ou quita un patrón dunha vez",
   "selectionRunsEmptyTitle": "Sen rotacións",
-  "selectionRunsEmptyMessage": "Cando apliques un patrón desde Pintar, aparecerá aquí.",
+  "selectionRunsEmptyMessage": "Aplica un patrón e a túa primeira rotación aparecerá aquí.",
   "selectionRunsRange": "Do {from} ao {to}",
   "@selectionRunsRange": {
     "placeholders": {
@@ -3419,7 +3419,7 @@
   "catalogPattern6x4Name": "6 x 4",
   "catalogPattern6x4Description": "6 mañás e 4 libres",
   "catalogPattern4x4Name": "4 x 4",
-  "catalogPattern4x4Description": "4 días de 12 h e 4 libres (4x4 ou catro e catro)",
+  "catalogPattern4x4Description": "4 días de 12 h e 4 libres, sen noites (4x4 ou catro e catro)",
   "catalogPattern5x2Name": "5 x 2",
   "catalogPattern5x2Description": "5 mañás e 2 libres (de luns a venres)",
   "catalogPattern223Name": "2-2-3",
@@ -3432,6 +3432,46 @@
   "catalogPatternPn2226Description": "2 mañás, 2 tardes, 2 noites, saínte e 5 libres (o 6x6 da Policía Nacional)",
   "catalogPatternGuard14Name": "Garda 1-4",
   "catalogPatternGuard14Description": "Garda de 24 h e 4 días libres (1 garda e 4 libres)",
+  "catalogPattern4x4NightsName": "4 x 4 con noites",
+  "@catalogPattern4x4NightsName": {
+    "description": "Catálogo de rotaciones: nombre y descripción de cada patrón (asistente de patrón y primer uso)."
+  },
+  "catalogPattern4x4NightsDescription": "4 días de 12 h, 4 libres, 4 noites de 12 h e 4 libres",
+  "@catalogPattern4x4NightsDescription": {
+    "description": "El 4x4 con noches: cuatro días de 12 h, cuatro libres, cuatro noches de 12 h y cuatro libres."
+  },
+  "catalogPatternGuard2448Name": "Garda 24/48",
+  "@catalogPatternGuard2448Name": {
+    "description": "Catálogo de rotaciones: nombre y descripción de cada patrón (asistente de patrón y primer uso)."
+  },
+  "catalogPatternGuard2448Description": "Garda de 24 h e 48 h libres (24/48)",
+  "@catalogPatternGuard2448Description": {
+    "description": "Una guardia de 24 h y dos días libres."
+  },
+  "catalogPattern6x6Name": "6 x 6",
+  "@catalogPattern6x6Name": {
+    "description": "Catálogo de rotaciones: nombre y descripción de cada patrón (asistente de patrón y primer uso)."
+  },
+  "catalogPattern6x6Description": "6 días de traballo e 6 libres (6x6). Escolle a túa quenda de traballo.",
+  "@catalogPattern6x6Description": {
+    "description": "Seis días de trabajo y seis libres, con el turno de trabajo a elegir."
+  },
+  "catalogPattern7x7Name": "7 x 7",
+  "@catalogPattern7x7Name": {
+    "description": "Catálogo de rotaciones: nombre y descripción de cada patrón (asistente de patrón y primer uso)."
+  },
+  "catalogPattern7x7Description": "7 días de traballo e 7 libres (7x7). Escolle a túa quenda de traballo.",
+  "@catalogPattern7x7Description": {
+    "description": "Siete días de trabajo y siete libres, con el turno de trabajo a elegir."
+  },
+  "catalogPattern14x14Name": "14 x 14",
+  "@catalogPattern14x14Name": {
+    "description": "Catálogo de rotaciones: nombre y descripción de cada patrón (asistente de patrón y primer uso)."
+  },
+  "catalogPattern14x14Description": "14 días de traballo e 14 libres (14x14). Escolle a túa quenda de traballo.",
+  "@catalogPattern14x14Description": {
+    "description": "Catorce días de trabajo y catorce libres, con el turno de trabajo a elegir."
+  },
   "holidayNameNewYear": "Aninovo",
   "holidayNameEpiphany": "Reis",
   "holidayNameMaundyThursday": "Xoves Santo",

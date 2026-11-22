@@ -295,7 +295,8 @@ Plantillas de tipo (`ShiftTemplate`, con clave estable) con la paleta de la espe
 | night12 | N12 | Noche 12 h | `#4B4FD1` | 20:00–08:00 | work |
 
 Presets de patrón (`PatternPreset`: `id`, `name`, `description`, `steps` en claves de plantilla, `suggestedStart`
-opcional como «empieza en lunes»), y `preset.materialize(Map<String clave, String shiftTypeId>) → Pattern`:
+opcional como «empieza en lunes», `chooseWorkShift` y `workKey`, la plantilla de los días de trabajo cuando el turno
+es elegible), y `preset.materialize(Map<String clave, String shiftTypeId>) → Pattern`:
 
 | id | ciclo | pasos |
 |---|---|---|
@@ -303,7 +304,7 @@ opcional como «empieza en lunes»), y `preset.materialize(Map<String clave, Str
 | 24x72 | 4 | G L L L |
 | 12h | 4 | D N12 S L |
 | 6x4 | 10 | M×6 L×4 |
-| 4x4 | 8 | D×4 L×4 |
+| 4x4 | 8 | D×4 L×4 (la mitad sin noches) |
 | 2x2 | 4 | M×2 L×2 (turno de trabajo elegible) |
 | 3x1 | 4 | M×3 L (turno de trabajo elegible) |
 | 5x2 | 7 | M×5 L×2 (empieza en lunes) |
@@ -312,6 +313,11 @@ opcional como «empieza en lunes»), y `preset.materialize(Map<String clave, Str
 | dupont | 28 | N12×4 L×3 D×3 L N12×3 L×3 D×4 L×7 |
 | pn-2-2-2-6 | 12 | M M T T N N S L×5 (Policía Nacional, el «6x6») |
 | guard-1-4 | 5 | G L×4 |
+| 4x4-nights | 16 | D×4 L×4 N12×4 L×4 (el 4x4 con noches) |
+| guard-24-48 | 3 | G L×2 |
+| 6x6 | 12 | M×6 L×6 (turno de trabajo elegible) |
+| 7x7 | 14 | D×7 L×7 (turno de trabajo elegible) |
+| 14x14 | 28 | D×14 L×14 (turno de trabajo elegible) |
 
 **2-2-3 y «2-2-3-2-2-3» son el mismo preset.** Los 14 días son las dos semanas del 2-2-3 escritas una tras otra
 (2 trabajo, 2 libres, 3 trabajo | 2 libres, 2 trabajo, 3 libres); también se conoce como Pitman o Panamá. No hay un
@@ -336,12 +342,24 @@ marzo de 2020, provisional y prorrogada). `guard-1-4`: guardia de 24 h y cuatro 
 trabajo de bomberos»: «habituales los turnos de 1-4 o 1-5»); el `24x72` es el 1-3 con otro nombre y su descripción lo
 nombra. Lo que se buscó y no se pudo comprobar está en `docs/competencia-2026-11.md`, §7.
 
+**Los cinco presets de noviembre de 2026** (`docs/turnos-catalogo-2026-11.md`, filas P05, P06, P12, P14 y P23, y §6):
+`4x4-nights` (16 días: 4 de 12 h, 4 libres, 4 noches de 12 h y 4 libres; el `4x4` es la mitad sin noches),
+`guard-24-48` (3 días: guardia de 24 h y 2 libres), `6x6` (12 días: 6 de trabajo y 6 libres), `7x7` (14 días: 7 de
+trabajo y 7 libres) y `14x14` (28 días: 14 de trabajo y 14 libres). Fuentes: RosterElf («Shift patterns») y Totalmobile
+(«Police shift patterns») para el 4x4 con noches; soon.works/kelly («Shift patterns») y Firefighter Now («Firefighter
+shift schedules and working hours explained») para el 24/48; BOCM de 3-5-2016 (San Lorenzo de El Escorial) y Granada
+para el 6x6 de Policía Local; Redimin («Turno 7x7») y Sonami para el 7x7 de minería; Orion («What offshore rotations
+are really like») y Worldwide RS para el 14x14 de offshore y minería.
+
 Los turnos Libre de los presets son el tipo L explícito (así se pinta el gris), no un paso vacío.
 
-**2 y 2 (2x2) y 3 y 1 (3x1):** el catálogo muestra Mañana como ejemplo. En el paso de inicio se elige el turno de
-trabajo; la vista previa y la aplicación usan esa misma elección. Se materializa con un id propio para conservar
-las rotaciones ya aplicadas. El catálogo no tiene buscador: los nombres Pitman/Panamá y cuatro y cuatro se incluyen
-en sus descripciones. «Continental» solo nombra aquí el ciclo de 28 días, nunca es un alias del 4x4.
+**2 y 2 (2x2), 3 y 1 (3x1), 6 x 6, 7 x 7 y 14 x 14:** el catálogo muestra el turno del propio preset como ejemplo
+(Mañana en el 2x2, el 3x1 y el 6x6; el día de 12 h en el 7x7 y el 14x14). En el paso de inicio se elige el turno de
+trabajo; la vista previa y la aplicación usan esa misma elección. Sin elección, manda el turno del preset, salvo en el
+asistente, donde el turno con el que se abrió (la brocha del pincel) es el de los presets que trabajan mañanas. Se
+materializa con un id propio para conservar las rotaciones ya aplicadas. El catálogo no tiene buscador: los nombres
+Pitman/Panamá y cuatro y cuatro se incluyen en sus descripciones. «Continental» solo nombra aquí el ciclo de 28 días,
+nunca es un alias del 4x4.
 
 ## Asistente de patrón y saliente automático
 

@@ -684,6 +684,7 @@ app/test/features/calendar/day_edit_controller_test.dart
 app/test/features/calendar/day_extras_controller_test.dart
 app/test/features/calendar/day_extras_ui_test.dart
 app/test/features/calendar/day_sheet_layout_test.dart
+app/test/features/calendar/destination_bar_test.dart
 app/test/features/calendar/grid_geometry_test.dart
 app/test/features/calendar/harness.dart
 app/test/features/calendar/history_feedback_test.dart
@@ -806,6 +807,7 @@ app/test/features/schedule/domain/editing_test.dart
 app/test/features/schedule/domain/fixtures.dart
 app/test/features/schedule/domain/hours_test.dart
 app/test/features/schedule/domain/presets_test.dart
+app/test/features/schedule/domain/real_patterns_test.dart
 app/test/features/schedule/domain/schedule_test.dart
 app/test/features/schedule/domain/shift_type_rate_test.dart
 app/test/features/schedule/domain/shift_type_v3_test.dart

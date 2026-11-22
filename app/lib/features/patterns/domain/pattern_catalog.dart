@@ -10,9 +10,9 @@ const weeksPerShiftTemplateId = 'weeks-per-shift';
 /// order. (A preset not listed here still shows, under "Otros".)
 const Map<PatternGroup, List<String>> patternGroupPresets = {
   PatternGroup.health: ['12h'],
-  PatternGroup.police: ['pn-2-2-2-6', '6x4', '4x4'],
-  PatternGroup.firefighters: ['24x72', 'guard-1-4'],
-  PatternGroup.industry: ['correturnos', 'continental', 'dupont', '5x2'],
+  PatternGroup.police: ['pn-2-2-2-6', '6x6', '6x4', '4x4', '4x4-nights'],
+  PatternGroup.firefighters: ['24x72', 'guard-1-4', 'guard-24-48'],
+  PatternGroup.industry: ['correturnos', 'continental', 'dupont', '5x2', '7x7', '14x14'],
   PatternGroup.security: ['2-2-3', '2x2', '3x1'],
 };
 
@@ -73,6 +73,23 @@ bool startsWithShift(List<List<String>> steps, String shiftTypeId) =>
 bool containsShift(List<List<String>> steps, String shiftTypeId) =>
     steps.any((step) => step.contains(shiftTypeId));
 
+/// The work shift a preset is built with: the one the person chose, or the
+/// default one — the shift the wizard opened with (the brush) for the
+/// presets whose work days are the mornings, or the shift the preset names
+/// (the 12-hour days of the 7 x 7 and the 14 x 14). Paint mode always opens
+/// with a brush, mornings by default, so the brush is not taken as a choice
+/// for the presets that name a shift of their own; the start step still
+/// lets the person pick another one.
+String workShiftOf(
+  PatternPreset preset,
+  String? chosenId, {
+  String? openedWith,
+}) =>
+    chosenId ??
+    (preset.workKey == 'morning' && openedWith != null
+        ? openedWith
+        : preset.workKey);
+
 /// Pattern of the catalogue [preset], as stored when it already exists in
 /// [schedule] (the same id) and built from its template keys otherwise. A
 /// preset with a chosen work shift gets one deterministic id per shift
@@ -90,7 +107,7 @@ Pattern presetPattern(
     return preset.materialize(
       {
         for (final k in preset.templateKeys)
-          k: k == 'morning' ? workShiftId : k,
+          k: k == preset.workKey ? workShiftId : k,
       },
       id: id,
       name: '${preset.name} · ${shift ?? workShiftId}',

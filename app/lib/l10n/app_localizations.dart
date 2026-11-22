@@ -2301,7 +2301,7 @@ abstract class AppLocalizations {
   /// No description provided for @selectionRunsEmptyMessage.
   ///
   /// In es, this message translates to:
-  /// **'Cuando apliques un patrón desde Pintar, aparecerá aquí.'**
+  /// **'Aplica un patrón y tu primera rotación aparecerá aquí.'**
   String get selectionRunsEmptyMessage;
 
   /// No description provided for @selectionRunsRange.
@@ -9030,7 +9030,7 @@ abstract class AppLocalizations {
   /// No description provided for @catalogPattern4x4Description.
   ///
   /// In es, this message translates to:
-  /// **'4 días de 12 h y 4 libres (4x4 o cuatro y cuatro)'**
+  /// **'4 días de 12 h y 4 libres, sin noches (4x4 o cuatro y cuatro)'**
   String get catalogPattern4x4Description;
 
   /// No description provided for @catalogPattern5x2Name.
@@ -9104,6 +9104,66 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Guardia de 24 h y 4 días libres (1 guardia y 4 libres)'**
   String get catalogPatternGuard14Description;
+
+  /// Catálogo de rotaciones: nombre y descripción de cada patrón (asistente de patrón y primer uso).
+  ///
+  /// In es, this message translates to:
+  /// **'4 x 4 con noches'**
+  String get catalogPattern4x4NightsName;
+
+  /// El 4x4 con noches: cuatro días de 12 h, cuatro libres, cuatro noches de 12 h y cuatro libres.
+  ///
+  /// In es, this message translates to:
+  /// **'4 días de 12 h, 4 libres, 4 noches de 12 h y 4 libres'**
+  String get catalogPattern4x4NightsDescription;
+
+  /// Catálogo de rotaciones: nombre y descripción de cada patrón (asistente de patrón y primer uso).
+  ///
+  /// In es, this message translates to:
+  /// **'Guardia 24/48'**
+  String get catalogPatternGuard2448Name;
+
+  /// Una guardia de 24 h y dos días libres.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardia de 24 h y 48 h libres (24/48)'**
+  String get catalogPatternGuard2448Description;
+
+  /// Catálogo de rotaciones: nombre y descripción de cada patrón (asistente de patrón y primer uso).
+  ///
+  /// In es, this message translates to:
+  /// **'6 x 6'**
+  String get catalogPattern6x6Name;
+
+  /// Seis días de trabajo y seis libres, con el turno de trabajo a elegir.
+  ///
+  /// In es, this message translates to:
+  /// **'6 días de trabajo y 6 libres (6x6). Elige tu turno de trabajo.'**
+  String get catalogPattern6x6Description;
+
+  /// Catálogo de rotaciones: nombre y descripción de cada patrón (asistente de patrón y primer uso).
+  ///
+  /// In es, this message translates to:
+  /// **'7 x 7'**
+  String get catalogPattern7x7Name;
+
+  /// Siete días de trabajo y siete libres, con el turno de trabajo a elegir.
+  ///
+  /// In es, this message translates to:
+  /// **'7 días de trabajo y 7 libres (7x7). Elige tu turno de trabajo.'**
+  String get catalogPattern7x7Description;
+
+  /// Catálogo de rotaciones: nombre y descripción de cada patrón (asistente de patrón y primer uso).
+  ///
+  /// In es, this message translates to:
+  /// **'14 x 14'**
+  String get catalogPattern14x14Name;
+
+  /// Catorce días de trabajo y catorce libres, con el turno de trabajo a elegir.
+  ///
+  /// In es, this message translates to:
+  /// **'14 días de trabajo y 14 libres (14x14). Elige tu turno de trabajo.'**
+  String get catalogPattern14x14Description;
 
   /// No description provided for @holidayNameNewYear.
   ///
@@ -9489,7 +9549,7 @@ abstract class AppLocalizations {
   /// **'Mes'**
   String get monthNavMonth;
 
-  /// Barra inferior: Mis rotaciones, o el asistente de patrón si aún no hay ninguna.
+  /// Destino de la barra inferior: Mis rotaciones (con el botón de aplicar un patrón si aún no hay ninguna).
   ///
   /// In es, this message translates to:
   /// **'Rotación'**

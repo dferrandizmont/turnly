@@ -27,7 +27,7 @@ class PatternWizardState {
     required this.start,
     this.step = WizardStep.choose,
     this.presetId,
-    this.workShiftId = 'morning',
+    this.workShiftId,
     this.customId,
     this.building = false,
     this.weeksTemplate = false,
@@ -53,7 +53,11 @@ class PatternWizardState {
 
   /// Catalogue preset chosen.
   final String? presetId;
-  final String workShiftId;
+
+  /// The work shift the person chose for the work days; `null` = they have
+  /// not chosen one and the preset's own work shift applies (see
+  /// [workShiftOf]).
+  final String? workShiftId;
 
   /// Pattern saved earlier chosen.
   final String? customId;
@@ -191,18 +195,21 @@ class PatternWizardController extends Notifier<PatternWizardState> {
   @override
   PatternWizardState build() {
     final today = CivilDate.fromDateTime(ref.read(clockProvider)());
-    final shift = args.shiftId == null
-        ? null
-        : ref
-              .read(scheduleControllerProvider)
-              .schedule
-              .shiftTypeById(args.shiftId!);
-    return PatternWizardState(
-      start: args.start ?? today,
-      workShiftId: shift != null && shift.category == ShiftCategory.work
-          ? shift.id
-          : 'morning',
-    );
+    return PatternWizardState(start: args.start ?? today);
+  }
+
+  /// The shift the wizard was opened with (the brush), when it is a work
+  /// shift: the default work shift of the presets that work mornings.
+  String? get openedWorkShift {
+    final id = args.shiftId;
+    if (id == null) return null;
+    final shift = ref
+        .read(scheduleControllerProvider)
+        .schedule
+        .shiftTypeById(id);
+    return shift != null && shift.category == ShiftCategory.work
+        ? shift.id
+        : null;
   }
 
   // ---- step 1: the pattern ------------------------------------------------
@@ -562,10 +569,15 @@ class PatternWizardController extends Notifier<PatternWizardState> {
       );
     }
     if (s.presetId != null) {
+      final preset = patternPresetById(s.presetId!);
       return presetPattern(
         schedule,
-        patternPresetById(s.presetId!),
-        workShiftId: s.workShiftId,
+        preset,
+        workShiftId: workShiftOf(
+          preset,
+          s.workShiftId,
+          openedWith: openedWorkShift,
+        ),
       );
     }
     if (s.customId != null) return schedule.patternById(s.customId!);

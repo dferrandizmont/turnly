@@ -108,9 +108,13 @@ which are not part of the system backup. Only this app's widgets read it.
 The address is **turnly@mainshai.com**, defined in `kSupportEmail`
 (`app/lib/core/config.dart`); the build can override it with `--dart-define=SUPPORT_EMAIL=...`.
 Mail circuit (outside the app, since 16 Nov 2026): Cloudflare Email Routing receives and forwards to a Gmail mailbox,
-where mail is read and answered; a Gmail filter keeps a copy in Proton; replies go out through Brevo's SMTP, which
-adds an open pixel and rewrites links (anonymous tracking on; it cannot be removed on the free plan). The policy
-covers it under “If you write to us”, “Who receives the data” and “International transfers”.
+where mail is read and answered; a Gmail filter keeps a copy in Proton. Since 20 Nov 2026 replies go out through
+Resend's SMTP (`smtp.resend.com`, domain `mainshai.com` in the Ireland region), with open and click tracking turned
+off: no pixel, no rewritten links and no unsubscribe footer. Resend keeps a copy of each reply and its sending log in
+the United States for 30 days after sending (it keeps backups for seven days). Until 20 Nov 2026 the intended service
+was Brevo's SMTP, with an open pixel and rewritten links (anonymous tracking), but only the owner's test emails were
+sent from turnly@mainshai.com; Brevo keeps the log of those tests under its retention rule (12 months). The policy covers it under “If you write to us”, “Who receives the data”, “International
+transfers” and “Retention”.
 "Open-source licences" opens Flutter's licence page, offline.
 "Privacy policy" (Settings › Help) opens the website in the **external browser**, only when tapped, through the
 official `url_launcher` plugin. It sends no roster data and adds no `INTERNET` permission to the app: the browser

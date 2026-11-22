@@ -193,6 +193,7 @@ class PatternPreset {
     required this.steps,
     this.suggestedStart,
     this.chooseWorkShift = false,
+    this.workKey = 'morning',
   }) : spanishName = name,
        spanishDescription = description;
 
@@ -214,8 +215,15 @@ class PatternPreset {
   /// Weekday the cycle should start on (1 = Monday ... 7 = Sunday), if any.
   final int? suggestedStart;
 
-  /// The person can replace the morning template with their work shift.
+  /// The person can replace the work days' template ([workKey]) with their
+  /// work shift.
   final bool chooseWorkShift;
+
+  /// The template key of the work days, the one the person's work shift
+  /// replaces (see [chooseWorkShift]). It is the shift the preset itself
+  /// names: the 7 x 7 of 12-hour days works with `day12`, the 6 x 6 of
+  /// mornings with `morning`.
+  final String workKey;
 
   int get lengthDays => steps.length;
 
@@ -289,7 +297,7 @@ final patternPresets = <PatternPreset>[
   PatternPreset(
     id: '4x4',
     name: '4 x 4',
-    description: '4 días de 12 h y 4 libres (4x4 o cuatro y cuatro)',
+    description: '4 días de 12 h y 4 libres, sin noches (4x4 o cuatro y cuatro)',
     steps: _seq('D4 L4'),
   ),
   PatternPreset(
@@ -370,6 +378,58 @@ final patternPresets = <PatternPreset>[
     name: 'Guardia 1-4',
     description: 'Guardia de 24 h y 4 días libres (1 guardia y 4 libres)',
     steps: _seq('G L4'),
+  ),
+  // "4 on 4 off with nights": four 12-hour days, four off, four 12-hour
+  // nights and four off (16 days). The 4x4 above is the half without
+  // nights. Sources: RosterElf, "Shift patterns"; Totalmobile, "Police
+  // shift patterns".
+  PatternPreset(
+    id: '4x4-nights',
+    name: '4 x 4 con noches',
+    description: '4 días de 12 h, 4 libres, 4 noches de 12 h y 4 libres',
+    steps: _seq('D4 L4 E4 L4'),
+  ),
+  // Firefighters' guard "24/48": one 24 h guard and two days off (48 h).
+  // Sources: soon.works/kelly, "Shift patterns"; Firefighter Now,
+  // "Firefighter shift schedules and working hours explained".
+  PatternPreset(
+    id: 'guard-24-48',
+    name: 'Guardia 24/48',
+    description: 'Guardia de 24 h y 48 h libres (24/48)',
+    steps: _seq('G L2'),
+  ),
+  // Local police "6x6": six days of work and six off (12-day cycle).
+  // Source: BOCM of 3-5-2016 (San Lorenzo de El Escorial); Granada.
+  PatternPreset(
+    id: '6x6',
+    name: '6 x 6',
+    description:
+        '6 días de trabajo y 6 libres (6x6). Elige tu turno de trabajo.',
+    steps: _seq('M6 L6'),
+    chooseWorkShift: true,
+  ),
+  // Mining and platforms "7x7": seven days of work (12 h) and seven off
+  // (14-day cycle). Sources: Redimin, "Turno 7x7"; Sonami.
+  PatternPreset(
+    id: '7x7',
+    name: '7 x 7',
+    description:
+        '7 días de trabajo y 7 libres (7x7). Elige tu turno de trabajo.',
+    steps: _seq('D7 L7'),
+    chooseWorkShift: true,
+    workKey: 'day12',
+  ),
+  // Offshore and mining "hitch" "14x14": fourteen days of work (12 h) and
+  // fourteen off (28-day cycle). Sources: Orion, "What offshore rotations
+  // are really like"; Worldwide RS.
+  PatternPreset(
+    id: '14x14',
+    name: '14 x 14',
+    description:
+        '14 días de trabajo y 14 libres (14x14). Elige tu turno de trabajo.',
+    steps: _seq('D14 L14'),
+    chooseWorkShift: true,
+    workKey: 'day12',
   ),
 ];
 

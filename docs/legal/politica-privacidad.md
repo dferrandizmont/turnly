@@ -1,6 +1,6 @@
 # Política de privacidad de Turnly
 
-Última actualización: 19 de noviembre de 2026 · versión 2026-11-19
+Última actualización: 20 de noviembre de 2026 · versión 2026-11-20
 
 Turnly es una app de calendario de turnos para quien trabaja a turnos en España. Es una app independiente: no
 está creada, revisada ni respaldada por ninguna empresa, administración ni sindicato.
@@ -8,8 +8,9 @@ está creada, revisada ni respaldada por ninguna empresa, administración ni sin
 Resumen: **no tienes cuenta, no hay servidor propio y tus turnos se quedan en tu móvil.** La app es totalmente
 gratuita y de código abierto, y no envía datos ni informes de errores a nadie. Lo único que puede sacar tus datos del
 móvil son las copias de seguridad de tu cuenta de Google o de Apple, la copia diaria en la carpeta que elijas (en
-Android, si la activas) y los archivos o calendarios que tú decidas exportar, y eso lo controlas tú. Si nos escribes por correo, en ese correo intervienen los proveedores que se
-explican en «Si nos escribes».
+Android, si la activas) y los archivos o calendarios que tú decidas exportar, y eso lo controlas tú. Si nos escribes, Cloudflare reenvía tu mensaje a Gmail y se
+guarda una copia en Proton. Enviamos las respuestas a través de Resend, sin seguimiento de aperturas ni de clics
+(detalle en «Si nos escribes»).
 
 ## 1. Responsable del tratamiento
 
@@ -117,8 +118,11 @@ nos mandes copias `.turnly` o `.cuadrante` ni capturas con turnos, notas o ausen
 con datos inventados.
 
 Si escribes a turnly@mainshai.com (o a dev@mainshai.com, la dirección de las primeras versiones), usamos tu dirección
-de correo, tu nombre si lo pones y lo que nos cuentes, solo para contestarte y resolver lo que nos preguntas. Por el
-camino intervienen estos proveedores:
+de correo, tu nombre si lo pones y lo que nos cuentes para contestarte y resolver lo que nos preguntas. Si ejerces un
+derecho de protección de datos, tratamos tu solicitud para cumplir las obligaciones que nos impone el RGPD (art.
+6.1.c). Si necesitamos conservar una conversación por una reclamación, lo hacemos por nuestro interés legítimo en
+formularla, ejercerla o defendernos frente a ella (art. 6.1.f), durante el tiempo necesario para ello. Por el camino
+intervienen estos proveedores:
 
 - **Cloudflare** (Cloudflare, Inc., Estados Unidos) recibe el mensaje en nuestro dominio y lo reenvía al momento. No
   guarda el mensaje, pero sí un registro técnico del reenvío (remitente, destinatario, asunto, fecha y resultado). Lo
@@ -129,21 +133,29 @@ camino intervienen estos proveedores:
   conversación. Google puede tratar estos datos también en Estados Unidos.
 - **Proton** (Proton AG, Suiza) guarda una copia de los mensajes que recibimos, como respaldo. Desde ahí no
   respondemos.
-- **Brevo** (Sendinblue SAS, que opera como Brevo, Francia) envía nuestras respuestas, por lo que trata su contenido,
-  y guarda un registro de cada envío (destinatario, asunto, fecha y si se entregó) y una copia de la respuesta (que
-  puede incluir tu mensaje, si va citado debajo). Además, Brevo añade a cada respuesta una imagen invisible (un píxel)
-  que registra si la abres, y cambia los enlaces por otros suyos que registran si los pulsas. No podemos quitarlo en el
-  plan que usamos, así que tenemos activado el seguimiento anónimo de Brevo: según Brevo, cuenta las aperturas y los
-  clics sin asociarlos a tu dirección de correo. Aun así, al cargar la imagen o pulsar un enlace, tu programa de correo
-  se conecta a los servidores de Brevo, que reciben datos técnicos como tu dirección IP. Nosotros no consultamos ni
-  usamos esa información. Si prefieres evitarlo, bloquea las imágenes externas en tu programa de correo y no abras los
-  enlaces de la respuesta. Tampoco sirve copiarlos y pegarlos en el navegador, porque siguen pasando por Brevo: para ir
-  a una página, escribe tú su dirección. La respuesta se lee igual.
+- **Resend** (Plus Five Five, Inc., Estados Unidos) envía nuestras respuestas, que salen desde turnly@mainshai.com, por
+  lo que trata su contenido. Las envía desde sus servidores de Irlanda, pero guarda los datos en Estados Unidos: una copia de cada respuesta (que
+  puede incluir tu mensaje, si va citado debajo) y su registro de envío (destinatario, asunto, fecha y si se entregó).
+  Según Resend, conserva cada respuesta y su registro de envío durante 30 días desde el envío, y sus copias de
+  seguridad se conservan durante siete días. Tenemos desactivado el seguimiento de aperturas y de clics: nuestras
+  respuestas no llevan ninguna imagen de seguimiento y sus enlaces no se cambian. Resend usa sus propios subencargados
+  (por ejemplo, Amazon Web Services para el envío), en Estados Unidos; la lista está en
+  https://resend.com/legal/subprocessors.
 
-Guardamos la conversación en Gmail, la copia en Proton y la copia y el registro de envío en Brevo como máximo un año
-desde el último mensaje de la conversación, salvo que necesitemos conservarlos más tiempo para atender una
-reclamación. Hacemos una limpieza cada tres meses y en cada una borramos lo que cumpliría el año antes de la siguiente. Si dejamos de usar alguno de esos servicios, borramos lo que haya en él. Si nos pides que borremos
-tus mensajes antes, los borramos de los tres sitios.
+**Brevo, hasta el 20 de noviembre de 2026.** Hasta esa fecha, esta política decía que las respuestas salían por Brevo
+(Sendinblue SAS, que opera como Brevo, Francia), que añade a los correos una imagen invisible (un píxel) que registra si
+se abren y cambia los enlaces por otros suyos que registran si se pulsan. Antes del cambio a Resend, desde
+turnly@mainshai.com solo se enviaron por Brevo pruebas del titular, ninguna respuesta a quien nos escribiera. Brevo
+conserva el registro de esas pruebas y lo borra automáticamente doce meses después de cada envío (el borrado puede
+tardar hasta un día más). Vamos a pedir a Brevo que borre antes ese historial y a cerrar la cuenta.
+
+Guardamos la conversación en Gmail y la copia en Proton como máximo un año desde el último mensaje de la
+conversación, salvo que necesitemos conservarlas más tiempo para atender una reclamación. Hacemos una limpieza cada
+tres meses y en cada una borramos lo que cumpliría el año antes de la siguiente. Según Resend, conserva cada respuesta
+y su registro de envío durante 30 días desde el envío, y sus copias de seguridad se conservan durante siete días. Si
+nos pides que borremos tus mensajes antes y procede la supresión, borramos los mensajes de Gmail y Proton y pedimos a
+Resend que elimine las respuestas y los registros de envío que aún conserve (solo se puede pidiéndoselo a su servicio
+de ayuda). Si debemos conservar algún dato, te explicaremos cuál y por qué.
 
 ## 3. Para qué y con qué base jurídica
 
@@ -152,6 +164,8 @@ tus mensajes antes, los borramos de los tres sitios.
 | Turnos, notas, ausencias y ajustes en tu móvil | Que lleves tu cuadrante, tus horas y tus alarmas | No los recibimos: se quedan en tu dispositivo, bajo tu control |
 | Copias de seguridad y exportaciones | Que no pierdas tus datos y puedas cambiar de móvil | Las haces tú; los servicios que uses (Google, Apple, tu nube) tienen sus propias condiciones |
 | Correos de soporte | Responder a tu consulta y guardar la conversación durante el plazo de «Cuánto tiempo se conservan» | Tu solicitud y nuestro interés legítimo en atenderla (art. 6.1.f) |
+| Solicitudes de derechos de protección de datos | Atender y documentar tu solicitud | Cumplir las obligaciones que nos impone el RGPD (art. 6.1.c) |
+| Conservación de una conversación por una reclamación | Formular, ejercer o defendernos frente a una reclamación | Nuestro interés legítimo (art. 6.1.f), durante el tiempo necesario |
 
 No tomamos decisiones automatizadas ni elaboramos perfiles sobre ti.
 
@@ -161,17 +175,20 @@ directamente, no nosotros. Si exportas a un calendario sincronizado, eliges para
 nube o tienes activada la copia del sistema, quien recibe esos datos es el proveedor de tu cuenta (Google, Apple u
 otro), en tu nombre y según sus condiciones.
 
-Si nos escribes, el correo de soporte pasa por estos proveedores (detalle en «Si nos escribes»):
+Si nos escribes, el correo de soporte pasa por estos proveedores, cada uno en el paso que indica la tabla (detalle en
+«Si nos escribes»):
 
 | Proveedor | Para qué | Dónde |
 |---|---|---|
 | Cloudflare, Inc. | Recibir y reenviar el correo de soporte; registro técnico del reenvío | EE. UU. |
 | Google Ireland Limited (Gmail) | Buzón del correo de soporte | Irlanda; Google LLC puede tratar datos en EE. UU. |
 | Proton AG | Copia de respaldo del correo recibido | Suiza |
-| Sendinblue SAS (Brevo), RCS París 498 019 298 | Enviar las respuestas; registro de envío y copia de la respuesta (como máximo un año desde el último mensaje, con limpieza trimestral); píxel de apertura y enlaces de clic, con el seguimiento anónimo de Brevo activado | UE (Francia) |
+| Plus Five Five, Inc. (Resend) | Enviar las respuestas; copia de cada respuesta y su registro de envío durante 30 días desde el envío (sus copias de seguridad se conservan siete días); sin seguimiento de aperturas ni de clics | EE. UU. (el envío sale de Irlanda) |
+| Sendinblue SAS (Brevo), RCS París 498 019 298 | Hasta el 20 de noviembre de 2026, servicio de envío previsto; solo envió pruebas del titular, cuyo registro borra automáticamente doce meses después de cada envío, aunque el borrado puede tardar hasta un día más | UE (Francia) |
 
 Usamos una cuenta de Gmail normal, sin contrato de encargo con Google: Google trata esos correos según sus propias
-condiciones.
+condiciones. Resend trata las respuestas como encargado del tratamiento, con el acuerdo de tratamiento de datos (art.
+28 del RGPD) que se aplica a todas sus cuentas (https://resend.com/legal/dpa).
 
 ## 5. Transferencias internacionales
 La app no realiza transferencias de datos. Los servicios externos que decidas utilizar (tu correo, nube, calendario
@@ -180,19 +197,27 @@ sincronizado, destino de una exportación o la tienda en la que valores la app) 
 En el correo de soporte, Cloudflare y Google pueden tratar datos en Estados Unidos. Cloudflare, Inc. y Google LLC
 están adheridas al Marco de Privacidad de Datos UE-EE. UU. (decisión de adecuación de la Comisión Europea de 10 de
 julio de 2023); el acuerdo de tratamiento de datos de Cloudflare incluye además cláusulas contractuales tipo. Proton
-está en Suiza, país con decisión de adecuación de la Comisión Europea. Brevo es una empresa francesa y, según su
-documentación, aloja los datos en la Unión Europea.
+está en Suiza, país con decisión de adecuación de la Comisión Europea. Resend (Plus Five Five, Inc.) guarda en Estados
+Unidos las respuestas y su registro, aunque el envío salga de Irlanda; esa transferencia se ampara en la adhesión de
+Resend al Marco de Privacidad de Datos UE-EE. UU. y en las cláusulas contractuales tipo de la Comisión Europea (módulo
+2) que incorpora su acuerdo de tratamiento de datos (https://resend.com/legal/dpa); también puedes pedirnos
+información en el correo de contacto. Brevo, el servicio previsto hasta el 20 de noviembre de 2026, es una empresa
+francesa y, según su documentación, aloja los datos en la Unión Europea.
 
 ## 6. Cuánto tiempo se conservan
 
 - **Datos en tu móvil:** hasta que desinstales la app o borres sus datos desde los ajustes del sistema (y, en su
   caso, de las copias de seguridad de tu cuenta, de los archivos que hayas exportado y de las copias diarias de la
   carpeta que elegiste, que siguen en ella hasta que las borres tú).
-- **Correos de soporte:** como máximo un año desde el último mensaje de la conversación, en Gmail, en Proton y en
-  Brevo, con una limpieza cada tres meses, salvo que necesitemos conservarlos más tiempo para atender una reclamación.
-  Antes, si nos lo pides (detalle en «Si nos escribes»). Cloudflare conserva su registro técnico del reenvío durante el
-  plazo que fija su servicio, que no hemos podido confirmar; si nos pides la supresión, le trasladaremos también la
-  solicitud y te informaremos del resultado.
+- **Correos de soporte:** la conversación en Gmail y la copia en Proton, como máximo un año desde el último mensaje de
+  la conversación, con una limpieza cada tres meses, salvo que necesitemos conservarlas más tiempo para atender una
+  reclamación. Según Resend, conserva cada respuesta y su registro de envío durante 30 días desde el envío, y sus
+  copias de seguridad se conservan durante siete días. Puedes pedir la supresión antes. Si procede, borramos los
+  mensajes de Gmail y Proton y pedimos a Resend que elimine las respuestas y los registros de envío que aún conserve.
+  Si debemos conservar algún dato, te explicaremos cuál y por qué (detalle en «Si nos escribes»).
+  Cloudflare conserva su registro técnico del reenvío durante el plazo que fija su servicio, que no hemos podido
+  confirmar; si nos pides la supresión, le trasladaremos también la solicitud y te informaremos del resultado. Sobre lo
+  que queda en Brevo, ver «Si nos escribes».
 
 ## 7. Tus derechos
 

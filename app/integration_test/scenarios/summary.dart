@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:cuadrante/features/calendar/application/visible_month.dart';
+import 'package:cuadrante/features/calendar/presentation/month_screen.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
 import 'package:cuadrante/features/settings/application/preferences_controller.dart';
 import 'package:cuadrante/features/summary/domain/month_summary.dart';
@@ -60,6 +61,20 @@ Future<void> _openSummary(WidgetTester t) async {
 
 Future<void> _back(WidgetTester t) =>
     t.tapAndSettle(find.byType(BackButton).last, reason: 'flecha atrás');
+
+/// Resumen opened from the month has the bar of destinations and no back
+/// arrow: the system back returns to the month, with «Mes» selected.
+Future<void> _backToMonth(WidgetTester t) async {
+  await t.binding.handlePopRoute();
+  await t.settle();
+  expect(find.byType(MonthScreen), findsOneWidget, reason: 'de vuelta en el mes');
+  expect(find.byType(SummaryScreen), findsNothing);
+  expect(
+    t.widget<NavigationBar>(_k('month-nav-bar')).selectedIndex,
+    0,
+    reason: '«Mes» marcado',
+  );
+}
 
 /// PNG size from its IHDR chunk.
 ({int width, int height}) _pngSize(Uint8List png) {
@@ -164,7 +179,7 @@ Future<void> _monthsAndYear(QaContext qa) async {
   expect(_text(t, 'summary-hours'), '168 h');
 
   // Looking at other months does not move the calendar.
-  await _back(t);
+  await _backToMonth(t);
   expect(app.container.read(visibleMonthProvider), _oct);
 }
 
@@ -192,7 +207,7 @@ Future<void> _holidaysAndAbsences(QaContext qa) async {
     ),
     findsOneWidget,
   );
-  await _back(t);
+  await _backToMonth(t);
 
   // 24 October (a Libre) becomes a holiday of the user: the Noche of the 23rd
   // runs 6 h into it.

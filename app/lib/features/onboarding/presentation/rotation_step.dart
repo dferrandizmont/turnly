@@ -185,7 +185,7 @@ class StartStep extends ConsumerWidget {
                 if (t.category == ShiftCategory.work)
                   shiftTypeForFirstUse(schedule, t.key)!,
             ],
-            selectedId: state.workShiftId,
+            selectedId: workShiftOf(preset, state.workShiftId),
             onChanged: controller.setWorkShift,
           ),
         // The same picker and live preview as the pattern wizard: the factory

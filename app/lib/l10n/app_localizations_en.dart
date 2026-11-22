@@ -1384,7 +1384,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectionRunsEmptyMessage =>
-      'When you apply a pattern from Paint, it will show up here.';
+      'Apply a pattern and your first rotation will show up here.';
 
   @override
   String selectionRunsRange(String from, String to) {
@@ -5712,7 +5712,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get catalogPattern4x4Description =>
-      '4 12-hour days and 4 off (4x4 or four on, four off)';
+      '4 12-hour days and 4 off, no nights (4x4 or four on, four off)';
 
   @override
   String get catalogPattern5x2Name => '5 x 2';
@@ -5755,6 +5755,41 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get catalogPatternGuard14Description =>
       '24-hour shift and 4 days off (1 shift, 4 off)';
+
+  @override
+  String get catalogPattern4x4NightsName => '4 on, 4 off with nights';
+
+  @override
+  String get catalogPattern4x4NightsDescription =>
+      '4 12-hour days, 4 off, 4 12-hour nights and 4 off';
+
+  @override
+  String get catalogPatternGuard2448Name => '24/48 guard';
+
+  @override
+  String get catalogPatternGuard2448Description =>
+      '24-hour shift and 48 hours off (24/48)';
+
+  @override
+  String get catalogPattern6x6Name => '6 on, 6 off';
+
+  @override
+  String get catalogPattern6x6Description =>
+      '6 work days and 6 off (6x6). Choose your work shift.';
+
+  @override
+  String get catalogPattern7x7Name => '7 on, 7 off';
+
+  @override
+  String get catalogPattern7x7Description =>
+      '7 work days and 7 off (7x7). Choose your work shift.';
+
+  @override
+  String get catalogPattern14x14Name => '14 on, 14 off';
+
+  @override
+  String get catalogPattern14x14Description =>
+      '14 work days and 14 off (14x14). Choose your work shift.';
 
   @override
   String get holidayNameNewYear => 'New Year’s Day';

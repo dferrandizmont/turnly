@@ -1387,7 +1387,7 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get selectionRunsEmptyMessage =>
-      'Cando apliques un patrón desde Pintar, aparecerá aquí.';
+      'Aplica un patrón e a túa primeira rotación aparecerá aquí.';
 
   @override
   String selectionRunsRange(String from, String to) {
@@ -5726,7 +5726,7 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get catalogPattern4x4Description =>
-      '4 días de 12 h e 4 libres (4x4 ou catro e catro)';
+      '4 días de 12 h e 4 libres, sen noites (4x4 ou catro e catro)';
 
   @override
   String get catalogPattern5x2Name => '5 x 2';
@@ -5769,6 +5769,41 @@ class AppLocalizationsGl extends AppLocalizations {
   @override
   String get catalogPatternGuard14Description =>
       'Garda de 24 h e 4 días libres (1 garda e 4 libres)';
+
+  @override
+  String get catalogPattern4x4NightsName => '4 x 4 con noites';
+
+  @override
+  String get catalogPattern4x4NightsDescription =>
+      '4 días de 12 h, 4 libres, 4 noites de 12 h e 4 libres';
+
+  @override
+  String get catalogPatternGuard2448Name => 'Garda 24/48';
+
+  @override
+  String get catalogPatternGuard2448Description =>
+      'Garda de 24 h e 48 h libres (24/48)';
+
+  @override
+  String get catalogPattern6x6Name => '6 x 6';
+
+  @override
+  String get catalogPattern6x6Description =>
+      '6 días de traballo e 6 libres (6x6). Escolle a túa quenda de traballo.';
+
+  @override
+  String get catalogPattern7x7Name => '7 x 7';
+
+  @override
+  String get catalogPattern7x7Description =>
+      '7 días de traballo e 7 libres (7x7). Escolle a túa quenda de traballo.';
+
+  @override
+  String get catalogPattern14x14Name => '14 x 14';
+
+  @override
+  String get catalogPattern14x14Description =>
+      '14 días de traballo e 14 libres (14x14). Escolle a túa quenda de traballo.';
 
   @override
   String get holidayNameNewYear => 'Aninovo';

@@ -72,7 +72,8 @@ void main() {
   for (final platform in _platforms) {
     group('${platform.name}:', () {
       // iPad 1.1.0 F5, still there in 1.2.1: a destination of the rail is not
-      // a screen you came to from another one, so no back chevron.
+      // a screen you came to from another one, so no back chevron. With one
+      // column the bar does the same job since 21-nov-2026.
       for (final entry in _sizes.entries) {
         final size = entry.value;
         final split = size.width >= 840 || size.width > size.height;
@@ -82,19 +83,19 @@ void main() {
           ('open-summary', 'Resumen'),
         ]) {
           testWidgets(
-            'F5: ${entry.key}, $tab ${split ? 'has no back button' : 'keeps it'}',
+            'F5: ${entry.key}, $tab has no back button',
             (tester) async {
               await pumpCalendar(tester, size: size);
               // Rotación needs a rotation: the demo data has one.
               await tester.tap(_key(key));
               await tester.pumpAndSettle();
-              if (split) {
-                expect(_key('month-nav-rail'), findsOneWidget);
-                expect(find.byType(BackButton), findsNothing);
-                expect(find.byIcon(Icons.arrow_back), findsNothing);
-              } else {
-                expect(find.byType(BackButton), findsWidgets);
-              }
+              // Two panes: the rail; one column: the bar (21-nov-2026).
+              expect(
+                _key(split ? 'month-nav-rail' : 'month-nav-bar'),
+                findsOneWidget,
+              );
+              expect(find.byType(BackButton), findsNothing);
+              expect(find.byIcon(Icons.arrow_back), findsNothing);
               expect(tester.takeException(), isNull);
             },
             variant: TargetPlatformVariant.only(platform),

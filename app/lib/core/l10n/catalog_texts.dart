@@ -103,6 +103,26 @@ CatalogTexts catalogTextsFrom(AppLocalizations l10n) => CatalogTexts(
       name: l10n.catalogPatternGuard14Name,
       description: l10n.catalogPatternGuard14Description,
     ),
+    '4x4-nights': (
+      name: l10n.catalogPattern4x4NightsName,
+      description: l10n.catalogPattern4x4NightsDescription,
+    ),
+    'guard-24-48': (
+      name: l10n.catalogPatternGuard2448Name,
+      description: l10n.catalogPatternGuard2448Description,
+    ),
+    '6x6': (
+      name: l10n.catalogPattern6x6Name,
+      description: l10n.catalogPattern6x6Description,
+    ),
+    '7x7': (
+      name: l10n.catalogPattern7x7Name,
+      description: l10n.catalogPattern7x7Description,
+    ),
+    '14x14': (
+      name: l10n.catalogPattern14x14Name,
+      description: l10n.catalogPattern14x14Description,
+    ),
   },
 );
 

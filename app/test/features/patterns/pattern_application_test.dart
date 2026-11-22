@@ -343,7 +343,7 @@ void main() {
         ],
         ['correturnos', 'continental', 'pn-2-2-2-6'],
       );
-      expect(startingWith('guard24'), ['24x72', 'guard-1-4']);
+      expect(startingWith('guard24'), ['24x72', 'guard-1-4', 'guard-24-48']);
       expect(startingWith('night12'), ['dupont']);
       expect(
         startingWith('morning'),

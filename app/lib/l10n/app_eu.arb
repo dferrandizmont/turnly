@@ -962,7 +962,7 @@
   "selectionRunsTitle": "Nire txandaketak",
   "selectionRunsSubtitle": "Amaitu edo kendu eredu bat aldi berean",
   "selectionRunsEmptyTitle": "Txandaketarik ez",
-  "selectionRunsEmptyMessage": "Margotu ataletik eredu bat aplikatzen duzunean, hemen agertuko da.",
+  "selectionRunsEmptyMessage": "Aplikatu eredu bat eta zure lehen txandaketa hemen agertuko da.",
   "selectionRunsRange": "{from} – {to}",
   "@selectionRunsRange": {
     "placeholders": {
@@ -3419,7 +3419,7 @@
   "catalogPattern6x4Name": "6 x 4",
   "catalogPattern6x4Description": "6 goiz eta 4 libre",
   "catalogPattern4x4Name": "4 x 4",
-  "catalogPattern4x4Description": "12 orduko 4 egun eta 4 libre (4x4 edo lau eta lau)",
+  "catalogPattern4x4Description": "12 orduko 4 egun eta 4 libre, gaueko txandarik gabe (4x4 edo lau eta lau)",
   "catalogPattern5x2Name": "5 x 2",
   "catalogPattern5x2Description": "5 goiz eta 2 libre (astelehenetik ostiralera)",
   "catalogPattern223Name": "2-2-3",
@@ -3432,6 +3432,46 @@
   "catalogPatternPn2226Description": "2 goiz, 2 arratsalde, 2 gau, gau-ondokoa eta 5 libre (Polizia Nazionalaren 6x6a)",
   "catalogPatternGuard14Name": "Guardia 1-4",
   "catalogPatternGuard14Description": "24 orduko guardia eta 4 egun libre (guardia 1 eta libre 4)",
+  "catalogPattern4x4NightsName": "4 x 4 gaueko txandekin",
+  "@catalogPattern4x4NightsName": {
+    "description": "Catálogo de rotaciones: nombre y descripción de cada patrón (asistente de patrón y primer uso)."
+  },
+  "catalogPattern4x4NightsDescription": "12 orduko 4 egun, 4 libre, 12 orduko 4 gau eta 4 libre",
+  "@catalogPattern4x4NightsDescription": {
+    "description": "El 4x4 con noches: cuatro días de 12 h, cuatro libres, cuatro noches de 12 h y cuatro libres."
+  },
+  "catalogPatternGuard2448Name": "Guardia 24/48",
+  "@catalogPatternGuard2448Name": {
+    "description": "Catálogo de rotaciones: nombre y descripción de cada patrón (asistente de patrón y primer uso)."
+  },
+  "catalogPatternGuard2448Description": "24 orduko guardia eta 48 ordu libre (24/48)",
+  "@catalogPatternGuard2448Description": {
+    "description": "Una guardia de 24 h y dos días libres."
+  },
+  "catalogPattern6x6Name": "6 x 6",
+  "@catalogPattern6x6Name": {
+    "description": "Catálogo de rotaciones: nombre y descripción de cada patrón (asistente de patrón y primer uso)."
+  },
+  "catalogPattern6x6Description": "6 lanegun eta 6 libre (6x6). Aukeratu zure laneko txanda.",
+  "@catalogPattern6x6Description": {
+    "description": "Seis días de trabajo y seis libres, con el turno de trabajo a elegir."
+  },
+  "catalogPattern7x7Name": "7 x 7",
+  "@catalogPattern7x7Name": {
+    "description": "Catálogo de rotaciones: nombre y descripción de cada patrón (asistente de patrón y primer uso)."
+  },
+  "catalogPattern7x7Description": "7 lanegun eta 7 libre (7x7). Aukeratu zure laneko txanda.",
+  "@catalogPattern7x7Description": {
+    "description": "Siete días de trabajo y siete libres, con el turno de trabajo a elegir."
+  },
+  "catalogPattern14x14Name": "14 x 14",
+  "@catalogPattern14x14Name": {
+    "description": "Catálogo de rotaciones: nombre y descripción de cada patrón (asistente de patrón y primer uso)."
+  },
+  "catalogPattern14x14Description": "14 lanegun eta 14 libre (14x14). Aukeratu zure laneko txanda.",
+  "@catalogPattern14x14Description": {
+    "description": "Catorce días de trabajo y catorce libres, con el turno de trabajo a elegir."
+  },
   "holidayNameNewYear": "Urte Berri eguna",
   "holidayNameEpiphany": "Errege eguna",
   "holidayNameMaundyThursday": "Ostegun Santua",
