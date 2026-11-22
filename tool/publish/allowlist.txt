@@ -705,6 +705,7 @@ app/test/features/calendar/overtime_sheet_theme_test.dart
 app/test/features/calendar/paint_grey_days_test.dart
 app/test/features/calendar/paint_header_test.dart
 app/test/features/calendar/paint_layout_test.dart
+app/test/features/calendar/pane_large_text_whole_words_test.dart
 app/test/features/calendar/pane_tools_proposals_test.dart
 app/test/features/calendar/persistence_ui_test.dart
 app/test/features/calendar/puck_label_test.dart
@@ -1564,6 +1565,7 @@ app/lib/core/platform/share_origin.dart
 app/lib/core/platform/window_controls.dart
 app/lib/core/widgets/keyboard_done_bar.dart
 app/lib/core/widgets/unsaved_changes_guard.dart
+app/lib/core/widgets/whole_word_text.dart
 app/lib/features/calendar/application/month_strip.dart
 app/lib/features/calendar/domain/rotation_day.dart
 app/lib/features/calendar/presentation/day_rotation_section.dart
@@ -1687,5 +1689,6 @@ app/test/features/shift_types/money_input_formatter_test.dart
 app/test/features/calendar/tablet_layout_qa_test.dart
 app/test/features/onboarding/onboarding_tablet_test.dart
 app/test/features/patterns/builder_layout_test.dart
+app/test/features/patterns/wizard_step_large_text_test.dart
 app/test/features/reports/report_sheet_tablet_test.dart
 app/test/features/widget/widget_preview_fit_test.dart

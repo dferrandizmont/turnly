@@ -7,6 +7,7 @@ import '../../../core/l10n/l10n.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/whole_word_text.dart';
 import '../../holidays/application/holidays_provider.dart';
 import '../../holidays/domain/holiday.dart';
 import '../../onboarding/presentation/onboarding_tip.dart';
@@ -250,7 +251,9 @@ class _UpcomingRow extends ConsumerWidget {
                       ShiftBadge(shift: shift, size: Disc.s),
                       const SizedBox(width: Sp.s),
                       Expanded(
-                        child: Text.rich(
+                        // Whole words in the narrow pane at large text (iOS
+                        // 1.2.2 QA, F1: «Aftern / oon», «22:0 / 0»).
+                        child: WholeWordText.rich(
                           TextSpan(
                             children: [
                               TextSpan(

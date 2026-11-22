@@ -17,6 +17,7 @@ import '../../../core/widgets/buttons.dart';
 import '../../../core/widgets/content_app_bar.dart';
 import '../../../core/widgets/page_body.dart';
 import '../../../core/widgets/value_row.dart';
+import '../../../core/widgets/whole_word_text.dart';
 import '../../calendar/application/schedule_controller.dart';
 import '../../calendar/application/visible_month.dart';
 import '../../calendar/presentation/shift_format.dart';
@@ -428,7 +429,7 @@ class _StepIndicator extends StatelessWidget {
               style: context.type.label.copyWith(color: colors.textMuted),
             ),
           ),
-          Text(
+          WholeWordText(
             title,
             key: const ValueKey('pattern-step-title'),
             style: context.type.headline,
@@ -830,8 +831,8 @@ class PatternDateTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: type.meta),
-                Text(value, style: type.bodyStrong),
+                WholeWordText(label, style: type.meta),
+                WholeWordText(value, style: type.bodyStrong),
               ],
             ),
           ),

@@ -8,6 +8,7 @@ import '../../../core/l10n/l10n.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/motion_size.dart';
+import '../../../core/widgets/whole_word_text.dart';
 import '../../../core/icons/month_icons.dart';
 import '../application/month_presentation.dart';
 import '../application/off_outlook.dart';
@@ -344,14 +345,16 @@ class _TodayCardState extends ConsumerState<TodayCard>
               children: [
                 Text(label, style: type.label.copyWith(color: labelColor)),
                 const SizedBox(height: Sp.hair),
-                Text(
+                // Whole words even in the narrow side pane at the largest
+                // text sizes (iOS 1.2.2 QA, F1: «Nig / ht», «22:0 / 0»).
+                WholeWordText(
                   title,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: type.display,
                 ),
                 if (detail != null)
-                  Text(
+                  WholeWordText(
                     detail,
                     style: type.bodyStrong.copyWith(
                       color: colors.textSecondary,
@@ -360,7 +363,7 @@ class _TodayCardState extends ConsumerState<TodayCard>
                 if (nextShift != null)
                   Padding(
                     padding: const EdgeInsets.only(top: Sp.xs),
-                    child: Text(
+                    child: WholeWordText(
                       nextShift,
                       style: AppTypography.tabular(type.meta),
                     ),
@@ -368,7 +371,10 @@ class _TodayCardState extends ConsumerState<TodayCard>
                 if (also != null)
                   Padding(
                     padding: const EdgeInsets.only(top: Sp.xs),
-                    child: Text(also, style: AppTypography.tabular(type.meta)),
+                    child: WholeWordText(
+                      also,
+                      style: AppTypography.tabular(type.meta),
+                    ),
                   ),
               ],
             ),
@@ -382,7 +388,7 @@ class _TodayCardState extends ConsumerState<TodayCard>
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           if (countdown != null) _CountdownChip(text: countdown),
-          Text(
+          WholeWordText(
             tomorrowText,
             style: AppTypography.tabular(
               type.body.copyWith(color: colors.textMuted),
@@ -397,7 +403,7 @@ class _TodayCardState extends ConsumerState<TodayCard>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (offLine != null)
-                  Text(
+                  WholeWordText(
                     offLine,
                     key: const ValueKey('today-off-line'),
                     style: type.meta.copyWith(
@@ -406,7 +412,7 @@ class _TodayCardState extends ConsumerState<TodayCard>
                     ),
                   ),
                 if (extraLine.isNotEmpty)
-                  Text(
+                  WholeWordText(
                     extraLine,
                     key: const ValueKey('today-off-extra'),
                     style: AppTypography.tabular(

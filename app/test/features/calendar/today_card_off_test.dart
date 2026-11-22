@@ -17,8 +17,13 @@ void main() {
   final offLine = find.byKey(const ValueKey('today-off-line'));
   final extraLine = find.byKey(const ValueKey('today-off-extra'));
 
+  // The lines are a WholeWordText with the key: its Text is the one inside.
+  Text textWidget(Finder finder, WidgetTester tester) => tester.widget<Text>(
+    find.descendant(of: finder, matching: find.byType(Text)),
+  );
+
   String textOf(Finder finder, WidgetTester tester) =>
-      tester.widget<Text>(finder).data!;
+      textWidget(finder, tester).data!;
 
   group('the next day off on the card', () {
     testWidgets('says when you are off, with the weekday and the day', (
@@ -138,11 +143,11 @@ void main() {
     ) async {
       await pumpCalendar(tester, clock: () => DateTime(2026, 10, 21, 12));
       expect(
-        tester.widget<Text>(offLine).style!.color,
+        textWidget(offLine, tester).style!.color,
         AppColors.light.textSecondary,
       );
       expect(
-        tester.widget<Text>(extraLine).style!.color,
+        textWidget(extraLine, tester).style!.color,
         AppColors.light.textMuted,
       );
       await pumpCalendar(
@@ -151,7 +156,7 @@ void main() {
         clock: () => DateTime(2026, 10, 21, 12),
       );
       expect(
-        tester.widget<Text>(offLine).style!.color,
+        textWidget(offLine, tester).style!.color,
         AppColors.dark.textSecondary,
       );
     });

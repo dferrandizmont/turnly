@@ -10,6 +10,16 @@ at once, so they can skip numbers.
 
 ## Unreleased
 
+- Fixed: with the largest text sizes, shift names and hours in the side pane in landscape and the title and date of the rotation wizard's second step no longer break in the middle of a word (already in iPhone 1.2.3).
+
+## 1.2.3 · 2026-11-22
+
+iPhone and iPad update (App Store build 8): the five new rotations and the bottom bar of Android 0.12.0, and a large-text fix. Your data is not touched.
+
+- New: five ready-made rotations: 4 on 4 off with nights, 24/48 guard, 6 on 6 off, 7 on 7 off and 14 on 14 off. In the last three you choose your work shift.
+- Improved: the bottom bar stays on Rotation, Agenda and Summary, so you can switch between them without going back to the month. "Rotation" always opens "My rotations", and with none yet it offers "Apply pattern" there.
+- Fixed (iPhone): with the largest text sizes, shift names and hours in the side pane in landscape and the title and date of the rotation wizard's second step no longer break in the middle of a word.
+
 ## 0.12.0 · 2026-11-21
 
 - New: five ready-made rotations: 4 on 4 off with nights, 24/48 guard, 6 on 6 off, 7 on 7 off and 14 on 14 off. In the last three you choose your work shift.

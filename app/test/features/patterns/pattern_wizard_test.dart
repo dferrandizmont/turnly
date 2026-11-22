@@ -49,8 +49,9 @@ Future<void> _openWizard(WidgetTester tester) async {
   expect(find.text('Aplicar patrón'), findsOneWidget);
 }
 
-String _stepTitle(WidgetTester tester) =>
-    (tester.widget(_key('pattern-step-title')) as Text).data!;
+String _stepTitle(WidgetTester tester) => (tester.widget(
+  find.descendant(of: _key('pattern-step-title'), matching: find.byType(Text)),
+) as Text).data!;
 
 /// Codes drawn in the preview cell of [date], in order.
 List<String> _previewCodes(WidgetTester tester, CivilDate date) {
