@@ -49,12 +49,12 @@ void main() {
     expect(backups.existsSync(), isFalse);
   });
 
-  test('opening it migrates to v7 (through v2) and keeps the copy made just '
+  test('opening it migrates to v8 (through v2) and keeps the copy made just '
       'before', () async {
     final db = await open();
 
     // Migrated: v6, the same data, attached to main, the same days.
-    expect(readUserVersion(file), 7);
+    expect(readUserVersion(file), 8);
     expect(await dumpV1Columns(db), before);
     final loaded = await ScheduleRepository(db).load('main');
     expect(
@@ -63,8 +63,8 @@ void main() {
     );
     await db.close();
 
-    // The copy: pre-v1-a-v7-<stamp>.sqlite, made before the migration.
-    expect(backupNames(), ['pre-v1-a-v7-20261102-083015.sqlite']);
+    // The copy: pre-v1-a-v8-<stamp>.sqlite, made before the migration.
+    expect(backupNames(), ['pre-v1-a-v8-20261102-083015.sqlite']);
     final copy = File(p.join(backups.path, backupNames().single));
     expect(readUserVersion(copy), 1);
 
@@ -90,7 +90,7 @@ void main() {
     final again = AppDatabase(NativeDatabase(restored));
     expect(await dumpV1Columns(again), before);
     await again.close();
-    expect(readUserVersion(restored), 7);
+    expect(readUserVersion(restored), 8);
   });
 
   test('opening twice does not migrate twice', () async {
@@ -107,14 +107,14 @@ void main() {
     await second.customSelect('SELECT 1').get();
 
     // No second copy, nothing recreated, nothing changed.
-    expect(backupNames(), ['pre-v1-a-v7-20261102-083015.sqlite']);
+    expect(backupNames(), ['pre-v1-a-v8-20261102-083015.sqlite']);
     expect(await _everything(second), afterFirst);
     expect(
       (await second.select(second.calendars).getSingle()).createdAt,
       calendarStamp,
     );
     await second.close();
-    expect(readUserVersion(file), 7);
+    expect(readUserVersion(file), 8);
   });
 
   test('without the safety copy there is no migration', () async {
@@ -140,7 +140,7 @@ void main() {
     expect([for (final c in calendars) c.id], ['main']);
     expect(calendars.single.name, 'Mi cuadrante');
     await db.close();
-    expect(readUserVersion(File(p.join(fresh.path, databaseFileName))), 7);
+    expect(readUserVersion(File(p.join(fresh.path, databaseFileName))), 8);
     expect(
       Directory(p.join(fresh.path, backupsDirectoryName)).existsSync(),
       isFalse,

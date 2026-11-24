@@ -213,7 +213,7 @@ void main() {
       final screen = tester.widget<PatternWizardScreen>(
         find.byType(PatternWizardScreen),
       );
-      final args = (start: screen.start, shiftId: screen.shiftId);
+      final args = PatternWizardArgs(start: screen.start, shiftId: screen.shiftId);
       final container = ProviderScope.containerOf(
         tester.element(find.byType(PatternWizardScreen)),
       );
@@ -433,10 +433,9 @@ void main() {
     final container = ProviderScope.containerOf(
       tester.element(find.byType(PatternWizardScreen)),
     );
-    final provider = patternWizardProvider((
-      start: screen.start,
-      shiftId: screen.shiftId,
-    ));
+    final provider = patternWizardProvider(
+      PatternWizardArgs(start: screen.start, shiftId: screen.shiftId),
+    );
     final semantics = tester.ensureSemantics();
     for (final id in ['morning', 'night', 'afternoon']) {
       await _tap(tester, 'builder-add-$id');
@@ -491,7 +490,7 @@ void main() {
         final screen = tester.widget<PatternWizardScreen>(
           find.byType(PatternWizardScreen),
         );
-        final args = (start: screen.start, shiftId: screen.shiftId);
+        final args = PatternWizardArgs(start: screen.start, shiftId: screen.shiftId);
         final container = ProviderScope.containerOf(
           tester.element(find.byType(PatternWizardScreen)),
         );
@@ -580,7 +579,7 @@ void main() {
       final screen = tester.widget<PatternWizardScreen>(
         find.byType(PatternWizardScreen),
       );
-      final args = (start: screen.start, shiftId: screen.shiftId);
+      final args = PatternWizardArgs(start: screen.start, shiftId: screen.shiftId);
       final container = ProviderScope.containerOf(
         tester.element(find.byType(PatternWizardScreen)),
       );

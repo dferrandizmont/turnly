@@ -15,6 +15,7 @@ import '../../calendar/presentation/shift_format.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../application/summary_providers.dart';
 import '../domain/month_summary.dart';
+import '../domain/period_hours.dart';
 import 'summary_format.dart';
 import 'year_month_cards.dart';
 
@@ -43,6 +44,8 @@ class YearTable extends ConsumerWidget {
     final colors = context.colors;
     final type = context.type;
     final totals = ref.watch(yearTotalsProvider(year));
+    final splits = ref.watch(yearSplitProvider(year));
+    final split = SplitTotals(splits);
     if (totals.isEmpty) {
       return Padding(
         key: const ValueKey('summary-year-empty'),
@@ -63,25 +66,38 @@ class YearTable extends ConsumerWidget {
 
     final cards = textScaleOf(context) >= cardsFromScale - 0.001;
     final table = cards
-        ? YearMonthCards(totals: totals, onOpenMonth: onOpenMonth)
+        ? YearMonthCards(
+            totals: totals,
+            splits: splits,
+            onOpenMonth: onOpenMonth,
+          )
         : AppCard(
             padding: const EdgeInsets.symmetric(vertical: Sp.s),
             child: Column(
               children: [
                 _Header(),
                 Divider(height: 1, color: colors.border),
-                for (final month in totals.months)
+                for (var i = 0; i < totals.months.length; i++)
                   _MonthRow(
-                    summary: month,
-                    onTap: () => onOpenMonth(month.month),
+                    summary: totals.months[i],
+                    split: splits[i],
+                    onTap: () => onOpenMonth(totals.months[i].month),
                   ),
                 Divider(height: 1, color: colors.border),
                 _Cells(
                   key: const ValueKey('summary-year-total'),
                   bold: true,
                   month: l10n.summaryYearTotal,
-                  shifts: '${totals.shiftsWorked}',
-                  hours: formatHours(l10n, totals.workedMinutes),
+                  shifts: _doneAndPlanned(
+                    '${split.doneShifts}',
+                    split.plannedShifts > 0 ? '${split.plannedShifts}' : null,
+                  ),
+                  hours: _doneAndPlanned(
+                    formatHours(l10n, split.doneMinutes),
+                    split.plannedMinutes > 0
+                        ? formatHours(l10n, split.plannedMinutes)
+                        : null,
+                  ),
                   night: formatHours(l10n, totals.nightMinutes),
                   estimate: totals.earningsCents == null
                       ? '–'
@@ -100,6 +116,14 @@ class YearTable extends ConsumerWidget {
           l10n.summaryYearHint,
           style: type.meta.copyWith(color: colors.textSecondary),
         ),
+        if (split.hasPlanned) ...[
+          const SizedBox(height: Sp.xs),
+          Text(
+            l10n.summaryYearHintPlanned,
+            key: const ValueKey('summary-year-hint-planned'),
+            style: type.meta.copyWith(color: colors.textSecondary),
+          ),
+        ],
         const SizedBox(height: Sp.section),
         AppCard.tinted(
           padding: const EdgeInsets.all(Sp.l),
@@ -155,10 +179,20 @@ class _Header extends StatelessWidget {
   }
 }
 
+/// «5 + 2»: what has been worked before today and, after the plus, what is
+/// planned from today on (a month that is all past has no plus).
+String _doneAndPlanned(String done, String? planned) =>
+    planned == null ? done : '$done + $planned';
+
 class _MonthRow extends StatelessWidget {
-  const _MonthRow({required this.summary, required this.onTap});
+  const _MonthRow({
+    required this.summary,
+    required this.split,
+    required this.onTap,
+  });
 
   final MonthSummary summary;
+  final PeriodSplit split;
   final VoidCallback onTap;
 
   @override
@@ -172,8 +206,22 @@ class _MonthRow extends StatelessWidget {
       key: ValueKey('summary-year-row-${month.month}'),
       muted: empty,
       month: monthAbbreviation(format.locale, month),
-      shifts: empty ? none : '${summary.shiftsWorked}',
-      hours: empty ? none : formatHours(l10n, summary.workedMinutes),
+      shifts: empty
+          ? none
+          : _doneAndPlanned(
+              '${split.shifts.doneShifts}',
+              split.shifts.plannedShifts > 0
+                  ? '${split.shifts.plannedShifts}'
+                  : null,
+            ),
+      hours: empty
+          ? none
+          : _doneAndPlanned(
+              formatHours(l10n, split.hours.doneMinutes),
+              split.hours.plannedMinutes > 0
+                  ? formatHours(l10n, split.hours.plannedMinutes)
+                  : null,
+            ),
       night: empty ? none : formatHours(l10n, summary.nightMinutes),
       estimate: summary.earningsCents == null
           ? none
@@ -187,8 +235,16 @@ class _MonthRow extends StatelessWidget {
       excludeSemantics: true,
       label: l10n.summaryYearMonthSemantics(
         name,
-        l10n.summaryShifts(summary.shiftsWorked),
-        formatHours(l10n, summary.workedMinutes),
+        split.shifts.plannedShifts > 0
+            ? '${l10n.summaryShifts(split.shifts.doneShifts)} '
+                  '${l10n.summaryShiftsPlannedRest(split.shifts.plannedShifts)}'
+            : l10n.summaryShifts(split.shifts.doneShifts),
+        split.hours.plannedMinutes > 0
+            ? l10n.summaryHowBarLabel(
+                formatHours(l10n, split.hours.doneMinutes),
+                formatHours(l10n, split.hours.plannedMinutes),
+              )
+            : formatHours(l10n, split.hours.doneMinutes),
       ),
       onTap: onTap,
       child: InkWell(onTap: onTap, child: cells),

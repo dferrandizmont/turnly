@@ -196,8 +196,9 @@ void main() {
       // October holds today: 96 h worked before the 19th, 64 h planned.
       expect(_text(tester, 'summary-hours'), '96 h');
       expect(_text(tester, 'summary-legend-planned'), '64 h');
-      expect(_text(tester, 'summary-shifts-value'), '20');
-      expect(find.text('19 días'), findsOneWidget);
+      // 20 shifts in the month: the 12 before the 19th are worked.
+      expect(_text(tester, 'summary-shifts-value'), '12');
+      expect(_text(tester, 'summary-shifts-detail'), 'y 8 previstos');
       expect(_text(tester, 'summary-night-value'), '40 h');
       expect(_text(tester, 'summary-rest-value'), '9');
       expect(_text(tester, 'summary-absences-value'), '2');
@@ -476,8 +477,10 @@ void main() {
       await pickDay(tester, '25');
       expect(_text(tester, 'summary-period'), '19 oct 2026 – 25 oct 2026');
       expect(_text(tester, 'summary-range-days'), startsWith('7 días'));
-      // Noche 19, 20 and 23, and Mañana + Tarde on the 21st: 5 shifts.
-      expect(_text(tester, 'summary-shifts-value'), '5');
+      // Noche 19, 20 and 23, and Mañana + Tarde on the 21st: 5 shifts, all
+      // planned (the range starts today).
+      expect(_text(tester, 'summary-shifts-value'), '0');
+      expect(_text(tester, 'summary-shifts-detail'), 'y 5 previstos');
       expect(_text(tester, 'summary-hours'), '40 h');
       expect(_text(tester, 'summary-night-value'), '24 h');
       // Compared with the 7 days before (12-18 October: five Tardes).
@@ -501,8 +504,9 @@ void main() {
 
       await _tap(tester, 'summary-next');
       expect(_text(tester, 'summary-period'), '26 oct 2026 – 1 nov 2026');
-      // Mañana 26, 29 and 30 (27-28 are Vacaciones).
-      expect(_text(tester, 'summary-shifts-value'), '3');
+      // Mañana 26, 29 and 30 (27-28 are Vacaciones): planned.
+      expect(_text(tester, 'summary-shifts-value'), '0');
+      expect(_text(tester, 'summary-shifts-detail'), 'y 3 previstos');
       await _tap(tester, 'summary-previous');
       await _tap(tester, 'summary-previous');
       expect(_text(tester, 'summary-period'), '12 oct 2026 – 18 oct 2026');
@@ -561,15 +565,16 @@ void main() {
       for (var m = 1; m <= 12; m++) {
         expect(_key('summary-year-row-$m'), findsOneWidget, reason: '$m');
       }
-      // October: 20 shifts, 160 h, 40 h at night, 1.248,00 EUR.
+      // October: 20 shifts and 160 h, of which 12 and 96 h before today (the
+      // 19th) and the rest planned; 40 h at night, 1.248,00 EUR.
       final october = find.descendant(
         of: _key('summary-year-row-10'),
         matching: find.byType(Text),
       );
       expect(tester.widgetList<Text>(october).map((t) => t.data), [
         'Oct',
-        '20',
-        '160 h',
+        '12 + 8',
+        '96 h + 64 h',
         '40 h',
         '1.248,00$_nbsp€',
       ]);
@@ -595,9 +600,14 @@ void main() {
       final totals = ProviderScope.containerOf(
         tester.element(find.byType(SummaryScreen)),
       ).read(yearTotalsProvider(2026));
-      expect(cells[1], '${totals.shiftsWorked}');
+      // Worked before today + planned from it add up to the year.
+      final shiftParts = cells[1]!.split(' + ').map(int.parse).toList();
+      expect(shiftParts.length, 2);
+      expect(shiftParts.last, greaterThan(8));
+      expect(shiftParts.first + shiftParts.last, totals.shiftsWorked);
       expect(totals.shiftsWorked, greaterThan(20));
       expect(cells[2], endsWith(' h'));
+      expect(cells[2], contains(' h + '));
 
       await _tap(tester, 'summary-year-row-10');
       expect(_text(tester, 'summary-period'), 'Octubre 2026');

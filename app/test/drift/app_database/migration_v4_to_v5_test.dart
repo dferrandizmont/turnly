@@ -6,6 +6,7 @@ import 'package:cuadrante/core/database/migration_v3_to_v4.dart';
 import 'package:cuadrante/core/database/migration_v4_to_v5.dart';
 import 'package:cuadrante/core/database/migration_v5_to_v6.dart';
 import 'package:cuadrante/core/database/migration_v6_to_v7.dart';
+import 'package:cuadrante/core/database/migration_v7_to_v8.dart';
 import 'package:cuadrante/features/schedule/data/schedule_repository.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
 import 'package:drift/drift.dart' hide isNull, isNotNull;
@@ -35,6 +36,7 @@ class _AtV4 extends AppDatabase {
       from4To5: (m, schema) async => throw StateError('not this far'),
       from5To6: (m, schema) async => throw StateError('not this far'),
       from6To7: (m, schema) async => throw StateError('not this far'),
+      from7To8: (m, schema) async => throw StateError('not this far'),
     ),
   );
 }
@@ -55,6 +57,7 @@ class _FailingV5 extends AppDatabase {
       ),
       from5To6: migrateFrom5To6,
       from6To7: migrateFrom6To7,
+      from7To8: migrateFrom7To8,
     ),
   );
 }

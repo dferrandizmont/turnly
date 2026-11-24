@@ -191,7 +191,7 @@ void main() {
     test('R6: a file from a newer version', () async {
       final newer = gzipEnvelope({
         'format': 'cuadrante',
-        'schemaVersion': 5,
+        'schemaVersion': 6,
         'appVersion': '4.0.0',
         'exportedAt': '2027-01-01T00:00:00Z',
         'data': {'shiftTypes': 'a different shape'},
@@ -200,8 +200,12 @@ void main() {
       await expectRejectedAndUntouched(
         newer,
         isA<NewerFormatVersion>()
-            .having((e) => e.found, 'found', 5)
-            .having((e) => e.supported, 'supported', 4),
+            .having((e) => e.found, 'found', 6)
+            .having(
+              (e) => e.supported,
+              'supported',
+              BackupCodec.supportedSchemaVersion,
+            ),
       );
     });
 

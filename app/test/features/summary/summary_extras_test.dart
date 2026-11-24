@@ -166,10 +166,12 @@ void main() {
     final row = tester.widget<Text>(
       find.descendant(
         of: _key('summary-year-row-10'),
-        matching: find.text('162 h'),
+        // The extras of the 26th are planned: 96 h before today (the 19th),
+        // 64 h + 2 h from it.
+        matching: find.text('96 h + 66 h'),
       ),
     );
-    expect(row.data, '162 h');
+    expect(row.data, '96 h + 66 h');
     expect(_key('summary-year-extras-note'), findsOneWidget);
   });
 }

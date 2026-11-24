@@ -104,6 +104,36 @@ abstract class AppLocalizations {
     Locale('gl'),
   ];
 
+  /// No description provided for @backupSwapApplicationsSkipped.
+  ///
+  /// In es, this message translates to:
+  /// **'Algunos registros de cambios de turno no se han podido restaurar. Sus datos se han conservado para recuperarlos.'**
+  String get backupSwapApplicationsSkipped;
+
+  /// No description provided for @swapRestoreSkipped.
+  ///
+  /// In es, this message translates to:
+  /// **'He conservado tu turno de {date} porque no he podido verificar el cambio que se aplicó.'**
+  String swapRestoreSkipped(String date);
+
+  /// Se pidió quitar el cambio y devolver el cuadrante, pero una fecha no se pudo verificar: no se ha hecho nada.
+  ///
+  /// In es, this message translates to:
+  /// **'No he quitado el cambio: sigue en el libro de cambios y no he tocado ninguno de sus días.'**
+  String get swapRemoveKept;
+
+  /// Un día solo admite un cambio aplicado: este no se aplica porque el día ya tiene el de otro compañero.
+  ///
+  /// In es, this message translates to:
+  /// **'El {date} ya tiene otro cambio aplicado (con {name}): quítalo del cuadrante primero.'**
+  String swapApplyConflict(String date, String name);
+
+  /// No description provided for @swapRestoreOnSave.
+  ///
+  /// In es, this message translates to:
+  /// **'Al guardar se recuperarán los turnos anteriores que se puedan restaurar.'**
+  String get swapRestoreOnSave;
+
   /// Nombre de la app (título de ventana y cabeceras).
   ///
   /// In es, this message translates to:
@@ -2688,6 +2718,42 @@ abstract class AppLocalizations {
   /// **'Día de inicio'**
   String get patternStartLabel;
 
+  /// No description provided for @dateSheetStartHint.
+  ///
+  /// In es, this message translates to:
+  /// **'El día en que empezó tu ciclo actual'**
+  String get dateSheetStartHint;
+
+  /// No description provided for @dateSheetLastMonday.
+  ///
+  /// In es, this message translates to:
+  /// **'Lunes pasado'**
+  String get dateSheetLastMonday;
+
+  /// No description provided for @dateSheetChooseMonth.
+  ///
+  /// In es, this message translates to:
+  /// **'Elegir mes'**
+  String get dateSheetChooseMonth;
+
+  /// No description provided for @dateSheetShowDays.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver los días'**
+  String get dateSheetShowDays;
+
+  /// No description provided for @dateSheetPreviousYear.
+  ///
+  /// In es, this message translates to:
+  /// **'Año anterior'**
+  String get dateSheetPreviousYear;
+
+  /// No description provided for @dateSheetNextYear.
+  ///
+  /// In es, this message translates to:
+  /// **'Año siguiente'**
+  String get dateSheetNextYear;
+
   /// No description provided for @patternSuggestedStart.
   ///
   /// In es, this message translates to:
@@ -2955,7 +3021,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingPathRotationHint.
   ///
   /// In es, this message translates to:
-  /// **'Elige tu ciclo (mañanas, tardes, noches, saliente…) y se rellena solo, mes tras mes.'**
+  /// **'Elige un ciclo (mañanas, tardes, noches, saliente…) o crea el tuyo y se rellena solo, mes tras mes.'**
   String get onboardingPathRotationHint;
 
   /// No description provided for @onboardingPathRotationTag.
@@ -3297,7 +3363,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingRotationHelp.
   ///
   /// In es, this message translates to:
-  /// **'Elige la que más se parezca. Luego dices cuándo empiezas.'**
+  /// **'Elige la tuya o créala en un momento. Luego dices cuándo empiezas.'**
   String get onboardingRotationHelp;
 
   /// No description provided for @onboardingRotationTypical.
@@ -3317,6 +3383,60 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Rotaciones'**
   String get onboardingRotationAll;
+
+  /// No description provided for @onboardingOwnCycle.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear mi ciclo'**
+  String get onboardingOwnCycle;
+
+  /// No description provided for @onboardingOwnCycleHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Monta tu ciclo día a día'**
+  String get onboardingOwnCycleHint;
+
+  /// No description provided for @onboardingOwnCycleAnother.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear otro ciclo'**
+  String get onboardingOwnCycleAnother;
+
+  /// No description provided for @onboardingOwnCycleNotHere.
+  ///
+  /// In es, this message translates to:
+  /// **'¿No está la tuya? Crear mi ciclo'**
+  String get onboardingOwnCycleNotHere;
+
+  /// No description provided for @onboardingOwnCycleAdjust.
+  ///
+  /// In es, this message translates to:
+  /// **'Ajustar'**
+  String get onboardingOwnCycleAdjust;
+
+  /// No description provided for @onboardingOwnCycleTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu ciclo'**
+  String get onboardingOwnCycleTitle;
+
+  /// No description provided for @onboardingOwnCycleUse.
+  ///
+  /// In es, this message translates to:
+  /// **'Usar este ciclo'**
+  String get onboardingOwnCycleUse;
+
+  /// No description provided for @onboardingOwnCycleHours.
+  ///
+  /// In es, this message translates to:
+  /// **'Las horas las cambias luego en Ajustes › Mis turnos.'**
+  String get onboardingOwnCycleHours;
+
+  /// No description provided for @onboardingOwnCycleName.
+  ///
+  /// In es, this message translates to:
+  /// **'Mi ciclo'**
+  String get onboardingOwnCycleName;
 
   /// No description provided for @onboardingByHand.
   ///
@@ -3677,6 +3797,18 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Turnos trabajados'**
   String get summaryShiftsWorked;
+
+  /// Resumen › Desglose: bajo «Turnos trabajados» de un periodo en curso o futuro, los turnos que aún no se han trabajado (hoy en adelante).
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{y 1 previsto} other{y {count} previstos}}'**
+  String summaryShiftsPlannedRest(int count);
+
+  /// Resumen › tipos de turno: aviso bajo el título de cada grupo cuando el periodo incluye hoy o días futuros; las cifras de cada tipo cubren todo el periodo.
+  ///
+  /// In es, this message translates to:
+  /// **'Total del periodo, con lo previsto'**
+  String get summaryTypesPeriodTotal;
 
   /// No description provided for @summaryNightHours.
   ///
@@ -4139,6 +4271,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Toca un mes para ver su detalle.'**
   String get summaryYearHint;
+
+  /// Resumen › Año: bajo la pista de la tabla cuando algún mes tiene días de hoy en adelante; explica «5 + 2» (trabajados + previstos).
+  ///
+  /// In es, this message translates to:
+  /// **'El «+» separa lo trabajado (hasta ayer) de lo previsto (de hoy en adelante). Las nocturnas y el estimado cuentan todo el mes.'**
+  String get summaryYearHintPlanned;
 
   /// No description provided for @summaryYearHeaderMonth.
   ///
@@ -10701,6 +10839,30 @@ abstract class AppLocalizations {
   /// **'Se borra el cambio con {name} del {date}. Tus turnos no cambian.'**
   String swapRemoveBody(String name, String date);
 
+  /// No description provided for @swapRemoveAppliedBody.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Qué quieres hacer con los turnos que cambió?'**
+  String get swapRemoveAppliedBody;
+
+  /// No description provided for @swapRemoveAndRestore.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar el cambio y devolver tu cuadrante'**
+  String get swapRemoveAndRestore;
+
+  /// No description provided for @swapRemoveOnly.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar solo el cambio'**
+  String get swapRemoveOnly;
+
+  /// No description provided for @swapSavedUnapplied.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardado. Se han devuelto los turnos anteriores a tu cuadrante'**
+  String get swapSavedUnapplied;
+
   /// No description provided for @swapRemoveConfirm.
   ///
   /// In es, this message translates to:
@@ -10802,6 +10964,66 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Este cambio no está aplicado al cuadrante'**
   String get swapNotApplied;
+
+  /// No description provided for @swapApplyStateApplied.
+  ///
+  /// In es, this message translates to:
+  /// **'Aplicado'**
+  String get swapApplyStateApplied;
+
+  /// No description provided for @swapApplyStatePending.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin aplicar'**
+  String get swapApplyStatePending;
+
+  /// No description provided for @swapApplyToggle.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar también mi cuadrante'**
+  String get swapApplyToggle;
+
+  /// No description provided for @swapApplyToggleOn.
+  ///
+  /// In es, this message translates to:
+  /// **'Tus días cambian al guardar. Podrás deshacerlo.'**
+  String get swapApplyToggleOn;
+
+  /// No description provided for @swapApplyToggleOff.
+  ///
+  /// In es, this message translates to:
+  /// **'Solo se anota el cambio: tu cuadrante no se toca.'**
+  String get swapApplyToggleOff;
+
+  /// No description provided for @swapApplyToggleNone.
+  ///
+  /// In es, this message translates to:
+  /// **'Elige los turnos del cambio para poder cambiar tu cuadrante.'**
+  String get swapApplyToggleNone;
+
+  /// No description provided for @swapApplyToggleDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu cuadrante ya está como dice el cambio.'**
+  String get swapApplyToggleDone;
+
+  /// No description provided for @swapSavedApplied.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardado y aplicado a tu cuadrante'**
+  String get swapSavedApplied;
+
+  /// No description provided for @swapSavedNotApplied.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardado. Tu cuadrante no cambia hasta que lo apliques'**
+  String get swapSavedNotApplied;
+
+  /// No description provided for @swapApplyAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Aplicar'**
+  String get swapApplyAction;
 
   /// No description provided for @swapDaySection.
   ///

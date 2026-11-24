@@ -365,6 +365,36 @@ class ShiftSwaps extends Table {
   ];
 }
 
+/// The original override of each day actually changed by a swap (v8).
+///
+/// At most one applied swap per calendar and day: the unique index on
+/// (`calendar_id`, `date`) refuses a second one, whatever path writes it
+/// (apply, undo and redo, restore, migration). `calendar_id` is always the
+/// swap's calendar (`SwapAppliedStore.write` checks it).
+@DataClassName('SwapApplicationRow')
+@TableIndex(
+  name: 'idx_swap_applications_day',
+  columns: {#calendarId, #date},
+  unique: true,
+)
+class SwapApplications extends Table {
+  TextColumn get swapId =>
+      text().references(ShiftSwaps, #id, onDelete: KeyAction.cascade)();
+  TextColumn get calendarId =>
+      text().references(Calendars, #id, onDelete: KeyAction.cascade)();
+  TextColumn get date => text().map(const CivilDateConverter())();
+  TextColumn get previousShiftTypeIds =>
+      text().map(const StringListConverter()).nullable()();
+
+  /// SQL NULL means the old application did not record what it wrote.
+  /// JSON null is a recorded write that removed the override.
+  TextColumn get appliedOverride => text().nullable()();
+  IntColumn get createdAt => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {swapId, date};
+}
+
 @DataClassName('HolidayRow')
 @TableIndex(name: 'idx_holidays_date', columns: {#date})
 class Holidays extends Table {

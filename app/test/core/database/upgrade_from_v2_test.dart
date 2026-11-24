@@ -9,8 +9,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqlite3/sqlite3.dart' as raw;
 
+import '../../drift/app_database/generated/schema_v1.dart' as v1;
 import '../../drift/app_database/generated/schema_v2.dart' as v2;
 import '../../support/test_storage.dart';
+import '../../support/v1_database.dart';
 import '../../support/v2_database.dart';
 
 /// What a user of 0.3.0 – 0.5.0 goes through when 0.6.0 starts: the real
@@ -65,11 +67,11 @@ void main() {
   });
 
   test(
-    'opening it migrates to v7 and keeps the copy made just before',
+    'opening it migrates to v8 and keeps the copy made just before',
     () async {
       final db = await open();
 
-      expect(readUserVersion(file), 7);
+      expect(readUserVersion(file), 8);
       expect(await dumpV2Columns(db), before);
       await expectEveryCalendarAsBefore(db);
       final types = await db.select(db.shiftTypes).get();
@@ -80,8 +82,8 @@ void main() {
       );
       await db.close();
 
-      // The copy: pre-v2-a-v7-<stamp>.sqlite, made before the migration.
-      expect(backupNames(), ['pre-v2-a-v7-20261102-083015.sqlite']);
+      // The copy: pre-v2-a-v8-<stamp>.sqlite, made before the migration.
+      expect(backupNames(), ['pre-v2-a-v8-20261102-083015.sqlite']);
       final copy = File(p.join(backups.path, backupNames().single));
       expect(readUserVersion(copy), 2);
 
@@ -106,7 +108,7 @@ void main() {
       final again = AppDatabase(NativeDatabase(restored));
       expect(await dumpV2Columns(again), before);
       await again.close();
-      expect(readUserVersion(restored), 7);
+      expect(readUserVersion(restored), 8);
     },
   );
 
@@ -122,11 +124,11 @@ void main() {
     await second.customSelect('SELECT 1').get();
 
     // No second copy, nothing recreated, nothing changed.
-    expect(backupNames(), ['pre-v2-a-v7-20261102-083015.sqlite']);
+    expect(backupNames(), ['pre-v2-a-v8-20261102-083015.sqlite']);
     expect(await dumpV2Columns(second), afterFirst);
     expect(afterFirst, before);
     await second.close();
-    expect(readUserVersion(file), 7);
+    expect(readUserVersion(file), 8);
   });
 
   test('without the safety copy there is no migration', () async {
@@ -148,10 +150,10 @@ void main() {
   test('a journal left by a crash does not block the start', () async {
     File('${file.path}-journal').writeAsStringSync('leftover');
     final db = await open();
-    expect(readUserVersion(file), 7);
+    expect(readUserVersion(file), 8);
     expect(await dumpV2Columns(db), before);
     await db.close();
-    expect(backupNames(), ['pre-v2-a-v7-20261102-083015.sqlite']);
+    expect(backupNames(), ['pre-v2-a-v8-20261102-083015.sqlite']);
   });
 
   test('a REAL hot journal is recovered before the copy and the migration: '
@@ -182,7 +184,7 @@ void main() {
     journal.writeAsBytesSync(hot);
 
     final opened = await open();
-    expect(readUserVersion(file), 7);
+    expect(readUserVersion(file), 8);
     // What was committed before the "crash", all of it, and none of the rest.
     expect(await dumpV2Columns(opened), before);
     await expectEveryCalendarAsBefore(opened);
@@ -211,23 +213,24 @@ void main() {
     expect(backupNames(), [
       'pre-v1-a-v2-20260201-000000.sqlite',
       'pre-v1-a-v2-20260301-000000.sqlite',
-      'pre-v2-a-v7-20261102-083015.sqlite',
+      'pre-v2-a-v8-20261102-083015.sqlite',
     ]);
   });
 
   test('with the copy of the whole chain already there (an earlier launch '
       'that failed midway) no new copy is made', () async {
     backups.createSync(recursive: true);
-    File(p.join(backups.path, 'pre-v1-a-v7-20261101-000000.sqlite'))
-        .writeAsStringSync('the original v1');
+    final copy = File(
+      p.join(backups.path, 'pre-v1-a-v8-20261101-000000.sqlite'),
+    );
+    final original = v1.DatabaseAtV1(NativeDatabase(copy));
+    await seedV1(original);
+    await original.close();
+    final originalBytes = copy.readAsBytesSync();
     final db = await open();
     await db.close();
-    expect(backupNames(), ['pre-v1-a-v7-20261101-000000.sqlite']);
-    expect(
-      File(p.join(backups.path, 'pre-v1-a-v7-20261101-000000.sqlite'))
-          .readAsStringSync(),
-      'the original v1',
-    );
+    expect(backupNames(), ['pre-v1-a-v8-20261101-000000.sqlite']);
+    expect(copy.readAsBytesSync(), originalBytes);
   });
 
   test('a file already on v6 makes no copy', () async {

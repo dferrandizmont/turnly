@@ -38,6 +38,13 @@ class OnboardingScreen extends ConsumerWidget {
   /// From this text scale the top bar and «Siguiente» scroll with the step.
   static const double compactTextScale = 1.5;
 
+  /// The steps with a long list, a preview or a form: their main button stays
+  /// pinned at any text size (only the bar scrolls away with big text).
+  static bool _listStage(OnboardingStage stage) =>
+      stage == OnboardingStage.place ||
+      stage == OnboardingStage.rotation ||
+      stage == OnboardingStage.start;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
@@ -71,7 +78,11 @@ class OnboardingScreen extends ConsumerWidget {
     // would take most of the screen and leave a card and a half of the list
     // (H-T01-6): the bar then scrolls away with the list. With big text
     // «Siguiente» goes with them, to the end of the content: fixed under the
-    // list it would leave two bars and little else on a 320 dp phone.
+    // list it would leave two bars and little else on a 320 dp phone. Not on
+    // the long steps (the place, «¿Cómo es tu rotación?» and «¿Cuándo
+    // empiezas?»): there the end of the content was many long swipes away at
+    // x2.0 (QA 0.12.1, M2), so «Siguiente» / «Continuar» stay fixed and only
+    // the bar scrolls away.
     final media = MediaQuery.of(context);
     final bigText = media.textScaler.scale(14) / 14 >= compactTextScale - 0.001;
     final compact = media.size.height < compactHeight || bigText;
@@ -143,7 +154,7 @@ class OnboardingScreen extends ConsumerWidget {
                           step,
                           next,
                           stage,
-                          nextInside: bigText,
+                          nextInside: bigText && !_listStage(stage),
                         )
                       : _fixedBody(header, step, next, stage),
                 ),

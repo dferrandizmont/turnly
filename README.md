@@ -26,30 +26,31 @@ Every feature is included: no Pro tier and no in-app purchases.
 ## Download
 
 <p>
-  <a href="https://play.google.com/apps/testing/es.cuadrante.app"><img src="https://img.shields.io/badge/Google_Play-Beta-414141?logo=googleplay&amp;style=for-the-badge" alt="Beta on Google Play"></a>
+  <a href="https://play.google.com/store/apps/details?id=es.turnly.app"><img src="https://img.shields.io/badge/Google_Play-Beta-414141?logo=googleplay&amp;style=for-the-badge" alt="Beta on Google Play"></a>
   <a href="https://github.com/dferrandizmont/turnly/releases"><img src="https://img.shields.io/badge/Available_on-GitHub-181717?logo=github&amp;style=for-the-badge" alt="Available on GitHub"></a>
   <a href="https://apps.apple.com/es/app/turnly-cuadrante-de-turnos/id6832554552"><img src="https://img.shields.io/badge/App_Store-Download-0D96F6?logo=appstore&amp;style=for-the-badge" alt="Available on the App Store"></a>
 </p>
 
-Android is in testing; iPhone is on the App Store. Light and dark themes.
+Android is in open testing on Google Play; iPhone is on the App Store. Light and dark themes.
+
+**Did you use the previous Android app?** Turnly is now a new app (`es.turnly.app`) and it does not update the old one (`es.cuadrante.app`); both can be installed side by side. In the old app go to Settings › Backup and tap “Save a backup outside Turnly”, then use “Import file” in the new one. Set up widgets and alarms again and uninstall the old app.
 
 <details>
-<summary>Join the beta on Google Play</summary>
+<summary>Install from Google Play</summary>
 
-Anyone can join the closed test on Google Play:
+Turnly is in open testing on Google Play, so anyone can install it:
 
-1. Join the [turnly-testers](https://groups.google.com/g/turnly-testers) group with your Google account.
-2. Accept the test: [play.google.com/apps/testing/es.cuadrante.app](https://play.google.com/apps/testing/es.cuadrante.app).
-3. Install the app from Google Play; it updates itself.
+1. Open [Turnly on Google Play](https://play.google.com/store/apps/details?id=es.turnly.app) on your phone or computer.
+2. Install the app (if asked, join the open test). It updates itself.
 
-Please stay in the test for 14 days and open the app now and then: Google needs 12 testers for 14 days before a public release. Feedback to turnly@mainshai.com.
+Feedback to turnly@mainshai.com.
 
 </details>
 
 <details>
 <summary>Install the APK from GitHub</summary>
 
-Or download the APK of the [latest release](https://github.com/dferrandizmont/turnly/releases) and install it by hand (allow installs from unknown sources). Since 0.8.3 it is signed with the same key as the Google Play version, so you can move from one to the other without uninstalling and without losing anything; Android only refuses to go back to an older version. If you installed Turnly from Google Play before 0.8.3, uninstall it once (export a backup first: `.turnly`; older versions use `.cuadrante`).
+Or download the APK of the [latest release](https://github.com/dferrandizmont/turnly/releases) and install it by hand (allow installs from unknown sources). Since 0.8.3 it is signed with the same key as the Google Play version, so within the same package (`es.turnly.app`) you can move between Google Play and the APK without uninstalling and without losing anything; Android only refuses to go back to an older version. To move from `es.cuadrante.app` to `es.turnly.app`, follow the export and import steps above. The versions published before 0.12.1 belong to the previous app (`es.cuadrante.app`); see the note above to move your data.
 
 </details>
 
@@ -155,6 +156,7 @@ you choose. The `.turnly` backup file is not encrypted.
 
 ## What's new
 
+- **0.12.1 (23 Nov 2026):** Android: new app on Google Play (`es.turnly.app`); save a backup in the old one and import it here. During setup you can create your own cycle or adjust a catalogue rotation. The start day of a rotation is chosen in a new sheet with shortcuts for last Monday and today. In Summary, “Shifts worked” shows shifts through yesterday, with planned shifts shown separately. Saving a swap can also change your schedule; if the swap has shifts that can be applied, you see “Applied” or “Not applied” next to its debt state. Region names appear in the app’s language. With large text, the buttons of the setup steps, the swap form and the “Apply” button in Allowance template stay within reach.
 - **0.12.0 (21 Nov 2026):** Android: five ready-made rotations in the catalog: 4 on, 4 off with nights; 24/48 guard; 6 on, 6 off; 7 on, 7 off; and 14 on, 14 off. In the last three, you choose your work shift. The bottom bar stays on Rotation, Agenda and Summary, so you can switch between them without going back to the month. “Rotation” always opens “My rotations” and, if you have none yet, offers “Apply pattern”.
 - **0.11.4 (19 Nov 2026):** Android: In “Start the rotation here”, choose the cycle day for that date on the numbered strip. On phones in landscape or with large text, the wizard header scrolls with the step. In “Weeks per shift”, the list stays still when you choose a shift. On tablets, if “Create my own” has only a few blocks, the shift palette sits right below them. With very large text, the digits of each date in “Upcoming days” stay on one line. Shift times fit in the small widget preview. On tablets, opening “Agenda” from the side rail no longer shows a back arrow. The month summary sits just below the calendar, and “Create and share” stays in view as you scroll through the report options.
 - **0.11.3 (19 Nov 2026):** Android: the month preview during setup shows the shift hours for the profession you choose. On tablets, the amount field comes back into view above the keyboard when you rotate the tablet, and open sheets follow the system’s light or dark theme. With large text, a new block’s title stays in view. With very large text, the “Today” card takes up less space. VoiceOver and TalkBack announce each button name once (“Undo”, “Clear the cycle” and “Back”).

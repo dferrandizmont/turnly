@@ -903,7 +903,7 @@ class _ShiftRow extends StatelessWidget {
     final paid = shift.hasTimes ? shift.effectivePaidMinutes : 0;
     final detail = times == null
         ? null
-        : (paid > 0 ? '$times · ${durationText(l10n, paid)}' : times);
+        : (paid > 0 ? '$times · ${durationTextUnbroken(l10n, paid)}' : times);
     final several = !(isFirst && isLast);
 
     PopupMenuItem<_ShiftAction> item(

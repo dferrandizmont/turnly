@@ -1,4 +1,4 @@
-import 'dart:ui' show CheckedState, Tristate;
+import 'dart:ui' show Tristate;
 
 import 'package:cuadrante/core/bootstrap/bootstrap.dart';
 import 'package:flutter/material.dart';
@@ -25,17 +25,11 @@ void main() {
     final app = await FirstLaunch.open(tester);
 
     await app.chooseRotation();
-    // ChoiceRow announces the choice through `checked`, not `selected`.
-    bool checked(Pattern label) {
-      final node = tester.getSemantics(find.bySemanticsLabel(label));
-      return node.getSemanticsData().flagsCollection.isChecked ==
-          CheckedState.isTrue;
-    }
-
-    expect(checked(RegExp('^Enfermería')), isFalse);
+    // The job chips announce the choice as selected, like the rotations.
+    expect(_selected(tester, RegExp('^Enfermería')), isFalse);
     await app.tap(key('onboarding-profession-nursing'));
-    expect(checked(RegExp('^Enfermería')), isTrue);
-    expect(checked(RegExp('^Medicina')), isFalse);
+    expect(_selected(tester, RegExp('^Enfermería')), isTrue);
+    expect(_selected(tester, RegExp('^Medicina')), isFalse);
 
     final preset = RegExp('^12 horas');
     expect(_selected(tester, preset), isFalse);

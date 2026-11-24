@@ -27,30 +27,31 @@ barneko erosketarik gabe.
 ## Deskargak
 
 <p>
-  <a href="https://play.google.com/apps/testing/es.cuadrante.app"><img src="https://img.shields.io/badge/Google_Play-Beta-414141?logo=googleplay&amp;style=for-the-badge" alt="Google Play-ko beta"></a>
+  <a href="https://play.google.com/store/apps/details?id=es.turnly.app"><img src="https://img.shields.io/badge/Google_Play-Beta-414141?logo=googleplay&amp;style=for-the-badge" alt="Google Play-ko beta"></a>
   <a href="https://github.com/dferrandizmont/turnly/releases"><img src="https://img.shields.io/badge/Deskargatu-GitHub-181717?logo=github&amp;style=for-the-badge" alt="Deskargatu GitHub-etik"></a>
   <a href="https://apps.apple.com/es/app/turnly-cuadrante-de-turnos/id6832554552"><img src="https://img.shields.io/badge/App_Store-Deskargatu-0D96F6?logo=appstore&amp;style=for-the-badge" alt="App Store-n eskuragarri"></a>
 </p>
 
-Android probetan; iPhone, App Store-n. Modu argia eta iluna.
+Android proba irekian Google Play-n; iPhone, App Store-n. Modu argia eta iluna.
+
+**Android-eko aurreko aplikazioa erabiltzen zenuen?** Turnly aplikazio berri bat da orain (`es.turnly.app`) eta ez du zaharra eguneratzen (`es.cuadrante.app`); biak batera instalatuta eduki ditzakezu. Zaharrean joan Ezarpenak › Babeskopia atalera eta sakatu «Gorde kopia bat Turnly-tik kanpo», eta berrian erabili «Inportatu fitxategia». Konfiguratu berriz widgetak eta alarmak, eta desinstalatu zaharra.
 
 <details>
-<summary>Sartu Google Play-ko betan</summary>
+<summary>Instalatu Google Play-tik</summary>
 
-Aplikazioa proba itxian dago Google Play-n, eta edonor sar daiteke:
+Turnly proba irekian dago Google Play-n, beraz edonork instalatu dezake:
 
-1. Sartu testerren taldean: [turnly-testers](https://groups.google.com/g/turnly-testers). Zure Google kontuarekin, sakatu taldean sartzeko botoia.
-2. Onartu proba mugikorretik edo ordenagailutik: [play.google.com/apps/testing/es.cuadrante.app](https://play.google.com/apps/testing/es.cuadrante.app).
-3. Instalatu aplikazioa Google Play-tik. Bere kabuz eguneratuko da.
+1. Ireki [Turnly Google Play-n](https://play.google.com/store/apps/details?id=es.turnly.app) mugikorretik edo ordenagailutik.
+2. Instalatu aplikazioa (eskatzen badu, sartu proba irekian). Bere kabuz eguneratuko da.
 
-Ahal baduzu, egon proban gutxienez 14 egunez eta erabili noizean behin (adibidez, begiratu biharko txanda edo jarri widgeta): Google-k 12 tester eskatzen ditu 14 egunez, aplikazioa guztientzat argitaratzeko. Iruzkinak, turnly@mainshai.com helbidera.
+Iruzkinak, turnly@mainshai.com helbidera.
 
 </details>
 
 <details>
 <summary>Instalatu APKa GitHub-etik</summary>
 
-[Azken bertsioaren](https://github.com/dferrandizmont/turnly/releases) APKa ere deskarga dezakezu eta eskuz instalatu (jatorri ezezaguneko aplikazioak instalatzea baimendu behar da). 0.8.3 bertsiotik aurrera Google Play-ko bertsioaren gako berarekin dago sinatuta; beraz, batetik bestera pasa zaitezke desinstalatu gabe eta ezer galdu gabe; Android-ek bertsio zaharrago batera itzultzea bakarrik ez du uzten. Turnly Google Play-tik 0.8.3 baino lehen instalatu bazenuen, desinstalatu behin (esportatu lehenago kopia bat aplikaziotik: `.turnly`; aurreko bertsioek `.cuadrante` gisa gordetzen dute).
+[Azken bertsioaren](https://github.com/dferrandizmont/turnly/releases) APKa ere deskarga dezakezu eta eskuz instalatu (jatorri ezezaguneko aplikazioak instalatzea baimendu behar da). 0.8.3 bertsiotik aurrera Google Play-ko bertsioaren gako berarekin dago sinatuta; beraz, pakete berean (`es.turnly.app`) Google Play eta APK artean pasa zaitezke desinstalatu gabe eta ezer galdu gabe; Android-ek bertsio zaharrago batera itzultzea bakarrik ez du uzten. `es.cuadrante.app`-etik `es.turnly.app`-era pasatzeko, jarraitu goiko esportatu eta inportatzeko urratsak. 0.12.1 baino lehen argitaratutako bertsioak aurreko aplikazioarenak dira (`es.cuadrante.app`); ikusi goiko oharra zure datuak pasatzeko.
 
 </details>
 
@@ -167,6 +168,7 @@ dago zifratuta.
 
 ## Berriak
 
+- **0.12.1 (2026-11-23):** Androiden: aplikazio berria Google Play-n (`es.turnly.app`); gorde kopia bat zaharrean eta inportatu hemen. Lehen erabileran zure ziklo propioa sor dezakezu edo katalogoko txandaketa bat doitu. Txandaketa baten hasiera eguna orri berri batean aukeratzen da, joan den astelehenerako eta gaurkorako lasterbideekin. «Lan egindako txandak» atalean, gaur baino lehen egindako txandak eta gaurtik aurrera aurreikusitakoak bereiz ikusiko dituzu. Txanda-trukea gordetzean txanden egutegia ere alda dezakezu; trukeak egutegian aplika daitezkeen txandak baditu, «Aplikatuta» edo «Aplikatu gabe» ikusiko duzu zorraren egoeraren ondoan. Erkidegoak aplikazioaren hizkuntzan agertzen dira. Letra handiarekin, lehen erabileraren urratsetako eta trukeen formularioko botoiak eta «Osagarrien txantiloia» ataleko «Aplikatu» botoia eskura geratzen dira.
 - **0.12.0 (2026-11-21):** Androiden: erabiltzeko prest dauden bost txandaketa katalogoan: 4 x 4 gaueko txandekin, Guardia 24/48, 6 x 6, 7 x 7 eta 14 x 14. 6 x 6, 7 x 7 eta 14 x 14 ereduetan zure laneko txanda aukeratzen duzu. Beheko barra ikusgai geratzen da Txandaketa, Agenda eta Laburpena ataletan, eta hilabetera itzuli gabe pasa zaitezke batetik bestera. «Txandaketa» hautatzen duzunean, «Nire txandaketak» pantaila irekitzen da beti. Oraindik txandaketarik ez baduzu, «Aplikatu eredua» aukera agertzen da bertan.
 - **0.11.4 (2026-11-19):** Androiden: «Hasi txandaketa hemen» aukeran, hautatu zikloko eguna zenbakidun zerrendan. Mugikorrean, horizontalean edo letra handiz, morroiaren goiburua edukiarekin mugitzen da. «Asteak txandako» atalean, zerrenda ez da mugitzen txanda bat aukeratzean. Tabletan, «Sortu nirea» atalean bloke gutxi badituzu, paleta haien azpian bertan dago. Letra oso handiz ere, «Hurrengo egunak» ataleko data bakoitzaren zifrak lerro berean daude. Widget txikiaren aurrebistan, orduak osorik ikusten dira. Tabletan, «Agenda» alboko barratik irekitzen baduzu, ez da atzera egiteko gezirik agertzen. Hileko laburpena egutegiaren azpian bertan dago, eta «Sortu eta partekatu» botoiak ikusgai jarraitzen du txostenaren aukerak korritzean.
 - **0.11.3 (2026-11-19):** Androiden: lehen erabilerako hilabetearen aurrebistan, aukeratzen duzun lanbideko txanden ordutegiak agertzen dira. Tableta biratzean, zenbatekoaren eremua berriro agertzen da teklatuaren gainean, eta tabletan irekita dauden orriak sistemaren modu argira edo ilunera egokitzen dira. Letra handiarekin, bloke berriaren izenburua bistan geratzen da. Letra oso handiarekin, «Gaur» txartelak leku gutxiago hartzen du. VoiceOver-ek eta TalkBack-ek behin bakarrik irakurtzen dute botoi bakoitzaren izena («Desegin», «Hustu zikloa» eta «Atzera»).

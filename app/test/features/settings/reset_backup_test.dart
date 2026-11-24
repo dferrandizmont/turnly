@@ -54,6 +54,48 @@ void main() {
     expect(await tools.preResetStore.list(), [earlier]);
   });
 
+  test('the verified pre-reset copy survives two copies dated later', () async {
+    final now = DateTime(2026, 11, 4);
+    final storage = await TestStorage.open(now: now);
+    addTearDown(storage.close);
+    final dir = makeTempDir('reset-later-copies');
+    final automatic = LocalFileBackupStore(dir);
+    final tools = BackupTools(
+      directory: dir,
+      autoStore: automatic,
+      safetyStore: LocalFileBackupStore(dir, prefix: 'pre-restore'),
+      service: BackupService(
+        repository: makeRepository(storage.database, dir, now: () => now),
+        store: automatic,
+        appVersion: 'test',
+        now: () => now,
+        runner: runOnThisIsolate,
+      ),
+    );
+    // The clock was set back: two copies (the store keeps two) are dated
+    // after now.
+    final later = [
+      for (final day in [1, 2])
+        await tools.preResetStore.save(
+          Uint8List.fromList([day]),
+          at: DateTime(2027, 1, day),
+        ),
+    ];
+    final container = ProviderContainer(
+      overrides: [
+        backupToolsProvider.overrideWith((ref) async => tools),
+        clockProvider.overrideWithValue(() => now),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final copy = await container.read(resetBackupProvider)();
+
+    final kept = await tools.preResetStore.list();
+    expect(kept, contains(copy));
+    expect(kept, containsAll(later));
+  });
+
   test('actual pre-reset copy survives reset and automatic retention for forty days', () async {
     var now = DateTime(2026, 11, 4);
     final storage = await TestStorage.open(now: now);

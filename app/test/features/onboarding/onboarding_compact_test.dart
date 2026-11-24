@@ -7,9 +7,9 @@ import 'onboarding_support.dart';
 
 /// H-T01-6: with text at 2.0 or in landscape the top bar (back, dots,
 /// «Saltar») and the title left a card and a half of the list. There the bar
-/// scrolls away with the step, so the list gets the screen. With text at 2.0
-/// «Siguiente» goes with them, at the end of the content: fixed, it still
-/// left only 1.5 cards between two bars on a 320 dp phone.
+/// scrolls away with the step, so the list gets the screen. «Siguiente» stays
+/// fixed under the list on the two long steps of the rotation (M2, 0.12.1: at
+/// the end of the content it was 8 and 3-4 long swipes away at 2.0).
 void main() {
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
@@ -55,26 +55,15 @@ void main() {
       expect(barScrolls(), isTrue);
 
       // The scroll view starts at the top of the screen (the bar is inside
-      // it). Landscape keeps «Siguiente» fixed under it; with big text it is
-      // inside, at the end of the content, and the list gets the whole
-      // screen.
+      // it). «Siguiente» stays fixed under the list at any text size, also at
+      // 2.0 (QA 0.12.1, M2: inside, it was 8 long swipes away on this step),
+      // and it is on the screen without scrolling.
       final viewport = tester.getRect(scroll);
       expect(viewport.top, lessThan(8));
-      if (scale >= 1.5) {
-        expect(nextScrolls(), isTrue);
-        expect(viewport.bottom, greaterThan(size.height - 8));
-        expect(
-          tester.getRect(key('onboarding-next')).top,
-          greaterThan(size.height / 2),
-          reason: 'under the cards, not fixed over them',
-        );
-      } else {
-        expect(nextScrolls(), isFalse);
-        expect(
-          tester.getRect(key('onboarding-next')).top,
-          greaterThanOrEqualTo(viewport.bottom),
-        );
-      }
+      expect(nextScrolls(), isFalse);
+      final nextRect = tester.getRect(key('onboarding-next'));
+      expect(nextRect.top, greaterThanOrEqualTo(viewport.bottom));
+      expect(nextRect.bottom, lessThanOrEqualTo(size.height + 0.5));
       expect(tester.takeException(), isNull);
 
       // The bar is reachable at the top, and gone after scrolling the list.
@@ -84,7 +73,7 @@ void main() {
       expect(tester.getRect(key('onboarding-skip')).bottom, lessThan(0));
 
       // And it still works: pick a rotation and go on from where the list
-      // is («Siguiente» is reached by scrolling when it is inside).
+      // is.
       await app.tap(key('onboarding-pattern-12h'));
       await app.tap(key('onboarding-next'));
       expect(app.title, '¿Cuándo empiezas?');
@@ -112,8 +101,8 @@ void main() {
   group('H-T01-6 on every width and text size', () {
     for (final width in [320.0, 360.0, 412.0]) {
       for (final scale in [1.0, 1.3, 2.0]) {
-        testWidgets('$width dp, text $scale: «Siguiente» is fixed below '
-            '2.0 and reachable at the end of the content at 2.0', (
+        testWidgets('$width dp, text $scale: «Siguiente» and «Continuar» are '
+            'fixed and on screen without scrolling', (
           tester,
         ) async {
           final app = await FirstLaunch.open(
@@ -123,24 +112,14 @@ void main() {
           );
           await app.chooseRotation();
           for (var step = 0; step < 2; step++) {
-            expect(nextScrolls(), scale >= 1.5, reason: 'step $step');
+            expect(nextScrolls(), isFalse, reason: 'step $step');
             final next = key('onboarding-next');
-            if (scale < 1.5) {
-              // Fixed: always on screen, under the list.
-              expect(tester.getRect(next).bottom, lessThanOrEqualTo(760));
-              expect(
-                tester.getRect(next).top,
-                greaterThanOrEqualTo(tester.getRect(scroll).bottom),
-              );
-            } else {
-              // Inside: scroll to the end and it is on screen, under the
-              // last card.
-              await tester.drag(scroll, const Offset(0, -8000));
-              await tester.pumpAndSettle();
-              final rect = tester.getRect(next);
-              expect(rect.bottom, lessThanOrEqualTo(760 + 0.5));
-              expect(rect.top, greaterThan(0));
-            }
+            // Fixed: always on screen, under the list, at any text size.
+            expect(tester.getRect(next).bottom, lessThanOrEqualTo(760));
+            expect(
+              tester.getRect(next).top,
+              greaterThanOrEqualTo(tester.getRect(scroll).bottom),
+            );
             if (step == 0) {
               await app.tap(key('onboarding-pattern-12h'));
             }

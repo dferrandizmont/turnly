@@ -253,4 +253,35 @@ void main() {
       expect(after.entries[_start]!.shiftTypeIds, const ['morning']);
     });
   });
+
+  group('swapApplicationOf', () {
+    test('a debt with no shifts has nothing to apply', () {
+      expect(swapApplicationOf(_schedule(), _swap()), SwapApplication.nothing);
+      expect(
+        swapApplicationOf(_schedule(), _swap(given: const ['gone'])),
+        SwapApplication.nothing,
+      );
+    });
+
+    test('is pending until the calendar is as the change says', () {
+      final schedule = _schedule();
+      final swap = _swap(given: const ['morning']);
+      expect(swapApplicationOf(schedule, swap), SwapApplication.pending);
+      final plan = planSwapApplication(schedule, swap);
+      final applied = schedule.apply(plan.change);
+      expect(swapApplicationOf(applied, swap), SwapApplication.applied);
+      // Applying it again changes nothing: it cannot be applied twice.
+      expect(planSwapApplication(applied, swap).isEmpty, isTrue);
+      // Taking it back from the calendar makes it pending again.
+      final undone = applied.apply(planSwapUndo(applied, plan.before).change);
+      expect(swapApplicationOf(undone, swap), SwapApplication.pending);
+    });
+
+    test('the received day counts only with a day to receive it on', () {
+      final swap = _swap(received: const ['night']);
+      expect(swapApplicationOf(_schedule(), swap), SwapApplication.nothing);
+      final dated = _swap(received: const ['night'], returnDate: _morningAgain);
+      expect(swapApplicationOf(_schedule(), dated), SwapApplication.pending);
+    });
+  });
 }

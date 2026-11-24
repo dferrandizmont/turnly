@@ -318,7 +318,7 @@ void main() {
         find.descendant(
           of: find.byType(BottomSheet),
           // Day detail 4A: the hours worked follow the times.
-          matching: find.text('09:00–13:00 · 17:00–21:00 · 8 h'),
+          matching: find.text('09:00–13:00 · 17:00–21:00 · 8\u00A0h'),
         ),
         findsOneWidget,
       );

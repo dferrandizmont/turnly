@@ -15,6 +15,7 @@ import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/button_row.dart';
 import '../../../core/widgets/buttons.dart';
 import '../../../core/widgets/content_app_bar.dart';
+import '../../../core/widgets/date_sheet.dart';
 import '../../../core/widgets/page_body.dart';
 import '../../../core/widgets/value_row.dart';
 import '../../../core/widgets/whole_word_text.dart';
@@ -52,7 +53,7 @@ class PatternWizardScreen extends ConsumerStatefulWidget {
 }
 
 class _PatternWizardScreenState extends ConsumerState<PatternWizardScreen> {
-  PatternWizardArgs get _args => (start: widget.start, shiftId: widget.shiftId);
+  PatternWizardArgs get _args => PatternWizardArgs(start: widget.start, shiftId: widget.shiftId);
   bool _confirming = false;
   // Where the list of patterns was when a sub-form opened over it.
   double _listOffset = 0;
@@ -713,6 +714,7 @@ class PatternCard extends StatelessWidget {
     required this.onTap,
     this.shiftOf,
     this.onEdit,
+    this.editLabel,
     this.onRemove,
     this.inUse = false,
   });
@@ -724,6 +726,10 @@ class PatternCard extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
   final VoidCallback? onEdit;
+
+  /// Text of the [onEdit] button; «Editar» when `null` (the first-use
+  /// catalogue says «Ajustar»).
+  final String? editLabel;
   final VoidCallback? onRemove;
   final bool inUse;
 
@@ -766,7 +772,10 @@ class PatternCard extends StatelessWidget {
               spacing: Sp.s,
               children: [
                 if (onEdit != null)
-                  TextButton(onPressed: onEdit, child: Text(l10n.patternEdit)),
+                  TextButton(
+                    onPressed: onEdit,
+                    child: Text(editLabel ?? l10n.patternEdit),
+                  ),
                 if (onRemove != null)
                   TextButton(
                     onPressed: onRemove,
@@ -788,20 +797,24 @@ String patternFullDate(AppDateFormat format, CivilDate d) => capitalize(
   '${format.weekdayDayMonth(DateTime(d.year, d.month, d.day))} ${d.year}',
 );
 
+/// Asks for the start day of a rotation (or, with [forStart] false, its last
+/// day) in the sheet of the app (`showDateSheet`), 2000 to 2100 or from
+/// [first]. `null` when the sheet is closed without a choice.
 Future<CivilDate?> pickPatternDate(
   BuildContext context,
   CivilDate initial, {
   CivilDate? first,
-}) async {
-  final picked = await showDatePicker(
-    context: context,
-    initialDate: DateTime(initial.year, initial.month, initial.day),
-    firstDate: first == null
-        ? DateTime(2000)
-        : DateTime(first.year, first.month, first.day),
-    lastDate: DateTime(2100),
+  bool forStart = true,
+}) {
+  final l10n = context.l10n;
+  return showDateSheet(
+    context,
+    initial: initial,
+    first: first ?? dateSheetFirst,
+    title: forStart ? l10n.patternStartLabel : l10n.patternUntilLabel,
+    hint: forStart ? l10n.dateSheetStartHint : null,
+    shortcuts: forStart,
   );
-  return picked == null ? null : CivilDate.fromDateTime(picked);
 }
 
 /// A tappable date with its calendar icon.
@@ -999,6 +1012,7 @@ class _EndStep extends ConsumerWidget {
                 context,
                 wizard.until!,
                 first: wizard.start,
+                forStart: false,
               );
               if (picked != null) controller.setUntil(picked);
             },

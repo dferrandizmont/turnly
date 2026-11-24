@@ -10,6 +10,7 @@ import '../../../core/widgets/app_card.dart';
 import '../../calendar/presentation/shift_format.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../domain/month_summary.dart';
+import '../domain/period_hours.dart';
 import 'summary_format.dart';
 
 /// The year as a list of cards, for large text (see `YearTable`): a tappable
@@ -24,10 +25,14 @@ class YearMonthCards extends StatelessWidget {
   const YearMonthCards({
     super.key,
     required this.totals,
+    required this.splits,
     required this.onOpenMonth,
   });
 
   final YearTotals totals;
+
+  /// The twelve months split at today, in the order of [totals].
+  final List<PeriodSplit> splits;
   final ValueChanged<CivilDate> onOpenMonth;
 
   /// Spaces that must not break a line: «176 h 30 min» stays together.
@@ -39,16 +44,29 @@ class YearMonthCards extends StatelessWidget {
     final colors = context.colors;
     final format = AppDateFormat.of(context);
 
+    final yearSplit = SplitTotals(splits);
+
     String hours(int minutes) => _together(formatHours(l10n, minutes));
 
-    /// «22 turnos · 176 h» and «56 h nocturnas · 2.180,00 € estimado».
+    /// «22 turnos · 176 h» (worked before today), then «y 2 previstos · 48 h
+    /// previstas» when the period still has days from today on, and
+    /// «56 h nocturnas · 2.180,00 € estimado».
     List<String> lines({
-      required int shifts,
-      required int workedMinutes,
+      required int doneShifts,
+      required int plannedShifts,
+      required int doneMinutes,
+      required int plannedMinutes,
       required int nightMinutes,
       required int? earningsCents,
     }) => [
-      '${_together(l10n.summaryShifts(shifts))} · ${hours(workedMinutes)}',
+      '${_together(l10n.summaryShifts(doneShifts))} · ${hours(doneMinutes)}',
+      if (plannedShifts > 0 || plannedMinutes > 0)
+        [
+          if (plannedShifts > 0)
+            _together(l10n.summaryShiftsPlannedRest(plannedShifts)),
+          if (plannedMinutes > 0)
+            '${hours(plannedMinutes)} ${l10n.summaryHowPlanned}',
+        ].join(' · '),
       [
         _together(l10n.summaryNightOf(hours(nightMinutes))),
         if (earningsCents != null)
@@ -61,9 +79,11 @@ class YearMonthCards extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        for (final month in totals.months) ...[
+        for (var i = 0; i < totals.months.length; i++) ...[
           Builder(
             builder: (context) {
+              final month = totals.months[i];
+              final split = splits[i];
               final name = capitalize(
                 format.monthName(DateTime(month.month.year, month.month.month)),
               );
@@ -72,14 +92,24 @@ class YearMonthCards extends StatelessWidget {
                 title: name,
                 semantics: l10n.summaryYearMonthSemantics(
                   name,
-                  l10n.summaryShifts(month.shiftsWorked),
-                  formatHours(l10n, month.workedMinutes),
+                  split.shifts.plannedShifts > 0
+                      ? '${l10n.summaryShifts(split.shifts.doneShifts)} '
+                            '${l10n.summaryShiftsPlannedRest(split.shifts.plannedShifts)}'
+                      : l10n.summaryShifts(split.shifts.doneShifts),
+                  split.hours.plannedMinutes > 0
+                      ? l10n.summaryHowBarLabel(
+                          formatHours(l10n, split.hours.doneMinutes),
+                          formatHours(l10n, split.hours.plannedMinutes),
+                        )
+                      : formatHours(l10n, split.hours.doneMinutes),
                 ),
                 lines: month.isEmpty
                     ? [l10n.summaryYearMonthEmpty]
                     : lines(
-                        shifts: month.shiftsWorked,
-                        workedMinutes: month.workedMinutes,
+                        doneShifts: split.shifts.doneShifts,
+                        plannedShifts: split.shifts.plannedShifts,
+                        doneMinutes: split.hours.doneMinutes,
+                        plannedMinutes: split.hours.plannedMinutes,
                         nightMinutes: month.nightMinutes,
                         earningsCents: month.earningsCents,
                       ),
@@ -94,8 +124,10 @@ class YearMonthCards extends StatelessWidget {
           key: const ValueKey('summary-year-total'),
           title: l10n.summaryYearTotal,
           lines: lines(
-            shifts: totals.shiftsWorked,
-            workedMinutes: totals.workedMinutes,
+            doneShifts: yearSplit.doneShifts,
+            plannedShifts: yearSplit.plannedShifts,
+            doneMinutes: yearSplit.doneMinutes,
+            plannedMinutes: yearSplit.plannedMinutes,
             nightMinutes: totals.nightMinutes,
             earningsCents: totals.earningsCents,
           ),

@@ -145,6 +145,27 @@ final yearTotalsProvider = Provider.autoDispose.family<YearTotals, int>((
   );
 });
 
+/// The twelve months of a year split at today (worked before today, planned
+/// from today on): what the year view shows. With a closing day each month
+/// is its payroll month, like [yearTotalsProvider].
+final yearSplitProvider = Provider.autoDispose.family<List<PeriodSplit>, int>((
+  ref,
+  year,
+) {
+  final schedule = ref.watch(
+    scheduleControllerProvider.select((s) => s.schedule),
+  );
+  final today = ref.watch(summaryTodayProvider);
+  final closingDay = ref.watch(summaryClosingDayProvider);
+  return [
+    for (var m = 1; m <= 12; m++)
+      () {
+        final range = payPeriodOf(CivilDate(year, m, 1), closingDay);
+        return splitPeriod(schedule, range.from, range.to, today);
+      }(),
+  ];
+});
+
 /// The overtime of the period against the cap, or `null` without a cap or
 /// when the cap is not counted on such a period. [OvertimeCapQuery.month] is
 /// the month on screen (a monthly cap counts its overtime, a yearly one the
@@ -204,6 +225,21 @@ final periodHoursProvider = Provider.autoDispose
         scheduleControllerProvider.select((s) => s.schedule),
       );
       return splitPeriodHours(
+        schedule,
+        range.from,
+        range.to,
+        ref.watch(summaryTodayProvider),
+      );
+    });
+
+/// The shifts of a period of the ACTIVE calendar split at today, like
+/// [periodHoursProvider]: worked before today, planned from today on.
+final periodShiftsProvider = Provider.autoDispose
+    .family<PeriodShifts, SummaryRange>((ref, range) {
+      final schedule = ref.watch(
+        scheduleControllerProvider.select((s) => s.schedule),
+      );
+      return splitPeriodShifts(
         schedule,
         range.from,
         range.to,

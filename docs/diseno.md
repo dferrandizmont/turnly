@@ -611,6 +611,31 @@ calendario útil en menos de 60 s sin responder nada que no haga falta.
   ayuda: la profesión elegida pone primero «Lo habitual en tu trabajo», como Policía con la 2-2-2-6) → día de inicio y
   **turno y día del ciclo**, que es el último paso («Continuar» guarda); a mano → último paso, y el mes se abre ya en modo
   pintar. «Lo pinto a mano» sigue en el catálogo y termina ahí mismo, sin volver a preguntar el lugar.
+- **«Crear mi ciclo» (1C, 23-nov-2026)**, en el catálogo de la rotación (paso 2 de 3), para quien conoce su ciclo y no
+  está en la lista: una `AppCard` justo debajo de la profesión y encima de «Lo habitual en tu trabajo», con un «+» en
+  un cuadrado `surfaceRaised` de `Disc.m`, el nombre en `bodyStrong`, una línea `meta` y una tira de días de ejemplo
+  (M M T T N N S L L) dibujada con `SequenceChips`, así que sale en el idioma de la app. Se repite al final de la lista
+  como botón de texto «¿No está la tuya? Crear mi ciclo», y cada tarjeta del catálogo lleva «Ajustar», que abre el
+  mismo constructor con esa rotación cargada (el resultado siempre es un ciclo propio; la del catálogo no se toca). La
+  ayuda dice «Elige la tuya o créala en un momento. Luego dices cuándo empiezas.». Abre **«Tu ciclo»**
+  (`OwnCycleScreen`), una pantalla completa por encima del primer uso con «cerrar» a la izquierda, el constructor del
+  asistente (`PatternBuilderViewport`, con su paleta fijada abajo y sus arreglos de letra grande y horizontal) y el
+  botón principal «Usar este ciclo», desactivado hasta que hay un día. La paleta sale de los tipos del primer uso (los
+  de fábrica en el idioma de la app, con las horas de la profesión elegida), con la ficha Saliente y sin las
+  ausencias (Vacaciones y Libre disposición), y una línea `meta` avisa: «Las horas las cambias luego en Ajustes › Mis
+  turnos.». «Usar este ciclo» guarda el ciclo solo en el estado del primer uso (nada en la base de datos hasta
+  «Continuar») y pasa directo a «¿Cuándo empiezas?», donde el selector del día y «Así quedará» usan el ciclo propio. Si
+  se vuelve atrás, el catálogo enseña arriba su ciclo como tarjeta elegida (borde `todayRing` y marca) con «Editar» y
+  «Quitar», y debajo la fila «Crear otro ciclo»; si elige otra rotación, la tarjeta se queda sin elegir hasta que la
+  quite. Cerrar «Tu ciclo» con cambios abre el aviso de siempre (`confirmDiscardSequence`) y el botón atrás del sistema
+  cierra «Tu ciclo», no el paso. «Listo» dice «Rotación: Mi ciclo (9 días), desde el …».
+- **La profesión, en una fila (para que «Crear mi ciclo» se vea sin desplazarse):** en el catálogo de la rotación las
+  profesiones son una sola fila de fichas `ChoicePill` de hasta 200 dp que se desplaza de lado, con un degradado en el borde
+  donde quedan más (como la tira del ciclo) y, bajo la fila, las horas habituales solo de la elegida. En el paso del lugar
+  siguen siendo una lista.
+- **«Siguiente» y «Continuar» fijos con letra grande (M2, QA 0.12.1):** en el lugar, «¿Cómo es tu rotación?» y «¿Cuándo
+  empiezas?», que son largos, el botón principal no se va dentro del desplazamiento con letra ×2,0 (estaba a 8 y a 3-4
+  deslizamientos largos): se queda fijo debajo, también en horizontal, y solo la barra de arriba se va con el contenido.
 - **Paso del lugar, opcional** (`PlaceStep`; el último salvo con una rotación, donde es el primero): «Paso N de M · Opcional» en `meta` seminegrita, «¿Dónde trabajas?» (país,
   comunidad y municipio como antes) y, debajo (salvo en el camino de la rotación, que ya la preguntó en el catálogo),
   «¿A qué te dedicas? Opcional» en `title` con las profesiones del país en una tarjeta con `ChoiceRow` de una columna (elección única; la elegida lleva la marca) y sus horas habituales en cada fila,
@@ -647,6 +672,13 @@ posterior), en 200 ms; la cabecera y la fila del mes no se mueven. Con «reducir
   día debajo) para quien la prefiera. Bajo el selector, **«Así quedará»**: dos meses con la misma `DayCell` de la
   pantalla del mes que se actualizan en vivo; el primer uso lo enseña con este mismo componente y el asistente lo deja
   para su paso 3, para no pintarlo dos veces. El texto bajo el selector resume «Ese día te toca: …».
+- **Día de inicio** (`pickPatternDate` › `showDateSheet`, `core/widgets/date_sheet.dart`): hoja de la app, no el diálogo de
+  Material. Título «Día de inicio» con su línea `meta`, atajos «Hoy · 23 nov» y «Lunes pasado · 16 nov» (`ChoicePill`),
+  cabecera «‹ Octubre 2026 ▾ ›» con flechas de 48 dp y rejilla de 6 filas con la semana de Ajustes (nunca domingo en
+  España). Elegido: relleno `accent` y negrita; hoy: anillo `todayRing`. Un toque en un día lo elige y cierra; deslizar
+  cambia de mes con el movimiento del mes; el título abre los 12 meses del año. Con letra grande, los números de la
+  rejilla se quedan en ×1,5 (`MonthFit.headerMaxScale`) y cada día se lee entero; el título se parte en líneas; en
+  horizontal la hoja se desplaza.
 - **Vista anual** (`/ano`): cada día es un cuadrado con la `bar` del turno (varios turnos: franjas verticales),
   `surfaceMuted` si no hay turno, un punto `holiday` en los festivos y un anillo `todayRing` en hoy; 3 columnas en
   móvil (4 desde 600 dp). Cada mes se lee en voz alta como sus recuentos («Octubre 2026: 8 Noche, 5 Libre»). La

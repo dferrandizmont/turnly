@@ -120,6 +120,16 @@ class ScheduleController extends Notifier<ScheduleState> {
   Future<void> _queue = Future.value();
   int _epoch = 0;
 
+  // Days with a queued day write that has not run yet, by calendar and day
+  // ([_dayKey]): how many such writes each one waits for. A swap job, which
+  // is planned on the schedule in memory, refuses to write a day that a
+  // later edit is still about to write ([commitSwapChange]). A step that
+  // carries swap records (an undo or redo of a swap) also counts every date
+  // of the records it replaces and restores and of the swap's definition,
+  // and its swap id ([_swapKey]): a swap job of that swap is refused while
+  // such a step waits, since that step would replace the swap's records.
+  final _pendingDays = <String, int>{};
+
   // Undo step of the latest note save, to join the next one of the same day
   // to it ([setNote] with `continuesTyping`).
   ScheduleChange? _noteStep;
@@ -138,6 +148,7 @@ class ScheduleController extends Notifier<ScheduleState> {
     _strokeDays.clear();
     _queue = Future.value();
     _epoch = 0;
+    _pendingDays.clear();
     _switchToken = 0;
     // Start loading "Saliente automático" now, so the first stroke sees it.
     ref.read(postNightAutoProvider);
@@ -239,7 +250,9 @@ class ScheduleController extends Notifier<ScheduleState> {
   ScheduleChange? lastStepOnlyOn(CivilDate date) {
     if (!ref.mounted || strokeActive) return null;
     final last = _undo.last;
-    if (last == null || last.runsAfter != null) return null;
+    if (last == null || last.runsAfter != null || last.swap != null) {
+      return null;
+    }
     final days = last.patch.changes.keys;
     return days.length == 1 && days.first == date ? last : null;
   }
@@ -367,8 +380,42 @@ class ScheduleController extends Notifier<ScheduleState> {
     // The calendar the change was made on, even if the user switches before
     // the write runs.
     final calendarId = state.calendarId;
+    final swap = change.swap;
+    final days = [
+      ...{
+        for (final date in change.patch.changes.keys) _dayKey(calendarId, date),
+        if (swap != null) ...[
+          for (final record in [...swap.before, ...swap.after])
+            _dayKey(calendarId, record.date),
+          for (final definition in [
+            swap.definition?.before,
+            swap.definition?.after,
+          ])
+            for (final date in [definition?.date, definition?.returnDate])
+              if (date != null) _dayKey(calendarId, date),
+          _swapKey(swap.swapId),
+        ],
+      },
+    ];
+    for (final day in days) {
+      _pendingDays[day] = (_pendingDays[day] ?? 0) + 1;
+    }
+    void settled() {
+      for (final day in days) {
+        final left = (_pendingDays[day] ?? 1) - 1;
+        if (left <= 0) {
+          _pendingDays.remove(day);
+        } else {
+          _pendingDays[day] = left;
+        }
+      }
+    }
+
     if (newTypes.isEmpty && newPattern == null) {
-      _enqueueTask((repository) => repository.apply(calendarId, change));
+      _enqueueTask(
+        (repository) => repository.apply(calendarId, change),
+        settled: settled,
+      );
       return;
     }
     // What the change refers to goes first (a run needs its pattern, a day
@@ -381,25 +428,39 @@ class ScheduleController extends Notifier<ScheduleState> {
         if (newPattern != null) await repository.savePattern(newPattern);
         await repository.apply(calendarId, change);
       }),
+      settled: settled,
     );
   }
 
-  /// Queues [task] behind every write already queued.
-  void _enqueueTask(Future<void> Function(ScheduleRepository repository) task) {
+  static String _dayKey(String calendarId, CivilDate date) =>
+      '$calendarId ${date.toIso()}';
+
+  static String _swapKey(String swapId) => 'swap $swapId';
+
+  /// Queues [task] behind every write already queued. [settled] runs when
+  /// the job is over, also when it is skipped.
+  void _enqueueTask(
+    Future<void> Function(ScheduleRepository repository) task, {
+    void Function()? settled,
+  }) {
     final epoch = _epoch;
     // The tail of the queue must never be a rejected future (that would skip
     // every later write for good), so a job swallows whatever escapes it.
     _queue = _queue
         .then((_) async {
-          if (epoch != _epoch || !ref.mounted) return;
           try {
+            if (epoch != _epoch || !ref.mounted) return;
             try {
-              await task(ref.read(scheduleRepositoryProvider));
-            } catch (error, stack) {
-              await _recover(error, stack);
+              try {
+                await task(ref.read(scheduleRepositoryProvider));
+              } catch (error, stack) {
+                await _recover(error, stack);
+              }
+            } catch (_) {
+              // Recovery itself failed: nothing left to do, the queue goes on.
             }
-          } catch (_) {
-            // Recovery itself failed: nothing left to do, the queue goes on.
+          } finally {
+            settled?.call();
           }
         })
         .catchError((Object _) {});
@@ -1218,6 +1279,114 @@ class ScheduleController extends Notifier<ScheduleState> {
     );
     _enqueueWrite(planned.change, newTypes: planned.newTypes);
     return planned.change;
+  }
+
+  /// Plans and writes a swap step in ONE queued transaction, from what the
+  /// database holds. The step reaches the caller only after it commits.
+  ///
+  /// The job runs in strict queue order, like any edit. [plan] gets
+  /// `readDays`, which it calls once with every day the swap may read or
+  /// write: it returns the schedule with those days **as stored** (an edit
+  /// queued before is already written), so the plan, the swap records and
+  /// the conflict check all come from the database; rotations and shift
+  /// types still come from memory. Where memory and disk
+  /// disagree on those days, disk wins: memory takes the stored days plus
+  /// the step. A plan that writes a day it did not read is a bug and fails.
+  ///
+  /// An edit queued after this job but already shown would later write one
+  /// of those days whole, as it was before the swap. So a day with such a
+  /// write still queued refuses the swap with nothing written, and so does
+  /// any change of the schedule in memory while the plan runs: the screen,
+  /// the disk and the undo history stay equal. So does a queued undo or redo
+  /// of the same swap ([swapId]), which would replace its records.
+  ///
+  /// An error of [plan] for which [isRefusal] is true is a refusal: the
+  /// transaction is rolled back and the error reaches the caller, with no
+  /// recovery and the undo history left alone.
+  Future<ScheduleChange?> commitSwapChange(
+    String calendarId,
+    Future<ScheduleChange?> Function(
+      Future<Schedule> Function(Iterable<CivilDate> days) readDays,
+    )
+    plan, {
+    bool Function(Object error)? isRefusal,
+    String? swapId,
+  }) async {
+    if (!ref.mounted || state.calendarId != calendarId) return null;
+    if (strokeActive) endStroke();
+    ScheduleChange? committed;
+    (Object, StackTrace)? failure;
+    var ran = false;
+    _enqueueTask((repository) async {
+      final outsideTransaction = Zone.current;
+      var stale = false;
+      try {
+        if (!ref.mounted || state.calendarId != calendarId || strokeActive) {
+          stale = true;
+          throw StateError('Calendar changed before planning a swap');
+        }
+        final memory = state.schedule;
+        committed = await repository.transaction(() async {
+          Schedule? base;
+          Set<CivilDate>? read;
+          Future<Schedule> readDays(Iterable<CivilDate> days) async {
+            if (base != null) throw StateError('Swap days read twice');
+            final wanted = days.toSet();
+            if ((swapId != null &&
+                    _pendingDays.containsKey(_swapKey(swapId))) ||
+                wanted.any(
+                  (date) => _pendingDays.containsKey(_dayKey(calendarId, date)),
+                )) {
+              stale = true;
+              throw StateError('A later edit of the same day is still queued');
+            }
+            final stored = await repository.entriesOn(calendarId, wanted);
+            read = wanted;
+            return base = memory.copyWith(
+              entries: {
+                for (final MapEntry(:key, :value) in memory.entries.entries)
+                  if (!wanted.contains(key)) key: value,
+                ...stored,
+              },
+            );
+          }
+
+          final change = await plan(readDays);
+          if (!ref.mounted ||
+              state.calendarId != calendarId ||
+              !identical(state.schedule, memory) ||
+              strokeActive) {
+            stale = true;
+            throw StateError('Calendar changed while planning a swap');
+          }
+          if (change == null || change.isEmpty) return null;
+          final days = change.patch.changes.keys;
+          if (days.isNotEmpty &&
+              (base == null || !days.every(read!.contains))) {
+            throw StateError('A swap step writes a day it did not read');
+          }
+          final from = base ?? memory;
+          // Listeners may start their own database work. It must not join
+          // this transaction or outlive it in Drift's transaction zone.
+          outsideTransaction.run(() {
+            _undo.push(change);
+            _emit(change.patch.isEmpty ? from : from.apply(change));
+          });
+          await repository.apply(calendarId, change);
+          return change;
+        });
+        ran = true;
+      } catch (error, stack) {
+        failure = (error, stack);
+        if (!stale && !(isRefusal?.call(error) ?? false)) rethrow;
+      }
+    });
+    await pendingWrites;
+    if (failure case (final error, final stack)) {
+      Error.throwWithStackTrace(error, stack);
+    }
+    if (!ran) throw StateError('Swap write was superseded');
+    return committed;
   }
 
   /// [change] on top of [base] plus, with "Saliente automático" on, the

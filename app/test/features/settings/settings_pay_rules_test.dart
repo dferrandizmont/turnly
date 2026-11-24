@@ -53,7 +53,9 @@ void main() {
       await tester.enterText(key('closing-day-field'), '45');
       await tapKey(tester, 'closing-day-save');
       expect(
-        find.text('Escribe un día del 1 al 30, o déjalo vacío para el mes natural.'),
+        find.text(
+          'Escribe un día del 1 al 30, o déjalo vacío para el mes natural.',
+        ),
         findsOneWidget,
       );
       expect(tester.takeException(), isNull);
@@ -136,6 +138,49 @@ void main() {
         await app.real(() => HoursGoalStore(app.database).load()),
         const HoursGoal(HoursGoalPeriod.year, 1782),
       );
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  // QA M5: «Aplicar» was at the end of a long form, 5 swipes down in
+  // landscape at text x2.0 and 2 in portrait at x1.5. It is pinned now.
+  for (final (size, scale) in [
+    (const Size(844, 390), 2.0),
+    (const Size(390, 844), 1.5),
+  ]) {
+    final label = '${size.width.toInt()}x${size.height.toInt()}, text $scale';
+
+    testWidgets('«Aplicar» of the template is on screen with no swipe at '
+        '$label', (tester) async {
+      tester.platformDispatcher.textScaleFactorTestValue = scale;
+      final app = await AppUnderTest.pump(tester, size: size);
+      await app.openSettings();
+      await tapKey(tester, 'settings-pay-template');
+      expect(tester.takeException(), isNull);
+
+      Rect apply() => tester.getRect(key('pay-template-apply'));
+      expect(apply().top, greaterThanOrEqualTo(0), reason: 'not above');
+      expect(
+        apply().bottom,
+        lessThanOrEqualTo(size.height + 0.5),
+        reason: 'on screen, no swipe',
+      );
+      final pinned = apply();
+
+      // The form scrolls behind it and the button does not move.
+      await tester.ensureVisible(key('pay-template-annual'));
+      await tester.pumpAndSettle();
+      expect(apply(), pinned);
+      expect(tester.takeException(), isNull);
+
+      // And it works from there.
+      await tester.tap(key('pay-template-apply'));
+      await tester.pumpAndSettle();
+      if (key('shift-scope-every-day').evaluate().isNotEmpty) {
+        await tapKey(tester, 'shift-scope-every-day');
+      }
+      expect(key('pay-template-apply'), findsNothing);
+      expect(key('shift-scope-every-day'), findsNothing);
       expect(tester.takeException(), isNull);
     });
   }

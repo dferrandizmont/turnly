@@ -26,7 +26,9 @@ class HolidaysSettingsRow extends ConsumerWidget {
       title: l10n.settingsHolidaysTitle,
       value: !place.isSpain
           ? holidayCountryLabel(context, place.countryCode)
-          : region?.name ?? l10n.holidaysSettingsRegionUnset,
+          : (region == null
+                ? l10n.holidaysSettingsRegionUnset
+                : regionLabel(context, region)),
       onTap: () => context.push(AppRoutes.settingsHolidays),
     );
   }

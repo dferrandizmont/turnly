@@ -469,7 +469,7 @@ void main() {
                 );
                 await tester.pumpAndSettle();
                 final wizard = container.read(
-                  patternWizardProvider((start: _rotationStart, shiftId: null))
+                  patternWizardProvider(PatternWizardArgs(start: _rotationStart))
                       .notifier,
                 );
                 wizard.startBuilding();

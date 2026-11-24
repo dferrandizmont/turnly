@@ -94,6 +94,17 @@ class AppDateFormat {
       ? DateFormat("EEEE d 'de' MMMM", locale).format(d)
       : longDate(d);
 
+  /// The whole date with its year, as it is read aloud and shown under the
+  /// date sheet: "domingo, 11 de octubre de 2026" · "Sunday, October 11,
+  /// 2026" · "2026ko urriaren 11, igandea" (the year in the genitive before
+  /// the month, and the day with the ending of [longDate]).
+  String spokenDate(DateTime d) => switch (_lang) {
+    'es' => DateFormat("EEEE, d 'de' MMMM 'de' y", locale).format(d),
+    'eu' =>
+      '${basqueYearOf(d.year)} ${_basqueDayOfMonth(d)}, ${weekdayLong(d)}',
+    _ => DateFormat.yMMMMEEEEd(locale).format(d),
+  };
+
   /// "octubre".
   String monthName(DateTime d) => DateFormat.LLLL(locale).format(d);
 
@@ -152,6 +163,20 @@ class AppDateFormat {
 
   static String _stripDot(String s) =>
       s.endsWith('.') ? s.substring(0, s.length - 1) : s;
+
+  /// "2026ko" · "2025eko": the year with its genitive ending. It is -ko after
+  /// a vowel sound and -eko after a consonant one, and what decides it is how
+  /// the last word of the numeral ends: 1 (bat), 5 (bost), 10 (hamar) and 15
+  /// (hamabost) end in a consonant, and so do the tens said with «-ta hamar»
+  /// (30, 50, 70, 90) and the hundreds (ehun); the thousands (mila) and every
+  /// other number end in a vowel.
+  static String basqueYearOf(int year) {
+    final n = year % 100;
+    final consonant = n == 0
+        ? year % 1000 != 0
+        : const {1, 5, 10, 15}.contains(n % 20);
+    return '$year${consonant ? 'eko' : 'ko'}';
+  }
 
   /// "urriaren 20a": genitive of the month (every Basque month name ends in
   /// -a, so it takes -ren) and the day with the article -a, which 11 and 31

@@ -53,8 +53,10 @@ class LocalFileBackupStore implements BackupStore {
   }
 
   /// Drops the copies the store does not keep ([retain], or the newest
-  /// [keep]). The newest copy is never dropped.
-  Future<void> prune() => _prune();
+  /// [keep]). The newest copy is never dropped, and neither is [protect]
+  /// (the copy just written and verified), even when copies dated later
+  /// (a clock set back) push it out of the newest.
+  Future<void> prune({BackupEntry? protect}) => _prune(protect: protect?.id);
 
   /// Deletes [entry] (e.g. a copy that turned out not to be readable). Only
   /// files of this store can be deleted.
@@ -67,7 +69,12 @@ class LocalFileBackupStore implements BackupStore {
   Future<void> _prune({String? protect}) async {
     final retain = this.retain;
     if (retain == null) {
-      await pruneBackupFiles(directory, _name, keep);
+      await pruneBackupFiles(
+        directory,
+        _name,
+        keep,
+        protect: protect == null ? null : File(p.join(directory.path, protect)),
+      );
       return;
     }
     final entries = await list();

@@ -172,23 +172,22 @@ void main() {
     }
   }
 
-  testWidgets('compact: only the chosen row shows its hours line', (tester) async {
+  testWidgets('compact: one row of chips, and only the chosen job shows its '
+      'hours line', (tester) async {
     final app = await FirstLaunch.open(tester);
     await app.chooseRotation();
-    // Nothing chosen yet: no row carries its hours line.
-    expect(
-      tester
-          .widgetList<ChoiceRow>(find.byType(ChoiceRow))
-          .where((r) => r.subtitle != null)
-          .length,
-      0,
-    );
+    // The jobs are chips in one row, not rows of a list.
+    expect(find.byType(ChoiceRow), findsNothing);
+    expect(key('onboarding-profession-chips'), findsOneWidget);
+    // Nothing chosen yet: no hours line.
+    expect(key('onboarding-profession-hours'), findsNothing);
 
     await app.tap(key('onboarding-profession-nursing'));
     await tester.pumpAndSettle();
-    final rows = tester.widgetList<ChoiceRow>(find.byType(ChoiceRow)).toList();
-    final withSubtitle = rows.where((r) => r.subtitle != null).toList();
-    expect(withSubtitle, hasLength(1));
-    expect(withSubtitle.single.label, 'Enfermería, TCAE y celadores');
+    expect(key('onboarding-profession-hours'), findsOneWidget);
+    expect(
+      tester.widget<Text>(key('onboarding-profession-hours')).data,
+      endsWith('saliente'),
+    );
   });
 }

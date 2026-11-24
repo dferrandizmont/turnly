@@ -185,6 +185,7 @@ class ReportModel {
     required this.holidays,
     required this.summary,
     required this.hours,
+    required this.shifts,
   });
 
   /// Name of the calendar (may be empty: the renderer then uses a fallback).
@@ -200,6 +201,9 @@ class ReportModel {
 
   /// Worked / planned hours split at today.
   final PeriodHours hours;
+
+  /// Worked / planned shifts split at today (the same cut as [hours]).
+  final PeriodShifts shifts;
 
   /// Whether the absences are counted and listed at all.
   bool get showsAbsences => options.absences != ReportAbsenceMode.hidden;
@@ -246,6 +250,7 @@ ReportModel buildReport({
     holidays: holidayDates,
   );
   final hours = splitPeriodHours(schedule, range.from, range.to, today);
+  final shifts = splitPeriodShifts(schedule, range.from, range.to, today);
   final mode = options.absences;
 
   final days = <ReportDay>[];
@@ -356,6 +361,7 @@ ReportModel buildReport({
     holidays: reportHolidays,
     summary: summary,
     hours: hours,
+    shifts: shifts,
   );
 }
 

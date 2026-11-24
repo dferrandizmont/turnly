@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,6 +15,7 @@ import '../../../core/widgets/choice_grid.dart';
 import '../../../core/widgets/choice_pill.dart';
 import '../../../core/widgets/labeled_field.dart';
 import '../../calendar/application/schedule_controller.dart';
+import '../../calendar/presentation/day_cell.dart' show textHeight;
 import '../../calendar/presentation/shift_badge.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../../shift_types/domain/shift_type_draft.dart'
@@ -72,7 +75,8 @@ Future<void> _openPayTemplate(
   if (!context.mounted) return;
   final choice = await showAppSheet<_TemplateChoice>(
     context: context,
-    padded: true,
+    // The sheet wraps itself in [AppSheetBody] to pin «Aplicar» under the form
+    // (QA M5: five swipes to reach it in landscape at text x2.0).
     builder: (_) => _PayTemplateSheet(
       workTypes: work,
       decimals: currencyDecimalsOf(context),
@@ -267,9 +271,32 @@ class _PayTemplateSheetState extends State<_PayTemplateSheet> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final type = context.type;
-    final colors = context.colors;
     final applicable = _applicable(_template);
     final digits = widget.decimals > 0 ? r'[0-9.,]' : r'[0-9]';
+    // The button: 12 dp above and below its line, 48 dp at least.
+    final button = math.max(
+      Sp.touch,
+      textHeight(type.button, MediaQuery.textScalerOf(context)) + 2 * Sp.m,
+    );
+    return AppSheetBody(
+      footer: PrimaryButton(
+        key: const ValueKey('pay-template-apply'),
+        label: l10n.payTemplateApply,
+        onPressed: _apply,
+      ),
+      footerHeight: button,
+      child: _form(context, applicable, digits),
+    );
+  }
+
+  Widget _form(
+    BuildContext context,
+    List<ShiftType> applicable,
+    String digits,
+  ) {
+    final l10n = context.l10n;
+    final type = context.type;
+    final colors = context.colors;
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -386,12 +413,6 @@ class _PayTemplateSheetState extends State<_PayTemplateSheet> {
                 ],
               ),
             ),
-        const SizedBox(height: Sp.l),
-        PrimaryButton(
-          key: const ValueKey('pay-template-apply'),
-          label: l10n.payTemplateApply,
-          onPressed: _apply,
-        ),
       ],
     );
   }

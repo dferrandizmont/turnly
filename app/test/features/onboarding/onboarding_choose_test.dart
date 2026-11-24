@@ -123,9 +123,9 @@ void main() {
       final rotation = tester.getSemantics(key('onboarding-path-rotation'));
       expect(
         rotation.label,
-        'Si tu turno se repite. Usar una rotación. Elige tu ciclo '
-        '(mañanas, tardes, noches, saliente…) y se rellena solo, mes tras '
-        'mes.',
+        'Si tu turno se repite. Usar una rotación. Elige un ciclo '
+        '(mañanas, tardes, noches, saliente…) o crea el tuyo y se rellena solo, '
+        'mes tras mes.',
       );
       expect(rotation.getSemanticsData().flagsCollection.isButton, isTrue);
       expect(

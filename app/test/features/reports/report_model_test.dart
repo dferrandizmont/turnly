@@ -169,10 +169,7 @@ void main() {
       final generic = legend.where((e) => e.shift.genericAbsence).single;
       expect(generic.days, 2);
       expect(legend.map((e) => e.shift.name), isNot(contains('Vacaciones')));
-      expect(
-        legend.map((e) => e.shift.name),
-        isNot(contains(secretLeaveName)),
-      );
+      expect(legend.map((e) => e.shift.name), isNot(contains(secretLeaveName)));
     });
 
     test('two absences on one day are one «Ausencia»', () {
@@ -231,9 +228,9 @@ void main() {
     test('the hours do not depend on how absences are shown', () {
       final totals = {
         for (final mode in ReportAbsenceMode.values)
-          octoberReport(
-            options: ReportOptions(absences: mode),
-          ).summary.workedMinutes,
+          octoberReport(options: ReportOptions(absences: mode))
+              .summary
+              .workedMinutes,
       };
       expect(totals, {48 * 60});
     });
@@ -254,6 +251,24 @@ void main() {
         octoberReport(today: const CivilDate(2026, 9, 1)).hours.tense,
         PeriodTense.future,
       );
+    });
+
+    test('shifts split into worked and planned at today, like the hours', () {
+      // A past period: everything worked.
+      final past = octoberReport(today: const CivilDate(2026, 11, 15));
+      expect(past.shifts.tense, PeriodTense.past);
+      expect(past.shifts.doneShifts, past.summary.shiftsWorked);
+      expect(past.shifts.plannedShifts, 0);
+      // Up to the 9th: Mañana, Noche and Partido; the rest is planned.
+      final current = octoberReport(today: const CivilDate(2026, 10, 10));
+      expect(current.shifts.tense, PeriodTense.current);
+      expect(current.shifts.doneShifts, 3);
+      expect(current.shifts.plannedShifts, greaterThan(0));
+      expect(current.shifts.totalShifts, current.summary.shiftsWorked);
+      // A future period: nothing worked.
+      final future = octoberReport(today: const CivilDate(2026, 9, 1));
+      expect(future.shifts.doneShifts, 0);
+      expect(future.shifts.plannedShifts, future.summary.shiftsWorked);
     });
 
     test('earnings only when asked, with the rates of the shift types', () {

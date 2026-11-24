@@ -5,6 +5,7 @@ import '../../../core/diagnostics/debug_log.dart';
 import '../../patterns/domain/new_pattern.dart';
 import '../../patterns/domain/pattern_catalog.dart';
 import '../../shift_types/domain/shift_type_draft.dart';
+import '../../swaps/data/swap_applied_store.dart';
 import '../domain/schedule_domain.dart';
 import 'overtime_store.dart';
 import 'schedule_mappers.dart';
@@ -95,6 +96,46 @@ class ScheduleRepository {
       calendarId: calendarId,
     );
   });
+
+  /// The stored days of [dates] in [calendarId], with their extra hours, as
+  /// [load] gives them. A date with nothing stored is absent.
+  Future<Map<CivilDate, DayEntry>> entriesOn(
+    String calendarId,
+    Iterable<CivilDate> dates,
+  ) async {
+    final wanted = dates.toSet();
+    if (wanted.isEmpty) return const {};
+    final rows =
+        await (_db.select(_db.dayEntries)..where(
+              (e) =>
+                  e.calendarId.equals(calendarId) & e.date.isInValues(wanted),
+            ))
+            .get();
+    final entries = {for (final row in rows) row.date: row.toEntry()};
+    final blocks =
+        await (_db.select(_db.overtimeBlocks)
+              ..where(
+                (b) =>
+                    b.calendarId.equals(calendarId) & b.date.isInValues(wanted),
+              )
+              ..orderBy([
+                (b) => OrderingTerm.asc(b.date),
+                (b) => OrderingTerm.asc(b.startMinute),
+                (b) => OrderingTerm.asc(b.id),
+              ]))
+            .get();
+    final byDay = <CivilDate, List<OvertimeBlock>>{};
+    for (final row in blocks) {
+      final block = row.toBlock();
+      (byDay[block.date] ??= []).add(block);
+    }
+    for (final MapEntry(key: date, value: list) in byDay.entries) {
+      entries[date] = (entries[date] ?? DayEntry(date: date)).copyWith(
+        overtimeBlocks: list,
+      );
+    }
+    return entries;
+  }
 
   /// Inserts or updates an overtime type (schema v7). An invalid one throws
   /// [ArgumentError] without writing.
@@ -214,6 +255,8 @@ class ScheduleRepository {
             );
       }
     }
+    final swap = change.swap;
+    if (swap != null) await SwapAppliedStore(_db).write(calendarId, swap);
   });
 
   /// Creates or updates a shift type. A new one goes last in the palette

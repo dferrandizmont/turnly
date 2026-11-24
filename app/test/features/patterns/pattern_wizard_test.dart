@@ -140,21 +140,12 @@ void main() {
 
         // 2: start on Monday 26 October through the date picker.
         await _tap(tester, _key('pattern-start-date'));
+        // One tap on the day chooses it and closes the sheet.
         await tester.tap(
           find.descendant(
-            of: find.byType(DatePickerDialog),
+            of: find.byKey(const ValueKey('date-sheet')),
             matching: find.text('26'),
           ),
-        );
-        await tester.pumpAndSettle();
-        // The dialog's confirm button is its last text button.
-        await tester.tap(
-          find
-              .descendant(
-                of: find.byType(DatePickerDialog),
-                matching: find.byType(TextButton),
-              )
-              .last,
         );
         await tester.pumpAndSettle();
         expect(find.text('Lunes 26 de octubre 2026'), findsOneWidget);
@@ -310,6 +301,46 @@ void main() {
       final run = s.runs.firstWhere((r) => r.patternId == '5x2');
       expect(run.startDate, fixedToday);
       expect(run.endDate, fixedToday.addDays(89));
+    });
+
+    testWidgets('the last day has its own sheet, from the start day on', (
+      tester,
+    ) async {
+      await _openWizard(tester);
+      await _tap(tester, _key('pattern-card-5x2'));
+      await _tap(tester, _key('pattern-next'));
+      await _tap(tester, _key('pattern-next'));
+      await _tap(tester, _key('pattern-end-until'));
+
+      await _tap(tester, _key('pattern-until-date'));
+      expect(_key('date-sheet'), findsOneWidget);
+      // «Último día»: no start hint and no shortcuts.
+      expect(
+        find.descendant(
+          of: _key('date-sheet'),
+          matching: find.text('Último día'),
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('El día en que empezó tu ciclo actual'), findsNothing);
+      expect(_key('date-sheet-today'), findsNothing);
+      expect(_key('date-sheet-last-monday'), findsNothing);
+      // The sheet opens on the month of the last day (89 days on): back to
+      // October with the arrow.
+      for (var i = 0; i < 3; i++) {
+        await tester.tap(_key('date-sheet-previous'));
+        await tester.pumpAndSettle();
+      }
+      // The start day (today, 19 October) is the first one that can be
+      // chosen: the day before is there but does nothing...
+      await tester.tap(_key('date-sheet-day-2026-10-18'));
+      await tester.pumpAndSettle();
+      expect(_key('date-sheet'), findsOneWidget);
+      // ...and the start day itself is chosen.
+      await tester.tap(_key('date-sheet-day-2026-10-19'));
+      await tester.pumpAndSettle();
+      expect(_key('date-sheet'), findsNothing);
+      expect(find.text('Lunes 19 de octubre 2026'), findsWidgets);
     });
 
     testWidgets('back goes one step; the choice and dates are kept', (

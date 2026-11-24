@@ -164,6 +164,7 @@ ReportStrings spanishStrings({
     hoursDone: 'Trabajadas hasta ayer',
     hoursPlannedFrom: 'Previstas desde hoy',
     shiftsWorked: 'Turnos trabajados',
+    shiftsPlannedRest: (n) => n == 1 ? 'y 1 previsto' : 'y $n previstos',
     nightHours: 'Horas nocturnas',
     holidayHours: 'Horas en festivo',
     overtime: 'Horas extra',

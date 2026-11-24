@@ -34,3 +34,43 @@ class SwapStageBadge extends StatelessWidget {
     );
   }
 }
+
+/// Whether the calendar shows the change: «Aplicado» or «Sin aplicar».
+///
+/// It is the second state of a change, next to its debt state
+/// ([SwapStageBadge]): one says who owes the shift, this one says whether the
+/// days of the calendar already changed. A word, never colour alone; the
+/// applied one is outlined with the accent so the two read apart.
+class SwapApplicationBadge extends StatelessWidget {
+  const SwapApplicationBadge({
+    super.key,
+    required this.text,
+    required this.applied,
+    required this.swapId,
+  });
+
+  final String text;
+  final bool applied;
+  final String swapId;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final type = context.type;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: Sp.s, vertical: Sp.xs),
+      decoration: BoxDecoration(
+        color: colors.surfaceRaised,
+        borderRadius: Rad.chipSmallRadius,
+        border: Border.all(color: applied ? colors.accentText : colors.border),
+      ),
+      child: Text(
+        text,
+        key: ValueKey('swap-application-$swapId'),
+        style: type.caption.copyWith(
+          color: applied ? colors.accentText : colors.textSecondary,
+        ),
+      ),
+    );
+  }
+}

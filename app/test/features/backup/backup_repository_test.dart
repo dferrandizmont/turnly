@@ -1000,7 +1000,7 @@ void main() {
 
       final newer = gzipEnvelope({
         'format': 'cuadrante',
-        'schemaVersion': 5,
+        'schemaVersion': 6,
         'data': <String, Object?>{},
         'checksum': 'x',
       });

@@ -423,12 +423,9 @@ void main() {
       await app.tap(key('onboarding-next'));
       await tester.tap(key('onboarding-start-date'));
       await tester.pumpAndSettle();
-      final dialog = find.byType(DatePickerDialog);
-      await tester.tap(find.descendant(of: dialog, matching: find.text('22')));
-      await tester.pumpAndSettle();
-      await tester.tap(
-        find.descendant(of: dialog, matching: find.byType(TextButton)).last,
-      );
+      // One tap on the day chooses it and closes the sheet.
+      final sheet = find.byKey(const ValueKey('date-sheet'));
+      await tester.tap(find.descendant(of: sheet, matching: find.text('22')));
       await tester.pumpAndSettle();
       await app.selectCycleDay(6);
       await app.tap(key('onboarding-next')); // the start step writes

@@ -47,6 +47,11 @@ class VerificationResultCard extends StatelessWidget {
             ? l10n.backupUiVerifyOlderNoDay
             : l10n.backupUiVerifyOlder(day(passed.firstDayDifferingFromLive!)),
       ),
+      VerificationIncomplete() => AppCallout(
+        key: cardKey,
+        icon: BackupIcons.warning,
+        title: l10n.backupSwapApplicationsSkipped,
+      ),
       final VerificationMismatch mismatch => AppCallout(
         key: cardKey,
         icon: BackupIcons.warning,

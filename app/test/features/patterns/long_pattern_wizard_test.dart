@@ -31,7 +31,7 @@ PatternWizardArgs _args(WidgetTester tester) {
   final screen = tester.widget<PatternWizardScreen>(
     find.byType(PatternWizardScreen),
   );
-  return (start: screen.start, shiftId: screen.shiftId);
+  return PatternWizardArgs(start: screen.start, shiftId: screen.shiftId);
 }
 
 PatternWizardController _wizard(WidgetTester tester) =>

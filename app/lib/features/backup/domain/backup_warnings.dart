@@ -6,6 +6,11 @@ sealed class BackupWarning {
   const BackupWarning();
 }
 
+/// Some old swap records could not be converted. Their raw data was kept.
+final class SwapApplicationsSkipped extends BackupWarning {
+  const SwapApplicationsSkipped();
+}
+
 /// The copy was made **without** some attachments because their files were
 /// missing or damaged (a copy that is whole except for the files that were
 /// already lost is better than no copy at all). Their rows stay in the

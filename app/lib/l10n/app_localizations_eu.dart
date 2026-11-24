@@ -10,6 +10,28 @@ class AppLocalizationsEu extends AppLocalizations {
   AppLocalizationsEu([String locale = 'eu']) : super(locale);
 
   @override
+  String get backupSwapApplicationsSkipped =>
+      'Txanda-trukeen erregistro batzuk ezin izan dira leheneratu. Datuak gorde dira gero berreskuratu ahal izateko.';
+
+  @override
+  String swapRestoreSkipped(String date) {
+    return 'Eguna: $date. Txanda bere horretan utzi dut, aplikatutako trukea ezin izan dudalako egiaztatu.';
+  }
+
+  @override
+  String get swapRemoveKept =>
+      'Ez dut trukea kendu: trukeen liburuan dago oraindik, eta ez dut haren egunik ukitu.';
+
+  @override
+  String swapApplyConflict(String date, String name) {
+    return 'Eguna: $date. Beste truke bat dago aplikatuta egun horretan ($name): kendu lehenik txanden egutegitik.';
+  }
+
+  @override
+  String get swapRestoreOnSave =>
+      'Gordetzean, berreskura daitezkeen aurreko txandak leheneratuko dira.';
+
+  @override
   String get appName => 'Turnly';
 
   @override
@@ -1630,6 +1652,24 @@ class AppLocalizationsEu extends AppLocalizations {
   String get patternStartLabel => 'Hasierako eguna';
 
   @override
+  String get dateSheetStartHint => 'Zure uneko zikloa hasi zen eguna';
+
+  @override
+  String get dateSheetLastMonday => 'Joan den astelehena';
+
+  @override
+  String get dateSheetChooseMonth => 'Aukeratu hilabetea';
+
+  @override
+  String get dateSheetShowDays => 'Ikusi egunak';
+
+  @override
+  String get dateSheetPreviousYear => 'Aurreko urtea';
+
+  @override
+  String get dateSheetNextYear => 'Hurrengo urtea';
+
+  @override
   String patternSuggestedStart(String weekday) {
     return 'Eredu hau egun honetan hasi ohi da: $weekday.';
   }
@@ -1799,7 +1839,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get onboardingPathRotationHint =>
-      'Aukeratu zure zikloa (goizak, arratsaldeak, gauak, gau-ondokoa…) eta bere kasa betetzen da, hilabetez hilabete.';
+      'Aukeratu zure zikloa (goizak, arratsaldeak, gauak, gau-ondokoa…) edo sortu zurea, eta bere kasa betetzen da, hilabetez hilabete.';
 
   @override
   String get onboardingPathRotationTag => 'Zure txanda errepikatzen bada';
@@ -1996,7 +2036,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get onboardingRotationHelp =>
-      'Aukeratu antzekoena. Gero esango duzu noiz hasten zaren.';
+      'Aukeratu zurea edo sortu ezazu une batean. Gero esango duzu noiz hasten zaren.';
 
   @override
   String get onboardingRotationTypical => 'Zure lanean ohikoena';
@@ -2006,6 +2046,34 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get onboardingRotationAll => 'Txandaketak';
+
+  @override
+  String get onboardingOwnCycle => 'Sortu nire zikloa';
+
+  @override
+  String get onboardingOwnCycleHint => 'Osatu zure zikloa egunez egun';
+
+  @override
+  String get onboardingOwnCycleAnother => 'Sortu beste ziklo bat';
+
+  @override
+  String get onboardingOwnCycleNotHere => 'Ez dago zurea? Sortu nire zikloa';
+
+  @override
+  String get onboardingOwnCycleAdjust => 'Doitu';
+
+  @override
+  String get onboardingOwnCycleTitle => 'Zure zikloa';
+
+  @override
+  String get onboardingOwnCycleUse => 'Erabili ziklo hau';
+
+  @override
+  String get onboardingOwnCycleHours =>
+      'Orduak gero aldatu ditzakezu Ezarpenak › Nire txandak atalean.';
+
+  @override
+  String get onboardingOwnCycleName => 'Nire zikloa';
 
   @override
   String get onboardingByHand => 'Eskuz margotuko dut';
@@ -2238,6 +2306,21 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get summaryShiftsWorked => 'Lan egindako txandak';
+
+  @override
+  String summaryShiftsPlannedRest(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'eta $count aurreikusita',
+      one: 'eta 1 aurreikusita',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get summaryTypesPeriodTotal =>
+      'Aldiaren guztira, aurreikusitakoa barne';
 
   @override
   String get summaryNightHours => 'Gaueko orduak';
@@ -2556,6 +2639,10 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get summaryYearHint => 'Ukitu hilabete bat xehetasunak ikusteko.';
+
+  @override
+  String get summaryYearHintPlanned =>
+      '«+» ikurrak lan egindakoa (atzo arte) eta aurreikusitakoa (gaurtik aurrera) bereizten ditu. Gauekoak eta zenbatespena hilabete osoarenak dira.';
 
   @override
   String get summaryYearHeaderMonth => 'Hila';
@@ -6749,6 +6836,21 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
+  String get swapRemoveAppliedBody =>
+      'Zer egin nahi duzu aldaketak ukitutako txandekin?';
+
+  @override
+  String get swapRemoveAndRestore =>
+      'Kendu aldaketa eta leheneratu zure txanden egutegia';
+
+  @override
+  String get swapRemoveOnly => 'Kendu aldaketa soilik';
+
+  @override
+  String get swapSavedUnapplied =>
+      'Gordeta. Aurreko txandak leheneratu dira zure txanden egutegian';
+
+  @override
   String get swapRemoveConfirm => 'Kendu';
 
   @override
@@ -6800,6 +6902,42 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get swapNotApplied => 'Truke hau ez dago txanden egutegian aplikatuta';
+
+  @override
+  String get swapApplyStateApplied => 'Aplikatuta';
+
+  @override
+  String get swapApplyStatePending => 'Aplikatu gabe';
+
+  @override
+  String get swapApplyToggle => 'Aldatu nire txanden egutegia ere';
+
+  @override
+  String get swapApplyToggleOn =>
+      'Zure egunak gordetzean aldatuko dira. Desegin ahal izango duzu.';
+
+  @override
+  String get swapApplyToggleOff =>
+      'Trukea bakarrik idazten da: zure txanden egutegia ez da ukitzen.';
+
+  @override
+  String get swapApplyToggleNone =>
+      'Aukeratu trukeko txandak zure txanden egutegia aldatu ahal izateko.';
+
+  @override
+  String get swapApplyToggleDone =>
+      'Zure txanden egutegia jada trukeak dioen bezala dago.';
+
+  @override
+  String get swapSavedApplied =>
+      'Gorde da eta zure txanden egutegian aplikatu da';
+
+  @override
+  String get swapSavedNotApplied =>
+      'Gorde da. Zure txanden egutegia ez da aldatuko aplikatu arte';
+
+  @override
+  String get swapApplyAction => 'Aplikatu';
 
   @override
   String get swapDaySection => 'Txanda-trukea';

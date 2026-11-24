@@ -1,4 +1,19 @@
 {
+  "backupSwapApplicationsSkipped": "Algunos registros de cambios de turno no se han podido restaurar. Sus datos se han conservado para recuperarlos.",
+  "swapRestoreSkipped": "He conservado tu turno de {date} porque no he podido verificar el cambio que se aplicó.",
+  "@swapRestoreSkipped": {
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "swapRemoveKept": "No he quitado el cambio: sigue en el libro de cambios y no he tocado ninguno de sus días.",
+  "@swapRemoveKept": {
+    "description": "Se pidió quitar el cambio y devolver el cuadrante, pero una fecha no se pudo verificar: no se ha hecho nada."
+  },
+  "swapApplyConflict": "El {date} ya tiene otro cambio aplicado (con {name}): quítalo del cuadrante primero.",
+  "@swapApplyConflict": {
+    "description": "Un día solo admite un cambio aplicado: este no se aplica porque el día ya tiene el de otro compañero.",
+    "placeholders": { "date": { "type": "String" }, "name": { "type": "String" } }
+  },
+  "swapRestoreOnSave": "Al guardar se recuperarán los turnos anteriores que se puedan restaurar.",
   "@@locale": "es",
   "appName": "Turnly",
   "@appName": {
@@ -1479,6 +1494,12 @@
     }
   },
   "patternStartLabel": "Día de inicio",
+  "dateSheetStartHint": "El día en que empezó tu ciclo actual",
+  "dateSheetLastMonday": "Lunes pasado",
+  "dateSheetChooseMonth": "Elegir mes",
+  "dateSheetShowDays": "Ver los días",
+  "dateSheetPreviousYear": "Año anterior",
+  "dateSheetNextYear": "Año siguiente",
   "patternSuggestedStart": "Este patrón suele empezar en {weekday}.",
   "@patternSuggestedStart": {
     "placeholders": {
@@ -1620,7 +1641,7 @@
   "onboardingPathImport": "Importar mis turnos",
   "onboardingPathImportHint": "Desde el calendario del móvil, un archivo .ics o CSV, o una copia de LRHSoft.",
   "onboardingPathRotation": "Usar una rotación",
-  "onboardingPathRotationHint": "Elige tu ciclo (mañanas, tardes, noches, saliente…) y se rellena solo, mes tras mes.",
+  "onboardingPathRotationHint": "Elige un ciclo (mañanas, tardes, noches, saliente…) o crea el tuyo y se rellena solo, mes tras mes.",
   "onboardingPathRotationTag": "Si tu turno se repite",
   "onboardingPathPaint": "Pintar a mano",
   "onboardingPathPaintHint": "Elige un turno y arrastra por los días. Para cuando cada mes es distinto.",
@@ -1708,10 +1729,19 @@
     }
   },
   "onboardingRotationTitle": "¿Cómo es tu rotación?",
-  "onboardingRotationHelp": "Elige la que más se parezca. Luego dices cuándo empiezas.",
+  "onboardingRotationHelp": "Elige la tuya o créala en un momento. Luego dices cuándo empiezas.",
   "onboardingRotationTypical": "Lo habitual en tu trabajo",
   "onboardingRotationOthers": "Otras rotaciones",
   "onboardingRotationAll": "Rotaciones",
+  "onboardingOwnCycle": "Crear mi ciclo",
+  "onboardingOwnCycleHint": "Monta tu ciclo día a día",
+  "onboardingOwnCycleAnother": "Crear otro ciclo",
+  "onboardingOwnCycleNotHere": "¿No está la tuya? Crear mi ciclo",
+  "onboardingOwnCycleAdjust": "Ajustar",
+  "onboardingOwnCycleTitle": "Tu ciclo",
+  "onboardingOwnCycleUse": "Usar este ciclo",
+  "onboardingOwnCycleHours": "Las horas las cambias luego en Ajustes › Mis turnos.",
+  "onboardingOwnCycleName": "Mi ciclo",
   "onboardingByHand": "Lo pinto a mano",
   "onboardingByHandHint": "Sin rotación: pintas tú los días en el calendario.",
   "onboardingStartTitle": "¿Cuándo empiezas?",
@@ -1861,6 +1891,19 @@
     }
   },
   "summaryShiftsWorked": "Turnos trabajados",
+  "summaryShiftsPlannedRest": "{count, plural, =1{y 1 previsto} other{y {count} previstos}}",
+  "@summaryShiftsPlannedRest": {
+    "description": "Resumen › Desglose: bajo «Turnos trabajados» de un periodo en curso o futuro, los turnos que aún no se han trabajado (hoy en adelante).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "summaryTypesPeriodTotal": "Total del periodo, con lo previsto",
+  "@summaryTypesPeriodTotal": {
+    "description": "Resumen › tipos de turno: aviso bajo el título de cada grupo cuando el periodo incluye hoy o días futuros; las cifras de cada tipo cubren todo el periodo."
+  },
   "summaryNightHours": "Horas nocturnas",
   "summaryRestDays": "Días libres",
   "summaryAbsences": "Ausencias",
@@ -2109,6 +2152,10 @@
   "summaryEstimateNoPrices": "Sin precios",
   "summaryYearEmpty": "Este año no tiene turnos.",
   "summaryYearHint": "Toca un mes para ver su detalle.",
+  "summaryYearHintPlanned": "El «+» separa lo trabajado (hasta ayer) de lo previsto (de hoy en adelante). Las nocturnas y el estimado cuentan todo el mes.",
+  "@summaryYearHintPlanned": {
+    "description": "Resumen › Año: bajo la pista de la tabla cuando algún mes tiene días de hoy en adelante; explica «5 + 2» (trabajados + previstos)."
+  },
   "summaryYearHeaderMonth": "Mes",
   "summaryYearHeaderShifts": "Turnos",
   "summaryYearHeaderHours": "Horas",
@@ -4731,6 +4778,10 @@
       }
     }
   },
+  "swapRemoveAppliedBody": "¿Qué quieres hacer con los turnos que cambió?",
+  "swapRemoveAndRestore": "Quitar el cambio y devolver tu cuadrante",
+  "swapRemoveOnly": "Quitar solo el cambio",
+  "swapSavedUnapplied": "Guardado. Se han devuelto los turnos anteriores a tu cuadrante",
   "swapRemoveConfirm": "Quitar",
   "swapSaveFailed": "No se ha podido guardar el cambio. Prueba otra vez.",
   "swapRemoved": "Cambio quitado",
@@ -4755,6 +4806,16 @@
   "swapUnapplied": "Cambio quitado del cuadrante",
   "swapNothingToApply": "Los días ya están como dice el cambio",
   "swapNotApplied": "Este cambio no está aplicado al cuadrante",
+  "swapApplyStateApplied": "Aplicado",
+  "swapApplyStatePending": "Sin aplicar",
+  "swapApplyToggle": "Cambiar también mi cuadrante",
+  "swapApplyToggleOn": "Tus días cambian al guardar. Podrás deshacerlo.",
+  "swapApplyToggleOff": "Solo se anota el cambio: tu cuadrante no se toca.",
+  "swapApplyToggleNone": "Elige los turnos del cambio para poder cambiar tu cuadrante.",
+  "swapApplyToggleDone": "Tu cuadrante ya está como dice el cambio.",
+  "swapSavedApplied": "Guardado y aplicado a tu cuadrante",
+  "swapSavedNotApplied": "Guardado. Tu cuadrante no cambia hasta que lo apliques",
+  "swapApplyAction": "Aplicar",
   "swapDaySection": "Cambio de turno",
   "swapDayAdd": "Anotar un cambio",
   "swapDayEmpty": "Ese día no tiene ningún cambio anotado.",

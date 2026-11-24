@@ -211,6 +211,12 @@ class VerificationPassed extends RestoreVerification {
   final CivilDate? firstDayDifferingFromLive;
 }
 
+/// The dry run restored the readable data and kept the unconverted swap
+/// records for recovery.
+class VerificationIncomplete extends RestoreVerification {
+  const VerificationIncomplete();
+}
+
 /// The file decoded but rebuilding it did **not** give the same data: a
 /// real fault in the restore. [firstDifferingDay] is `null` when the
 /// resolved days agree and only stored entities differ.

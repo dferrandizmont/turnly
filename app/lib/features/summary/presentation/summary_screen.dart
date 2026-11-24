@@ -736,6 +736,7 @@ class _PeriodBody extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final hours = ref.watch(periodHoursProvider(period));
+    final shifts = ref.watch(periodShiftsProvider(period));
     final hasGoal = ref.watch(
       hoursGoalProvider.select((goal) => goal.value != null),
     );
@@ -771,6 +772,7 @@ class _PeriodBody extends ConsumerWidget {
           previous: previous,
           previousName: previousName,
           showHolidays: showHolidays,
+          shifts: shifts,
         ),
         if (summary.hasEarnings) ...[
           const SizedBox(height: Sp.card),
@@ -784,7 +786,11 @@ class _PeriodBody extends ConsumerWidget {
         ])
           if (group.$2.isNotEmpty) ...[
             const SizedBox(height: Sp.section),
-            _TypeGroup(title: group.$1, rows: group.$2),
+            _TypeGroup(
+              title: group.$1,
+              rows: group.$2,
+              periodTotal: hours.tense != PeriodTense.past,
+            ),
           ],
         if (absencesNone || estimateNone) ...[
           const SizedBox(height: Sp.section),
@@ -817,11 +823,16 @@ class _BreakdownCard extends StatelessWidget {
     required this.previous,
     required this.previousName,
     required this.showHolidays,
+    required this.shifts,
   });
 
   final MonthSummary summary;
   final MonthSummary previous;
   final String previousName;
+
+  /// The shifts split at today: the figure counts those worked before today
+  /// and the detail adds the planned ones (A3, like the hours card).
+  final PeriodShifts shifts;
 
   /// Whether the line of the hours on holidays shows.
   final bool showHolidays;
@@ -837,6 +848,13 @@ class _BreakdownCard extends StatelessWidget {
         : delta == 0
         ? l10n.summaryDeltaSame(previousName)
         : l10n.summaryDelta(formatSignedHours(l10n, delta), previousName);
+
+    final shiftsDetail = [
+      if (shifts.doneDays != shifts.doneShifts)
+        l10n.summaryDays(shifts.doneDays),
+      if (shifts.plannedShifts > 0 || shifts.tense == PeriodTense.future)
+        l10n.summaryShiftsPlannedRest(shifts.plannedShifts),
+    ];
 
     Widget stat(String id, String label, String value, [String? detail]) =>
         SummaryStatRow(id: id, label: label, value: value, detail: detail);
@@ -864,10 +882,8 @@ class _BreakdownCard extends StatelessWidget {
           stat(
             'summary-shifts',
             l10n.summaryShiftsWorked,
-            '${summary.shiftsWorked}',
-            summary.workedDays != summary.shiftsWorked
-                ? l10n.summaryDays(summary.workedDays)
-                : null,
+            '${shifts.doneShifts}',
+            shiftsDetail.isEmpty ? null : shiftsDetail.join(' · '),
           ),
           if (summary.longestStreak case final streak?)
             stat(
@@ -1171,10 +1187,18 @@ class _FoldRow extends StatelessWidget {
 
 /// A titled card with a row per shift type.
 class _TypeGroup extends StatelessWidget {
-  const _TypeGroup({required this.title, required this.rows});
+  const _TypeGroup({
+    required this.title,
+    required this.rows,
+    this.periodTotal = false,
+  });
 
   final String title;
   final List<ShiftTypeMonth> rows;
+
+  /// The period has today or later days: each row adds up the whole period,
+  /// planned included, so the group says so.
+  final bool periodTotal;
 
   @override
   Widget build(BuildContext context) {
@@ -1183,12 +1207,21 @@ class _TypeGroup extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(bottom: Sp.s),
+          padding: EdgeInsets.only(bottom: periodTotal ? Sp.xs : Sp.s),
           child: Semantics(
             header: true,
             child: Text(title, style: context.type.bodyStrong),
           ),
         ),
+        if (periodTotal)
+          Padding(
+            padding: const EdgeInsets.only(bottom: Sp.s),
+            child: Text(
+              context.l10n.summaryTypesPeriodTotal,
+              key: ValueKey('summary-types-total-$title'),
+              style: context.type.meta.copyWith(color: colors.textSecondary),
+            ),
+          ),
         AppCard(
           padding: EdgeInsets.zero,
           child: Column(

@@ -17,6 +17,7 @@ import '../../calendar/application/schedule_controller.dart';
 import '../application/pattern_wizard.dart';
 import '../domain/pattern_blocks.dart';
 import 'cycle_strip.dart';
+import 'pattern_builder_shifts.dart';
 
 class PatternBlockControls extends ConsumerWidget {
   const PatternBlockControls({
@@ -33,6 +34,9 @@ class PatternBlockControls extends ConsumerWidget {
     if (index >= wizard.blocks.length) return const SizedBox.shrink();
     final block = wizard.blocks[index];
     final controller = ref.read(patternWizardProvider(args).notifier);
+    // Resolved here: the sheet below opens on the root navigator, where the
+    // first-use shifts (PatternBuilderShifts) are not above it any more.
+    final own = PatternBuilderShifts.maybeOf(context);
     final l10n = context.l10n;
     void setDays(int days) {
       if (days == block.days) return;
@@ -118,7 +122,8 @@ class PatternBlockControls extends ConsumerWidget {
             onPressed: () => showAppSheet<void>(
               context: context,
               padded: true,
-              builder: (_) => _BlockActions(args: args, index: index),
+              builder: (_) =>
+                  _BlockActions(args: args, index: index, own: own),
             ),
             icon: Icon(AppIcons.more),
             tooltip: l10n.dayDetailMore,
@@ -130,9 +135,16 @@ class PatternBlockControls extends ConsumerWidget {
 }
 
 class _BlockActions extends ConsumerWidget {
-  const _BlockActions({required this.args, required this.index});
+  const _BlockActions({
+    required this.args,
+    required this.index,
+    required this.own,
+  });
   final PatternWizardArgs args;
   final int index;
+
+  /// The first-use shifts the block controls had above them, if any.
+  final PatternBuilderShifts? own;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -141,9 +153,11 @@ class _BlockActions extends ConsumerWidget {
     if (index >= blocks.length) return const SizedBox.shrink();
     final block = blocks[index];
     final controller = ref.read(patternWizardProvider(args).notifier);
-    final palette = ref.watch(
+    final stored = ref.watch(
       scheduleControllerProvider.select((s) => s.palette),
     );
+    // The first-use flow hands over its own shifts (PatternBuilderShifts).
+    final palette = own?.palette ?? stored;
     final l10n = context.l10n;
     // Taken now: after the sheet closes its own context is gone.
     final messenger = ScaffoldMessenger.of(context);

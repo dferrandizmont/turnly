@@ -34,20 +34,12 @@ void main() {
       );
 
       await app.tap(key('onboarding-start-date'));
+      // One tap on the day chooses it and closes the sheet.
       await tester.tap(
         find.descendant(
-          of: find.byType(DatePickerDialog),
+          of: find.byKey(const ValueKey('date-sheet')),
           matching: find.text('20'),
         ),
-      );
-      await tester.pumpAndSettle();
-      await tester.tap(
-        find
-            .descendant(
-              of: find.byType(DatePickerDialog),
-              matching: find.byType(TextButton),
-            )
-            .last,
       );
       await tester.pumpAndSettle();
       expect(

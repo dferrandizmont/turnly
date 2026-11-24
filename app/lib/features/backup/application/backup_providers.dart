@@ -661,7 +661,9 @@ final resetBackupProvider = Provider<Future<BackupEntry> Function()>((ref) {
       await tools.preResetStore.delete(entry);
       rethrow;
     }
-    await tools.preResetStore.prune();
+    // The copy just verified is what the reset relies on: copies dated
+    // later must not push it out.
+    await tools.preResetStore.prune(protect: entry);
     ref.invalidate(backupCopiesProvider);
     return entry;
   };

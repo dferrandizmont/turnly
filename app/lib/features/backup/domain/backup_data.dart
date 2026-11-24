@@ -6,6 +6,7 @@ import '../../notes/domain/day_task.dart';
 import '../../notes/domain/note_attachment.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../../swaps/domain/shift_swap.dart';
+import '../../swaps/domain/swap_application.dart';
 import 'backup_errors.dart';
 
 const _deepEq = DeepCollectionEquality();
@@ -1393,6 +1394,49 @@ class BackupOvertimeBlock extends _Value {
   ];
 }
 
+/// The original override of one date changed by a swap (backup format 5).
+class BackupSwapApplication extends _Value {
+  const BackupSwapApplication(this.record);
+
+  factory BackupSwapApplication.fromJson(Map<String, Object?> json) {
+    final r = _JsonReader(json, 'swapApplications[]');
+    if (!json.containsKey('previousShiftTypeIds')) {
+      throw const FormatException('Missing previousShiftTypeIds');
+    }
+    return BackupSwapApplication(
+      SwapApplicationRecord(
+        swapId: r.string('swapId'),
+        date: r.date('date'),
+        previousShiftTypeIds: r.stringListOrNull('previousShiftTypeIds'),
+        createdAt: r.integer('createdAt'),
+        appliedOverride: json.containsKey('appliedOverride')
+            ? (shiftTypeIds: r.stringListOrNull('appliedOverride'))
+            : null,
+      ),
+    );
+  }
+
+  final SwapApplicationRecord record;
+
+  Map<String, Object?> toJson() => {
+    'swapId': record.swapId,
+    'date': record.date.toIso(),
+    'previousShiftTypeIds': record.previousShiftTypeIds,
+    'createdAt': record.createdAt,
+    if (record.appliedOverride case final override?)
+      'appliedOverride': override.shiftTypeIds,
+  };
+
+  @override
+  List<Object?> get props => [
+    record.swapId,
+    record.date,
+    record.previousShiftTypeIds,
+    record.createdAt,
+    if (record.appliedOverride case final override?) override.shiftTypeIds,
+  ];
+}
+
 /// Everything the user owns in the database, as the `.cuadrante` file holds it.
 ///
 /// The lists are normalised on construction, so equal data compares equal and
@@ -1419,6 +1463,7 @@ class BackupData {
     Iterable<BackupNoteAttachment> noteAttachments = const [],
     Iterable<BackupDayTask> dayTasks = const [],
     Iterable<BackupShiftSwap> shiftSwaps = const [],
+    Iterable<BackupSwapApplication> swapApplications = const [],
     Iterable<BackupOvertimeType> overtimeTypes = const [],
     Iterable<BackupOvertimeBlock> overtimeBlocks = const [],
   }) : calendars = List.unmodifiable(
@@ -1456,6 +1501,12 @@ class BackupData {
        ),
        shiftSwaps = List.unmodifiable(
          shiftSwaps.toList()..sort((a, b) => a.id.compareTo(b.id)),
+       ),
+       swapApplications = List.unmodifiable(
+         swapApplications.toList()..sort((a, b) {
+           final bySwap = a.record.swapId.compareTo(b.record.swapId);
+           return bySwap != 0 ? bySwap : a.record.date.compareTo(b.record.date);
+         }),
        ),
        overtimeTypes = List.unmodifiable(
          overtimeTypes.toList()..sort((a, b) => a.id.compareTo(b.id)),
@@ -1555,6 +1606,7 @@ class BackupData {
   factory BackupData.fromJson(
     Map<String, Object?> json, {
     bool readOvertime = false,
+    bool readSwapApplications = false,
   }) {
     final r = _JsonReader(json, 'data');
     List<T> optional<T>(String key, T Function(Map<String, Object?>) parse) =>
@@ -1566,6 +1618,10 @@ class BackupData {
       ),
       dayTasks: optional('dayTasks', BackupDayTask.fromJson),
       shiftSwaps: optional('shiftSwaps', BackupShiftSwap.fromJson),
+      swapApplications:
+          readSwapApplications && json.containsKey('swapApplications')
+          ? r.objects('swapApplications', BackupSwapApplication.fromJson)
+          : const [],
       overtimeTypes: readOvertime
           ? optional('overtimeTypes', BackupOvertimeType.fromJson)
           : const [],
@@ -1603,6 +1659,7 @@ class BackupData {
   final List<BackupNoteAttachment> noteAttachments;
   final List<BackupDayTask> dayTasks;
   final List<BackupShiftSwap> shiftSwaps;
+  final List<BackupSwapApplication> swapApplications;
 
   /// Database v7 (format version 4): the overtime types, sorted by id, and
   /// the blocks of every calendar, by calendar, day and id. None of them =
@@ -1627,6 +1684,10 @@ class BackupData {
     if (dayTasks.isNotEmpty) 'dayTasks': [for (final t in dayTasks) t.toJson()],
     if (shiftSwaps.isNotEmpty)
       'shiftSwaps': [for (final s in shiftSwaps) s.toJson()],
+    if (swapApplications.isNotEmpty)
+      'swapApplications': [
+        for (final record in swapApplications) record.toJson(),
+      ],
     if (overtimeTypes.isNotEmpty || overtimeBlocks.isNotEmpty) ...{
       'overtimeTypes': [for (final t in overtimeTypes) t.toJson()],
       'overtimeBlocks': [for (final b in overtimeBlocks) b.toJson()],
@@ -1736,10 +1797,66 @@ class BackupData {
       noteAttachments: noteAttachments,
       dayTasks: dayTasks,
       shiftSwaps: shiftSwaps,
+      swapApplications: swapApplications,
       overtimeTypes: types,
       overtimeBlocks: blocks,
     );
   }
+
+  /// Converts the v7 swap setting before restoring or fingerprinting the
+  /// data, exactly as when opening an older SQLite database. Then keeps at
+  /// most one applied swap per calendar and day, as the database requires
+  /// ([keepOneSwapPerDay]): a file from an earlier build can hold two, and
+  /// restoring both would let one of them take back the other's day. The
+  /// swaps left out keep their records in a recovery setting, which the
+  /// restore and the check report.
+  BackupData upgradedSwapApplications() {
+    final legacy = settings[legacySwapApplicationsKey];
+    final upgradedSettings = {...settings};
+    var records = [
+      for (final application in swapApplications) application.record,
+    ];
+    if (legacy != null) {
+      final recordedSwaps = {for (final record in records) record.swapId};
+      final conversion = readLegacySwapApplications(legacy, {
+        for (final swap in shiftSwaps)
+          if (!recordedSwaps.contains(swap.id)) swap.id: swap.updatedAt,
+      });
+      upgradedSettings.remove(legacySwapApplicationsKey);
+      if (conversion.rejectedJson case final rejected?) {
+        final key = availableSwapApplicationRecoveryKey(upgradedSettings.keys);
+        upgradedSettings[key] = rejected;
+      }
+      records = [...records, ...conversion.records];
+    }
+    final perDay = keepOneSwapPerDay(records, {
+      for (final swap in shiftSwaps) swap.id: swap.calendarId,
+    });
+    if (legacy == null && perDay.dropped.isEmpty) return this;
+    if (perDay.dropped.isNotEmpty) {
+      final key = availableSwapApplicationRecoveryKey(upgradedSettings.keys);
+      upgradedSettings[key] = encodeOverlappingSwapApplications(perDay.dropped);
+    }
+    return BackupData(
+      calendars: calendars,
+      shiftTypes: shiftTypes,
+      patterns: patterns,
+      patternRuns: patternRuns,
+      dayEntries: dayEntries,
+      holidays: holidays,
+      absenceBalances: absenceBalances,
+      settings: upgradedSettings,
+      noteAttachments: noteAttachments,
+      dayTasks: dayTasks,
+      shiftSwaps: shiftSwaps,
+      swapApplications: perDay.kept.map(BackupSwapApplication.new),
+      overtimeTypes: overtimeTypes,
+      overtimeBlocks: overtimeBlocks,
+    );
+  }
+
+  bool get hasSwapApplicationRecovery =>
+      settings.keys.any(isSwapApplicationRecoveryKey);
 
   /// How many shift types carry an alarm sound that is not a system one
   /// ([isSystemAlarmSound]).
@@ -1766,6 +1883,7 @@ class BackupData {
       ],
       dayTasks: dayTasks,
       shiftSwaps: shiftSwaps,
+      swapApplications: swapApplications,
       overtimeTypes: overtimeTypes,
       overtimeBlocks: overtimeBlocks,
     );
@@ -1796,6 +1914,7 @@ class BackupData {
       noteAttachments: noteAttachments,
       dayTasks: dayTasks,
       shiftSwaps: shiftSwaps,
+      swapApplications: swapApplications,
       overtimeTypes: overtimeTypes,
       overtimeBlocks: overtimeBlocks,
     );
@@ -2050,6 +2169,17 @@ class BackupData {
       if (problem != null) fail('Swap "${s.id}" is invalid ($problem)');
     }
 
+    final applicationKeys = <(String, CivilDate)>{};
+    for (final application in swapApplications) {
+      final record = application.record;
+      if (!swapIds.contains(record.swapId)) {
+        fail('Application points at a missing swap');
+      }
+      if (!applicationKeys.add((record.swapId, record.date))) {
+        fail('Duplicate application for a swap and date');
+      }
+    }
+
     // Database v7: the same rules as the tables (`OvertimeType.problem`,
     // `OvertimeBlock.problem`) and their foreign keys.
     final overtimeTypeIds = <String>{};
@@ -2094,6 +2224,7 @@ class BackupData {
       _deepEq.equals(noteAttachments, other.noteAttachments) &&
       _deepEq.equals(dayTasks, other.dayTasks) &&
       _deepEq.equals(shiftSwaps, other.shiftSwaps) &&
+      _deepEq.equals(swapApplications, other.swapApplications) &&
       _deepEq.equals(overtimeTypes, other.overtimeTypes) &&
       _deepEq.equals(overtimeBlocks, other.overtimeBlocks);
 
@@ -2110,6 +2241,7 @@ class BackupData {
     _deepEq.hash(noteAttachments),
     _deepEq.hash(dayTasks),
     _deepEq.hash(shiftSwaps),
+    _deepEq.hash(swapApplications),
     _deepEq.hash(overtimeTypes),
     _deepEq.hash(overtimeBlocks),
   );

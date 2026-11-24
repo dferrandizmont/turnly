@@ -384,7 +384,9 @@ class _HolidaysSettingsScreenState
                       key: const ValueKey('holidays-region'),
                       icon: HolidaysIcons.region,
                       title: l10n.holidaysSettingsRegionTitle,
-                      value: region?.name ?? l10n.holidaysSettingsRegionUnset,
+                      value: region == null
+                          ? l10n.holidaysSettingsRegionUnset
+                          : regionLabel(context, region),
                       forceStacked: stackPlace,
                       onTap: () => _pickRegion(place),
                     ),
@@ -462,14 +464,16 @@ class _HolidaysSettingsScreenState
               else
                 HolidayMonthList(
                   rows: rows,
-                  regionName: region?.name ?? subdivisionName(place.regionCode),
+                  regionName: region == null
+                      ? subdivisionName(place.regionCode)
+                      : regionLabel(context, region),
                   onRemove: _remove,
                 ),
               if (region != null && substituted.isNotEmpty) ...[
                 const SizedBox(height: Sp.section),
                 SubstitutedHolidaysNote(
                   key: const ValueKey('holidays-substituted'),
-                  regionName: region.name,
+                  regionName: regionLabel(context, region),
                   days: substituted,
                 ),
               ],

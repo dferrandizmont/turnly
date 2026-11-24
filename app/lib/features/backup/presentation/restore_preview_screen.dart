@@ -54,6 +54,7 @@ class _RestorePreviewScreenState extends ConsumerState<RestorePreviewScreen> {
 
   /// What the safety copy made before the restore left out.
   int _skippedAttachments = 0;
+  bool _skippedSwapApplications = false;
 
   /// Who handed the file over (informational), when the system said.
   String? _sender;
@@ -133,6 +134,9 @@ class _RestorePreviewScreenState extends ConsumerState<RestorePreviewScreen> {
       setState(() {
         _hasSafetyCopy = safety != null;
         _skippedAttachments = skippedAttachmentCount(warnings);
+        _skippedSwapApplications = warnings.any(
+          (warning) => warning is SwapApplicationsSkipped,
+        );
         _phase = _Phase.done;
       });
     } on RestoreFailure catch (failure, stack) {
@@ -244,12 +248,17 @@ class _RestorePreviewScreenState extends ConsumerState<RestorePreviewScreen> {
         return _Centered(
           child: EmptyState(
             key: const ValueKey('restore-done'),
-            icon: AppIcons.check,
-            title: l10n.backupUiDoneTitle,
-            message: _skippedAttachments > 0
-                ? '${l10n.backupUiDoneBody}\n\n'
-                      '${l10n.backupWarnRestoreSkipped(_skippedAttachments)}'
-                : l10n.backupUiDoneBody,
+            icon: _skippedSwapApplications
+                ? BackupIcons.warning
+                : AppIcons.check,
+            title: _skippedSwapApplications
+                ? l10n.backupSwapApplicationsSkipped
+                : l10n.backupUiDoneTitle,
+            message: [
+              l10n.backupUiDoneBody,
+              if (_skippedAttachments > 0)
+                l10n.backupWarnRestoreSkipped(_skippedAttachments),
+            ].join('\n\n'),
             actionLabel: l10n.backupUiDoneView,
             primaryAction: true,
             onAction: () => context.go(AppRoutes.home),

@@ -28,7 +28,7 @@ Future<PatternWizardArgs> _open(WidgetTester tester) async {
   final screen = tester.widget<PatternWizardScreen>(
     find.byType(PatternWizardScreen),
   );
-  final args = (start: screen.start, shiftId: screen.shiftId);
+  final args = PatternWizardArgs(start: screen.start, shiftId: screen.shiftId);
   final wizard = _container(tester).read(patternWizardProvider(args).notifier);
   wizard.replaceBlocks([
     for (final id in ['morning', 'night', 'afternoon'])

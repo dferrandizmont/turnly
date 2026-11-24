@@ -12,9 +12,42 @@ import '../domain/pattern_blocks.dart';
 import '../domain/weeks_per_shift.dart';
 import 'post_night_provider.dart';
 
+/// Who owns a wizard (the family key of [patternWizardProvider]): the pattern
+/// wizard of a route, or the first-use flow's «Tu ciclo» screen.
+enum PatternWizardScope { wizard, firstUse }
+
 /// How the wizard is opened: the start day (the one long-pressed in paint
-/// mode, else today) and the shift whose typical patterns go first.
-typedef PatternWizardArgs = ({CivilDate? start, String? shiftId});
+/// mode, else today), the shift whose typical patterns go first, and its
+/// [scope]. The scope is part of the key, so the first-use screen never shares
+/// a draft with a wizard open at the same time, whatever shift (or route
+/// query) the wizard was opened with.
+@immutable
+class PatternWizardArgs {
+  const PatternWizardArgs({
+    this.start,
+    this.shiftId,
+    this.scope = PatternWizardScope.wizard,
+  });
+
+  final CivilDate? start;
+  final String? shiftId;
+  final PatternWizardScope scope;
+
+  @override
+  bool operator ==(Object other) =>
+      other is PatternWizardArgs &&
+      other.start == start &&
+      other.shiftId == shiftId &&
+      other.scope == scope;
+
+  @override
+  int get hashCode => Object.hash(start, shiftId, scope);
+}
+
+/// The arguments of the wizard of the first-use flow's «Tu ciclo» screen.
+const PatternWizardArgs firstUseWizardArgs = PatternWizardArgs(
+  scope: PatternWizardScope.firstUse,
+);
 
 /// Steps of the wizard.
 enum WizardStep { choose, start, end }

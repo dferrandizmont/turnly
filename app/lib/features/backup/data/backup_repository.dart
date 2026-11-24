@@ -15,6 +15,7 @@ import '../../review/data/review_repository.dart' show reviewSettingPrefix;
 import '../../schedule/data/overtime_store.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../../settings/domain/preferences.dart' show PreferenceKeys;
+import '../../swaps/data/swap_applied_store.dart';
 import '../domain/backup_codec.dart';
 import '../domain/backup_data.dart';
 import '../domain/backup_errors.dart';
@@ -196,7 +197,9 @@ class BackupRepository {
       verified: verified,
     );
     // The old overtime minutes become blocks, as the database migration does.
-    final safe = _withoutForeignSounds(data).upgradedOvertime()..validate();
+    final safe = _withoutForeignSounds(
+      data,
+    ).upgradedOvertime().upgradedSwapApplications()..validate();
     final safety = await _writeSafetyCopy();
     final written = await _writeAttachmentFiles(safe, files);
     try {
@@ -210,7 +213,10 @@ class BackupRepository {
     // The files the safety copy had to leave out are not swept: the copy is
     // the way back, and it does not hold them.
     await _sweepAttachmentFiles(keep: safety.skippedPaths);
-    return safety.warnings;
+    return [
+      ...safety.warnings,
+      if (safe.hasSwapApplicationRecovery) const SwapApplicationsSkipped(),
+    ];
   }
 
   /// The files of the attachments of [data], by id: what a copy carries next
@@ -428,7 +434,9 @@ class BackupRepository {
       ScheduleFingerprint fingerprint(BackupData data) =>
           scheduleFingerprint(data, from: window.from, to: window.to);
 
-      final data = file.data.sanitized().upgradedOvertime()..validate();
+      final data =
+          file.data.sanitized().upgradedOvertime().upgradedSwapApplications()
+            ..validate();
       final expected = fingerprint(data);
       final scratch = _openScratchDatabase();
       final BackupData rebuilt;
@@ -445,6 +453,9 @@ class BackupRepository {
           actual: actual,
           firstDifferingDay: expected.firstDayDifferingFrom(actual),
         );
+      }
+      if (data.hasSwapApplicationRecovery) {
+        return const VerificationIncomplete();
       }
 
       final live = fingerprint(await readAll());
@@ -506,14 +517,17 @@ class BackupRepository {
     await _runner(() {
       final verified = codec.decode(persisted);
       // The writer gives old overtime minutes as blocks (format version 4).
-      if (verified.data != data.upgradedOvertime()) {
+      if (verified.data != data.upgradedOvertime().upgradedSwapApplications()) {
         throw const CorruptBackup('Safety copy differs from current data');
       }
     });
+    // The copy just verified is the one the restore relies on: copies dated
+    // later (a clock set back) must not push it out.
     await pruneBackupFiles(
       safetyDirectory,
       backupNamePattern(_safetyPrefix),
       keepSafetyCopies,
+      protect: file,
     );
     return (warnings: encoding.warnings, skippedPaths: skippedPaths);
   }
@@ -560,6 +574,7 @@ class BackupRepository {
       final attachments = await db.select(db.noteAttachments).get();
       final tasks = await db.select(db.dayTasks).get();
       final swaps = await db.select(db.shiftSwaps).get();
+      final applications = await db.select(db.swapApplications).get();
       final versionRows = await db.select(db.shiftTypeVersions).get();
       final versionsByType = <String, List<ShiftTypeVersionRow>>{};
       for (final v in versionRows) {
@@ -763,6 +778,9 @@ class BackupRepository {
               updatedAt: t.updatedAt,
             ),
         ],
+        swapApplications: [
+          for (final row in applications) BackupSwapApplication(row.toRecord()),
+        ],
         shiftSwaps: [
           for (final s in swaps)
             BackupShiftSwap(
@@ -801,6 +819,7 @@ class BackupRepository {
         await db.delete(db.dayEntries).go();
         await db.delete(db.noteAttachments).go();
         await db.delete(db.dayTasks).go();
+        await db.delete(db.swapApplications).go();
         await db.delete(db.shiftSwaps).go();
         await db.delete(db.absenceBalances).go();
         await db.delete(db.calendars).go();
@@ -956,6 +975,13 @@ class BackupRepository {
                 updatedAt: s.updatedAt,
                 closedAt: Value(s.closedAt),
               ),
+          ]);
+          final calendarOfSwap = {
+            for (final s in data.shiftSwaps) s.id: s.calendarId,
+          };
+          b.insertAll(db.swapApplications, [
+            for (final entry in data.swapApplications)
+              entry.record.toCompanion(calendarOfSwap[entry.record.swapId]!),
           ]);
           b.insertAll(db.holidays, [
             for (final h in data.holidays)

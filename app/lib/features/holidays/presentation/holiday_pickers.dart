@@ -101,10 +101,22 @@ Future<String?> showCountryPicker(
   );
 }
 
-/// The 19 autonomous territories in alphabetical order of their names (accents
-/// ignored): the order of [RegionPicker].
+/// The 19 autonomous territories in alphabetical order of their Spanish names
+/// (accents ignored).
 final List<SpanishRegion> alphabeticalRegions = [...spanishRegions]
   ..sort((a, b) => compareSpanish(a.name, b.name));
+
+/// The 19 in alphabetical order of their names in [languageCode]: the order
+/// of [RegionPicker].
+List<SpanishRegion> regionsInOrder(String languageCode) => [...spanishRegions]
+  ..sort(
+    (a, b) => compareSpanish(a.nameIn(languageCode), b.nameIn(languageCode)),
+  );
+
+/// How a community reads in the app's language («Euskadi» in Basque, «País
+/// Vasco» in Spanish).
+String regionLabel(BuildContext context, SpanishRegion region) =>
+    region.nameIn(Localizations.localeOf(context).languageCode);
 
 /// Which community: the 19 regions in alphabetical order, the current one
 /// marked with a check. A plain list with no scrolling of its own, so a host
@@ -144,10 +156,12 @@ class RegionPicker extends StatelessWidget {
             selected: current == null,
             onTap: () => onSelected(null),
           ),
-        for (final region in alphabeticalRegions)
+        for (final region in regionsInOrder(
+          Localizations.localeOf(context).languageCode,
+        ))
           PickerOptionRow(
             key: ValueKey('region-option-${region.code}'),
-            label: region.name,
+            label: regionLabel(context, region),
             selected: region.code == current,
             onTap: () => onSelected(region.code),
           ),

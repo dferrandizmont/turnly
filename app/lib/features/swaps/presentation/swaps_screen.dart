@@ -4,10 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/format/app_date_format.dart';
 import '../../../core/icons/app_icons.dart';
 import '../../../core/l10n/l10n.dart';
-import '../../../core/providers.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/app_card.dart';
-import '../../../core/widgets/app_snack_bar.dart';
 import '../../../core/widgets/buttons.dart';
 import '../../../core/widgets/content_app_bar.dart';
 import '../../../core/widgets/empty_illustration.dart';
@@ -21,8 +19,11 @@ import '../../calendar/presentation/shift_format.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../../summary/presentation/summary_format.dart';
 import '../application/swaps_controller.dart';
+import '../application/swaps_providers.dart';
 import '../domain/shift_swap.dart';
 import '../domain/swap_ledger.dart';
+import '../domain/swap_schedule_plan.dart';
+import 'swap_apply.dart';
 import 'swap_format.dart';
 import 'swap_icons.dart';
 import 'swap_sheet.dart';
@@ -45,10 +46,7 @@ class SwapsScreen extends ConsumerWidget {
     final hasChanges = ledger.value?.swaps.isNotEmpty ?? false;
 
     return Scaffold(
-      appBar: ContentAppBar.adaptive(
-        context,
-        title: Text(l10n.swapTitle),
-      ),
+      appBar: ContentAppBar.adaptive(context, title: Text(l10n.swapTitle)),
       body: PageBody(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(
@@ -128,10 +126,7 @@ class SwapsScreen extends ConsumerWidget {
       if (ledger.balances.isNotEmpty) ...[
         Semantics(
           header: true,
-          child: Text(
-            l10n.swapBalancesTitle,
-            style: context.type.headline,
-          ),
+          child: Text(l10n.swapBalancesTitle, style: context.type.headline),
         ),
         const SizedBox(height: Sp.m),
         _BalanceCard(balances: ledger.balances),
@@ -139,10 +134,7 @@ class SwapsScreen extends ConsumerWidget {
       ],
       Semantics(
         header: true,
-        child: Text(
-          l10n.swapChangesTitle,
-          style: context.type.headline,
-        ),
+        child: Text(l10n.swapChangesTitle, style: context.type.headline),
       ),
       const SizedBox(height: Sp.m),
       for (final swap in ledger.swaps) ...[
@@ -203,10 +195,7 @@ class _BalanceRow extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: Sp.l, vertical: Sp.m),
         child: ValueRow(
-          title: Text(
-            balance.colleague,
-            style: type.bodyStrong,
-          ),
+          title: Text(balance.colleague, style: type.bodyStrong),
           value: Text(
             text,
             style: type.body.copyWith(
@@ -246,6 +235,15 @@ class _SwapRow extends ConsumerWidget {
     final given = typesOf(swap.givenShiftTypeIds);
     final received = typesOf(swap.receivedShiftTypeIds);
 
+    // Whether the calendar shows the change: read from the calendar itself,
+    // so it is right after a restore or an undo. The debt state (pending,
+    // returned, settled) is a different thing and has its own badge.
+    final schedule = ref.watch(
+      scheduleControllerProvider.select((s) => s.schedule),
+    );
+    final application = swapApplicationOf(schedule, swap);
+    final applicationText = swapApplicationText(l10n, application);
+
     // What the row says, in one go for the reader: the day, with whom, which
     // side owes it and its state (never colour alone).
     final label = [
@@ -253,6 +251,7 @@ class _SwapRow extends ConsumerWidget {
       swap.colleague,
       swapDirectionText(l10n, swap.direction),
       swapStageText(l10n, swap.stage),
+      ?applicationText,
     ].join(' · ');
 
     return AppCard(
@@ -288,7 +287,21 @@ class _SwapRow extends ConsumerWidget {
                 const SizedBox(width: Sp.s),
                 Align(
                   alignment: Alignment.topLeft,
-                  child: SwapStageBadge(stage: swap.stage, swapId: swap.id),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      SwapStageBadge(stage: swap.stage, swapId: swap.id),
+                      if (applicationText != null) ...[
+                        const SizedBox(height: Sp.xs),
+                        SwapApplicationBadge(
+                          text: applicationText,
+                          applied: application == SwapApplication.applied,
+                          swapId: swap.id,
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
                 Align(
                   alignment: Alignment.center,
@@ -323,6 +336,23 @@ class _SwapRow extends ConsumerWidget {
               swap.note!,
               key: ValueKey('swap-note-${swap.id}'),
               style: type.meta.copyWith(color: colors.textSecondary),
+            ),
+          ],
+          // The way to put the change on the calendar, in sight: it is not
+          // applied by saving it (QA M4: it hid in the menu).
+          if (application == SwapApplication.pending) ...[
+            const SizedBox(height: Sp.m),
+            SecondaryButton(
+              key: ValueKey('swap-apply-${swap.id}'),
+              icon: AppIcons.paint,
+              label: l10n.swapApplyToCalendar,
+              onPressed: () => applySwapToCalendar(
+                messenger: ScaffoldMessenger.of(context),
+                l10n: l10n,
+                controller: ref.read(swapLedgerProvider.notifier),
+                schedule: ref.read(scheduleControllerProvider.notifier),
+                swap: swap,
+              ),
             ),
           ],
         ],
@@ -397,7 +427,7 @@ class _SwapShiftPill extends StatelessWidget {
 }
 
 /// What can be done with a change.
-enum _SwapAction { edit, markReturned, settle, reopen, apply, unapply, remove }
+enum _SwapAction { edit, markReturned, settle, reopen, unapply, remove }
 
 /// The menu of a change.
 class _SwapMenu extends ConsumerWidget {
@@ -409,6 +439,9 @@ class _SwapMenu extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final colors = context.colors;
+    final hasRecords =
+        ref.watch(swapApplicationRecordsProvider(swap.id)).value?.isNotEmpty ??
+        false;
 
     PopupMenuItem<_SwapAction> item(
       _SwapAction action,
@@ -416,16 +449,16 @@ class _SwapMenu extends ConsumerWidget {
       IconData icon,
       String label,
     ) => PopupMenuItem(
-          key: ValueKey(key),
-          value: action,
-          child: Row(
-            children: [
-              Icon(icon, size: IconSize.button, color: colors.textSecondary),
-              const SizedBox(width: Sp.m),
-              Flexible(child: Text(label)),
-            ],
-          ),
-        );
+      key: ValueKey(key),
+      value: action,
+      child: Row(
+        children: [
+          Icon(icon, size: IconSize.button, color: colors.textSecondary),
+          const SizedBox(width: Sp.m),
+          Flexible(child: Text(label)),
+        ],
+      ),
+    );
 
     return PopupMenuButton<_SwapAction>(
       key: ValueKey('swap-menu-${swap.id}'),
@@ -459,18 +492,13 @@ class _SwapMenu extends ConsumerWidget {
             AppIcons.undo,
             l10n.swapReopen,
           ),
-        item(
-          _SwapAction.apply,
-          'swap-menu-apply',
-          AppIcons.paint,
-          l10n.swapApplyToCalendar,
-        ),
-        item(
-          _SwapAction.unapply,
-          'swap-menu-unapply',
-          AppIcons.erase,
-          l10n.swapUndoFromCalendar,
-        ),
+        if (hasRecords)
+          item(
+            _SwapAction.unapply,
+            'swap-menu-unapply',
+            AppIcons.erase,
+            l10n.swapUndoFromCalendar,
+          ),
         item(
           _SwapAction.remove,
           'swap-menu-remove',
@@ -492,63 +520,92 @@ class _SwapMenu extends ConsumerWidget {
     final messenger = ScaffoldMessenger.of(context);
     final controller = ref.read(swapLedgerProvider.notifier);
     final schedule = ref.read(scheduleControllerProvider.notifier);
-    switch (action) {
-      case _SwapAction.edit:
-        await showSwapSheet(context, swap: swap);
-      case _SwapAction.markReturned:
-        final date = await _pickReturnDate(context, swap);
-        if (date == null) return;
-        await controller.save(
-          swap.copyWith(
-            returnDate: date,
-            updatedAt: ref.read(clockProvider)().millisecondsSinceEpoch,
-          ),
-        );
-        _say(messenger, l10n.swapMarkedReturned);
-      case _SwapAction.settle:
-        await controller.settle(swap.id);
-        _say(messenger, l10n.swapMarkedSettled);
-      case _SwapAction.reopen:
-        await controller.reopen(swap.id);
-        _say(messenger, l10n.swapReopened);
-      case _SwapAction.apply:
-        final step = controller.applyToCalendar(swap);
-        if (step == null) {
-          _say(messenger, l10n.swapNothingToApply);
-          return;
-        }
-        _say(
-          messenger,
-          l10n.swapApplied,
-          action: SnackBarAction(
-            label: l10n.undo,
-            onPressed: () => schedule.undoIfLast(step),
-          ),
-        );
-      case _SwapAction.unapply:
-        final step = controller.undoFromCalendar(swap);
-        if (step == null) {
-          _say(messenger, l10n.swapNotApplied);
-          return;
-        }
-        _say(
-          messenger,
-          l10n.swapUnapplied,
-          action: SnackBarAction(
-            label: l10n.undo,
-            onPressed: () => schedule.undoIfLast(step),
-          ),
-        );
-      case _SwapAction.remove:
-        await controller.remove(swap.id);
-        _say(
-          messenger,
-          l10n.swapRemoved,
-          action: SnackBarAction(
-            label: l10n.undo,
-            onPressed: () => controller.save(swap),
-          ),
-        );
+    if (controller.isBusy(swap.id)) return;
+    try {
+      switch (action) {
+        case _SwapAction.edit:
+          await showSwapSheet(context, swap: swap);
+        case _SwapAction.markReturned:
+          final date = await _pickReturnDate(context, swap);
+          if (date == null) return;
+          var skipped = const <CivilDate>[];
+          await controller.markReturned(
+            swap.id,
+            date,
+            onSkipped: (days) => skipped = days,
+          );
+          if (messenger.mounted) {
+            if (skipped.isEmpty) {
+              showSwapNotice(messenger, l10n.swapMarkedReturned);
+            } else {
+              showSkippedSwapDays(messenger, l10n, schedule, skipped);
+            }
+          }
+        case _SwapAction.settle:
+          await controller.settle(swap.id);
+          if (messenger.mounted) {
+            showSwapNotice(messenger, l10n.swapMarkedSettled);
+          }
+        case _SwapAction.reopen:
+          await controller.reopen(swap.id);
+          if (messenger.mounted) showSwapNotice(messenger, l10n.swapReopened);
+        case _SwapAction.unapply:
+          var skipped = const <CivilDate>[];
+          final step = await controller.undoFromCalendar(
+            swap,
+            onSkipped: (days) => skipped = days,
+          );
+          if (!messenger.mounted) return;
+          if (skipped.isNotEmpty) {
+            showSkippedSwapDays(messenger, l10n, schedule, skipped, step: step);
+          } else if (step != null) {
+            showSwapUndoNotice(
+              messenger,
+              l10n,
+              schedule,
+              l10n.swapUnapplied,
+              step,
+            );
+          }
+        case _SwapAction.remove:
+          final records = await ref
+              .read(swapAppliedStoreProvider)
+              .before(swap.id);
+          if (!context.mounted) return;
+          final restore = await confirmSwapRemoval(
+            context,
+            swap,
+            hasRecords: records.isNotEmpty,
+            confirmUnapplied: false,
+          );
+          if (restore == null) return;
+          var skipped = const <CivilDate>[];
+          final step = await controller.remove(
+            swap.id,
+            restoreCalendar: restore,
+            onSkipped: (days) => skipped = days,
+          );
+          if (!messenger.mounted) return;
+          if (skipped.isNotEmpty) {
+            showSkippedSwapDays(
+              messenger,
+              l10n,
+              schedule,
+              skipped,
+              removalRefused: true,
+            );
+          } else if (step != null) {
+            showSwapUndoNotice(
+              messenger,
+              l10n,
+              schedule,
+              l10n.swapRemoved,
+              step,
+            );
+          }
+      }
+    } catch (_) {
+      if (messenger.mounted) showSwapNotice(messenger, l10n.swapSaveFailed);
     }
   }
 }
@@ -566,18 +623,3 @@ Future<CivilDate?> _pickReturnDate(BuildContext context, ShiftSwap swap) async {
   if (picked == null) return null;
   return CivilDate.fromDateTime(picked);
 }
-
-/// A notice of the screen, with «Deshacer» when there is something to undo.
-void _say(
-  ScaffoldMessengerState messenger,
-  String message, {
-  SnackBarAction? action,
-}) => messenger
-  ..hideCurrentSnackBar()
-  ..showSnackBar(
-    appSnackBar(
-      context: messenger.context,
-      content: Text(message),
-      action: action,
-    ),
-  );

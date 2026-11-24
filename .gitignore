@@ -22,7 +22,7 @@ build/
 .venv/
 
 # QA evidence (screenshots, logs)
-qa/*/evidence/
+qa/*/evidence*/
 
 # Browser automation output
 .playwright-mcp/

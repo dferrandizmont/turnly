@@ -6232,6 +6232,467 @@ class ShiftSwapsCompanion extends UpdateCompanion<ShiftSwapRow> {
   }
 }
 
+class $SwapApplicationsTable extends SwapApplications
+    with TableInfo<$SwapApplicationsTable, SwapApplicationRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SwapApplicationsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _swapIdMeta = const VerificationMeta('swapId');
+  @override
+  late final GeneratedColumn<String> swapId = GeneratedColumn<String>(
+    'swap_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES shift_swaps (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _calendarIdMeta = const VerificationMeta(
+    'calendarId',
+  );
+  @override
+  late final GeneratedColumn<String> calendarId = GeneratedColumn<String>(
+    'calendar_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES calendars (id) ON DELETE CASCADE',
+    ),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<CivilDate, String> date =
+      GeneratedColumn<String>(
+        'date',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<CivilDate>($SwapApplicationsTable.$converterdate);
+  @override
+  late final GeneratedColumnWithTypeConverter<List<String>?, String>
+  previousShiftTypeIds =
+      GeneratedColumn<String>(
+        'previous_shift_type_ids',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<List<String>?>(
+        $SwapApplicationsTable.$converterpreviousShiftTypeIdsn,
+      );
+  static const VerificationMeta _appliedOverrideMeta = const VerificationMeta(
+    'appliedOverride',
+  );
+  @override
+  late final GeneratedColumn<String> appliedOverride = GeneratedColumn<String>(
+    'applied_override',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    swapId,
+    calendarId,
+    date,
+    previousShiftTypeIds,
+    appliedOverride,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'swap_applications';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<SwapApplicationRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('swap_id')) {
+      context.handle(
+        _swapIdMeta,
+        swapId.isAcceptableOrUnknown(data['swap_id']!, _swapIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_swapIdMeta);
+    }
+    if (data.containsKey('calendar_id')) {
+      context.handle(
+        _calendarIdMeta,
+        calendarId.isAcceptableOrUnknown(data['calendar_id']!, _calendarIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_calendarIdMeta);
+    }
+    if (data.containsKey('applied_override')) {
+      context.handle(
+        _appliedOverrideMeta,
+        appliedOverride.isAcceptableOrUnknown(
+          data['applied_override']!,
+          _appliedOverrideMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {swapId, date};
+  @override
+  SwapApplicationRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SwapApplicationRow(
+      swapId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}swap_id'],
+      )!,
+      calendarId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}calendar_id'],
+      )!,
+      date: $SwapApplicationsTable.$converterdate.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}date'],
+        )!,
+      ),
+      previousShiftTypeIds: $SwapApplicationsTable
+          .$converterpreviousShiftTypeIdsn
+          .fromSql(
+            attachedDatabase.typeMapping.read(
+              DriftSqlType.string,
+              data['${effectivePrefix}previous_shift_type_ids'],
+            ),
+          ),
+      appliedOverride: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}applied_override'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $SwapApplicationsTable createAlias(String alias) {
+    return $SwapApplicationsTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<CivilDate, String> $converterdate =
+      const CivilDateConverter();
+  static TypeConverter<List<String>, String> $converterpreviousShiftTypeIds =
+      const StringListConverter();
+  static TypeConverter<List<String>?, String?> $converterpreviousShiftTypeIdsn =
+      NullAwareTypeConverter.wrap($converterpreviousShiftTypeIds);
+}
+
+class SwapApplicationRow extends DataClass
+    implements Insertable<SwapApplicationRow> {
+  final String swapId;
+  final String calendarId;
+  final CivilDate date;
+  final List<String>? previousShiftTypeIds;
+
+  /// SQL NULL means the old application did not record what it wrote.
+  /// JSON null is a recorded write that removed the override.
+  final String? appliedOverride;
+  final int createdAt;
+  const SwapApplicationRow({
+    required this.swapId,
+    required this.calendarId,
+    required this.date,
+    this.previousShiftTypeIds,
+    this.appliedOverride,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['swap_id'] = Variable<String>(swapId);
+    map['calendar_id'] = Variable<String>(calendarId);
+    {
+      map['date'] = Variable<String>(
+        $SwapApplicationsTable.$converterdate.toSql(date),
+      );
+    }
+    if (!nullToAbsent || previousShiftTypeIds != null) {
+      map['previous_shift_type_ids'] = Variable<String>(
+        $SwapApplicationsTable.$converterpreviousShiftTypeIdsn.toSql(
+          previousShiftTypeIds,
+        ),
+      );
+    }
+    if (!nullToAbsent || appliedOverride != null) {
+      map['applied_override'] = Variable<String>(appliedOverride);
+    }
+    map['created_at'] = Variable<int>(createdAt);
+    return map;
+  }
+
+  SwapApplicationsCompanion toCompanion(bool nullToAbsent) {
+    return SwapApplicationsCompanion(
+      swapId: Value(swapId),
+      calendarId: Value(calendarId),
+      date: Value(date),
+      previousShiftTypeIds: previousShiftTypeIds == null && nullToAbsent
+          ? const Value.absent()
+          : Value(previousShiftTypeIds),
+      appliedOverride: appliedOverride == null && nullToAbsent
+          ? const Value.absent()
+          : Value(appliedOverride),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory SwapApplicationRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SwapApplicationRow(
+      swapId: serializer.fromJson<String>(json['swapId']),
+      calendarId: serializer.fromJson<String>(json['calendarId']),
+      date: serializer.fromJson<CivilDate>(json['date']),
+      previousShiftTypeIds: serializer.fromJson<List<String>?>(
+        json['previousShiftTypeIds'],
+      ),
+      appliedOverride: serializer.fromJson<String?>(json['appliedOverride']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'swapId': serializer.toJson<String>(swapId),
+      'calendarId': serializer.toJson<String>(calendarId),
+      'date': serializer.toJson<CivilDate>(date),
+      'previousShiftTypeIds': serializer.toJson<List<String>?>(
+        previousShiftTypeIds,
+      ),
+      'appliedOverride': serializer.toJson<String?>(appliedOverride),
+      'createdAt': serializer.toJson<int>(createdAt),
+    };
+  }
+
+  SwapApplicationRow copyWith({
+    String? swapId,
+    String? calendarId,
+    CivilDate? date,
+    Value<List<String>?> previousShiftTypeIds = const Value.absent(),
+    Value<String?> appliedOverride = const Value.absent(),
+    int? createdAt,
+  }) => SwapApplicationRow(
+    swapId: swapId ?? this.swapId,
+    calendarId: calendarId ?? this.calendarId,
+    date: date ?? this.date,
+    previousShiftTypeIds: previousShiftTypeIds.present
+        ? previousShiftTypeIds.value
+        : this.previousShiftTypeIds,
+    appliedOverride: appliedOverride.present
+        ? appliedOverride.value
+        : this.appliedOverride,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  SwapApplicationRow copyWithCompanion(SwapApplicationsCompanion data) {
+    return SwapApplicationRow(
+      swapId: data.swapId.present ? data.swapId.value : this.swapId,
+      calendarId: data.calendarId.present
+          ? data.calendarId.value
+          : this.calendarId,
+      date: data.date.present ? data.date.value : this.date,
+      previousShiftTypeIds: data.previousShiftTypeIds.present
+          ? data.previousShiftTypeIds.value
+          : this.previousShiftTypeIds,
+      appliedOverride: data.appliedOverride.present
+          ? data.appliedOverride.value
+          : this.appliedOverride,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SwapApplicationRow(')
+          ..write('swapId: $swapId, ')
+          ..write('calendarId: $calendarId, ')
+          ..write('date: $date, ')
+          ..write('previousShiftTypeIds: $previousShiftTypeIds, ')
+          ..write('appliedOverride: $appliedOverride, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    swapId,
+    calendarId,
+    date,
+    previousShiftTypeIds,
+    appliedOverride,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SwapApplicationRow &&
+          other.swapId == this.swapId &&
+          other.calendarId == this.calendarId &&
+          other.date == this.date &&
+          other.previousShiftTypeIds == this.previousShiftTypeIds &&
+          other.appliedOverride == this.appliedOverride &&
+          other.createdAt == this.createdAt);
+}
+
+class SwapApplicationsCompanion extends UpdateCompanion<SwapApplicationRow> {
+  final Value<String> swapId;
+  final Value<String> calendarId;
+  final Value<CivilDate> date;
+  final Value<List<String>?> previousShiftTypeIds;
+  final Value<String?> appliedOverride;
+  final Value<int> createdAt;
+  final Value<int> rowid;
+  const SwapApplicationsCompanion({
+    this.swapId = const Value.absent(),
+    this.calendarId = const Value.absent(),
+    this.date = const Value.absent(),
+    this.previousShiftTypeIds = const Value.absent(),
+    this.appliedOverride = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SwapApplicationsCompanion.insert({
+    required String swapId,
+    required String calendarId,
+    required CivilDate date,
+    this.previousShiftTypeIds = const Value.absent(),
+    this.appliedOverride = const Value.absent(),
+    required int createdAt,
+    this.rowid = const Value.absent(),
+  }) : swapId = Value(swapId),
+       calendarId = Value(calendarId),
+       date = Value(date),
+       createdAt = Value(createdAt);
+  static Insertable<SwapApplicationRow> custom({
+    Expression<String>? swapId,
+    Expression<String>? calendarId,
+    Expression<String>? date,
+    Expression<String>? previousShiftTypeIds,
+    Expression<String>? appliedOverride,
+    Expression<int>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (swapId != null) 'swap_id': swapId,
+      if (calendarId != null) 'calendar_id': calendarId,
+      if (date != null) 'date': date,
+      if (previousShiftTypeIds != null)
+        'previous_shift_type_ids': previousShiftTypeIds,
+      if (appliedOverride != null) 'applied_override': appliedOverride,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SwapApplicationsCompanion copyWith({
+    Value<String>? swapId,
+    Value<String>? calendarId,
+    Value<CivilDate>? date,
+    Value<List<String>?>? previousShiftTypeIds,
+    Value<String?>? appliedOverride,
+    Value<int>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return SwapApplicationsCompanion(
+      swapId: swapId ?? this.swapId,
+      calendarId: calendarId ?? this.calendarId,
+      date: date ?? this.date,
+      previousShiftTypeIds: previousShiftTypeIds ?? this.previousShiftTypeIds,
+      appliedOverride: appliedOverride ?? this.appliedOverride,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (swapId.present) {
+      map['swap_id'] = Variable<String>(swapId.value);
+    }
+    if (calendarId.present) {
+      map['calendar_id'] = Variable<String>(calendarId.value);
+    }
+    if (date.present) {
+      map['date'] = Variable<String>(
+        $SwapApplicationsTable.$converterdate.toSql(date.value),
+      );
+    }
+    if (previousShiftTypeIds.present) {
+      map['previous_shift_type_ids'] = Variable<String>(
+        $SwapApplicationsTable.$converterpreviousShiftTypeIdsn.toSql(
+          previousShiftTypeIds.value,
+        ),
+      );
+    }
+    if (appliedOverride.present) {
+      map['applied_override'] = Variable<String>(appliedOverride.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SwapApplicationsCompanion(')
+          ..write('swapId: $swapId, ')
+          ..write('calendarId: $calendarId, ')
+          ..write('date: $date, ')
+          ..write('previousShiftTypeIds: $previousShiftTypeIds, ')
+          ..write('appliedOverride: $appliedOverride, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $HolidaysTable extends Holidays
     with TableInfo<$HolidaysTable, HolidayRow> {
   @override
@@ -8944,6 +9405,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final $DayTasksTable dayTasks = $DayTasksTable(this);
   late final $ShiftSwapsTable shiftSwaps = $ShiftSwapsTable(this);
+  late final $SwapApplicationsTable swapApplications = $SwapApplicationsTable(
+    this,
+  );
   late final $HolidaysTable holidays = $HolidaysTable(this);
   late final $AbsenceBalancesTable absenceBalances = $AbsenceBalancesTable(
     this,
@@ -8963,6 +9427,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'idx_shift_swaps_day',
     'CREATE INDEX idx_shift_swaps_day ON shift_swaps (calendar_id, date)',
   );
+  late final Index idxSwapApplicationsDay = Index(
+    'idx_swap_applications_day',
+    'CREATE UNIQUE INDEX idx_swap_applications_day ON swap_applications (calendar_id, date)',
+  );
   late final Index idxHolidaysDate = Index(
     'idx_holidays_date',
     'CREATE INDEX idx_holidays_date ON holidays (date)',
@@ -8981,6 +9449,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     noteAttachments,
     dayTasks,
     shiftSwaps,
+    swapApplications,
     holidays,
     absenceBalances,
     settings,
@@ -8989,6 +9458,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     idxNoteAttachmentsDay,
     idxDayTasksDay,
     idxShiftSwapsDay,
+    idxSwapApplicationsDay,
     idxHolidaysDate,
   ];
   @override
@@ -9020,6 +9490,20 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('shift_swaps', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'shift_swaps',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('swap_applications', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'calendars',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('swap_applications', kind: UpdateKind.delete)],
     ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
@@ -9150,6 +9634,26 @@ final class $$CalendarsTableReferences
     ).filter((f) => f.calendarId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_shiftSwapsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$SwapApplicationsTable, List<SwapApplicationRow>>
+  _swapApplicationsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.swapApplications,
+    aliasName: 'calendars__id__swap_applications__calendar_id',
+  );
+
+  $$SwapApplicationsTableProcessedTableManager get swapApplicationsRefs {
+    final manager = $$SwapApplicationsTableTableManager(
+      $_db,
+      $_db.swapApplications,
+    ).filter((f) => f.calendarId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _swapApplicationsRefsTable($_db),
+    );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -9354,6 +9858,31 @@ class $$CalendarsTableFilterComposer
           }) => $$ShiftSwapsTableFilterComposer(
             $db: $db,
             $table: $db.shiftSwaps,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> swapApplicationsRefs(
+    Expression<bool> Function($$SwapApplicationsTableFilterComposer f) f,
+  ) {
+    final $$SwapApplicationsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.swapApplications,
+      getReferencedColumn: (t) => t.calendarId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SwapApplicationsTableFilterComposer(
+            $db: $db,
+            $table: $db.swapApplications,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -9616,6 +10145,31 @@ class $$CalendarsTableAnnotationComposer
     return f(composer);
   }
 
+  Expression<T> swapApplicationsRefs<T extends Object>(
+    Expression<T> Function($$SwapApplicationsTableAnnotationComposer a) f,
+  ) {
+    final $$SwapApplicationsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.swapApplications,
+      getReferencedColumn: (t) => t.calendarId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SwapApplicationsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.swapApplications,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
   Expression<T> absenceBalancesRefs<T extends Object>(
     Expression<T> Function($$AbsenceBalancesTableAnnotationComposer a) f,
   ) {
@@ -9686,6 +10240,7 @@ class $$CalendarsTableTableManager
             bool noteAttachmentsRefs,
             bool dayTasksRefs,
             bool shiftSwapsRefs,
+            bool swapApplicationsRefs,
             bool absenceBalancesRefs,
             bool overtimeBlocksRefs,
           })
@@ -9756,6 +10311,7 @@ class $$CalendarsTableTableManager
                 noteAttachmentsRefs = false,
                 dayTasksRefs = false,
                 shiftSwapsRefs = false,
+                swapApplicationsRefs = false,
                 absenceBalancesRefs = false,
                 overtimeBlocksRefs = false,
               }) {
@@ -9767,6 +10323,7 @@ class $$CalendarsTableTableManager
                     if (noteAttachmentsRefs) db.noteAttachments,
                     if (dayTasksRefs) db.dayTasks,
                     if (shiftSwapsRefs) db.shiftSwaps,
+                    if (swapApplicationsRefs) db.swapApplications,
                     if (absenceBalancesRefs) db.absenceBalances,
                     if (overtimeBlocksRefs) db.overtimeBlocks,
                   ],
@@ -9878,6 +10435,27 @@ class $$CalendarsTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (swapApplicationsRefs)
+                        await $_getPrefetchedData<
+                          CalendarRow,
+                          $CalendarsTable,
+                          SwapApplicationRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$CalendarsTableReferences
+                              ._swapApplicationsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$CalendarsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).swapApplicationsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.calendarId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                       if (absenceBalancesRefs)
                         await $_getPrefetchedData<
                           CalendarRow,
@@ -9946,6 +10524,7 @@ typedef $$CalendarsTableProcessedTableManager =
         bool noteAttachmentsRefs,
         bool dayTasksRefs,
         bool shiftSwapsRefs,
+        bool swapApplicationsRefs,
         bool absenceBalancesRefs,
         bool overtimeBlocksRefs,
       })
@@ -13156,6 +13735,26 @@ final class $$ShiftSwapsTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
+
+  static MultiTypedResultKey<$SwapApplicationsTable, List<SwapApplicationRow>>
+  _swapApplicationsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.swapApplications,
+    aliasName: 'shift_swaps__id__swap_applications__swap_id',
+  );
+
+  $$SwapApplicationsTableProcessedTableManager get swapApplicationsRefs {
+    final manager = $$SwapApplicationsTableTableManager(
+      $_db,
+      $_db.swapApplications,
+    ).filter((f) => f.swapId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _swapApplicationsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$ShiftSwapsTableFilterComposer
@@ -13254,6 +13853,31 @@ class $$ShiftSwapsTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> swapApplicationsRefs(
+    Expression<bool> Function($$SwapApplicationsTableFilterComposer f) f,
+  ) {
+    final $$SwapApplicationsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.swapApplications,
+      getReferencedColumn: (t) => t.swapId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SwapApplicationsTableFilterComposer(
+            $db: $db,
+            $table: $db.swapApplications,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
   }
 }
 
@@ -13426,6 +14050,31 @@ class $$ShiftSwapsTableAnnotationComposer
     );
     return composer;
   }
+
+  Expression<T> swapApplicationsRefs<T extends Object>(
+    Expression<T> Function($$SwapApplicationsTableAnnotationComposer a) f,
+  ) {
+    final $$SwapApplicationsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.swapApplications,
+      getReferencedColumn: (t) => t.swapId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SwapApplicationsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.swapApplications,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ShiftSwapsTableTableManager
@@ -13441,7 +14090,7 @@ class $$ShiftSwapsTableTableManager
           $$ShiftSwapsTableUpdateCompanionBuilder,
           (ShiftSwapRow, $$ShiftSwapsTableReferences),
           ShiftSwapRow,
-          PrefetchHooks Function({bool calendarId})
+          PrefetchHooks Function({bool calendarId, bool swapApplicationsRefs})
         > {
   $$ShiftSwapsTableTableManager(_$AppDatabase db, $ShiftSwapsTable table)
     : super(
@@ -13528,7 +14177,461 @@ class $$ShiftSwapsTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({calendarId = false}) {
+          prefetchHooksCallback:
+              ({calendarId = false, swapApplicationsRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (swapApplicationsRefs) db.swapApplications,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (calendarId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.calendarId,
+                            referencedTable: $$ShiftSwapsTableReferences
+                                ._calendarIdTable(db),
+                            referencedColumn: $$ShiftSwapsTableReferences
+                                ._calendarIdTable(db)
+                                .id,
+                          ) as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (swapApplicationsRefs)
+                        await $_getPrefetchedData<
+                          ShiftSwapRow,
+                          $ShiftSwapsTable,
+                          SwapApplicationRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ShiftSwapsTableReferences
+                              ._swapApplicationsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ShiftSwapsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).swapApplicationsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.swapId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$ShiftSwapsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ShiftSwapsTable,
+      ShiftSwapRow,
+      $$ShiftSwapsTableFilterComposer,
+      $$ShiftSwapsTableOrderingComposer,
+      $$ShiftSwapsTableAnnotationComposer,
+      $$ShiftSwapsTableCreateCompanionBuilder,
+      $$ShiftSwapsTableUpdateCompanionBuilder,
+      (ShiftSwapRow, $$ShiftSwapsTableReferences),
+      ShiftSwapRow,
+      PrefetchHooks Function({bool calendarId, bool swapApplicationsRefs})
+    >;
+typedef $$SwapApplicationsTableCreateCompanionBuilder =
+    SwapApplicationsCompanion Function({
+      required String swapId,
+      required String calendarId,
+      required CivilDate date,
+      Value<List<String>?> previousShiftTypeIds,
+      Value<String?> appliedOverride,
+      required int createdAt,
+      Value<int> rowid,
+    });
+typedef $$SwapApplicationsTableUpdateCompanionBuilder =
+    SwapApplicationsCompanion Function({
+      Value<String> swapId,
+      Value<String> calendarId,
+      Value<CivilDate> date,
+      Value<List<String>?> previousShiftTypeIds,
+      Value<String?> appliedOverride,
+      Value<int> createdAt,
+      Value<int> rowid,
+    });
+
+final class $$SwapApplicationsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $SwapApplicationsTable,
+          SwapApplicationRow
+        > {
+  $$SwapApplicationsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ShiftSwapsTable _swapIdTable(_$AppDatabase db) =>
+      db.shiftSwaps.createAlias('swap_applications__swap_id__shift_swaps__id');
+
+  $$ShiftSwapsTableProcessedTableManager get swapId {
+    final $_column = $_itemColumn<String>('swap_id')!;
+
+    final manager = $$ShiftSwapsTableTableManager(
+      $_db,
+      $_db.shiftSwaps,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_swapIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $CalendarsTable _calendarIdTable(_$AppDatabase db) =>
+      db.calendars.createAlias('swap_applications__calendar_id__calendars__id');
+
+  $$CalendarsTableProcessedTableManager get calendarId {
+    final $_column = $_itemColumn<String>('calendar_id')!;
+
+    final manager = $$CalendarsTableTableManager(
+      $_db,
+      $_db.calendars,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_calendarIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$SwapApplicationsTableFilterComposer
+    extends Composer<_$AppDatabase, $SwapApplicationsTable> {
+  $$SwapApplicationsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnWithTypeConverterFilters<CivilDate, CivilDate, String> get date =>
+      $composableBuilder(
+        column: $table.date,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnWithTypeConverterFilters<List<String>?, List<String>, String>
+  get previousShiftTypeIds => $composableBuilder(
+    column: $table.previousShiftTypeIds,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<String> get appliedOverride => $composableBuilder(
+    column: $table.appliedOverride,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ShiftSwapsTableFilterComposer get swapId {
+    final $$ShiftSwapsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.swapId,
+      referencedTable: $db.shiftSwaps,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ShiftSwapsTableFilterComposer(
+            $db: $db,
+            $table: $db.shiftSwaps,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CalendarsTableFilterComposer get calendarId {
+    final $$CalendarsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.calendarId,
+      referencedTable: $db.calendars,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CalendarsTableFilterComposer(
+            $db: $db,
+            $table: $db.calendars,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$SwapApplicationsTableOrderingComposer
+    extends Composer<_$AppDatabase, $SwapApplicationsTable> {
+  $$SwapApplicationsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get previousShiftTypeIds => $composableBuilder(
+    column: $table.previousShiftTypeIds,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get appliedOverride => $composableBuilder(
+    column: $table.appliedOverride,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ShiftSwapsTableOrderingComposer get swapId {
+    final $$ShiftSwapsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.swapId,
+      referencedTable: $db.shiftSwaps,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ShiftSwapsTableOrderingComposer(
+            $db: $db,
+            $table: $db.shiftSwaps,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CalendarsTableOrderingComposer get calendarId {
+    final $$CalendarsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.calendarId,
+      referencedTable: $db.calendars,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CalendarsTableOrderingComposer(
+            $db: $db,
+            $table: $db.calendars,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$SwapApplicationsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SwapApplicationsTable> {
+  $$SwapApplicationsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumnWithTypeConverter<CivilDate, String> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<List<String>?, String>
+  get previousShiftTypeIds => $composableBuilder(
+    column: $table.previousShiftTypeIds,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get appliedOverride => $composableBuilder(
+    column: $table.appliedOverride,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$ShiftSwapsTableAnnotationComposer get swapId {
+    final $$ShiftSwapsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.swapId,
+      referencedTable: $db.shiftSwaps,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ShiftSwapsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.shiftSwaps,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CalendarsTableAnnotationComposer get calendarId {
+    final $$CalendarsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.calendarId,
+      referencedTable: $db.calendars,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CalendarsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.calendars,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$SwapApplicationsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $SwapApplicationsTable,
+          SwapApplicationRow,
+          $$SwapApplicationsTableFilterComposer,
+          $$SwapApplicationsTableOrderingComposer,
+          $$SwapApplicationsTableAnnotationComposer,
+          $$SwapApplicationsTableCreateCompanionBuilder,
+          $$SwapApplicationsTableUpdateCompanionBuilder,
+          (SwapApplicationRow, $$SwapApplicationsTableReferences),
+          SwapApplicationRow,
+          PrefetchHooks Function({bool swapId, bool calendarId})
+        > {
+  $$SwapApplicationsTableTableManager(
+    _$AppDatabase db,
+    $SwapApplicationsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SwapApplicationsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SwapApplicationsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SwapApplicationsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> swapId = const Value.absent(),
+                Value<String> calendarId = const Value.absent(),
+                Value<CivilDate> date = const Value.absent(),
+                Value<List<String>?> previousShiftTypeIds =
+                    const Value.absent(),
+                Value<String?> appliedOverride = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SwapApplicationsCompanion(
+                swapId: swapId,
+                calendarId: calendarId,
+                date: date,
+                previousShiftTypeIds: previousShiftTypeIds,
+                appliedOverride: appliedOverride,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String swapId,
+                required String calendarId,
+                required CivilDate date,
+                Value<List<String>?> previousShiftTypeIds =
+                    const Value.absent(),
+                Value<String?> appliedOverride = const Value.absent(),
+                required int createdAt,
+                Value<int> rowid = const Value.absent(),
+              }) => SwapApplicationsCompanion.insert(
+                swapId: swapId,
+                calendarId: calendarId,
+                date: date,
+                previousShiftTypeIds: previousShiftTypeIds,
+                appliedOverride: appliedOverride,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$SwapApplicationsTable, SwapApplicationRow>(
+                    table,
+                  ),
+                  $$SwapApplicationsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({swapId = false, calendarId = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [],
@@ -13548,13 +14651,24 @@ class $$ShiftSwapsTableTableManager
                       dynamic
                     >
                   >(state) {
+                    if (swapId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.swapId,
+                        referencedTable: $$SwapApplicationsTableReferences
+                            ._swapIdTable(db),
+                        referencedColumn: $$SwapApplicationsTableReferences
+                            ._swapIdTable(db)
+                            .id,
+                      ) as T;
+                    }
                     if (calendarId) {
                       state = state.withJoin(
                         currentTable: table,
                         currentColumn: table.calendarId,
-                        referencedTable: $$ShiftSwapsTableReferences
+                        referencedTable: $$SwapApplicationsTableReferences
                             ._calendarIdTable(db),
-                        referencedColumn: $$ShiftSwapsTableReferences
+                        referencedColumn: $$SwapApplicationsTableReferences
                             ._calendarIdTable(db)
                             .id,
                       ) as T;
@@ -13571,19 +14685,19 @@ class $$ShiftSwapsTableTableManager
       );
 }
 
-typedef $$ShiftSwapsTableProcessedTableManager =
+typedef $$SwapApplicationsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
-      $ShiftSwapsTable,
-      ShiftSwapRow,
-      $$ShiftSwapsTableFilterComposer,
-      $$ShiftSwapsTableOrderingComposer,
-      $$ShiftSwapsTableAnnotationComposer,
-      $$ShiftSwapsTableCreateCompanionBuilder,
-      $$ShiftSwapsTableUpdateCompanionBuilder,
-      (ShiftSwapRow, $$ShiftSwapsTableReferences),
-      ShiftSwapRow,
-      PrefetchHooks Function({bool calendarId})
+      $SwapApplicationsTable,
+      SwapApplicationRow,
+      $$SwapApplicationsTableFilterComposer,
+      $$SwapApplicationsTableOrderingComposer,
+      $$SwapApplicationsTableAnnotationComposer,
+      $$SwapApplicationsTableCreateCompanionBuilder,
+      $$SwapApplicationsTableUpdateCompanionBuilder,
+      (SwapApplicationRow, $$SwapApplicationsTableReferences),
+      SwapApplicationRow,
+      PrefetchHooks Function({bool swapId, bool calendarId})
     >;
 typedef $$HolidaysTableCreateCompanionBuilder = HolidaysCompanion Function({
   Value<int> id,
@@ -15379,6 +16493,8 @@ class $AppDatabaseManager {
       $$DayTasksTableTableManager(_db, _db.dayTasks);
   $$ShiftSwapsTableTableManager get shiftSwaps =>
       $$ShiftSwapsTableTableManager(_db, _db.shiftSwaps);
+  $$SwapApplicationsTableTableManager get swapApplications =>
+      $$SwapApplicationsTableTableManager(_db, _db.swapApplications);
   $$HolidaysTableTableManager get holidays =>
       $$HolidaysTableTableManager(_db, _db.holidays);
   $$AbsenceBalancesTableTableManager get absenceBalances =>

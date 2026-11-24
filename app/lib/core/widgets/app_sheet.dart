@@ -53,10 +53,31 @@ Future<T?> showAppSheet<T>({
 /// above it (1.1.0 QA, F4). Buttons and fields take their own taps first.
 /// The field being typed in is scrolled above the pad and the bar, so the
 /// person never types blind (1.2.0 QA, iPhone F5).
+///
+/// With a [footer] (the sheet's main button) it is pinned under the scrolling
+/// form, so it is on screen however long the form or large the text (QA M3 and
+/// M5). It joins the end of the form instead, and scrolls with it, when the
+/// keyboard is up or when pinned it would take more than [maxPinnedShare] of
+/// the height (a landscape phone): the person then scrolls to it, as before.
 class AppSheetBody extends StatefulWidget {
-  const AppSheetBody({super.key, required this.child});
+  const AppSheetBody({
+    super.key,
+    required this.child,
+    this.footer,
+    this.footerHeight = Sp.touch,
+  });
 
   final Widget child;
+
+  /// The widget pinned under the form, if any.
+  final Widget? footer;
+
+  /// Its height with the text size in use, a little over is fine: the pin is
+  /// given up when this plus its gutter passes [maxPinnedShare] of the height.
+  final double footerHeight;
+
+  /// The share of the height the pinned [footer] may take.
+  static const double maxPinnedShare = 0.4;
 
   @override
   State<AppSheetBody> createState() => _AppSheetBodyState();
@@ -161,18 +182,55 @@ class _AppSheetBodyState extends State<AppSheetBody> {
               (ModalRoute.of(context)?.isCurrent ?? true) &&
               numberPadHasFocus();
           _reveal(bar, MediaQuery.sizeOf(context));
+          final footer = widget.footer;
           return Stack(
             children: [
               SafeArea(
                 top: false,
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.fromLTRB(
-                    Sp.page,
-                    0,
-                    Sp.page,
-                    Sp.l + inset + (bar ? KeyboardDoneBar.height : 0),
-                  ),
-                  child: widget.child,
+                child: LayoutBuilder(
+                  builder: (context, box) {
+                    final pinned =
+                        footer != null &&
+                        inset == 0 &&
+                        widget.footerHeight + Sp.m + Sp.l <=
+                            box.maxHeight * AppSheetBody.maxPinnedShare;
+                    final scroll = SingleChildScrollView(
+                      padding: EdgeInsets.fromLTRB(
+                        Sp.page,
+                        0,
+                        Sp.page,
+                        Sp.l + inset + (bar ? KeyboardDoneBar.height : 0),
+                      ),
+                      child: footer == null || pinned
+                          ? widget.child
+                          : Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                widget.child,
+                                const SizedBox(height: Sp.l),
+                                footer,
+                              ],
+                            ),
+                    );
+                    if (!pinned) return scroll;
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Flexible(child: scroll),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(
+                            Sp.page,
+                            Sp.m,
+                            Sp.page,
+                            Sp.l,
+                          ),
+                          child: footer,
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
               if (bar)

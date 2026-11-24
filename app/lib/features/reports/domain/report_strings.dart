@@ -22,6 +22,7 @@ class ReportStrings {
     required this.hoursDone,
     required this.hoursPlannedFrom,
     required this.shiftsWorked,
+    required this.shiftsPlannedRest,
     required this.nightHours,
     required this.holidayHours,
     required this.overtime,
@@ -84,6 +85,9 @@ class ReportStrings {
   final String hoursDone;
   final String hoursPlannedFrom;
   final String shiftsWorked;
+
+  /// «y 2 previstos»: the shifts from today on, after the worked ones.
+  final String Function(int count) shiftsPlannedRest;
   final String nightHours;
   final String holidayHours;
   final String overtime;

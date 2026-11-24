@@ -6,6 +6,7 @@ import 'package:cuadrante/core/database/migration_v3_to_v4.dart';
 import 'package:cuadrante/core/database/migration_v4_to_v5.dart';
 import 'package:cuadrante/core/database/migration_v5_to_v6.dart';
 import 'package:cuadrante/core/database/migration_v6_to_v7.dart';
+import 'package:cuadrante/core/database/migration_v7_to_v8.dart';
 import 'package:cuadrante/features/calendars/data/calendars_repository.dart';
 import 'package:cuadrante/features/calendars/domain/calendar.dart';
 import 'package:cuadrante/features/schedule/data/schedule_repository.dart';
@@ -45,6 +46,7 @@ class _FailingMigrationDatabase extends AppDatabase {
       from4To5: migrateFrom4To5,
       from5To6: migrateFrom5To6,
       from6To7: migrateFrom6To7,
+      from7To8: migrateFrom7To8,
     ),
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');

@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 
+import '../../swaps/domain/swap_application.dart';
 import 'civil_date.dart';
 import 'pattern.dart';
 import 'schedule.dart';
@@ -139,18 +140,21 @@ class ScheduleChange {
     this.patch = EntriesPatch.empty,
     this.runsBefore,
     this.runsAfter,
+    this.swap,
   });
 
   final EntriesPatch patch;
   final List<PatternRun>? runsBefore;
   final List<PatternRun>? runsAfter;
+  final SwapChange? swap;
 
-  bool get isEmpty => patch.isEmpty && runsAfter == null;
+  bool get isEmpty => patch.isEmpty && runsAfter == null && swap == null;
 
   ScheduleChange inverse() => ScheduleChange(
     patch: patch.inverse(),
     runsBefore: runsAfter,
     runsAfter: runsBefore,
+    swap: swap?.inverse(),
   );
 }
 

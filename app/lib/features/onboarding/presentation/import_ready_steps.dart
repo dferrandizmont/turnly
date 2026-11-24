@@ -155,12 +155,18 @@ class ReadyStep extends ConsumerWidget {
         l10n.onboardingReadyPlace(
           [
             state.municipalityName,
-            regionByCode(state.regionCode)?.name,
+            switch (regionByCode(state.regionCode)) {
+              final region? => regionLabel(context, region),
+              null => null,
+            },
           ].whereType<String>().join(', '),
         ),
       if (state.hasRotation) ...[
         l10n.onboardingReadyRotation(
-          patternPresetById(state.presetId!).name,
+          // The own cycle says its length (a catalogue name already does).
+          state.hasOwnCycle
+              ? '${state.customName} (${l10n.patternCycleDays(state.customSteps!.length)})'
+              : patternPresetById(state.presetId!).name,
           format.weekdayDayMonth(
             DateTime(state.start.year, state.start.month, state.start.day),
           ),

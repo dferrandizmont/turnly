@@ -81,6 +81,116 @@ void main() {
       expect(readUserVersion(file), 1);
     });
 
+    test(
+      'retries an interrupted copy and ignores a truncated final name',
+      () async {
+        final file = makeDatabase(dir, 7, marker: 'original');
+        backups.createSync();
+        final truncated = file.readAsBytesSync().sublist(0, 512);
+        File(p.join(backups.path, 'pre-v8.sqlite.partial'))
+            .writeAsBytesSync(truncated);
+        File(p.join(backups.path, 'pre-v7-a-v8-20261101-000000.sqlite'))
+            .writeAsBytesSync(truncated);
+
+        final retried = (await run(file, 8))!;
+        expect(names(), ['pre-v7-a-v8-20261102-083015.sqlite']);
+        expect(readMarker(retried), 'original');
+        expect(retried.readAsBytesSync(), file.readAsBytesSync());
+        expect(await run(file, 8), isNull);
+      },
+    );
+
+    test(
+      'a copy that cannot be checked (locked) is kept, never deleted',
+      () async {
+        // The original copy of a chain that failed midway: v1 -> v2 done, the
+        // file is at v2 now, so this is the only copy of the v1 data.
+        final v1 = makeDatabase(dir, 1, marker: 'original v1');
+        final original = (await run(v1, 3))!;
+        // Another connection holds the copy: reading it fails with
+        // SQLITE_BUSY, which proves nothing about the file.
+        final lock = sqlite3.open(original.path);
+        lock.execute('PRAGMA journal_mode = DELETE');
+        lock.execute('BEGIN EXCLUSIVE');
+        var locked = true;
+        void unlock() {
+          if (!locked) return;
+          locked = false;
+          lock.execute('ROLLBACK');
+          lock.close();
+        }
+
+        addTearDown(unlock);
+
+        final v2 = makeDatabase(dir, 2, marker: 'half migrated');
+        final copy = await run(v2, 3, at: now.add(const Duration(days: 1)));
+        unlock();
+
+        expect(original.existsSync(), isTrue);
+        expect(readMarker(original), 'original v1');
+        expect(copy, isNotNull);
+        expect(names(), [
+          'pre-v1-a-v3-20261102-083015.sqlite',
+          'pre-v2-a-v3-20261103-083015.sqlite',
+        ]);
+        expect(readMarker(copy!), 'half migrated');
+        // Once it can be read again, the original stops any further copy.
+        expect(await run(v2, 3, at: now.add(const Duration(days: 2))), isNull);
+      },
+    );
+
+    test(
+      'a new copy never takes the name of one that cannot be checked',
+      () async {
+        // Same source version, same target and the same second: the new copy
+        // would get the very name of the unchecked one.
+        final file = makeDatabase(dir, 1, marker: 'original v1');
+        final original = (await run(file, 3))!;
+        final lock = sqlite3.open(original.path);
+        lock.execute('PRAGMA journal_mode = DELETE');
+        lock.execute('BEGIN EXCLUSIVE');
+        var locked = true;
+        void unlock() {
+          if (!locked) return;
+          locked = false;
+          lock.execute('ROLLBACK');
+          lock.close();
+        }
+
+        addTearDown(unlock);
+
+        makeDatabase(dir, 1, marker: 'second launch');
+        final copy = (await run(file, 3))!;
+        unlock();
+
+        expect(p.basename(copy.path), 'pre-v1-a-v3-20261102-083015-2.sqlite');
+        expect(names(), [
+          'pre-v1-a-v3-20261102-083015-2.sqlite',
+          'pre-v1-a-v3-20261102-083015.sqlite',
+        ]);
+        expect(readMarker(original), 'original v1');
+        expect(readMarker(copy), 'second launch');
+
+        // In the same second the suffixed copy is the newer one, so pruning
+        // keeps the unsuffixed original as the oldest of the target.
+        await pruneMigrationBackups(backups, 1, protectOldestOfTarget: 3);
+        expect(names(), hasLength(2));
+        await pruneMigrationBackups(backups, 1);
+        expect(names(), ['pre-v1-a-v3-20261102-083015-2.sqlite']);
+      },
+    );
+
+    test('a file that is not a database is replaced', () async {
+      final file = makeDatabase(dir, 7, marker: 'original');
+      backups.createSync();
+      File(p.join(backups.path, 'pre-v7-a-v8-20261101-000000.sqlite'))
+          .writeAsBytesSync(List.filled(4096, 0x41));
+
+      final copy = (await run(file, 8))!;
+      expect(names(), ['pre-v7-a-v8-20261102-083015.sqlite']);
+      expect(readMarker(copy), 'original');
+    });
+
     test('a v2 file going to v3 is copied as pre-v2-a-v3', () async {
       final file = makeDatabase(dir, 2, marker: 'v2 data');
       final copy = await run(file, 3);

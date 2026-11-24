@@ -482,6 +482,7 @@ app/lib/features/onboarding/presentation/import_ready_steps.dart
 app/lib/features/onboarding/presentation/onboarding_screen.dart
 app/lib/features/onboarding/presentation/onboarding_tip.dart
 app/lib/features/onboarding/presentation/onboarding_widgets.dart
+app/lib/features/onboarding/presentation/own_cycle_screen.dart
 app/lib/features/onboarding/presentation/place_step.dart
 app/lib/features/onboarding/presentation/profession_step.dart
 app/lib/features/onboarding/presentation/rotation_step.dart
@@ -494,6 +495,7 @@ app/lib/features/patterns/domain/pattern_catalog.dart
 app/lib/features/patterns/domain/post_night.dart
 app/lib/features/patterns/presentation/mini_month.dart
 app/lib/features/patterns/presentation/pattern_builder.dart
+app/lib/features/patterns/presentation/pattern_builder_shifts.dart
 app/lib/features/patterns/presentation/pattern_pick_banner.dart
 app/lib/features/patterns/presentation/pattern_wizard_screen.dart
 app/lib/features/patterns/presentation/runs_screen.dart
@@ -784,6 +786,7 @@ app/test/features/onboarding/onboarding_data_test.dart
 app/test/features/onboarding/onboarding_flow_test.dart
 app/test/features/onboarding/onboarding_header_test.dart
 app/test/features/onboarding/onboarding_language_test.dart
+app/test/features/onboarding/onboarding_own_cycle_test.dart
 app/test/features/onboarding/onboarding_place_sheets_test.dart
 app/test/features/onboarding/onboarding_preview_test.dart
 app/test/features/onboarding/onboarding_progress_test.dart
@@ -1257,10 +1260,12 @@ app/lib/features/summary/presentation/summary_stat_row.dart
 app/lib/features/swaps/application/swaps_controller.dart
 app/lib/features/swaps/application/swaps_providers.dart
 app/lib/features/swaps/data/shift_swaps_repository.dart
+app/lib/features/swaps/data/swap_applied_store.dart
 app/lib/features/swaps/domain/shift_swap.dart
 app/lib/features/swaps/domain/swap_ledger.dart
 app/lib/features/swaps/domain/swap_schedule_plan.dart
 app/lib/features/swaps/presentation/day_swap_section.dart
+app/lib/features/swaps/presentation/swap_apply.dart
 app/lib/features/swaps/presentation/swap_format.dart
 app/lib/features/swaps/presentation/swap_icons.dart
 app/lib/features/swaps/presentation/swap_sheet.dart
@@ -1390,10 +1395,12 @@ app/test/features/summary/domain/month_summary_clock_extras_test.dart
 app/test/features/summary/domain/month_summary_plus_test.dart
 app/test/features/summary/domain/payroll_test.dart
 app/test/features/summary/domain/period_hours_test.dart
+app/test/features/summary/domain/period_shifts_test.dart
 app/test/features/summary/domain/summary_quarter_test.dart
 app/test/features/summary/hours_goal_store_test.dart
 app/test/features/summary/summary_goal_test.dart
 app/test/features/summary/summary_how_card_test.dart
+app/test/features/summary/summary_shifts_split_test.dart
 app/test/features/summary/summary_money_test.dart
 app/test/features/swaps/shift_swaps_test.dart
 app/test/features/swaps/swap_ledger_test.dart
@@ -1692,3 +1699,19 @@ app/test/features/patterns/builder_layout_test.dart
 app/test/features/patterns/wizard_step_large_text_test.dart
 app/test/features/reports/report_sheet_tablet_test.dart
 app/test/features/widget/widget_preview_fit_test.dart
+app/test/features/calendar/duration_unbroken_test.dart
+app/test/features/holidays/region_names_test.dart
+# 23-nov-2026: date sheet of the start day (2A).
+app/lib/core/widgets/date_sheet.dart
+app/test/core/widgets/date_sheet_test.dart
+app/drift_schemas/app_database/drift_schema_v8.json
+app/lib/core/database/migration_v7_to_v8.dart
+app/lib/features/swaps/domain/swap_application.dart
+app/test/core/widgets/app_sheet_test.dart
+app/test/drift/app_database/generated/schema_v8.dart
+app/test/drift/app_database/migration_v7_to_v8_test.dart
+app/test/features/backup/golden_v5_fixture_test.dart
+app/test/fixtures/golden_backup/golden_v5.cuadrante
+app/test/fixtures/golden_backup/golden_v5.expected.json
+app/drift_schemas/app_database/drift_schema_v7.json
+app/test/features/swaps/swap_day_ownership_test.dart

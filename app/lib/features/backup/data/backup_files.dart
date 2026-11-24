@@ -92,14 +92,17 @@ Future<List<File>> listBackupFiles(Directory directory, RegExp pattern) async {
 }
 
 /// Deletes all but the [keep] newest files of [directory] matching
-/// [pattern].
+/// [pattern]. [protect] (the copy just written) is never deleted, even when
+/// files dated later push it out of the newest.
 Future<void> pruneBackupFiles(
   Directory directory,
   RegExp pattern,
-  int keep,
-) async {
+  int keep, {
+  File? protect,
+}) async {
   final files = await listBackupFiles(directory, pattern);
   for (final file in files.skip(keep)) {
+    if (protect != null && p.equals(file.path, protect.path)) continue;
     await file.delete();
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../core/diagnostics/crash_reporting.dart';
 import '../../../core/providers.dart';
@@ -58,6 +59,9 @@ class OnboardingState {
     this.municipalityCode,
     this.municipalityName,
     this.presetId,
+    this.customSteps,
+    this.customName = '',
+    this.useCustom = false,
     this.workShiftId,
     this.byHand = false,
     this.stepOffset = 0,
@@ -88,6 +92,18 @@ class OnboardingState {
   /// Catalogue preset chosen on the rotation screen.
   final String? presetId;
 
+  /// The cycle built on «Tu ciclo» (one list of shift type ids per day), kept
+  /// in memory only: nothing reaches the database until [OnboardingController
+  /// .finish]. It stays here (as a card, not chosen) when the person picks a
+  /// catalogue rotation after building it, until they remove it.
+  final List<List<String>>? customSteps;
+
+  /// Name of [customSteps] (never empty: the screen gives it a default).
+  final String customName;
+
+  /// The own cycle is the rotation chosen ([presetId] is then `null`).
+  final bool useCustom;
+
   /// The work shift the person chose for the work days; `null` = they have
   /// not chosen one and the preset's own work shift applies.
   final String? workShiftId;
@@ -107,7 +123,11 @@ class OnboardingState {
   /// Something of the writing failed (the rest was saved).
   final bool saveFailed;
 
-  bool get hasRotation => presetId != null && !byHand;
+  /// The own cycle is the one chosen.
+  bool get hasOwnCycle =>
+      useCustom && customSteps != null && customSteps!.isNotEmpty && !byHand;
+
+  bool get hasRotation => (presetId != null || hasOwnCycle) && !byHand;
 
   bool get isSpain => countryCode == spainCountryCode;
 
@@ -133,6 +153,11 @@ class OnboardingState {
     bool clearPlace = false,
     bool clearMunicipality = false,
     String? presetId,
+    List<List<String>>? customSteps,
+    String? customName,
+    bool clearCustom = false,
+    bool? useCustom,
+    bool clearPreset = false,
     String? workShiftId,
     bool? byHand,
     bool clearRotation = false,
@@ -152,7 +177,12 @@ class OnboardingState {
     municipalityName: clearPlace || clearMunicipality
         ? null
         : municipalityName ?? this.municipalityName,
-    presetId: clearRotation ? null : presetId ?? this.presetId,
+    presetId: clearRotation || clearPreset ? null : presetId ?? this.presetId,
+    customSteps: clearCustom ? null : customSteps ?? this.customSteps,
+    customName: clearCustom ? '' : customName ?? this.customName,
+    useCustom: clearCustom || clearRotation
+        ? false
+        : useCustom ?? this.useCustom,
     workShiftId: workShiftId ?? this.workShiftId,
     byHand: clearRotation ? byHand ?? false : byHand ?? this.byHand,
     start: start ?? this.start,
@@ -228,10 +258,12 @@ class OnboardingController extends Notifier<OnboardingState> {
   /// orders) when the person uses a rotation, and in the place step on the
   /// other ways. The rotation chosen stays: the job only sets the hours of
   /// the shift types.
-  void selectProfession(Profession profession) =>
-      state = state.profession == profession
-      ? state.copyWith(clearProfession: true)
-      : state.copyWith(profession: profession);
+  void selectProfession(Profession profession) {
+    if (state.finishing) return;
+    state = state.profession == profession
+        ? state.copyWith(clearProfession: true)
+        : state.copyWith(profession: profession);
+  }
 
   // ---- place (optional) ------------------------------------------------------
 
@@ -240,6 +272,7 @@ class OnboardingController extends Notifier<OnboardingState> {
   /// if the job chosen is not in that country's list, swaps it for the
   /// closest one there ([professionForCountry]).
   void selectCountry(String countryCode) {
+    if (state.finishing) return;
     final code = normalizeCountryCode(countryCode) ?? otherCountryCode;
     if (code == state.countryCode) return;
     final profession = state.profession;
@@ -275,6 +308,7 @@ class OnboardingController extends Notifier<OnboardingState> {
   }
 
   void selectRegion(String? regionCode) {
+    if (state.finishing) return;
     if (regionCode == state.regionCode) return;
     // A municipality belongs to one region.
     state = regionCode == null
@@ -283,18 +317,64 @@ class OnboardingController extends Notifier<OnboardingState> {
   }
 
   /// [name] is only for showing the choice back ("Listo").
-  void selectMunicipality(String? municipalityCode, {String? name}) =>
-      state = municipalityCode == null
-      ? state.copyWith(clearMunicipality: true)
-      : state.copyWith(
-          municipalityCode: municipalityCode,
-          municipalityName: name,
-        );
+  void selectMunicipality(String? municipalityCode, {String? name}) {
+    if (state.finishing) return;
+    state = municipalityCode == null
+        ? state.copyWith(clearMunicipality: true)
+        : state.copyWith(
+            municipalityCode: municipalityCode,
+            municipalityName: name,
+          );
+  }
 
   // ---- rotation -------------------------------------------------------------
 
-  void selectPreset(String presetId) =>
-      state = state.copyWith(presetId: presetId, byHand: false, stepOffset: 0);
+  // While the choices are being written (`finishing`) nothing can be chosen:
+  // the writing must find what was chosen when it started.
+  void selectPreset(String presetId) {
+    if (state.finishing) return;
+    state = state.copyWith(
+      presetId: presetId,
+      useCustom: false,
+      byHand: false,
+      stepOffset: 0,
+    );
+  }
+
+  /// «Usar este ciclo» on «Tu ciclo»: the cycle the person built becomes the
+  /// rotation (it replaces the catalogue one) and is kept in memory only. The
+  /// flow then goes straight to «¿Cuándo empiezas?», where the day it starts
+  /// is chosen; [name] is already the one to show (never empty).
+  void useOwnCycle(List<List<String>> steps, String name) {
+    if (state.finishing || steps.isEmpty) return;
+    state = state.copyWith(
+      customSteps: [for (final day in steps) List<String>.of(day)],
+      customName: name,
+      useCustom: true,
+      byHand: false,
+      stepOffset: 0,
+      clearPreset: true,
+      stage: OnboardingStage.start,
+    );
+  }
+
+  /// Chooses again the cycle kept on its card (after picking a catalogue
+  /// rotation, say).
+  void selectOwnCycle() {
+    if (state.finishing || state.customSteps == null) return;
+    state = state.copyWith(
+      useCustom: true,
+      clearPreset: true,
+      byHand: false,
+      stepOffset: 0,
+    );
+  }
+
+  /// «Quitar» on the card of the own cycle: it goes, chosen or not.
+  void removeOwnCycle() {
+    if (state.finishing) return;
+    state = state.copyWith(clearCustom: true);
+  }
 
   /// "Lo pinto a mano" on the rotation screen: no rotation, and since the
   /// place was already asked, the choices are written (and the month opens in
@@ -305,11 +385,20 @@ class OnboardingController extends Notifier<OnboardingState> {
     await finish();
   }
 
-  void setStart(CivilDate date) => state = state.copyWith(start: date);
+  void setStart(CivilDate date) {
+    if (state.finishing) return;
+    state = state.copyWith(start: date);
+  }
 
-  void setStepOffset(int index) => state = state.copyWith(stepOffset: index);
+  void setStepOffset(int index) {
+    if (state.finishing) return;
+    state = state.copyWith(stepOffset: index);
+  }
 
-  void setWorkShift(String id) => state = state.copyWith(workShiftId: id);
+  void setWorkShift(String id) {
+    if (state.finishing) return;
+    state = state.copyWith(workShiftId: id);
+  }
 
   // ---- navigation -----------------------------------------------------------
 
@@ -317,7 +406,7 @@ class OnboardingController extends Notifier<OnboardingState> {
   /// first question has no main button: its cards go on by themselves.
   bool get canAdvance => switch (state.stage) {
     OnboardingStage.choose => false,
-    OnboardingStage.rotation => state.presetId != null,
+    OnboardingStage.rotation => state.presetId != null || state.hasOwnCycle,
     _ => true,
   };
 
@@ -416,16 +505,32 @@ class OnboardingController extends Notifier<OnboardingState> {
 
   // ---- result ---------------------------------------------------------------
 
-  /// What the rotation would be: the chosen preset from [start].
-  PatternRequest? request(Schedule schedule) {
-    final id = state.presetId;
-    if (id == null || state.byHand) return null;
-    final preset = patternPresetById(id);
-    final pattern = presetPattern(
-      schedule,
-      preset,
-      workShiftId: workShiftOf(preset, state.workShiftId),
-    );
+  // Id the own cycle gets if it ends up written: one per flow.
+  final String _customId = 'custom-${const Uuid().v4()}';
+
+  /// What the rotation would be: the chosen preset, or the own cycle, from
+  /// [start].
+  PatternRequest? request(Schedule schedule) => _requestFor(state, schedule);
+
+  PatternRequest? _requestFor(OnboardingState state, Schedule schedule) {
+    if (state.byHand) return null;
+    final Pattern pattern;
+    if (state.hasOwnCycle) {
+      pattern = Pattern(
+        id: _customId,
+        name: state.customName,
+        steps: [for (final day in state.customSteps!) List<String>.of(day)],
+      );
+    } else {
+      final id = state.presetId;
+      if (id == null) return null;
+      final preset = patternPresetById(id);
+      pattern = presetPattern(
+        schedule,
+        preset,
+        workShiftId: workShiftOf(preset, state.workShiftId),
+      );
+    }
     return PatternRequest(
       pattern: pattern,
       from: state.start,
@@ -453,6 +558,9 @@ class OnboardingController extends Notifier<OnboardingState> {
   Future<void> finish() async {
     if (state.finishing) return;
     state = state.copyWith(finishing: true, saveFailed: false);
+    // What was chosen when the writing started: it is what gets written, even
+    // if something moved meanwhile.
+    final chosen = state;
     final schedule = ref.read(scheduleControllerProvider.notifier);
     final repository = ref.read(onboardingRepositoryProvider);
     var failed = false;
@@ -522,7 +630,10 @@ class OnboardingController extends Notifier<OnboardingState> {
           ),
     );
 
-    final rotation = request(ref.read(scheduleControllerProvider).schedule);
+    final rotation = _requestFor(
+      chosen,
+      ref.read(scheduleControllerProvider).schedule,
+    );
     if (rotation != null) {
       await guarded(() async {
         await schedule.applyPatternRun(rotation);

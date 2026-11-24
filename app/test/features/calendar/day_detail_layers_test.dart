@@ -332,7 +332,7 @@ void main() {
       expect(
         find.descendant(
           of: _key('day-shift-0'),
-          matching: find.text('22:00–06:00 · 8 h'),
+          matching: find.text('22:00–06:00 · 8\u00A0h'),
         ),
         findsOneWidget,
       );
@@ -365,7 +365,7 @@ void main() {
           (w) =>
               w is Text &&
               w.data?.replaceAll('\u2060', '') ==
-                  '09:00–13:00 · 17:00–21:00 · 8 h',
+                  '09:00–13:00 · 17:00–21:00 · 8\u00A0h',
         ),
       ),
       findsOneWidget,

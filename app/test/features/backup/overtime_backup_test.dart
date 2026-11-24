@@ -220,7 +220,7 @@ void main() {
       }
     });
 
-    test('is a newer format for an app that only reads version 3', () {
+    test('rejects a version newer than this reader supports', () {
       final bytes = codec.encode(
         _v7Data(),
         appVersion: testAppVersion,
@@ -228,7 +228,7 @@ void main() {
       );
       expect(readEnvelope(bytes)['schemaVersion'], 4);
       // The same rule, one version up: this build refuses a version 5.
-      final envelope = readEnvelope(bytes)..['schemaVersion'] = 5;
+      final envelope = readEnvelope(bytes)..['schemaVersion'] = 6;
       expect(
         () => codec.decode(gzipEnvelope(envelope)),
         throwsA(isA<NewerFormatVersion>()),

@@ -26,30 +26,31 @@ Totes les funcions disponibles són obertes, sense Pro ni compres dins de l’ap
 ## Baixades
 
 <p>
-  <a href="https://play.google.com/apps/testing/es.cuadrante.app"><img src="https://img.shields.io/badge/Google_Play-Beta-414141?logo=googleplay&amp;style=for-the-badge" alt="Beta a Google Play"></a>
+  <a href="https://play.google.com/store/apps/details?id=es.turnly.app"><img src="https://img.shields.io/badge/Google_Play-Beta-414141?logo=googleplay&amp;style=for-the-badge" alt="Beta a Google Play"></a>
   <a href="https://github.com/dferrandizmont/turnly/releases"><img src="https://img.shields.io/badge/Disponible_a-GitHub-181717?logo=github&amp;style=for-the-badge" alt="Disponible a GitHub"></a>
   <a href="https://apps.apple.com/es/app/turnly-cuadrante-de-turnos/id6832554552"><img src="https://img.shields.io/badge/App_Store-Baixa-0D96F6?logo=appstore&amp;style=for-the-badge" alt="Disponible a l’App Store"></a>
 </p>
 
-Android en proves; iPhone, a l’App Store. Mode clar i fosc.
+Android en proves obertes a Google Play; iPhone, a l’App Store. Mode clar i fosc.
+
+**Feies servir l’app anterior d’Android?** Turnly és ara una app nova (`es.turnly.app`) i no actualitza l’antiga (`es.cuadrante.app`); es poden tenir les dues instal·lades. A l’antiga ves a Configuració › Còpia de seguretat i toca «Desa una còpia fora de Turnly»; a la nova fes servir «Importa un fitxer». Torna a configurar widgets i alarmes i desinstal·la l’antiga.
 
 <details>
-<summary>Uneix-te a la beta de Google Play</summary>
+<summary>Instal·la des de Google Play</summary>
 
-L’app és en prova tancada a Google Play i s’hi pot apuntar qualsevol persona:
+Turnly és en prova oberta a Google Play, així que qualsevol pot instal·lar-la:
 
-1. Uneix-te al grup de testers: [turnly-testers](https://groups.google.com/g/turnly-testers). Amb el teu compte de Google, prem «Uneix-te al grup».
-2. Accepta la prova des del mòbil o l’ordinador: [play.google.com/apps/testing/es.cuadrante.app](https://play.google.com/apps/testing/es.cuadrante.app).
-3. Instal·la l’app des de Google Play. S’actualitzarà sola.
+1. Obre [Turnly a Google Play](https://play.google.com/store/apps/details?id=es.turnly.app) des del mòbil o l’ordinador.
+2. Instal·la l’app (si ho demana, uneix-te a la prova oberta). S’actualitzarà sola.
 
-Si pots, queda’t a la prova almenys 14 dies i fes-la servir de tant en tant (per exemple, mira el torn de demà o posa el widget): Google exigeix 12 testers durant 14 dies per publicar-la per a tothom. Els comentaris, a turnly@mainshai.com.
+Els comentaris, a turnly@mainshai.com.
 
 </details>
 
 <details>
 <summary>Instal·la l’APK des de GitHub</summary>
 
-També pots baixar l’APK de la [darrera versió](https://github.com/dferrandizmont/turnly/releases) i instal·lar-lo a mà (cal permetre «instal·lar aplicacions d’origen desconegut»). Des de la 0.8.3 està signat amb la mateixa clau que la versió de Google Play, així que pots passar de l’una a l’altra sense desinstal·lar i sense perdre res; Android només no deixa tornar a una versió més antiga. Si vas instal·lar Turnly des de Google Play abans de la 0.8.3, desinstal·la-la una vegada (exporta abans una còpia des de l’app: `.turnly`; les versions anteriors la desen com a `.cuadrante`).
+També pots baixar l’APK de la [darrera versió](https://github.com/dferrandizmont/turnly/releases) i instal·lar-lo a mà (cal permetre «instal·lar aplicacions d’origen desconegut»). Des de la 0.8.3 està signat amb la mateixa clau que la versió de Google Play, així que dins del mateix paquet (`es.turnly.app`) pots passar de l’una a l’altra sense desinstal·lar i sense perdre res; Android només no deixa tornar a una versió més antiga. Per passar d’`es.cuadrante.app` a `es.turnly.app`, segueix els passos d’exportar i importar de dalt. Les versions publicades abans de la 0.12.1 són de l’app anterior (`es.cuadrante.app`); mira la nota de dalt per passar les teves dades.
 
 </details>
 
@@ -159,6 +160,7 @@ dades van a la destinació que triïs. El fitxer de còpia `.turnly` no està xi
 
 ## Novetats
 
+- **0.12.1 (23-nov-2026):** Android: app nova a Google Play (`es.turnly.app`); desa una còpia a l’antiga i importa-la aquí. Al primer ús pots crear el teu propi cicle o ajustar una rotació del catàleg. Ara pots triar la data d’inici amb dreceres per anar a dilluns passat o a avui. A «Torns treballats» veuràs els torns treballats fins ahir i, a part, els previstos a partir d’avui. En desar un canvi de torn també pots canviar el quadrant; si el canvi té torns que es poden aplicar al quadrant, veuràs «Aplicat» o «Sense aplicar» al costat de l’estat del deute. Les comunitats surten en l’idioma de l’app. Amb lletra gran, els botons dels passos del primer ús, del formulari de canvis i el botó «Aplica» de la plantilla de plusos queden a l’abast.
 - **0.12.0 (21-nov-2026):** Android: cinc rotacions llestes per fer servir al catàleg: 4 x 4 amb nits, Guàrdia 24/48, 6 x 6, 7 x 7 i 14 x 14. Al 6 x 6, al 7 x 7 i al 14 x 14 tries el teu torn de feina. La barra de baix es queda a la vista a Rotació, Agenda i Resum, així que passes d’una a l’altra sense tornar al mes. «Rotació» obre sempre «Les meves rotacions» i, si encara no en tens cap, t’ofereix «Aplica un patró».
 - **0.11.4 (19-nov-2026):** Android: «Comença la rotació aquí» et deixa triar el dia del cicle a la tira numerada. Al mòbil, en horitzontal o amb lletra gran, la capçalera de l’assistent es desplaça amb el contingut. A «Setmanes per torn», la llista no es mou quan tries un torn. A la tauleta, si tens pocs blocs a «Crea el meu», la paleta queda just a sota. Amb lletra molt gran, les xifres de cada data de «Pròxims dies» es veuen en una sola línia. A la vista prèvia del widget petit, les hores es veuen senceres. A la tauleta, si obres «Agenda» des de la barra lateral, ja no hi apareix la fletxa per tornar enrere. El resum del mes queda just a sota del calendari i «Crea i comparteix» continua a la vista mentre et desplaces per les opcions de l’informe.
 - **0.11.3 (19-nov-2026):** Android: la previsualització del mes durant el primer ús mostra els horaris dels torns de la professió que tries. A la tauleta, el camp de l’import torna a quedar visible per sobre del teclat quan la gires i les pantalles obertes segueixen el mode clar o fosc del sistema. Amb lletra gran, el títol del bloc nou queda a la vista. Amb lletra molt gran, la targeta «Avui» ocupa menys espai. VoiceOver i TalkBack llegeixen una sola vegada el nom de cada botó («Desfés», «Buida el cicle» i «Enrere»).

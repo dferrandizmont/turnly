@@ -1,6 +1,7 @@
 import '../../../core/l10n/l10n.dart';
 import '../domain/shift_swap.dart';
 import '../domain/swap_ledger.dart';
+import '../domain/swap_schedule_plan.dart';
 
 /// «Me debe 2 turnos» / «Le debo 1 turno» / «Nada pendiente»: what one
 /// colleague owes (or is owed) right now.
@@ -19,6 +20,15 @@ String swapStageText(AppLocalizations l10n, SwapStage stage) => switch (stage) {
   SwapStage.returned => l10n.swapStageReturned,
   SwapStage.settled => l10n.swapStageSettled,
 };
+
+/// «Aplicado» / «Sin aplicar»: whether the calendar shows the change. `null`
+/// when the change has no shifts to write there (a debt only).
+String? swapApplicationText(AppLocalizations l10n, SwapApplication state) =>
+    switch (state) {
+      SwapApplication.nothing => null,
+      SwapApplication.pending => l10n.swapApplyStatePending,
+      SwapApplication.applied => l10n.swapApplyStateApplied,
+    };
 
 /// «Me lo deben» / «Se lo debo»: who owes the shift.
 String swapDirectionText(AppLocalizations l10n, SwapDirection direction) =>

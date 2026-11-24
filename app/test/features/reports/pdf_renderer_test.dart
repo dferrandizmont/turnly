@@ -84,6 +84,43 @@ void main() {
       }
     });
 
+    test(
+      'a past month says every shift was worked, with none planned',
+      () async {
+        final model = octoberReport();
+        final text = _asText(await _plainPdf(model));
+        expect(
+          text,
+          contains('Turnos trabajados ${model.summary.shiftsWorked} '),
+        );
+        expect(text, isNot(contains('previsto')));
+      },
+    );
+
+    test('a month with days from today on counts the worked ones and the '
+        'planned ones apart', () async {
+      final model = octoberReport(today: const CivilDate(2026, 10, 10));
+      final planned = model.shifts.plannedShifts;
+      final text = _asText(await _plainPdf(model));
+      expect(text, contains('Turnos trabajados 3 · y $planned previstos'));
+      // The hours already split the same way.
+      expect(text, contains('Trabajadas hasta ayer'));
+    });
+
+    test(
+      'a month that has not started shows 0 worked and all planned',
+      () async {
+        final model = octoberReport(today: const CivilDate(2026, 9, 1));
+        final text = _asText(await _plainPdf(model));
+        expect(
+          text,
+          contains(
+            'Turnos trabajados 0 · y ${model.summary.shiftsWorked} previstos',
+          ),
+        );
+      },
+    );
+
     test('includes the longest work streak and its clipped dates', () async {
       final model = octoberReport();
       final streak = model.summary.longestStreak!;

@@ -252,10 +252,10 @@ void main() {
     });
 
     test('is rejected with the versions involved', () {
-      final e = thrown<NewerFormatVersion>(() => codec.decode(future(5)));
-      expect(e.found, 5);
+      final e = thrown<NewerFormatVersion>(() => codec.decode(future(6)));
+      expect(e.found, 6);
       expect(e.supported, BackupCodec.supportedSchemaVersion);
-      expect(e.message, contains('v4'));
+      expect(e.message, contains('v${BackupCodec.supportedSchemaVersion}'));
     });
 
     test('is rejected before the content is checked', () {
@@ -880,9 +880,9 @@ void main() {
       );
     });
 
-    test('the writer is version 4 and a version 5 file is "newer"', () {
+    test('the reader supports version 5 with swap records', () {
       // Version 4 (database v7): the extra hours are blocks.
-      expect(BackupCodec.supportedSchemaVersion, 4);
+      expect(BackupCodec.supportedSchemaVersion, 5);
     });
   });
 

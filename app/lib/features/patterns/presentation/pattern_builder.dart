@@ -22,6 +22,7 @@ import '../domain/pattern_blocks.dart';
 import '../domain/pattern_catalog.dart';
 import 'cycle_strip.dart';
 import 'pattern_block_editor.dart';
+import 'pattern_builder_shifts.dart';
 
 /// The most of the height the pinned palette may take.
 const double _maxPinnedPaletteShare = 0.4;
@@ -38,9 +39,10 @@ class PatternBuilderViewport extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final palette = ref.watch(
+    final stored = ref.watch(
       scheduleControllerProvider.select((s) => s.palette),
     );
+    final palette = PatternBuilderShifts.maybeOf(context)?.palette ?? stored;
     final full = ref.watch(
       patternWizardProvider(args)
           .select((s) => s.draft.length >= maxPatternCycleDays),
@@ -230,22 +232,30 @@ class _PatternBuilderState extends ConsumerState<PatternBuilder> {
     final schedule = ref.watch(
       scheduleControllerProvider.select((s) => s.schedule),
     );
-    ShiftType? shiftOf(String id) => shiftTypeForDisplay(schedule, id);
+    // The first-use screen has its own shifts (see [PatternBuilderShifts]) and
+    // its own way out (the close button), not «Elegir un patrón de la lista».
+    final own = PatternBuilderShifts.maybeOf(context);
+    ShiftType? shiftOf(String id) =>
+        own?.shiftOf(id) ?? shiftTypeForDisplay(schedule, id);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextButton.icon(
-          key: const ValueKey('builder-back'),
-          onPressed: () async {
-            if (_confirming) return;
-            _confirming = true;
-            final discard = await confirmDiscardSequence(context, controller);
-            if (mounted && discard) controller.stopBuilding();
-            _confirming = false;
-          },
-          icon: Icon(AppIcons.back, size: IconSize.button),
-          label: Text(l10n.patternBuilderBack),
-        ),
+        if (own == null)
+          TextButton.icon(
+            key: const ValueKey('builder-back'),
+            onPressed: () async {
+              if (_confirming) return;
+              _confirming = true;
+              final discard = await confirmDiscardSequence(
+                context,
+                controller,
+              );
+              if (mounted && discard) controller.stopBuilding();
+              _confirming = false;
+            },
+            icon: Icon(AppIcons.back, size: IconSize.button),
+            label: Text(l10n.patternBuilderBack),
+          ),
         LabeledField(
           label: l10n.patternBuilderName,
           child: TextField(
@@ -254,7 +264,7 @@ class _PatternBuilderState extends ConsumerState<PatternBuilder> {
             textCapitalization: TextCapitalization.sentences,
             maxLength: 40,
             decoration: InputDecoration(
-              hintText: l10n.patternBuilderDefaultName,
+              hintText: own?.defaultName ?? l10n.patternBuilderDefaultName,
               counterText: '',
             ),
             onChanged: controller.setName,
@@ -466,9 +476,10 @@ class _PatternBuilderPaletteState extends ConsumerState<PatternBuilderPalette> {
     final l10n = context.l10n;
     final wizard = ref.watch(patternWizardProvider(widget.args));
     final controller = ref.read(patternWizardProvider(widget.args).notifier);
-    final palette = ref.watch(
+    final stored = ref.watch(
       scheduleControllerProvider.select((s) => s.palette),
     );
+    final palette = PatternBuilderShifts.maybeOf(context)?.palette ?? stored;
     final full = wizard.draft.length >= maxPatternCycleDays;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

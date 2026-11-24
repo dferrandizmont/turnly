@@ -10,6 +10,28 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get backupSwapApplicationsSkipped =>
+      'Some shift swap records couldn’t be restored. Their data was kept for recovery.';
+
+  @override
+  String swapRestoreSkipped(String date) {
+    return 'Your shift for $date stayed as it was because the applied swap couldn’t be verified.';
+  }
+
+  @override
+  String get swapRemoveKept =>
+      'The swap wasn’t removed: it’s still in the swap book and none of its dates were changed.';
+
+  @override
+  String swapApplyConflict(String date, String name) {
+    return 'There’s already another swap applied on $date (with $name): take it off the schedule first.';
+  }
+
+  @override
+  String get swapRestoreOnSave =>
+      'Saving will restore the previous shifts where possible.';
+
+  @override
   String get appName => 'Turnly';
 
   @override
@@ -1627,6 +1649,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get patternStartLabel => 'Start day';
 
   @override
+  String get dateSheetStartHint => 'The day your current cycle started';
+
+  @override
+  String get dateSheetLastMonday => 'Last Monday';
+
+  @override
+  String get dateSheetChooseMonth => 'Choose month';
+
+  @override
+  String get dateSheetShowDays => 'Show days';
+
+  @override
+  String get dateSheetPreviousYear => 'Previous year';
+
+  @override
+  String get dateSheetNextYear => 'Next year';
+
+  @override
   String patternSuggestedStart(String weekday) {
     return 'This pattern usually starts on a $weekday.';
   }
@@ -1795,7 +1835,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingPathRotationHint =>
-      'Pick your cycle (mornings, afternoons, nights, post-night…) and it fills itself in, month after month.';
+      'Pick your cycle (mornings, afternoons, nights, post-night…) or create your own and it fills itself in, month after month.';
 
   @override
   String get onboardingPathRotationTag => 'If your shifts repeat';
@@ -1990,7 +2030,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingRotationHelp =>
-      'Choose the closest one. Then you say when you start.';
+      'Pick a rotation or create your own. Then choose when it starts.';
 
   @override
   String get onboardingRotationTypical => 'Usual in your job';
@@ -2000,6 +2040,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingRotationAll => 'Rotations';
+
+  @override
+  String get onboardingOwnCycle => 'Create my own cycle';
+
+  @override
+  String get onboardingOwnCycleHint => 'Build your cycle day by day';
+
+  @override
+  String get onboardingOwnCycleAnother => 'Create another cycle';
+
+  @override
+  String get onboardingOwnCycleNotHere =>
+      'Can’t find your rotation? Create your own cycle';
+
+  @override
+  String get onboardingOwnCycleAdjust => 'Adjust';
+
+  @override
+  String get onboardingOwnCycleTitle => 'Your cycle';
+
+  @override
+  String get onboardingOwnCycleUse => 'Use this cycle';
+
+  @override
+  String get onboardingOwnCycleHours =>
+      'You can change the hours later in Settings › My shifts.';
+
+  @override
+  String get onboardingOwnCycleName => 'My cycle';
 
   @override
   String get onboardingByHand => 'I’ll paint it by hand';
@@ -2232,6 +2301,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get summaryShiftsWorked => 'Shifts worked';
+
+  @override
+  String summaryShiftsPlannedRest(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'and $count planned',
+      one: 'and 1 planned',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get summaryTypesPeriodTotal => 'Period total, planned included';
 
   @override
   String get summaryNightHours => 'Night hours';
@@ -2555,6 +2638,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get summaryYearHint => 'Tap a month to see its details.';
+
+  @override
+  String get summaryYearHintPlanned =>
+      'The «+» separates what is worked (up to yesterday) from what is planned (from today on). Night hours and the estimate count the whole month.';
 
   @override
   String get summaryYearHeaderMonth => 'Month';
@@ -6721,6 +6808,20 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get swapRemoveAppliedBody =>
+      'What would you like to do with the shifts this swap changed?';
+
+  @override
+  String get swapRemoveAndRestore => 'Remove swap and restore your schedule';
+
+  @override
+  String get swapRemoveOnly => 'Remove swap only';
+
+  @override
+  String get swapSavedUnapplied =>
+      'Saved. Your previous shifts have been restored';
+
+  @override
   String get swapRemoveConfirm => 'Remove';
 
   @override
@@ -6772,6 +6873,40 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get swapNotApplied => 'This swap is not applied to the schedule';
+
+  @override
+  String get swapApplyStateApplied => 'Applied';
+
+  @override
+  String get swapApplyStatePending => 'Not applied';
+
+  @override
+  String get swapApplyToggle => 'Change my schedule too';
+
+  @override
+  String get swapApplyToggleOn =>
+      'Your days change when you save. You can undo it.';
+
+  @override
+  String get swapApplyToggleOff =>
+      'Only the swap is noted: your schedule stays as it is.';
+
+  @override
+  String get swapApplyToggleNone =>
+      'Pick the shifts in the swap so you can change your schedule.';
+
+  @override
+  String get swapApplyToggleDone => 'Your schedule already matches the swap.';
+
+  @override
+  String get swapSavedApplied => 'Saved and applied to your schedule';
+
+  @override
+  String get swapSavedNotApplied =>
+      'Saved. Your schedule doesn’t change until you apply it';
+
+  @override
+  String get swapApplyAction => 'Apply';
 
   @override
   String get swapDaySection => 'Shift swap';

@@ -108,20 +108,12 @@ void main() {
         findsOneWidget,
       );
       await tap(tester, 'pattern-start-date');
+      // One tap on the day chooses it and closes the sheet.
       await tester.tap(
         find.descendant(
-          of: find.byType(DatePickerDialog),
+          of: find.byKey(const ValueKey('date-sheet')),
           matching: find.text('20'),
         ),
-      );
-      await tester.pumpAndSettle();
-      await tester.tap(
-        find
-            .descendant(
-              of: find.byType(DatePickerDialog),
-              matching: find.byType(TextButton),
-            )
-            .last,
       );
       await tester.pumpAndSettle();
       expect(
@@ -137,7 +129,7 @@ void main() {
       final screen = tester.widget<PatternWizardScreen>(
         find.byType(PatternWizardScreen),
       );
-      final args = (start: screen.start, shiftId: screen.shiftId);
+      final args = PatternWizardArgs(start: screen.start, shiftId: screen.shiftId);
       // The demo data has manual days in this week; replace them so only the
       // rotation is left to check.
       container
@@ -183,7 +175,7 @@ void main() {
       final screen = tester.widget<PatternWizardScreen>(
         find.byType(PatternWizardScreen),
       );
-      final args = (start: screen.start, shiftId: screen.shiftId);
+      final args = PatternWizardArgs(start: screen.start, shiftId: screen.shiftId);
       final wizard = container.read(patternWizardProvider(args).notifier);
       // The demo data has manual days in this week; replace them so only the
       // rotation is left to check.

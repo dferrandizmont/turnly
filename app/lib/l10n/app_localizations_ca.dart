@@ -10,6 +10,28 @@ class AppLocalizationsCa extends AppLocalizations {
   AppLocalizationsCa([String locale = 'ca']) : super(locale);
 
   @override
+  String get backupSwapApplicationsSkipped =>
+      'No s’han pogut restaurar alguns registres de canvis de torn. Se n’han conservat les dades per poder-les recuperar.';
+
+  @override
+  String swapRestoreSkipped(String date) {
+    return 'He conservat el teu torn de $date perquè no he pogut verificar el canvi que es va aplicar.';
+  }
+
+  @override
+  String get swapRemoveKept =>
+      'No he tret el canvi: continua al llibre de canvis i no he tocat cap dels seus dies.';
+
+  @override
+  String swapApplyConflict(String date, String name) {
+    return 'El $date ja té un altre canvi aplicat (amb $name): treu-lo del quadrant primer.';
+  }
+
+  @override
+  String get swapRestoreOnSave =>
+      'En desar es recuperaran els torns anteriors que es puguin restaurar.';
+
+  @override
   String get appName => 'Turnly';
 
   @override
@@ -1628,6 +1650,25 @@ class AppLocalizationsCa extends AppLocalizations {
   String get patternStartLabel => 'Dia d’inici';
 
   @override
+  String get dateSheetStartHint =>
+      'El dia en què va començar el teu cicle actual';
+
+  @override
+  String get dateSheetLastMonday => 'Dilluns passat';
+
+  @override
+  String get dateSheetChooseMonth => 'Tria el mes';
+
+  @override
+  String get dateSheetShowDays => 'Mostra els dies';
+
+  @override
+  String get dateSheetPreviousYear => 'Any anterior';
+
+  @override
+  String get dateSheetNextYear => 'Any següent';
+
+  @override
   String patternSuggestedStart(String weekday) {
     return 'Aquest patró sol començar un $weekday.';
   }
@@ -1795,7 +1836,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get onboardingPathRotationHint =>
-      'Tria el teu cicle (matins, tardes, nits, sortint…) i s’omple sol, mes rere mes.';
+      'Tria un cicle (matins, tardes, nits, sortint…) o crea el teu i s’omple sol, mes rere mes.';
 
   @override
   String get onboardingPathRotationTag => 'Si el teu torn es repeteix';
@@ -1990,7 +2031,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get onboardingRotationHelp =>
-      'Tria la que s’hi assembli més. Després dius quan comences.';
+      'Tria la teva o crea-la en un moment. Després dius quan comences.';
 
   @override
   String get onboardingRotationTypical => 'El més habitual a la teva feina';
@@ -2000,6 +2041,35 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get onboardingRotationAll => 'Rotacions';
+
+  @override
+  String get onboardingOwnCycle => 'Crea el meu cicle';
+
+  @override
+  String get onboardingOwnCycleHint => 'Munta el teu cicle dia a dia';
+
+  @override
+  String get onboardingOwnCycleAnother => 'Crea un altre cicle';
+
+  @override
+  String get onboardingOwnCycleNotHere =>
+      'No hi és, la teva? Crea el meu cicle';
+
+  @override
+  String get onboardingOwnCycleAdjust => 'Ajusta';
+
+  @override
+  String get onboardingOwnCycleTitle => 'El teu cicle';
+
+  @override
+  String get onboardingOwnCycleUse => 'Fes servir aquest cicle';
+
+  @override
+  String get onboardingOwnCycleHours =>
+      'Les hores les canvies després a Configuració › Els meus torns.';
+
+  @override
+  String get onboardingOwnCycleName => 'El meu cicle';
 
   @override
   String get onboardingByHand => 'Ho pinto a mà';
@@ -2232,6 +2302,20 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get summaryShiftsWorked => 'Torns treballats';
+
+  @override
+  String summaryShiftsPlannedRest(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'i $count previstos',
+      one: 'i 1 previst',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get summaryTypesPeriodTotal => 'Total del període, amb el previst';
 
   @override
   String get summaryNightHours => 'Hores nocturnes';
@@ -2556,6 +2640,10 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get summaryYearHint => 'Toca un mes per veure’n el detall.';
+
+  @override
+  String get summaryYearHintPlanned =>
+      'El «+» separa el que has treballat (fins ahir) del previst (d’avui endavant). Les nocturnes i l’estimat compten tot el mes.';
 
   @override
   String get summaryYearHeaderMonth => 'Mes';
@@ -6736,6 +6824,20 @@ class AppLocalizationsCa extends AppLocalizations {
   }
 
   @override
+  String get swapRemoveAppliedBody =>
+      'Què vols fer amb els torns que va canviar?';
+
+  @override
+  String get swapRemoveAndRestore => 'Treu el canvi i restaura el teu quadrant';
+
+  @override
+  String get swapRemoveOnly => 'Treu només el canvi';
+
+  @override
+  String get swapSavedUnapplied =>
+      'Desat. S’han restaurat els torns anteriors al teu quadrant';
+
+  @override
   String get swapRemoveConfirm => 'Treu';
 
   @override
@@ -6788,6 +6890,40 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get swapNotApplied => 'Aquest canvi no està aplicat al quadrant';
+
+  @override
+  String get swapApplyStateApplied => 'Aplicat';
+
+  @override
+  String get swapApplyStatePending => 'Sense aplicar';
+
+  @override
+  String get swapApplyToggle => 'Canvia també el meu quadrant';
+
+  @override
+  String get swapApplyToggleOn =>
+      'Els teus dies canvien en desar. Ho podràs desfer.';
+
+  @override
+  String get swapApplyToggleOff =>
+      'Només s’anota el canvi: el teu quadrant no es toca.';
+
+  @override
+  String get swapApplyToggleNone =>
+      'Tria els torns del canvi per poder canviar el teu quadrant.';
+
+  @override
+  String get swapApplyToggleDone => 'El teu quadrant ja està com diu el canvi.';
+
+  @override
+  String get swapSavedApplied => 'Desat i aplicat al teu quadrant';
+
+  @override
+  String get swapSavedNotApplied =>
+      'Desat. El teu quadrant no canvia fins que l’apliquis';
+
+  @override
+  String get swapApplyAction => 'Aplica';
 
   @override
   String get swapDaySection => 'Canvi de torn';

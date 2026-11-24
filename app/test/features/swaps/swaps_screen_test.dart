@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cuadrante/app.dart';
 import 'package:cuadrante/core/bootstrap/bootstrap.dart';
 import 'package:cuadrante/core/router.dart';
@@ -6,6 +8,7 @@ import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
 import 'package:cuadrante/features/swaps/application/swaps_controller.dart';
 import 'package:cuadrante/features/swaps/application/swaps_providers.dart';
 import 'package:cuadrante/features/swaps/domain/shift_swap.dart';
+import 'package:cuadrante/features/swaps/presentation/swap_sheet.dart';
 import 'package:cuadrante/features/swaps/presentation/swaps_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,12 +34,16 @@ ProviderContainer _container(WidgetTester tester) =>
 
 /// Lets the database answer (real time) and the screen draw what it got.
 Future<void> _settle(WidgetTester tester) async {
-  for (var i = 0; i < 8; i++) {
+  for (var i = 0; i < 40; i++) {
     await tester.runAsync(
       () => Future<void>.delayed(const Duration(milliseconds: 15)),
     );
-    await tester.pumpAndSettle();
+    // A save indicator schedules frames while the transaction is pending.
+    // Advance both clocks so the database can finish while it animates.
+    await tester.pump(const Duration(milliseconds: 50));
+    if (i >= 7 && !tester.binding.hasScheduledFrame) return;
   }
+  expect(tester.binding.hasScheduledFrame, isFalse, reason: 'Swap UI settled');
 }
 
 Finder _key(String key) => find.byKey(ValueKey(key));
@@ -86,7 +93,7 @@ Future<void> _menu(WidgetTester tester, String swapId, String actionKey) async {
   await tester.tap(_key('swap-menu-$swapId'));
   await tester.pumpAndSettle();
   await tester.tap(_key(actionKey));
-  await tester.pumpAndSettle();
+  await _settle(tester);
 }
 
 /// The shifts a day has, as the schedule resolves them.
@@ -96,6 +103,39 @@ List<String> _ids(WidgetTester tester, CivilDate date) =>
         .schedule
         .resolve(date)
         .shiftIds;
+
+/// Opens the sheet of a new change that starts on [date].
+Future<void> _openSheet(WidgetTester tester, {CivilDate date = _oct21}) async {
+  unawaited(
+    showSwapSheet(tester.element(find.byType(SwapsScreen)), date: date),
+  );
+  await _settle(tester);
+}
+
+/// Types the name, picks the shift the person gives and taps «Guardar».
+Future<void> _fillAndSave(WidgetTester tester) async {
+  await _fill(tester);
+  await _tapSave(tester);
+}
+
+/// Types the name and picks the morning shift as the one that is given.
+Future<void> _fill(WidgetTester tester) async {
+  await tester.enterText(_key('swap-field-colleague'), 'Raúl');
+  await tester.ensureVisible(_key('swap-given-morning'));
+  await tester.tap(_key('swap-given-morning'));
+  await tester.pumpAndSettle();
+}
+
+Future<void> _tapSave(WidgetTester tester) async {
+  await tester.ensureVisible(_key('swap-save'));
+  await tester.pumpAndSettle();
+  await tester.tap(_key('swap-save'));
+  await _settle(tester);
+}
+
+/// The value of the sheet's «Cambiar también mi cuadrante» switch.
+bool _switchOn(WidgetTester tester) =>
+    tester.widget<SwitchListTile>(_key('swap-apply-switch')).value;
 
 void main() {
   setUpAll(() async {
@@ -140,9 +180,8 @@ void main() {
       givenShiftTypeIds: const ['morning'],
     );
     await _register(tester, colleague: 'Luis', direction: SwapDirection.iOwe);
-    await _container(tester)
-        .read(swapLedgerProvider.notifier)
-        .settle(settled.id);
+    final controller = _container(tester).read(swapLedgerProvider.notifier);
+    await tester.runAsync(() => controller.settle(settled.id));
     await _settle(tester);
     await _open(tester);
 
@@ -216,6 +255,154 @@ void main() {
     expect(stored.single.id, swap.id);
   });
 
+  testWidgets('an unchanged sheet keeps calendar redo', (tester) async {
+    var now = fixedNow;
+    await pumpCalendar(tester, size: const Size(390, 1600), clock: () => now);
+    final swap = await _register(tester);
+    final container = _container(tester);
+    final schedule = container.read(scheduleControllerProvider.notifier);
+    schedule.clearDays([_oct21]);
+    expect(schedule.undo(), isTrue);
+    await _open(tester);
+
+    now = now.add(const Duration(minutes: 1));
+    await _menu(tester, swap.id, 'swap-menu-edit');
+    await _tapSave(tester);
+
+    expect((await _stored(tester)).single, swap);
+    expect(schedule.undo(), isFalse);
+    expect(schedule.redo(), isTrue);
+  });
+
+  group('«Guardar» stays in reach in landscape at text x2.0 (QA M3)', () {
+    const size = Size(844, 390);
+    const name = 'Lucía Nueva';
+
+    /// The changes of [name] that are stored.
+    Future<List<ShiftSwap>> storedOf(WidgetTester tester) async => [
+      for (final swap in await _stored(tester))
+        if (swap.colleague == name) swap,
+    ];
+
+    testWidgets('pinned: on screen with no swipe, and the form scrolls', (
+      tester,
+    ) async {
+      await pumpCalendar(tester, size: size, textScale: 2);
+      await _register(tester);
+      await _open(tester);
+      await tester.tap(_key('swap-add'));
+      await _settle(tester);
+      expect(find.text('Nuevo cambio'), findsOneWidget);
+
+      // Without a single swipe: the button is on screen and answers a tap.
+      final save = tester.getRect(_key('swap-save'));
+      expect(save.top, greaterThanOrEqualTo(0));
+      expect(save.bottom, lessThanOrEqualTo(size.height + 0.5));
+      await tester.tap(_key('swap-save'));
+      await _settle(tester);
+      expect(find.text('Escribe con quién es el cambio.'), findsOneWidget);
+
+      // The form still scrolls behind it, and the button does not move.
+      await tester.ensureVisible(_key('swap-field-note'));
+      await tester.pumpAndSettle();
+      expect(tester.getRect(_key('swap-save')), save);
+      await tester.enterText(_key('swap-field-colleague'), name);
+      await tester.tap(_key('swap-save'));
+      await _settle(tester);
+      expect(find.text('Nuevo cambio'), findsNothing);
+      final stored = await storedOf(tester);
+      expect(stored, hasLength(1));
+      expect(stored.single.date, _today);
+      // The one that was there is untouched.
+      expect(await _stored(tester), hasLength(2));
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('with the keyboard up it joins the form, which scrolls to it', (
+      tester,
+    ) async {
+      await pumpCalendar(tester, size: size, textScale: 2);
+      await _register(tester);
+      await _open(tester);
+      await tester.tap(_key('swap-add'));
+      await _settle(tester);
+      // The keyboard takes most of a landscape phone: a pinned button would
+      // take the little that is left, so it goes to the end of the form.
+      tester.view.viewInsets = FakeViewPadding(
+        bottom: 220 * tester.view.devicePixelRatio,
+      );
+      addTearDown(tester.view.resetViewInsets);
+      await tester.pumpAndSettle();
+      await tester.enterText(_key('swap-field-colleague'), name);
+      final scrollable = find
+          .descendant(
+            of: find.byType(BottomSheet),
+            matching: find.byType(Scrollable),
+          )
+          .first;
+      // It is in the scroll: not on screen until the form is scrolled to it.
+      expect(
+        find.descendant(of: scrollable, matching: _key('swap-save')),
+        findsOneWidget,
+      );
+      // The field that was typed in is done with: it would pull the form
+      // back to itself as the view changes.
+      FocusManager.instance.primaryFocus?.unfocus();
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        _key('swap-save'),
+        100,
+        scrollable: scrollable,
+      );
+      await tester.pumpAndSettle();
+      final rect = tester.getRect(_key('swap-save'));
+      expect(rect.bottom, lessThanOrEqualTo(size.height - 220 + 0.5));
+      await tester.tap(_key('swap-save'));
+      await _settle(tester);
+      expect(find.text('Nuevo cambio'), findsNothing);
+      expect(await storedOf(tester), hasLength(1));
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('editing: «Quitar» is reachable and asks first', (
+      tester,
+    ) async {
+      await pumpCalendar(tester, size: size, textScale: 2);
+      final swap = await _register(tester, colleague: name);
+      await _open(tester);
+      await tester.scrollUntilVisible(
+        _key('swap-menu-${swap.id}'),
+        100,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
+      await _menu(tester, swap.id, 'swap-menu-edit');
+      expect(find.text('Editar cambio'), findsOneWidget);
+      // «Guardar» is pinned, «Quitar» is at the end of the form.
+      expect(
+        tester.getRect(_key('swap-save')).bottom,
+        lessThanOrEqualTo(size.height + 0.5),
+      );
+      await tester.ensureVisible(_key('swap-remove'));
+      await tester.pumpAndSettle();
+      await tester.tap(_key('swap-remove'));
+      await _settle(tester);
+      expect(find.text('¿Quitar este cambio?'), findsOneWidget);
+      // Cancelling keeps it.
+      await tester.tap(find.text('Cancelar'));
+      await _settle(tester);
+      expect(await storedOf(tester), hasLength(1));
+      // Confirming removes it.
+      await tester.ensureVisible(_key('swap-remove'));
+      await tester.tap(_key('swap-remove'));
+      await _settle(tester);
+      await tester.tap(_key('swap-remove-confirm'));
+      await _settle(tester);
+      expect(await storedOf(tester), isEmpty);
+      expect(tester.takeException(), isNull);
+    });
+  });
+
   testWidgets('a change is marked as returned and as settled', (tester) async {
     await pumpCalendar(tester, size: const Size(390, 1600));
     final swap = await _register(tester);
@@ -260,7 +447,13 @@ void main() {
     expect(_ids(tester, _oct21), const ['morning', 'afternoon']);
     expect(_ids(tester, _oct24), const ['rest']);
 
-    await _menu(tester, swap.id, 'swap-menu-apply');
+    await tester.tap(_key('swap-menu-${swap.id}'));
+    await tester.pumpAndSettle();
+    expect(_key('swap-menu-apply'), findsNothing);
+    await tester.tapAt(const Offset(4, 4));
+    await tester.pumpAndSettle();
+    await tester.tap(_key('swap-apply-${swap.id}'));
+    await tester.tap(_key('swap-apply-${swap.id}'));
     await _settle(tester);
     expect(find.text('Cambio aplicado al cuadrante'), findsOneWidget);
     expect(_ids(tester, _oct21), const ['afternoon']);
@@ -283,7 +476,7 @@ void main() {
     );
     await _open(tester);
 
-    await _menu(tester, swap.id, 'swap-menu-apply');
+    await tester.tap(_key('swap-apply-${swap.id}'));
     await _settle(tester);
     expect(_ids(tester, _oct21), const ['afternoon']);
 
@@ -366,6 +559,389 @@ void main() {
       contains('Pendiente'),
     );
     semantics.dispose();
+  });
+
+  group('saving a change and the calendar (QA M4)', () {
+    testWidgets('with the switch on (the default), «Guardar» applies it', (
+      tester,
+    ) async {
+      await pumpCalendar(tester, size: const Size(390, 1600));
+      await _open(tester);
+      await _openSheet(tester);
+      expect(find.text('Cambiar también mi cuadrante'), findsOneWidget);
+      // Nothing to apply until a shift is chosen: the switch is off.
+      expect(_switchOn(tester), isFalse);
+
+      await _fillAndSave(tester);
+      expect(find.text('Nuevo cambio'), findsNothing);
+      final swap = (await _stored(tester)).single;
+      expect(swap.givenShiftTypeIds, const ['morning']);
+      // The calendar shows the swap, and the notice says so.
+      expect(_ids(tester, _oct21), const ['afternoon']);
+      expect(find.text('Guardado y aplicado a tu cuadrante'), findsOneWidget);
+      expect(_key('swap-application-${swap.id}'), findsOneWidget);
+      expect(find.text('Aplicado'), findsOneWidget);
+      expect(find.text('Sin aplicar'), findsNothing);
+      expect(_key('swap-apply-${swap.id}'), findsNothing);
+
+      // «Deshacer» takes the calendar back; the change stays in the book.
+      await tester.tap(find.text('Deshacer'));
+      await _settle(tester);
+      expect(_ids(tester, _oct21), const ['morning', 'afternoon']);
+      expect(await _stored(tester), hasLength(1));
+      expect(find.text('Sin aplicar'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('with the switch off nothing changes and the card applies it', (
+      tester,
+    ) async {
+      await pumpCalendar(tester, size: const Size(390, 1600));
+      await _open(tester);
+      await _openSheet(tester);
+      await _fill(tester);
+      // Now there is something to apply: the switch comes on by itself.
+      expect(_switchOn(tester), isTrue);
+      await tester.ensureVisible(_key('swap-apply-switch'));
+      await tester.tap(_key('swap-apply-switch'));
+      await tester.pumpAndSettle();
+      expect(_switchOn(tester), isFalse);
+      await _tapSave(tester);
+
+      final swap = (await _stored(tester)).single;
+      expect(_ids(tester, _oct21), const ['morning', 'afternoon']);
+      expect(
+        find.text('Guardado. Tu cuadrante no cambia hasta que lo apliques'),
+        findsOneWidget,
+      );
+      // The card says it apart from the debt state, with its button.
+      expect(find.text('Pendiente'), findsOneWidget);
+      expect(find.text('Sin aplicar'), findsOneWidget);
+      final button = _key('swap-apply-${swap.id}');
+      expect(button, findsOneWidget);
+      await tester.ensureVisible(button);
+      await tester.tap(button);
+      await _settle(tester);
+
+      expect(_ids(tester, _oct21), const ['afternoon']);
+      expect(find.text('Cambio aplicado al cuadrante'), findsOneWidget);
+      expect(find.text('Aplicado'), findsOneWidget);
+      expect(button, findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('the notice of a saved change has «Aplicar»', (tester) async {
+      await pumpCalendar(tester, size: const Size(390, 1600));
+      await _open(tester);
+      await _openSheet(tester);
+      await _fill(tester);
+      await tester.ensureVisible(_key('swap-apply-switch'));
+      await tester.tap(_key('swap-apply-switch'));
+      await tester.pumpAndSettle();
+      await _tapSave(tester);
+      expect(_ids(tester, _oct21), const ['morning', 'afternoon']);
+
+      await tester.tap(find.text('Aplicar'));
+      await _settle(tester);
+      expect(_ids(tester, _oct21), const ['afternoon']);
+      expect(find.text('Cambio aplicado al cuadrante'), findsOneWidget);
+      expect(find.text('Aplicado'), findsOneWidget);
+    });
+
+    testWidgets('the hint to choose the shifts goes once both are chosen', (
+      tester,
+    ) async {
+      const hint =
+          'Elige los turnos del cambio para poder aplicarlo al cuadrante.';
+      await pumpCalendar(tester, size: const Size(390, 1600));
+      await _open(tester);
+      await _openSheet(tester);
+      expect(find.text(hint), findsOneWidget);
+      await _fill(tester);
+      // Only the shift I give is chosen: the hint stays.
+      expect(find.text(hint), findsOneWidget);
+      await tester.ensureVisible(_key('swap-received-afternoon'));
+      await tester.tap(_key('swap-received-afternoon'));
+      await tester.pumpAndSettle();
+      expect(find.text(hint), findsNothing);
+    });
+
+    testWidgets('a debt with no shifts says nothing about the calendar', (
+      tester,
+    ) async {
+      await pumpCalendar(tester, size: const Size(390, 1600));
+      await _open(tester);
+      await _openSheet(tester);
+      await tester.enterText(_key('swap-field-colleague'), 'Raúl');
+      await _tapSave(tester);
+
+      expect(await _stored(tester), hasLength(1));
+      expect(_ids(tester, _oct21), const ['morning', 'afternoon']);
+      expect(find.text('Sin aplicar'), findsNothing);
+      expect(find.text('Aplicado'), findsNothing);
+      expect(find.text('Aplicar'), findsNothing);
+    });
+
+    testWidgets('editing an applied change does not apply it twice', (
+      tester,
+    ) async {
+      await pumpCalendar(tester, size: const Size(390, 1600));
+      final swap = await _register(
+        tester,
+        givenShiftTypeIds: const ['morning'],
+      );
+      await _open(tester);
+      await tester.tap(_key('swap-apply-${swap.id}'));
+      await _settle(tester);
+      expect(_ids(tester, _oct21), const ['afternoon']);
+
+      // Its note changes: the days are left as they are, the switch is on
+      // and disabled, and there is no notice about the calendar.
+      await _menu(tester, swap.id, 'swap-menu-edit');
+      expect(
+        tester.widget<SwitchListTile>(_key('swap-apply-switch')).onChanged,
+        isNull,
+      );
+      expect(_switchOn(tester), isTrue);
+      await tester.enterText(_key('swap-field-note'), 'Me lo devuelve');
+      await _tapSave(tester);
+      expect((await _stored(tester)).single.note, 'Me lo devuelve');
+      expect(_ids(tester, _oct21), const ['afternoon']);
+      expect(find.text('Guardado y aplicado a tu cuadrante'), findsNothing);
+      expect(find.text('Aplicado'), findsOneWidget);
+
+      // Another shift: the first application is taken back before the new
+      // one goes on, so the day does not lose both.
+      await _menu(tester, swap.id, 'swap-menu-edit');
+      await tester.ensureVisible(_key('swap-given-morning'));
+      await tester.tap(_key('swap-given-morning'));
+      await tester.ensureVisible(_key('swap-given-afternoon'));
+      await tester.tap(_key('swap-given-afternoon'));
+      await tester.pumpAndSettle();
+      expect(_switchOn(tester), isTrue);
+      await _tapSave(tester);
+      expect((await _stored(tester)).single.givenShiftTypeIds, const [
+        'afternoon',
+      ]);
+      expect(_ids(tester, _oct21), const ['morning']);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('editing warns about a date that was changed by hand', (
+      tester,
+    ) async {
+      await pumpCalendar(tester, size: const Size(390, 1600));
+      final swap = await _register(
+        tester,
+        givenShiftTypeIds: const ['morning'],
+        returnDate: _oct24,
+        receivedShiftTypeIds: const ['morning'],
+      );
+      await _open(tester);
+      await tester.tap(_key('swap-apply-${swap.id}'));
+      await _settle(tester);
+      final schedule = _container(tester)
+          .read(scheduleControllerProvider.notifier);
+      schedule.setShiftOnDays([_oct24], 'afternoon');
+      await _settle(tester);
+
+      await _menu(tester, swap.id, 'swap-menu-edit');
+      await tester.ensureVisible(_key('swap-field-return-clear'));
+      await tester.tap(_key('swap-field-return-clear'));
+      await tester.pumpAndSettle();
+      expect(_switchOn(tester), isTrue);
+      await tester.ensureVisible(_key('swap-apply-switch'));
+      await tester.tap(_key('swap-apply-switch'));
+      await tester.pumpAndSettle();
+      expect(_switchOn(tester), isFalse);
+      expect(
+        find.text(
+          'Al guardar se recuperarán los turnos anteriores que se puedan restaurar.',
+        ),
+        findsOneWidget,
+      );
+      await _tapSave(tester);
+
+      expect(
+        find.textContaining('He conservado tu turno de 24 oct'),
+        findsOneWidget,
+      );
+      expect((await _stored(tester)).single.returnDate, isNull);
+      expect(_ids(tester, _oct24), ['afternoon']);
+      expect(_ids(tester, _oct21), ['morning', 'afternoon']);
+    });
+
+    testWidgets('removing an applied change leaves the calendar as it is', (
+      tester,
+    ) async {
+      await pumpCalendar(tester, size: const Size(390, 1600));
+      final swap = await _register(
+        tester,
+        givenShiftTypeIds: const ['morning'],
+      );
+      await _open(tester);
+      await tester.tap(_key('swap-apply-${swap.id}'));
+      await _settle(tester);
+      await _menu(tester, swap.id, 'swap-menu-remove');
+      await _settle(tester);
+      expect(
+        find.text('Quitar el cambio y devolver tu cuadrante'),
+        findsOneWidget,
+      );
+      await tester.tap(find.text('Quitar solo el cambio'));
+      await _settle(tester);
+      expect(await _stored(tester), isEmpty);
+      expect(_ids(tester, _oct21), const ['afternoon']);
+    });
+
+    testWidgets('a removal stopped by one date says the swap stays whole', (
+      tester,
+    ) async {
+      await pumpCalendar(tester, size: const Size(390, 1600));
+      final swap = await _register(
+        tester,
+        givenShiftTypeIds: const ['morning'],
+        returnDate: _oct24,
+        receivedShiftTypeIds: const ['morning'],
+      );
+      await _open(tester);
+      await tester.tap(_key('swap-apply-${swap.id}'));
+      await _settle(tester);
+      _container(tester)
+          .read(scheduleControllerProvider.notifier)
+          .setShiftOnDays([_oct24], 'afternoon');
+      await _settle(tester);
+
+      await _menu(tester, swap.id, 'swap-menu-remove');
+      await tester.tap(find.text('Quitar el cambio y devolver tu cuadrante'));
+      await _settle(tester);
+
+      expect(
+        find.textContaining('He conservado tu turno de 24 oct'),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining(
+          'No he quitado el cambio: sigue en el libro de cambios y no he '
+          'tocado ninguno de sus días.',
+        ),
+        findsOneWidget,
+      );
+      expect((await _stored(tester)).single.id, swap.id);
+      // The other date keeps what the swap wrote: nothing was restored.
+      expect(_ids(tester, _oct21), const ['afternoon']);
+      expect(_ids(tester, _oct24), const ['afternoon']);
+    });
+  });
+
+  group('one applied swap per day (QA M4)', () {
+    const conflict =
+        'ya tiene otro cambio aplicado (con Marta): quítalo del cuadrante '
+        'primero.';
+
+    /// Marta's swap gives the morning of the 21st and is applied.
+    Future<ShiftSwap> applyMarta(WidgetTester tester) async {
+      final marta = await _register(
+        tester,
+        givenShiftTypeIds: const ['morning'],
+      );
+      await _open(tester);
+      await tester.tap(_key('swap-apply-${marta.id}'));
+      await _settle(tester);
+      expect(_ids(tester, _oct21), const ['afternoon']);
+      return marta;
+    }
+
+    testWidgets('the card button refuses a day another swap holds', (
+      tester,
+    ) async {
+      await pumpCalendar(tester, size: const Size(390, 1600));
+      await applyMarta(tester);
+      final raul = await _register(
+        tester,
+        colleague: 'Raúl',
+        givenShiftTypeIds: const ['afternoon'],
+      );
+      await _settle(tester);
+
+      await tester.ensureVisible(_key('swap-apply-${raul.id}'));
+      await tester.tap(_key('swap-apply-${raul.id}'));
+      await _settle(tester);
+
+      expect(find.textContaining(conflict), findsOneWidget);
+      expect(_ids(tester, _oct21), const ['afternoon']);
+      final records = await tester.runAsync(
+        () => _container(tester).read(swapAppliedStoreProvider).before(raul.id),
+      );
+      expect(records, isEmpty);
+    });
+
+    testWidgets('the sheet switch is off and says why, and so does «Aplicar»', (
+      tester,
+    ) async {
+      await pumpCalendar(tester, size: const Size(390, 1600));
+      await applyMarta(tester);
+      await _openSheet(tester);
+      await tester.enterText(_key('swap-field-colleague'), 'Raúl');
+      await tester.ensureVisible(_key('swap-given-afternoon'));
+      await tester.tap(_key('swap-given-afternoon'));
+      await tester.pumpAndSettle();
+
+      final toggle = tester.widget<SwitchListTile>(_key('swap-apply-switch'));
+      expect(toggle.value, isFalse);
+      expect(toggle.onChanged, isNull);
+      expect(find.textContaining(conflict), findsOneWidget);
+
+      // Saved without applying; the notice's «Aplicar» explains the refusal.
+      await _tapSave(tester);
+      expect(await _stored(tester), hasLength(2));
+      expect(_ids(tester, _oct21), const ['afternoon']);
+      await tester.tap(find.text('Aplicar'));
+      await _settle(tester);
+      expect(find.textContaining(conflict), findsOneWidget);
+      expect(_ids(tester, _oct21), const ['afternoon']);
+    });
+
+    testWidgets('moving an applied swap onto a held day shows both results', (
+      tester,
+    ) async {
+      const oct23 = CivilDate(2026, 10, 23);
+      await pumpCalendar(tester, size: const Size(390, 1600));
+      await applyMarta(tester);
+      final raul = await _register(
+        tester,
+        colleague: 'Raúl',
+        date: oct23,
+        givenShiftTypeIds: const ['night'],
+        returnDate: _oct21,
+      );
+      await tester.ensureVisible(_key('swap-apply-${raul.id}'));
+      await tester.tap(_key('swap-apply-${raul.id}'));
+      await _settle(tester);
+      expect(_ids(tester, oct23), isEmpty);
+
+      // Receiving a morning on the 21st would write Marta's day.
+      await _menu(tester, raul.id, 'swap-menu-edit');
+      await tester.ensureVisible(_key('swap-received-morning'));
+      await tester.tap(_key('swap-received-morning'));
+      await tester.pumpAndSettle();
+
+      final toggle = tester.widget<SwitchListTile>(_key('swap-apply-switch'));
+      expect(toggle.value, isFalse);
+      expect(toggle.onChanged, isNull);
+      expect(
+        find.textContaining(
+          'Al guardar se recuperarán los turnos anteriores que se puedan '
+          'restaurar.',
+        ),
+        findsOneWidget,
+      );
+      expect(find.textContaining(conflict), findsOneWidget);
+
+      await _tapSave(tester);
+      expect(_ids(tester, oct23), const ['night']);
+      expect(_ids(tester, _oct21), const ['afternoon']);
+    });
   });
 
   group('layout', () {

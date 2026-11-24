@@ -15,6 +15,7 @@ import 'migration_v3_to_v4.dart';
 import 'migration_v4_to_v5.dart';
 import 'migration_v5_to_v6.dart';
 import 'migration_v6_to_v7.dart';
+import 'migration_v7_to_v8.dart';
 import 'tables.dart';
 
 part 'app_database.g.dart';
@@ -32,6 +33,7 @@ part 'app_database.g.dart';
     NoteAttachments,
     DayTasks,
     ShiftSwaps,
+    SwapApplications,
     Holidays,
     AbsenceBalances,
     Settings,
@@ -49,7 +51,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The schema version this code expects. Bump it together with a new
   /// migration step (see docs/datos.md, "Migraciones").
-  static const int latestSchemaVersion = 7;
+  static const int latestSchemaVersion = 8;
 
   @override
   int get schemaVersion => latestSchemaVersion;
@@ -73,6 +75,7 @@ class AppDatabase extends _$AppDatabase {
       from4To5: migrateFrom4To5,
       from5To6: migrateFrom5To6,
       from6To7: migrateFrom6To7,
+      from7To8: migrateFrom7To8,
     ),
     beforeOpen: (details) async {
       _createdThisOpen = details.wasCreated;

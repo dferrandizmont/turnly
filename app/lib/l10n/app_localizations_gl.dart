@@ -10,6 +10,28 @@ class AppLocalizationsGl extends AppLocalizations {
   AppLocalizationsGl([String locale = 'gl']) : super(locale);
 
   @override
+  String get backupSwapApplicationsSkipped =>
+      'Non se puideron restaurar algúns rexistros de cambios de quenda. Conserváronse os seus datos para poder recuperalos.';
+
+  @override
+  String swapRestoreSkipped(String date) {
+    return 'Conservei a túa quenda de $date porque non puiden verificar o cambio que se aplicou.';
+  }
+
+  @override
+  String get swapRemoveKept =>
+      'Non quitei o cambio: segue no libro de cambios e non toquei ningún dos seus días.';
+
+  @override
+  String swapApplyConflict(String date, String name) {
+    return 'O $date xa ten outro cambio aplicado (con $name): quítao do cadro de quendas primeiro.';
+  }
+
+  @override
+  String get swapRestoreOnSave =>
+      'Ao gardar recuperaranse as quendas anteriores que se poidan restaurar.';
+
+  @override
   String get appName => 'Turnly';
 
   @override
@@ -1631,6 +1653,24 @@ class AppLocalizationsGl extends AppLocalizations {
   String get patternStartLabel => 'Día de inicio';
 
   @override
+  String get dateSheetStartHint => 'O día en que comezou o teu ciclo actual';
+
+  @override
+  String get dateSheetLastMonday => 'Luns pasado';
+
+  @override
+  String get dateSheetChooseMonth => 'Escoller mes';
+
+  @override
+  String get dateSheetShowDays => 'Ver os días';
+
+  @override
+  String get dateSheetPreviousYear => 'Ano anterior';
+
+  @override
+  String get dateSheetNextYear => 'Ano seguinte';
+
+  @override
   String patternSuggestedStart(String weekday) {
     return 'Este patrón adoita comezar un $weekday.';
   }
@@ -1797,7 +1837,7 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get onboardingPathRotationHint =>
-      'Escolle o teu ciclo (mañás, tardes, noites, saínte…) e énchese só, mes tras mes.';
+      'Escolle un ciclo (mañás, tardes, noites, saínte…) ou crea o teu e énchese só, mes tras mes.';
 
   @override
   String get onboardingPathRotationTag => 'Se a túa quenda se repite';
@@ -1990,7 +2030,7 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get onboardingRotationHelp =>
-      'Escolle a que máis se pareza. Logo dis cando comezas.';
+      'Escolle a túa ou créaa nun momento. Logo dis cando comezas.';
 
   @override
   String get onboardingRotationTypical => 'O habitual no teu traballo';
@@ -2000,6 +2040,34 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get onboardingRotationAll => 'Rotacións';
+
+  @override
+  String get onboardingOwnCycle => 'Crear o meu ciclo';
+
+  @override
+  String get onboardingOwnCycleHint => 'Monta o teu ciclo día a día';
+
+  @override
+  String get onboardingOwnCycleAnother => 'Crear outro ciclo';
+
+  @override
+  String get onboardingOwnCycleNotHere => 'Non está a túa? Crear o meu ciclo';
+
+  @override
+  String get onboardingOwnCycleAdjust => 'Axustar';
+
+  @override
+  String get onboardingOwnCycleTitle => 'O teu ciclo';
+
+  @override
+  String get onboardingOwnCycleUse => 'Usar este ciclo';
+
+  @override
+  String get onboardingOwnCycleHours =>
+      'As horas cámbiaas despois en Configuración › As miñas quendas.';
+
+  @override
+  String get onboardingOwnCycleName => 'O meu ciclo';
 
   @override
   String get onboardingByHand => 'Píntoo a man';
@@ -2232,6 +2300,20 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get summaryShiftsWorked => 'Quendas traballadas';
+
+  @override
+  String summaryShiftsPlannedRest(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'e $count previstos',
+      one: 'e 1 previsto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get summaryTypesPeriodTotal => 'Total do período, co previsto';
 
   @override
   String get summaryNightHours => 'Horas nocturnas';
@@ -2555,6 +2637,10 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get summaryYearHint => 'Toca un mes para ver o seu detalle.';
+
+  @override
+  String get summaryYearHintPlanned =>
+      'O «+» separa o traballado (ata onte) do previsto (de hoxe en diante). As nocturnas e o estimado contan todo o mes.';
 
   @override
   String get summaryYearHeaderMonth => 'Mes';
@@ -6737,6 +6823,21 @@ class AppLocalizationsGl extends AppLocalizations {
   }
 
   @override
+  String get swapRemoveAppliedBody =>
+      'Que queres facer coas quendas que cambiou?';
+
+  @override
+  String get swapRemoveAndRestore =>
+      'Quita o cambio e restaura o teu cadro de quendas';
+
+  @override
+  String get swapRemoveOnly => 'Quita só o cambio';
+
+  @override
+  String get swapSavedUnapplied =>
+      'Gardado. Restauráronse as quendas anteriores no teu cadro';
+
+  @override
   String get swapRemoveConfirm => 'Quitar';
 
   @override
@@ -6788,6 +6889,40 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get swapNotApplied => 'Este cambio non está aplicado ao cadro';
+
+  @override
+  String get swapApplyStateApplied => 'Aplicado';
+
+  @override
+  String get swapApplyStatePending => 'Sen aplicar';
+
+  @override
+  String get swapApplyToggle => 'Cambiar tamén o meu cadro';
+
+  @override
+  String get swapApplyToggleOn =>
+      'Os teus días cambian ao gardar. Poderás desfacelo.';
+
+  @override
+  String get swapApplyToggleOff =>
+      'Só se anota o cambio: o teu cadro non se toca.';
+
+  @override
+  String get swapApplyToggleNone =>
+      'Escolle as quendas do cambio para poder cambiar o teu cadro.';
+
+  @override
+  String get swapApplyToggleDone => 'O teu cadro xa está como di o cambio.';
+
+  @override
+  String get swapSavedApplied => 'Gardado e aplicado ao teu cadro';
+
+  @override
+  String get swapSavedNotApplied =>
+      'Gardado. O teu cadro non cambia ata que o apliques';
+
+  @override
+  String get swapApplyAction => 'Aplicar';
 
   @override
   String get swapDaySection => 'Cambio de quenda';

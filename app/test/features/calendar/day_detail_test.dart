@@ -121,7 +121,7 @@ void main() {
 
       await openDay(tester, oct20);
       expect(
-        find.descendant(of: _sheet, matching: find.text('22:00–06:00 · 8 h')),
+        find.descendant(of: _sheet, matching: find.text('22:00–06:00 · 8\u00A0h')),
         findsOneWidget,
       );
       expect(find.text('Cambio con Marta si sale el turno'), findsOneWidget);

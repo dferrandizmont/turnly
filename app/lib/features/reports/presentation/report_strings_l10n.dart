@@ -53,6 +53,7 @@ ReportStrings reportStringsFor(
     hoursDone: l10n.reportHoursDone,
     hoursPlannedFrom: l10n.reportHoursPlannedFrom,
     shiftsWorked: l10n.summaryShiftsWorked,
+    shiftsPlannedRest: l10n.summaryShiftsPlannedRest,
     nightHours: l10n.summaryNightHours,
     holidayHours: l10n.summaryHolidayHours,
     overtime: l10n.summaryOvertime,

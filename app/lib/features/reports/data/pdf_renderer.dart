@@ -482,7 +482,17 @@ List<pw.Widget> _totalsBlock(ReportModel model, ReportStrings s) {
       ..add((s.hoursDone, s.hours(tense.doneMinutes)))
       ..add((s.hoursPlannedFrom, s.hours(tense.plannedMinutes)));
   }
-  rows.add((s.shiftsWorked, '${summary.shiftsWorked}'));
+  // Only the shifts before today are worked; the ones from today on are
+  // planned, as in the summary: «5 · y 2 previstos».
+  final shifts = model.shifts;
+  rows.add((
+    s.shiftsWorked,
+    [
+      '${shifts.doneShifts}',
+      if (shifts.plannedShifts > 0 || shifts.tense == PeriodTense.future)
+        s.shiftsPlannedRest(shifts.plannedShifts),
+    ].join(' · '),
+  ));
   if (summary.nightMinutes > 0) {
     rows.add((s.nightHours, s.hours(summary.nightMinutes)));
   }

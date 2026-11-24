@@ -10,9 +10,9 @@ contact_email = "turnly@mainshai.com"
 screenshots = ["01-mes", "01-mes-oscuro", "02-lista", "02-lista-oscuro", "03-pintar", "03-pintar-oscuro", "04-rotaciones", "04-rotaciones-oscuro", "05-horas", "05-horas-oscuro", "06-festivos", "06-festivos-oscuro", "08-vacaciones", "08-vacaciones-oscuro", "09-cambios", "09-cambios-oscuro", "10-primer-uso", "10-primer-uso-oscuro", "11-widgets", "11-widgets-oscuro"]
 privacy = { es = "docs/legal/politica-privacidad.md", en = "docs/legal/politica-privacidad.en.md" }
 privacy_fallback = { ca = "es", gl = "es", eu = "es" }
-closed_test = { group_name = "turnly-testers", group_url = "https://groups.google.com/g/turnly-testers", install_url = "https://play.google.com/store/apps/details?id=es.cuadrante.app" }
+closed_test = { group_name = "turnly-testers", group_url = "https://groups.google.com/g/turnly-testers", install_url = "https://play.google.com/store/apps/details?id=es.turnly.app" }
 downloads = [
   { kind = "app_store", state = "available", url = "https://apps.apple.com/es/app/turnly-cuadrante-de-turnos/id6832554552" },
-  { kind = "play", state = "closed_test", url = "https://play.google.com/apps/testing/es.cuadrante.app" },
+  { kind = "play", state = "beta", url = "https://play.google.com/store/apps/details?id=es.turnly.app" },
   { kind = "apk", state = "beta", url = "https://github.com/dferrandizmont/turnly/releases" },
 ]

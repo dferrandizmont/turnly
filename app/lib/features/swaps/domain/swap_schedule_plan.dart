@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 
 import '../../schedule/domain/schedule_domain.dart';
 import 'shift_swap.dart';
+import 'swap_application.dart';
 
 /// What applying a change to the calendar does to the days it touches.
 ///
@@ -35,13 +36,17 @@ class SwapSchedulePlan {
 /// plan when nothing changes. The shift types that do not exist any more are
 /// ignored (the engine ignores them too), and a side whose types are all
 /// unknown leaves its day alone.
-SwapSchedulePlan planSwapApplication(Schedule schedule, ShiftSwap swap) {
+SwapSchedulePlan planSwapApplication(
+  Schedule schedule,
+  ShiftSwap swap, {
+  Set<CivilDate> excluding = const {},
+}) {
   final changes = <CivilDate, EntryChange>{};
   final before = <CivilDate, DayEntry?>{};
   var working = schedule;
 
   final given = _known(schedule, swap.givenShiftTypeIds);
-  if (swap.givenShiftTypeIds != null && given.isNotEmpty) {
+  if (given.isNotEmpty && !excluding.contains(swap.date)) {
     final change = _planGivenDay(
       schedule,
       working,
@@ -55,7 +60,9 @@ SwapSchedulePlan planSwapApplication(Schedule schedule, ShiftSwap swap) {
 
   final received = _known(schedule, swap.receivedShiftTypeIds);
   final returnDate = swap.returnDate;
-  if (swap.receivedShiftTypeIds != null && returnDate != null) {
+  if (swap.receivedShiftTypeIds != null &&
+      returnDate != null &&
+      !excluding.contains(returnDate)) {
     final wanted = swap.receivedShiftTypeIds!;
     if (received.isNotEmpty || wanted.isEmpty) {
       _planReceivedDay(
@@ -69,6 +76,8 @@ SwapSchedulePlan planSwapApplication(Schedule schedule, ShiftSwap swap) {
     }
   }
 
+  changes.removeWhere((_, change) => change.before == change.after);
+  before.removeWhere((date, _) => !changes.containsKey(date));
   return SwapSchedulePlan(
     change: ScheduleChange(patch: EntriesPatch(changes)),
     before: Map.unmodifiable(before),
@@ -101,6 +110,141 @@ SwapSchedulePlan planSwapUndo(
     change: ScheduleChange(patch: EntriesPatch(changes)),
     before: Map.unmodifiable(before),
   );
+}
+
+/// Restore only days that still hold the recorded override. Keep records
+/// for days changed since the swap and for legacy writes with no snapshot.
+({ScheduleChange change, List<SwapApplicationRecord> skipped})
+planRecordedSwapUndo(Schedule schedule, List<SwapApplicationRecord> records) {
+  final before = <CivilDate, DayEntry>{};
+  final skipped = <SwapApplicationRecord>[];
+  for (final record in records) {
+    final applied = record.appliedOverride;
+    if (applied == null ||
+        !const ListEquality<String>().equals(
+          applied.shiftTypeIds,
+          schedule.entries[record.date]?.shiftTypeIds,
+        )) {
+      skipped.add(record);
+      continue;
+    }
+    before[record.date] = DayEntry(
+      date: record.date,
+      shiftTypeIds: _restorableIds(schedule, record.previousShiftTypeIds),
+    );
+  }
+  return (change: planSwapUndo(schedule, before).change, skipped: skipped);
+}
+
+/// A day that another swap's application already holds on the calendar.
+///
+/// At most one applied swap per day: a swap is never applied over a day
+/// another one wrote, so taking any of them off the calendar can only give
+/// back what that swap itself replaced.
+class SwapDayClaim {
+  const SwapDayClaim({
+    required this.date,
+    required this.swapId,
+    required this.colleague,
+  });
+
+  final CivilDate date;
+  final String swapId;
+  final String colleague;
+
+  @override
+  bool operator ==(Object other) =>
+      other is SwapDayClaim &&
+      other.date == date &&
+      other.swapId == swapId &&
+      other.colleague == colleague;
+
+  @override
+  int get hashCode => Object.hash(date, swapId, colleague);
+}
+
+/// Applying a swap was refused: [claim] says which day already holds
+/// another applied swap. Nothing was written.
+class SwapApplyConflict implements Exception {
+  const SwapApplyConflict(this.claim);
+
+  final SwapDayClaim claim;
+
+  @override
+  String toString() => 'SwapApplyConflict(${claim.date}, ${claim.swapId})';
+}
+
+/// What saving [swap] does to the calendar, computed the same way by the
+/// sheet (to preview it) and by the save itself.
+///
+/// - With [moved] (the dates or shifts of an applied swap change), the days
+///   in [records] come back first ([planRecordedSwapUndo]); the ones that
+///   cannot are [skipped] and stay out of the new application.
+/// - With [apply], the swap is applied on top ([applied]). [conflict] is the
+///   first day it would write that another swap of the calendar already
+///   holds ([claims]); such an application must be refused.
+({
+  ScheduleChange restoration,
+  List<SwapApplicationRecord> skipped,
+  SwapSchedulePlan? applied,
+  SwapDayClaim? conflict,
+})
+planSwapSave(
+  Schedule base,
+  ShiftSwap swap, {
+  required bool moved,
+  required List<SwapApplicationRecord> records,
+  required bool apply,
+  Iterable<SwapDayClaim> claims = const [],
+}) {
+  final restored = moved ? planRecordedSwapUndo(base, records) : null;
+  final skipped = restored?.skipped ?? const <SwapApplicationRecord>[];
+  final restoration = restored?.change ?? const ScheduleChange();
+  final applied = apply
+      ? planSwapApplication(
+          base.apply(restoration),
+          swap,
+          excluding: {for (final record in skipped) record.date},
+        )
+      : null;
+  return (
+    restoration: restoration,
+    skipped: skipped,
+    applied: applied,
+    conflict: applied == null
+        ? null
+        : swapApplyConflictOf(applied, swap.id, claims),
+  );
+}
+
+/// The first day of [plan] that another swap than [swapId] already holds.
+SwapDayClaim? swapApplyConflictOf(
+  SwapSchedulePlan plan,
+  String swapId,
+  Iterable<SwapDayClaim> claims,
+) {
+  final days = plan.days.toSet();
+  final conflicts = [
+    for (final claim in claims)
+      if (claim.swapId != swapId && days.contains(claim.date)) claim,
+  ]..sort((a, b) => a.date.compareTo(b.date));
+  return conflicts.firstOrNull;
+}
+
+List<String>? _restorableIds(Schedule schedule, List<String>? ids) {
+  if (ids == null || ids.isEmpty) return ids;
+  final remaining = _known(schedule, ids);
+  return remaining.isEmpty ? null : remaining;
+}
+
+extension SwapCalendarFields on ShiftSwap {
+  bool movesCalendarDaysFrom(ShiftSwap other) {
+    const same = ListEquality<String>();
+    return date != other.date ||
+        returnDate != other.returnDate ||
+        !same.equals(givenShiftTypeIds, other.givenShiftTypeIds) ||
+        !same.equals(receivedShiftTypeIds, other.receivedShiftTypeIds);
+  }
 }
 
 /// The day I gave: the shifts I gave are not mine any more.
@@ -137,9 +281,7 @@ void _planReceivedDay(
   final current = working.resolve(date).shiftIds;
   if (_sameIds(current, received)) return;
   final after = _entryWithShifts(working, date, received);
-  final original = before.containsKey(date)
-      ? before[date]
-      : base.entries[date];
+  final original = before.containsKey(date) ? before[date] : base.entries[date];
   changes[date] = EntryChange(original, after);
   before.putIfAbsent(date, () => base.entries[date]);
 }
@@ -154,11 +296,48 @@ DayEntry? _entryWithShifts(
 ) {
   final pattern = schedule.resolvePattern(date).shiftIds;
   final override = _sameIds(ids, pattern) ? null : ids;
-  final entry =
-      (schedule.entries[date] ?? DayEntry(date: date)).withShiftTypeIds(
-        override,
-      );
+  final entry = (schedule.entries[date] ?? DayEntry(date: date))
+      .withShiftTypeIds(override);
   return entry.isEmpty ? null : entry;
+}
+
+/// Whether a change is on the calendar, as the calendar itself says.
+enum SwapApplication {
+  /// The change has no shifts that could be written to the calendar (a debt
+  /// only, or shift types that do not exist any more).
+  nothing,
+
+  /// The change has shifts and the calendar is not as it says yet: applying
+  /// it would change the calendar.
+  pending,
+
+  /// The calendar already is as the change says.
+  applied,
+}
+
+/// The state of [swap] against [schedule].
+///
+/// It is read from the calendar, never stored: the change is applied when the
+/// days are as the plan ([planSwapApplication]) leaves them, so it stays right
+/// after a restore, an undo or an edit of those days by hand. Applying a
+/// change that is [SwapApplication.applied] changes nothing, so it can never
+/// be applied twice.
+SwapApplication swapApplicationOf(
+  Schedule schedule,
+  ShiftSwap swap, {
+  Set<CivilDate> excluding = const {},
+}) {
+  final given = _known(schedule, swap.givenShiftTypeIds);
+  final received = _known(schedule, swap.receivedShiftTypeIds);
+  final givenActive = swap.givenShiftTypeIds != null && given.isNotEmpty;
+  final receivedActive =
+      swap.receivedShiftTypeIds != null &&
+      swap.returnDate != null &&
+      (received.isNotEmpty || swap.receivedShiftTypeIds!.isEmpty);
+  if (!givenActive && !receivedActive) return SwapApplication.nothing;
+  return planSwapApplication(schedule, swap, excluding: excluding).isEmpty
+      ? SwapApplication.applied
+      : SwapApplication.pending;
 }
 
 /// The ids of the shift types that exist in [schedule] (the ones that do not

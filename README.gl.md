@@ -26,30 +26,31 @@ Todas as funcións dispoñibles están abertas, sen Pro nin compras dentro da ap
 ## Descargas
 
 <p>
-  <a href="https://play.google.com/apps/testing/es.cuadrante.app"><img src="https://img.shields.io/badge/Google_Play-Beta-414141?logo=googleplay&amp;style=for-the-badge" alt="Beta en Google Play"></a>
+  <a href="https://play.google.com/store/apps/details?id=es.turnly.app"><img src="https://img.shields.io/badge/Google_Play-Beta-414141?logo=googleplay&amp;style=for-the-badge" alt="Beta en Google Play"></a>
   <a href="https://github.com/dferrandizmont/turnly/releases"><img src="https://img.shields.io/badge/Dispo%C3%B1ible_en-GitHub-181717?logo=github&amp;style=for-the-badge" alt="Dispoñible en GitHub"></a>
   <a href="https://apps.apple.com/es/app/turnly-cuadrante-de-turnos/id6832554552"><img src="https://img.shields.io/badge/App_Store-Descargar-0D96F6?logo=appstore&amp;style=for-the-badge" alt="Dispoñible na App Store"></a>
 </p>
 
-Android en probas; iPhone, na App Store. Modo claro e escuro.
+Android en probas abertas en Google Play; iPhone, na App Store. Modo claro e escuro.
+
+**Usabas a app anterior de Android?** Turnly é agora unha app nova (`es.turnly.app`) e non actualiza a antiga (`es.cuadrante.app`); pódense ter as dúas instaladas. Na antiga vai a Configuración › Copia de seguranza e preme «Gardar unha copia fóra de Turnly»; na nova usa «Importar ficheiro». Volve configurar widgets e alarmas e desinstala a antiga.
 
 <details>
-<summary>Únete á beta de Google Play</summary>
+<summary>Instala desde Google Play</summary>
 
-A app está en proba pechada en Google Play e calquera pode apuntarse:
+Turnly está en proba aberta en Google Play, así que calquera pode instalala:
 
-1. Únete ao grupo de testers: [turnly-testers](https://groups.google.com/g/turnly-testers). Coa túa conta de Google, preme «Unirse ao grupo».
-2. Acepta a proba desde o móbil ou o ordenador: [play.google.com/apps/testing/es.cuadrante.app](https://play.google.com/apps/testing/es.cuadrante.app).
-3. Instala a app desde Google Play. Actualizarase soa.
+1. Abre [Turnly en Google Play](https://play.google.com/store/apps/details?id=es.turnly.app) desde o móbil ou o ordenador.
+2. Instala a app (se o pide, únete á proba aberta). Actualizarase soa.
 
-Se podes, quédate na proba polo menos 14 días e úsaa de cando en vez (por exemplo, mira a túa quenda de mañá ou pon o widget): Google esixe 12 testers durante 14 días para publicala para todo o mundo. Os comentarios, a turnly@mainshai.com.
+Os comentarios, a turnly@mainshai.com.
 
 </details>
 
 <details>
 <summary>Instala o APK desde GitHub</summary>
 
-Tamén podes descargar o APK da [última versión](https://github.com/dferrandizmont/turnly/releases) e instalalo á man (hai que permitir «instalar aplicacións de orixe descoñecida»). Desde a 0.8.3 vai asinado coa mesma clave que a versión de Google Play, así que podes pasar dunha á outra sen desinstalar e sen perder nada; Android só non deixa volver a unha versión máis antiga. Se instalaches Turnly desde Google Play antes da 0.8.3, desinstálaa unha vez (exporta antes unha copia desde a app: `.turnly`; as versións anteriores gárdana como `.cuadrante`).
+Tamén podes descargar o APK da [última versión](https://github.com/dferrandizmont/turnly/releases) e instalalo á man (hai que permitir «instalar aplicacións de orixe descoñecida»). Desde a 0.8.3 vai asinado coa mesma clave que a versión de Google Play, así que dentro do mesmo paquete (`es.turnly.app`) podes pasar dunha á outra sen desinstalar e sen perder nada; Android só non deixa volver a unha versión máis antiga. Para pasar de `es.cuadrante.app` a `es.turnly.app`, segue os pasos de exportar e importar de arriba. As versións publicadas antes da 0.12.1 son da app anterior (`es.cuadrante.app`); mira a nota de arriba para pasar os teus datos.
 
 </details>
 
@@ -159,6 +160,7 @@ datos van ao destino que escollas. O ficheiro de copia `.turnly` non está cifra
 
 ## Novidades
 
+- **0.12.1 (23-nov-2026):** Android: app nova en Google Play (`es.turnly.app`); garda unha copia na antiga e impórtaa aquí. No primeiro uso podes crear o teu propio ciclo ou axustar unha rotación do catálogo. Agora podes escoller a data de inicio con atallos para ir ao luns pasado ou a hoxe. En «Quendas traballadas» verás as quendas que traballaches ata onte e, á parte, as previstas desde hoxe. Ao gardar un cambio de quenda tamén podes cambiar o teu cadro; se o cambio ten quendas que se poden aplicar ao cadro, verás «Aplicado» ou «Sen aplicar» xunto ao estado da débeda. As comunidades saen no idioma da app. Con letra grande, os botóns dos pasos do primeiro uso, do formulario de cambios e o botón «Aplicar» do modelo de pluses quedan á man.
 - **0.12.0 (21-nov-2026):** Android: cinco rotacións listas para usar no catálogo: 4 x 4 con noites, Garda 24/48, 6 x 6, 7 x 7 e 14 x 14. No 6 x 6, no 7 x 7 e no 14 x 14 escolles a túa quenda de traballo. A barra de abaixo segue á vista en Rotación, Axenda e Resumo, así que pasas dunha a outra sen volver ao mes. «Rotación» abre sempre «As miñas rotacións» e, se aínda non tes ningunha, ofréceche «Aplicar patrón».
 - **0.11.4 (19-nov-2026):** Android: «Comezar a rotación aquí» permíteche escoller o día do ciclo na tira numerada. No móbil, en horizontal ou con letra grande, a cabeceira do asistente desprázase co contido. En «Semanas por quenda», a lista non se move ao escoller unha quenda. Na tableta, se tes poucos bloques en «Crear o meu», a paleta queda xusto debaixo. Con letra moi grande, as cifras de cada data de «Próximos días» vense nunha soa liña. Na vista previa do widget pequeno, as horas vense enteiras. Na tableta, se abres «Axenda» desde a barra lateral, xa non aparece a frecha para volver. O resumo do mes queda xusto debaixo do calendario e «Crear e compartir» segue á vista mentres percorres as opcións do informe.
 - **0.11.3 (19-nov-2026):** Android: a vista previa do mes no primeiro uso amosa os horarios das quendas da profesión que escolles. Na tableta, o campo do importe volve quedar á vista por riba do teclado ao xirala e as follas abertas seguen o modo claro ou escuro do sistema. Con letra grande, o título do bloque novo queda á vista. Con letra moi grande, a tarxeta «Hoxe» ocupa menos espazo. VoiceOver e TalkBack len unha soa vez o nome de cada botón («Desfacer», «Baleirar o ciclo» e «Atrás»).

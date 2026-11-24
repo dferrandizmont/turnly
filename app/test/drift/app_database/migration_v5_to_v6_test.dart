@@ -6,6 +6,7 @@ import 'package:cuadrante/core/database/migration_v3_to_v4.dart';
 import 'package:cuadrante/core/database/migration_v4_to_v5.dart';
 import 'package:cuadrante/core/database/migration_v5_to_v6.dart';
 import 'package:cuadrante/core/database/migration_v6_to_v7.dart';
+import 'package:cuadrante/core/database/migration_v7_to_v8.dart';
 import 'package:cuadrante/features/absences/data/absence_balances_repository.dart';
 import 'package:cuadrante/features/absences/domain/absence_balance.dart';
 import 'package:cuadrante/features/notes/data/day_tasks_repository.dart';
@@ -43,6 +44,7 @@ class _FailingV6 extends AppDatabase {
         afterChanges: () async => throw StateError('boom after the changes'),
       ),
       from6To7: migrateFrom6To7,
+      from7To8: migrateFrom7To8,
     ),
   );
 }

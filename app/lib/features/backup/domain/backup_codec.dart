@@ -55,11 +55,9 @@ class BackupCodec {
   /// Value of the `format` field.
   static const String formatName = 'cuadrante';
 
-  /// The newest `schemaVersion` this build can read (and the one it writes).
-  /// 4 since database v7: the extra hours are blocks with a type, and an app
-  /// that only knows version 3 would drop them without a word, so it must
-  /// see `NewerFormatVersion` instead (docs/copia-de-seguridad.md).
-  static const int supportedSchemaVersion = 4;
+  /// The newest format this build can read. A file with swap applications
+  /// uses version 5 so that a version 4 reader cannot silently drop them.
+  static const int supportedSchemaVersion = 5;
 
   /// Shared reader/writer caps. Large histories and notes may exceed 4 MiB;
   /// the absolute cap and ratio protection still bound untrusted input.
@@ -182,10 +180,13 @@ class BackupCodec {
   }) {
     data.validate();
     // Always the newest form: old overtime minutes become blocks.
-    final dataJson = data.upgradedOvertime().toJson();
+    final upgraded = data.upgradedOvertime().upgradedSwapApplications();
+    final dataJson = upgraded.toJson();
     return canonicalJsonBytes({
       'format': formatName,
-      'schemaVersion': supportedSchemaVersion,
+      'schemaVersion': upgraded.swapApplications.isEmpty
+          ? 4
+          : supportedSchemaVersion,
       'appVersion': appVersion,
       'exportedAt': _formatTime(exportedAt),
       'data': dataJson,
@@ -366,6 +367,7 @@ class BackupCodec {
         2 => _decodeV2(envelope),
         3 => _decodeV3(envelope),
         4 => _decodeV4(envelope),
+        5 => _decodeV5(envelope),
         _ => throw CorruptBackup('No reader for schemaVersion $version'),
       };
     } on BackupException {
@@ -444,6 +446,22 @@ class BackupCodec {
       ..validate();
     return BackupFile(
       schemaVersion: 4,
+      appVersion: env.appVersion,
+      exportedAt: _parseTime(env.exportedAt),
+      checksum: env.checksum,
+      data: data,
+    );
+  }
+
+  BackupFile _decodeV5(Map<String, Object?> envelope) {
+    final env = _readEnvelope(envelope);
+    final data = BackupData.fromJson(
+      env.dataJson,
+      readOvertime: true,
+      readSwapApplications: true,
+    )..validate();
+    return BackupFile(
+      schemaVersion: 5,
       appVersion: env.appVersion,
       exportedAt: _parseTime(env.exportedAt),
       checksum: env.checksum,

@@ -64,6 +64,23 @@ Future<void> _book(QaContext qa) async {
     reason: 'el cambio en la lista',
   );
   expect(find.text('Me debe 1 turno'), findsOneWidget);
+
+  // Saving applied it (the switch is on): the notice says so and the day lost
+  // the shift. «Deshacer» takes it back; the change stays in the book.
+  expect(
+    find.text('Guardado y aplicado a tu cuadrante'),
+    findsOneWidget,
+    reason: 'el aviso de guardado y aplicado',
+  );
+  expect(find.text('Aplicado'), findsOneWidget, reason: 'estado Aplicado');
+  expect(app.schedule.resolve(qaToday).shiftIds, isEmpty);
+  await t.tapAndSettle(find.text('Deshacer'), reason: 'Deshacer lo aplicado');
+  expect(app.schedule.resolve(qaToday).shiftIds, const ['night']);
+  expect(
+    find.text('Sin aplicar'),
+    findsOneWidget,
+    reason: 'estado Sin aplicar',
+  );
   expect(find.text('Pendiente'), findsOneWidget);
   final stored = await app.query(
     'SELECT id, colleague, direction, given_shift_type_ids, status '
@@ -84,10 +101,9 @@ Future<void> _book(QaContext qa) async {
   t.platformDispatcher.platformBrightnessTestValue = Brightness.light;
   await t.settle();
 
-  // Applied to the calendar: the day loses the shift, in ONE undo step.
-  expect(app.schedule.resolve(qaToday).shiftIds, const ['night']);
-  await t.tapAndSettle(_key('swap-menu-$id'), reason: 'menú del cambio');
-  await t.tapAndSettle(_key('swap-menu-apply'), reason: 'Aplicar al cuadrante');
+  // Applied to the calendar with the button of the card: the day loses the
+  // shift, in ONE undo step.
+  await t.tapAndSettle(_key('swap-apply-$id'), reason: 'Aplicar al cuadrante');
   await t.waitFor(
     find.text('Cambio aplicado al cuadrante'),
     reason: 'el aviso de aplicado',
@@ -126,7 +142,11 @@ Future<void> _book(QaContext qa) async {
   );
   await t.tapAndSettle(find.text('Aceptar'), reason: 'Aceptar el día');
   await t.waitFor(find.text('Devuelto'), reason: 'el estado Devuelto');
-  expect(find.text('Nada pendiente'), findsOneWidget, reason: 'el balance a cero');
+  expect(
+    find.text('Nada pendiente'),
+    findsOneWidget,
+    reason: 'el balance a cero',
+  );
   final returned = await app.query(
     "SELECT return_date, status FROM shift_swaps WHERE id = '$id'",
   );

@@ -13,7 +13,84 @@ class SpanishRegion {
 
   /// INE provinces, two digits.
   final List<String> provinces;
+
+  /// The name in the app's language (`es`, `ca`, `gl`, `eu`, `en`), like the
+  /// countries of `holiday_country.dart`; [name] (Spanish, the one the data
+  /// files use) for a language with no column.
+  String nameIn(String languageCode) =>
+      _regionNames[code]?[languageCode] ?? name;
 }
+
+Map<String, String> _n(String ca, String gl, String eu, String en) => {
+  'ca': ca,
+  'gl': gl,
+  'eu': eu,
+  'en': en,
+};
+
+/// Names of the 19 in Catalan, Galician, Basque and English (Spanish is
+/// [SpanishRegion.name]). The official names in each language.
+final Map<String, Map<String, String>> _regionNames = {
+  'ES-AN': _n('Andalusia', 'Andalucía', 'Andaluzia', 'Andalusia'),
+  'ES-AR': _n('Aragó', 'Aragón', 'Aragoi', 'Aragon'),
+  'ES-AS': _n(
+    'Principat d’Astúries',
+    'Principado de Asturias',
+    'Asturiasko Printzerria',
+    'Asturias',
+  ),
+  'ES-IB': _n(
+    'Illes Balears',
+    'Illas Baleares',
+    'Balear Uharteak',
+    'Balearic Islands',
+  ),
+  'ES-CN': _n('Canàries', 'Canarias', 'Kanariak', 'Canary Islands'),
+  'ES-CB': _n('Cantàbria', 'Cantabria', 'Kantabria', 'Cantabria'),
+  'ES-CL': _n(
+    'Castella i Lleó',
+    'Castela e León',
+    'Gaztela eta Leon',
+    'Castile and León',
+  ),
+  'ES-CM': _n(
+    'Castella-la Manxa',
+    'Castela-A Mancha',
+    'Gaztela-Mantxa',
+    'Castilla-La Mancha',
+  ),
+  'ES-CT': _n('Catalunya', 'Cataluña', 'Katalunia', 'Catalonia'),
+  'ES-EX': _n('Extremadura', 'Estremadura', 'Extremadura', 'Extremadura'),
+  'ES-GA': _n('Galícia', 'Galicia', 'Galizia', 'Galicia'),
+  'ES-RI': _n('La Rioja', 'A Rioxa', 'Errioxa', 'La Rioja'),
+  'ES-MD': _n(
+    'Comunitat de Madrid',
+    'Comunidade de Madrid',
+    'Madrilgo Erkidegoa',
+    'Community of Madrid',
+  ),
+  'ES-MC': _n(
+    'Regió de Múrcia',
+    'Rexión de Murcia',
+    'Murtziako Eskualdea',
+    'Region of Murcia',
+  ),
+  'ES-NC': _n(
+    'Comunitat Foral de Navarra',
+    'Comunidade Foral de Navarra',
+    'Nafarroako Foru Komunitatea',
+    'Navarre',
+  ),
+  'ES-PV': _n('País Basc', 'País Vasco', 'Euskadi', 'Basque Country'),
+  'ES-VC': _n(
+    'Comunitat Valenciana',
+    'Comunidade Valenciana',
+    'Valentziako Erkidegoa',
+    'Valencian Community',
+  ),
+  'ES-CE': _n('Ceuta', 'Ceuta', 'Ceuta', 'Ceuta'),
+  'ES-ML': _n('Melilla', 'Melilla', 'Melilla', 'Melilla'),
+};
 
 const List<SpanishRegion> spanishRegions = [
   SpanishRegion('ES-AN', 'Andalucía', [

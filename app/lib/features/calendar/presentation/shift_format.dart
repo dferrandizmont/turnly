@@ -132,3 +132,13 @@ String durationText(AppLocalizations l10n, int minutes) {
   }
   return l10n.durationMinutes(minutes);
 }
+
+final RegExp _numberThenUnit = RegExp(r'(\d) (?=\S)');
+
+/// [durationText] with each number glued to its unit by a no-break space: a
+/// narrow line wraps «10 h» whole, never «10» / «h» (Android 0.12.1 QA, C1:
+/// the side pane in landscape at the largest text size).
+String durationTextUnbroken(AppLocalizations l10n, int minutes) => durationText(
+  l10n,
+  minutes,
+).replaceAllMapped(_numberThenUnit, (m) => '${m[1]}\u00A0');

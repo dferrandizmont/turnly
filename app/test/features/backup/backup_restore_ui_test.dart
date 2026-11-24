@@ -11,6 +11,7 @@ import 'package:cuadrante/features/backup/data/backup_files.dart'
 import 'package:cuadrante/features/backup/data/icloud_backup_store.dart';
 import 'package:cuadrante/features/backup/data/platform_backup_channel.dart';
 import 'package:cuadrante/features/backup/domain/backup_codec.dart';
+import 'package:cuadrante/features/backup/domain/backup_data.dart';
 import 'package:cuadrante/features/notes/domain/note_attachment.dart';
 import 'package:cuadrante/features/backup/domain/schedule_fingerprint.dart';
 import 'package:cuadrante/features/calendar/application/schedule_controller.dart';
@@ -145,6 +146,30 @@ void main() {
   });
 
   group('importing', () {
+    testWidgets('restore reports when a legacy swap record needed recovery', (
+      tester,
+    ) async {
+      final h = BackupUiHarness(tester);
+      await h.open();
+      final data = BackupData(settings: {'swaps.applied': '{'}).toJson();
+      final legacy = gzipEnvelope({
+        'format': BackupCodec.formatName,
+        'schemaVersion': 4,
+        'appVersion': testAppVersion,
+        'exportedAt': '2026-11-10T00:00:00.000Z',
+        'data': data,
+        'checksum': BackupCodec.checksumOfJson(data),
+      });
+      await importFile(tester, h, legacy);
+      await confirm(tester);
+
+      expect(
+        find.textContaining('Algunos registros de cambios de turno'),
+        findsOneWidget,
+      );
+      expect(find.text('Listo, tu cuadrante está restaurado'), findsNothing);
+    });
+
     testWidgets('confirming restores the file, reloads and shows the '
         'calendar (R4)', (tester) async {
       final h = BackupUiHarness(tester);
@@ -279,7 +304,7 @@ void main() {
       'a newer version (R6)': (
         gzipEnvelope({
           'format': 'cuadrante',
-          'schemaVersion': 5,
+          'schemaVersion': 6,
           'appVersion': '9.9.9',
           'exportedAt': '2030-01-01T00:00:00Z',
           'data': {'calendars': <Object?>[]},

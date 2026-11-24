@@ -247,6 +247,17 @@ void main() {
       expect(find.textContaining('La copia está completa'), findsNothing);
     });
 
+    testWidgets('incomplete verification reports the omitted swaps', (
+      tester,
+    ) async {
+      await show(tester, const VerificationIncomplete());
+      expect(
+        find.textContaining('Algunos registros de cambios de turno'),
+        findsOneWidget,
+      );
+      expect(find.textContaining('La copia está completa'), findsNothing);
+    });
+
     testWidgets('mismatch without a day: only stored data differs', (
       tester,
     ) async {

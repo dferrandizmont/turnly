@@ -52,8 +52,8 @@ ordenadas en todos los niveles, sin espacios ni saltos de línea), de modo que l
 }
 ```
 
-La app escribe siempre la versión 4 (desde la base de datos v7, las horas extra en bloques; ver «Versión 4»). Los
-archivos de las versiones 0.1.0 y 0.2.0 son de la versión 1, los de la 0.3.0 a la 0.5.0 de la versión 2, los de la
+La app escribe la versión 4 para las copias sin registros de aplicación de cambios y la versión 5 cuando los incluye.
+Los archivos de las versiones 0.1.0 y 0.2.0 son de la versión 1, los de la 0.3.0 a la 0.5.0 de la versión 2, los de la
 0.6.0 a la 1.0 de la versión 3, y se siguen leyendo (ver «Versiones»).
 
 | Campo | Tipo | Significado |
@@ -84,6 +84,7 @@ versión 3 (marcados abajo), que solo se escriben si tienen valor** (ver «Por q
 | `noteAttachments` | (v6, opcional) los adjuntos de las notas: ver «Esquema v6» | por `id` |
 | `dayTasks` | (v6, opcional) las tareas de los días | por `id` |
 | `shiftSwaps` | (v6, opcional) el libro de cambios | por `id` |
+| `swapApplications` | (formato 5, esquema Drift v8) excepciones previas de cambios aplicados | por `swapId` y `date` |
 
 Los patrones son la única lista que no va ordenada por `id`: la tabla no tiene columna de orden y la app los muestra
 en el orden en que se crearon, así que ese orden es dato. Al restaurar se insertan en ese orden.
@@ -415,8 +416,9 @@ de perder datos en silencio** (apartado 1, «Por qué se sube la versión»). En
      (clave ausente = `null`). `overtimeTypes` y `overtimeBlocks` se ignoran aunque vengan.
    - **Leer un v4 (`_decodeV4`, `BackupData.fromJson(readOvertime: true)`):** lo de la v3 más los tipos y bloques de
      horas extra (ver «Versión 4»).
-2. El escritor escribe solo la versión más reciente (`supportedSchemaVersion` = 4, desde la base de datos v7). Nada
-   vuelve a escribir un v1, un v2 ni un v3. (Las pruebas reconstruyen esas formas a mano: `test/features/backup/v1_format.dart` y `v2_format.dart`.)
+   - **Leer un v5 (`_decodeV5`):** lo de la v4 más `swapApplications`.
+2. El escritor usa la versión 5 cuando hay registros de aplicación de cambios. Las demás copias se escriben en v4.
+   Las pruebas reconstruyen los formatos anteriores con `test/features/backup/v1_format.dart` y `v2_format.dart`.
 3. Una app vieja ante un archivo de **versión de formato superior** dice que el archivo viene de una versión más reciente (`NewerFormatVersion`) y
    no toca nada. La pantalla debe proponer actualizar la app.
 4. El archivo de referencia `app/test/fixtures/golden_backup/golden_v1.cuadrante` se queda para siempre y se añade
@@ -1255,3 +1257,21 @@ copias verificadas y no participa en la rotación de las automáticas ni en iClo
 verificar se elimina antes de fallar y nunca sustituye una copia buena. Se muestra como copia de seguridad en
 Recuperar, también desde el primer uso. La copia diaria en una carpeta se desactiva y olvida su permiso; los
 archivos que ya había en esa carpeta se conservan.
+
+## Formato 5: cambios aplicados al cuadrante
+
+Una copia con registros de aplicación usa el formato 5. **Ninguna versión publicada ha escrito el formato 5** (solo compilaciones internas de M4), así que no hay copias v5 de usuarios con registros solapados que reparar; el tratamiento de los solapes de abajo es una red de seguridad. `swapApplications` contiene `swapId`, `date`, `previousShiftTypeIds` (lista, lista vacía o `null`) y `createdAt`. `appliedOverride` indica la excepción que escribió el cambio. Puede ser una lista, una lista vacía o `null` si se recuperó la rotación. Cuando falta, el registro antiguo carece de esa información y la app conserva el día al intentar deshacer el cambio. Cada par de cambio y fecha es único y debe apuntar a una ficha del libro. Como en la base de datos, un día de un calendario admite un solo cambio aplicado: si la copia trae dos o más, al restaurar o probarla se queda el primero (por `createdAt` y luego por `swapId`) y las filas de los demás cambios pasan enteras a una clave `swaps.applied.recovery` con `{"overlapping": [...]}`; la restauración avisa como con los registros rechazados. Las copias sin filas de aplicación se escriben en formato 4. El lector de formato 5 admite una lista de aplicaciones vacía o ausente.
+
+Al restaurar una copia anterior, el ajuste `swaps.applied` se traslada a la tabla con las mismas reglas que en la migración de Drift a v8. Los registros rechazados se conservan como JSON en `swaps.applied.recovery` y viajan en las siguientes copias. Si el ajuste entero es ilegible, se conserva el valor original. La restauración y «Probar restauración» avisan de los registros omitidos. La huella incluye las entidades convertidas y los datos de recuperación. La prueba automatizada de R4 cubre estas rutas y distingue la lista vacía de `null` (`swaps_backup_test.dart`).
+
+| Caso de la matriz | Archivo del escritor nuevo | Lector | Resultado esperado |
+|---|---|---|---|
+| R4 | Formato 4 sin filas de aplicación, en gzip y ZIP con adjuntos | iOS 1.2.3 y Android 0.12.0 | Abre y restaura las entidades y, en ZIP, los adjuntos. |
+| R6 | Formato 5 con filas de aplicación, en gzip y ZIP con adjuntos | iOS 1.2.3 y Android 0.12.0 | Pide actualizar Turnly. Conserva la base de datos actual. |
+| R6 | Formato 5 en gzip o en ZIP con adjuntos | Lectores antiguos compatibles con ZIP cuyo máximo es 3 o 4 (por ejemplo, Android 0.9.0 admite hasta 3) | Pide actualizar Turnly. Conserva la base de datos actual. |
+| R6 | Formato 5 en gzip | Lectores antiguos que solo leen gzip (por ejemplo, Android 0.6.0) | Rechaza la versión y pide actualizar Turnly. Conserva la base de datos actual. |
+| R6 | Formato 5 en ZIP con adjuntos | Lectores antiguos que solo leen gzip (por ejemplo, Android 0.6.0) | Rechaza el archivo como formato desconocido antes de leer la versión. Conserva la base de datos actual. |
+| R6 | Formato 4 en gzip del escritor nuevo | Lectores que solo leen gzip cuyo máximo es anterior a 4 (por ejemplo, Android 0.6.0) | Rechaza la versión. Conserva la base de datos actual. |
+| R6 | Formato 4 en gzip o en ZIP con adjuntos | Lectores compatibles con ZIP cuyo máximo es 3 (por ejemplo, Android 0.9.0) | Rechaza la versión. Conserva la base de datos actual. |
+
+`golden_v5.cuadrante` fija los bytes canónicos y la huella de la matriz para una copia con registros de aplicación.

@@ -117,20 +117,12 @@ Future<void> _preview(QaContext qa) async {
 
   await _openWizardOn(t, '24x72');
   await t.tapAndSettle(_key('pattern-start-date'));
+  // One tap on the day chooses it and closes the sheet.
   await t.tap(
     find.descendant(
-      of: find.byType(DatePickerDialog),
+      of: find.byKey(const ValueKey('date-sheet')),
       matching: find.text('29'),
     ),
-  );
-  await t.settle();
-  await t.tap(
-    find
-        .descendant(
-          of: find.byType(DatePickerDialog),
-          matching: find.byType(TextButton),
-        )
-        .last,
   );
   await t.settle();
   await t.tapAndSettle(_key('offset-1'));

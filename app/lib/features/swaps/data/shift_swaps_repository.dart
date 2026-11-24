@@ -60,12 +60,12 @@ class ShiftSwapsRepository {
         if (calendarId != null) where = where & t.calendarId.equals(calendarId);
         if (status != null) where = where & t.status.equals(status.name);
         return where;
-      });
+      }).map((row) => row.toSwap()).get();
 
   /// The swaps of [date] in [calendarId].
   Future<List<ShiftSwap>> forDay(String calendarId, CivilDate date) => _ordered(
     (t) => t.calendarId.equals(calendarId) & t.date.equals(date.toIso()),
-  );
+  ).map((row) => row.toSwap()).get();
 
   Future<ShiftSwap?> byId(String id) async {
     final row = await (_db.select(
@@ -73,6 +73,11 @@ class ShiftSwapsRepository {
     )..where((t) => t.id.equals(id))).getSingleOrNull();
     return row?.toSwap();
   }
+
+  Stream<List<ShiftSwap>> watchCalendar(String calendarId) =>
+      _ordered((t) => t.calendarId.equals(calendarId))
+          .watch()
+          .map((rows) => [for (final row in rows) row.toSwap()]);
 
   /// Inserts or replaces [swap] (by id). Throws [ArgumentError] when it is
   /// not valid ([ShiftSwap.problem]), without writing.
@@ -106,18 +111,13 @@ class ShiftSwapsRepository {
         return next;
       });
 
-  Future<List<ShiftSwap>> _ordered(
+  Selectable<ShiftSwapRow> _ordered(
     Expression<bool> Function($ShiftSwapsTable t) filter,
-  ) async {
-    final rows =
-        await (_db.select(_db.shiftSwaps)
-              ..where(filter)
-              ..orderBy([
-                (t) => OrderingTerm.desc(t.date),
-                (t) => OrderingTerm.desc(t.createdAt),
-                (t) => OrderingTerm.asc(t.id),
-              ]))
-            .get();
-    return [for (final row in rows) row.toSwap()];
-  }
+  ) => _db.select(_db.shiftSwaps)
+    ..where(filter)
+    ..orderBy([
+      (t) => OrderingTerm.desc(t.date),
+      (t) => OrderingTerm.desc(t.createdAt),
+      (t) => OrderingTerm.asc(t.id),
+    ]);
 }

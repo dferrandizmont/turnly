@@ -150,7 +150,7 @@ class PlaceStep extends ConsumerWidget {
         key: const ValueKey('onboarding-region'),
         label: l10n.onboardingRegionLabel,
         placeholder: l10n.onboardingRegionPick,
-        value: region?.name,
+        value: region == null ? null : regionLabel(context, region),
         onTap: () async {
           // The same sheet and list as Ajustes › Festivos (H-T10-3): the 19
           // in alphabetical order, the current one marked.

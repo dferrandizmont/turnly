@@ -418,6 +418,8 @@ capa de datos**: sin pantallas, el motor no cambia de comportamiento. Todo lo nu
 | `day_tasks` (nueva) | `id` TEXT PK, `calendar_id` → `calendars.id` (cascada), `date`, `title`, `done` = false, `sort_order` = 0, `created_at`, `updated_at`; índice (`calendar_id`, `date`) | Lista de casillas de un día. CHECK: título no en blanco y hasta 500. |
 | `shift_swaps` (nueva) | `id` TEXT PK, `calendar_id` → `calendars.id` (cascada), `date`, `colleague`, `direction` (`theyOwe`/`iOwe`), `given_shift_type_ids`?, `received_shift_type_ids`? (JSON), `return_date`?, `status` (`pending`/`returned`) = `pending`, `note`?, `created_at`, `updated_at`, `closed_at`?; índice (`calendar_id`, `date`) | El libro de cambios: «me debe / le debo». CHECK: compañero no en blanco y hasta 200; nota hasta 2000; `closed_at` existe **exactamente** cuando el estado es `returned`. No cambia el calendario por sí solo. |
 
+«Aplicado» o «Sin aplicar» se lee del calendario (`swapApplicationOf`). El registro de las excepciones que escribió el cambio se guarda desde la v8 (ver «Esquema v8»).
+
 ### Decisiones
 - **Tareas en tabla propia, no JSON en `day_entries.tasks`.** La fila de `day_entries` la gestiona el motor: existe solo
   si el día guarda algo y se borra cuando queda vacía, y pasa por deshacer, copiar y pegar, la huella... Con las tareas
@@ -630,11 +632,23 @@ un tipo en uso y la cascada al borrar un calendario). Las pruebas de cada paso a
 - **Tabla propia y no JSON en `day_entries`**, pero viajan con el día por el motor (deshacer, copiar, pegar, huella)
   como el importe extra: un bloque es una anotación del día.
 
+## Esquema v8: registro de los cambios aplicados al cuadrante
+
+| Tabla | Columnas | Detalle |
+|---|---|---|
+| `swap_applications` | `swap_id` TEXT → `shift_swaps.id` (cascada), `calendar_id` TEXT → `calendars.id` (cascada; siempre el calendario del cambio), `date` TEXT (`CivilDate`), `previous_shift_type_ids` TEXT NULL (JSON), `applied_override` TEXT NULL (JSON), `created_at` INT (ms UTC). PK (`swap_id`, `date`); índice único `idx_swap_applications_day` (`calendar_id`, `date`). | Una fila por día que el cambio modificó. **Como mucho un cambio aplicado por día**, garantizado por el índice único: ninguna ruta (aplicar, deshacer y rehacer, restaurar, migrar) puede guardar dos; si lo intenta, falla la transacción entera y no se escribe nada. Aplicar un cambio sobre un día que ya tiene el registro de otro cambio del mismo calendario se rechaza sin escribir nada (desde el interruptor de la ficha, el botón de la tarjeta o el «Aplicar» del aviso), y el aviso dice qué día y con quién. Así, quitar un cambio del cuadrante solo puede devolver lo que ese cambio sustituyó. `applied_override` distingue entre un registro antiguo sin información (NULL en SQL), la rotación (`null` en JSON) y un día explícitamente vacío (`[]`). Al reaplicar se conserva el primer «antes» y se actualiza la excepción escrita. |
+
+Los días y sus registros pasan por la cola del cuadrante y se guardan en una misma transacción. El trabajo de un cambio va en estricto orden de cola, como cualquier edición, y dentro de esa transacción lee de la base de datos la ficha, sus registros, los registros de los demás cambios del calendario (quién tiene cada día) y los días del cambio tal como están guardados, con sus horas extra (fechas actuales, nuevas y las de sus registros); las rotaciones y los tipos de turno salen de la memoria. Si la memoria y el disco no coinciden en esos días, manda el disco y la pantalla toma los días guardados. Si una edición encolada después todavía tiene que escribir uno de esos días, el cambio se rechaza sin escribir nada («No se ha podido guardar el cambio. Prueba otra vez.»): esa escritura de día entero llevaría el día de antes del cambio. Así un cambio de dos días nunca se aplica a medias. Un deshacer o rehacer de un cambio cuenta como pendiente en todas las fechas de los registros que sustituye y devuelve y de la ficha, y en el propio cambio: un «Aplicar» de ese cambio encolado antes se rechaza. Además, al escribir los registros se comprueba que los guardados son los que el paso esperaba; si no, falla la transacción entera. Un deshacer que devolvería el registro de un día que ya tiene otro cambio choca con el índice: falla, la app recarga lo guardado y avisa.
+
+El paso v7 → v8 crea la tabla y su índice único, traslada `settings['swaps.applied']` y elimina esa clave en la misma transacción. Conserva las fechas y listas válidas, con `shift_swaps.updated_at` como fecha de creación porque el ajuste antiguo carecía de marca de tiempo. Los cambios huérfanos o malformados se conservan enteros en `swaps.applied.recovery`. Si dos cambios del mismo calendario tienen registro en un mismo día, se queda el primero (por fecha y luego por id) y los demás pasan **enteros** a otra clave de recuperación (`{"overlapping": [filas]}`). Si el ajuste entero es ilegible, se guarda su valor original. Si no existe, no hay nada que trasladar. La copia automática `pre-v7-a-v8-<fecha>.sqlite` conserva el ajuste original. La prueba simula un fallo en el traslado, reintenta la migración y comprueba los datos y la copia tras reabrir (`migration_v7_to_v8_test.dart`).
+
+Las copias exportadas incluyen las filas en `swapApplications`. Al restaurar o probar una copia, los cambios que comparten día con otro del mismo calendario se tratan igual que en la migración (el primero se queda, los demás a recuperación) y se avisa. La restauración convierte también el ajuste de las copias antiguas. «Probar restauración» incluye el registro en la huella de entidades.
+
 ## Migraciones
-- `schemaVersion` es 7 (la 1 fue la de las versiones 0.1.0 y 0.2.0; la 2, la de 0.3.0 a 0.5.0; la 3 añadió los
+- `schemaVersion` es 8 (la 1 fue la de las versiones 0.1.0 y 0.2.0; la 2, la de 0.3.0 a 0.5.0; la 3 añadió los
   campos de paridad de la 0.6.0; la 4, el plus fijo; la 5, las versiones de un tipo; la 6, la base de las funciones
   de pago que damos gratis: adjuntos, tareas, cambios, saldos, lugar, pluses por hora e importe por día; la 7, las
-  horas extra en bloques con tipo, horario y precio). Esquemas guardados con
+  horas extra en bloques con tipo, horario y precio; la 8, el registro de cambios aplicados al cuadrante). Esquemas guardados con
   `dart run drift_dev make-migrations` (configurado en `build.yaml`, carpeta `app/drift_schemas/`), que también
   genera las pruebas de migración y los pasos (`stepByStep`). Cada versión nueva: subir `schemaVersion`, ejecutar
   `make-migrations`, escribir el paso (en su propio archivo, como `migration_v1_to_v2.dart`, dentro de una
@@ -642,8 +656,9 @@ un tipo en uso y la cascada al borrar un calendario). Las pruebas de cada paso a
   regenera también `test/drift/app_database/generated/` (se sube con el cambio).
 - **Copia previa a la migración:** antes de abrir con Drift, se lee `PRAGMA user_version` del archivo; si es menor
   que `schemaVersion` (y mayor que 0), se copia el archivo a `backups/pre-v{origen}-a-v{destino}-{fecha}.sqlite`
-  dentro de Application Support. Se guardan las 3 últimas. **Una sola copia por destino:** si ya existe un
-  `pre-v*-a-v{destino}-*`, no se hace otra. Si v1 → v2 confirma y v2 → v3 falla en cada arranque, la copia buena es
+  dentro de Application Support. Primero se escribe y verifica un archivo temporal en esa misma carpeta y luego se
+  renombra. Se guardan las 3 últimas. **Una sola copia por destino:** si ya existe un
+  `pre-v*-a-v{destino}-*` íntegro, se reutiliza. Una copia solo se borra si la comprobación **demuestra** que está incompleta (más corta de lo que dice su cabecera, sin cabecera de SQLite o con SQLite diciendo que está dañada); si no se puede comprobar (bloqueada, error de lectura), se conserva y se hace otra al lado, con el sufijo siguiente al mayor de ese segundo (`…-<fecha>-2.sqlite`, o `-6` si existen `-3` a `-5`): nunca se sobrescribe, y al podar nunca se borra la copia recién hecha (tampoco la copia previa a restaurar, aunque haya copias con fecha posterior por un reloj atrasado). Si v1 → v2 confirma y v2 → v3 falla en cada arranque, la copia buena es
   la primera (`pre-v1-a-v3-*`, los datos antes de tocar nada); una copia por arranque la habría borrado a la tercera
   pasada. Además, al podar nunca se borra la copia más antigua del destino actual. Con pruebas
   (`migration_backup_test.dart`, `upgrade_from_v2_test.dart`).
