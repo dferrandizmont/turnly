@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -28,6 +30,7 @@ import '../../settings/application/preferences_controller.dart';
 import '../../settings/presentation/withholding_sheet.dart';
 import '../../year/application/year_providers.dart';
 import '../../year/presentation/year_image.dart';
+import '../../calendar/presentation/month_fit.dart';
 import '../../calendar/presentation/overtime_format.dart';
 import '../../calendar/presentation/shift_badge.dart';
 import '../../calendar/presentation/shift_format.dart';
@@ -280,43 +283,48 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
             Sp.section,
           ),
           children: [
-            ChoiceGrid.pills(
-              sizing: ChoiceGridSizing.wholeLabel,
-              maxColumns: 4,
-              pills: [
-                ChoicePill(
-                  expand: true,
-                  reserveIcon: true,
-                  key: const ValueKey('summary-mode-month'),
-                  label: l10n.summaryModeMonth,
-                  selected: _period == _Period.month,
-                  onTap: () => _setPeriod(_Period.month),
-                ),
-                ChoicePill(
-                  expand: true,
-                  reserveIcon: true,
-                  key: const ValueKey('summary-mode-quarter'),
-                  label: l10n.moneyModeQuarter,
-                  selected: _period == _Period.quarter,
-                  onTap: () => _setPeriod(_Period.quarter),
-                ),
-                ChoicePill(
-                  expand: true,
-                  reserveIcon: true,
-                  key: const ValueKey('summary-mode-year'),
-                  label: l10n.summaryModeYear,
-                  selected: _yearView,
-                  onTap: () => _setPeriod(_Period.year),
-                ),
-                ChoicePill(
-                  expand: true,
-                  reserveIcon: true,
-                  key: const ValueKey('summary-mode-range'),
-                  label: l10n.summaryModeRange,
-                  selected: _period == _Period.range,
-                  onTap: () => _setPeriod(_Period.range),
-                ),
-              ],
+            // The period buttons stop growing at the header's size (QA 0.12.1,
+            // C3): at x2.0 they stacked four full-width rows and pushed the
+            // figures below the first view. Everything under them keeps the
+            // reader's size.
+            MediaQuery.withClampedTextScaling(
+              maxScaleFactor: MonthFit.headerMaxScale,
+              child: _PeriodPills(
+                pills: [
+                  ChoicePill(
+                    expand: true,
+                    reserveIcon: true,
+                    key: const ValueKey('summary-mode-month'),
+                    label: l10n.summaryModeMonth,
+                    selected: _period == _Period.month,
+                    onTap: () => _setPeriod(_Period.month),
+                  ),
+                  ChoicePill(
+                    expand: true,
+                    reserveIcon: true,
+                    key: const ValueKey('summary-mode-quarter'),
+                    label: l10n.moneyModeQuarter,
+                    selected: _period == _Period.quarter,
+                    onTap: () => _setPeriod(_Period.quarter),
+                  ),
+                  ChoicePill(
+                    expand: true,
+                    reserveIcon: true,
+                    key: const ValueKey('summary-mode-year'),
+                    label: l10n.summaryModeYear,
+                    selected: _yearView,
+                    onTap: () => _setPeriod(_Period.year),
+                  ),
+                  ChoicePill(
+                    expand: true,
+                    reserveIcon: true,
+                    key: const ValueKey('summary-mode-range'),
+                    label: l10n.summaryModeRange,
+                    selected: _period == _Period.range,
+                    onTap: () => _setPeriod(_Period.range),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: Sp.s),
             Row(
@@ -431,6 +439,73 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
 }
 
 /// Everything under the month switcher.
+/// The four period buttons. In equal columns (the look of every group of
+/// choices) when at least two of them fit across; where the longest name
+/// would make the columns so wide that they stack (Basque «Hiruhilekoa» at
+/// 360 dp and x1.5, C3), each takes the width of its own name and the short
+/// ones share a row.
+class _PeriodPills extends StatelessWidget {
+  const _PeriodPills({required this.pills});
+
+  final List<ChoicePill> pills;
+
+  @override
+  Widget build(BuildContext context) {
+    final compact = pills.any((pill) => pill.compact);
+    double cellOf(Iterable<String> labels) => ChoiceGrid.minCellWidthFor(
+      context,
+      labels: labels,
+      sizing: ChoiceGridSizing.wholeLabel,
+      compact: compact,
+    );
+    return LayoutBuilder(
+      builder: (context, box) {
+        final widest = cellOf([for (final pill in pills) pill.label]);
+        if (ChoiceGrid.columnsFor(box.maxWidth, widest, maxColumns: 4) >= 2) {
+          return ChoiceGrid.pills(
+            sizing: ChoiceGridSizing.wholeLabel,
+            maxColumns: 4,
+            pills: pills,
+          );
+        }
+        // Rows of whole names, each row filled: a pill's share of the row is
+        // its own width.
+        final rows = <List<(ChoicePill, double)>>[[]];
+        var used = 0.0;
+        for (final pill in pills) {
+          final width = math.min(cellOf([pill.label]), box.maxWidth);
+          final next = rows.last.isEmpty ? width : used + Sp.s + width;
+          if (next > box.maxWidth && rows.last.isNotEmpty) {
+            rows.add([]);
+            used = 0;
+          }
+          used = rows.last.isEmpty ? width : used + Sp.s + width;
+          rows.last.add((pill, width));
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (final (i, row) in rows.indexed) ...[
+              if (i > 0) const SizedBox(height: Sp.s),
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (final (j, (pill, width)) in row.indexed) ...[
+                      if (j > 0) const SizedBox(width: Sp.s),
+                      Expanded(flex: width.round(), child: pill),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ],
+        );
+      },
+    );
+  }
+}
+
 class _MonthBody extends ConsumerWidget {
   const _MonthBody({required this.month});
 
@@ -704,6 +779,13 @@ class _DateRow extends StatelessWidget {
   }
 }
 
+/// Whether the line of the hours on holidays shows: only when there are
+/// minutes on a holiday. A shift that touches a holiday but adds up to 0
+/// minutes (a break that is not paid, the last minute of the shift) has
+/// nothing to show, and «Cómo se cuenta» promises the line only appears with
+/// hours (QA 0.12.1, J8).
+bool showHolidayHours(MonthSummary summary) => summary.holidayMinutes > 0;
+
 /// The cards of a period that has shifts.
 class _PeriodBody extends ConsumerWidget {
   const _PeriodBody({
@@ -742,8 +824,7 @@ class _PeriodBody extends ConsumerWidget {
     );
     // «Horas en festivo: 0 h / 0 turnos en festivo» says nothing: like the
     // overtime lines, it is left out when both are 0 (H-T08-6 / H-T10-4).
-    final showHolidays =
-        summary.holidayMinutes > 0 || summary.holidayShifts > 0;
+    final showHolidays = showHolidayHours(summary);
     // B5: what has no data is folded into one line each at the end (the
     // absences when there are none, the pay while no shift has a price).
     final absencesNone = summary.absenceTypes.isEmpty;
@@ -1113,7 +1194,9 @@ class _FoldedCardState extends State<_FoldedCard> {
                 _FoldRow(
                   key: const ValueKey('summary-estimate-fold'),
                   label: l10n.summaryEstimateTitle,
-                  value: l10n.summaryEstimateNoPrices,
+                  value: widget.summary.overtimeMinutes > 0
+                      ? l10n.summaryEstimateExtrasExcluded
+                      : l10n.summaryEstimateNoPrices,
                   expanded: _estimateOpen,
                   onTap: () => setState(() => _estimateOpen = !_estimateOpen),
                 ),
@@ -1344,7 +1427,8 @@ class _Notes extends StatelessWidget {
   /// There is an hours goal: its note shows.
   final bool goal;
 
-  /// The line of the holiday hours shows, so its note does too.
+  /// The line of the holiday hours shows (its note explains it); without it,
+  /// the note says when it appears.
   final bool holidays;
 
   /// A free range: the first note speaks of days, not of months.
@@ -1362,7 +1446,10 @@ class _Notes extends StatelessWidget {
       l10n.summaryStreakHelp,
       if (summary.shiftsWithoutTimes > 0) l10n.summaryNoteNoTimes,
       if (summary.hasExtras) l10n.summaryNoteExtras,
-      if (holidays) l10n.summaryNoteHoliday,
+      // The line only shows with hours on holidays: when it is hidden the
+      // note says so, instead of leaving the person to wonder (QA 0.12.1,
+      // J8).
+      holidays ? l10n.summaryNoteHoliday : l10n.summaryNoteHolidayHidden,
       if (tense != PeriodTense.past) l10n.summaryNoteTense,
       if (goal) l10n.summaryNoteGoal,
       if (closingDay case final day?) l10n.summaryNoteClosingDay(day),

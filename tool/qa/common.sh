@@ -31,6 +31,8 @@ QA_SERIAL=""                 # serial the tests run on
 QA_EMULATOR_STARTED=0        # 1 = this script started it (and will kill it)
 QA_EMULATOR_PID=""
 QA_BG_PIDS=()                # helper loops (screenshot collector, permission grant)
+QA_DEVICE_LOCK_PID=""
+QA_DEVICE_RESERVED=0        # 1 = this run holds the reservation and must release it
 
 qa_log() { echo "[qa] $*"; }
 
@@ -61,10 +63,57 @@ qa_online() {
   "$ADB" devices 2>/dev/null | tr -d '\r' | awk -v s="$1" '$1==s && $2=="device" {found=1} END {exit !found}'
 }
 
+# Give each run its own lock identity, even inside a shared Claude session.
+qa_lock_pid() {
+  local pid="$1" winpid
+  if [ -r "/proc/$pid/winpid" ] && read -r winpid <"/proc/$pid/winpid"; then
+    pid="$winpid"
+  fi
+  printf '%s\n' "$pid"
+}
+
+qa_device_lock() {
+  local lock
+  lock="$(command -v device-lock.sh)" || lock="$HOME/.agents/scripts/device-lock.sh"
+  PATH="${ADB%/*}:$PATH" env -u CLAUDE_CODE_HOST_SESSION_ID -u CLAUDE_CODE_SESSION_ID \
+    sh "$lock" "$@" --owner-pid "$QA_DEVICE_LOCK_PID"
+}
+
+qa_is_u02_avd() {
+  [[ "$1" =~ ^emulator-[0-9]+$ ]] &&
+    qa_online "$1" && [ "$(qa_avd_of "$1")" = Cuadrante_QA ]
+}
+
+qa_owned_device_ready() {
+  [ -n "$QA_DEVICE_LOCK_PID" ] && qa_is_u02_avd "$QA_SERIAL" &&
+    qa_device_lock mine "$QA_SERIAL"
+}
+
+# Only the battery that holds the lock can pass its running AVD to U02.
+qa_borrow_parent_device() {
+  QA_DEVICE_LOCK_PID="$(qa_lock_pid "$PPID")"
+  QA_SERIAL="${QA_DEVICE:-}"
+  if ! qa_owned_device_ready; then
+    QA_SERIAL=""
+    qa_log "U02 necesita un Cuadrante_QA reservado por el proceso padre"
+    return 2
+  fi
+  qa_log "using the battery's reserved Cuadrante_QA ($QA_SERIAL)"
+}
+
 # qa_device_select: sets QA_SERIAL (and QA_EMULATOR_STARTED) or exits.
 #  QA_DEVICE=<serial>  use that device as it is, never kill it.
 #  otherwise           boot QA_AVD on QA_EMULATOR_PORT unless this script's emulator is up.
+#  owned               boot Cuadrante_QA and take a device-lock reservation (U02).
 qa_device_select() {
+  local mode="${1:-}"
+  if [ "$mode" = owned ]; then
+    if [ -n "${QA_DEVICE:-}" ] || [ "$QA_AVD" != Cuadrante_QA ]; then
+      qa_log "U02 arranca su propio Cuadrante_QA; deja QA_DEVICE vacío y usa QA_AVD=Cuadrante_QA"
+      return 2
+    fi
+    QA_DEVICE_LOCK_PID="$(qa_lock_pid "$$")"
+  fi
   if [ -n "${QA_DEVICE:-}" ]; then
     QA_SERIAL="$QA_DEVICE"
     qa_online "$QA_SERIAL" || { qa_log "device $QA_SERIAL is not online"; return 2; }
@@ -76,26 +125,35 @@ qa_device_select() {
   if qa_online "$serial"; then
     local name
     name="$(qa_avd_of "$serial")"
-    if [ "$name" = "$QA_AVD" ]; then
+    if [ "$name" = "$QA_AVD" ] && [ "$mode" != owned ]; then
       QA_SERIAL="$serial"
       qa_log "$QA_AVD already running on $serial: reusing it (not started by this run, will not be stopped)"
       return 0
     fi
-    qa_log "port $QA_EMULATOR_PORT is taken by '$name' (not ours): set QA_EMULATOR_PORT to another even port"
+    qa_log "port $QA_EMULATOR_PORT is already in use by '$name'"
     return 2
   fi
 
   # The same AVD cannot run twice: if somebody else runs it, do not touch it.
   local other name
-  for other in $("$ADB" devices 2>/dev/null | tr -d '\r' | awk '$1 ~ /^emulator-/ && $2=="device" {print $1}'); do
+  for other in $("$ADB" devices 2>/dev/null | tr -d '\r' | awk '$1 ~ /^emulator-/ {print $1}'); do
+    if [ "$mode" = owned ] && [ "$other" = "$serial" ]; then
+      qa_log "port $QA_EMULATOR_PORT is already in use by $other"
+      return 2
+    fi
     name="$(qa_avd_of "$other")"
     if [ "$name" = "$QA_AVD" ]; then
       qa_log "$QA_AVD is already running as $other and it is not ours."
-      qa_log "Use QA_DEVICE=$other to run on it deliberately, or QA_AVD=<another avd>."
+      if [ "$mode" != owned ]; then
+        qa_log "Use QA_DEVICE=$other to run on it deliberately, or QA_AVD=<another avd>."
+      fi
       return 2
     fi
   done
 
+  if [ "$mode" = owned ]; then
+    qa_device_lock who avd-Cuadrante_QA || return 2
+  fi
   qa_log "booting $QA_AVD on port $QA_EMULATOR_PORT"
   local args=(-avd "$QA_AVD" -port "$QA_EMULATOR_PORT" -no-snapshot-save -no-boot-anim -no-audio)
   if [ "${QA_WINDOW:-0}" != 1 ]; then
@@ -109,6 +167,10 @@ qa_device_select() {
 
   local waited=0
   until qa_online "$serial"; do
+    if [ "$mode" = owned ] && ! kill -0 "$QA_EMULATOR_PID" 2>/dev/null; then
+      qa_log "the emulator process exited before connecting (see $QA_OUT/emulator.log)"
+      return 2
+    fi
     sleep 2
     waited=$((waited + 2))
     if [ "$waited" -ge 120 ]; then
@@ -116,6 +178,11 @@ qa_device_select() {
       return 2
     fi
   done
+  if [ "$mode" = owned ]; then
+    kill -0 "$QA_EMULATOR_PID" 2>/dev/null && qa_is_u02_avd "$serial" &&
+      qa_device_lock take "$serial" --purpose "Turnly QA U02" || return 2
+    QA_DEVICE_RESERVED=1
+  fi
   waited=0
   until [ "$(qa_adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = "1" ]; do
     sleep 3
@@ -207,14 +274,22 @@ qa_cleanup() {
   done
 
   if [ "$QA_EMULATOR_STARTED" = 1 ] && [ -n "$QA_SERIAL" ]; then
-    qa_log "stopping the emulator this run started ($QA_SERIAL)"
-    "$ADB" -s "$QA_SERIAL" emu kill >/dev/null 2>&1 || true
-    local i
-    for i in $(seq 1 20); do
-      qa_online "$QA_SERIAL" || break
-      sleep 1
-    done
-    qa_online "$QA_SERIAL" && qa_kill_tree "$QA_EMULATOR_PID"
+    if [ -z "$QA_DEVICE_LOCK_PID" ] ||
+        { [ "$QA_DEVICE_RESERVED" = 1 ] && qa_owned_device_ready; }; then
+      qa_log "stopping the emulator this run started ($QA_SERIAL)"
+      "$ADB" -s "$QA_SERIAL" emu kill >/dev/null 2>&1 || true
+      local i
+      for i in $(seq 1 20); do
+        qa_online "$QA_SERIAL" || break
+        sleep 1
+      done
+      qa_online "$QA_SERIAL" && qa_kill_tree "$QA_EMULATOR_PID"
+    else
+      qa_kill_tree "$QA_EMULATOR_PID"
+    fi
+  fi
+  if [ "$QA_DEVICE_RESERVED" = 1 ] && qa_device_lock mine avd-Cuadrante_QA; then
+    qa_device_lock release avd-Cuadrante_QA || true
   fi
 
   # No `gradlew --stop`: it stops the daemons of every session on the machine.

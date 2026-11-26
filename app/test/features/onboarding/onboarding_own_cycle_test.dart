@@ -7,6 +7,7 @@ import 'package:cuadrante/features/onboarding/data/onboarding_repository.dart';
 import 'package:cuadrante/features/patterns/application/pattern_wizard.dart';
 import 'package:cuadrante/features/schedule/data/schedule_repository.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
+import 'package:cuadrante/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -308,8 +309,7 @@ void main() {
       await app.chooseRotation();
       expect(
         find.text(
-          'Elige la tuya o créala en un momento. Luego dices cuándo '
-          'empiezas.',
+          lookupAppLocalizations(const Locale('es')).onboardingRotationHelp,
         ),
         findsOneWidget,
       );

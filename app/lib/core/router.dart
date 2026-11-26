@@ -47,6 +47,10 @@ class AppRoutes {
   static const settingsHolidays = '/ajustes/festivos';
   static const settingsAlarms = '/ajustes/alarmas';
   static const settingsBackup = '/ajustes/copia';
+
+  /// The copies screen from «Recuperar una copia de seguridad» in first use:
+  /// «Importar archivo» comes first.
+  static const settingsBackupRecover = '/ajustes/copia?importar=1';
   static const settingsReset = '/ajustes/borrar-todo';
 
   /// «Vacaciones y permisos»: the balances of days of leave of a year (P3).
@@ -182,7 +186,8 @@ GoRouter buildRouter({
       ),
       GoRoute(
         path: AppRoutes.settingsBackup,
-        builder: (c, s) => const BackupScreen(),
+        builder: (c, s) =>
+            BackupScreen(importFirst: s.uri.queryParameters['importar'] == '1'),
       ),
       GoRoute(
         path: AppRoutes.settingsReset,

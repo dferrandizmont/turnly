@@ -4,6 +4,7 @@ import 'package:cuadrante/features/calendar/presentation/month_fit.dart';
 import 'package:cuadrante/features/calendar/presentation/paint_bar.dart';
 import 'package:cuadrante/features/calendar/presentation/today_card.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
+import 'package:cuadrante/features/calendar/presentation/month_summary_strip.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -61,11 +62,18 @@ void main() {
         reason: '$day cannot be hit ($why)',
       );
     }
+    // The six rows are whole in view; the month may scroll only as far as the
+    // strip of the month after them (QA 0.12.1, N6: with no room under the
+    // days it is the card after them, never left out).
+    final strip = find.byType(MonthSummaryStrip);
+    final stripHeight = strip.evaluate().isEmpty
+        ? 0.0
+        : tester.getSize(strip).height;
     final scrollable = monthScrollable(tester);
     expect(
       scrollable.position.maxScrollExtent,
-      lessThan(0.5),
-      reason: 'the month does not scroll ($why)',
+      lessThan(stripHeight + 0.5),
+      reason: 'the month scrolls only to its strip ($why)',
     );
   }
 

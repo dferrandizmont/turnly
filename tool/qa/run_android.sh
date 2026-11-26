@@ -31,7 +31,11 @@ mkdir -p "$QA_OUT/shots"
 # build/ is not in the repo .gitignore: make the output folder ignore itself.
 [ -f "$QA_ROOT/build/.gitignore" ] || echo '*' >"$QA_ROOT/build/.gitignore"
 
-qa_device_select || exit 2
+if [ "${QA_UPGRADE:-0}" = 1 ]; then
+  qa_device_select owned || exit 2
+else
+  qa_device_select || exit 2
+fi
 DEVICE_MODEL="$(qa_adb shell getprop ro.product.model | tr -d '\r')"
 DEVICE_API="$(qa_adb shell getprop ro.build.version.sdk | tr -d '\r')"
 qa_log "device $QA_SERIAL: $DEVICE_MODEL, API $DEVICE_API"
@@ -75,10 +79,9 @@ REPORT_RC=$?
 qa_log "done in ${DURATION}s. Report: $QA_OUT/report.md (flutter exit $FLUTTER_RC)"
 UPGRADE_RC=0
 if [ "${QA_UPGRADE:-0}" = 1 ]; then
-  # U02 on the emulator this run already has (QA_DEVICE: it is never stopped by the
-  # child; this script's trap stops it if it started it). Adds its row to report.md.
+  # U02 verifies our reservation and leaves the emulator for our cleanup.
   qa_log "QA_UPGRADE=1: running U02 (tool/qa/upgrade_android.sh)"
-  QA_DEVICE="$QA_SERIAL" "$QA_ROOT/tool/qa/upgrade_android.sh"
+  QA_DEVICE="$QA_SERIAL" QA_U02_USE_PARENT_LOCK=1 "$QA_ROOT/tool/qa/upgrade_android.sh"
   UPGRADE_RC=$?
 fi
 # The verdict is explicit and printed, so a log (or a person reading it) can see why the run

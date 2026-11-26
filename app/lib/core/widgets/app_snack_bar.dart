@@ -144,12 +144,14 @@ void showTrackedSnackBarAfter(
   required ScaffoldMessengerState messenger,
   required double clearance,
   required Widget content,
+  SnackBarAction? action,
   Duration duration = kSnackBarDuration,
 }) => _showTracked(
   cover,
   messenger,
   clearance,
   content: content,
+  action: action,
   duration: duration,
 );
 

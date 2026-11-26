@@ -21,11 +21,10 @@ void main() {
   const landscape = Size(852, 393);
   Finder key(String k) => find.byKey(ValueKey(k));
 
-  /// Whether [paragraph] wraps only between words. A line may also end after
-  /// the dash of an hour range («22:00–» then «06:00»): each hour stays whole.
+  /// Whether [paragraph] wraps only between words. An hour range counts as one
+  /// word: it never breaks after its dash («22:00–» then «06:00», N1 of 1.2.3).
   bool wholeWords(RenderParagraph paragraph) {
     List<String> words(String text) => text
-        .replaceAll('–', '– ')
         .split(RegExp(r'\s+'))
         .where((w) => w.isNotEmpty)
         .toList();

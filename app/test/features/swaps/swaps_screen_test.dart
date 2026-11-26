@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:cuadrante/app.dart';
 import 'package:cuadrante/core/bootstrap/bootstrap.dart';
 import 'package:cuadrante/core/router.dart';
+import 'package:cuadrante/core/theme/spacing.dart';
+import 'package:cuadrante/core/widgets/buttons.dart';
+import 'package:cuadrante/core/widgets/app_snack_bar.dart';
 import 'package:cuadrante/features/calendar/application/schedule_controller.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
 import 'package:cuadrante/features/swaps/application/swaps_controller.dart';
@@ -11,6 +14,7 @@ import 'package:cuadrante/features/swaps/domain/shift_swap.dart';
 import 'package:cuadrante/features/swaps/presentation/swap_sheet.dart';
 import 'package:cuadrante/features/swaps/presentation/swaps_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -403,6 +407,275 @@ void main() {
     });
   });
 
+  group('the sheet leads the person to what is missing (QA M7, N20)', () {
+    const size = Size(390, 560);
+
+    /// Whether [finder] is inside the visible part of the sheet's form.
+    bool inView(WidgetTester tester, Finder finder) {
+      final scroll = tester.getRect(
+        find
+            .descendant(
+              of: find.byType(BottomSheet),
+              matching: find.byType(SingleChildScrollView),
+            )
+            .first,
+      );
+      final rect = tester.getRect(finder);
+      return rect.top >= scroll.top - 0.5 && rect.bottom <= scroll.bottom + 0.5;
+    }
+
+    testWidgets('save with the name empty takes you to the field', (
+      tester,
+    ) async {
+      await pumpCalendar(tester, size: size);
+      await _open(tester);
+      await _openSheet(tester);
+      // The person is down in the form, the name out of sight.
+      await tester.ensureVisible(_key('swap-field-note'));
+      await tester.pumpAndSettle();
+      expect(inView(tester, _key('swap-field-colleague')), isFalse);
+
+      await tester.tap(_key('swap-save'));
+      await _settle(tester);
+      await tester.pumpAndSettle();
+
+      final error = find.text('Escribe con quién es el cambio.');
+      expect(error, findsOneWidget);
+      expect(inView(tester, _key('swap-field-colleague')), isTrue);
+      expect(inView(tester, error), isTrue);
+      final field = tester.widget<TextField>(_key('swap-field-colleague'));
+      expect(field.focusNode!.hasFocus, isTrue);
+      expect(find.text('Nuevo cambio'), findsOneWidget);
+      expect(await _stored(tester), isEmpty);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('with reduced motion it gets there without animating', (
+      tester,
+    ) async {
+      tester.platformDispatcher.accessibilityFeaturesTestValue =
+          const FakeAccessibilityFeatures(disableAnimations: true);
+      addTearDown(
+        tester.platformDispatcher.clearAccessibilityFeaturesTestValue,
+      );
+      await pumpCalendar(tester, size: size);
+      await _open(tester);
+      await _openSheet(tester);
+      await tester.ensureVisible(_key('swap-field-note'));
+      await tester.pumpAndSettle();
+      await tester.tap(_key('swap-save'));
+      // A few frames are enough: there is no scroll animation to wait for.
+      for (var i = 0; i < 5; i++) {
+        await tester.pump();
+      }
+      expect(inView(tester, _key('swap-field-colleague')), isTrue);
+    });
+
+    testWidgets('the name hint reads as an example, not as a filled name', (
+      tester,
+    ) async {
+      await pumpCalendar(tester, size: size);
+      await _open(tester);
+      await _openSheet(tester);
+      expect(find.text('Por ejemplo: Marta'), findsOneWidget);
+    });
+
+    testWidgets('a date picker closes the keyboard before it opens', (
+      tester,
+    ) async {
+      await pumpCalendar(tester, size: size);
+      await _open(tester);
+      await _openSheet(tester);
+      await tester.tap(_key('swap-field-colleague'));
+      await tester.pumpAndSettle();
+      final field = tester.widget<TextField>(_key('swap-field-colleague'));
+      expect(field.focusNode!.hasFocus, isTrue);
+
+      // Straight from the button's callback: a tap would also close the
+      // keyboard through the sheet's own tap-away, hiding what is tested.
+      await tester.ensureVisible(_key('swap-field-return-date'));
+      await tester.pumpAndSettle();
+      tester
+          .widget<SecondaryButton>(_key('swap-field-return-date'))
+          .onPressed!();
+      await tester.pumpAndSettle();
+      expect(find.byType(DatePickerDialog), findsOneWidget);
+
+      // Cancelling does not bring the keyboard back.
+      await tester.tap(find.text('Cancelar'));
+      await tester.pumpAndSettle();
+      expect(find.byType(DatePickerDialog), findsNothing);
+      expect(field.focusNode!.hasFocus, isFalse);
+      expect(tester.testTextInput.isVisible, isFalse);
+    });
+
+    testWidgets(
+      'a focused date button keeps its focus when the picker closes',
+      (tester) async {
+        await pumpCalendar(tester, size: size);
+        await _open(tester);
+        await _openSheet(tester);
+        await tester.ensureVisible(_key('swap-field-return-date'));
+        await tester.pumpAndSettle();
+        final label = find.descendant(
+          of: _key('swap-field-return-date'),
+          matching: find.byType(Text),
+        );
+        final node = Focus.of(tester.element(label));
+        node.requestFocus();
+        await tester.pump();
+        expect(node.hasPrimaryFocus, isTrue);
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await tester.pumpAndSettle();
+        expect(find.byType(DatePickerDialog), findsOneWidget);
+
+        await tester.tap(find.text('Cancelar'));
+        await tester.pumpAndSettle();
+        expect(find.byType(DatePickerDialog), findsNothing);
+        expect(node.hasPrimaryFocus, isTrue);
+      },
+    );
+
+    testWidgets('a note too long by UTF-16 units is refused on the note', (
+      tester,
+    ) async {
+      await pumpCalendar(tester, size: size);
+      await _open(tester);
+      await _openSheet(tester);
+      await tester.enterText(_key('swap-field-colleague'), 'Raúl');
+      // 1,999 letters and an emoji: 2,000 characters, so the field's limit
+      // lets it through, but 2,001 UTF-16 units, which the swap refuses.
+      await tester.ensureVisible(_key('swap-field-note'));
+      await tester.enterText(_key('swap-field-note'), '${'a' * 1999}\u{1F600}');
+      await tester.pumpAndSettle();
+      final note = tester.widget<TextField>(_key('swap-field-note'));
+      expect(note.controller!.text.length, 2001);
+
+      // The person is back at the top, out of sight of the note.
+      FocusManager.instance.primaryFocus?.unfocus();
+      await tester.ensureVisible(_key('swap-field-colleague'));
+      await tester.pumpAndSettle();
+      expect(inView(tester, _key('swap-field-note')), isFalse);
+
+      await tester.tap(_key('swap-save'));
+      await _settle(tester);
+      await tester.pumpAndSettle();
+
+      final error = find.text('La nota es demasiado larga. Acórtala.');
+      expect(error, findsOneWidget);
+      expect(inView(tester, error), isTrue);
+      expect(note.focusNode!.hasFocus, isTrue);
+      expect(find.text('Nuevo cambio'), findsOneWidget);
+      expect(await _stored(tester), isEmpty);
+
+      // Shortened to what fits, it saves.
+      await tester.enterText(_key('swap-field-note'), 'a' * 1999);
+      await tester.pumpAndSettle();
+      expect(error, findsNothing);
+      await _tapSave(tester);
+      expect(find.text('Nuevo cambio'), findsNothing);
+      final stored = (await _stored(tester)).single;
+      expect(stored.note!.length, 1999);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('pasting into a full note keeps the text and the cursor', (
+      tester,
+    ) async {
+      await pumpCalendar(tester, size: size);
+      await _open(tester);
+      await _openSheet(tester);
+      await tester.ensureVisible(_key('swap-field-note'));
+      final full = String.fromCharCodes([
+        for (var i = 0; i < maxSwapNoteLength; i++) 97 + i % 26,
+      ]);
+      await tester.enterText(_key('swap-field-note'), full);
+      await tester.pumpAndSettle();
+      final note = tester.widget<TextField>(_key('swap-field-note'));
+      expect(note.controller!.text, full);
+
+      // The cursor in the middle, then a letter pasted there: the field is
+      // full, so the standard limit refuses the paste and keeps the whole
+      // text and the cursor where they were (nothing at the end is eaten).
+      tester.testTextInput.updateEditingValue(
+        TextEditingValue(
+          text: full,
+          selection: const TextSelection.collapsed(offset: 5),
+        ),
+      );
+      await tester.pump();
+      expect(note.controller!.selection.baseOffset, 5);
+      final pasted = '${full.substring(0, 5)}X${full.substring(5)}';
+      tester.testTextInput.updateEditingValue(
+        TextEditingValue(
+          text: pasted,
+          selection: const TextSelection.collapsed(offset: 6),
+        ),
+      );
+      await tester.pump();
+      expect(note.controller!.text, full);
+      expect(note.controller!.selection.baseOffset, 5);
+    });
+  });
+
+  testWidgets('a notice leaves room under the list (QA N33)', (tester) async {
+    // The clock moves between the two changes, so the book lists them in a
+    // fixed order (the newer one first) and not by their random ids.
+    var now = fixedNow;
+    await pumpCalendar(tester, size: const Size(390, 700), clock: () => now);
+    // Raúl first, so that Marta is the newer card and Raúl's is the lower.
+    final raul = await _register(
+      tester,
+      colleague: 'Raúl',
+      givenShiftTypeIds: const ['afternoon'],
+    );
+    now = now.add(const Duration(minutes: 1));
+    final marta = await _register(tester, givenShiftTypeIds: const ['morning']);
+    await _open(tester);
+    double bottomPadding() => tester
+        .widget<ListView>(find.byType(ListView).first)
+        .padding!
+        .resolve(TextDirection.ltr)
+        .bottom;
+    expect(bottomPadding(), Sp.section);
+
+    final first = _key('swap-apply-${marta.id}');
+    await tester.ensureVisible(first);
+    await tester.pump();
+    await tester.pumpAndSettle();
+    await tester.tap(first);
+    await _settle(tester);
+    expect(find.text('Cambio aplicado al cuadrante'), findsOneWidget);
+
+    final cover = _container(tester).read(snackBarCoverProvider);
+    expect(cover, isNotNull);
+    expect(bottomPadding(), Sp.section + cover!);
+
+    // With the notice still up, the other change's button is in the list,
+    // clear of the notice, and answers a real tap with the refusal.
+    final second = _key('swap-apply-${raul.id}');
+    await tester.drag(find.byType(ListView).first, const Offset(0, -3000));
+    await tester.pump();
+    await tester.pumpAndSettle();
+    expect(find.text('Cambio aplicado al cuadrante'), findsOneWidget);
+    expect(second.hitTestable(), findsOneWidget);
+    await tester.tap(second);
+    await _settle(tester);
+    expect(
+      find.textContaining('ya tiene otro cambio aplicado'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('Marta'), findsWidgets);
+
+    // The notice goes away by itself and the room goes with it.
+    await tester.pump(kSnackBarDuration + const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    expect(_container(tester).read(snackBarCoverProvider), isNull);
+    expect(bottomPadding(), Sp.section);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('a change is marked as returned and as settled', (tester) async {
     await pumpCalendar(tester, size: const Size(390, 1600));
     final swap = await _register(tester);
@@ -413,8 +686,12 @@ void main() {
     expect(find.text('¿Qué día te lo devuelven?'), findsOneWidget);
     await tester.tap(find.text('Aceptar'));
     await _settle(tester);
-    expect(find.text('Devuelto'), findsOneWidget);
-    expect((await _stored(tester)).single.returnDate, isNotNull);
+    expect(find.text('Con fecha'), findsOneWidget);
+    expect(
+      find.text('Cedes el 21 oct 2026 y recibes el 21 oct 2026'),
+      findsOneWidget,
+    );
+    expect((await _stored(tester)).single.returnDate, _oct21);
     expect((await _stored(tester)).single.isReturned, isFalse);
 
     // Settled: it leaves the pending list and the balance.
@@ -433,6 +710,30 @@ void main() {
     );
   });
 
+  testWidgets('changing the return date confirms the date was saved', (
+    tester,
+  ) async {
+    await pumpCalendar(tester, size: const Size(390, 1600));
+    final swap = await _register(tester, returnDate: _oct24);
+    await _open(tester);
+
+    await _menu(tester, swap.id, 'swap-menu-returned');
+    await tester.tap(
+      find.descendant(
+        of: find.byType(DatePickerDialog),
+        matching: find.text('25'),
+      ),
+    );
+    await tester.tap(find.text('Aceptar'));
+    await _settle(tester);
+
+    expect(find.text('Fecha de devolución guardada'), findsOneWidget);
+    expect(find.text('Cambio marcado como devuelto'), findsNothing);
+    final stored = (await _stored(tester)).single;
+    expect(stored.returnDate, const CivilDate(2026, 10, 25));
+    expect(stored.isReturned, isFalse);
+  });
+
   testWidgets('a change is applied to the calendar and undone', (tester) async {
     await pumpCalendar(tester, size: const Size(390, 1600));
     final swap = await _register(
@@ -444,6 +745,10 @@ void main() {
     await _open(tester);
 
     // The day it gives loses the shift and the day it comes back gets it.
+    expect(
+      find.text('Cedes el 21 oct 2026 y recibes el 24 oct 2026'),
+      findsOneWidget,
+    );
     expect(_ids(tester, _oct21), const ['morning', 'afternoon']);
     expect(_ids(tester, _oct24), const ['rest']);
 
@@ -486,6 +791,32 @@ void main() {
     expect(_ids(tester, _oct21), const ['morning', 'afternoon']);
     expect(_ids(tester, _oct24), const ['rest']);
   });
+
+  testWidgets(
+    'removing an applied swap without a snapshot preserves both days',
+    (tester) async {
+      await pumpCalendar(tester, size: const Size(390, 1600));
+      // The old override is already present in the schedule, but there is no
+      // swap application snapshot for either day.
+      const givenDate = CivilDate(2026, 10, 22);
+      final swap = await _register(
+        tester,
+        date: givenDate,
+        givenShiftTypeIds: const ['morning'],
+        receivedShiftTypeIds: const ['rest'],
+        returnDate: _oct24,
+      );
+      await _open(tester);
+      await _menu(tester, swap.id, 'swap-menu-unapply');
+      expect(
+        find.textContaining('No hay datos para recuperar los turnos'),
+        findsOneWidget,
+      );
+      expect(_ids(tester, givenDate), isEmpty);
+      expect(_ids(tester, _oct24), const ['rest']);
+      expect(_key('swap-card-${swap.id}'), findsOneWidget);
+    },
+  );
 
   testWidgets('a change is removed and can be brought back', (tester) async {
     await pumpCalendar(tester, size: const Size(390, 1600));

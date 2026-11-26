@@ -286,7 +286,7 @@ w_tap_visible() {
 
 w_pin() {   # w_pin <button regex of the sheet>
   qa_adb shell am kill "$QA_PACKAGE"
-  qa_adb shell am start -n "$QA_PACKAGE/.MainActivity" >/dev/null
+  qa_adb shell am start -n "$QA_PACKAGE/es.cuadrante.app.MainActivity" >/dev/null
   sleep 3
   w_tap_wait "Abrir ajustes" 15 || { w_fail "no está el botón de Ajustes"; return 1; }
   sleep 2
@@ -307,14 +307,14 @@ w_pin() {   # w_pin <button regex of the sheet>
 }
 
 w01() {
-  qa_adb shell am start -n "$QA_PACKAGE/.MainActivity" >/dev/null
+  qa_adb shell am start -n "$QA_PACKAGE/es.cuadrante.app.MainActivity" >/dev/null
   local i
   # A first launch of a debug build (kernel extraction, JIT) can take more than
   # a minute on the emulator before the first publish: wait up to 3 minutes and
   # bring the app to the front again halfway.
   for i in $(seq 1 90); do
     [ -n "$(w_snapshot)" ] && break
-    [ "$i" = 45 ] && qa_adb shell am start -n "$QA_PACKAGE/.MainActivity" >/dev/null
+    [ "$i" = 45 ] && qa_adb shell am start -n "$QA_PACKAGE/es.cuadrante.app.MainActivity" >/dev/null
     sleep 2
   done
   [ -n "$(w_snapshot)" ] || { w_fail "la app no publicó la instantánea en HomeWidgetPreferences"; return 1; }

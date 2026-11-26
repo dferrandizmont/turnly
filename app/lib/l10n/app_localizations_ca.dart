@@ -32,6 +32,35 @@ class AppLocalizationsCa extends AppLocalizations {
       'En desar es recuperaran els torns anteriors que es puguin restaurar.';
 
   @override
+  String get onboardingRestoreReceived => 'Revisa la còpia rebuda';
+
+  @override
+  String get dayDetailResetManual => 'Treu el canvi manual';
+
+  @override
+  String get dayDetailNoRotation => 'Aquell dia no té rotació.';
+
+  @override
+  String get summaryEstimateExtrasExcluded => 'Hores extra sense valorar';
+
+  @override
+  String monthStripUnrecorded(String date) {
+    return 'Sense torn anotat: $date';
+  }
+
+  @override
+  String get swapEditReturnDate => 'Canvia la data de retorn';
+
+  @override
+  String get swapUnapplyNoSnapshot =>
+      'No hi ha dades per recuperar els torns anteriors al canvi. El teu quadrant continua igual.';
+
+  @override
+  String swapDates(String given, String received) {
+    return 'Cedeixes el $given i reps el $received';
+  }
+
+  @override
   String get appName => 'Turnly';
 
   @override
@@ -286,6 +315,16 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get daySemanticsNote => 'amb nota';
+
+  @override
+  String daySwapWith(String name) {
+    return 'Canvi amb $name';
+  }
+
+  @override
+  String daySemanticsSwap(String name) {
+    return 'canvi amb $name';
+  }
 
   @override
   String daySemanticsOvertime(String duration) {
@@ -2031,7 +2070,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get onboardingRotationHelp =>
-      'Tria la teva o crea-la en un moment. Després dius quan comences.';
+      'Per continuar, tria la teva rotació o crea un cicle. Després tries quan comença.';
 
   @override
   String get onboardingRotationTypical => 'El més habitual a la teva feina';
@@ -2473,6 +2512,10 @@ class AppLocalizationsCa extends AppLocalizations {
   @override
   String get summaryNoteHoliday =>
       'Hores en festiu: les que cauen en un festiu de la teva comunitat i municipi, també si el torn passa la mitjanit.';
+
+  @override
+  String get summaryNoteHolidayHidden =>
+      'Hores en festiu: aquesta línia només apareix quan hi ha hores en un festiu de la teva comunitat i municipi; si no n’hi ha cap, no es mostra.';
 
   @override
   String get summaryNoteTense =>
@@ -6754,7 +6797,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get swapStagePending => 'Pendent';
 
   @override
-  String get swapStageReturned => 'Retornat';
+  String get swapStageReturned => 'Amb data';
 
   @override
   String get swapStageSettled => 'Saldat';
@@ -6772,10 +6815,13 @@ class AppLocalizationsCa extends AppLocalizations {
   String get swapFieldColleague => 'Amb qui';
 
   @override
-  String get swapFieldColleagueHint => 'Marta';
+  String get swapFieldColleagueHint => 'Per exemple: Marta';
 
   @override
   String get swapInvalidColleague => 'Escriu amb qui és el canvi.';
+
+  @override
+  String get swapInvalidNote => 'La nota és massa llarga. Escurça-la.';
 
   @override
   String get swapFieldDirection => 'Qui deu el torn';
@@ -6859,7 +6905,7 @@ class AppLocalizationsCa extends AppLocalizations {
   String get swapMarkReturnedTitle => 'Quin dia te’l tornen?';
 
   @override
-  String get swapMarkedReturned => 'Canvi marcat com a retornat';
+  String get swapReturnDateSaved => 'Data de devolució desada';
 
   @override
   String get swapMarkSettled => 'Marca com a saldat';

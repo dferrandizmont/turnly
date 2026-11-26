@@ -134,6 +134,54 @@ abstract class AppLocalizations {
   /// **'Al guardar se recuperarán los turnos anteriores que se puedan restaurar.'**
   String get swapRestoreOnSave;
 
+  /// No description provided for @onboardingRestoreReceived.
+  ///
+  /// In es, this message translates to:
+  /// **'Revisar la copia recibida'**
+  String get onboardingRestoreReceived;
+
+  /// No description provided for @dayDetailResetManual.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar el cambio a mano'**
+  String get dayDetailResetManual;
+
+  /// No description provided for @dayDetailNoRotation.
+  ///
+  /// In es, this message translates to:
+  /// **'Ese día no tiene rotación.'**
+  String get dayDetailNoRotation;
+
+  /// No description provided for @summaryEstimateExtrasExcluded.
+  ///
+  /// In es, this message translates to:
+  /// **'Horas extra sin valorar'**
+  String get summaryEstimateExtrasExcluded;
+
+  /// No description provided for @monthStripUnrecorded.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin turno anotado: {date}'**
+  String monthStripUnrecorded(String date);
+
+  /// No description provided for @swapEditReturnDate.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar la fecha de devolución'**
+  String get swapEditReturnDate;
+
+  /// No description provided for @swapUnapplyNoSnapshot.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay datos para recuperar los turnos anteriores al cambio. Tu cuadrante sigue igual.'**
+  String get swapUnapplyNoSnapshot;
+
+  /// No description provided for @swapDates.
+  ///
+  /// In es, this message translates to:
+  /// **'Cedes el {given} y recibes el {received}'**
+  String swapDates(String given, String received);
+
   /// Nombre de la app (título de ventana y cabeceras).
   ///
   /// In es, this message translates to:
@@ -523,6 +571,18 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'con nota'**
   String get daySemanticsNote;
+
+  /// Detalle del día: línea que dice con quién es el cambio de turno aplicado a ese día, p. ej. «Cambio con Marta».
+  ///
+  /// In es, this message translates to:
+  /// **'Cambio con {name}'**
+  String daySwapWith(String name);
+
+  /// Etiqueta hablada de la celda de un día con un cambio de turno aplicado, p. ej. «cambio con Marta».
+  ///
+  /// In es, this message translates to:
+  /// **'cambio con {name}'**
+  String daySemanticsSwap(String name);
 
   /// No description provided for @daySemanticsOvertime.
   ///
@@ -3363,7 +3423,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingRotationHelp.
   ///
   /// In es, this message translates to:
-  /// **'Elige la tuya o créala en un momento. Luego dices cuándo empiezas.'**
+  /// **'Para seguir, elige tu rotación o crea un ciclo. Luego eliges cuándo empieza.'**
   String get onboardingRotationHelp;
 
   /// No description provided for @onboardingRotationTypical.
@@ -4019,6 +4079,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Horas en festivo: las que caen en un día festivo de tu comunidad y municipio, también si el turno cruza la medianoche.'**
   String get summaryNoteHoliday;
+
+  /// No description provided for @summaryNoteHolidayHidden.
+  ///
+  /// In es, this message translates to:
+  /// **'Horas en festivo: esta línea solo aparece cuando hay horas en un día festivo de tu comunidad y municipio; si no hay ninguna, no se muestra.'**
+  String get summaryNoteHolidayHidden;
 
   /// No description provided for @summaryNoteTense.
   ///
@@ -10710,7 +10776,7 @@ abstract class AppLocalizations {
   /// No description provided for @swapStageReturned.
   ///
   /// In es, this message translates to:
-  /// **'Devuelto'**
+  /// **'Con fecha'**
   String get swapStageReturned;
 
   /// No description provided for @swapStageSettled.
@@ -10746,7 +10812,7 @@ abstract class AppLocalizations {
   /// No description provided for @swapFieldColleagueHint.
   ///
   /// In es, this message translates to:
-  /// **'Marta'**
+  /// **'Por ejemplo: Marta'**
   String get swapFieldColleagueHint;
 
   /// No description provided for @swapInvalidColleague.
@@ -10754,6 +10820,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Escribe con quién es el cambio.'**
   String get swapInvalidColleague;
+
+  /// No description provided for @swapInvalidNote.
+  ///
+  /// In es, this message translates to:
+  /// **'La nota es demasiado larga. Acórtala.'**
+  String get swapInvalidNote;
 
   /// No description provided for @swapFieldDirection.
   ///
@@ -10899,11 +10971,11 @@ abstract class AppLocalizations {
   /// **'¿Qué día te lo devuelven?'**
   String get swapMarkReturnedTitle;
 
-  /// No description provided for @swapMarkedReturned.
+  /// No description provided for @swapReturnDateSaved.
   ///
   /// In es, this message translates to:
-  /// **'Cambio marcado como devuelto'**
-  String get swapMarkedReturned;
+  /// **'Fecha de devolución guardada'**
+  String get swapReturnDateSaved;
 
   /// No description provided for @swapMarkSettled.
   ///

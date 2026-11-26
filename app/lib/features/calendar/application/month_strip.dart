@@ -8,25 +8,32 @@ import '../../summary/domain/pay_period.dart';
 import '../../summary/domain/period_hours.dart';
 import 'off_outlook.dart';
 import 'schedule_controller.dart';
+import 'today_status.dart';
 
 /// The day off the strip under the month names.
 class MonthStripOff {
-  const MonthStripOff({required this.date, this.daysAway});
+  const MonthStripOff({
+    required this.date,
+    this.daysAway,
+    this.inferred = false,
+  });
 
   final CivilDate date;
 
   /// Days from today (0 = today) in the current month: «Próximo libre».
   /// `null` in a month to come: the first day off of that month.
   final int? daysAway;
+  final bool inferred;
 
   @override
   bool operator ==(Object other) =>
       other is MonthStripOff &&
       other.date == date &&
-      other.daysAway == daysAway;
+      other.daysAway == daysAway &&
+      other.inferred == inferred;
 
   @override
-  int get hashCode => Object.hash(date, daysAway);
+  int get hashCode => Object.hash(date, daysAway, inferred);
 
   @override
   String toString() => 'MonthStripOff($date, $daysAway)';
@@ -51,12 +58,16 @@ MonthStripOff? monthStripOff(
     final next = computeOffOutlook(schedule, today).nextOff;
     return next == null
         ? null
-        : MonthStripOff(date: next.date, daysAway: next.daysAway);
+        : MonthStripOff(
+            date: next.date,
+            daysAway: next.daysAway,
+            inferred: next.inferred,
+          );
   }
   if (first.isBefore(current)) return null;
   final next = computeOffOutlook(schedule, first, lookBack: 0).nextOff;
   if (next == null || next.date.firstDayOfMonth != first) return null;
-  return MonthStripOff(date: next.date);
+  return MonthStripOff(date: next.date, inferred: next.inferred);
 }
 
 /// The three facts of the strip under the month (`docs/diseno.md`, «Tira del
@@ -118,11 +129,18 @@ final monthStripProvider = Provider.autoDispose
       final period = payPeriodOf(month, closingDay);
       final off = month.firstDayOfMonth == today.firstDayOfMonth
           ? switch (ref.watch(offOutlookProvider).nextOff) {
-              final next? => MonthStripOff(
-                date: next.date,
-                daysAway: next.daysAway,
-              ),
-              null => null,
+              final next?
+                  when !ref.watch(
+                    todayStatusProvider.select(
+                      (status) => status.activeShiftOverlaps(next.date),
+                    ),
+                  ) =>
+                MonthStripOff(
+                  date: next.date,
+                  daysAway: next.daysAway,
+                  inferred: next.inferred,
+                ),
+              _ => null,
             }
           : monthStripOff(schedule, month, today);
       return MonthStripData(

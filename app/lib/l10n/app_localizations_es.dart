@@ -32,6 +32,35 @@ class AppLocalizationsEs extends AppLocalizations {
       'Al guardar se recuperarán los turnos anteriores que se puedan restaurar.';
 
   @override
+  String get onboardingRestoreReceived => 'Revisar la copia recibida';
+
+  @override
+  String get dayDetailResetManual => 'Quitar el cambio a mano';
+
+  @override
+  String get dayDetailNoRotation => 'Ese día no tiene rotación.';
+
+  @override
+  String get summaryEstimateExtrasExcluded => 'Horas extra sin valorar';
+
+  @override
+  String monthStripUnrecorded(String date) {
+    return 'Sin turno anotado: $date';
+  }
+
+  @override
+  String get swapEditReturnDate => 'Cambiar la fecha de devolución';
+
+  @override
+  String get swapUnapplyNoSnapshot =>
+      'No hay datos para recuperar los turnos anteriores al cambio. Tu cuadrante sigue igual.';
+
+  @override
+  String swapDates(String given, String received) {
+    return 'Cedes el $given y recibes el $received';
+  }
+
+  @override
   String get appName => 'Turnly';
 
   @override
@@ -286,6 +315,16 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get daySemanticsNote => 'con nota';
+
+  @override
+  String daySwapWith(String name) {
+    return 'Cambio con $name';
+  }
+
+  @override
+  String daySemanticsSwap(String name) {
+    return 'cambio con $name';
+  }
 
   @override
   String daySemanticsOvertime(String duration) {
@@ -2035,7 +2074,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get onboardingRotationHelp =>
-      'Elige la tuya o créala en un momento. Luego dices cuándo empiezas.';
+      'Para seguir, elige tu rotación o crea un ciclo. Luego eliges cuándo empieza.';
 
   @override
   String get onboardingRotationTypical => 'Lo habitual en tu trabajo';
@@ -2476,6 +2515,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get summaryNoteHoliday =>
       'Horas en festivo: las que caen en un día festivo de tu comunidad y municipio, también si el turno cruza la medianoche.';
+
+  @override
+  String get summaryNoteHolidayHidden =>
+      'Horas en festivo: esta línea solo aparece cuando hay horas en un día festivo de tu comunidad y municipio; si no hay ninguna, no se muestra.';
 
   @override
   String get summaryNoteTense =>
@@ -6764,7 +6807,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get swapStagePending => 'Pendiente';
 
   @override
-  String get swapStageReturned => 'Devuelto';
+  String get swapStageReturned => 'Con fecha';
 
   @override
   String get swapStageSettled => 'Saldado';
@@ -6782,10 +6825,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get swapFieldColleague => 'Con quién';
 
   @override
-  String get swapFieldColleagueHint => 'Marta';
+  String get swapFieldColleagueHint => 'Por ejemplo: Marta';
 
   @override
   String get swapInvalidColleague => 'Escribe con quién es el cambio.';
+
+  @override
+  String get swapInvalidNote => 'La nota es demasiado larga. Acórtala.';
 
   @override
   String get swapFieldDirection => 'Quién debe el turno';
@@ -6869,7 +6915,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get swapMarkReturnedTitle => '¿Qué día te lo devuelven?';
 
   @override
-  String get swapMarkedReturned => 'Cambio marcado como devuelto';
+  String get swapReturnDateSaved => 'Fecha de devolución guardada';
 
   @override
   String get swapMarkSettled => 'Marcar como saldado';

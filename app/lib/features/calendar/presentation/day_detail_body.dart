@@ -19,8 +19,10 @@ import '../../holidays/application/holidays_provider.dart';
 import '../../holidays/presentation/holiday_names.dart';
 import '../../schedule/domain/schedule_domain.dart';
 import '../../summary/presentation/summary_format.dart';
+import '../application/day_pane_actions.dart';
 import '../application/open_day.dart';
 import '../application/schedule_controller.dart';
+import '../application/swap_marks.dart';
 import 'day_extra_amount_section.dart';
 import 'day_extras_section.dart';
 import 'day_more_options.dart';
@@ -121,7 +123,23 @@ class DayDetailBodyState extends ConsumerState<DayDetailBody>
 
   bool _moreOpen = false;
 
+  /// The pane's date row shows this detail's «Deshacer» (inline only): the
+  /// last state handed over, and the holder to hand it back with.
+  late final DayPaneActions _paneActions;
+  bool? _publishedUndo;
+
   CivilDate get _date => widget.date;
+
+  void _publishUndo(bool enabled) {
+    if (_publishedUndo == enabled) return;
+    _publishedUndo = enabled;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _paneActions.publish(
+        DayPaneUndo(owner: this, enabled: enabled, onUndo: _undoLast),
+      );
+    });
+  }
 
   @override
   void initState() {
@@ -129,6 +147,7 @@ class DayDetailBodyState extends ConsumerState<DayDetailBody>
     WidgetsBinding.instance.addObserver(this);
     _schedule = ref.read(scheduleControllerProvider.notifier);
     _draft = ref.read(noteDraftProvider.notifier);
+    _paneActions = ref.read(dayPaneActionsProvider.notifier);
     _note.text =
         ref.read(scheduleControllerProvider).schedule.entries[_date]?.note ??
         '';
@@ -169,6 +188,10 @@ class DayDetailBodyState extends ConsumerState<DayDetailBody>
         schedule.setNote(date, text, continuesTyping: continues);
         draft.clear(date);
       });
+    }
+    if (widget.inline) {
+      final actions = _paneActions;
+      scheduleMicrotask(() => actions.clearIf(this));
     }
     _note.dispose();
     _noteFocus.dispose();
@@ -452,6 +475,14 @@ class DayDetailBodyState extends ConsumerState<DayDetailBody>
     final sections = ref.watch(dayMoreSectionsProvider);
 
     final day = schedule.resolve(_date);
+    // Who an applied swap on this day is with (QA 0.12.1, N31).
+    final swapWith = ref
+        .watch(
+          swapMarksProvider(
+            ref.watch(scheduleControllerProvider.select((s) => s.calendarId)),
+          ),
+        )
+        .value?[_date];
     final entry = schedule.entries[_date];
     final reminder = entry?.noteReminderMinute;
     final overtime = day.overtimeMinutes;
@@ -469,6 +500,8 @@ class DayDetailBodyState extends ConsumerState<DayDetailBody>
         userHoliday != null;
     final ids = day.shiftIds;
     final isOverride = day.source == DaySource.override;
+    final baseline = isOverride ? schedule.resolvePattern(_date) : null;
+    final hasRotation = baseline?.source == DaySource.pattern;
     final date = DateTime(_date.year, _date.month, _date.day);
     // A swap whose row is gone (undone, removed) falls back to adding.
     final changing = _changing != null && _changing! < day.shifts.length
@@ -478,6 +511,8 @@ class DayDetailBodyState extends ConsumerState<DayDetailBody>
         palette.isNotEmpty &&
         (changing != null || (_paletteOpen ?? day.shifts.isEmpty));
     final canUndo = _noteDirty || _schedule.lastStepOnlyOn(_date) != null;
+    // In the pane the button lives in its date row.
+    if (widget.inline) _publishUndo(canUndo);
 
     const gutter = EdgeInsets.symmetric(horizontal: Sp.page);
 
@@ -521,31 +556,36 @@ class DayDetailBodyState extends ConsumerState<DayDetailBody>
         ],
       ],
     );
-    final header = Padding(
-      padding: widget.inline
-          ? const EdgeInsets.fromLTRB(Sp.page, Sp.xs, Sp.xs, Sp.xs)
-          : const EdgeInsets.fromLTRB(Sp.page, 0, Sp.s, Sp.s),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(top: widget.inline ? Sp.s : Sp.xs),
-              child: title,
+    // In the pane «Deshacer» and the way back to the «Hoy» view are in the
+    // date row above (QA 0.12.1, C1b): here there is no row of its own for
+    // them, only the holiday line when the day has one.
+    final header = widget.inline
+        ? (holiday == null
+              ? const SizedBox.shrink()
+              : Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    Sp.page,
+                    Sp.xs,
+                    Sp.page,
+                    Sp.xs,
+                  ),
+                  child: title,
+                ))
+        : Padding(
+            padding: const EdgeInsets.fromLTRB(Sp.page, 0, Sp.s, Sp.s),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: Sp.xs),
+                    child: title,
+                  ),
+                ),
+                undoButton,
+              ],
             ),
-          ),
-          undoButton,
-          // In the pane the way back to the "today" view is a button.
-          if (widget.inline)
-            IconButton(
-              key: const ValueKey('day-pane-close'),
-              tooltip: l10n.dayPaneClose,
-              icon: Icon(AppIcons.close, color: colors.textMuted),
-              onPressed: widget.onClose,
-            ),
-        ],
-      ),
-    );
+          );
 
     final shifts = <Widget>[
       if (day.shifts.isEmpty)
@@ -569,6 +609,27 @@ class DayDetailBodyState extends ConsumerState<DayDetailBody>
             onRemove: () => _remove(ids, index),
           ),
       ],
+      if (swapWith != null)
+        Padding(
+          padding: const EdgeInsets.only(top: Sp.xs),
+          child: Row(
+            key: const ValueKey('day-swap-line'),
+            children: [
+              Icon(
+                AppIcons.swap,
+                size: IconSize.inline,
+                color: colors.textSecondary,
+              ),
+              const SizedBox(width: Sp.s),
+              Expanded(
+                child: Text(
+                  l10n.daySwapWith(swapWith),
+                  style: type.bodyStrong.copyWith(color: colors.textSecondary),
+                ),
+              ),
+            ],
+          ),
+        ),
       // Where the day comes from and what can be done with its rotation.
       DayRotationSection(
         date: _date,
@@ -580,7 +641,7 @@ class DayDetailBodyState extends ConsumerState<DayDetailBody>
         SecondaryButton(
           key: const ValueKey('day-reset'),
           icon: AppIcons.undo,
-          label: l10n.dayDetailReset,
+          label: hasRotation ? l10n.dayDetailReset : l10n.dayDetailResetManual,
           expand: false,
           onPressed: () {
             _commitNote();
@@ -590,9 +651,11 @@ class DayDetailBodyState extends ConsumerState<DayDetailBody>
         ),
         const SizedBox(height: Sp.xs),
         Text(
-          l10n.dayDetailPatternGives(
-            shiftsLine(l10n, format, schedule.resolvePattern(_date).shifts),
-          ),
+          hasRotation
+              ? l10n.dayDetailPatternGives(
+                  shiftsLine(l10n, format, baseline!.shifts),
+                )
+              : l10n.dayDetailNoRotation,
           key: const ValueKey('day-pattern-gives'),
           style: type.meta,
         ),
@@ -903,7 +966,9 @@ class _ShiftRow extends StatelessWidget {
     final paid = shift.hasTimes ? shift.effectivePaidMinutes : 0;
     final detail = times == null
         ? null
-        : (paid > 0 ? '$times · ${durationTextUnbroken(l10n, paid)}' : times);
+        : (paid > 0
+              ? '$times · ${durationTextUnbroken(l10n, paid, inHours: true)}'
+              : times);
     final several = !(isFirst && isLast);
 
     PopupMenuItem<_ShiftAction> item(

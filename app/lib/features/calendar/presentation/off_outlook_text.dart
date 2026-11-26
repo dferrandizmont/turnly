@@ -33,15 +33,26 @@ String? nextOffText(
 
 /// «Fin de semana libre: 14–15 nov» (or «31 oct – 1 nov» across months).
 /// `null` when there is none.
+///
+/// With [joined] the dates cannot wrap apart (for the card, which draws them;
+/// not for the spoken label or the widget).
 String? freeWeekendText(
   AppLocalizations l10n,
   AppDateFormat format,
-  OffOutlook outlook,
-) {
+  OffOutlook outlook, {
+  bool joined = false,
+}) {
   final weekend = outlook.freeWeekend;
   if (weekend == null) return null;
-  return l10n.offWeekend(weekendRange(format, weekend));
+  final range = weekendRange(format, weekend);
+  return l10n.offWeekend(joined ? _unbreakable(range) : range);
 }
+
+/// The dates of the weekend stay on one line: «Fin de semana libre:» may wrap
+/// before them, but «29» never lands alone on the next line (QA 0.12.1, N35).
+/// Spaces become no-break spaces and a word joiner follows the dash.
+String _unbreakable(String range) =>
+    range.replaceAll(' ', '\u00A0').replaceAll('–', '–\u2060');
 
 /// «14–15 nov» · «31 oct – 1 nov» · «Nov 14–15» · «Oct 31 – Nov 1».
 String weekendRange(AppDateFormat format, FreeWeekend weekend) {

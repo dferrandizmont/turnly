@@ -6,160 +6,100 @@
 {% block content %}
 {%- set light = shots[0] -%}
 {%- set dark = shots[site.screenshots.index('01-mes-oscuro')] if '01-mes-oscuro' in site.screenshots else shots[0] -%}
-{%- set hero_sizes = '(max-width: 760px) 220px, 300px' -%}
-{#- Feature badges follow the order of c.features: calendar, painting and rotations, alarms (bell), backups, hours
-    (clock), shift swaps and holidays (flag). The bar colour is a shift's (n Noche, m Mañana, t Tarde, v Vacaciones),
-    one per card, only decorative. -#}
+{#- Feature icons follow the order of c.features: calendar, painting and rotations, alarms (bell), backups, hours (clock), shift
+    swaps and holidays (flag). The colour class is a shift's (n Noche, m Mañana, t Tarde, s Saliente, g Guardia), only decorative. -#}
 {%- set feature_icons = ['cal', 'brush', 'bell', 'backup', 'clock', 'swap', 'flag'] -%}
-{%- set feature_bars = ['s-n', 's-m', 's-t', 's-v', 's-m', 's-n', 's-v'] -%}
-{%- set key_bars = ['k-m', 'k-t', 'k-n', 'k-v', 'k-s', 'k-l'] -%}
-{#- Drawings of the app (aria-hidden, decorative): the month of the first screenshot (December, the same shifts, the
-    holidays and today's ring), a 5 x 2 sequence copied week by week, and three cards like the ones of the today card
-    and the widgets. Shift names and codes come from the app's own catalogue (content `anim`); the hours are the
-    default shifts' (06-14, 14-22, 22-06) in the app's compact format. Each cell carries d<n> (diagonal wave), or
-    r<n> and c<n> (week and day) so that the CSS needs no style attribute. -#}
-{%- set a = c.anim -%}
-{%- set month = [
-  [[30, 'x'], [1, 'm'], [2, 'm'], [3, 'm'], [4, 'm'], [5, 'l'], [6, 'l']],
-  [[7, 'l', 'h'], [8, 'l', 'h'], [9, 'l'], [10, 't'], [11, 't'], [12, 'l'], [13, 'l']],
-  [[14, 'l'], [15, 'l'], [16, 'l'], [17, 'l'], [18, 'l'], [19, 'l'], [20, 'l']],
-  [[21, 'l'], [22, 'l'], [23, 'n'], [24, 'n', 'today'], [25, 'n', 'h'], [26, 's'], [27, 'l']],
-  [[28, 'l'], [29, 'l'], [30, 'l'], [31, 'l'], [1, 'x', 'h'], [2, 'x'], [3, 'x']]
-] -%}
-{%- set hours = a.hours -%}
-{#- The pattern of the viz is a real one of the app's catalogue: Policia Nacional 2-2-2-6 (`M2 T2 N2 S L5`, 12 days). The
-    strip shows it in rows of seven, as the app does; the month repeats it from December 1st. Each month cell carries
-    r<n> (which copy of the cycle) and c<n> (its day in the cycle). -#}
-{%- set cycle = ['m', 'm', 't', 't', 'n', 'n', 's', 'l', 'l', 'l', 'l', 'l'] -%}
-{% macro viz_month() %}<div class="viz vmo" data-play aria-hidden="true">
-<div class="viz-title">{{ a.month }}</div>
-<div class="viz-wk">{% for w in a.weekdays %}<span>{{ w }}</span>{% endfor %}</div>
-<div class="mgrid">
-{%- for row in month %}{% set r = loop.index0 %}{% for cell in row %}{% set k = cell[1] %}{% set fl = cell[2] if cell | length > 2 else '' %}
-<span class="mc s-{{ k }} d{{ r + loop.index0 }}{% if fl == 'h' %} hol{% endif %}"><b class="mc-n">{{ cell[0] }}</b>{% if k != 'x' %}<b class="mc-k{% if a.shifts[k].code | length > 1 %} long{% endif %}">{{ a.shifts[k].code }}</b>{% if k in hours %}<b class="mc-t">{{ hours[k] }}</b>{% endif %}{% endif %}{% if fl == 'today' %}<u class="mc-r"></u>{% endif %}</span>
-{%- endfor %}{% endfor %}
-</div>
-</div>{% endmacro %}
-{% macro viz_pattern() %}<div class="viz vpa" data-play aria-hidden="true">
-<div class="viz-title"><span>{{ a.sequence }}</span><small>{{ a.cycle_days | replace('{n}', cycle | length | string) }}</small></div>
-<div class="pstrip">{% for k in cycle %}<span class="pb s-{{ k }} c{{ loop.index0 }}"><b>{{ a.shifts[k].code }}</b></span>{% endfor %}</div>
-<div class="mgrid mini">
-{%- for row in month %}{% set ri = loop.index0 %}{% for cell in row %}{% set x = cell[1] == 'x' %}{% set pos = (cell[0] - 1) % (cycle | length) %}{% set k = 'x' if x else cycle[pos] %}{% set cr = (0 if ri == 0 else 2) if x else (cell[0] - 1) // (cycle | length) %}{% set cc = (0 if ri == 0 else cycle | length - 1) if x else pos %}
-<span class="mc s-{{ k }} r{{ cr }} c{{ cc }}"><b class="mc-n">{{ cell[0] }}</b>{% if k != 'x' %}<b class="mc-k{% if a.shifts[k].code | length > 1 %} long{% endif %}">{{ a.shifts[k].code }}</b>{% endif %}</span>
-{%- endfor %}{% endfor %}
-</div>
-</div>{% endmacro %}
-<section id="about" class="wrap" aria-labelledby="t-about">
-<div class="today">
-<div>
-<div class="t-head"><img class="t-icon" src="{{ 'icon.png' | asset }}" alt="" width="56" height="56"><p class="label">{{ c.kicker }}</p></div>
-<h1 id="t-about" class="h1">{{ c.tagline }}</h1>
-<p class="chip">{{ c.chip }}</p>
+{%- set feature_bars = ['s-n', 's-m', 's-t', 's-s', 's-m', 's-n', 's-g'] -%}
+{%- set key_bars = ['k-v', 'k-s', 'k-l'] -%}
+<section id="about" class="hero" aria-labelledby="t-hero">
+<div class="wrap">
+<div class="hero-copy">
+<h1 class="h1" id="t-hero"><span class="ln"><span>{{ c.hero_line_1 }}</span></span> <span class="ln"><span class="em">{{ c.hero_line_2 }}</span></span></h1>
+<p class="chip"><i aria-hidden="true"></i>{{ c.chip }}</p>
 <p class="lede">{{ c.intro }}</p>
-<p class="cta"><a class="btn btn-primary" href="#download">{{ c.hero_cta }}</a></p>
+<p class="cta"><a class="btn" href="#download">{{ icon('download') }}{{ c.hero_cta }}</a></p>
 <ul class="keys">
-{%- set facts = c.key_facts.split(' · ') -%}
-{% for fact in facts %}<li><i aria-hidden="true" class="kd {{ key_bars[loop.index0 % key_bars | length] }}"></i>{{ fact }}{% if not loop.last %}<span class="vh"> · </span>{% endif %}</li>{% endfor %}
-</ul>
+{% for fact in c.key_facts.split(' · ') %}<li><i aria-hidden="true" class="kd {{ key_bars[loop.index0 % key_bars | length] }}"></i>{{ fact }}{% if not loop.last %}<span class="vh"> · </span>{% endif %}</li>
+{% endfor %}</ul>
 </div>
-<div class="stage">
-{#- Three cards sit to the left of the screenshot, taken from the app: the today card, the small widget and the next
-    day off. They come in once and then stand still (WCAG 2.2.2), and the countdown reads «4 h», as the app does next to it.
-    Decorative, so hidden from screen readers and from the phones, where they only add height. -#}
-{%- set si = a.starts_in.split('{duration}') -%}
-<div class="fchips" aria-hidden="true">
-<div class="fc"><div class="fcard fa s-n"><span class="fb">{{ a.shifts.n.code }}</span><span class="fl">{{ a.tonight }}</span><span class="ft"><b>{{ a.shifts.n.name }}</b><span class="fh">{{ a.night_range }}</span></span><span class="cdp"><span class="cdt">{{ si[0] }}4 {{ a.unit_h }}{{ si[1] }}</span></span></div></div>
-<div class="fc"><div class="fcard fw s-n"><span class="fl">{{ a.widget_day }}</span><b class="fk">{{ a.shifts.n.code }}</b><span class="fh">{{ a.night_range }}</span><span class="fm">{{ a.widget_tomorrow }}: {{ a.shifts.n.code }} {{ a.hours.n }}</span><i class="fbar"></i></div></div>
-<div class="fc"><div class="fcard fo s-s"><span class="fb">{{ a.shifts.s.code }}</span><span class="fh">{{ a.off_on }}</span></div></div>
-</div>
-<figure class="t-shot">
-{#- One picture per theme; CSS shows the one for the theme in use (data-theme or, without it, the system).
-    The dark one is lazy so that, hidden, it is not downloaded. -#}
-<picture{% if dark is not sameas light %} class="shot-light"{% endif %}>
-<source type="image/avif" srcset="{{ light.avif }}" sizes="{{ hero_sizes }}">
-<source type="image/webp" srcset="{{ light.webp }}" sizes="{{ hero_sizes }}">
-<img src="{{ light.src }}" srcset="{{ light.webp }}" sizes="{{ hero_sizes }}" width="{{ light.width }}" height="{{ light.height }}" alt="{{ light.alt }}" fetchpriority="high">
-</picture>
-{% if dark is not sameas light %}<picture class="shot-dark">
-<source type="image/avif" srcset="{{ dark.avif }}" sizes="{{ hero_sizes }}">
-<source type="image/webp" srcset="{{ dark.webp }}" sizes="{{ hero_sizes }}">
-<img src="{{ dark.src }}" srcset="{{ dark.webp }}" sizes="{{ hero_sizes }}" width="{{ dark.width }}" height="{{ dark.height }}" alt="{{ dark.alt }}" loading="lazy">
-</picture>{% endif %}
+{#- Without JS (or if the demo cannot start) the first screenshot stands in for the demo, one picture per theme: CSS shows the one
+    for the theme in use and the hidden one is lazy, so it is not downloaded. assets/site.js builds the board in #board and adds
+    .demo-ready to <html>, which swaps one for the other. The demo texts travel in data-demo (JSON, never script). -#}
+<figure class="hero-shot">
+<span class="by-l">{{ picture(light, false, '(max-width: 960px) 280px, 360px') }}</span><span class="by-d">{{ picture(dark, false, '(max-width: 960px) 280px, 360px') }}</span>
 </figure>
-</div>
+<div class="board app" id="board" hidden data-demo='{{ c.demo | tojson }}' role="group" aria-label="{{ c.demo.label }}"></div>
 </div>
 </section>
 
 <section id="download" class="sec wrap" aria-labelledby="t-download">
-<div data-reveal><p class="label">{{ t.download }}</p>
-<h2 id="t-download" class="h2">{{ c.download_title }}</h2>
-<p class="intro">{{ c.download_intro }}</p></div>
-<div class="rows" data-reveal="stagger">
-{#- Rows: platform and name, note (and steps) and the action. The action is the common macro: the official badge with the
-    state under it for the two stores, a text button for the APK. -#}
-{% for item in site.downloads %}{% set steps = item.kind == 'play' and item.state == 'closed_test' %}<div class="row">
-<div class="r-title"><p class="plat">{{ t.ios if item.kind in ('app_store', 'testflight') else t.android }}</p><h3>{{ t[item.kind] }}</h3></div>
-{#- The action carries the state (under the badge, or after the name on the APK button); the note and, for Google Play in
-    closed test, the three steps go in the middle column. In the DOM the action comes before them, as on a phone. -#}
-<div class="r-act">{{ download(item, t, lang) }}</div>
-<div class="r-info"><p class="desc">{{ c.download_notes[item.kind] }}</p>
+<h2 id="t-download" class="h2 rv-me">{{ c.download_title }}</h2>
+<p class="intro rv-me">{{ c.download_intro }}</p>
+<div class="dl rv-me">
+{#- A roster of rows: platform, store and its note on the left, the action (the common macro: the official badge with the state
+    under it, or the dashed «coming soon» pill) on the right. The three closed-test steps follow the note when Google Play is in it. -#}
+{% for item in site.downloads %}{% set steps = item.kind == 'play' and item.state == 'closed_test' %}<div class="dl-row">
+<span class="dl-plat">{{ t.ios if item.kind in ('app_store', 'testflight') else t.android }}</span>
+<div><h3>{{ t[item.kind] }}</h3>{% if c.download_notes[item.kind] %}<p>{{ c.download_notes[item.kind] }}</p>{% endif %}
 {%- if steps %}
 {% include 'base/closed_test.html.j2' %}
 {%- endif %}</div>
+<div class="dl-act">{{ download(item, t, lang) }}</div>
 </div>
 {% endfor %}</div>
 </section>
 
 <section id="screenshots" class="sec wrap" aria-labelledby="t-shots">
-<div data-reveal><p class="label">{{ t.screenshots }}</p>
-<h2 id="t-shots" class="h2">{{ c.screenshots_title }}</h2>
-<p class="intro">{{ c.screenshots_intro }}</p></div>
-{#- One screen at a time, the capture on the left and what it shows on the right (as in Ink Lab). `site.screenshots`
-    lists each light capture followed by its dark twin (NN-name, NN-name-oscuro): both go in the same slide, CSS shows the
-    one for the theme in use and the hidden one is lazy, so it is not fetched. Without JS every slide is listed, two per
-    row; assets/site.js turns the list into tabs (from 761 px) or, on phones, a stepper (one screen at a time with previous /
-    next buttons). Under each capture the common «enlarge» link opens the 720 px version, for the fine details on a phone. -#}
-{%- set tour_sizes = '(max-width: 760px) 280px, 300px' -%}
-<div class="tour" data-tour data-label="{{ c.screenshots_nav }}" data-prev="{{ c.screenshots_prev }}" data-next="{{ c.screenshots_next }}" data-position="{{ c.screenshots_position }}" data-reveal>
-<ol class="tour-list">
+<h2 id="t-shots" class="h2 rv-me">{{ c.screenshots_title }}</h2>
+<p class="intro rv-me">{{ c.screenshots_intro }}</p>
+{#- One screen at a time: tabs, the capture and what it shows. `site.screenshots` lists each light capture followed by its dark twin
+    (NN-name, NN-name-oscuro): both go in the same slide, CSS shows the one for the theme in use and the hidden one is lazy, so it
+    is not fetched. Without JS every slide is listed (two per row); assets/site.js adds the tabs and the previous / next buttons and
+    shows one slide at a time. Under each capture the common «enlarge» link opens the 720 px version. -#}
+{%- set tour_sizes = '(max-width: 900px) 280px, 300px' -%}
+<div class="tour rv-me" id="tour" data-label="{{ c.screenshots_nav }}" data-prev="{{ c.screenshots_prev }}" data-next="{{ c.screenshots_next }}" data-position="{{ c.screenshots_position }}" data-count="{{ c.screenshots_count }}">
+<ol class="slides">
 {% for shot in shots %}{% if not site.screenshots[loop.index0].endswith('-oscuro') %}{% set name = site.screenshots[loop.index0] %}<li class="slide">
-<div class="slide-fig"><span class="by-l">{{ picture(shot, loop.first, tour_sizes, true, t) }}</span><span class="by-d">{{ picture(shots[loop.index0 + 1], false, tour_sizes, true, t) }}</span></div>
-<div class="slide-txt"><h3>{{ c.screenshot_captions[name] }}</h3><p>{{ c.screenshot_details[name] }}</p></div>
+<div class="phone"><span class="by-l">{{ picture(shot, loop.first, tour_sizes, true, t) }}</span><span class="by-d">{{ picture(shots[loop.index0 + 1], false, tour_sizes, true, t) }}</span></div>
+<div class="shot-txt"><h3>{{ c.screenshot_captions[name] }}</h3><p>{{ c.screenshot_details[name] }}</p></div>
 </li>
 {% endif %}{% endfor %}</ol>
+<p class="vh" id="shotLive" role="status" aria-live="polite"></p>
 </div>
 </section>
 
 <section id="features" class="sec wrap" aria-labelledby="t-feat">
-<div data-reveal><p class="label">{{ t.features }}</p>
+<div class="feat">
+<div class="feat-head rv-me">
 <h2 id="t-feat" class="h2">{{ c.features_title }}</h2>
-<p class="intro">{{ c.features_intro }}</p></div>
-<ol class="fcards" data-reveal="stagger">
-{% for feature in c.features %}{% set k = loop.index0 % feature_icons | length %}<li class="{{ feature_bars[k] }}{% if k < 2 %} fwide{% endif %}"><span class="fic">{{ icon(feature_icons[k]) }}</span><div><h3>{{ c.feature_titles[loop.index0] }}</h3><p>{{ feature }}</p></div>{% if k == 0 %}{{ viz_month() }}{% elif k == 1 %}{{ viz_pattern() }}{% endif %}</li>
+<p class="intro">{{ c.features_intro }}</p>
+</div>
+<ol class="flist">
+{% for feature in c.features %}{% set k = loop.index0 % feature_icons | length %}<li class="{{ feature_bars[k] }} rv-me"><span class="fic">{{ icon(feature_icons[k]) }}</span><div><h3>{{ c.feature_titles[loop.index0] }}</h3><p>{{ feature }}</p></div></li>
 {% endfor %}</ol>
+</div>
 </section>
 
 <section id="privacy" class="band" aria-labelledby="t-priv">
-<div class="wrap band-in" data-reveal>
-<div>
-<p class="label">{{ t.privacy }}</p>
+<div class="wrap band-in">
+<div class="rv-me">
 <h2 id="t-priv" class="h2">{{ c.privacy_title }}</h2>
 </div>
-<div>
+<div class="rv-me">
 {% for sentence in c.privacy_summary %}<p>{{ sentence }}</p>
-{% endfor %}<a class="btn" href="{{ route(lang, true) }}">{{ t.privacy_full }}</a>
+{% endfor %}<a class="link-btn" href="{{ route(lang, true) }}">{{ t.privacy_full }}{{ icon('arrow') }}</a>
 </div>
 </div>
 </section>
 
 <section id="support" class="sec wrap" aria-labelledby="t-sup">
-<div class="help" data-reveal>
-<div>
-<p class="label">{{ t.support }}</p>
+<div class="help">
+<div class="rv-me">
 <h2 id="t-sup" class="h2">{{ t.faq }}</h2>
-<p class="intro">{{ c.support_intro }}<br><a class="mail" href="mailto:{{ contact_email }}">{{ icon('mail') }}<span>{{ contact_email }}</span></a></p>
+<p class="intro">{{ c.support_intro }}</p>
+<a class="mail" href="mailto:{{ contact_email }}">{{ icon('mail') }}<span>{{ contact_email }}</span></a>
 </div>
-<div class="qa">{{ faq(c.faq) }}</div>
+<div class="qa rv-me">{{ faq(c.faq) }}</div>
 </div>
 </section>
 {% endblock %}

@@ -20,6 +20,7 @@ class MonthStripLayout {
     this._lines, {
     required this.bare,
     required this.height,
+    this.pushed = 0,
   });
 
   final List<_StripLine> _lines;
@@ -30,6 +31,10 @@ class MonthStripLayout {
 
   /// The height of the strip, its gap above included.
   final double height;
+
+  /// What the card was pushed down (already in [height]) so that the edge of
+  /// the month does not cut a line of it ([MonthSummaryStrip.layoutBehindFold]).
+  final double pushed;
 
   /// Lines of text it takes.
   int get textLines => _lines.fold(0, (sum, line) => sum + line.lines);
@@ -54,9 +59,10 @@ class MonthStripLayout {
 /// rules). The month screen says how much room the grid has to spare
 /// ([layoutFor]) and the strip takes the tallest form that fits in it: the
 /// card with two lines, the card with one, or one bare line of text. With no
-/// room for a full [Sp.touch] target plus its gap, it is not shown.
-/// Where the month already scrolls (or
-/// in the list) there is no limit and it is the card.
+/// room for a full [Sp.touch] target plus its gap, [layoutFor] says so and the
+/// month screen shows the card after the days instead, scrolling to it (QA
+/// 0.12.1, N6): the strip is never left out. Where the month already scrolls
+/// (or in the list) there is no limit and it is the card.
 class MonthSummaryStrip extends ConsumerWidget {
   const MonthSummaryStrip({super.key, this.layout});
 
@@ -145,6 +151,53 @@ class MonthSummaryStrip extends ConsumerWidget {
     return MonthStripLayout._(one.lines, bare: true, height: bare);
   }
 
+  /// How the strip is drawn in a month that has to scroll to reach it: there
+  /// is no room under the days for even the bare line ([layoutFor] gave
+  /// `null`), so the strip is the card after them and only [edge] dp of it
+  /// (its gap above included) are in view at rest, the rest is under the fold
+  /// of the month, the fixed row and the bar of destinations (QA iOS 1.3.0,
+  /// F8: in Catalan and Basque the second line was cut in half there).
+  ///
+  /// It is the same card [layoutFor] draws with no limit, with every line
+  /// kept, but pushed down just enough that the fold never falls inside a
+  /// line of text: each line is whole in view or whole under the fold, and
+  /// scrolling brings all of them above the bar. `null` only when there is
+  /// nothing to show.
+  static MonthStripLayout? layoutBehindFold(
+    BuildContext context,
+    CivilDate month,
+    MonthStripData data,
+    double width, {
+    required double edge,
+  }) {
+    final base = layoutFor(context, month, data, width);
+    if (base == null || base.bare) return base;
+    final line = _lineHeight(context, _style(context));
+    final block = base.textLines * line;
+    final box =
+        (_padding.vertical + block.clamp(IconSize.inline, double.infinity))
+            .clamp(Sp.touch, double.infinity);
+    // The text is centered in the card, which is at least a touch target.
+    final first =
+        _gapAbove + _padding.top + (box - _padding.vertical - block) / 2;
+    for (var i = 0; i < base.textLines; i++) {
+      final top = first + i * line;
+      if (top < edge - _cutSlack && top + line > edge + _cutSlack) {
+        final push = edge - top;
+        return MonthStripLayout._(
+          base._lines,
+          bare: false,
+          height: base.height + push,
+          pushed: push,
+        );
+      }
+    }
+    return base;
+  }
+
+  /// A dp of play when deciding whether the fold cuts a line.
+  static const double _cutSlack = 0.25;
+
   /// The hours of the month: «128 h», or «128 / 160 h» with an hours goal.
   static String _hours(AppLocalizations l10n, MonthStripData data) {
     final goal = data.goal;
@@ -184,6 +237,7 @@ class MonthSummaryStrip extends ConsumerWidget {
     final day = off.date.firstDayOfMonth == month.firstDayOfMonth
         ? format.weekdayDay(date)
         : format.shortDate(date);
+    if (off.inferred) return l10n.monthStripUnrecorded(day);
     return switch (off.daysAway) {
       null => l10n.monthStripFirstOff(day),
       0 => l10n.offToday,
@@ -369,7 +423,7 @@ class MonthSummaryStrip extends ConsumerWidget {
       );
     }
     return Padding(
-      padding: _margin + const EdgeInsets.only(top: _gapAbove),
+      padding: _margin + EdgeInsets.only(top: _gapAbove + layout.pushed),
       child: AppCard(
         key: const ValueKey('month-strip'),
         padding: _padding,

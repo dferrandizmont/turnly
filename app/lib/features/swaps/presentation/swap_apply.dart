@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/l10n/l10n.dart';
 import '../../../core/widgets/app_snack_bar.dart';
@@ -12,19 +13,27 @@ import '../domain/swap_schedule_plan.dart';
 
 /// A notice of the swap screens, with an action («Deshacer», «Aplicar») when
 /// there is something to do about it.
+///
+/// It is tracked by [snackBarCoverProvider]: the notice floats over the
+/// bottom of the book, and the list leaves that room under its last card so
+/// «Aplicar al cuadrante» can be scrolled clear of it (QA N33).
 void showSwapNotice(
   ScaffoldMessengerState messenger,
   String message, {
   SnackBarAction? action,
-}) => messenger
-  ..hideCurrentSnackBar()
-  ..showSnackBar(
-    appSnackBar(
-      context: messenger.context,
-      content: Text(message),
-      action: action,
-    ),
+}) {
+  final context = messenger.context;
+  showTrackedSnackBarAfter(
+    ProviderScope.containerOf(
+      context,
+      listen: false,
+    ).read(snackBarCoverProvider.notifier),
+    messenger: messenger,
+    clearance: snackBarClearance(context),
+    content: Text(message),
+    action: action,
   );
+}
 
 void showSwapUndoNotice(
   ScaffoldMessengerState messenger,

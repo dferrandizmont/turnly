@@ -1,11 +1,12 @@
 {% extends 'base/layout.html.j2' %}
-{% block content %}<section class="wrap lost">
-<div class="today today-solo">
-<p class="label">404</p>
-<h1 class="h1">{{ t.not_found }}</h1>
-<p class="lede">{{ t.not_found_text }}</p>
+{#- Cloudflare serves one 404.html for the whole site, so it is built in the default language; assets/site.js (lost()) reads data-lost (the
+    404 texts of every language) and shows the one of the language in the address (/eu/…): the heading, the sentence, the «home» word of the
+    buttons, the skip link, the <html lang> and the title. Without JS it stays in the default language. -#}
+{% block content %}<section class="wrap lost" id="lost" data-name="{{ c.name }}" data-lost='{{ c.lost | tojson }}'>
+<p class="tc-label lost-no" aria-hidden="true">404</p>
+<h1 class="h1 lost-t" id="lostT">{{ t.not_found }}</h1>
+<p class="lede" id="lostX">{{ t.not_found_text }}</p>
 <ul class="lost-links">
-{% for code in site.languages %}<li><a class="btn" href="{{ route(code) }}" lang="{{ code }}" hreflang="{{ code }}">{{ t.home }} · {{ t.languages[code] }}</a></li>{% endfor %}
+{% for code in site.languages %}<li><a class="btn" href="{{ route(code) }}" lang="{{ code }}" hreflang="{{ code }}"><span class="lost-home">{{ t.home }}</span> · {{ t.languages[code] }}</a></li>{% endfor %}
 </ul>
-</div>
 </section>{% endblock %}

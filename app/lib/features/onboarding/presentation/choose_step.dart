@@ -9,6 +9,7 @@ import '../../../core/router.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/choice_sheet.dart';
+import '../../backup/application/backup_providers.dart';
 import '../../calendar/application/schedule_controller.dart';
 import '../../calendar/presentation/shift_badge.dart';
 import '../../calendar/presentation/shift_format.dart';
@@ -34,9 +35,10 @@ class ChooseStep extends ConsumerWidget {
     final l10n = context.l10n;
     final type = context.type;
     final controller = ref.read(onboardingControllerProvider.notifier);
+    final backupWaiting = ref.watch(backupWaitingForOnboardingProvider);
 
     Future<void> restore() async {
-      await context.push(AppRoutes.settingsBackup);
+      await context.push(AppRoutes.settingsBackupRecover);
       // A restore that finished marks the first use as done and leaves the
       // person's data: nothing left to ask.
       if (!context.mounted) return;
@@ -95,7 +97,12 @@ class ChooseStep extends ConsumerWidget {
             key: const ValueKey('onboarding-restore'),
             onPressed: restore,
             icon: Icon(ImportIcons.backupFile, size: IconSize.button),
-            label: Text(l10n.onboardingRestore, textAlign: TextAlign.center),
+            label: Text(
+              backupWaiting
+                  ? l10n.onboardingRestoreReceived
+                  : l10n.onboardingRestore,
+              textAlign: TextAlign.center,
+            ),
           ),
         ),
       ],
@@ -121,10 +128,18 @@ class _PathCard extends StatelessWidget {
   final String? tag;
   final VoidCallback onTap;
 
+  /// From this text size the drawing is left out.
+  static const double _hideArtFrom = 1.5;
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final type = context.type;
+    // With large text the drawing gives its room to the words: the texts
+    // wrapped in a column a third of the card, three cards no longer fitted
+    // and only «Importar» was in the first view (QA 0.12.1, N19).
+    final drawing =
+        MediaQuery.textScalerOf(context).scale(10) / 10 < _hideArtFrom;
     return AppCard(
       onTap: onTap,
       semanticLabel: [?tag, title, hint].join('. '),
@@ -132,17 +147,19 @@ class _PathCard extends StatelessWidget {
       child: ExcludeSemantics(
         child: Row(
           children: [
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: colors.surfaceRaised,
-                borderRadius: Rad.innerRadius,
+            if (drawing) ...[
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: colors.surfaceRaised,
+                  borderRadius: Rad.innerRadius,
+                ),
+                child: SizedBox.square(
+                  dimension: Disc.badge,
+                  child: Center(child: art),
+                ),
               ),
-              child: SizedBox.square(
-                dimension: Disc.badge,
-                child: Center(child: art),
-              ),
-            ),
-            const SizedBox(width: Sp.m),
+              const SizedBox(width: Sp.m),
+            ],
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,9 +1,12 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/choice_grid.dart';
 import '../../../core/widgets/choice_pill.dart';
 import '../../../core/widgets/choice_row.dart';
 import '../../holidays/domain/holiday_country.dart';
@@ -80,15 +83,13 @@ class ProfessionSection extends ConsumerWidget {
             spain: spain,
             onSelected: controller.selectProfession,
           ),
-          if (selected != null)
-            Padding(
-              padding: const EdgeInsets.only(top: Sp.xs),
-              child: Text(
-                selected.hint(l10n, spain: spain),
-                key: const ValueKey('onboarding-profession-hours'),
-                style: type.meta,
-              ),
-            ),
+          // The line of the usual hours keeps its room whether a job is
+          // chosen or not: it appeared under the chips and pushed «Crear mi
+          // ciclo» away from the finger (QA 0.12.1, N14).
+          _HoursLine(
+            hints: [for (final p in professions) p.hint(l10n, spain: spain)],
+            shown: selected?.hint(l10n, spain: spain),
+          ),
         ] else
           AppCard(
             padding: const EdgeInsets.symmetric(horizontal: Sp.s),
@@ -111,6 +112,51 @@ class ProfessionSection extends ConsumerWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+/// The usual hours of the chosen job, under the chips of the compact form. It
+/// is as tall as the longest of the hours lines at the width and text size in
+/// use, so choosing (or changing) a job moves nothing below it.
+class _HoursLine extends StatelessWidget {
+  const _HoursLine({required this.hints, required this.shown});
+
+  final List<String> hints;
+  final String? shown;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = context.type.meta;
+    final scaler = MediaQuery.textScalerOf(context);
+    final direction = Directionality.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: Sp.xs),
+      child: LayoutBuilder(
+        builder: (context, box) {
+          var height = 0.0;
+          for (final hint in hints) {
+            final painter = TextPainter(
+              text: TextSpan(text: hint, style: style),
+              textDirection: direction,
+              textScaler: scaler,
+            )..layout(maxWidth: box.maxWidth);
+            if (painter.height > height) height = painter.height;
+            painter.dispose();
+          }
+          return SizedBox(
+            height: height,
+            width: double.infinity,
+            child: shown == null
+                ? null
+                : Text(
+                    shown!,
+                    key: const ValueKey('onboarding-profession-hours'),
+                    style: style,
+                  ),
+          );
+        },
+      ),
     );
   }
 }
@@ -145,9 +191,47 @@ class _JobChipsState extends State<JobChips> {
     super.dispose();
   }
 
+  /// The widest a chip of the scrolling row gets before its name wraps: 200 dp
+  /// for the name plus the place the chip keeps for its check.
+  static const double _chipMaxWidth = 200 + IconSize.inline + Sp.s;
+
+  /// One job. It keeps room for the check whether it is chosen or not
+  /// (`reserveIcon`), so choosing it changes neither its width nor what is
+  /// after it (QA 0.12.1, N14).
+  Widget _chip(BuildContext context, Profession profession) => ChoicePill(
+    key: ValueKey('onboarding-profession-${profession.name}'),
+    label: profession.label(context.l10n, spain: widget.spain),
+    selected: widget.selected == profession,
+    reserveIcon: true,
+    onTap: () => widget.onSelected(profession),
+  );
+
+  /// From this text size the chips wrap onto lines instead of scrolling
+  /// sideways: at x2.0 only the edge of the next job showed after a swipe
+  /// (QA 0.12.1, N12), and the step scrolls with pinned buttons anyway.
+  static const double _wrapFrom = 1.5;
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    if (MediaQuery.textScalerOf(context).scale(10) / 10 >= _wrapFrom) {
+      // A chip may take the whole row: a long name keeps its words whole
+      // instead of splitting at a fixed width (QA 0.12.1, Astra).
+      return LayoutBuilder(
+        builder: (context, box) => Wrap(
+          key: const ValueKey('onboarding-profession-chips'),
+          spacing: Sp.s,
+          runSpacing: Sp.s,
+          children: [
+            for (final profession in widget.professions)
+              ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: box.maxWidth),
+                child: _chip(context, profession),
+              ),
+          ],
+        ),
+      );
+    }
     return Stack(
       children: [
         SingleChildScrollView(
@@ -162,17 +246,22 @@ class _JobChipsState extends State<JobChips> {
                   Padding(
                     padding: const EdgeInsets.only(right: Sp.s),
                     // A long name (Basque, Galician) wraps in the chip
-                    // instead of making it wider than the screen.
+                    // instead of making it wider than the screen, but never
+                    // inside a word: the chip is at least as wide as its
+                    // longest word.
                     child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 200),
-                      child: ChoicePill(
-                        key: ValueKey(
-                          'onboarding-profession-${profession.name}',
+                      constraints: BoxConstraints(
+                        maxWidth: math.max(
+                          _chipMaxWidth,
+                          ChoiceGrid.minCellWidthFor(
+                            context,
+                            labels: [
+                              profession.label(l10n, spain: widget.spain),
+                            ],
+                          ),
                         ),
-                        label: profession.label(l10n, spain: widget.spain),
-                        selected: widget.selected == profession,
-                        onTap: () => widget.onSelected(profession),
                       ),
+                      child: _chip(context, profession),
                     ),
                   ),
               ],

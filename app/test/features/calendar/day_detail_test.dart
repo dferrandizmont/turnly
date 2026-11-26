@@ -1,5 +1,6 @@
 import 'package:cuadrante/core/widgets/buttons.dart';
 import 'package:cuadrante/features/calendar/application/schedule_controller.dart';
+import 'package:cuadrante/features/calendar/application/visible_month.dart';
 import 'package:cuadrante/features/calendars/domain/calendar.dart';
 import 'package:cuadrante/features/holidays/application/holidays_provider.dart';
 import 'package:cuadrante/features/schedule/application/schedule_providers.dart';
@@ -142,6 +143,30 @@ void main() {
   });
 
   group('shifts', () {
+    testWidgets('a manual 24-hour guard shows hours and the manual reset', (
+      tester,
+    ) async {
+      await pumpCalendar(tester);
+      final controller = containerOf(
+        tester,
+      ).read(scheduleControllerProvider.notifier);
+      const date = CivilDate(2026, 6, 19); // Before the demo rotation.
+      controller.saveShiftType(
+        shiftTemplates
+            .firstWhere((t) => t.key == 'guard24')
+            .toShiftType('guard24'),
+      );
+      controller.setDayShifts(date, const ['guard24']);
+      containerOf(tester).read(visibleMonthProvider.notifier).goTo(date);
+      await tester.pumpAndSettle();
+      await openDay(tester, date);
+      expect(find.text('08:00–08:00 · 24\u00a0h'), findsOneWidget);
+      expect(find.text('Quitar el cambio a mano'), findsOneWidget);
+      expect(find.text('Ese día no tiene rotación.'), findsOneWidget);
+      await tapInSheet(tester, 'day-reset');
+      expect(schedule(tester).resolve(date).shiftIds, isEmpty);
+    });
+
     testWidgets('adding from the palette doubles the day, in one undo step', (
       tester,
     ) async {

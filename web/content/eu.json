@@ -4,7 +4,6 @@
   "description": "Txanden egutegi doakoa eta kode irekikoa, Espainian txandaka lan egiten dutenentzat. Pro bertsiorik, iragarkirik, konturik eta konexiorik gabe.",
   "intro": "Txanden egutegia Espainian txandaka lan egiten dutenentzat (osasungintza, polizia, suhiltzaileak, industria, ostalaritza edo beste edozein sektore): antolatu goizak, arratsaldeak, gauak, guardiak, gau-ondokoak eta egun libreak, eta ikusi zure hurrengo txanda begi-kolpe batean.",
   "hero_cta": "Deskargatu doan",
-  "key_facts": "Dena doan, Pro bertsiorik gabe · Iragarkirik gabe · Konturik gabe · Konexiorik gabe dabil · Kode irekia · Bost hizkuntza",
   "features": [
     "Zure hurrengo txanda eta hurrengo egun librea gaurko txartelan; hilabetea saretan edo zerrendan, agenda eta urtea, mugikorreko egutegiko hitzorduak zure txanden ondoan. Oharrak argazki eta zereginekin, eta gehienez sei egutegi, zein egunetan zaudeten libre aldi berean ikusteko.",
     "Ukitu edo arrastatu hainbat egun margotzeko, jarri txanda bat baino gehiago egun berean eta desegin nahi duzuna. Txandaketen laguntzaileak zure txandaketa aurrebistarekin aplikatzen du: txanda birakariak, 24/72, 4×4, 6×4, 5×2, 2-2-3, «2 eta 2», «3 eta 1» edo zure eredua, tokatzen zaizun zikloko egunetik hasita.",
@@ -26,10 +25,6 @@
     {
       "question": "Kontu bat edo Interneteko konexioa behar al dut?",
       "answer": "Ez. Ez dago konturik, eta dena dabil konexiorik gabe, baita jaiegunak ere."
-    },
-    {
-      "question": "Nola eman dezaket izena Google Play-ko proban?",
-      "answer": "Sartu Google Groups-eko turnly-testers proba-taldean zure Google kontuarekin, onartu proba Google Play-ko estekan eta instalatu aplikazioa dendatik. Bere kabuz eguneratuko da."
     },
     {
       "question": "Eta iPhonean eta iPadean?",
@@ -72,66 +67,16 @@
     "11-widgets-oscuro": "«Gehitu widgeta» galeria zure benetako txandekin: txikia, agenda, ertaina eta gehiago"
   },
   "privacy_date": "2026-11-20",
-  "kicker": "Txanden egutegia",
   "tagline": "Zure txandak, begi-kolpe batean.",
   "chip": "Dena doan: Pro bertsiorik, iragarkirik eta konturik gabe.",
   "nav_label": "Atalak",
   "theme_label": "Gaia",
   "theme_dark": "Iluna",
   "theme_hint": "Aldatu gaia",
-  "anim": {
-    "month": "Abendua",
-    "weekdays": [
-      "A",
-      "A",
-      "A",
-      "O",
-      "O",
-      "L",
-      "I"
-    ],
-    "shifts": {
-      "m": {
-        "code": "Goi",
-        "name": "Goiza"
-      },
-      "t": {
-        "code": "Arr",
-        "name": "Arratsaldea"
-      },
-      "n": {
-        "code": "Gau",
-        "name": "Gaua"
-      },
-      "l": {
-        "code": "L",
-        "name": "Libre"
-      },
-      "s": {
-        "code": "GO",
-        "name": "Gau-ondokoa"
-      }
-    },
-    "sequence": "Zure sekuentzia",
-    "cycle_days": "{n} egun",
-    "tonight": "Gaur gauean",
-    "starts_in": "{duration} barru hasiko da",
-    "widget_day": "og. 24",
-    "widget_tomorrow": "Bihar",
-    "off_on": "Hurrengo egun librea: larunbata 26",
-    "unit_h": "h",
-    "hours": {
-      "m": "06–14",
-      "t": "14–22",
-      "n": "22–06"
-    },
-    "night_range": "22:00–06:00"
-  },
-  "download_title": "App Store-n, iPhone eta iPadetarako; Android, probetan.",
+  "download_title": "App Store-n, iPhone eta iPadetarako; Android, laster.",
   "download_intro": "Modu argia eta iluna. Doan eta konturik gabe.",
   "download_notes": {
-    "play": "Edonork eman dezake izena hiru pausotan:",
-    "apk": "Eskuz instalatzen da. 0.8.3 bertsiotik aurrera Google Play-ko bertsioaren sinadura bera du: batetik bestera pasa zaitezke desinstalatu gabe.",
+    "play": "Laster egongo da eskuragarri Google Play-n.",
     "app_store": "Doan App Store-n, iOS 17 edo berriagoa duten iPhone eta iPadetarako."
   },
   "screenshots_title": "Benetako pantailak",
@@ -181,5 +126,184 @@
   "toc_aria": "Politikaren aurkibidea",
   "toc_count": "{count} atal",
   "fallback_label": "Hizkuntza-oharra",
-  "fallback_text": "Politika gaztelaniaz erakusten da, hori baita baliozko bertsioa. Webgunearen gainerakoa euskaraz dago."
+  "fallback_text": "Politika gaztelaniaz erakusten da, hori baita baliozko bertsioa. Webgunearen gainerakoa euskaraz dago.",
+  "key_facts": "Konexiorik gabe dabil · Kode irekia · Bost hizkuntza",
+  "hero_line_1": "Zure txandak,",
+  "hero_line_2": "begi-kolpe batean.",
+  "screenshots_count": "{n} / {total}",
+  "demo": {
+    "label": "Adibideko egutegia: aplikatu eredu bat edo margotu zure txandak",
+    "tabs_label": "Zer probatu nahi duzu",
+    "tab_pattern": "Aplikatu eredua",
+    "tab_paint": "Margotu",
+    "month": "Abendua",
+    "weekdays": [
+      "Al",
+      "Ar",
+      "Az",
+      "Og",
+      "Or",
+      "Lr",
+      "Ig"
+    ],
+    "weekday_names": [
+      "igandea",
+      "astelehena",
+      "asteartea",
+      "asteazkena",
+      "osteguna",
+      "ostirala",
+      "larunbata"
+    ],
+    "today_label": "og 24",
+    "tonight": "Gaur gauean",
+    "starts_in": "{duration} barru hasiko da",
+    "duration": "4 h",
+    "off_on": "Hurrengo egun librea: {weekday}, hilak {day}",
+    "summary": "{n} txanda · {h} h",
+    "day_label": "Abenduak {day}: {shift}",
+    "day_today": " (gaur)",
+    "and": " + ",
+    "pattern_label": "Txandaketak",
+    "cycle_days": "{n} egun",
+    "sequence": "Zure sekuentzia",
+    "cycle_hint": "Zikloko zenbatgarren eguna dagokizu abenduaren 1ean? Ukitu egun hori.",
+    "that_day": "Egun horretan: {shifts}",
+    "cycle_day_label": "Zikloko eguna: {n}, guztira {total}, {shift}",
+    "paint": {
+      "header": "Margotzen",
+      "mode_replace": "Aldatu txanda",
+      "mode_add": "Gehitu beste txanda bat",
+      "mode_add_spoken": "Gehitu beste txanda bat (bikoiztu)",
+      "eraser": "Ezabatu",
+      "done": "Eginda",
+      "undo": "Desegin",
+      "redo": "Berregin",
+      "pattern_button": "Eredua",
+      "tools_label": "Margotzeko tresnak",
+      "preview_title": "Egun bat ukitzean",
+      "preview_title_double": "Egun bat ukitzean (bikoiztu)",
+      "effect_replace": "Dagoena ordezkatzen du",
+      "effect_add": "Dagoenari gehitzen zaio",
+      "effect_erase": "Eguna hutsik uzten du",
+      "empty": "hutsik",
+      "hint_idle": "Aukeratu txanda bat eta arrastatu.",
+      "hint_painting": "Margotzen: {name}",
+      "preview_spoken": "{title}. Lehen: {before}. Gero: {after}. {effect}",
+      "preview_spoken_times": "{title}. Lehen: {before}. Gero: {after}, {times}. {effect}"
+    },
+    "shifts": {
+      "M": {
+        "name": "Goiza",
+        "code": "Goi",
+        "short": "06–14",
+        "full": "06:00–14:00"
+      },
+      "T": {
+        "name": "Arratsaldea",
+        "code": "Arr",
+        "short": "14–22",
+        "full": "14:00–22:00"
+      },
+      "N": {
+        "name": "Gaua",
+        "code": "Gau",
+        "short": "22–06",
+        "full": "22:00–06:00"
+      },
+      "G": {
+        "name": "Guardia 24 h",
+        "code": "G24",
+        "short": "08–08",
+        "full": "08:00–08:00"
+      },
+      "D": {
+        "name": "Eguna 12 h",
+        "code": "E12",
+        "short": "08–20",
+        "full": "08:00–20:00"
+      },
+      "L": {
+        "name": "Libre",
+        "code": "L"
+      },
+      "S": {
+        "name": "Gau-ondokoa",
+        "code": "GO"
+      }
+    },
+    "rotations": {
+      "correturnos": {
+        "name": "Txanda birakariak",
+        "description": "5 goiz, 2 libre, 5 arratsalde, 2 libre, 5 gau, 2 libre"
+      },
+      "24x72": {
+        "name": "24 x 72",
+        "description": "24 orduko guardia eta 72 ordu libre (1-3 ere bai)"
+      },
+      "4x4": {
+        "name": "4 x 4",
+        "description": "12 orduko 4 egun eta 4 libre, gaueko txandarik gabe (4x4 edo lau eta lau)"
+      },
+      "6x4": {
+        "name": "6 x 4",
+        "description": "6 goiz eta 4 libre"
+      },
+      "5x2": {
+        "name": "5 x 2",
+        "description": "5 goiz eta 2 libre (astelehenetik ostiralera)"
+      },
+      "2-2-3": {
+        "name": "2-2-3",
+        "description": "12 orduko bi egun, bi libre, 12 orduko hiru, bi libre, 12 orduko bi eta hiru libre (2-2-3-2-2-3 ere bai). Pitman edo Panama izenez ere ezagutzen da."
+      },
+      "2x2": {
+        "name": "2 eta 2",
+        "description": "2 lanegun eta 2 libre (2x2)."
+      },
+      "3x1": {
+        "name": "3 eta 1",
+        "description": "3 lanegun eta egun libre 1 (3x1)."
+      }
+    },
+    "ends_in": "{duration} barru amaituko da",
+    "duration_fmt": "{h} h",
+    "no_times": "ordutegirik gabe",
+    "clear_painted": "Kendu margotutakoa",
+    "summary_one": "Txanda {n} · {h} h",
+    "off_tomorrow": "Bihar libre zaude",
+    "now": "Orain"
+  },
+  "lost": {
+    "es": {
+      "title": "Página no encontrada",
+      "text": "Esta página no existe. Puedes volver al inicio.",
+      "home": "Inicio",
+      "skip": "Saltar al contenido"
+    },
+    "ca": {
+      "title": "Pàgina no trobada",
+      "text": "Aquesta pàgina no existeix. Pots tornar a l’inici.",
+      "home": "Inici",
+      "skip": "Salta al contingut"
+    },
+    "gl": {
+      "title": "Páxina non atopada",
+      "text": "Esta páxina non existe. Podes volver ao inicio.",
+      "home": "Inicio",
+      "skip": "Saltar ao contido"
+    },
+    "eu": {
+      "title": "Ez da orria aurkitu",
+      "text": "Orri hau ez dago. Hasierara itzul zaitezke.",
+      "home": "Hasiera",
+      "skip": "Joan edukira"
+    },
+    "en": {
+      "title": "Page not found",
+      "text": "This page does not exist. You can return to the home page.",
+      "home": "Home",
+      "skip": "Skip to content"
+    }
+  }
 }

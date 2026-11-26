@@ -5,6 +5,7 @@
 //
 // The tests print machine-readable lines (support/qa_core.dart):
 //   QA_START|id|title            QA_RESULT|id|PASS|ms|        QA_RESULT|id|FAIL|ms|message
+//   QA_RESULT|id|SKIP|ms|reason
 //   QA_TRACE|id|stack            QA_SHOT|id|name              QA_METRIC|id|name|value
 //   QA_NOTE|id|text
 // Extra options:
@@ -71,21 +72,29 @@ void main(List<String> args) {
 
   var passed = 0;
   final failed = <_Scenario>[];
+  var skipped = 0;
   for (final id in order) {
     final s = scenarios[id]!;
     if (s.status == 'PASS') {
       passed++;
+    } else if (s.status == 'SKIP') {
+      skipped++;
     } else {
       failed.add(s);
     }
   }
   final total = order.length;
-  final ok = total > 0 && failed.isEmpty && flutterExit == 0;
+  final ok = total > 0 && failed.isEmpty && skipped == 0 && flutterExit == 0;
+  final verdict = switch ((ok, failed.isEmpty && skipped > 0 && flutterExit == 0)) {
+    (true, _) => 'TODO EN VERDE',
+    (_, true) => 'INCOMPLETO',
+    _ => 'HAY FALLOS',
+  };
 
   final b = StringBuffer()
     ..writeln('# Informe de la batería QA — Cuadrante')
     ..writeln()
-    ..writeln('- Resultado: **${ok ? 'TODO EN VERDE' : 'HAY FALLOS'}** '
+    ..writeln('- Resultado: **$verdict** '
         '($passed/$total escenarios)')
     ..writeln('- Fecha: ${DateTime.now().toIso8601String().split('.').first}')
     ..writeln('- Dispositivo: ${opts['device'] ?? '?'} (AVD ${opts['avd'] ?? '?'}'
@@ -103,7 +112,7 @@ void main(List<String> args) {
     ..writeln('|---|---|:---:|---:|---|');
   for (final id in order) {
     final s = scenarios[id]!;
-    final mark = s.status == 'PASS' ? '✔' : '✘';
+    final mark = _mark(s);
     final title = s.title.replaceAll('|', '/');
     b.writeln('| ${s.id} | $title | $mark | ${_fmt(s.ms)} | ${shotsOf(s.id)} |');
   }
@@ -217,8 +226,18 @@ void _appendToReport(File report, Directory out, List<String> extra) {
   var lines = report.readAsStringSync().split('\n');
   for (final id in order) {
     lines.removeWhere(
-      (l) => l.startsWith('| $id |') || l.startsWith('- $id · ') || l.startsWith('### $id '),
+      (l) => l.startsWith('| $id |') || l.startsWith('- $id · '),
     );
+    final failure = lines.indexWhere((l) => l.startsWith('### $id '));
+    if (failure >= 0) {
+      final end = lines.indexWhere(
+        (l) => l.startsWith('## ') ||
+            l.startsWith('### ') ||
+            l.startsWith('Registro completo'),
+        failure + 1,
+      );
+      lines.removeRange(failure, end < 0 ? lines.length : end);
+    }
   }
   // The table: its last row.
   var last = lines.lastIndexWhere((l) => l.startsWith('| ') || l.startsWith('|---'));
@@ -232,7 +251,7 @@ void _appendToReport(File report, Directory out, List<String> extra) {
           '[${f.substring(0, f.length - 4)}](shots/$f)',
     ].join(' ');
     rows.add(
-      '| $id | ${s.title.replaceAll('|', '/')} | ${s.status == 'PASS' ? '✔' : '✘'} | '
+      '| $id | ${s.title.replaceAll('|', '/')} | ${_mark(s)} | '
       '${_fmt(s.ms)} | ${shots.isEmpty ? '—' : shots} |',
     );
   }
@@ -241,7 +260,7 @@ void _appendToReport(File report, Directory out, List<String> extra) {
   final measures = <String>[
     for (final id in order) ...[
       for (final e in scenarios[id]!.metrics.entries) '- $id · ${e.key}: ${e.value}',
-      for (final n in scenarios[id]!.notes) '- $id · nota: $n',
+        for (final n in scenarios[id]!.notes) '- $id · nota: $n',
     ],
   ];
   if (measures.isNotEmpty) {
@@ -260,7 +279,8 @@ void _appendToReport(File report, Directory out, List<String> extra) {
       lines.insertAll(e, measures);
     }
   }
-  final failed = [for (final id in order) if (scenarios[id]!.status != 'PASS') scenarios[id]!];
+  final failed = [for (final id in order) if (scenarios[id]!.status != 'PASS' && scenarios[id]!.status != 'SKIP') scenarios[id]!];
+  final skipped = [for (final id in order) if (scenarios[id]!.status == 'SKIP') scenarios[id]!];
   if (failed.isNotEmpty) {
     final end = lines.indexWhere((l) => l.startsWith('Registro completo'));
     lines.insertAll(end < 0 ? lines.length : end, [
@@ -275,19 +295,43 @@ void _appendToReport(File report, Directory out, List<String> extra) {
       ],
     ]);
   }
+  final failuresHeading = lines.indexOf('## Fallos');
+  if (failuresHeading >= 0 &&
+      !lines.skip(failuresHeading + 1)
+          .takeWhile((l) => !l.startsWith('## ') && !l.startsWith('Registro completo'))
+          .any((l) => l.trim().isNotEmpty)) {
+    lines.removeAt(failuresHeading);
+  }
 
   // Counts and verdict in the header.
-  final tableRows = lines.where((l) => RegExp(r'^\| [A-Z]\d+ \|').hasMatch(l)).toList();
-  final passed = tableRows.where((l) => l.contains('| ✔ |')).length;
+  final statuses = [
+    for (final l in lines)
+      if (RegExp(r'^\| [A-Z]\d+ \|').hasMatch(l)) l.split(' | ')[2],
+  ];
+  final passed = statuses.where((status) => status == '✔').length;
+  final batteryFailed = lines.any(
+    (l) => l.startsWith('- No se ejecutó ningún escenario') ||
+        (l.startsWith('- Duración total:') &&
+            RegExp(r'terminó con código [1-9]\d*\)').hasMatch(l)),
+  );
+  final verdict = statuses.contains('✘') || batteryFailed
+      ? 'HAY FALLOS'
+      : passed == statuses.length ? 'TODO EN VERDE' : 'INCOMPLETO';
   lines = [
     for (final l in lines)
       if (l.startsWith('- Resultado:'))
-        '- Resultado: **${passed == tableRows.length && l.contains('TODO EN VERDE') ? 'TODO EN VERDE' : 'HAY FALLOS'}** '
-            '($passed/${tableRows.length} escenarios)'
+        '- Resultado: **$verdict** '
+            '($passed/${statuses.length} escenarios)'
       else
         l,
   ];
   report.writeAsStringSync(lines.join('\n'));
   stdout.writeln(rows.join('\n'));
-  exit(failed.isEmpty ? 0 : 1);
+  exit(failed.isEmpty && skipped.isEmpty ? 0 : 1);
 }
+
+String _mark(_Scenario scenario) => switch (scenario.status) {
+  'PASS' => '✔',
+  'SKIP' => 'Omitido',
+  _ => '✘',
+};

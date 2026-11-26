@@ -38,7 +38,12 @@ import '../../../core/platform/share_origin.dart';
 /// action (B9), the copy on the phone, import and test, and the list of
 /// copies with "Restaurar esta".
 class BackupScreen extends ConsumerStatefulWidget {
-  const BackupScreen({super.key});
+  const BackupScreen({super.key, this.importFirst = false});
+
+  /// Opened from «Recuperar una copia de seguridad» in first use: the person
+  /// has no data to save yet, so «Importar archivo» is the main action and
+  /// saving a copy comes after it (QA 0.12.1, N29).
+  final bool importFirst;
 
   @override
   ConsumerState<BackupScreen> createState() => _BackupScreenState();
@@ -192,6 +197,27 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Recovering in first use: the action comes before the state of
+              // the copies, which on a new install is an illustration, a
+              // title, an invitation to make a copy and the notices (QA
+              // 0.12.1, N29).
+              if (widget.importFirst) ...[
+                PrimaryButton(
+                  key: const ValueKey('backup-import-first'),
+                  label: l10n.backupUiImport,
+                  icon: BackupIcons.importFile,
+                  onPressed: _import,
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(Sp.xs, Sp.s, Sp.xs, Sp.l),
+                  child: Text(
+                    l10n.backupUiImportSubtitle,
+                    style: context.type.meta.copyWith(
+                      color: context.colors.textSecondary,
+                    ),
+                  ),
+                ),
+              ],
               copies.when(
                 data: (list) => _StatusSection(
                   latest: list
@@ -212,15 +238,26 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
               // B9: the copy that saves you is the one outside the phone, so
               // it is the main action; the copy on the phone comes second.
               Builder(
-                builder: (buttonContext) => PrimaryButton(
-                  key: const ValueKey('backup-export'),
-                  label: l10n.backupUiSaveOutside,
-                  icon: AppIcons.share,
-                  onPressed: () {
+                builder: (buttonContext) {
+                  void export() {
                     rememberShareOrigin(buttonContext);
                     _export();
-                  },
-                ),
+                  }
+
+                  return widget.importFirst
+                      ? SecondaryButton(
+                          key: const ValueKey('backup-export'),
+                          label: l10n.backupUiSaveOutside,
+                          icon: AppIcons.share,
+                          onPressed: export,
+                        )
+                      : PrimaryButton(
+                          key: const ValueKey('backup-export'),
+                          label: l10n.backupUiSaveOutside,
+                          icon: AppIcons.share,
+                          onPressed: export,
+                        );
+                },
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(Sp.xs, Sp.s, Sp.xs, Sp.m),

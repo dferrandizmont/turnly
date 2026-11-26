@@ -36,6 +36,19 @@ import '../../../core/platform/share_origin.dart';
 
 // ---- where things live --------------------------------------------------
 
+/// Whether a shared file is waiting for the first-use flow to leave its page.
+final backupWaitingForOnboardingProvider =
+    NotifierProvider<BackupWaitingForOnboarding, bool>(
+      BackupWaitingForOnboarding.new,
+    );
+
+class BackupWaitingForOnboarding extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void set(bool waiting) => state = waiting;
+}
+
 /// Whether the copies are replicated to iCloud Drive at all. **`false` until
 /// question 13 of `docs/preguntas.md` is answered** (the replica would carry
 /// every shift and absence, sick leave included, to a folder visible in Files

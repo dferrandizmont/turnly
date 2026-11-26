@@ -116,9 +116,13 @@ String shiftsLine(
 
 /// "3 h 40 min", "40 min", "2 h", "1 d 8 h" (minutes are dropped from a day
 /// on). [minutes] is a whole number of minutes, at least 1.
-String durationText(AppLocalizations l10n, int minutes) {
-  final days = minutes ~/ 1440;
-  final hours = (minutes % 1440) ~/ 60;
+String durationText(
+  AppLocalizations l10n,
+  int minutes, {
+  bool inHours = false,
+}) {
+  final days = inHours ? 0 : minutes ~/ 1440;
+  final hours = (inHours ? minutes : minutes % 1440) ~/ 60;
   final rest = minutes % 60;
   if (days > 0) {
     return hours == 0
@@ -138,7 +142,12 @@ final RegExp _numberThenUnit = RegExp(r'(\d) (?=\S)');
 /// [durationText] with each number glued to its unit by a no-break space: a
 /// narrow line wraps «10 h» whole, never «10» / «h» (Android 0.12.1 QA, C1:
 /// the side pane in landscape at the largest text size).
-String durationTextUnbroken(AppLocalizations l10n, int minutes) => durationText(
+String durationTextUnbroken(
+  AppLocalizations l10n,
+  int minutes, {
+  bool inHours = false,
+}) => durationText(
   l10n,
   minutes,
+  inHours: inHours,
 ).replaceAllMapped(_numberThenUnit, (m) => '${m[1]}\u00A0');

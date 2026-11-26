@@ -32,6 +32,36 @@ class AppLocalizationsEu extends AppLocalizations {
       'Gordetzean, berreskura daitezkeen aurreko txandak leheneratuko dira.';
 
   @override
+  String get onboardingRestoreReceived => 'Berrikusi jasotako kopia';
+
+  @override
+  String get dayDetailResetManual => 'Kendu eskuzko aldaketa';
+
+  @override
+  String get dayDetailNoRotation => 'Egun horretan ez dago txandaketarik.';
+
+  @override
+  String get summaryEstimateExtrasExcluded =>
+      'Aparteko orduak kalkulutik kanpo';
+
+  @override
+  String monthStripUnrecorded(String date) {
+    return 'Txandarik ez dago jasota: $date';
+  }
+
+  @override
+  String get swapEditReturnDate => 'Aldatu itzultze-data';
+
+  @override
+  String get swapUnapplyNoSnapshot =>
+      'Ez dago trukearen aurreko txandak leheneratzeko daturik. Zure txanden egutegia bere horretan dago.';
+
+  @override
+  String swapDates(String given, String received) {
+    return 'Eman: $given · Jaso: $received';
+  }
+
+  @override
   String get appName => 'Turnly';
 
   @override
@@ -286,6 +316,16 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get daySemanticsNote => 'oharrarekin';
+
+  @override
+  String daySwapWith(String name) {
+    return 'Trukea: $name';
+  }
+
+  @override
+  String daySemanticsSwap(String name) {
+    return 'trukea: $name';
+  }
 
   @override
   String daySemanticsOvertime(String duration) {
@@ -2036,7 +2076,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get onboardingRotationHelp =>
-      'Aukeratu zurea edo sortu ezazu une batean. Gero esango duzu noiz hasten zaren.';
+      'Jarraitzeko, aukeratu txandaketa bat edo sortu ziklo bat. Gero, aukeratu noiz hasten den.';
 
   @override
   String get onboardingRotationTypical => 'Zure lanean ohikoena';
@@ -2472,6 +2512,10 @@ class AppLocalizationsEu extends AppLocalizations {
   @override
   String get summaryNoteHoliday =>
       'Jaiegunetako orduak: zure erkidegoko eta udalerriko jaiegun batean egiten direnak, baita txandak gauerdia gainditzen badu ere.';
+
+  @override
+  String get summaryNoteHolidayHidden =>
+      'Jaiegunetako orduak: lerro hau zure erkidegoko eta udalerriko jaiegun batean orduak daudenean bakarrik agertzen da; bat ere ez badago, ez da erakusten.';
 
   @override
   String get summaryNoteTense =>
@@ -6766,7 +6810,7 @@ class AppLocalizationsEu extends AppLocalizations {
   String get swapStagePending => 'Zain';
 
   @override
-  String get swapStageReturned => 'Itzulita';
+  String get swapStageReturned => 'Data du';
 
   @override
   String get swapStageSettled => 'Kitatuta';
@@ -6784,10 +6828,13 @@ class AppLocalizationsEu extends AppLocalizations {
   String get swapFieldColleague => 'Norekin';
 
   @override
-  String get swapFieldColleagueHint => 'Marta';
+  String get swapFieldColleagueHint => 'Adibidez: Marta';
 
   @override
   String get swapInvalidColleague => 'Idatzi norekin den trukea.';
+
+  @override
+  String get swapInvalidNote => 'Oharra luzeegia da. Laburtu ezazu.';
 
   @override
   String get swapFieldDirection => 'Nork zor du txanda';
@@ -6871,7 +6918,7 @@ class AppLocalizationsEu extends AppLocalizations {
   String get swapMarkReturnedTitle => 'Zein egunetan itzuliko dizute?';
 
   @override
-  String get swapMarkedReturned => 'Trukea itzulitzat markatu da';
+  String get swapReturnDateSaved => 'Itzultzeko data gorde da';
 
   @override
   String get swapMarkSettled => 'Markatu kitatutzat';

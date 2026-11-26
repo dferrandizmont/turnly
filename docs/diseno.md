@@ -122,7 +122,7 @@ alternativa), así que en un móvil de 320 dp con letra ×1,6 un tamaño mayor l
 no desborda (`test/core/theme/cell_text_size_test.dart`). Las filas del mes crecen con él (`dayCellHeightWithTime`
 mide los estilos del tema). Se guarda en `appearance.cellTextSize` (ausente = Normal) y viaja en la copia.
 
-**Letra grande (QA 1.1.0, F2, F7, F12).** Los títulos fijos de arriba tienen un tope de escala para no comerse la pantalla ni partir palabras: la fecha de la hoja del día (`DayDetailBodyState.dateTitleMaxScale`) y la cabecera del mes (fecha, selector de calendario, Cuadrícula/Lista, mes y «Hoy», `MonthFit.headerMaxScale`) llegan como mucho a ×1,5; el resto de la pantalla sigue el tamaño del lector. La tarjeta «Hoy» (`TodayCard.maxTextScale`) llega como mucho a ×1,3 (0.11.3): con AX3 ocupaba la mitad de la pantalla y ahora un tercio. Es una excepción deliberada al 200 % de WCAG 1.4.4 para que la cuadrícula del mes siga a la vista; lo del día se lee a tamaño completo en la hoja del día. Desde ×1,5 el selector de calendario va en una línea propia bajo la fecha, con todo su ancho. La marca de horas extra de la casilla se escribe «+2 h» o «+3:45» solo donde cabe junto al número del día a `cellTimeMinSize` (8 dp) o más y sin pisar el número; donde no cabe (con la nota y los puntos al lado, o en una casilla estrecha) queda el «+» pequeño, y la cantidad está en la etiqueta hablada y en el detalle del día; el PDF la pone en la fila del número del día. Los campos con teclado numérico dentro de una hoja (`AppSheetBody`) llevan una barra «Listo» sobre el teclado (en iOS ese teclado no tiene intro) y un toque en un hueco de la hoja lo cierra.
+**Letra grande (QA 1.1.0, F2, F7, F12).** Los títulos fijos de arriba tienen un tope de escala para no comerse la pantalla ni partir palabras: la fecha de la hoja del día (`DayDetailBodyState.dateTitleMaxScale`) y la cabecera del mes (fecha, selector de calendario, Cuadrícula/Lista, mes y «Hoy», `MonthFit.headerMaxScale`) llegan como mucho a ×1,5; el resto de la pantalla sigue el tamaño del lector. La QA 0.12.1 añade tres topes del mismo tipo: los botones de periodo del Resumen (×1,5, `MonthFit.headerMaxScale`), «Seleccionar días» (×1,3, `MonthSelectDaysControl.maxTextScale`) y el texto de las celdas de la cuadrícula en el mes de dos paneles, móvil apaisado o tableta (×1,5, `splitGridMaxTextScale`; la tarjeta, el panel y lo demás siguen al lector). La tarjeta «Hoy» (`TodayCard.maxTextScale`) llega como mucho a ×1,3 (0.11.3): con AX3 ocupaba la mitad de la pantalla y ahora un tercio. Es una excepción deliberada al 200 % de WCAG 1.4.4 para que la cuadrícula del mes siga a la vista; lo del día se lee a tamaño completo en la hoja del día. Desde ×1,5 el selector de calendario va en una línea propia bajo la fecha, con todo su ancho. La marca de horas extra de la casilla se escribe «+2 h» o «+3:45» solo donde cabe junto al número del día a `cellTimeMinSize` (8 dp) o más y sin pisar el número; donde no cabe (con la nota y los puntos al lado, o en una casilla estrecha) queda el «+» pequeño, y la cantidad está en la etiqueta hablada y en el detalle del día; el PDF la pone en la fila del número del día. Los campos con teclado numérico dentro de una hoja (`AppSheetBody`) llevan una barra «Listo» sobre el teclado (en iOS ese teclado no tiene intro) y un toque en un hueco de la hoja lo cierra.
 
 La altura de las líneas de la casilla se **mide**, no se estima: el motor las dibuja en píxeles enteros, así que
 la celda reserva la altura real del número, del código y de la hora (con la letra al 130 %, la línea real mide
@@ -485,13 +485,16 @@ Tocarla abre el Resumen de ese mes; para el lector es un botón «Resumen del me
 un dato es más ancho que la tira). Si no caben en dos líneas quita lo que falta del objetivo, o el próximo libre (ya lo
 dice la tarjeta de hoy), o los dos, y al final los turnos.
 
-**No empuja el calendario** (decisión 28: manda la cuadrícula). La tira solo usa la altura que les sobra a las seis
-filas con su mínimo, así que un mes que cabe nunca pasa a desplazarse por ella ni se le encogen las filas. Con lo que
+**No empuja el calendario** (decisión 28: manda la cuadrícula; las seis filas siempre se ven enteras). La tira usa la altura que les sobra a las seis
+filas con su mínimo, así que a las filas nunca se les encoge por ella; si ni la línea sola cabe, el mes se desplaza lo justo para llegar a ella (QA 0.12.1, N6, decisión del usuario del 26-nov). Con lo que
 sobra elige la forma más alta que cabe (`MonthSummaryStrip.layoutFor`): la tarjeta con dos líneas, la tarjeta con una
 (los datos que caben en una), o **una línea sola**, sin tarjeta (4 dp por encima, el mismo texto con su icono y su
 flecha, toda la línea es el botón). Todas las variantes reservan al menos `Sp.touch` (48 dp) de alto para interacción
 y semántica, además del margen superior. Si no sobra ni eso (por ejemplo con la tarjeta de hoy abierta y la pantalla justa),
-la tira no sale: plegar la tarjeta le hace sitio. Donde el mes ya se desplaza (texto grande, pantalla corta) va detrás
+sale como tarjeta detrás de los días y el mes se desplaza hasta ella; plegar la tarjeta de hoy le hace sitio debajo. Esa
+tarjeta nunca se ve cortada por la mitad de una línea (QA iOS 1.3.0, F8: en catalán y euskera la segunda línea quedaba
+a medias bajo el borde del mes): `MonthSummaryStrip.layoutBehindFold` la baja lo justo para que cada línea de texto
+quede entera a la vista o entera bajo el borde, y al desplazar el mes se ve entera sobre la barra. Donde el mes ya se desplaza (texto grande, pantalla corta) va igual, detrás
 de los días, como tarjeta. No sale al pintar ni al seleccionar días, ni en un mes sin nada que contar.
 
 El objetivo de horas y el día de cierre los lee de `monthStripGoalProvider` y `monthStripClosingDayProvider`
@@ -636,6 +639,33 @@ calendario útil en menos de 60 s sin responder nada que no haga falta.
 - **«Siguiente» y «Continuar» fijos con letra grande (M2, QA 0.12.1):** en el lugar, «¿Cómo es tu rotación?» y «¿Cuándo
   empiezas?», que son largos, el botón principal no se va dentro del desplazamiento con letra ×2,0 (estaba a 8 y a 3-4
   deslizamientos largos): se queda fijo debajo, también en horizontal, y solo la barra de arriba se va con el contenido.
+- **Menores de la QA 0.12.1 con letra grande:** los botones de periodo del Resumen se dibujan como mucho a ×1,5 (la
+  letra de la cabecera) y «Seleccionar días» a ×1,3, que conserva su nombre salvo que ni así quepa antes del botón
+  flotante; desde ×1,5 las tres vías de «¿Cómo empiezas?» pierden el dibujo para dar el ancho al texto y las
+  profesiones de la rotación pasan de una fila que se desliza a líneas (`Wrap`); la línea de horas de la elegida
+  reserva su altura para que «Crear mi ciclo» no se mueva, y las fichas de trabajo guardan siempre el sitio de la marca
+  (`reserveIcon`), así que elegir una no cambia su ancho ni la fila donde cae ninguna otra. Un arrastre horizontal lento
+  sobre la cuadrícula cambia de mes igual que un lanzamiento cuando va de lado 72 dp o más, al menos el doble de lo que
+  se mueve en vertical (medido de donde empezó el dedo a donde acaba) y no se está pintando; en modo selección también
+  (la pulsación larga que ya eligió días conserva su gesto).
+- **Menores de la QA 0.12.1, a decisión del usuario (26-nov):**
+  - *Panel lateral con un día abierto (C1b):* «Deshacer» y cerrar van en la fila de la fecha del panel (con su tooltip
+    y etiqueta hablada) y «Hoy» baja a la fila de los botones; el detalle ya no gasta una fila en ellos y la primera
+    franja no queda tapada por «Pintar» en horizontal a ×2,0.
+  - *Tira del mes (N6):* siempre sale bajo los días. Con sitio sobrante es la línea o la tarjeta de siempre; sin sitio ni
+    para la línea, va como tarjeta tras los días y el mes se desplaza hasta ella.
+  - *Plantilla de pluses (N36):* en horizontal con letra ≥ ×1,5 la frase de introducción se pliega a una línea (un
+    toque la abre); el botón «Aplicar» sigue fijo.
+  - *Día con un cambio aplicado (N31):* la celda lleva en su fila de marcas (arriba a la derecha, junto a la nota y los
+    puntos) el glifo de dos flechas (`AppIcons.swap`), con la tinta legible de las demás marcas (`lead.legible`, AA sobre
+    el color del turno), a 11 dp como la nota, y se encoge con ellas en vez de pasar sobre el código o la hora; nunca solo
+    color. La etiqueta hablada dice «cambio con Marta» y el detalle del día lleva la línea «Cambio con Marta» (icono y
+    texto) bajo sus turnos, también en un día que el cambio dejó vacío.
+  - *Horas en festivo (J8):* la línea sigue oculta con 0 h y «Cómo se cuenta» dice que solo aparece cuando hay horas en un
+    día festivo.
+  - *Recuperar una copia en el primer uso (N29):* la pantalla de copias pone «Importar archivo» como acción principal
+    ANTES del estado de las copias (una instalación nueva trae ilustración, título, invitación y avisos), y guardar una
+    copia pasa a secundario.
 - **Paso del lugar, opcional** (`PlaceStep`; el último salvo con una rotación, donde es el primero): «Paso N de M · Opcional» en `meta` seminegrita, «¿Dónde trabajas?» (país,
   comunidad y municipio como antes) y, debajo (salvo en el camino de la rotación, que ya la preguntó en el catálogo),
   «¿A qué te dedicas? Opcional» en `title` con las profesiones del país en una tarjeta con `ChoiceRow` de una columna (elección única; la elegida lleva la marca) y sus horas habituales en cada fila,

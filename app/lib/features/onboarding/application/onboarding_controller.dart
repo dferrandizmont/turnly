@@ -637,7 +637,7 @@ class OnboardingController extends Notifier<OnboardingState> {
     if (rotation != null) {
       await guarded(() async {
         await schedule.applyPatternRun(rotation);
-        ref.read(visibleMonthProvider.notifier).goTo(rotation.from);
+        ref.read(visibleMonthProvider.notifier).today();
       });
     }
 

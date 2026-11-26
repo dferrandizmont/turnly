@@ -461,6 +461,10 @@ class ScheduleController extends Notifier<ScheduleState> {
             }
           } finally {
             settled?.call();
+            // The job is over: whatever it wrote is in the database now, so
+            // what is read from it (the marks of the swaps) can be read
+            // again (QA 0.12.1, N31).
+            if (ref.mounted) ref.read(scheduleWritesProvider.notifier).bump();
           }
         })
         .catchError((Object _) {});
@@ -1619,3 +1623,18 @@ class ScheduleController extends Notifier<ScheduleState> {
 
 final scheduleControllerProvider =
     NotifierProvider<ScheduleController, ScheduleState>(ScheduleController.new);
+
+/// How many jobs of the write queue of [ScheduleController] have finished.
+/// It goes up after each one is over (committed, failed or skipped), so a
+/// reader of what is stored can read it again when it changes, and never
+/// reads between a screen change and its write.
+final scheduleWritesProvider = NotifierProvider<ScheduleWrites, int>(
+  ScheduleWrites.new,
+);
+
+class ScheduleWrites extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void bump() => state++;
+}

@@ -18,6 +18,7 @@ import '../application/open_day.dart';
 import '../application/paint_controller.dart';
 import '../application/schedule_controller.dart';
 import '../application/selection_controller.dart';
+import '../application/swap_marks.dart';
 import '../application/visible_month.dart';
 import '../application/week_layout.dart';
 import 'day_cell.dart';
@@ -39,6 +40,16 @@ const double _maxCellAspect = 1.5;
 /// Horizontal fling speed (dp/s) that changes the month.
 const double _swipeVelocity = 300;
 
+/// A slow drag changes the month too once the finger has moved this far
+/// sideways (dp) and mostly sideways ([_swipeSideways] times as far as it
+/// moved up or down): a swipe with no fling at its end was ignored (QA
+/// 0.12.1, N21).
+const double _swipeDistance = 72;
+
+/// How much further sideways than vertically a slow drag has to go to be a
+/// swipe between months and not a scroll that started sideways.
+const double _swipeSideways = 2;
+
 /// Only weeks containing stacked shifts, or a note that has to be written on
 /// a line of its own, grow. Gesture geometry and the outer scroll extent use
 /// these same measured minima.
@@ -57,6 +68,7 @@ List<double> monthGridMinimumRowHeights(
   double cellWidth = 0,
   Map<CivilDate, Holiday> holidays = const {},
   Map<CivilDate, int> deviceEventCounts = const {},
+  TextScaler? textScaler,
 }) => [
   for (var row = 0; row < _rows; row++)
     days
@@ -73,6 +85,7 @@ List<double> monthGridMinimumRowHeights(
               cellWidth: cellWidth,
               holiday: holidays.containsKey(day.date),
               deviceEvents: (deviceEventCounts[day.date] ?? 0) > 0,
+              textScaler: textScaler,
             ),
           ),
         ),
@@ -121,6 +134,11 @@ class _MonthGridState extends ConsumerState<MonthGrid> {
   GridGeometry _geometry = const GridGeometry(width: 1, height: 1);
   GridGeometry? _strokeGeometry;
   ScheduleController? _strokeController;
+
+  /// Where the current horizontal drag started and where the finger is now
+  /// (global, dp): the distance of a slow swipe is measured on both axes.
+  Offset _swipeFrom = Offset.zero;
+  Offset _swipeTo = Offset.zero;
   CivilDate _gridStart = const CivilDate(2000, 1, 3);
   Offset? _lastPoint;
   final _dayFocus = List.generate(_columns * _rows, (_) => FocusNode());
@@ -128,6 +146,9 @@ class _MonthGridState extends ConsumerState<MonthGrid> {
   /// The appointments of the phone of each day of the grid (P6): the cell
   /// marks the days that have some.
   Map<CivilDate, int> _deviceEventCounts = const {};
+
+  /// The days an applied swap holds, with who it is with (N31).
+  Map<CivilDate, String> _swapWith = const {};
 
   int _handledFocusRequest = 0;
 
@@ -265,12 +286,32 @@ class _MonthGridState extends ConsumerState<MonthGrid> {
     controller.endStroke();
   }
 
+  void _onHorizontalDragStart(DragStartDetails details) {
+    _swipeFrom = details.globalPosition;
+    _swipeTo = details.globalPosition;
+  }
+
+  void _onHorizontalDragUpdate(DragUpdateDetails details) =>
+      _swipeTo = details.globalPosition;
+
+  /// A fling, or a horizontal drag that went far enough, changes the month.
+  /// The distance counts only when the finger went mostly sideways (a drag
+  /// of 80 dp across and 200 dp down is a scroll that started sideways) and
+  /// was not flung back the other way.
   void _onHorizontalDragEnd(DragEndDetails details) {
     final velocity = details.primaryVelocity ?? 0;
+    final moved = _swipeTo - _swipeFrom;
+    final distance = moved.dx.abs() >= _swipeSideways * moved.dy.abs()
+        ? moved.dx
+        : 0.0;
+    _swipeFrom = Offset.zero;
+    _swipeTo = Offset.zero;
     final month = ref.read(visibleMonthProvider.notifier);
-    if (velocity <= -_swipeVelocity) {
+    if (velocity <= -_swipeVelocity ||
+        (distance <= -_swipeDistance && velocity < _swipeVelocity)) {
       month.next();
-    } else if (velocity >= _swipeVelocity) {
+    } else if (velocity >= _swipeVelocity ||
+        (distance >= _swipeDistance && velocity > -_swipeVelocity)) {
       month.previous();
     }
   }
@@ -330,6 +371,19 @@ class _MonthGridState extends ConsumerState<MonthGrid> {
         entry.key: entry.value.count,
     };
 
+    // The days an applied swap holds (QA 0.12.1, N31): a small glyph.
+    _swapWith =
+        ref
+            .watch(
+              swapMarksProvider(
+                ref.watch(
+                  scheduleControllerProvider.select((s) => s.calendarId),
+                ),
+              ),
+            )
+            .value ??
+        const {};
+
     return LayoutBuilder(
       builder: (context, box) {
         final gutter = weekNumbers ? MonthGrid.weekNumberWidth : 0.0;
@@ -380,6 +434,8 @@ class _MonthGridState extends ConsumerState<MonthGrid> {
             onPanUpdate: painting ? _onPanUpdate : null,
             onPanEnd: painting ? (_) => _endStroke() : null,
             onPanCancel: painting ? _endStroke : null,
+            onHorizontalDragStart: painting ? null : _onHorizontalDragStart,
+            onHorizontalDragUpdate: painting ? null : _onHorizontalDragUpdate,
             onHorizontalDragEnd: painting ? null : _onHorizontalDragEnd,
             // Long press (then drag) chooses days; it never competes with
             // paint mode, where a drag already means paint.
@@ -469,6 +525,7 @@ class _MonthGridState extends ConsumerState<MonthGrid> {
           selected: selectedDays.contains(day.date),
           focused: day.date == openDay,
           deviceEventCount: _deviceEventCounts[day.date] ?? 0,
+          swapWith: _swapWith[day.date],
           showNoteInMonth: showNoteInMonth,
           focusNode: _dayFocus[index],
           onMoveFocus: (delta) => _moveFocus(index, delta),

@@ -9,6 +9,8 @@
   "use strict";
   var KEY = "turnly-theme";
   var root = document.documentElement;
+  /* .js lets the stylesheet tell the page that scripts run (the demo replaces the static screenshot, the tour gets its tabs). */
+  root.classList.add("js");
   var media = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
 
   function stored() {

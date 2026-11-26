@@ -146,6 +146,7 @@ void main() {
     expect(state().saveErrors, 0);
     final painted = state().schedule;
     await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump(const Duration(milliseconds: 1));
     await tester.runAsync(() async {
       await db.close();
       db = await open();
@@ -162,5 +163,7 @@ void main() {
       ]);
     }
     expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump(const Duration(milliseconds: 1));
   });
 }

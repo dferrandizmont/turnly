@@ -10,6 +10,8 @@ import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/motion_size.dart';
 import '../../../core/widgets/whole_word_text.dart';
 import '../../../core/icons/month_icons.dart';
+import '../../schedule/domain/schedule_domain.dart';
+import '../../swaps/application/swaps_providers.dart';
 import '../application/month_presentation.dart';
 import '../application/off_outlook.dart';
 import '../application/schedule_controller.dart';
@@ -110,15 +112,34 @@ class _TodayCardState extends ConsumerState<TodayCard>
     final colors = context.colors;
     final type = context.type;
     final format = AppDateFormat.of(context);
-    final schedule = ref.watch(
-      scheduleControllerProvider.select((s) => s.schedule),
+    final (schedule, calendarId) = ref.watch(
+      scheduleControllerProvider.select((s) => (s.schedule, s.calendarId)),
     );
     final now = ref.watch(minuteClockProvider);
-    final status = todayStatus(schedule, now);
+    final status = ref.watch(todayStatusProvider);
     final outlook = ref.watch(offOutlookProvider);
-    final offLine = nextOffText(l10n, format, outlook);
+    final nextOff = outlook.nextOff;
+    final overlapsActiveShift =
+        nextOff != null && status.activeShiftOverlaps(nextOff.date);
+    final today = CivilDate.fromDateTime(now);
+    final cededToday =
+        status.phase == TodayPhase.free &&
+        schedule.resolve(today).shiftIds.isEmpty &&
+        (ref
+                .watch(swapDayClaimsProvider(calendarId))
+                .value
+                ?.any((claim) => claim.date == today) ??
+            false);
+    final offLine =
+        overlapsActiveShift || (cededToday && nextOff?.daysAway == 0)
+        ? null
+        : nextOffText(l10n, format, outlook);
     // The weekend and the streak share a second, quieter line.
     final extraLine = [
+      freeWeekendText(l10n, format, outlook, joined: true),
+      streakText(l10n, outlook),
+    ].nonNulls.join('  ·  ');
+    final extraSpoken = [
       freeWeekendText(l10n, format, outlook),
       streakText(l10n, outlook),
     ].nonNulls.join('  ·  ');
@@ -132,13 +153,15 @@ class _TodayCardState extends ConsumerState<TodayCard>
       TodayPhase.now => l10n.todayLabelNow,
       TodayPhase.tonight => l10n.todayLabelTonight,
       TodayPhase.today => l10n.todayLabelToday,
-      TodayPhase.free => l10n.todayLabelFree,
+      TodayPhase.free =>
+        cededToday ? l10n.todayLabelToday : l10n.todayLabelFree,
       TodayPhase.done => l10n.todayLabelDone,
       TodayPhase.gap => l10n.todayLabelGap,
     }.toUpperCase();
     final labelColor = swatch?.ink ?? colors.textMuted;
 
-    final title = main?.name ?? l10n.todayFreeTitle;
+    final title =
+        main?.name ?? (cededToday ? l10n.calendarNoShift : l10n.todayFreeTitle);
 
     // Second line: hours, "until" for a shift in progress, when it ended, or
     // the next shift when today is free.
@@ -230,7 +253,9 @@ class _TodayCardState extends ConsumerState<TodayCard>
       ?detail,
       ?countdown,
       ?offLine,
-      if (extraLine.isNotEmpty) extraLine,
+      // The plain dates, as in the open card (the drawn line keeps them
+      // together with no-break spaces).
+      if (extraSpoken.isNotEmpty) extraSpoken,
     ].join(', ');
 
     final Widget content;

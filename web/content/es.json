@@ -4,7 +4,6 @@
   "description": "Calendario de turnos gratuito y de código abierto para quienes trabajan a turnos en España. Sin Pro, sin anuncios, sin cuenta y sin conexión.",
   "intro": "Calendario para quienes trabajan a turnos en España (sanidad, policía, bomberos, industria, hostelería o cualquier otro sector): organiza mañanas, tardes, noches, guardias, salientes y días libres, y consulta tu próximo turno de un vistazo.",
   "hero_cta": "Descargar gratis",
-  "key_facts": "Todo gratis, sin Pro · Sin anuncios · Sin cuenta · Funciona sin conexión · Código abierto · Cinco idiomas",
   "features": [
     "Tu próximo turno y tu próximo día libre en la tarjeta de hoy; el mes en cuadrícula o lista, la agenda y el año, con las citas del calendario del móvil junto a tus turnos. Notas con fotos y tareas, y hasta seis calendarios para ver qué días libráis a la vez.",
     "Toca o arrastra para pintar varios días, pon más de un turno en el mismo día y deshaz lo que quieras. El asistente de rotaciones aplica la tuya con vista previa: correturnos, 24/72, 4×4, 6×4, 5×2, 2-2-3, «2 y 2», «3 y 1» o tu propio patrón, desde el día del ciclo que te toque.",
@@ -26,10 +25,6 @@
     {
       "question": "¿Necesito una cuenta o conexión a internet?",
       "answer": "No. No hay cuenta y todo funciona sin conexión, también los festivos."
-    },
-    {
-      "question": "¿Cómo me apunto a la prueba de Google Play?",
-      "answer": "Únete al grupo de pruebas turnly-testers en Google Groups con tu cuenta de Google, acepta la prueba en el enlace de Google Play e instala la app desde la tienda. Se actualizará sola."
     },
     {
       "question": "¿Y en iPhone y iPad?",
@@ -72,66 +67,16 @@
     "11-widgets-oscuro": "Galería «Añadir widget» con tus turnos reales: pequeño, agenda, mediano y más"
   },
   "privacy_date": "2026-11-20",
-  "kicker": "Calendario de turnos",
   "tagline": "Tus turnos, de un vistazo.",
   "chip": "Todo gratis: sin Pro, sin anuncios y sin cuenta.",
   "nav_label": "Secciones",
   "theme_label": "Tema",
   "theme_dark": "Oscuro",
   "theme_hint": "Cambiar tema",
-  "anim": {
-    "month": "Diciembre",
-    "weekdays": [
-      "L",
-      "M",
-      "X",
-      "J",
-      "V",
-      "S",
-      "D"
-    ],
-    "shifts": {
-      "m": {
-        "code": "M",
-        "name": "Mañana"
-      },
-      "t": {
-        "code": "T",
-        "name": "Tarde"
-      },
-      "n": {
-        "code": "N",
-        "name": "Noche"
-      },
-      "l": {
-        "code": "L",
-        "name": "Libre"
-      },
-      "s": {
-        "code": "S",
-        "name": "Saliente"
-      }
-    },
-    "sequence": "Tu secuencia",
-    "cycle_days": "{n} días",
-    "tonight": "Esta noche",
-    "starts_in": "Empieza en {duration}",
-    "widget_day": "jue 24",
-    "widget_tomorrow": "Mañana",
-    "off_on": "Libras el sábado 26",
-    "unit_h": "h",
-    "hours": {
-      "m": "06–14",
-      "t": "14–22",
-      "n": "22–06"
-    },
-    "night_range": "22:00–06:00"
-  },
-  "download_title": "En la App Store para iPhone y iPad; Android, en pruebas.",
+  "download_title": "En la App Store para iPhone y iPad; Android, próximamente.",
   "download_intro": "Modo claro y oscuro. Gratis y sin cuenta.",
   "download_notes": {
-    "play": "Cualquiera puede apuntarse en tres pasos:",
-    "apk": "Lo instalas a mano. Desde la 0.8.3 lleva la misma firma que la versión de Google Play: puedes pasar de una a otra sin desinstalar.",
+    "play": "Estará disponible muy pronto en Google Play.",
     "app_store": "Gratis en la App Store, para iPhone y iPad con iOS 17 o posterior."
   },
   "screenshots_title": "Pantallas reales",
@@ -181,5 +126,184 @@
   "toc_aria": "Índice de la política",
   "toc_count": "{count} apartados",
   "fallback_label": "Aviso de idioma",
-  "fallback_text": "Es la versión válida de la política. El resto de la web está en español."
+  "fallback_text": "Es la versión válida de la política. El resto de la web está en español.",
+  "key_facts": "Funciona sin conexión · Código abierto · Cinco idiomas",
+  "hero_line_1": "Tus turnos,",
+  "hero_line_2": "de un vistazo.",
+  "screenshots_count": "{n} / {total}",
+  "demo": {
+    "label": "Calendario de ejemplo: aplica un patrón o pinta tus turnos",
+    "tabs_label": "Qué quieres probar",
+    "tab_pattern": "Aplicar patrón",
+    "tab_paint": "Pintar",
+    "month": "Diciembre",
+    "weekdays": [
+      "L",
+      "M",
+      "X",
+      "J",
+      "V",
+      "S",
+      "D"
+    ],
+    "weekday_names": [
+      "domingo",
+      "lunes",
+      "martes",
+      "miércoles",
+      "jueves",
+      "viernes",
+      "sábado"
+    ],
+    "today_label": "jue 24",
+    "tonight": "Esta noche",
+    "starts_in": "Empieza en {duration}",
+    "duration": "4 h",
+    "off_on": "Libras el {weekday} {day}",
+    "summary": "{n} turnos · {h} h",
+    "day_label": "{day} de diciembre: {shift}",
+    "day_today": " (hoy)",
+    "and": " + ",
+    "pattern_label": "Rotaciones",
+    "cycle_days": "{n} días",
+    "sequence": "Tu secuencia",
+    "cycle_hint": "¿Qué día del ciclo es el 1 de diciembre? Tócalo.",
+    "that_day": "Ese día te toca: {shifts}",
+    "cycle_day_label": "Día {n} de {total}, {shift}",
+    "paint": {
+      "header": "Pintando",
+      "mode_replace": "Cambiar el turno",
+      "mode_add": "Añadir otro turno",
+      "mode_add_spoken": "Añadir otro turno (doblar)",
+      "eraser": "Borrar",
+      "done": "Listo",
+      "undo": "Deshacer",
+      "redo": "Rehacer",
+      "pattern_button": "Patrón",
+      "tools_label": "Herramientas para pintar",
+      "preview_title": "Al tocar un día",
+      "preview_title_double": "Al tocar un día (doblar)",
+      "effect_replace": "Sustituye al que haya",
+      "effect_add": "Se suma al que ya hay",
+      "effect_erase": "Deja el día vacío",
+      "empty": "vacío",
+      "hint_idle": "Elige un turno y arrastra.",
+      "hint_painting": "Pintando: {name}",
+      "preview_spoken": "{title}: {before} pasa a {after}. {effect}",
+      "preview_spoken_times": "{title}: {before} pasa a {after}, {times}. {effect}"
+    },
+    "shifts": {
+      "M": {
+        "name": "Mañana",
+        "code": "M",
+        "short": "06–14",
+        "full": "06:00–14:00"
+      },
+      "T": {
+        "name": "Tarde",
+        "code": "T",
+        "short": "14–22",
+        "full": "14:00–22:00"
+      },
+      "N": {
+        "name": "Noche",
+        "code": "N",
+        "short": "22–06",
+        "full": "22:00–06:00"
+      },
+      "G": {
+        "name": "Guardia 24 h",
+        "code": "G",
+        "short": "08–08",
+        "full": "08:00–08:00"
+      },
+      "D": {
+        "name": "Día 12 h",
+        "code": "D",
+        "short": "08–20",
+        "full": "08:00–20:00"
+      },
+      "L": {
+        "name": "Libre",
+        "code": "L"
+      },
+      "S": {
+        "name": "Saliente",
+        "code": "S"
+      }
+    },
+    "rotations": {
+      "correturnos": {
+        "name": "Correturnos",
+        "description": "5 mañanas, 2 libres, 5 tardes, 2 libres, 5 noches, 2 libres"
+      },
+      "24x72": {
+        "name": "24 x 72",
+        "description": "Guardia de 24 h y 72 h libres (también 1-3)"
+      },
+      "4x4": {
+        "name": "4 x 4",
+        "description": "4 días de 12 h y 4 libres, sin noches (4x4 o cuatro y cuatro)"
+      },
+      "6x4": {
+        "name": "6 x 4",
+        "description": "6 mañanas y 4 libres"
+      },
+      "5x2": {
+        "name": "5 x 2",
+        "description": "5 mañanas y 2 libres (lunes a viernes)"
+      },
+      "2-2-3": {
+        "name": "2-2-3",
+        "description": "Dos días de 12 h, dos libres, tres de 12 h, dos libres, dos de 12 h y tres libres (también 2-2-3-2-2-3). También se conoce como Pitman o Panamá."
+      },
+      "2x2": {
+        "name": "2 y 2",
+        "description": "2 días de trabajo y 2 libres (2x2)."
+      },
+      "3x1": {
+        "name": "3 y 1",
+        "description": "3 días de trabajo y 1 libre (3x1)."
+      }
+    },
+    "ends_in": "Termina en {duration}",
+    "duration_fmt": "{h} h",
+    "no_times": "sin horario",
+    "clear_painted": "Quitar lo pintado",
+    "summary_one": "{n} turno · {h} h",
+    "off_tomorrow": "Mañana libras",
+    "now": "Ahora"
+  },
+  "lost": {
+    "es": {
+      "title": "Página no encontrada",
+      "text": "Esta página no existe. Puedes volver al inicio.",
+      "home": "Inicio",
+      "skip": "Saltar al contenido"
+    },
+    "ca": {
+      "title": "Pàgina no trobada",
+      "text": "Aquesta pàgina no existeix. Pots tornar a l’inici.",
+      "home": "Inici",
+      "skip": "Salta al contingut"
+    },
+    "gl": {
+      "title": "Páxina non atopada",
+      "text": "Esta páxina non existe. Podes volver ao inicio.",
+      "home": "Inicio",
+      "skip": "Saltar ao contido"
+    },
+    "eu": {
+      "title": "Ez da orria aurkitu",
+      "text": "Orri hau ez dago. Hasierara itzul zaitezke.",
+      "home": "Hasiera",
+      "skip": "Joan edukira"
+    },
+    "en": {
+      "title": "Page not found",
+      "text": "This page does not exist. You can return to the home page.",
+      "home": "Home",
+      "skip": "Skip to content"
+    }
+  }
 }

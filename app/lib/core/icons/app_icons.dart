@@ -88,6 +88,19 @@ class AppIcons {
   static IconData get arrowDown =>
       _pick(CupertinoIcons.arrow_down, Symbols.arrow_downward_rounded);
 
+  /// A day held by a shift swap (the mark of its cell and the line of its
+  /// detail): two arrows, one each way.
+  static IconData get swap =>
+      _pick(CupertinoIcons.arrow_right_arrow_left, Symbols.swap_horiz_rounded);
+
+  /// Opens a folded text or section (a disclosure, not a move).
+  static IconData get expand =>
+      _pick(CupertinoIcons.chevron_down, Symbols.expand_more_rounded);
+
+  /// Folds it again.
+  static IconData get collapse =>
+      _pick(CupertinoIcons.chevron_up, Symbols.expand_less_rounded);
+
   /// Delete for good (an archived calendar).
   static IconData get delete =>
       _pick(CupertinoIcons.trash, Symbols.delete_rounded);

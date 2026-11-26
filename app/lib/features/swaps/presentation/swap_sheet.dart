@@ -10,7 +10,6 @@ import '../../../core/l10n/l10n.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/app_sheet.dart';
-import '../../../core/widgets/app_snack_bar.dart';
 import '../../../core/widgets/buttons.dart';
 import '../../../core/widgets/choice_grid.dart';
 import '../../../core/widgets/choice_pill.dart';
@@ -68,6 +67,15 @@ class _SwapSheetState extends ConsumerState<SwapSheet> {
     text: widget.swap?.note ?? '',
   );
 
+  /// The field of «Con quién» (label, input and error): «Guardar» scrolls to
+  /// it and focuses it when the name is missing (QA M7).
+  final GlobalKey _colleagueField = GlobalKey();
+  final FocusNode _colleagueFocus = FocusNode();
+
+  /// The same for the note, which can be too long for what is stored.
+  final GlobalKey _noteField = GlobalKey();
+  final FocusNode _noteFocus = FocusNode();
+
   late SwapDirection _direction =
       widget.swap?.direction ?? SwapDirection.theyOwe;
 
@@ -100,6 +108,8 @@ class _SwapSheetState extends ConsumerState<SwapSheet> {
   @override
   void dispose() {
     _colleague.dispose();
+    _colleagueFocus.dispose();
+    _noteFocus.dispose();
     _note.dispose();
     super.dispose();
   }
@@ -108,6 +118,11 @@ class _SwapSheetState extends ConsumerState<SwapSheet> {
     final name = _colleague.text.trim();
     return name.isNotEmpty && name.length <= maxSwapColleagueLength;
   }
+
+  /// Whether the note fits what is stored: the domain counts UTF-16 units
+  /// ([ShiftSwap.problem]), while the field's limit counts characters, so an
+  /// emoji can get past it.
+  bool get _noteOk => _note.text.trim().length <= maxSwapNoteLength;
 
   /// The shifts of the first day, `null` when they are not recorded.
   List<String>? get _givenIds {
@@ -199,6 +214,10 @@ class _SwapSheetState extends ConsumerState<SwapSheet> {
   });
 
   Future<void> _pickDate({bool returnDate = false}) async {
+    // Close the keyboard first: the picker is a dialog that would open
+    // squeezed above it, or under it on a short screen (QA N20).
+    // A button reached with Tab keeps its focus for when the dialog closes.
+    dropTextFocus();
     final initial = returnDate ? (_returnDate ?? _date) : _date;
     final picked = await showDatePicker(
       context: context,
@@ -220,10 +239,39 @@ class _SwapSheetState extends ConsumerState<SwapSheet> {
     });
   }
 
+  /// «Guardar» is pinned under the form, so the error of a field that is out
+  /// of sight would say nothing: scroll to the field (without animation when
+  /// the person asked to reduce motion) and give it the focus (QA M7).
+  void _showFieldError(GlobalKey field, FocusNode focus) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      final duration = Motion.of(context, Motion.page);
+      // The focus goes first: a field that gets it scrolls its own caret
+      // into view, which would cancel a scroll started before and leave the
+      // error half cut off. The scroll to the whole field comes after.
+      focus.requestFocus();
+      await WidgetsBinding.instance.endOfFrame;
+      final target = field.currentContext;
+      if (target == null || !target.mounted) return;
+      await Scrollable.ensureVisible(
+        target,
+        duration: duration,
+        curve: Motion.curve,
+      );
+    });
+  }
+
   Future<void> _save() async {
     if (_saving || _confirmingRemoval) return;
     setState(() => _showErrors = true);
-    if (!_nameOk) return;
+    if (!_nameOk) {
+      _showFieldError(_colleagueField, _colleagueFocus);
+      return;
+    }
+    if (!_noteOk) {
+      _showFieldError(_noteField, _noteFocus);
+      return;
+    }
     final l10n = context.l10n;
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
@@ -291,9 +339,7 @@ class _SwapSheetState extends ConsumerState<SwapSheet> {
       showSwapNotice(messenger, swapConflictMessage(l10n, conflict.claim));
       if (mounted) setState(() => _saving = false);
     } catch (_) {
-      messenger
-        ..hideCurrentSnackBar()
-        ..showSnackBar(appSnackBar(content: Text(l10n.swapSaveFailed)));
+      showSwapNotice(messenger, l10n.swapSaveFailed);
       if (mounted) setState(() => _saving = false);
     }
   }
@@ -344,9 +390,7 @@ class _SwapSheetState extends ConsumerState<SwapSheet> {
         showSwapUndoNotice(messenger, l10n, schedule, l10n.swapRemoved, step);
       }
     } catch (_) {
-      messenger
-        ..hideCurrentSnackBar()
-        ..showSnackBar(appSnackBar(content: Text(l10n.swapSaveFailed)));
+      showSwapNotice(messenger, l10n.swapSaveFailed);
       if (mounted) setState(() => _saving = false);
     } finally {
       _confirmingRemoval = false;
@@ -474,10 +518,12 @@ class _SwapSheetState extends ConsumerState<SwapSheet> {
         ),
         const SizedBox(height: Sp.s),
         LabeledField(
+          key: _colleagueField,
           label: l10n.swapFieldColleague,
           child: TextField(
             key: const ValueKey('swap-field-colleague'),
             controller: _colleague,
+            focusNode: _colleagueFocus,
             textCapitalization: TextCapitalization.words,
             textInputAction: TextInputAction.next,
             inputFormatters: [
@@ -611,10 +657,12 @@ class _SwapSheetState extends ConsumerState<SwapSheet> {
         ),
         const SizedBox(height: Sp.s),
         LabeledField(
+          key: _noteField,
           label: l10n.swapFieldNote,
           child: TextField(
             key: const ValueKey('swap-field-note'),
             controller: _note,
+            focusNode: _noteFocus,
             minLines: 2,
             maxLines: 4,
             keyboardType: TextInputType.multiline,
@@ -622,7 +670,12 @@ class _SwapSheetState extends ConsumerState<SwapSheet> {
             inputFormatters: [
               LengthLimitingTextInputFormatter(maxSwapNoteLength),
             ],
-            decoration: InputDecoration(hintText: l10n.swapNoteHint),
+            decoration: InputDecoration(
+              hintText: l10n.swapNoteHint,
+              errorText: _showErrors && !_noteOk ? l10n.swapInvalidNote : null,
+              errorMaxLines: 3,
+            ),
+            onChanged: (_) => setState(() {}),
           ),
         ),
         if (save != null) ...[const SizedBox(height: Sp.xl), save],

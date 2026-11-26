@@ -134,6 +134,8 @@ Nombres completos. ca: gener, febrer, març, abril, maig, juny, juliol, agost, s
 | eu | astelehena, urriaren 20a (mes + *-(r)en* + día + *-a*) |
 | en | Monday, October 20 (US) · Monday, 20 October (UK). El orden depende de `en_GB` / `en_US`: el skeleton `MMMMEEEEd` lo resuelve solo. |
 
+**Fecha larga con año en euskera.** Usa `AppDateFormat.spokenDate`: «2026ko urriaren 11, igandea». El año precede al mes y lleva `-ko` o `-eko` según el final del numeral. Los días 11 y 31 conservan la forma sin `-a` adicional.
+
 Hora: el formato lo elige la persona en Ajustes › Apariencia › Formato de hora (`docs/formatos.md`). Las instalaciones que ya
 existían siguen en 24 h en todos los idiomas (también en inglés: `22:00`, es lo que ven los turnistas en Osakidetza/NHS);
 una instalación nueva sigue al móvil. Los textos fijos no llevan horas escritas con AM/PM: la hora siempre es un parámetro.

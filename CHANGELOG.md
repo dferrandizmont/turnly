@@ -10,6 +10,74 @@ at once, so they can skip numbers.
 
 ## Unreleased
 
+- New home page for the website: a month you can paint with the app's own widgets (rotation cards, cycle strip, paint tools and today card), the screens tour in light and dark, and the same look on the privacy policy and the 404 page.
+- Fixed: in Catalan and Basque, when the month has to scroll to reach the summary strip, the edge of the month no longer cuts a line of it in half; scrolling shows it whole above the bottom bar.
+
+## 0.13.0 · 2026-11-26
+
+Android update (Google Play build 2027): the swap form takes you to the field that is missing, days held by an applied swap show a swap mark, and many large-text and landscape fixes.
+
+- Fixed: in landscape, an hour range in "Upcoming days" no longer wraps after the dash (22:00– / 06:00).
+- Fixed rotation dates in Basque and opened the current month after first-use setup, even when the rotation started earlier.
+- Clarified manually edited days and days with no recorded shift. The calendar waits for an overnight shift to finish before showing today's day-off message. A day left empty by a swap shows “No shift”. The day detail now shows a 24-hour shift as 24 h.
+- The swap book shows both dates even when they fall on the same day. Saving a return date confirms the date and keeps the swap pending until it is settled. The book explains when the original shifts cannot be recovered.
+- Summary flags unpriced overtime in the collapsed income estimate.
+- First use now tells you when a shared backup is ready to review.
+- Fixed: in the swap form, «Save» with the colleague empty now scrolls to that field and focuses it (it used to fail with the error out of sight), and the grey «Marta» reads as an example («For example: Marta», in every language). The date buttons close the keyboard before the picker opens, and the swap book's notices no longer cover «Apply to the schedule»: the list leaves room under its last card while a notice is up.
+- Fixed: in Summary the period buttons (Month, Quarter, Year, Dates…) share rows at the largest text size instead of stacking four full-width rows.
+- Fixed: with large text, "Select days" under the month keeps its name instead of turning into a bare icon.
+- Fixed: a slow swipe across the month grid now changes month too, not only a quick flick.
+- Fixed: the free weekend on the Today card ("28–29 Nov") no longer wraps with the second date alone on a line.
+- Improved: the block length in your own cycle adds shortcuts for 2 and 3 days.
+- Fixed: with large text, the three ways to start in first use take less height (the drawings give way to the text).
+- Fixed: with large text, the jobs in the rotation step wrap onto lines instead of sliding sideways, and choosing one no longer pushes "Create my own cycle" away from your finger.
+- Improved: "Restore a backup" in first use puts "Import file" first on the backup screen.
+- Improved: "How it's counted" in Summary now says that the public-holiday hours line only appears when there are hours on a holiday.
+- Fixed: in landscape with large text, the intro sentence of Settings › Pay template folds to one line (tap to read it) so there is more room above "Apply".
+- Fixed: the month summary strip (shifts, hours, next day off) is always shown under the days; when it does not fit the month scrolls to it, also in six-row months.
+- Fixed: in landscape (two-pane month) the text of the days in the grid stops growing at 150 %, so more rows of weeks fit next to the day pane at the largest text size.
+- Fixed: in landscape with large text, the open day's "Undo" and close buttons sit in the date row of the side pane instead of a row of their own, so the first shift is no longer cut off by "Paint".
+- New: a day held by an applied shift swap shows a small swap glyph in the month grid and "Swap with Marta" in its detail, also on a day the swap left empty.
+- Fixed: with the largest text sizes, the swap mark stays visible on the days of the month held by a swap; where it does not fit beside the day number it sits on a row under it.
+- Fixed: in Catalan and Basque, when the month has to scroll to reach the summary strip, the edge of the month no longer cuts a line of it in half; scrolling shows it whole above the bottom bar.
+
+## 1.3.0 · 2026-11-26
+
+iPhone and iPad update (App Store build 9): swaps in the swap book now also change your schedule, "Create my own cycle" in first use, a new sheet to pick the rotation start day, a fix to «Shifts worked» in Summary, and many large-text and landscape fixes. It also upgrades the database, with an automatic backup first: your data is kept.
+
+- Fixed: in landscape, an hour range in "Upcoming days" no longer wraps after the dash (22:00– / 06:00).
+- Fixed rotation dates in Basque and opened the current month after first-use setup, even when the rotation started earlier.
+- Clarified manually edited days and days with no recorded shift. The calendar waits for an overnight shift to finish before showing today's day-off message. A day left empty by a swap shows “No shift”. The day detail now shows a 24-hour shift as 24 h.
+- The swap book shows both dates even when they fall on the same day. Saving a return date confirms the date and keeps the swap pending until it is settled. The book explains when the original shifts cannot be recovered.
+- Summary flags unpriced overtime in the collapsed income estimate.
+- First use now tells you when a shared backup is ready to review.
+- Fixed: in the swap form, «Save» with the colleague empty now scrolls to that field and focuses it (it used to fail with the error out of sight), and the grey «Marta» reads as an example («For example: Marta», in every language). The date buttons close the keyboard before the picker opens, and the swap book's notices no longer cover «Apply to the schedule»: the list leaves room under its last card while a notice is up.
+- Fixed: in Summary the period buttons (Month, Quarter, Year, Dates…) share rows at the largest text size instead of stacking four full-width rows.
+- Fixed: with large text, "Select days" under the month keeps its name instead of turning into a bare icon.
+- Fixed: a slow swipe across the month grid now changes month too, not only a quick flick.
+- Fixed: the free weekend on the Today card ("28–29 Nov") no longer wraps with the second date alone on a line.
+- Improved: the block length in your own cycle adds shortcuts for 2 and 3 days.
+- Fixed: with large text, the three ways to start in first use take less height (the drawings give way to the text).
+- Fixed: with large text, the jobs in the rotation step wrap onto lines instead of sliding sideways, and choosing one no longer pushes "Create my own cycle" away from your finger.
+- Improved: "Restore a backup" in first use puts "Import file" first on the backup screen.
+- Improved: "How it's counted" in Summary now says that the public-holiday hours line only appears when there are hours on a holiday.
+- Fixed: in landscape with large text, the intro sentence of Settings › Pay template folds to one line (tap to read it) so there is more room above "Apply".
+- Fixed: the month summary strip (shifts, hours, next day off) is always shown under the days; when it does not fit the month scrolls to it, also in six-row months.
+- Fixed: in landscape (two-pane month) the text of the days in the grid stops growing at 150 %, so more rows of weeks fit next to the day pane at the largest text size.
+- Fixed: in landscape with large text, the open day's "Undo" and close buttons sit in the date row of the side pane instead of a row of their own, so the first shift is no longer cut off by "Paint".
+- New: a day held by an applied shift swap shows a small swap glyph in the month grid and "Swap with Marta" in its detail, also on a day the swap left empty.
+- Fixed: in Summary, "Shifts worked" now counts only the shifts before today and adds the planned ones ("5 · and 2 planned"), like the hours card; the shift types say they add up the whole period. The same cut applies to the PDF report ("Shifts worked 3 · and 7 planned") and to the year table and cards ("5 + 2": worked before today + planned).
+- Fixed: "Apply" in Settings › Pay template stays at the bottom of the sheet instead of several swipes down in landscape or with large text.
+- Fixed: saving a swap in the swap book now also changes your schedule (switch "Change my schedule too", on by default) and says so, with Undo; with the switch off it says the schedule does not change until you apply it, with an "Apply" button. Each swap shows "Applied" or "Not applied" next to its debt state, and an unapplied one has a visible "Apply to the schedule" button.
+- Fixed: editing or undoing an applied swap preserves later shift changes and tells you which days it skipped. A day holds at most one applied swap: applying another one on that day is refused and the notice says which day and with whom (the switch in the form shows it too, along with the dates that a moved swap gives back). A note or edit made while a swap is being saved is never lost; if it touches one of the swap's days, the swap is not applied at all and asks you to try again. When "Remove swap and restore your schedule" is stopped by one date, the notice says the swap is still in the book and none of its dates changed. Saving an unchanged swap keeps calendar redo available.
+- Fixed: restoring or checking an older backup reports damaged swap records and keeps their data for recovery; two swaps applied on the same day keep only the first and the other is kept for recovery. The app verifies its database copy before starting an upgrade and never deletes or overwrites an earlier copy it cannot check, nor the copy it has just made.
+- Fixed: backups made by Android 0.12.1 that contain applied swaps can now be restored on iPhone and iPad.
+- Fixed: the list of communities is now in the app's language (Euskadi, Katalunia, Andaluzia in Basque; Basque Country, Catalonia in English), in setup and in Settings › Holidays.
+- Fixed: in a day's detail, a shift's length («10 h») no longer splits between the number and the unit at the largest text sizes.
+- Improved: the start day of a rotation is chosen in a sheet of the app, with last Monday and today as shortcuts, an arrow on each side of the month and a swipe between months, so going back a few weeks takes three taps. Fixed: "Save" in the swap book form is always in reach in landscape with large text.
+- Fixed (iPhone): with the largest text sizes, the swap mark stays visible on the days of the month held by a swap; where it does not fit beside the day number it sits on a row under it.
+- New: first use lets you create your own cycle ("Create my own cycle") with the same day-by-day builder as the rotation wizard, or adjust any catalogue rotation ("Adjust"), and then pick the start day; nothing is saved until the end. Fixed: with the largest text size, "Next" and "Continue" on the rotation and start-day steps of first use stay at the bottom instead of many swipes down.
+
 ## 0.12.1 · 2026-11-23
 
 - **Breaking change (Android): new package.** Turnly is now a new app in Google Play (`es.turnly.app`), in open testing for everyone. The previous app (`es.cuadrante.app`, from Google Play or from the APKs on GitHub) does not update to it and the two can be installed side by side: in the old app, use «Save a backup outside Turnly» (Settings › Backup), install the new one and use «Import file» there (do not open the file from Share or «Open with»: both apps are called Turnly with the same icon); then uninstall the old one. Widgets and alarms have to be set up again.

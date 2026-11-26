@@ -8,6 +8,7 @@ import '../../../core/format/app_date_format.dart';
 import '../../../core/icons/app_icons.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme_context.dart';
+import '../../../core/widgets/adaptive.dart';
 import '../../holidays/domain/holiday.dart';
 import '../../holidays/presentation/holiday_names.dart';
 import '../../schedule/domain/schedule_domain.dart';
@@ -41,6 +42,7 @@ String daySemanticsLabel(
   required bool isToday,
   bool selected = false,
   int deviceEventCount = 0,
+  String? swapWith,
 }) {
   final l10n = context.l10n;
   final format = AppDateFormat.of(context);
@@ -58,6 +60,9 @@ String daySemanticsLabel(
           .reduce((a, b) => l10n.daySemanticsAnd(a, b)),
     if (holiday != null) holidaySpoken(l10n, holidayDisplayName(l10n, holiday)),
     if (day.note != null && day.note!.isNotEmpty) l10n.daySemanticsNote,
+    // A day held by a shift swap: the glyph of the cell is only a mark, so
+    // the swap and who it is with are said out loud.
+    if (swapWith != null) l10n.daySemanticsSwap(swapWith),
     // The appointments of the phone (P6): the dot of the cell is only a
     // mark, so the count is said out loud.
     if (deviceEventCount > 0) l10n.devEventsCount(deviceEventCount),
@@ -113,6 +118,7 @@ class DayCell extends StatefulWidget {
     this.selected = false,
     this.focused = false,
     this.deviceEventCount = 0,
+    this.swapWith,
     this.showNoteInMonth = false,
     this.onTap,
     this.onLongPress,
@@ -141,6 +147,11 @@ class DayCell extends StatefulWidget {
   /// How many appointments of the phone the day has (P6): the cell marks it
   /// with a discreet dot, and the label says how many.
   final int deviceEventCount;
+
+  /// Who the swap applied on this day is with, or `null` when no applied swap
+  /// holds it: the cell shows a small swap glyph in its row of marks (QA
+  /// 0.12.1, N31) and the spoken label says it.
+  final String? swapWith;
 
   /// «Ver la nota en el mes» (UX): the first line of the note of the day is
   /// written in the cell, in place of its clip, when it fits. Off, the cell
@@ -300,6 +311,7 @@ class _DayCellState extends State<DayCell> {
       :selected,
       :focused,
       :deviceEventCount,
+      :swapWith,
       :showNoteInMonth,
       :onTap,
       :onLongPress,
@@ -402,7 +414,7 @@ class _DayCellState extends State<DayCell> {
         ? Sp.selectionRing
         : Sp.ring;
 
-    final body = ClipRRect(
+    Widget buildBody({required bool swapBelow}) => ClipRRect(
       borderRadius: radius,
       child: Stack(
         fit: StackFit.expand,
@@ -421,7 +433,9 @@ class _DayCellState extends State<DayCell> {
                       painted: painted,
                       selected: selected && inMonth,
                       compact: multi,
-                      topReserve: i == 0 ? numberReserve : 0,
+                      topReserve: i == 0
+                          ? numberReserve + (swapBelow ? _swapRowReserve : 0)
+                          : 0,
                       bottomReserve: i == bands - 1
                           ? Sp.bar + noteLineHeight
                           : 0,
@@ -499,6 +513,7 @@ class _DayCellState extends State<DayCell> {
           if (holiday != null ||
               noteClip ||
               day.hasExtras ||
+              swapWith != null ||
               deviceEventCount > 0)
             Positioned.fill(
               child: _DayMarks(
@@ -506,6 +521,8 @@ class _DayCellState extends State<DayCell> {
                 extras: day.hasExtras,
                 overtimeMinutes: day.overtimeMinutes,
                 note: noteClip,
+                swap: swapWith != null,
+                swapBelow: swapBelow,
                 holiday: holiday != null,
                 deviceEvents: deviceEventCount > 0,
                 isToday: isToday,
@@ -537,6 +554,23 @@ class _DayCellState extends State<DayCell> {
       ),
     );
 
+    // The swap glyph goes in the row of marks beside the day number; where not
+    // even its smallest size fits there (an iPhone at the largest accessibility
+    // sizes, F1 of 1.3.0), it gets a row of its own under the number, and the
+    // first band keeps that row free. The width is only asked for then.
+    final Widget body = swapWith == null
+        ? buildBody(swapBelow: false)
+        : LayoutBuilder(
+            builder: (context, box) => buildBody(
+              swapBelow: !_swapFitsBesideNumber(
+                context,
+                bodyWidth: box.maxWidth,
+                date: day.date,
+                isToday: isToday,
+                holiday: holiday != null,
+              ),
+            ),
+          );
     final paddedBody = Padding(
       padding: const EdgeInsets.all(Sp.cellGap / 2),
       child: body,
@@ -555,6 +589,7 @@ class _DayCellState extends State<DayCell> {
         isToday: isToday,
         selected: selected,
         deviceEventCount: deviceEventCount,
+        swapWith: swapWith,
       ),
       onTap: onTap,
       onLongPress: onLongPress,
@@ -593,9 +628,13 @@ class _DayCellState extends State<DayCell> {
 ///
 /// The limit grows with the text (80 dp at the normal size), so the code of
 /// the cell can grow too instead of being squeezed (H-T18-5).
-double dayCellHeightWithTime(BuildContext context, {double? limit}) {
+double dayCellHeightWithTime(
+  BuildContext context, {
+  double? limit,
+  TextScaler? textScaler,
+}) {
   final type = context.type;
-  final scaler = MediaQuery.textScalerOf(context);
+  final scaler = textScaler ?? MediaQuery.textScalerOf(context);
   final height =
       textHeight(type.cellDay, scaler) +
       Sp.xs +
@@ -616,9 +655,13 @@ double dayCellHeightWithTime(BuildContext context, {double? limit}) {
 /// A cell never draws more than [_maxCellBands] bands: with four or more
 /// shifts the third one is the neutral «+N» of [_OverflowBand]. A day with six
 /// shifts therefore takes exactly the room of a day with four.
-List<double> _bandHeights(BuildContext context, List<ShiftType> shifts) {
+List<double> _bandHeights(
+  BuildContext context,
+  List<ShiftType> shifts, [
+  TextScaler? textScaler,
+]) {
   final type = context.type;
-  final scaler = MediaQuery.textScalerOf(context);
+  final scaler = textScaler ?? MediaQuery.textScalerOf(context);
   final number = textHeight(type.cellDay, scaler) + Sp.xs + Sp.hair;
   final codeLine = textHeight(type.cellCodeMulti, scaler);
   final timeLine = textHeight(type.cellTime, scaler);
@@ -662,10 +705,19 @@ List<int> _bandFlex(
 /// band needs (see [_bandHeights]) plus the gap between cells, never less
 /// than a cell with a single shift. The tallest band does not set the pace:
 /// the bands share the cell in proportion to their own needs.
-double dayCellHeightForShifts(BuildContext context, List<ShiftType> shifts) {
-  if (shifts.length < 2) return dayCellHeightWithTime(context);
-  final sum = _bandHeights(context, shifts).fold<double>(0, (a, b) => a + b);
-  return math.max(dayCellHeightWithTime(context), sum + Sp.cellGap);
+double dayCellHeightForShifts(
+  BuildContext context,
+  List<ShiftType> shifts, {
+  TextScaler? textScaler,
+}) {
+  final single = dayCellHeightWithTime(context, textScaler: textScaler);
+  if (shifts.length < 2) return single;
+  final sum = _bandHeights(
+    context,
+    shifts,
+    textScaler,
+  ).fold<double>(0, (a, b) => a + b);
+  return math.max(single, sum + Sp.cellGap);
 }
 
 /// The most the line of the note grows with the reader's text size. The cells
@@ -673,15 +725,34 @@ double dayCellHeightForShifts(BuildContext context, List<ShiftType> shifts) {
 /// «Q…» (1.2.0 QA, iPhone F9); at this size a few letters of it fit.
 const double noteLineMaxTextScale = 1.3;
 
-TextScaler _noteLineScaler(BuildContext context) =>
-    MediaQuery.textScalerOf(context)
-        .clamp(maxScaleFactor: noteLineMaxTextScale);
+TextScaler _noteLineScaler(BuildContext context, [TextScaler? textScaler]) =>
+    (textScaler ?? MediaQuery.textScalerOf(context)).clamp(
+      maxScaleFactor: noteLineMaxTextScale,
+    );
+
+/// The most the text of the cells of the month grid grows with the reader's
+/// text size in the two-pane month (a landscape phone or a tablet): there the
+/// grid is short and at x2.0 only one or two rows of weeks fitted next to the
+/// pane (QA 0.12.1, C2). The code and the time keep a readable size; the day
+/// card, the pane and the rest of the screen keep the reader's.
+const double splitGridMaxTextScale = 1.5;
+
+/// The text scaler the month grid measures its rows and draws its cells with:
+/// the reader's, up to [splitGridMaxTextScale] when the month has two panes.
+/// The month screen measures with it and [MonthGrid] draws with it, so the
+/// rows are as tall as the cells need.
+TextScaler monthGridTextScaler(BuildContext context) {
+  final scaler = MediaQuery.textScalerOf(context);
+  return Adaptive.useSplit(MediaQuery.sizeOf(context))
+      ? scaler.clamp(maxScaleFactor: splitGridMaxTextScale)
+      : scaler;
+}
 
 /// The height of the line of the note at the bottom of a cell: one line of
 /// the time's style at the user's text size (up to [noteLineMaxTextScale]),
 /// measured like every other line of the cell.
-double noteLineHeightOf(BuildContext context) =>
-    textHeight(context.type.cellTime, _noteLineScaler(context));
+double noteLineHeightOf(BuildContext context, {TextScaler? textScaler}) =>
+    textHeight(context.type.cellTime, _noteLineScaler(context, textScaler));
 
 /// Whether the note of [day] needs the line of its own at the bottom of the
 /// cell: «Ver la nota en el mes» is on and the day has a note. The note is
@@ -717,8 +788,13 @@ double dayCellMinimumHeight(
   required double cellWidth,
   bool holiday = false,
   bool deviceEvents = false,
+  TextScaler? textScaler,
 }) {
-  final base = dayCellHeightForShifts(context, day.shifts);
+  final base = dayCellHeightForShifts(
+    context,
+    day.shifts,
+    textScaler: textScaler,
+  );
   if (day.shifts.isEmpty ||
       !dayNeedsBottomNoteLine(
         context,
@@ -730,7 +806,7 @@ double dayCellMinimumHeight(
       )) {
     return base;
   }
-  return base + noteLineHeightOf(context);
+  return base + noteLineHeightOf(context, textScaler: textScaler);
 }
 
 /// Where the first line of the note goes with «Ver la nota en el mes» on.
@@ -811,6 +887,8 @@ class _DayMarks extends StatelessWidget {
     required this.extras,
     this.overtimeMinutes = 0,
     required this.note,
+    this.swap = false,
+    this.swapBelow = false,
     required this.holiday,
     required this.deviceEvents,
     required this.isToday,
@@ -823,6 +901,14 @@ class _DayMarks extends StatelessWidget {
   final bool extras;
   final int overtimeMinutes;
   final bool note;
+
+  /// The day is held by an applied shift swap (the glyph of two arrows).
+  final bool swap;
+
+  /// The swap glyph does not fit beside the day number (see
+  /// [_swapFitsBesideNumber]): the row of marks is drawn under the number, on
+  /// a row of its own that the first band keeps free ([_swapRowReserve]).
+  final bool swapBelow;
   final bool holiday;
 
   /// The day has appointments of the phone (P6): a discreet dot of its own,
@@ -883,6 +969,30 @@ class _DayMarks extends StatelessWidget {
         // Number: 8 dp from the left edge, then a gap before the marks.
         final free = box.maxWidth - inset - Sp.s - numberWidth - Sp.xs;
 
+        // The marks that are drawn. A swap glyph never reaches the day number
+        // (QA 0.12.1, Astra): with it on, the marks go in order of what they
+        // tell while they fit in what the number leaves, even shrunk to 60 %
+        // of their size; the rest stay in the spoken label and in the detail
+        // of the day. Without it the row works as it always did.
+        // Under the number the row has the width of the cell, so the marks
+        // that did not fit beside it come back.
+        final room = swapBelow ? box.maxWidth - Sp.s - inset : free + Sp.hair;
+        final marks = swap
+            ? _marksThatFit(
+                room: room,
+                extras: extras,
+                note: note,
+                device: deviceEvents,
+                holiday: holiday,
+              )
+            : (
+                extras: extras,
+                note: note,
+                swap: false,
+                device: deviceEvents,
+                holiday: holiday,
+              );
+
         // The hours of the extras are drawn as text only where they fit beside
         // the number at a legible size (never under the smallest size of a
         // time in a cell, 8 dp, and never over the room of the number). Where
@@ -891,13 +1001,14 @@ class _DayMarks extends StatelessWidget {
         // the detail of the day.
         double naturalOf({required bool asText}) {
           final widths = [
-            if (extras)
+            if (marks.extras)
               (extraText != null && asText)
                   ? extraWidth
                   : DayCell._extrasIconSize,
-            if (note) DayCell._noteIconSize,
-            if (deviceEvents) DayCell._dotSize,
-            if (holiday) DayCell._dotSize,
+            if (marks.note) DayCell._noteIconSize,
+            if (marks.swap) DayCell._noteIconSize,
+            if (marks.device) DayCell._dotSize,
+            if (marks.holiday) DayCell._dotSize,
           ];
           return widths.fold<double>(0, (x, y) => x + y) +
               (widths.length - 1) * Sp.xs;
@@ -906,9 +1017,11 @@ class _DayMarks extends StatelessWidget {
         final minTextScale = extraText == null
             ? 0.6
             : math.min(1.0, AppTypography.cellTimeMinSize / extraFont);
-        // The gap before the marks (4 dp) may give up half of itself.
-        final room = free + Sp.hair;
+        // The gap before the marks (4 dp) may give up half of itself. (The
+        // row under the number keeps the height of the plus: the hours stay
+        // in the spoken label and in the detail of the day.)
         final showText =
+            !swapBelow &&
             extraText != null &&
             naturalOf(asText: true) * minTextScale <= room + 0.01;
         final natural = naturalOf(asText: showText);
@@ -916,14 +1029,24 @@ class _DayMarks extends StatelessWidget {
         // that is all it takes. Otherwise it may go down to 60 % of its size
         // and take a bit more room than the number leaves in a cell too
         // narrow for anything else: the plus and the dots stay seen.
-        final width = showText
+        final width = showText || swap
             ? math.min(natural, room).clamp(0.0, box.maxWidth - inset)
             : math.max(free, natural * 0.6).clamp(0.0, box.maxWidth - inset);
         final rowHeight = showText
             ? math.max(DayCell._noteIconSize, extraHeight)
             : DayCell._noteIconSize;
         return Padding(
-          padding: EdgeInsets.only(top: Sp.xs + Sp.hair, right: inset),
+          padding: EdgeInsets.only(
+            top: swapBelow
+                ? textHeight(
+                        context.type.cellDay,
+                        MediaQuery.textScalerOf(context),
+                      ) +
+                      Sp.xs +
+                      Sp.hair
+                : Sp.xs + Sp.hair,
+            right: inset,
+          ),
           child: Align(
             alignment: Alignment.topRight,
             child: SizedBox(
@@ -937,40 +1060,51 @@ class _DayMarks extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (extras) extraMark(asText: showText),
-                      if (extras && (note || holiday || deviceEvents))
-                        const SizedBox(width: Sp.xs),
-                      if (note)
-                        Icon(
-                          AppIcons.note,
-                          size: DayCell._noteIconSize,
-                          color: color,
-                        ),
-                      if (note && (holiday || deviceEvents))
-                        const SizedBox(width: Sp.xs),
-                      if (deviceEvents)
-                        DecoratedBox(
-                          key: ValueKey('device-event-mark-${date.toIso()}'),
-                          decoration: BoxDecoration(
-                            color: deviceColor,
-                            shape: BoxShape.circle,
+                      for (final (i, mark) in [
+                        if (marks.extras) extraMark(asText: showText),
+                        if (marks.note)
+                          Icon(
+                            AppIcons.note,
+                            size: DayCell._noteIconSize,
+                            color: color,
                           ),
-                          child: const SizedBox.square(
-                            dimension: DayCell._dotSize,
+                        // Two arrows in the ink of the other marks (the same
+                        // contrast as the clip of the note), never colour
+                        // alone: the glyph is the mark and the label says
+                        // who the swap is with.
+                        if (marks.swap)
+                          Icon(
+                            AppIcons.swap,
+                            key: ValueKey('swap-mark-${date.toIso()}'),
+                            size: DayCell._noteIconSize,
+                            color: color,
                           ),
-                        ),
-                      if (deviceEvents && holiday) const SizedBox(width: Sp.xs),
-                      if (holiday)
-                        DecoratedBox(
-                          key: ValueKey('holiday-dot-${date.toIso()}'),
-                          decoration: BoxDecoration(
-                            color: dotColor,
-                            shape: BoxShape.circle,
+                        if (marks.device)
+                          DecoratedBox(
+                            key: ValueKey('device-event-mark-${date.toIso()}'),
+                            decoration: BoxDecoration(
+                              color: deviceColor,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const SizedBox.square(
+                              dimension: DayCell._dotSize,
+                            ),
                           ),
-                          child: const SizedBox.square(
-                            dimension: DayCell._dotSize,
+                        if (marks.holiday)
+                          DecoratedBox(
+                            key: ValueKey('holiday-dot-${date.toIso()}'),
+                            decoration: BoxDecoration(
+                              color: dotColor,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const SizedBox.square(
+                              dimension: DayCell._dotSize,
+                            ),
                           ),
-                        ),
+                      ].indexed) ...[
+                        if (i > 0) const SizedBox(width: Sp.xs),
+                        mark,
+                      ],
                     ],
                   ),
                 ),
@@ -981,6 +1115,68 @@ class _DayMarks extends StatelessWidget {
       },
     );
   }
+}
+
+/// Height the first band keeps free under the day number when the swap glyph
+/// has a row of its own there ([_swapFitsBesideNumber] says no).
+const double _swapRowReserve = DayCell._noteIconSize + Sp.hair;
+
+/// Whether the swap glyph, at its smallest size (60 % of itself), fits in the
+/// row of marks beside the day number. It does at every text size up to the
+/// larger ones; at the largest accessibility sizes of a phone the number takes
+/// the whole width of the cell and the glyph moves under it instead of
+/// disappearing (F1 of 1.3.0). [bodyWidth] is the width of the cell without
+/// the gap between cells.
+bool _swapFitsBesideNumber(
+  BuildContext context, {
+  required double bodyWidth,
+  required CivilDate date,
+  required bool isToday,
+  required bool holiday,
+}) {
+  final inset = holiday ? Sp.s : Sp.xs;
+  final free =
+      bodyWidth - inset - Sp.s - _numberWidth(context, date, isToday) - Sp.xs;
+  return DayCell._noteIconSize * 0.6 <= free + Sp.hair + 0.01;
+}
+
+/// Which marks of a cell with a swap glyph are drawn: in the order swap,
+/// holiday dot, extras plus, note clip, appointments dot, each one while the
+/// row (each mark down to 60 % of its size) fits in [room], so the marks never
+/// reach the day number. The swap glyph, first in the order, always stays: it
+/// is what tells a day held by a swap from a day with no data. A mark that does not fit is left out of the cell
+/// (it is still in the spoken label and in the detail of the day).
+({bool extras, bool note, bool swap, bool device, bool holiday}) _marksThatFit({
+  required double room,
+  required bool extras,
+  required bool note,
+  required bool device,
+  required bool holiday,
+}) {
+  final order = <(String, double)>[
+    ('swap', DayCell._noteIconSize),
+    if (holiday) ('holiday', DayCell._dotSize),
+    if (extras) ('extras', DayCell._extrasIconSize),
+    if (note) ('note', DayCell._noteIconSize),
+    if (device) ('device', DayCell._dotSize),
+  ];
+  final kept = <String>{};
+  var used = 0.0;
+  for (final (name, width) in order) {
+    final next = used + (kept.isEmpty ? 0 : Sp.xs) + width;
+    // The swap glyph is never left out: a day held by a swap would look like
+    // a day with no data (F1 of 1.3.0).
+    if (name != 'swap' && next * 0.6 > room + 0.01) continue;
+    kept.add(name);
+    used = next;
+  }
+  return (
+    extras: kept.contains('extras'),
+    note: kept.contains('note'),
+    swap: kept.contains('swap'),
+    device: kept.contains('device'),
+    holiday: kept.contains('holiday'),
+  );
 }
 
 /// The band that says how many shifts of the day the cell does not show

@@ -148,6 +148,10 @@ void main() {
         final app = await FirstLaunch.open(tester);
         await app.chooseRotation();
         expect(_nextButton(tester).onPressed, isNull);
+        expect(
+          find.textContaining('Para seguir, elige tu rotación'),
+          findsOneWidget,
+        );
         await app.tap(key('onboarding-pattern-12h'));
         expect(_nextButton(tester).onPressed, isNotNull);
         await _next(app);

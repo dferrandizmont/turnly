@@ -102,10 +102,12 @@ class PatternBlockControls extends ConsumerWidget {
           key: const ValueKey('block-shortcuts'),
           sizing: ChoiceGridSizing.wholeLabel,
           pills: [
-            for (final days in [5, 7, 14, 21, 28])
+            // 2 and 3 days first: the short blocks of a guard or a night
+            // cycle took one tap on «+» each (QA 0.12.1, N11).
+            for (final days in [2, 3, 5, 7, 14, 21, 28])
               ChoicePill(
                 key: ValueKey('block-days-$days'),
-                label: days == 5
+                label: days < 7
                     ? l10n.patternCycleDays(days)
                     : l10n.patternWeeks(days ~/ 7),
                 selected: block.days == days,
@@ -122,8 +124,7 @@ class PatternBlockControls extends ConsumerWidget {
             onPressed: () => showAppSheet<void>(
               context: context,
               padded: true,
-              builder: (_) =>
-                  _BlockActions(args: args, index: index, own: own),
+              builder: (_) => _BlockActions(args: args, index: index, own: own),
             ),
             icon: Icon(AppIcons.more),
             tooltip: l10n.dayDetailMore,

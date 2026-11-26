@@ -49,6 +49,10 @@ Future<void> _go(WidgetTester tester, String location) async {
 
 Size _phone(double width) => Size(width, 760);
 
+/// «Cómo se cuenta» says when the holiday line appears (QA 0.12.1, J8).
+const _hiddenNote =
+    'esta línea solo aparece cuando hay horas en un día festivo';
+
 void main() {
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
@@ -435,6 +439,13 @@ void main() {
       await _go(tester, '/resumen?mes=2026-10');
       expect(_key('summary-holiday'), findsOneWidget);
       expect(find.text('Horas en festivo'), findsOneWidget);
+      await tester.ensureVisible(_key('summary-notes'));
+      await tester.pumpAndSettle();
+      expect(
+        find.textContaining('Horas en festivo: las que caen'),
+        findsOneWidget,
+      );
+      expect(find.textContaining(_hiddenNote), findsNothing);
 
       // September 2026 has shifts and no national holiday.
       await _go(tester, '/resumen?mes=2026-09');
@@ -442,8 +453,15 @@ void main() {
       expect(_key('summary-holiday'), findsNothing);
       expect(find.text('Horas en festivo'), findsNothing);
       expect(find.textContaining('turnos en festivo'), findsNothing);
-      // Nor the note that explains it.
-      expect(find.textContaining('Horas en festivo:'), findsNothing);
+      // The note explains when it appears (J8) instead of the one about its
+      // figures.
+      await tester.ensureVisible(_key('summary-notes'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining(_hiddenNote), findsOneWidget);
+      expect(
+        find.textContaining('Horas en festivo: las que caen'),
+        findsNothing,
+      );
     });
 
     testWidgets('a month with a holiday nobody works on has no line either', (
@@ -461,7 +479,9 @@ void main() {
       expect(_key('summary-holiday'), findsNothing);
       expect(find.text('Horas en festivo'), findsNothing);
       expect(find.textContaining('turnos en festivo'), findsNothing);
-      expect(find.textContaining('Horas en festivo:'), findsNothing);
+      await tester.ensureVisible(_key('summary-notes'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining(_hiddenNote), findsOneWidget);
     });
 
     testWidgets('«Fechas…» follows the same rule', (tester) async {

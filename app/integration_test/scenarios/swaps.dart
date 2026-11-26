@@ -141,7 +141,7 @@ Future<void> _book(QaContext qa) async {
     reason: 'el 21 de octubre',
   );
   await t.tapAndSettle(find.text('Aceptar'), reason: 'Aceptar el día');
-  await t.waitFor(find.text('Devuelto'), reason: 'el estado Devuelto');
+  await t.waitFor(find.text('Con fecha'), reason: 'la fecha de devolución anotada');
   expect(
     find.text('Nada pendiente'),
     findsOneWidget,

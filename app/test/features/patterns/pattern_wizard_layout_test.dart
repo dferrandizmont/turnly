@@ -213,7 +213,10 @@ void main() {
       final screen = tester.widget<PatternWizardScreen>(
         find.byType(PatternWizardScreen),
       );
-      final args = PatternWizardArgs(start: screen.start, shiftId: screen.shiftId);
+      final args = PatternWizardArgs(
+        start: screen.start,
+        shiftId: screen.shiftId,
+      );
       final container = ProviderScope.containerOf(
         tester.element(find.byType(PatternWizardScreen)),
       );
@@ -258,7 +261,7 @@ void main() {
           );
           expect(
             find.descendant(of: controls, matching: find.byType(ChoicePill)),
-            findsNWidgets(5),
+            findsNWidgets(7),
           );
           final palette = tester.getRect(_key('builder-palette'));
           final viewport = tester.getRect(_key('pattern-step-choose'));
@@ -271,6 +274,8 @@ void main() {
               .isEmpty;
           for (final key in [
             'block-plus',
+            'block-days-2',
+            'block-days-3',
             'block-days-5',
             'block-days-7',
             'block-days-14',
@@ -490,7 +495,10 @@ void main() {
         final screen = tester.widget<PatternWizardScreen>(
           find.byType(PatternWizardScreen),
         );
-        final args = PatternWizardArgs(start: screen.start, shiftId: screen.shiftId);
+        final args = PatternWizardArgs(
+          start: screen.start,
+          shiftId: screen.shiftId,
+        );
         final container = ProviderScope.containerOf(
           tester.element(find.byType(PatternWizardScreen)),
         );
@@ -579,7 +587,10 @@ void main() {
       final screen = tester.widget<PatternWizardScreen>(
         find.byType(PatternWizardScreen),
       );
-      final args = PatternWizardArgs(start: screen.start, shiftId: screen.shiftId);
+      final args = PatternWizardArgs(
+        start: screen.start,
+        shiftId: screen.shiftId,
+      );
       final container = ProviderScope.containerOf(
         tester.element(find.byType(PatternWizardScreen)),
       );

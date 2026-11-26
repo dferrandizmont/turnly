@@ -793,9 +793,14 @@ class PatternCard extends StatelessWidget {
 
 // ---- step 2 -----------------------------------------------------------------
 
-String patternFullDate(AppDateFormat format, CivilDate d) => capitalize(
-  '${format.weekdayDayMonth(DateTime(d.year, d.month, d.day))} ${d.year}',
-);
+String patternFullDate(AppDateFormat format, CivilDate d) {
+  final date = DateTime.utc(d.year, d.month, d.day);
+  return capitalize(
+    format.locale.split(RegExp('[-_]')).first == 'eu'
+        ? format.spokenDate(date)
+        : '${format.weekdayDayMonth(date)} ${d.year}',
+  );
+}
 
 /// Asks for the start day of a rotation (or, with [forStart] false, its last
 /// day) in the sheet of the app (`showDateSheet`), 2000 to 2100 or from

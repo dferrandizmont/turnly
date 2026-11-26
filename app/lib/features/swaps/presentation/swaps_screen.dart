@@ -6,6 +6,7 @@ import '../../../core/icons/app_icons.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/theme_context.dart';
 import '../../../core/widgets/app_card.dart';
+import '../../../core/widgets/app_snack_bar.dart';
 import '../../../core/widgets/buttons.dart';
 import '../../../core/widgets/content_app_bar.dart';
 import '../../../core/widgets/empty_illustration.dart';
@@ -44,16 +45,19 @@ class SwapsScreen extends ConsumerWidget {
     final l10n = context.l10n;
     final ledger = ref.watch(swapLedgerProvider);
     final hasChanges = ledger.value?.swaps.isNotEmpty ?? false;
+    // A notice floats over the bottom of the list: while it is up the last
+    // card scrolls clear of it, «Aplicar al cuadrante» included (QA N33).
+    final noticeRoom = ref.watch(snackBarCoverProvider);
 
     return Scaffold(
       appBar: ContentAppBar.adaptive(context, title: Text(l10n.swapTitle)),
       body: PageBody(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(
+          padding: EdgeInsets.fromLTRB(
             Sp.page,
             Sp.s,
             Sp.page,
-            Sp.section,
+            Sp.section + (noticeRoom ?? 0),
           ),
           children: [
             ...ledger.when(
@@ -243,11 +247,19 @@ class _SwapRow extends ConsumerWidget {
     );
     final application = swapApplicationOf(schedule, swap);
     final applicationText = swapApplicationText(l10n, application);
+    final givenDate = formatRangeDate(l10n.localeName, swap.date);
+    final dates = switch (swap.returnDate) {
+      final received? => l10n.swapDates(
+        givenDate,
+        formatRangeDate(l10n.localeName, received),
+      ),
+      _ => givenDate,
+    };
 
     // What the row says, in one go for the reader: the day, with whom, which
     // side owes it and its state (never colour alone).
     final label = [
-      formatRangeDate(l10n.localeName, swap.date),
+      dates,
       swap.colleague,
       swapDirectionText(l10n, swap.direction),
       swapStageText(l10n, swap.stage),
@@ -271,7 +283,7 @@ class _SwapRow extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        formatRangeDate(l10n.localeName, swap.date),
+                        dates,
                         key: ValueKey('swap-date-${swap.id}'),
                         style: type.bodyStrong,
                       ),
@@ -305,7 +317,7 @@ class _SwapRow extends ConsumerWidget {
                 ),
                 Align(
                   alignment: Alignment.center,
-                  child: _SwapMenu(swap: swap),
+                  child: _SwapMenu(swap: swap, application: application),
                 ),
               ],
             ),
@@ -431,17 +443,16 @@ enum _SwapAction { edit, markReturned, settle, reopen, unapply, remove }
 
 /// The menu of a change.
 class _SwapMenu extends ConsumerWidget {
-  const _SwapMenu({required this.swap});
+  const _SwapMenu({required this.swap, required this.application});
 
   final ShiftSwap swap;
+  final SwapApplication application;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final colors = context.colors;
-    final hasRecords =
-        ref.watch(swapApplicationRecordsProvider(swap.id)).value?.isNotEmpty ??
-        false;
+    final records = ref.watch(swapApplicationRecordsProvider(swap.id)).value;
 
     PopupMenuItem<_SwapAction> item(
       _SwapAction action,
@@ -477,7 +488,9 @@ class _SwapMenu extends ConsumerWidget {
             _SwapAction.markReturned,
             'swap-menu-returned',
             SwapIcons.returned,
-            l10n.swapMarkReturned,
+            swap.returnDate == null
+                ? l10n.swapMarkReturned
+                : l10n.swapEditReturnDate,
           ),
           item(
             _SwapAction.settle,
@@ -492,7 +505,8 @@ class _SwapMenu extends ConsumerWidget {
             AppIcons.undo,
             l10n.swapReopen,
           ),
-        if (hasRecords)
+        if (records != null &&
+            (records.isNotEmpty || application == SwapApplication.applied))
           item(
             _SwapAction.unapply,
             'swap-menu-unapply',
@@ -536,7 +550,7 @@ class _SwapMenu extends ConsumerWidget {
           );
           if (messenger.mounted) {
             if (skipped.isEmpty) {
-              showSwapNotice(messenger, l10n.swapMarkedReturned);
+              showSwapNotice(messenger, l10n.swapReturnDateSaved);
             } else {
               showSkippedSwapDays(messenger, l10n, schedule, skipped);
             }
@@ -550,6 +564,16 @@ class _SwapMenu extends ConsumerWidget {
           await controller.reopen(swap.id);
           if (messenger.mounted) showSwapNotice(messenger, l10n.swapReopened);
         case _SwapAction.unapply:
+          final records = await ref
+              .read(swapAppliedStoreProvider)
+              .before(swap.id);
+          if (controller.isBusy(swap.id)) return;
+          if (records.isEmpty) {
+            if (messenger.mounted) {
+              showSwapNotice(messenger, l10n.swapUnapplyNoSnapshot);
+            }
+            return;
+          }
           var skipped = const <CivilDate>[];
           final step = await controller.undoFromCalendar(
             swap,

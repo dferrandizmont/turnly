@@ -133,6 +133,23 @@ void main() {
     );
   });
 
+  testWidgets('the folded estimate identifies unpriced overtime', (
+    tester,
+  ) async {
+    await pumpCalendar(tester, size: const Size(390, 1600));
+    containerOf(tester)
+        .read(scheduleControllerProvider.notifier)
+        .setDayExtras(const CivilDate(2026, 10, 19), overtimeMinutes: 30);
+    await tester.pumpAndSettle();
+    await _openSummary(tester);
+    await tester.ensureVisible(_key('summary-estimate-fold'));
+    await tester.pumpAndSettle();
+    expect(find.text('Horas extra sin valorar'), findsOneWidget);
+    await tester.tap(_key('summary-estimate-fold'));
+    await tester.pumpAndSettle();
+    expect(_key('summary-extras-no-rate'), findsOneWidget);
+  });
+
   testWidgets('a month with only overtime on a day with no shift still shows '
       'its hours', (tester) async {
     await pumpCalendar(tester);
@@ -152,6 +169,29 @@ void main() {
     expect(_key('summary-empty'), findsNothing);
     expect(_text(tester, 'summary-hours'), '45 min');
     expect(_text(tester, 'summary-overtime-value'), '+45 min');
+  });
+
+  testWidgets('a full unpriced early leave does not add an estimate row', (
+    tester,
+  ) async {
+    await pumpCalendar(
+      tester,
+      clock: () => DateTime(2025, 3, 4, 12),
+      size: const Size(390, 1600),
+    );
+    const date = CivilDate(2025, 3, 3); // Before the rotation.
+    final controller = containerOf(tester)
+        .read(scheduleControllerProvider.notifier);
+    controller.setDayShifts(date, const ['morning']);
+    controller.setDayExtras(date, earlyLeaveMinutes: 8 * 60);
+    await tester.pumpAndSettle();
+    await _openSummary(tester);
+
+    expect(_text(tester, 'summary-hours'), '0 h');
+    expect(_key('summary-early-leave'), findsOneWidget);
+    expect(_key('summary-overtime'), findsNothing);
+    expect(_key('summary-estimate-fold'), findsNothing);
+    expect(find.text('Sin precios'), findsNothing);
   });
 
   testWidgets('the year table totals include the extras', (tester) async {

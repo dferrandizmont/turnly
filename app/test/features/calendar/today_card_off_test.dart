@@ -1,8 +1,14 @@
 import 'package:cuadrante/core/bootstrap/bootstrap.dart';
 import 'package:cuadrante/core/theme/app_colors.dart';
 import 'package:cuadrante/features/calendar/application/off_outlook.dart';
+import 'package:cuadrante/features/calendars/domain/calendar.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
+import 'package:cuadrante/features/swaps/application/swaps_controller.dart';
+import 'package:cuadrante/features/swaps/application/swaps_providers.dart';
+import 'package:cuadrante/features/swaps/domain/shift_swap.dart';
+import 'package:cuadrante/features/swaps/domain/swap_schedule_plan.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'harness.dart';
@@ -42,6 +48,114 @@ void main() {
       await pumpCalendar(tester, clock: () => DateTime(2026, 10, 22, 10));
       expect(find.text('HOY LIBRE'), findsOneWidget);
       expect(textOf(offLine, tester), 'Hoy libras; vuelves el viernes 23');
+    });
+
+    testWidgets('a day ceded in a swap says it has no shift', (tester) async {
+      await pumpCalendar(
+        tester,
+        clock: () => DateTime(2026, 10, 22, 10),
+        overrides: [
+          swapDayClaimsProvider(mainCalendarId).overrideWith(
+            (ref) => Stream.value(const [
+              SwapDayClaim(
+                date: CivilDate(2026, 10, 22),
+                swapId: 'swap',
+                colleague: 'Marta',
+              ),
+            ]),
+          ),
+        ],
+      );
+      expect(find.text('HOY'), findsOneWidget);
+      expect(find.text('Sin turno'), findsOneWidget);
+      expect(offLine, findsNothing);
+    });
+
+    testWidgets('a ceded manual shift without a rotation leaves no shift', (
+      tester,
+    ) async {
+      const day = CivilDate(2025, 3, 3); // Before the demo rotation.
+      await pumpCalendar(
+        tester,
+        clock: () => DateTime(2025, 3, 3, 10),
+        prepare: (repository) => repository.apply(
+          mainCalendarId,
+          ScheduleChange(
+            patch: EntriesPatch({
+              day: EntryChange(
+                null,
+                const DayEntry(date: day, shiftTypeIds: ['morning']),
+              ),
+            }),
+          ),
+        ),
+      );
+      final container = containerOf(tester);
+      final claims = swapDayClaimsProvider(mainCalendarId);
+      expect(idsOn(scheduleOf(tester), day), 'morning');
+      final swap = await tester.runAsync(
+        () => container
+            .read(swapLedgerProvider.notifier)
+            .register(
+              colleague: 'Marta',
+              date: day,
+              direction: SwapDirection.theyOwe,
+              givenShiftTypeIds: const ['morning'],
+            )
+            .timeout(const Duration(seconds: 5)),
+      );
+      await tester.pumpAndSettle();
+      final change = await tester.runAsync(
+        () => container
+            .read(swapLedgerProvider.notifier)
+            .applyToCalendar(swap!)
+            .timeout(const Duration(seconds: 5)),
+      );
+      expect(change, isNotNull);
+      final savedClaims = await tester.runAsync(
+        () => container.read(swapAppliedStoreProvider).claims(mainCalendarId),
+      );
+      expect(savedClaims!.single.date, day);
+      for (var i = 0; i < 10 && container.read(claims).isLoading; i++) {
+        await tester.runAsync(
+          () => Future<void>.delayed(const Duration(milliseconds: 20)),
+        );
+        await tester.pump();
+      }
+      await tester.pumpAndSettle();
+      expect(scheduleOf(tester).entries[day]?.shiftTypeIds, isNull);
+      expect(find.text('HOY LIBRE'), findsNothing);
+      expect(find.text('Sin turno'), findsOneWidget);
+    });
+
+    testWidgets('the card and strip show the day off after the night ends', (
+      tester,
+    ) async {
+      final semantics = tester.ensureSemantics();
+      try {
+        var now = DateTime(2026, 10, 24, 3);
+        await pumpCalendar(tester, clock: () => now, size: const Size(600, 1100));
+        final strip = find.byKey(const ValueKey('month-strip'));
+        final stripOff = find.descendant(
+          of: strip,
+          matching: find.textContaining('Hoy libras'),
+        );
+        expect(find.text('AHORA'), findsOneWidget);
+        expect(offLine, findsNothing);
+        expect(strip, findsOneWidget);
+        expect(stripOff, findsNothing);
+        expect(tester.getSemantics(strip).label, isNot(contains('Hoy libras')));
+
+        now = DateTime(2026, 10, 24, 6);
+        await tester.pump(const Duration(minutes: 1));
+        await tester.pumpAndSettle();
+        expect(find.text('AHORA'), findsNothing);
+        expect(textOf(offLine, tester), contains('Hoy libras'));
+        expect(stripOff, findsOneWidget);
+        expect(tester.getSemantics(strip).label, contains('Hoy libras'));
+      } finally {
+        semantics.dispose();
+      }
     });
 
     testWidgets('the streak of work shows from three days, with the rest', (
@@ -118,7 +232,9 @@ void main() {
       expect(textOf(offLine, tester), 'Libras el sábado 24');
       expect(
         textOf(extraLine, tester),
-        'Fin de semana libre: 24–25 oct  ·  Llevas 4 días seguidos; te quedan 4',
+        // The dates cannot wrap apart: no-break spaces and a word joiner.
+        'Fin de semana libre: 24–\u206025\u00A0oct  ·  '
+        'Llevas 4 días seguidos; te quedan 4',
       );
     });
 

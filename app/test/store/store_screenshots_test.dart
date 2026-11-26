@@ -17,11 +17,13 @@ import 'package:cuadrante/features/absences/data/absence_balances_repository.dar
 import 'package:cuadrante/features/absences/data/absence_carry_over_store.dart';
 import 'package:cuadrante/features/absences/domain/absence_balance.dart';
 import 'package:cuadrante/features/calendar/application/paint_controller.dart';
+import 'package:cuadrante/features/calendar/application/schedule_controller.dart';
 import 'package:cuadrante/features/calendars/data/calendars_repository.dart';
 import 'package:cuadrante/features/calendars/domain/calendar.dart';
 import 'package:cuadrante/features/holidays/application/holidays_provider.dart';
 import 'package:cuadrante/features/holidays/data/holiday_repository.dart';
 import 'package:cuadrante/features/holidays/presentation/holidays_settings_providers.dart';
+import 'package:cuadrante/features/onboarding/application/onboarding_controller.dart';
 import 'package:cuadrante/features/onboarding/application/onboarding_providers.dart'
     show initialOnboardingProvider;
 import 'package:cuadrante/features/onboarding/data/onboarding_repository.dart';
@@ -48,6 +50,31 @@ import '../support/test_storage.dart';
 import 'readme_render_support.dart';
 
 final _now = DateTime(2026, 12, 24, 18);
+final _stamp = _now.toUtc().millisecondsSinceEpoch;
+
+ShiftSwap _pendingSwap(int stamp) => ShiftSwap(
+  id: 'store-swap-laura',
+  calendarId: mainCalendarId,
+  date: const CivilDate(2026, 12, 11),
+  colleague: 'Laura',
+  direction: SwapDirection.theyOwe,
+  givenShiftTypeIds: const ['afternoon'],
+  createdAt: stamp,
+  updatedAt: stamp,
+);
+
+ShiftSwap _appliedSwap(int stamp) => ShiftSwap(
+  id: 'store-swap-sara',
+  calendarId: mainCalendarId,
+  date: const CivilDate(2026, 12, 4),
+  returnDate: const CivilDate(2026, 12, 5),
+  colleague: 'Sara',
+  direction: SwapDirection.theyOwe,
+  givenShiftTypeIds: const ['morning'],
+  receivedShiftTypeIds: const ['afternoon'],
+  createdAt: stamp,
+  updatedAt: stamp,
+);
 const _month = CivilDate(2026, 12, 1);
 const _rotationStart = CivilDate(2027, 2, 1);
 const _logical = Size(412, 940);
@@ -351,48 +378,18 @@ void main() {
                 ScheduleChange(patch: EntriesPatch(absences)),
               );
             }
-            if (index == 7) {
+            if (index == 0 || index == 7) {
               final stamp = _now.toUtc().millisecondsSinceEpoch;
               final swaps = ShiftSwapsRepository(storage.database);
-              // Two colleagues with something pending and one settled.
-              await swaps.save(
-                ShiftSwap(
-                  id: 'store-swap-laura',
-                  calendarId: mainCalendarId,
-                  date: const CivilDate(2026, 12, 5),
-                  colleague: 'Laura',
-                  direction: SwapDirection.theyOwe,
-                  givenShiftTypeIds: const ['morning', 'afternoon'],
-                  createdAt: stamp,
-                  updatedAt: stamp,
-                ),
-              );
-              await swaps.save(
-                ShiftSwap(
-                  id: 'store-swap-marcos',
-                  calendarId: mainCalendarId,
-                  date: const CivilDate(2026, 12, 12),
-                  colleague: 'Marcos',
-                  direction: SwapDirection.iOwe,
-                  receivedShiftTypeIds: const ['night'],
-                  createdAt: stamp,
-                  updatedAt: stamp,
-                ),
-              );
-              await swaps.save(
-                ShiftSwap(
-                  id: 'store-swap-ana',
-                  calendarId: mainCalendarId,
-                  date: const CivilDate(2026, 11, 20),
-                  colleague: 'Ana',
-                  direction: SwapDirection.theyOwe,
-                  givenShiftTypeIds: const ['morning'],
-                  status: SwapStatus.returned,
-                  createdAt: stamp,
-                  updatedAt: stamp,
-                  closedAt: stamp,
-                ),
-              );
+              // Laura still owes me the afternoon of 11 December: not on the
+              // calendar yet («Sin aplicar», with its button).
+              await swaps.save(_pendingSwap(stamp));
+              // Sara and I traded 4 and 5 December: I give my morning and
+              // take her afternoon. The scene applies it through the real
+              // controller below («Aplicado», and the swap glyph on both
+              // days of the month). One shift out, one in: the month totals
+              // stay as the scene checks them.
+              await swaps.save(_appliedSwap(stamp));
             }
           });
           final snapshot = (await tester.runAsync(
@@ -447,6 +444,26 @@ void main() {
               tester.element(find.byType(CuadranteApp)),
             );
             final router = container.read(routerProvider);
+            if (index == 0 || index == 7) {
+              // Apply Sara's change with the app's own code: it writes the
+              // days and the records the month marks come from.
+              final applied = (await tester.runAsync(
+                () => container
+                    .read(swapLedgerProvider.notifier)
+                    .applyToCalendar(_appliedSwap(_stamp)),
+              ))!;
+              expect(applied.isEmpty, isFalse);
+              await tester.pumpAndSettle();
+              final after = container.read(scheduleControllerProvider);
+              final holidaysNow = holidays.byDay.keys.toSet();
+              final again = summarizeMonth(
+                after.schedule,
+                _month,
+                holidays: holidaysNow,
+              );
+              expect(again.shiftsWorked, 9);
+              expect(again.workedMinutes, 76 * 60);
+            }
             switch (index) {
               case 1:
                 await tester.tap(
@@ -507,6 +524,16 @@ void main() {
                 await tester.runAsync(
                   () => container.read(swapLedgerProvider.future),
                 );
+              case 8:
+                // The rotation step (0.13.0): «Create my own cycle» above
+                // the catalogue. The place step comes first on this path.
+                final onboarding = container.read(
+                  onboardingControllerProvider.notifier,
+                );
+                onboarding.chooseRotation();
+                await tester.pumpAndSettle();
+                await onboarding.next();
+                await tester.pumpAndSettle();
               case 9:
                 // The «Add widget» gallery over the real month.
                 unawaited(

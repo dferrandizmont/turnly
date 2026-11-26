@@ -4,7 +4,6 @@
   "description": "Calendario de quendas gratuíto e de código aberto para quen traballa a quendas en España. Sen Pro, sen anuncios, sen conta e sen conexión.",
   "intro": "Calendario de quendas para quen traballa a quendas en España (sanidade, policía, bombeiros, industria, hostalaría ou calquera outro sector): organiza mañás, tardes, noites, gardas, saíntes e días libres, e consulta a túa próxima quenda dunha ollada.",
   "hero_cta": "Descargar gratis",
-  "key_facts": "Todo gratis, sen Pro · Sen anuncios · Sen conta · Funciona sen conexión · Código aberto · Cinco idiomas",
   "features": [
     "A túa próxima quenda e o próximo día libre na tarxeta de hoxe; o mes en cuadrícula ou lista, a axenda e o ano, coas citas do calendario do móbil xunto ás túas quendas. Notas con fotos e tarefas, e ata seis calendarios para ver que días tedes libres á vez.",
     "Toca ou arrastra para pintar varios días, pon máis dunha quenda no mesmo día e desfai o que queiras. O asistente de rotacións aplica a túa con vista previa: quendas rotativas, 24/72, 4×4, 6×4, 5×2, 2-2-3, «2 e 2», «3 e 1» ou o teu propio patrón, desde o día do ciclo que che toque.",
@@ -26,10 +25,6 @@
     {
       "question": "Necesito unha conta ou conexión a internet?",
       "answer": "Non. Non hai conta e todo funciona sen conexión, tamén os festivos."
-    },
-    {
-      "question": "Como me apunto á proba de Google Play?",
-      "answer": "Únete ao grupo de probas turnly-testers en Google Groups coa túa conta de Google, acepta a proba na ligazón de Google Play e instala a app desde a tenda. Actualizarase soa."
     },
     {
       "question": "E no iPhone e no iPad?",
@@ -72,66 +67,16 @@
     "11-widgets-oscuro": "Galería «Engadir widget» coas túas quendas reais: pequeno, axenda, mediano e máis"
   },
   "privacy_date": "2026-11-20",
-  "kicker": "Calendario de quendas",
   "tagline": "As túas quendas, dunha ollada.",
   "chip": "Todo gratis: sen Pro, sen anuncios e sen conta.",
   "nav_label": "Seccións",
   "theme_label": "Tema",
   "theme_dark": "Escuro",
   "theme_hint": "Cambiar o tema",
-  "anim": {
-    "month": "Decembro",
-    "weekdays": [
-      "L",
-      "M",
-      "M",
-      "X",
-      "V",
-      "S",
-      "D"
-    ],
-    "shifts": {
-      "m": {
-        "code": "M",
-        "name": "Mañá"
-      },
-      "t": {
-        "code": "T",
-        "name": "Tarde"
-      },
-      "n": {
-        "code": "N",
-        "name": "Noite"
-      },
-      "l": {
-        "code": "L",
-        "name": "Libre"
-      },
-      "s": {
-        "code": "S",
-        "name": "Saínte"
-      }
-    },
-    "sequence": "A túa secuencia",
-    "cycle_days": "{n} días",
-    "tonight": "Esta noite",
-    "starts_in": "Comeza en {duration}",
-    "widget_day": "xov. 24",
-    "widget_tomorrow": "Mañá",
-    "off_on": "Tes libre o sábado 26",
-    "unit_h": "h",
-    "hours": {
-      "m": "06–14",
-      "t": "14–22",
-      "n": "22–06"
-    },
-    "night_range": "22:00–06:00"
-  },
-  "download_title": "Na App Store para iPhone e iPad; Android, en probas.",
+  "download_title": "Na App Store para iPhone e iPad; Android, en breve.",
   "download_intro": "Modo claro e escuro. Gratis e sen conta.",
   "download_notes": {
-    "play": "Calquera pode apuntarse en tres pasos:",
-    "apk": "Instálalo á man. Desde a 0.8.3 leva a mesma sinatura que a versión de Google Play: podes pasar dunha á outra sen desinstalar.",
+    "play": "Estará dispoñible moi pronto en Google Play.",
     "app_store": "De balde na App Store, para iPhone e iPad con iOS 17 ou posterior."
   },
   "screenshots_title": "Pantallas reais",
@@ -181,5 +126,184 @@
   "toc_aria": "Índice da política",
   "toc_count": "{count} apartados",
   "fallback_label": "Aviso de idioma",
-  "fallback_text": "A política móstrase en castelán, que é a versión válida. O resto da web está en galego."
+  "fallback_text": "A política móstrase en castelán, que é a versión válida. O resto da web está en galego.",
+  "key_facts": "Funciona sen conexión · Código aberto · Cinco idiomas",
+  "hero_line_1": "As túas quendas,",
+  "hero_line_2": "dunha ollada.",
+  "screenshots_count": "{n} / {total}",
+  "demo": {
+    "label": "Calendario de exemplo: aplica un patrón ou pinta as túas quendas",
+    "tabs_label": "Que queres probar",
+    "tab_pattern": "Aplicar patrón",
+    "tab_paint": "Pintar",
+    "month": "Decembro",
+    "weekdays": [
+      "L",
+      "M",
+      "M",
+      "X",
+      "V",
+      "S",
+      "D"
+    ],
+    "weekday_names": [
+      "domingo",
+      "luns",
+      "martes",
+      "mércores",
+      "xoves",
+      "venres",
+      "sábado"
+    ],
+    "today_label": "xov 24",
+    "tonight": "Esta noite",
+    "starts_in": "Comeza en {duration}",
+    "duration": "4 h",
+    "off_on": "Tes libre o {weekday} {day}",
+    "summary": "{n} quendas · {h} h",
+    "day_label": "{day} de decembro: {shift}",
+    "day_today": " (hoxe)",
+    "and": " + ",
+    "pattern_label": "Rotacións",
+    "cycle_days": "{n} días",
+    "sequence": "A túa secuencia",
+    "cycle_hint": "Que día do ciclo che toca o 1 de decembro? Tócao.",
+    "that_day": "Ese día tócache: {shifts}",
+    "cycle_day_label": "Día {n} de {total}, {shift}",
+    "paint": {
+      "header": "Pintando",
+      "mode_replace": "Cambiar a quenda",
+      "mode_add": "Engadir outra quenda",
+      "mode_add_spoken": "Engadir outra quenda (dobrar)",
+      "eraser": "Borrar",
+      "done": "Feito",
+      "undo": "Desfacer",
+      "redo": "Refacer",
+      "pattern_button": "Patrón",
+      "tools_label": "Ferramentas para pintar",
+      "preview_title": "Ao tocar un día",
+      "preview_title_double": "Ao tocar un día (dobrar)",
+      "effect_replace": "Substitúe a que haxa",
+      "effect_add": "Súmase á que xa hai",
+      "effect_erase": "Deixa o día baleiro",
+      "empty": "baleiro",
+      "hint_idle": "Escolle unha quenda e arrasta.",
+      "hint_painting": "Pintando: {name}",
+      "preview_spoken": "{title}: {before} pasa a {after}. {effect}",
+      "preview_spoken_times": "{title}: {before} pasa a {after}, {times}. {effect}"
+    },
+    "shifts": {
+      "M": {
+        "name": "Mañá",
+        "code": "M",
+        "short": "06–14",
+        "full": "06:00–14:00"
+      },
+      "T": {
+        "name": "Tarde",
+        "code": "T",
+        "short": "14–22",
+        "full": "14:00–22:00"
+      },
+      "N": {
+        "name": "Noite",
+        "code": "N",
+        "short": "22–06",
+        "full": "22:00–06:00"
+      },
+      "G": {
+        "name": "Garda 24 h",
+        "code": "G",
+        "short": "08–08",
+        "full": "08:00–08:00"
+      },
+      "D": {
+        "name": "Día 12 h",
+        "code": "D",
+        "short": "08–20",
+        "full": "08:00–20:00"
+      },
+      "L": {
+        "name": "Libre",
+        "code": "L"
+      },
+      "S": {
+        "name": "Saínte",
+        "code": "S"
+      }
+    },
+    "rotations": {
+      "correturnos": {
+        "name": "Quendas rotativas",
+        "description": "5 mañás, 2 libres, 5 tardes, 2 libres, 5 noites, 2 libres"
+      },
+      "24x72": {
+        "name": "24 x 72",
+        "description": "Garda de 24 h e 72 h libres (tamén 1-3)"
+      },
+      "4x4": {
+        "name": "4 x 4",
+        "description": "4 días de 12 h e 4 libres, sen noites (4x4 ou catro e catro)"
+      },
+      "6x4": {
+        "name": "6 x 4",
+        "description": "6 mañás e 4 libres"
+      },
+      "5x2": {
+        "name": "5 x 2",
+        "description": "5 mañás e 2 libres (de luns a venres)"
+      },
+      "2-2-3": {
+        "name": "2-2-3",
+        "description": "Dous días de 12 h, dous libres, tres de 12 h, dous libres, dous de 12 h e tres libres (tamén 2-2-3-2-2-3). Tamén se coñece como Pitman ou Panamá."
+      },
+      "2x2": {
+        "name": "2 e 2",
+        "description": "2 días de traballo e 2 libres (2x2)."
+      },
+      "3x1": {
+        "name": "3 e 1",
+        "description": "3 días de traballo e 1 libre (3x1)."
+      }
+    },
+    "ends_in": "Remata en {duration}",
+    "duration_fmt": "{h} h",
+    "no_times": "sen horario",
+    "clear_painted": "Quitar o que pintaches",
+    "summary_one": "{n} quenda · {h} h",
+    "off_tomorrow": "Mañá tes libre",
+    "now": "Agora"
+  },
+  "lost": {
+    "es": {
+      "title": "Página no encontrada",
+      "text": "Esta página no existe. Puedes volver al inicio.",
+      "home": "Inicio",
+      "skip": "Saltar al contenido"
+    },
+    "ca": {
+      "title": "Pàgina no trobada",
+      "text": "Aquesta pàgina no existeix. Pots tornar a l’inici.",
+      "home": "Inici",
+      "skip": "Salta al contingut"
+    },
+    "gl": {
+      "title": "Páxina non atopada",
+      "text": "Esta páxina non existe. Podes volver ao inicio.",
+      "home": "Inicio",
+      "skip": "Saltar ao contido"
+    },
+    "eu": {
+      "title": "Ez da orria aurkitu",
+      "text": "Orri hau ez dago. Hasierara itzul zaitezke.",
+      "home": "Hasiera",
+      "skip": "Joan edukira"
+    },
+    "en": {
+      "title": "Page not found",
+      "text": "This page does not exist. You can return to the home page.",
+      "home": "Home",
+      "skip": "Skip to content"
+    }
+  }
 }

@@ -30,7 +30,7 @@ Future<T?> showAppSheet<T>({
   bool enableDrag = true,
 }) {
   final barrierLabel = context.l10n.close;
-  _dropTextFocus();
+  dropTextFocus();
   return showModalBottomSheet<T>(
     context: Navigator.of(context, rootNavigator: true).context,
     useRootNavigator: true,
@@ -248,8 +248,9 @@ class _AppSheetBodyState extends State<AppSheetBody> {
   }
 }
 
-/// Unfocuses the primary focus only when it is an editable text field.
-void _dropTextFocus() {
+/// Unfocuses the primary focus only when it is an editable text field (a
+/// button reached with Tab keeps it, so the person does not lose their place).
+void dropTextFocus() {
   final focus = FocusManager.instance.primaryFocus;
   final context = focus?.context;
   if (focus == null || context == null) return;

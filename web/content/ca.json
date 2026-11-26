@@ -4,7 +4,6 @@
   "description": "Calendari de torns gratuït i de codi obert per a qui treballa a torns a Espanya. Sense Pro, sense anuncis, sense compte i sense connexió.",
   "intro": "Calendari per a qui treballa a torns a Espanya (sanitat, policia, bombers, indústria, hostaleria o qualsevol altre sector): organitza matins, tardes, nits, guàrdies, sortints i dies lliures, i consulta el teu proper torn d’un cop d’ull.",
   "hero_cta": "Descarrega gratis",
-  "key_facts": "Tot gratis, sense Pro · Sense anuncis · Sense compte · Funciona sense connexió · Codi obert · Cinc idiomes",
   "features": [
     "El teu proper torn i el proper dia lliure a la targeta d’avui; el mes en quadrícula o llista, l’agenda i l’any, amb les cites del calendari del mòbil al costat dels teus torns. Notes amb fotos i tasques, i fins a sis calendaris per veure quins dies teniu lliures alhora.",
     "Toca o arrossega per pintar diversos dies, posa més d’un torn al mateix dia i desfés el que vulguis. L’assistent de rotacions aplica la teva amb vista prèvia: torns rotatius, 24/72, 4×4, 6×4, 5×2, 2-2-3, «2 i 2», «3 i 1» o el teu propi patró, des del dia del cicle que et toqui.",
@@ -26,10 +25,6 @@
     {
       "question": "Necessito un compte o connexió a internet?",
       "answer": "No. No hi ha compte i tot funciona sense connexió, també els festius."
-    },
-    {
-      "question": "Com m’apunto a la prova de Google Play?",
-      "answer": "Uneix-te al grup de proves turnly-testers de Google Groups amb el teu compte de Google, accepta la prova a l’enllaç de Google Play i instal·la l’app des de la botiga. S’actualitzarà sola."
     },
     {
       "question": "I a l’iPhone i l’iPad?",
@@ -72,66 +67,16 @@
     "11-widgets-oscuro": "Galeria «Afegeix un widget» amb els teus torns reals: petit, agenda, mitjà i més"
   },
   "privacy_date": "2026-11-20",
-  "kicker": "Calendari de torns",
   "tagline": "Els teus torns, d’un cop d’ull.",
   "chip": "Tot gratis: sense Pro, sense anuncis i sense compte.",
   "nav_label": "Seccions",
   "theme_label": "Tema",
   "theme_dark": "Fosc",
   "theme_hint": "Canvia el tema",
-  "anim": {
-    "month": "Desembre",
-    "weekdays": [
-      "dl",
-      "dt",
-      "dc",
-      "dj",
-      "dv",
-      "ds",
-      "dg"
-    ],
-    "shifts": {
-      "m": {
-        "code": "M",
-        "name": "Matí"
-      },
-      "t": {
-        "code": "T",
-        "name": "Tarda"
-      },
-      "n": {
-        "code": "N",
-        "name": "Nit"
-      },
-      "l": {
-        "code": "L",
-        "name": "Lliure"
-      },
-      "s": {
-        "code": "S",
-        "name": "Sortint"
-      }
-    },
-    "sequence": "La teva seqüència",
-    "cycle_days": "{n} dies",
-    "tonight": "Aquesta nit",
-    "starts_in": "Comença d’aquí a {duration}",
-    "widget_day": "dj. 24",
-    "widget_tomorrow": "Demà",
-    "off_on": "Tens lliure el dissabte 26",
-    "unit_h": "h",
-    "hours": {
-      "m": "06–14",
-      "t": "14–22",
-      "n": "22–06"
-    },
-    "night_range": "22:00–06:00"
-  },
-  "download_title": "A l’App Store per a iPhone i iPad; Android, en proves.",
+  "download_title": "A l’App Store per a iPhone i iPad; Android, aviat.",
   "download_intro": "Mode clar i fosc. Gratis i sense compte.",
   "download_notes": {
-    "play": "Qualsevol s’hi pot apuntar en tres passos:",
-    "apk": "L’instal·les a mà. Des de la 0.8.3 porta la mateixa signatura que la versió de Google Play: pots passar de l’una a l’altra sense desinstal·lar.",
+    "play": "Estarà disponible molt aviat a Google Play.",
     "app_store": "Gratis a l’App Store, per a iPhone i iPad amb iOS 17 o posterior."
   },
   "screenshots_title": "Pantalles reals",
@@ -181,5 +126,184 @@
   "toc_aria": "Índex de la política",
   "toc_count": "{count} apartats",
   "fallback_label": "Avís d’idioma",
-  "fallback_text": "La política es mostra en castellà, que és la versió vàlida. La resta del web és en català."
+  "fallback_text": "La política es mostra en castellà, que és la versió vàlida. La resta del web és en català.",
+  "key_facts": "Funciona sense connexió · Codi obert · Cinc idiomes",
+  "hero_line_1": "Els teus torns,",
+  "hero_line_2": "d’un cop d’ull.",
+  "screenshots_count": "{n} / {total}",
+  "demo": {
+    "label": "Calendari d’exemple: aplica un patró o pinta els teus torns",
+    "tabs_label": "Què vols provar",
+    "tab_pattern": "Aplica un patró",
+    "tab_paint": "Pinta",
+    "month": "Desembre",
+    "weekdays": [
+      "dl",
+      "dt",
+      "dc",
+      "dj",
+      "dv",
+      "ds",
+      "dg"
+    ],
+    "weekday_names": [
+      "diumenge",
+      "dilluns",
+      "dimarts",
+      "dimecres",
+      "dijous",
+      "divendres",
+      "dissabte"
+    ],
+    "today_label": "dj 24",
+    "tonight": "Aquesta nit",
+    "starts_in": "Comença d’aquí a {duration}",
+    "duration": "4 h",
+    "off_on": "Tens lliure el {weekday} {day}",
+    "summary": "{n} torns · {h} h",
+    "day_label": "{day} de desembre: {shift}",
+    "day_today": " (avui)",
+    "and": " + ",
+    "pattern_label": "Rotacions",
+    "cycle_days": "{n} dies",
+    "sequence": "La teva seqüència",
+    "cycle_hint": "Quin dia del cicle és l’1 de desembre? Toca’l.",
+    "that_day": "Aquell dia et toca: {shifts}",
+    "cycle_day_label": "Dia {n} de {total}, {shift}",
+    "paint": {
+      "header": "Pintant",
+      "mode_replace": "Canvia el torn",
+      "mode_add": "Afegeix un altre torn",
+      "mode_add_spoken": "Afegeix un altre torn (doblar)",
+      "eraser": "Esborra",
+      "done": "Fet",
+      "undo": "Desfés",
+      "redo": "Refés",
+      "pattern_button": "Patró",
+      "tools_label": "Eines per pintar",
+      "preview_title": "En tocar un dia",
+      "preview_title_double": "En tocar un dia (doblar)",
+      "effect_replace": "Substitueix el que hi hagi",
+      "effect_add": "S’afegeix al que ja hi ha",
+      "effect_erase": "Deixa el dia buit",
+      "empty": "buit",
+      "hint_idle": "Tria un torn i arrossega.",
+      "hint_painting": "Pintant: {name}",
+      "preview_spoken": "{title}: {before} passa a {after}. {effect}",
+      "preview_spoken_times": "{title}: {before} passa a {after}, {times}. {effect}"
+    },
+    "shifts": {
+      "M": {
+        "name": "Matí",
+        "code": "M",
+        "short": "06–14",
+        "full": "06:00–14:00"
+      },
+      "T": {
+        "name": "Tarda",
+        "code": "T",
+        "short": "14–22",
+        "full": "14:00–22:00"
+      },
+      "N": {
+        "name": "Nit",
+        "code": "N",
+        "short": "22–06",
+        "full": "22:00–06:00"
+      },
+      "G": {
+        "name": "Guàrdia 24 h",
+        "code": "G",
+        "short": "08–08",
+        "full": "08:00–08:00"
+      },
+      "D": {
+        "name": "Dia 12 h",
+        "code": "D",
+        "short": "08–20",
+        "full": "08:00–20:00"
+      },
+      "L": {
+        "name": "Lliure",
+        "code": "L"
+      },
+      "S": {
+        "name": "Sortint",
+        "code": "S"
+      }
+    },
+    "rotations": {
+      "correturnos": {
+        "name": "Torns rotatius",
+        "description": "5 matins, 2 lliures, 5 tardes, 2 lliures, 5 nits, 2 lliures"
+      },
+      "24x72": {
+        "name": "24 x 72",
+        "description": "Guàrdia de 24 h i 72 h lliures (també 1-3)"
+      },
+      "4x4": {
+        "name": "4 x 4",
+        "description": "4 dies de 12 h i 4 lliures, sense nits (4x4 o quatre i quatre)"
+      },
+      "6x4": {
+        "name": "6 x 4",
+        "description": "6 matins i 4 lliures"
+      },
+      "5x2": {
+        "name": "5 x 2",
+        "description": "5 matins i 2 lliures (de dilluns a divendres)"
+      },
+      "2-2-3": {
+        "name": "2-2-3",
+        "description": "Dos dies de 12 h, dos lliures, tres de 12 h, dos lliures, dos de 12 h i tres lliures (també 2-2-3-2-2-3). També es coneix com a Pitman o Panamà."
+      },
+      "2x2": {
+        "name": "2 i 2",
+        "description": "2 dies de feina i 2 lliures (2x2)."
+      },
+      "3x1": {
+        "name": "3 i 1",
+        "description": "3 dies de feina i 1 lliure (3x1)."
+      }
+    },
+    "ends_in": "Acaba d’aquí a {duration}",
+    "duration_fmt": "{h} h",
+    "no_times": "sense horari",
+    "clear_painted": "Treure el que has pintat",
+    "summary_one": "{n} torn · {h} h",
+    "off_tomorrow": "Demà tens lliure",
+    "now": "Ara"
+  },
+  "lost": {
+    "es": {
+      "title": "Página no encontrada",
+      "text": "Esta página no existe. Puedes volver al inicio.",
+      "home": "Inicio",
+      "skip": "Saltar al contenido"
+    },
+    "ca": {
+      "title": "Pàgina no trobada",
+      "text": "Aquesta pàgina no existeix. Pots tornar a l’inici.",
+      "home": "Inici",
+      "skip": "Salta al contingut"
+    },
+    "gl": {
+      "title": "Páxina non atopada",
+      "text": "Esta páxina non existe. Podes volver ao inicio.",
+      "home": "Inicio",
+      "skip": "Saltar ao contido"
+    },
+    "eu": {
+      "title": "Ez da orria aurkitu",
+      "text": "Orri hau ez dago. Hasierara itzul zaitezke.",
+      "home": "Hasiera",
+      "skip": "Joan edukira"
+    },
+    "en": {
+      "title": "Page not found",
+      "text": "This page does not exist. You can return to the home page.",
+      "home": "Home",
+      "skip": "Skip to content"
+    }
+  }
 }

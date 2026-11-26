@@ -142,6 +142,58 @@ void main() {
     });
   }
 
+  // QA 0.12.1, N36: in landscape with large text the intro sentence folds to
+  // one line (a tap opens it) so the form above the pinned «Aplicar» has room.
+  group('N36: the intro of the template', () {
+    const intro = 'pay-template-intro';
+
+    Future<double> firstChipTop(WidgetTester tester) async =>
+        tester.getTopLeft(key('pay-template-publicHealth')).dy -
+        tester.getTopLeft(key(intro)).dy;
+
+    testWidgets('folds in landscape at x2.0 and opens with a tap', (
+      tester,
+    ) async {
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      final app = await AppUnderTest.pump(tester, size: const Size(844, 390));
+      await app.openSettings();
+      await tapKey(tester, 'settings-pay-template');
+      expect(tester.takeException(), isNull);
+      expect(key(intro), findsOneWidget);
+      final text = find.descendant(of: key(intro), matching: find.byType(Text));
+      expect(tester.widget<Text>(text).maxLines, 1);
+      final folded = await firstChipTop(tester);
+
+      await tester.tap(key(intro));
+      await tester.pumpAndSettle();
+      expect(tester.widget<Text>(text).maxLines, isNull);
+      expect(await firstChipTop(tester), greaterThan(folded + 20));
+      expect(tester.takeException(), isNull);
+
+      // Opened it is taller than the visible part of the sheet: tap its top.
+      await tester.tapAt(tester.getTopLeft(key(intro)) + const Offset(20, 10));
+      await tester.pumpAndSettle();
+      expect(await firstChipTop(tester), folded);
+      // The pinned «Aplicar» is still there and never moved.
+      expect(key('pay-template-apply'), findsOneWidget);
+    });
+
+    for (final (size, scale) in [
+      (const Size(390, 844), 2.0),
+      (const Size(844, 390), 1.0),
+    ]) {
+      testWidgets('stays whole in ${size.width.toInt()}x${size.height.toInt()}'
+          ' at x$scale', (tester) async {
+        tester.platformDispatcher.textScaleFactorTestValue = scale;
+        final app = await AppUnderTest.pump(tester, size: size);
+        await app.openSettings();
+        await tapKey(tester, 'settings-pay-template');
+        expect(key(intro), findsNothing);
+        expect(tester.takeException(), isNull);
+      });
+    }
+  });
+
   // QA M5: «Aplicar» was at the end of a long form, 5 swipes down in
   // landscape at text x2.0 and 2 in portrait at x1.5. It is pinned now.
   for (final (size, scale) in [

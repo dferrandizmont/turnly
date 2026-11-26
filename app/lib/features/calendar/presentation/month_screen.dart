@@ -22,6 +22,7 @@ import '../../holidays/application/holidays_provider.dart';
 import '../../holidays/domain/holiday.dart';
 import '../../schedule/domain/civil_date.dart';
 import '../../summary/presentation/month_sharing.dart';
+import '../application/day_pane_actions.dart';
 import '../application/open_day.dart';
 import '../application/month_presentation.dart';
 import '../application/month_strip.dart';
@@ -204,7 +205,11 @@ class _MonthScreenState extends ConsumerState<MonthScreen>
     // still advance a touch target rather than creeping a few pixels per tap.
     final step = math.max(
       Sp.touch,
-      position.viewportDimension - dayCellHeightWithTime(context),
+      position.viewportDimension -
+          dayCellHeightWithTime(
+            context,
+            textScaler: monthGridTextScaler(context),
+          ),
     );
     final target = (position.pixels + (down ? step : -step)).clamp(
       position.minScrollExtent,
@@ -310,7 +315,10 @@ class _MonthScreenState extends ConsumerState<MonthScreen>
                       noticeRoom: noticeRoom,
                       ringOpenDay: true,
                       strip: !editing,
-                      minCellHeight: dayCellHeightWithTime(context),
+                      minCellHeight: dayCellHeightWithTime(
+                        context,
+                        textScaler: monthGridTextScaler(context),
+                      ),
                     ),
                   ),
                   VerticalDivider(
@@ -525,6 +533,7 @@ class _MonthScreenState extends ConsumerState<MonthScreen>
           cellWidth: cellWidth,
           holidays: holidays,
           deviceEventCounts: deviceEventCounts,
+          textScaler: monthGridTextScaler(context),
         ).reduce((a, b) => a + b);
       }
       return _gridMinHeight!;
@@ -541,7 +550,10 @@ class _MonthScreenState extends ConsumerState<MonthScreen>
     if (listing || !monthRowPinned(context)) return null;
     final grid =
         _gridMin(
-          dayCellHeightWithTime(context),
+          dayCellHeightWithTime(
+            context,
+            textScaler: monthGridTextScaler(context),
+          ),
           painting: true,
           ringOpenDay: false,
           // Until the first layout, the width a phone column gives the grid.
@@ -567,9 +579,11 @@ class _MonthScreenState extends ConsumerState<MonthScreen>
   /// landscape phone), and then the whole screen scrolls instead of squeezing
   /// the cells. [bottomRoom] is kept free under the grid (the floating
   /// button). With [strip] the three facts of the month ([MonthSummaryStrip])
-  /// go right under the days, in the height the grid has to spare: a month
-  /// that fits never scrolls because of it and its rows are never squeezed.
-  /// Where the month scrolls anyway, the strip comes after the days.
+  /// go right under the days, in the height the grid has to spare (a bare
+  /// line, one line or two in a card) and its rows are never squeezed. Where
+  /// there is no room even for the bare line, or the month scrolls anyway,
+  /// the strip comes after the days as the card and the month scrolls to it:
+  /// it is always there when the month has something to say.
   Widget _monthScroll({
     required List<Widget> top,
     required bool painting,
@@ -656,22 +670,46 @@ class _MonthScreenState extends ConsumerState<MonthScreen>
               final stripLayout = stripData == null
                   ? null
                   : MonthSummaryStrip.layoutFor(
-                      context,
-                      month,
-                      stripData,
-                      box.crossAxisExtent,
-                      room: spare < -0.5 ? double.infinity : spare,
-                    );
+                          context,
+                          month,
+                          stripData,
+                          box.crossAxisExtent,
+                          room: spare < -0.5 ? double.infinity : spare,
+                        ) ??
+                        // Not even a bare line fits: the strip is still
+                        // there, as the card after the days, and the month
+                        // scrolls to it (QA 0.12.1, N6). It is only left out
+                        // when there is nothing to say. Only `edge` dp of
+                        // it are in view at rest: the card is pushed down
+                        // so that the edge never cuts a line of its text
+                        // (QA iOS 1.3.0, F8).
+                        MonthSummaryStrip.layoutBehindFold(
+                          context,
+                          month,
+                          stripData,
+                          box.crossAxisExtent,
+                          edge: math.max(0.0, spare + bottomRoom),
+                        );
               final stripHeight = stripLayout?.height ?? 0.0;
               final grid = Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: MonthScreen._gridInset,
                 ),
+                // The cells draw with the scaler the screen measured the rows
+                // with (capped in the two-pane month, QA 0.12.1 C2).
                 child: _withMonthChange(
-                  MonthGrid(
-                    ringOpenDay: ringOpenDay,
-                    minCellHeight: minCellHeight,
-                  ),
+                  Adaptive.useSplit(MediaQuery.sizeOf(context))
+                      ? MediaQuery.withClampedTextScaling(
+                          maxScaleFactor: splitGridMaxTextScale,
+                          child: MonthGrid(
+                            ringOpenDay: ringOpenDay,
+                            minCellHeight: minCellHeight,
+                          ),
+                        )
+                      : MonthGrid(
+                          ringOpenDay: ringOpenDay,
+                          minCellHeight: minCellHeight,
+                        ),
                 ),
               );
               return SliverToBoxAdapter(
@@ -831,6 +869,14 @@ class _DateHeader extends ConsumerWidget {
         : DateTime(open.year, open.month, open.day);
     final sharing = ref.watch(monthSharingProvider);
     final month = ref.watch(visibleMonthProvider);
+    final undo = open == null ? null : ref.watch(dayPaneActionsProvider);
+    // The «Hoy» button of the pane (only with a day open).
+    final todayWidth = _todayWidth(
+      context,
+      context.l10n,
+      MediaQuery.textScalerOf(context),
+      withToday: open != null,
+    );
 
     // The three buttons are 48 dp each with a 24 dp glyph, so a 4 dp inset puts
     // the glyph of the last one at `Sp.l` from the edge, flush with the
@@ -843,23 +889,41 @@ class _DateHeader extends ConsumerWidget {
           builder: (context, box) {
             // The header's text stops growing at MonthFit.headerMaxScale; at
             // that size the calendar switcher goes below the date.
-            final stacked =
-                open == null &&
-                MediaQuery.textScalerOf(context).scale(10) / 10 >=
-                    MonthFit.headerMaxScale;
+            // With a day open in the pane the row holds «Hoy» and the three
+            // buttons too: when what they leave is under the least the
+            // selector needs, it goes on a line of its own as well (a 300 dp
+            // pane, QA 0.12.1, Astra).
+            final stacked = open == null
+                ? MediaQuery.textScalerOf(context).scale(10) / 10 >=
+                      MonthFit.headerMaxScale
+                : box.maxWidth - _buttonsWidth - todayWidth < _selectorMinWidth;
             return Column(
               children: [
                 if (open != null)
                   Row(
                     children: [
                       Expanded(child: _DateText(now: displayedDate)),
-                      TextButton(
-                        key: const ValueKey('pane-today-button'),
-                        onPressed: () {
-                          ref.read(openDayProvider.notifier).close();
-                          ref.read(visibleMonthProvider.notifier).today();
-                        },
-                        child: Text(context.l10n.calendarToday),
+                      // «Deshacer» of the open day and the way back to the
+                      // «Hoy» view share the row of the date instead of a row
+                      // of their own in the detail (QA 0.12.1, C1b). «Hoy»
+                      // goes with the buttons below, so the date keeps room
+                      // for its long form.
+                      IconButton(
+                        key: const ValueKey('day-undo'),
+                        tooltip: context.l10n.dayDetailUndo,
+                        icon: Icon(AppIcons.undo),
+                        onPressed: undo != null && undo.enabled
+                            ? undo.onUndo
+                            : null,
+                      ),
+                      IconButton(
+                        key: const ValueKey('day-pane-close'),
+                        tooltip: context.l10n.dayPaneClose,
+                        icon: Icon(
+                          AppIcons.close,
+                          color: context.colors.textMuted,
+                        ),
+                        onPressed: ref.read(openDayProvider.notifier).close,
                       ),
                     ],
                   ),
@@ -870,16 +934,30 @@ class _DateHeader extends ConsumerWidget {
                     // `Expanded` date would split the free space in two and leave a
                     // hole before the buttons).
                     if (open == null) Expanded(child: _DateText(now: now)),
-                    if (open != null) const Spacer(),
+                    if (open != null) ...[
+                      TextButton(
+                        key: const ValueKey('pane-today-button'),
+                        onPressed: () {
+                          ref.read(openDayProvider.notifier).close();
+                          ref.read(visibleMonthProvider.notifier).today();
+                        },
+                        child: Text(context.l10n.calendarToday),
+                      ),
+                      const Spacer(),
+                    ],
                     // Hidden with one calendar. With two its name is ellipsized, and
                     // it never takes more than 55 % of what the buttons leave, so the
                     // date and the switcher fit on a 320 dp phone with large text.
                     if (!stacked)
                       ConstrainedBox(
                         constraints: BoxConstraints(
+                          // «Hoy» (open day, in the pane) takes its width
+                          // first: on a 300 dp pane it left 61 dp for itself
+                          // when the selector took 55 % of the rest (QA
+                          // 0.12.1, Astra).
                           maxWidth: math.max(
                             0,
-                            (box.maxWidth - _buttonsWidth) * 0.55,
+                            (box.maxWidth - _buttonsWidth - todayWidth) * 0.55,
                           ),
                         ),
                         child: const CalendarSwitcher(),
@@ -907,6 +985,10 @@ class _DateHeader extends ConsumerWidget {
   /// Share, report and settings: three touch targets, flush right (the
   /// agenda moved to the bar of destinations).
   static const double _buttonsWidth = 3 * Sp.touch;
+
+  /// The least room the calendar selector gets beside «Hoy» and the buttons
+  /// (its dot, a few letters and its chevron).
+  static const double _selectorMinWidth = 120;
 
   List<Widget> _buttons(
     BuildContext context,

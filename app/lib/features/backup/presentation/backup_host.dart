@@ -32,10 +32,6 @@ class _BackupHostState extends ConsumerState<BackupHost> {
   late final GoRouter _router;
   bool _pushing = false;
 
-  /// A file arrived during the first-use flow: it stays pending (on the
-  /// platform side) and opens as soon as that flow is left.
-  bool _waitingForOnboarding = false;
-
   @override
   void initState() {
     super.initState();
@@ -67,8 +63,10 @@ class _BackupHostState extends ConsumerState<BackupHost> {
   }
 
   void _routeChanged() {
-    if (!_waitingForOnboarding || _onboardingOnTop) return;
-    _waitingForOnboarding = false;
+    if (!ref.read(backupWaitingForOnboardingProvider) || _onboardingOnTop) {
+      return;
+    }
+    ref.read(backupWaitingForOnboardingProvider.notifier).set(false);
     unawaited(_openIncoming());
   }
 
@@ -104,7 +102,7 @@ class _BackupHostState extends ConsumerState<BackupHost> {
     // the choices the person goes on to make. The file stays pending and
     // opens once the flow has ended.
     if (_onboardingOnTop) {
-      _waitingForOnboarding = true;
+      ref.read(backupWaitingForOnboardingProvider.notifier).set(true);
       return;
     }
     final router = ref.read(routerProvider);

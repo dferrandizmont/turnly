@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/format/app_date_format.dart';
+import '../../../core/format/text_wrap.dart';
 import '../../../core/icons/app_icons.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/providers.dart';
@@ -262,7 +263,7 @@ class _UpcomingRow extends ConsumerWidget {
                               ),
                               if (shift.timeRange(format) case final times?)
                                 TextSpan(
-                                  text: '  $times',
+                                  text: '  ${keepTimeRangesTogether(times)}',
                                   style: AppTypography.tabular(
                                     type.body.copyWith(
                                       color: colors.textSecondary,

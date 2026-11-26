@@ -1,4 +1,15 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../core/providers.dart';
 import '../../schedule/domain/schedule_domain.dart';
+import 'schedule_controller.dart';
+
+final todayStatusProvider = Provider<TodayStatus>((ref) {
+  final schedule = ref.watch(
+    scheduleControllerProvider.select((s) => s.schedule),
+  );
+  return todayStatus(schedule, ref.watch(minuteClockProvider));
+});
 
 /// Which of the four moments of the "today" card applies.
 enum TodayPhase {
@@ -98,6 +109,15 @@ class TodayStatus {
 
   /// Shifts of tomorrow, in order.
   final List<ShiftType> tomorrow;
+
+  /// Whether the shift in progress still covers [date], including after
+  /// midnight. Its end is exclusive.
+  bool activeShiftOverlaps(CivilDate date) =>
+      phase == TodayPhase.now &&
+      !date.isBefore(CivilDate.fromDateTime(timed!.start)) &&
+      !date.isAfter(
+        CivilDate.fromDateTime(timed!.end.subtract(const Duration(minutes: 1))),
+      );
 }
 
 /// Status of the "today" card at [now] (only minute precision is used).

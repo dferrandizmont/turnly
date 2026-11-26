@@ -240,7 +240,10 @@ void main() {
       final texts = [for (final t in row21.evaluate()) (t.widget as Text)];
       final all = texts
           .map((t) => t.data ?? t.textSpan!.toPlainText())
-          .join('|');
+          .join('|')
+          // The hour range carries an invisible word joiner after the dash
+          // so it never wraps there (N1); compare the visible text.
+          .replaceAll('⁠', '');
       expect(all, contains('Mañana'));
       expect(all, contains('Tarde'));
       expect(all, contains('06:00–14:00'));

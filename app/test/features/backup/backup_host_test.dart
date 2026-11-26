@@ -209,6 +209,7 @@ void main() {
       expect(previews(), 0, reason: 'not over the first-use flow');
       expect(h.channel.takes, 0, reason: 'still pending, not read');
       expect(h.channel.discards, 0);
+      expect(find.text('Revisar la copia recibida'), findsOneWidget);
 
       // The flow ends: the file opens.
       app.container.read(routerProvider).go(AppRoutes.home);

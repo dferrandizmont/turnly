@@ -367,6 +367,12 @@ class MonthSelectDaysControl extends ConsumerWidget {
   /// Gap Material leaves between the icon and the label of a button.
   static const double _iconGap = 8;
 
+  /// The label stops growing here, like the «Hoy» card's text (QA 0.12.1,
+  /// N18): from x1.5 the name no longer fit before the floating «Pintar» and
+  /// the control became a bare icon. It keeps its name as long as it fits at
+  /// this size, and only then falls back to the icon.
+  static const double maxTextScale = 1.3;
+
   /// The width the floating «Pintar» takes from the end of the row: its
   /// padding, icon, gap and label (at the user's text size), and the margin
   /// the scaffold leaves at the edge.
@@ -387,7 +393,8 @@ class MonthSelectDaysControl extends ConsumerWidget {
     final label = context.l10n.monthSelectDays;
     final style = context.type.meta.copyWith(fontWeight: FontWeight.w700);
     final colors = context.colors;
-    final scaler = MediaQuery.textScalerOf(context);
+    final scaler = MediaQuery.textScalerOf(context)
+        .clamp(maxScaleFactor: maxTextScale);
     return LayoutBuilder(
       builder: (context, box) {
         final needed =
@@ -431,12 +438,15 @@ class MonthSelectDaysControl extends ConsumerWidget {
                       ),
                     ),
                   )
-                : OutlinedButton.icon(
-                    key: const ValueKey('month-select-days'),
-                    style: buttonStyle,
-                    onPressed: onPressed,
-                    icon: icon,
-                    label: Text(label),
+                : MediaQuery.withClampedTextScaling(
+                    maxScaleFactor: maxTextScale,
+                    child: OutlinedButton.icon(
+                      key: const ValueKey('month-select-days'),
+                      style: buttonStyle,
+                      onPressed: onPressed,
+                      icon: icon,
+                      label: Text(label),
+                    ),
                   ),
           ),
         );

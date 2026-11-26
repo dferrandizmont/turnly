@@ -4,7 +4,6 @@
   "description": "A free, open-source shift calendar for people who work shifts in Spain. No Pro, no ads, no account, and it works offline.",
   "intro": "A shift calendar for people who work shifts in Spain (healthcare, police, firefighters, industry, hospitality or any other sector): set up mornings, afternoons, nights, on-call shifts, post-night days and days off, and see your next shift at a glance.",
   "hero_cta": "Download for free",
-  "key_facts": "All free, no Pro · No ads · No account · Works offline · Open source · Five languages",
   "features": [
     "Your next shift and your next day off on the today card; the month as a grid or list, the agenda and the year, with your phone calendar events next to your shifts. Notes with photos and tasks, and up to six calendars to see the days you are all off.",
     "Tap or drag to paint several days, put more than one shift on the same day and undo whatever you want. The rotation wizard applies yours with a preview: rotating shifts, 24/72, 4×4, 6×4, 5×2, 2-2-3, “2 and 2”, “3 and 1” or your own pattern, starting from the day of the cycle you are on.",
@@ -26,10 +25,6 @@
     {
       "question": "Do I need an account or an internet connection?",
       "answer": "No. There is no account and everything works offline, public holidays included."
-    },
-    {
-      "question": "How do I join the Google Play test?",
-      "answer": "Join the turnly-testers test group on Google Groups with your Google account, accept the test at the Google Play link and install the app from the store. It updates itself."
     },
     {
       "question": "What about iPhone and iPad?",
@@ -72,66 +67,16 @@
     "11-widgets-oscuro": "The «Add widget» gallery with your real shifts: small, agenda, medium and more"
   },
   "privacy_date": "2026-11-20",
-  "kicker": "Shift calendar",
   "tagline": "Your shifts at a glance.",
   "chip": "All free: no Pro, no ads and no account.",
   "nav_label": "Sections",
   "theme_label": "Theme",
   "theme_dark": "Dark",
   "theme_hint": "Change theme",
-  "anim": {
-    "month": "December",
-    "weekdays": [
-      "M",
-      "T",
-      "W",
-      "T",
-      "F",
-      "S",
-      "S"
-    ],
-    "shifts": {
-      "m": {
-        "code": "M",
-        "name": "Morning"
-      },
-      "t": {
-        "code": "A",
-        "name": "Afternoon"
-      },
-      "n": {
-        "code": "N",
-        "name": "Night"
-      },
-      "l": {
-        "code": "O",
-        "name": "Off"
-      },
-      "s": {
-        "code": "PN",
-        "name": "Post-night"
-      }
-    },
-    "sequence": "Your sequence",
-    "cycle_days": "{n} days",
-    "tonight": "Tonight",
-    "starts_in": "Starts in {duration}",
-    "widget_day": "Thu 24",
-    "widget_tomorrow": "Tomorrow",
-    "off_on": "Next day off: Saturday 26",
-    "unit_h": "h",
-    "hours": {
-      "m": "06–14",
-      "t": "14–22",
-      "n": "22–06"
-    },
-    "night_range": "22:00–06:00"
-  },
-  "download_title": "On the App Store for iPhone and iPad; Android, in testing.",
+  "download_title": "On the App Store for iPhone and iPad; Android, soon.",
   "download_intro": "Light and dark themes. Free, with no account.",
   "download_notes": {
-    "play": "Anyone can join in three steps:",
-    "apk": "Install it by hand. Since 0.8.3 it has the same signature as the Google Play version: you can switch between them without uninstalling.",
+    "play": "Coming soon to Google Play.",
     "app_store": "Free on the App Store, for iPhone and iPad with iOS 17 or later."
   },
   "screenshots_title": "Real screens",
@@ -181,5 +126,184 @@
   "toc_aria": "Policy contents",
   "toc_count": "{count} sections",
   "fallback_label": "Language notice",
-  "fallback_text": "That is the valid version of the policy. The rest of the site is in English."
+  "fallback_text": "That is the valid version of the policy. The rest of the site is in English.",
+  "key_facts": "Works offline · Open source · Five languages",
+  "hero_line_1": "Your shifts",
+  "hero_line_2": "at a glance.",
+  "screenshots_count": "{n} / {total}",
+  "demo": {
+    "label": "Example calendar: apply a pattern or paint your shifts",
+    "tabs_label": "What you want to try",
+    "tab_pattern": "Apply pattern",
+    "tab_paint": "Paint",
+    "month": "December",
+    "weekdays": [
+      "M",
+      "T",
+      "W",
+      "T",
+      "F",
+      "S",
+      "S"
+    ],
+    "weekday_names": [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ],
+    "today_label": "Thu 24",
+    "tonight": "Tonight",
+    "starts_in": "Starts in {duration}",
+    "duration": "4 h",
+    "off_on": "Next day off: {weekday} {day}",
+    "summary": "{n} shifts · {h} h",
+    "day_label": "December {day}: {shift}",
+    "day_today": " (today)",
+    "and": " + ",
+    "pattern_label": "Rotations",
+    "cycle_days": "{n} days",
+    "sequence": "Your sequence",
+    "cycle_hint": "Which day of your cycle falls on December 1? Tap that day.",
+    "that_day": "That day you’re on: {shifts}",
+    "cycle_day_label": "Day {n} of {total}, {shift}",
+    "paint": {
+      "header": "Painting",
+      "mode_replace": "Change the shift",
+      "mode_add": "Add another shift",
+      "mode_add_spoken": "Add another shift (double)",
+      "eraser": "Erase",
+      "done": "Done",
+      "undo": "Undo",
+      "redo": "Redo",
+      "pattern_button": "Pattern",
+      "tools_label": "Painting tools",
+      "preview_title": "When you tap a day",
+      "preview_title_double": "When you tap a day (double)",
+      "effect_replace": "Replaces what is there",
+      "effect_add": "Goes next to what is there",
+      "effect_erase": "Leaves the day empty",
+      "empty": "empty",
+      "hint_idle": "Pick a shift and drag.",
+      "hint_painting": "Painting: {name}",
+      "preview_spoken": "{title}: {before} becomes {after}. {effect}",
+      "preview_spoken_times": "{title}: {before} becomes {after}, {times}. {effect}"
+    },
+    "shifts": {
+      "M": {
+        "name": "Morning",
+        "code": "M",
+        "short": "06–14",
+        "full": "06:00–14:00"
+      },
+      "T": {
+        "name": "Afternoon",
+        "code": "A",
+        "short": "14–22",
+        "full": "14:00–22:00"
+      },
+      "N": {
+        "name": "Night",
+        "code": "N",
+        "short": "22–06",
+        "full": "22:00–06:00"
+      },
+      "G": {
+        "name": "24-hour shift",
+        "code": "24",
+        "short": "08–08",
+        "full": "08:00–08:00"
+      },
+      "D": {
+        "name": "Day 12 h",
+        "code": "D",
+        "short": "08–20",
+        "full": "08:00–20:00"
+      },
+      "L": {
+        "name": "Off",
+        "code": "O"
+      },
+      "S": {
+        "name": "Post-night",
+        "code": "PN"
+      }
+    },
+    "rotations": {
+      "correturnos": {
+        "name": "Rotating shifts",
+        "description": "5 mornings, 2 off, 5 afternoons, 2 off, 5 nights, 2 off"
+      },
+      "24x72": {
+        "name": "24 x 72",
+        "description": "24-hour shift and 72 hours off (also 1-3)"
+      },
+      "4x4": {
+        "name": "4 x 4",
+        "description": "4 12-hour days and 4 off, no nights (4x4 or four on, four off)"
+      },
+      "6x4": {
+        "name": "6 x 4",
+        "description": "6 mornings and 4 off"
+      },
+      "5x2": {
+        "name": "5 x 2",
+        "description": "5 mornings and 2 off (Monday to Friday)"
+      },
+      "2-2-3": {
+        "name": "2-2-3",
+        "description": "Two 12-hour days, two off, three 12-hour days, two off, two 12-hour days and three off (also 2-2-3-2-2-3). Also known as Pitman or Panama."
+      },
+      "2x2": {
+        "name": "2 on, 2 off",
+        "description": "2 work days and 2 off (2x2)."
+      },
+      "3x1": {
+        "name": "3 on, 1 off",
+        "description": "3 work days and 1 off (3x1)."
+      }
+    },
+    "ends_in": "Ends in {duration}",
+    "duration_fmt": "{h} h",
+    "no_times": "no times",
+    "clear_painted": "Clear painted days",
+    "summary_one": "{n} shift · {h} h",
+    "off_tomorrow": "Off tomorrow",
+    "now": "Now"
+  },
+  "lost": {
+    "es": {
+      "title": "Página no encontrada",
+      "text": "Esta página no existe. Puedes volver al inicio.",
+      "home": "Inicio",
+      "skip": "Saltar al contenido"
+    },
+    "ca": {
+      "title": "Pàgina no trobada",
+      "text": "Aquesta pàgina no existeix. Pots tornar a l’inici.",
+      "home": "Inici",
+      "skip": "Salta al contingut"
+    },
+    "gl": {
+      "title": "Páxina non atopada",
+      "text": "Esta páxina non existe. Podes volver ao inicio.",
+      "home": "Inicio",
+      "skip": "Saltar ao contido"
+    },
+    "eu": {
+      "title": "Ez da orria aurkitu",
+      "text": "Orri hau ez dago. Hasierara itzul zaitezke.",
+      "home": "Hasiera",
+      "skip": "Joan edukira"
+    },
+    "en": {
+      "title": "Page not found",
+      "text": "This page does not exist. You can return to the home page.",
+      "home": "Home",
+      "skip": "Skip to content"
+    }
+  }
 }

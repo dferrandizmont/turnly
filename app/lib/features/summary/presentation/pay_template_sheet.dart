@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/format/money.dart';
+import '../../../core/icons/app_icons.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/theme_context.dart';
@@ -164,6 +165,19 @@ class _PayTemplateSheetState extends State<_PayTemplateSheet> {
   bool _badAnnual = false;
   late Set<String> _selected;
 
+  /// The intro sentence is open (it starts folded in landscape with large
+  /// text, see [_foldIntro]).
+  bool _introOpen = false;
+
+  /// From this text size, in landscape, the intro folds to one line: the
+  /// pinned «Aplicar» takes a share of a short screen and the form above it
+  /// had room for little more than the title (QA 0.12.1, N36).
+  static const double _foldIntroFrom = 1.5;
+
+  bool _foldIntro(BuildContext context) =>
+      MediaQuery.orientationOf(context) == Orientation.landscape &&
+      MediaQuery.textScalerOf(context).scale(10) / 10 >= _foldIntroFrom;
+
   @override
   void initState() {
     super.initState();
@@ -289,6 +303,49 @@ class _PayTemplateSheetState extends State<_PayTemplateSheet> {
     );
   }
 
+  /// The sentence under the title: whole, or in landscape with large text
+  /// one line that opens with a tap (its whole text is the spoken label).
+  Widget _intro(BuildContext context) {
+    final l10n = context.l10n;
+    final colors = context.colors;
+    final style = context.type.body.copyWith(color: colors.textSecondary);
+    if (!_foldIntro(context)) {
+      return Text(l10n.payTemplateIntro, style: style);
+    }
+    return Semantics(
+      container: true,
+      button: true,
+      expanded: _introOpen,
+      excludeSemantics: true,
+      label: l10n.payTemplateIntro,
+      onTap: () => setState(() => _introOpen = !_introOpen),
+      child: InkWell(
+        key: const ValueKey('pay-template-intro'),
+        onTap: () => setState(() => _introOpen = !_introOpen),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: Sp.touch),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  l10n.payTemplateIntro,
+                  style: style,
+                  maxLines: _introOpen ? null : 1,
+                  overflow: _introOpen ? null : TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: Sp.s),
+              Icon(
+                _introOpen ? AppIcons.collapse : AppIcons.expand,
+                color: colors.textMuted,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _form(
     BuildContext context,
     List<ShiftType> applicable,
@@ -307,10 +364,7 @@ class _PayTemplateSheetState extends State<_PayTemplateSheet> {
           child: Text(l10n.payTemplateTitle, style: type.headline),
         ),
         const SizedBox(height: Sp.s),
-        Text(
-          l10n.payTemplateIntro,
-          style: type.body.copyWith(color: colors.textSecondary),
-        ),
+        _intro(context),
         const SizedBox(height: Sp.l),
         ChoiceGrid.pills(
           pills: [

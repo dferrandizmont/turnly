@@ -23,7 +23,7 @@ export ANDROID_HOME="${ANDROID_HOME:-$HOME/AppData/Local/Android/Sdk}"
 ADB="$ANDROID_HOME/platform-tools/adb"
 [ -x "$ADB" ] || ADB="$ANDROID_HOME/platform-tools/adb.exe"
 PACKAGE="es.turnly.app"
-COMPONENT="$PACKAGE/.MainActivity"
+COMPONENT="$PACKAGE/es.cuadrante.app.MainActivity"
 
 fail() { echo "[single-activity] FAIL: $*" >&2; exit 1; }
 
@@ -37,7 +37,7 @@ adb_() { "$ADB" -s "$SERIAL" "$@"; }
 
 count_activities() {
   adb_ shell dumpsys activity activities | tr -d '\r' |
-    grep -o "ActivityRecord{[^}]*${PACKAGE}/\.MainActivity[^}]*}" |
+    grep -o "ActivityRecord{[^}]*${PACKAGE}/es.cuadrante.app.MainActivity[^}]*}" |
     sed 's/ t[0-9-]*}$/}/' | sort -u | wc -l | tr -d ' '
 }
 

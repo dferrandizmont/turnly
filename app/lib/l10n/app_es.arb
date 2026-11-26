@@ -15,6 +15,16 @@
   },
   "swapRestoreOnSave": "Al guardar se recuperarán los turnos anteriores que se puedan restaurar.",
   "@@locale": "es",
+  "onboardingRestoreReceived": "Revisar la copia recibida",
+  "dayDetailResetManual": "Quitar el cambio a mano",
+  "dayDetailNoRotation": "Ese día no tiene rotación.",
+  "summaryEstimateExtrasExcluded": "Horas extra sin valorar",
+  "monthStripUnrecorded": "Sin turno anotado: {date}",
+  "swapEditReturnDate": "Cambiar la fecha de devolución",
+  "swapUnapplyNoSnapshot": "No hay datos para recuperar los turnos anteriores al cambio. Tu cuadrante sigue igual.",
+  "swapDates": "Cedes el {given} y recibes el {received}",
+  "@monthStripUnrecorded": {"placeholders": {"date": {"type": "String"}}},
+  "@swapDates": {"placeholders": {"given": {"type": "String"}, "received": {"type": "String"}}},
   "appName": "Turnly",
   "@appName": {
     "description": "Nombre de la app (título de ventana y cabeceras)."
@@ -358,6 +368,24 @@
     }
   },
   "daySemanticsNote": "con nota",
+  "daySwapWith": "Cambio con {name}",
+  "daySemanticsSwap": "cambio con {name}",
+  "@daySwapWith": {
+    "description": "Detalle del día: línea que dice con quién es el cambio de turno aplicado a ese día, p. ej. «Cambio con Marta».",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@daySemanticsSwap": {
+    "description": "Etiqueta hablada de la celda de un día con un cambio de turno aplicado, p. ej. «cambio con Marta».",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "daySemanticsOvertime": "horas extra: {duration}",
   "@daySemanticsOvertime": {
     "placeholders": {
@@ -1729,7 +1757,7 @@
     }
   },
   "onboardingRotationTitle": "¿Cómo es tu rotación?",
-  "onboardingRotationHelp": "Elige la tuya o créala en un momento. Luego dices cuándo empiezas.",
+  "onboardingRotationHelp": "Para seguir, elige tu rotación o crea un ciclo. Luego eliges cuándo empieza.",
   "onboardingRotationTypical": "Lo habitual en tu trabajo",
   "onboardingRotationOthers": "Otras rotaciones",
   "onboardingRotationAll": "Rotaciones",
@@ -2012,6 +2040,7 @@
   "summaryNoteDst": "Son horas de reloj: en la noche del cambio de hora no se ajusta a 7 o 9 horas.",
   "summaryNoteNoTimes": "Los turnos sin horario cuentan como turno, pero no suman horas.",
   "summaryNoteHoliday": "Horas en festivo: las que caen en un día festivo de tu comunidad y municipio, también si el turno cruza la medianoche.",
+  "summaryNoteHolidayHidden": "Horas en festivo: esta línea solo aparece cuando hay horas en un día festivo de tu comunidad y municipio; si no hay ninguna, no se muestra.",
   "summaryNoteTense": "Trabajadas: los días anteriores a hoy. Previstas: de hoy en adelante, según tu cuadrante.",
   "summaryNoteGoal": "Objetivo: en un mes cuenta la doceava parte del anual; en un año, el mensual por 12; en unas fechas, la parte de sus días. La diferencia suma las trabajadas y las previstas.",
   "summaryNoteClosingDay": "Mes de nómina: con el día de cierre en el {day}, cada mes va del día siguiente al {day} del mes anterior hasta el {day} (o hasta el último día, si el mes es más corto). Las horas, el dinero, el objetivo y el tope de horas extra se cuentan así.",
@@ -4746,14 +4775,15 @@
   "swapNewTitle": "Nuevo cambio",
   "swapEditTitle": "Editar cambio",
   "swapStagePending": "Pendiente",
-  "swapStageReturned": "Devuelto",
+  "swapStageReturned": "Con fecha",
   "swapStageSettled": "Saldado",
   "swapDirectionTheyOwe": "Me lo deben",
   "swapDirectionIOwe": "Se lo debo",
   "swapFieldService": "Datos del servicio",
   "swapFieldColleague": "Con quién",
-  "swapFieldColleagueHint": "Marta",
+  "swapFieldColleagueHint": "Por ejemplo: Marta",
   "swapInvalidColleague": "Escribe con quién es el cambio.",
+  "swapInvalidNote": "La nota es demasiado larga. Acórtala.",
   "swapFieldDirection": "Quién debe el turno",
   "swapFieldDirectionHelper": "Elige quién queda en deuda con el cambio.",
   "swapFieldDate": "El día que cedes el turno",
@@ -4795,7 +4825,7 @@
   },
   "swapMarkReturned": "Marcar como devuelto",
   "swapMarkReturnedTitle": "¿Qué día te lo devuelven?",
-  "swapMarkedReturned": "Cambio marcado como devuelto",
+  "swapReturnDateSaved": "Fecha de devolución guardada",
   "swapMarkSettled": "Marcar como saldado",
   "swapMarkedSettled": "Cambio saldado",
   "swapReopen": "Marcar como pendiente",

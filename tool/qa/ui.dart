@@ -8,6 +8,8 @@
 //   dart tool/qa/ui.dart week <dump.xml>            "x1 y x2 y" from the first to the last cell
 //                                                   of a full row of 7 days (a drag paints it)
 //   dart tool/qa/ui.dart package <dump.xml> <pkg>   exit 0 if the dump is of that package
+//   dart tool/qa/ui.dart scroll <dump.xml>          swipe up within the largest scroll area
+//   dart tool/qa/ui.dart backup-name <dump.xml>     suggested backup name in the save picker
 //
 // Day cells are recognised by their semantics label, "jueves 22 de octubre ..."
 // (`daySemanticsLabel`): weekday, number, "de", month.
@@ -87,7 +89,9 @@ Node? paintableDay(List<Node> nodes) {
 
 void main(List<String> args) {
   if (args.length < 2) {
-    stderr.writeln('usage: ui.dart node|days|week|package <dump.xml> [arg]');
+    stderr.writeln(
+      'usage: ui.dart node|days|week|package|scroll|backup-name <dump.xml> [arg]',
+    );
     exit(64);
   }
   final nodes = parse(args[1]);
@@ -111,6 +115,28 @@ void main(List<String> args) {
       for (final n in nodes.where(_isDay)) {
         stdout.writeln('${n.cx} ${n.cy}|${n.desc.replaceAll('\n', ' ')}');
       }
+    case 'scroll':
+      final scrolls = nodes
+          .where((n) => n.visible && n.attrs['scrollable'] == 'true')
+          .toList();
+      if (scrolls.isEmpty) exit(1);
+      int height(Node n) => n.bounds[3] - n.bounds[1];
+      scrolls.sort((a, b) => height(b).compareTo(height(a)));
+      final area = scrolls.first;
+      final distance = height(area) ~/ 3;
+      stdout.writeln(
+        '${area.cx} ${area.cy + distance} ${area.cx} ${area.cy - distance}',
+      );
+    case 'backup-name':
+      final name = RegExp(r'^(turnly|cuadrante)-[0-9-]+\.(turnly|cuadrante)$');
+      for (final n in nodes) {
+        if (n.attrs['class'] == 'android.widget.EditText' &&
+            name.hasMatch(n.text)) {
+          stdout.writeln(n.text);
+          return;
+        }
+      }
+      exit(1);
     case 'week':
       final days = nodes.where(_isDay).toList();
       final rows = <List<Node>>[];
@@ -133,7 +159,7 @@ void main(List<String> args) {
         '${row.first.cx} ${row.first.cy} ${row.last.cx} ${row.last.cy}',
       );
     case 'package':
-      exit(nodes.any((n) => n.attrs['package'] == args[2]) ? 0 : 1);
+      exit(nodes.any((n) => args.skip(2).contains(n.attrs['package'])) ? 0 : 1);
     default:
       stderr.writeln('unknown command ${args[0]}');
       exit(64);

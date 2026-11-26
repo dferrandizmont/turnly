@@ -1,10 +1,14 @@
 import 'package:cuadrante/core/bootstrap/bootstrap.dart';
 import 'package:cuadrante/core/config.dart';
+import 'package:cuadrante/core/format/app_date_format.dart';
 import 'package:cuadrante/core/format/text_wrap.dart';
 import 'package:cuadrante/features/calendar/presentation/month_screen.dart';
 import 'package:cuadrante/features/calendars/domain/calendar.dart';
 import 'package:cuadrante/features/onboarding/domain/profession.dart';
+import 'package:cuadrante/features/onboarding/application/onboarding_controller.dart';
 import 'package:cuadrante/features/patterns/domain/pattern_catalog.dart';
+import 'package:cuadrante/features/patterns/presentation/pattern_wizard_screen.dart';
+import 'package:cuadrante/features/calendar/application/visible_month.dart';
 import 'package:cuadrante/features/schedule/data/schedule_repository.dart';
 import 'package:cuadrante/features/schedule/domain/schedule_domain.dart';
 import 'package:flutter/widgets.dart';
@@ -31,6 +35,16 @@ Future<Schedule> _seeded() async {
 /// calendar gets when the wizard finishes.
 void main() {
   setUpAll(initializeLocale);
+
+  test('the rotation date tile puts the Basque year before the month', () {
+    expect(
+      patternFullDate(
+        const AppDateFormat('eu_ES'),
+        const CivilDate(2026, 10, 11),
+      ),
+      '2026ko urriaren 11, igandea',
+    );
+  });
 
   test('the preview shows the shift types that finishing will create, for '
       'every job and every rotation', () async {
@@ -125,12 +139,19 @@ void main() {
       findsOneWidget,
     );
 
+    const start = CivilDate(2026, 9, 19);
+    app.container.read(onboardingControllerProvider.notifier).setStart(start);
+    app.container.read(visibleMonthProvider.notifier).goTo(start);
     await app.tap(key('onboarding-next')); // the start step writes
     await app.flushWrites();
     await app.tap(key('onboarding-next'));
     expect(find.byType(MonthScreen), findsOneWidget);
     final morning = app.schedule.shiftTypeById('morning')!;
     expect((morning.startMinute, morning.endMinute), (8 * 60, 15 * 60));
-    expect(idsOn(app.schedule, onboardingToday), 'morning');
+    expect(idsOn(app.schedule, start), 'morning');
+    expect(
+      app.container.read(visibleMonthProvider),
+      onboardingToday.firstDayOfMonth,
+    );
   });
 }

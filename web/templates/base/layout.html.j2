@@ -1,45 +1,42 @@
-{% from 'icons.html.j2' import icon -%}
+{% from 'icons.html.j2' import icon, sprite -%}
 <!doctype html>
 <html lang="{{ lang }}">
 <head>{% include 'base/head.html.j2' %}
-{#- No defer: it sets the saved theme on <html> before the first paint. -#}
+<link rel="preload" href="{{ 'fonts/Archivo-Variable-latin.woff2' | asset }}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{{ 'fonts/Manrope-Variable-latin.woff2' | asset }}" as="font" type="font/woff2" crossorigin>
+{#- No defer: it sets the saved theme on <html> (and the .js class) before the first paint. -#}
 <script src="{{ 'theme.js' | asset }}"></script>
 <script src="{{ 'lang.js' | asset }}" defer></script>
 <script src="{{ 'site.js' | asset }}" defer></script></head>
 <body>
+{{ sprite() }}
 {% include 'base/skip_link.html.j2' %}
 {% set home = route(lang) %}
 {% block header %}<header class="top">
 <div class="wrap top-in">
-<a class="brand" href="{{ home }}"><img src="{{ 'icon.png' | asset }}" alt="" width="36" height="36"><span>{{ c.name }}</span></a>
-<nav class="nav" aria-label="{{ c.nav_label }}">
-<a href="{{ '' if page_kind == 'home' else home }}#download">{{ t.download }}</a>
-<a href="{{ '' if page_kind == 'home' else home }}#screenshots">{{ t.screenshots }}</a>
-<a href="{{ '' if page_kind == 'home' else home }}#features">{{ t.features }}</a>
-<a href="{{ '' if page_kind == 'home' else home }}#privacy">{{ t.privacy }}</a>
-<a href="{{ '' if page_kind == 'home' else home }}#support">{{ t.support }}</a>
-</nav>
-{#- Hidden without JS (it would do nothing). assets/theme.js shows it. Same toggle as the other sites: sun and moon,
-    aria-pressed = dark is on. Without a saved choice it follows the system; pressing it saves light or dark
-    (and forgets the choice if it matches the system). The accessible name is «Tema: Oscuro» (hidden label plus the
-    state it switches to, with aria-pressed); the icon in use is picked by CSS from data-theme on <html>. -#}
-<button class="theme-btn" type="button" title="{{ c.theme_hint }}" data-theme-toggle aria-pressed="false" hidden><span class="vh">{{ c.theme_label }}: {{ c.theme_dark }}</span>{{ icon('sun', 'i i-sun') }}{{ icon('moon', 'i i-moon') }}</button>
+<a class="brand" href="{{ home }}" aria-label="{{ c.name }}"><img src="{{ 'icon.png' | asset }}" alt="" width="34" height="34"><span>{{ c.name }}</span></a>
+{% if page_kind != '404' %}<nav class="nav" aria-label="{{ c.nav_label }}">
+{% for anchor in ['download', 'screenshots', 'features', 'privacy', 'support'] %}{% if anchor == 'privacy' and page_kind == 'privacy' %}<a href="{{ route(lang, true) }}" aria-current="page">{{ t[anchor] }}</a>
+{% else %}<a href="{{ home }}#{{ anchor }}">{{ t[anchor] }}</a>
+{% endif %}{% endfor %}</nav>{% endif %}
 {% include 'base/lang_switcher.html.j2' %}
+{#- Hidden without JS (it would do nothing). assets/theme.js shows it. Same toggle as the other sites: aria-pressed = dark is on.
+    Without a saved choice it follows the system; pressing it saves light or dark. The accessible name is «Tema: Oscuro»
+    (hidden label plus the state it switches to, with aria-pressed); the icon in use is picked by CSS from data-theme on <html>. -#}
+<button class="theme" type="button" title="{{ c.theme_hint }}" data-theme-toggle aria-pressed="false" hidden>{{ icon('moon', 'icon moon') }}{{ icon('sun', 'icon sun') }}<span class="vh">{{ c.theme_label }}: {{ c.theme_dark }}</span></button>
 </div>
 </header>{% endblock %}
 <main id="content">{% block content %}{% endblock %}</main>
-{#- Same required content as the shared base/required_footer.html.j2 (author, code and licence, Ko-fi, mail,
-    no tracking), laid out as direction B: brand on the left, links on the right. -#}
 {% block footer %}{% set author_parts = t.author.split('DanielMF') %}<footer class="foot">
 <div class="wrap foot-in">
-<a class="brand" href="{{ home }}"><img src="{{ 'icon.png' | asset }}" alt="" width="36" height="36"><span>{{ c.name }}</span></a>
 <ul class="foot-links">
-<li><span>{{ author_parts[0].format(app=c.name) }}<a href="https://mainshai.com">DanielMF</a>{{ author_parts[1] }}</span></li>
-{% if site.open_source %}<li><span><a href="{{ site.repo_url }}">{{ t.code }}</a> · {{ c.licence_text }}</span></li>{% endif %}
-{% if site.free %}<li><a href="https://ko-fi.com/danielmfdev">{{ t.coffee }}</a></li>{% endif %}
-<li><a href="mailto:{{ contact_email }}">{{ t.contact }}</a></li>
-<li><span class="no-track">{{ icon('lock', 'i i-s') }}{{ t.no_tracking }}</span></li>
+{% if site.open_source %}<li><a href="{{ site.repo_url }}">{{ icon('code') }}{{ t.code }}</a></li>
+{% endif %}{% if site.free %}<li><a href="https://ko-fi.com/danielmfdev">{{ icon('coffee') }}{{ t.coffee }}</a></li>
+{% endif %}<li><a href="mailto:{{ contact_email }}">{{ icon('mail') }}{{ t.contact }}</a></li>
 </ul>
+<p class="foot-meta"><span>{{ author_parts[0].format(app=c.name) }}<a href="https://mainshai.com">DanielMF</a>{{ author_parts[1] }}</span>
+<span>{% if site.open_source %}{{ c.licence_text }}{% endif %}</span>
+<span class="no-track">{{ t.no_tracking }}</span></p>
 </div>
 </footer>{% endblock %}
 </body>

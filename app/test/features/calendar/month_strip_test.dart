@@ -250,13 +250,13 @@ void main() {
       expect(shifts, greaterThan(0));
       expect(
         _said(tester),
-        '$shifts turnos · 160 h · Próximo libre: jue 22, en 3 días',
+        '$shifts turnos · 160 h · Sin turno anotado: jue 22',
       );
       expect(_textLines(tester), lessThanOrEqualTo(2));
       expect(
         tester.getSemantics(_strip).label,
         'Resumen del mes: $shifts turnos, 160 h, '
-        'Próximo libre: jue 22, en 3 días',
+        'Sin turno anotado: jue 22',
       );
     });
 
@@ -292,7 +292,7 @@ void main() {
       expect(
         _said(tester),
         '$shifts turnos · 160 / 170 h · Por completar: 10 h · '
-        'Próximo libre: jue 22, en 3 días',
+        'Sin turno anotado: jue 22',
       );
       expect(_textLines(tester), lessThanOrEqualTo(2));
     });
@@ -315,11 +315,14 @@ void main() {
           .read(hoursGoalProvider.notifier)
           .set(const HoursGoal(HoursGoalPeriod.month, 160));
       await tester.pumpAndSettle();
-      expect(_said(tester), contains('turnos · 160 / 160 h · Próximo'));
+      expect(
+        _said(tester),
+        contains('turnos · 160 / 160 h · Sin turno anotado'),
+      );
 
       await container.read(hoursGoalProvider.notifier).clear();
       await tester.pumpAndSettle();
-      expect(_said(tester), contains('turnos · 160 h · Próximo'));
+      expect(_said(tester), contains('turnos · 160 h · Sin turno anotado'));
     });
 
     testWidgets('a month with nothing in it has no strip', (tester) async {
@@ -398,10 +401,9 @@ void main() {
       expect(card.height, Sp.touch + Sp.s);
     });
 
-    testWidgets('it takes only the room the days have to spare: nothing, '
-        'one bare line, the card; a month that fits never scrolls', (
-      tester,
-    ) async {
+    testWidgets('it takes only the room the days have to spare: none (then '
+        'it is the card after the days), one bare line, the card; a month '
+        'that fits never scrolls because of it', (tester) async {
       // 390 x 844 with the card of today folded: the six rows fit with a
       // few dp to spare (month_fit_test.dart). Every 2 dp more of screen is
       // 2 dp more of room under the days, catching the narrow bare-line range.
@@ -414,15 +416,36 @@ void main() {
         tester.view.physicalSize = Size(390, height) * 3;
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull);
-        expect(
-          _scrollExtent(tester),
-          lessThan(0.5),
-          reason: 'the month does not scroll at $height dp',
-        );
         final String form;
-        if (_strip.evaluate().isEmpty) {
-          form = 'none';
+        if (_scrollExtent(tester) > 0.5) {
+          // Not even the bare line fits under the days (QA 0.12.1, N6): the
+          // strip is still there, as the card after them, and the month
+          // scrolls to it.
+          await _reveal(tester);
+          expect(_strip, findsOneWidget, reason: 'the strip at $height dp');
+          expect(_isCard(tester), isTrue);
+          expect(
+            tester.getRect(_strip).top,
+            greaterThanOrEqualTo(
+              tester.getRect(find.byType(MonthGrid)).bottom - 0.01,
+            ),
+          );
+          form = 'scrolls';
+          tester
+              .state<ScrollableState>(
+                find
+                    .descendant(
+                      of: _key('month-scroll'),
+                      matching: find.byType(Scrollable),
+                    )
+                    .first,
+              )
+              .position
+              .jumpTo(0);
+          await tester.pumpAndSettle();
         } else {
+          // The month fits and never scrolls because of the strip.
+          expect(_strip, findsOneWidget, reason: 'the strip at $height dp');
           // Whole and under the days, above the fixed row.
           final viewport = tester.getRect(_key('month-scroll'));
           final strip = tester.getRect(_strip);
@@ -450,11 +473,11 @@ void main() {
         );
       }
       // More room, never a smaller strip; the bare line comes before the
-      // card.
-      const order = ['none', 'bare', 'card 1', 'card 2'];
+      // card, and where there is no room for it the card is after the days.
+      const order = ['scrolls', 'bare', 'card 1', 'card 2'];
       final ranks = [for (final form in seen) order.indexOf(form)];
       expect(ranks, [...ranks]..sort(), reason: '$seen');
-      expect(seen, containsAllInOrder(['bare', 'card 1']));
+      expect(seen, containsAllInOrder(['scrolls', 'bare', 'card 1']));
     });
 
     testWidgets('the bare line still opens the summary and reads the same', (
@@ -587,11 +610,11 @@ void main() {
         openCard: false,
       );
       await _reveal(tester);
-      expect(_lines(tester).join(' '), isNot(contains('Próximo libre')));
+      expect(_lines(tester).join(' '), isNot(contains('Sin turno anotado')));
       expect(_lines(tester).join(' '), contains('turnos'));
       expect(_lines(tester).join(' '), contains('160 h'));
       // The reader still gets the three of them.
-      expect(tester.getSemantics(_strip).label, contains('Próximo libre'));
+      expect(tester.getSemantics(_strip).label, contains('Sin turno anotado'));
     });
   });
 }

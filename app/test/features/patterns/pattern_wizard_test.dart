@@ -452,14 +452,15 @@ void main() {
       await _tap(tester, _key('builder-add-morning'));
       await _tap(tester, _key('builder-add-morning'));
       await _tap(tester, _key('builder-add-night'));
-      expect(find.text('3 días'), findsOneWidget);
+      // The length of the cycle and the 3-day shortcut of the open block.
+      expect(find.text('3 días'), findsNWidgets(2));
       await _tap(tester, _key('block-options'));
       await _tap(tester, _key('block-same-day'));
       await _tap(tester, _key('block-add-afternoon'));
       await _tap(tester, _key('builder-add-rest'));
       expect(find.text('4 días'), findsOneWidget);
       await _tap(tester, _key('builder-undo'));
-      expect(find.text('3 días'), findsOneWidget);
+      expect(find.text('3 días'), findsNWidgets(2));
       await _tap(tester, _key('builder-clear'));
       expect(find.text('0 días'), findsOneWidget);
       await _tap(tester, _key('builder-add-night'));
